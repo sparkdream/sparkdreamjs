@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** Op is a message describing a benchmark operation. */
 export interface Op {
   seed: bigint;
@@ -28,16 +29,6 @@ export interface OpAminoMsg {
   type: "cosmos-sdk/Op";
   value: OpAmino;
 }
-/** Op is a message describing a benchmark operation. */
-export interface OpSDKType {
-  seed: bigint;
-  actor: string;
-  key_length: bigint;
-  value_length: bigint;
-  iterations: number;
-  delete: boolean;
-  exists: boolean;
-}
 function createBaseOp(): Op {
   return {
     seed: BigInt(0),
@@ -51,6 +42,7 @@ function createBaseOp(): Op {
 }
 export const Op = {
   typeUrl: "/cosmos.benchmark.v1.Op",
+  aminoType: "cosmos-sdk/Op",
   encode(message: Op, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.seed !== BigInt(0)) {
       writer.uint32(8).uint64(message.seed);
@@ -110,7 +102,7 @@ export const Op = {
     }
     return message;
   },
-  fromPartial(object: Partial<Op>): Op {
+  fromPartial(object: DeepPartial<Op>): Op {
     const message = createBaseOp();
     message.seed = object.seed !== undefined && object.seed !== null ? BigInt(object.seed.toString()) : BigInt(0);
     message.actor = object.actor ?? "";

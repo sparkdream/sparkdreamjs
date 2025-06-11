@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /** PubKey defines a secp256r1 ECDSA public key. */
 export interface PubKey {
   /**
@@ -25,10 +25,6 @@ export interface PubKeyAminoMsg {
   type: "cosmos-sdk/PubKey";
   value: PubKeyAmino;
 }
-/** PubKey defines a secp256r1 ECDSA public key. */
-export interface PubKeySDKType {
-  key: Uint8Array;
-}
 /** PrivKey defines a secp256r1 ECDSA private key. */
 export interface PrivKey {
   /** secret number serialized using big-endian encoding */
@@ -47,10 +43,6 @@ export interface PrivKeyAminoMsg {
   type: "cosmos-sdk/PrivKey";
   value: PrivKeyAmino;
 }
-/** PrivKey defines a secp256r1 ECDSA private key. */
-export interface PrivKeySDKType {
-  secret: Uint8Array;
-}
 function createBasePubKey(): PubKey {
   return {
     key: new Uint8Array()
@@ -58,6 +50,7 @@ function createBasePubKey(): PubKey {
 }
 export const PubKey = {
   typeUrl: "/cosmos.crypto.secp256r1.PubKey",
+  aminoType: "cosmos-sdk/PubKey",
   encode(message: PubKey, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.key.length !== 0) {
       writer.uint32(10).bytes(message.key);
@@ -81,7 +74,7 @@ export const PubKey = {
     }
     return message;
   },
-  fromPartial(object: Partial<PubKey>): PubKey {
+  fromPartial(object: DeepPartial<PubKey>): PubKey {
     const message = createBasePubKey();
     message.key = object.key ?? new Uint8Array();
     return message;
@@ -127,6 +120,7 @@ function createBasePrivKey(): PrivKey {
 }
 export const PrivKey = {
   typeUrl: "/cosmos.crypto.secp256r1.PrivKey",
+  aminoType: "cosmos-sdk/PrivKey",
   encode(message: PrivKey, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.secret.length !== 0) {
       writer.uint32(10).bytes(message.secret);
@@ -150,7 +144,7 @@ export const PrivKey = {
     }
     return message;
   },
-  fromPartial(object: Partial<PrivKey>): PrivKey {
+  fromPartial(object: DeepPartial<PrivKey>): PrivKey {
     const message = createBasePrivKey();
     message.secret = object.secret ?? new Uint8Array();
     return message;

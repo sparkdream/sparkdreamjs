@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../helpers";
 export interface NetAddress {
   id: string;
   ip: string;
@@ -19,11 +19,6 @@ export interface NetAddressAminoMsg {
   type: "/tendermint.p2p.NetAddress";
   value: NetAddressAmino;
 }
-export interface NetAddressSDKType {
-  id: string;
-  ip: string;
-  port: number;
-}
 export interface ProtocolVersion {
   p2p: bigint;
   block: bigint;
@@ -41,11 +36,6 @@ export interface ProtocolVersionAmino {
 export interface ProtocolVersionAminoMsg {
   type: "/tendermint.p2p.ProtocolVersion";
   value: ProtocolVersionAmino;
-}
-export interface ProtocolVersionSDKType {
-  p2p: bigint;
-  block: bigint;
-  app: bigint;
 }
 export interface DefaultNodeInfo {
   protocolVersion: ProtocolVersion;
@@ -75,16 +65,6 @@ export interface DefaultNodeInfoAminoMsg {
   type: "/tendermint.p2p.DefaultNodeInfo";
   value: DefaultNodeInfoAmino;
 }
-export interface DefaultNodeInfoSDKType {
-  protocol_version: ProtocolVersionSDKType;
-  default_node_id: string;
-  listen_addr: string;
-  network: string;
-  version: string;
-  channels: Uint8Array;
-  moniker: string;
-  other: DefaultNodeInfoOtherSDKType;
-}
 export interface DefaultNodeInfoOther {
   txIndex: string;
   rpcAddress: string;
@@ -100,10 +80,6 @@ export interface DefaultNodeInfoOtherAmino {
 export interface DefaultNodeInfoOtherAminoMsg {
   type: "/tendermint.p2p.DefaultNodeInfoOther";
   value: DefaultNodeInfoOtherAmino;
-}
-export interface DefaultNodeInfoOtherSDKType {
-  tx_index: string;
-  rpc_address: string;
 }
 function createBaseNetAddress(): NetAddress {
   return {
@@ -149,7 +125,7 @@ export const NetAddress = {
     }
     return message;
   },
-  fromPartial(object: Partial<NetAddress>): NetAddress {
+  fromPartial(object: DeepPartial<NetAddress>): NetAddress {
     const message = createBaseNetAddress();
     message.id = object.id ?? "";
     message.ip = object.ip ?? "";
@@ -236,7 +212,7 @@ export const ProtocolVersion = {
     }
     return message;
   },
-  fromPartial(object: Partial<ProtocolVersion>): ProtocolVersion {
+  fromPartial(object: DeepPartial<ProtocolVersion>): ProtocolVersion {
     const message = createBaseProtocolVersion();
     message.p2p = object.p2p !== undefined && object.p2p !== null ? BigInt(object.p2p.toString()) : BigInt(0);
     message.block = object.block !== undefined && object.block !== null ? BigInt(object.block.toString()) : BigInt(0);
@@ -358,7 +334,7 @@ export const DefaultNodeInfo = {
     }
     return message;
   },
-  fromPartial(object: Partial<DefaultNodeInfo>): DefaultNodeInfo {
+  fromPartial(object: DeepPartial<DefaultNodeInfo>): DefaultNodeInfo {
     const message = createBaseDefaultNodeInfo();
     message.protocolVersion = object.protocolVersion !== undefined && object.protocolVersion !== null ? ProtocolVersion.fromPartial(object.protocolVersion) : undefined;
     message.defaultNodeId = object.defaultNodeId ?? "";
@@ -463,7 +439,7 @@ export const DefaultNodeInfoOther = {
     }
     return message;
   },
-  fromPartial(object: Partial<DefaultNodeInfoOther>): DefaultNodeInfoOther {
+  fromPartial(object: DeepPartial<DefaultNodeInfoOther>): DefaultNodeInfoOther {
     const message = createBaseDefaultNodeInfoOther();
     message.txIndex = object.txIndex ?? "";
     message.rpcAddress = object.rpcAddress ?? "";

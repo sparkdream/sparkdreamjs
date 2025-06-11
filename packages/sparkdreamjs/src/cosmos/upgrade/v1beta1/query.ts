@@ -1,7 +1,7 @@
 //@ts-nocheck
-import { Plan, PlanAmino, PlanSDKType, ModuleVersion, ModuleVersionAmino, ModuleVersionSDKType } from "./upgrade";
+import { Plan, PlanAmino, ModuleVersion, ModuleVersionAmino } from "./upgrade";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /**
  * QueryCurrentPlanRequest is the request type for the Query/CurrentPlan RPC
  * method.
@@ -20,11 +20,6 @@ export interface QueryCurrentPlanRequestAminoMsg {
   type: "cosmos-sdk/QueryCurrentPlanRequest";
   value: QueryCurrentPlanRequestAmino;
 }
-/**
- * QueryCurrentPlanRequest is the request type for the Query/CurrentPlan RPC
- * method.
- */
-export interface QueryCurrentPlanRequestSDKType {}
 /**
  * QueryCurrentPlanResponse is the response type for the Query/CurrentPlan RPC
  * method.
@@ -48,13 +43,6 @@ export interface QueryCurrentPlanResponseAmino {
 export interface QueryCurrentPlanResponseAminoMsg {
   type: "cosmos-sdk/QueryCurrentPlanResponse";
   value: QueryCurrentPlanResponseAmino;
-}
-/**
- * QueryCurrentPlanResponse is the response type for the Query/CurrentPlan RPC
- * method.
- */
-export interface QueryCurrentPlanResponseSDKType {
-  plan?: PlanSDKType;
 }
 /**
  * QueryCurrentPlanRequest is the request type for the Query/AppliedPlan RPC
@@ -81,13 +69,6 @@ export interface QueryAppliedPlanRequestAminoMsg {
   value: QueryAppliedPlanRequestAmino;
 }
 /**
- * QueryCurrentPlanRequest is the request type for the Query/AppliedPlan RPC
- * method.
- */
-export interface QueryAppliedPlanRequestSDKType {
-  name: string;
-}
-/**
  * QueryAppliedPlanResponse is the response type for the Query/AppliedPlan RPC
  * method.
  */
@@ -110,13 +91,6 @@ export interface QueryAppliedPlanResponseAmino {
 export interface QueryAppliedPlanResponseAminoMsg {
   type: "cosmos-sdk/QueryAppliedPlanResponse";
   value: QueryAppliedPlanResponseAmino;
-}
-/**
- * QueryAppliedPlanResponse is the response type for the Query/AppliedPlan RPC
- * method.
- */
-export interface QueryAppliedPlanResponseSDKType {
-  height: bigint;
 }
 /**
  * QueryUpgradedConsensusStateRequest is the request type for the Query/UpgradedConsensusState
@@ -151,14 +125,6 @@ export interface QueryUpgradedConsensusStateRequestAminoMsg {
   value: QueryUpgradedConsensusStateRequestAmino;
 }
 /**
- * QueryUpgradedConsensusStateRequest is the request type for the Query/UpgradedConsensusState
- * RPC method.
- */
-/** @deprecated */
-export interface QueryUpgradedConsensusStateRequestSDKType {
-  last_height: bigint;
-}
-/**
  * QueryUpgradedConsensusStateResponse is the response type for the Query/UpgradedConsensusState
  * RPC method.
  */
@@ -183,14 +149,6 @@ export interface QueryUpgradedConsensusStateResponseAmino {
 export interface QueryUpgradedConsensusStateResponseAminoMsg {
   type: "cosmos-sdk/QueryUpgradedConsensusStateResponse";
   value: QueryUpgradedConsensusStateResponseAmino;
-}
-/**
- * QueryUpgradedConsensusStateResponse is the response type for the Query/UpgradedConsensusState
- * RPC method.
- */
-/** @deprecated */
-export interface QueryUpgradedConsensusStateResponseSDKType {
-  upgraded_consensus_state: Uint8Array;
 }
 /**
  * QueryModuleVersionsRequest is the request type for the Query/ModuleVersions
@@ -229,15 +187,6 @@ export interface QueryModuleVersionsRequestAminoMsg {
   value: QueryModuleVersionsRequestAmino;
 }
 /**
- * QueryModuleVersionsRequest is the request type for the Query/ModuleVersions
- * RPC method.
- * 
- * Since: cosmos-sdk 0.43
- */
-export interface QueryModuleVersionsRequestSDKType {
-  module_name: string;
-}
-/**
  * QueryModuleVersionsResponse is the response type for the Query/ModuleVersions
  * RPC method.
  * 
@@ -266,15 +215,6 @@ export interface QueryModuleVersionsResponseAminoMsg {
   value: QueryModuleVersionsResponseAmino;
 }
 /**
- * QueryModuleVersionsResponse is the response type for the Query/ModuleVersions
- * RPC method.
- * 
- * Since: cosmos-sdk 0.43
- */
-export interface QueryModuleVersionsResponseSDKType {
-  module_versions: ModuleVersionSDKType[];
-}
-/**
  * QueryAuthorityRequest is the request type for Query/Authority
  * 
  * Since: cosmos-sdk 0.46
@@ -294,12 +234,6 @@ export interface QueryAuthorityRequestAminoMsg {
   type: "cosmos-sdk/QueryAuthorityRequest";
   value: QueryAuthorityRequestAmino;
 }
-/**
- * QueryAuthorityRequest is the request type for Query/Authority
- * 
- * Since: cosmos-sdk 0.46
- */
-export interface QueryAuthorityRequestSDKType {}
 /**
  * QueryAuthorityResponse is the response type for Query/Authority
  * 
@@ -324,19 +258,12 @@ export interface QueryAuthorityResponseAminoMsg {
   type: "cosmos-sdk/QueryAuthorityResponse";
   value: QueryAuthorityResponseAmino;
 }
-/**
- * QueryAuthorityResponse is the response type for Query/Authority
- * 
- * Since: cosmos-sdk 0.46
- */
-export interface QueryAuthorityResponseSDKType {
-  address: string;
-}
 function createBaseQueryCurrentPlanRequest(): QueryCurrentPlanRequest {
   return {};
 }
 export const QueryCurrentPlanRequest = {
   typeUrl: "/cosmos.upgrade.v1beta1.QueryCurrentPlanRequest",
+  aminoType: "cosmos-sdk/QueryCurrentPlanRequest",
   encode(_: QueryCurrentPlanRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -354,7 +281,7 @@ export const QueryCurrentPlanRequest = {
     }
     return message;
   },
-  fromPartial(_: Partial<QueryCurrentPlanRequest>): QueryCurrentPlanRequest {
+  fromPartial(_: DeepPartial<QueryCurrentPlanRequest>): QueryCurrentPlanRequest {
     const message = createBaseQueryCurrentPlanRequest();
     return message;
   },
@@ -395,6 +322,7 @@ function createBaseQueryCurrentPlanResponse(): QueryCurrentPlanResponse {
 }
 export const QueryCurrentPlanResponse = {
   typeUrl: "/cosmos.upgrade.v1beta1.QueryCurrentPlanResponse",
+  aminoType: "cosmos-sdk/QueryCurrentPlanResponse",
   encode(message: QueryCurrentPlanResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.plan !== undefined) {
       Plan.encode(message.plan, writer.uint32(10).fork()).ldelim();
@@ -418,7 +346,7 @@ export const QueryCurrentPlanResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryCurrentPlanResponse>): QueryCurrentPlanResponse {
+  fromPartial(object: DeepPartial<QueryCurrentPlanResponse>): QueryCurrentPlanResponse {
     const message = createBaseQueryCurrentPlanResponse();
     message.plan = object.plan !== undefined && object.plan !== null ? Plan.fromPartial(object.plan) : undefined;
     return message;
@@ -464,6 +392,7 @@ function createBaseQueryAppliedPlanRequest(): QueryAppliedPlanRequest {
 }
 export const QueryAppliedPlanRequest = {
   typeUrl: "/cosmos.upgrade.v1beta1.QueryAppliedPlanRequest",
+  aminoType: "cosmos-sdk/QueryAppliedPlanRequest",
   encode(message: QueryAppliedPlanRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -487,7 +416,7 @@ export const QueryAppliedPlanRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryAppliedPlanRequest>): QueryAppliedPlanRequest {
+  fromPartial(object: DeepPartial<QueryAppliedPlanRequest>): QueryAppliedPlanRequest {
     const message = createBaseQueryAppliedPlanRequest();
     message.name = object.name ?? "";
     return message;
@@ -533,6 +462,7 @@ function createBaseQueryAppliedPlanResponse(): QueryAppliedPlanResponse {
 }
 export const QueryAppliedPlanResponse = {
   typeUrl: "/cosmos.upgrade.v1beta1.QueryAppliedPlanResponse",
+  aminoType: "cosmos-sdk/QueryAppliedPlanResponse",
   encode(message: QueryAppliedPlanResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.height !== BigInt(0)) {
       writer.uint32(8).int64(message.height);
@@ -556,7 +486,7 @@ export const QueryAppliedPlanResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryAppliedPlanResponse>): QueryAppliedPlanResponse {
+  fromPartial(object: DeepPartial<QueryAppliedPlanResponse>): QueryAppliedPlanResponse {
     const message = createBaseQueryAppliedPlanResponse();
     message.height = object.height !== undefined && object.height !== null ? BigInt(object.height.toString()) : BigInt(0);
     return message;
@@ -602,6 +532,7 @@ function createBaseQueryUpgradedConsensusStateRequest(): QueryUpgradedConsensusS
 }
 export const QueryUpgradedConsensusStateRequest = {
   typeUrl: "/cosmos.upgrade.v1beta1.QueryUpgradedConsensusStateRequest",
+  aminoType: "cosmos-sdk/QueryUpgradedConsensusStateRequest",
   encode(message: QueryUpgradedConsensusStateRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.lastHeight !== BigInt(0)) {
       writer.uint32(8).int64(message.lastHeight);
@@ -625,7 +556,7 @@ export const QueryUpgradedConsensusStateRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryUpgradedConsensusStateRequest>): QueryUpgradedConsensusStateRequest {
+  fromPartial(object: DeepPartial<QueryUpgradedConsensusStateRequest>): QueryUpgradedConsensusStateRequest {
     const message = createBaseQueryUpgradedConsensusStateRequest();
     message.lastHeight = object.lastHeight !== undefined && object.lastHeight !== null ? BigInt(object.lastHeight.toString()) : BigInt(0);
     return message;
@@ -671,6 +602,7 @@ function createBaseQueryUpgradedConsensusStateResponse(): QueryUpgradedConsensus
 }
 export const QueryUpgradedConsensusStateResponse = {
   typeUrl: "/cosmos.upgrade.v1beta1.QueryUpgradedConsensusStateResponse",
+  aminoType: "cosmos-sdk/QueryUpgradedConsensusStateResponse",
   encode(message: QueryUpgradedConsensusStateResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.upgradedConsensusState.length !== 0) {
       writer.uint32(18).bytes(message.upgradedConsensusState);
@@ -694,7 +626,7 @@ export const QueryUpgradedConsensusStateResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryUpgradedConsensusStateResponse>): QueryUpgradedConsensusStateResponse {
+  fromPartial(object: DeepPartial<QueryUpgradedConsensusStateResponse>): QueryUpgradedConsensusStateResponse {
     const message = createBaseQueryUpgradedConsensusStateResponse();
     message.upgradedConsensusState = object.upgradedConsensusState ?? new Uint8Array();
     return message;
@@ -740,6 +672,7 @@ function createBaseQueryModuleVersionsRequest(): QueryModuleVersionsRequest {
 }
 export const QueryModuleVersionsRequest = {
   typeUrl: "/cosmos.upgrade.v1beta1.QueryModuleVersionsRequest",
+  aminoType: "cosmos-sdk/QueryModuleVersionsRequest",
   encode(message: QueryModuleVersionsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.moduleName !== "") {
       writer.uint32(10).string(message.moduleName);
@@ -763,7 +696,7 @@ export const QueryModuleVersionsRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryModuleVersionsRequest>): QueryModuleVersionsRequest {
+  fromPartial(object: DeepPartial<QueryModuleVersionsRequest>): QueryModuleVersionsRequest {
     const message = createBaseQueryModuleVersionsRequest();
     message.moduleName = object.moduleName ?? "";
     return message;
@@ -809,6 +742,7 @@ function createBaseQueryModuleVersionsResponse(): QueryModuleVersionsResponse {
 }
 export const QueryModuleVersionsResponse = {
   typeUrl: "/cosmos.upgrade.v1beta1.QueryModuleVersionsResponse",
+  aminoType: "cosmos-sdk/QueryModuleVersionsResponse",
   encode(message: QueryModuleVersionsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.moduleVersions) {
       ModuleVersion.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -832,7 +766,7 @@ export const QueryModuleVersionsResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryModuleVersionsResponse>): QueryModuleVersionsResponse {
+  fromPartial(object: DeepPartial<QueryModuleVersionsResponse>): QueryModuleVersionsResponse {
     const message = createBaseQueryModuleVersionsResponse();
     message.moduleVersions = object.moduleVersions?.map(e => ModuleVersion.fromPartial(e)) || [];
     return message;
@@ -878,6 +812,7 @@ function createBaseQueryAuthorityRequest(): QueryAuthorityRequest {
 }
 export const QueryAuthorityRequest = {
   typeUrl: "/cosmos.upgrade.v1beta1.QueryAuthorityRequest",
+  aminoType: "cosmos-sdk/QueryAuthorityRequest",
   encode(_: QueryAuthorityRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -895,7 +830,7 @@ export const QueryAuthorityRequest = {
     }
     return message;
   },
-  fromPartial(_: Partial<QueryAuthorityRequest>): QueryAuthorityRequest {
+  fromPartial(_: DeepPartial<QueryAuthorityRequest>): QueryAuthorityRequest {
     const message = createBaseQueryAuthorityRequest();
     return message;
   },
@@ -936,6 +871,7 @@ function createBaseQueryAuthorityResponse(): QueryAuthorityResponse {
 }
 export const QueryAuthorityResponse = {
   typeUrl: "/cosmos.upgrade.v1beta1.QueryAuthorityResponse",
+  aminoType: "cosmos-sdk/QueryAuthorityResponse",
   encode(message: QueryAuthorityResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -959,7 +895,7 @@ export const QueryAuthorityResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryAuthorityResponse>): QueryAuthorityResponse {
+  fromPartial(object: DeepPartial<QueryAuthorityResponse>): QueryAuthorityResponse {
     const message = createBaseQueryAuthorityResponse();
     message.address = object.address ?? "";
     return message;

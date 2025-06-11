@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /** Module is the config object of the crisis module. */
 export interface Module {
   /** fee_collector_name is the name of the FeeCollector ModuleAccount. */
@@ -22,11 +23,6 @@ export interface ModuleAminoMsg {
   type: "cosmos-sdk/Module";
   value: ModuleAmino;
 }
-/** Module is the config object of the crisis module. */
-export interface ModuleSDKType {
-  fee_collector_name: string;
-  authority: string;
-}
 function createBaseModule(): Module {
   return {
     feeCollectorName: "",
@@ -35,6 +31,7 @@ function createBaseModule(): Module {
 }
 export const Module = {
   typeUrl: "/cosmos.crisis.module.v1.Module",
+  aminoType: "cosmos-sdk/Module",
   encode(message: Module, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.feeCollectorName !== "") {
       writer.uint32(10).string(message.feeCollectorName);
@@ -64,7 +61,7 @@ export const Module = {
     }
     return message;
   },
-  fromPartial(object: Partial<Module>): Module {
+  fromPartial(object: DeepPartial<Module>): Module {
     const message = createBaseModule();
     message.feeCollectorName = object.feeCollectorName ?? "";
     message.authority = object.authority ?? "";

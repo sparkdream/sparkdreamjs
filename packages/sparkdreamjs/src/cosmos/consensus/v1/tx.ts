@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { BlockParams, BlockParamsAmino, BlockParamsSDKType, EvidenceParams, EvidenceParamsAmino, EvidenceParamsSDKType, ValidatorParams, ValidatorParamsAmino, ValidatorParamsSDKType, ABCIParams, ABCIParamsAmino, ABCIParamsSDKType } from "../../../tendermint/types/params";
+import { BlockParams, BlockParamsAmino, EvidenceParams, EvidenceParamsAmino, ValidatorParams, ValidatorParamsAmino, ABCIParams, ABCIParamsAmino } from "../../../tendermint/types/params";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** MsgUpdateParams is the Msg/UpdateParams request type. */
 export interface MsgUpdateParams {
   /** authority is the address that controls the module (defaults to x/gov unless overwritten). */
@@ -43,14 +44,6 @@ export interface MsgUpdateParamsAminoMsg {
   type: "cosmos-sdk/x/consensus/MsgUpdateParams";
   value: MsgUpdateParamsAmino;
 }
-/** MsgUpdateParams is the Msg/UpdateParams request type. */
-export interface MsgUpdateParamsSDKType {
-  authority: string;
-  block?: BlockParamsSDKType;
-  evidence?: EvidenceParamsSDKType;
-  validator?: ValidatorParamsSDKType;
-  abci?: ABCIParamsSDKType;
-}
 /**
  * MsgUpdateParamsResponse defines the response structure for executing a
  * MsgUpdateParams message.
@@ -69,11 +62,6 @@ export interface MsgUpdateParamsResponseAminoMsg {
   type: "cosmos-sdk/MsgUpdateParamsResponse";
   value: MsgUpdateParamsResponseAmino;
 }
-/**
- * MsgUpdateParamsResponse defines the response structure for executing a
- * MsgUpdateParams message.
- */
-export interface MsgUpdateParamsResponseSDKType {}
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
     authority: "",
@@ -85,6 +73,7 @@ function createBaseMsgUpdateParams(): MsgUpdateParams {
 }
 export const MsgUpdateParams = {
   typeUrl: "/cosmos.consensus.v1.MsgUpdateParams",
+  aminoType: "cosmos-sdk/x/consensus/MsgUpdateParams",
   encode(message: MsgUpdateParams, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -132,7 +121,7 @@ export const MsgUpdateParams = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpdateParams>): MsgUpdateParams {
+  fromPartial(object: DeepPartial<MsgUpdateParams>): MsgUpdateParams {
     const message = createBaseMsgUpdateParams();
     message.authority = object.authority ?? "";
     message.block = object.block !== undefined && object.block !== null ? BlockParams.fromPartial(object.block) : undefined;
@@ -196,6 +185,7 @@ function createBaseMsgUpdateParamsResponse(): MsgUpdateParamsResponse {
 }
 export const MsgUpdateParamsResponse = {
   typeUrl: "/cosmos.consensus.v1.MsgUpdateParamsResponse",
+  aminoType: "cosmos-sdk/MsgUpdateParamsResponse",
   encode(_: MsgUpdateParamsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -213,7 +203,7 @@ export const MsgUpdateParamsResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
+  fromPartial(_: DeepPartial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
     const message = createBaseMsgUpdateParamsResponse();
     return message;
   },

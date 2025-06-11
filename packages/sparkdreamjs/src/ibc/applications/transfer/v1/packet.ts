@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /**
  * FungibleTokenPacketData defines a struct for the packet payload
  * See FungibleTokenPacketData spec:
@@ -42,18 +43,6 @@ export interface FungibleTokenPacketDataAminoMsg {
   type: "cosmos-sdk/FungibleTokenPacketData";
   value: FungibleTokenPacketDataAmino;
 }
-/**
- * FungibleTokenPacketData defines a struct for the packet payload
- * See FungibleTokenPacketData spec:
- * https://github.com/cosmos/ibc/tree/master/spec/app/ics-020-fungible-token-transfer#data-structures
- */
-export interface FungibleTokenPacketDataSDKType {
-  denom: string;
-  amount: string;
-  sender: string;
-  receiver: string;
-  memo: string;
-}
 function createBaseFungibleTokenPacketData(): FungibleTokenPacketData {
   return {
     denom: "",
@@ -65,6 +54,7 @@ function createBaseFungibleTokenPacketData(): FungibleTokenPacketData {
 }
 export const FungibleTokenPacketData = {
   typeUrl: "/ibc.applications.transfer.v1.FungibleTokenPacketData",
+  aminoType: "cosmos-sdk/FungibleTokenPacketData",
   encode(message: FungibleTokenPacketData, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.denom !== "") {
       writer.uint32(10).string(message.denom);
@@ -112,7 +102,7 @@ export const FungibleTokenPacketData = {
     }
     return message;
   },
-  fromPartial(object: Partial<FungibleTokenPacketData>): FungibleTokenPacketData {
+  fromPartial(object: DeepPartial<FungibleTokenPacketData>): FungibleTokenPacketData {
     const message = createBaseFungibleTokenPacketData();
     message.denom = object.denom ?? "";
     message.amount = object.amount ?? "";

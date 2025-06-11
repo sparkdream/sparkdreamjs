@@ -1,7 +1,8 @@
 //@ts-nocheck
-import { PageRequest, PageRequestAmino, PageRequestSDKType, PageResponse, PageResponseAmino, PageResponseSDKType } from "../../base/query/v1beta1/pagination";
-import { Permissions, PermissionsAmino, PermissionsSDKType, GenesisAccountPermissions, GenesisAccountPermissionsAmino, GenesisAccountPermissionsSDKType } from "./types";
+import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "../../base/query/v1beta1/pagination";
+import { Permissions, PermissionsAmino, GenesisAccountPermissions, GenesisAccountPermissionsAmino } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** QueryAccountRequest is the request type for the Query/Account RPC method. */
 export interface QueryAccountRequest {
   address: string;
@@ -18,10 +19,6 @@ export interface QueryAccountRequestAminoMsg {
   type: "cosmos-sdk/QueryAccountRequest";
   value: QueryAccountRequestAmino;
 }
-/** QueryAccountRequest is the request type for the Query/Account RPC method. */
-export interface QueryAccountRequestSDKType {
-  address: string;
-}
 /** AccountResponse is the response type for the Query/Account RPC method. */
 export interface AccountResponse {
   permission?: Permissions;
@@ -37,10 +34,6 @@ export interface AccountResponseAmino {
 export interface AccountResponseAminoMsg {
   type: "cosmos-sdk/AccountResponse";
   value: AccountResponseAmino;
-}
-/** AccountResponse is the response type for the Query/Account RPC method. */
-export interface AccountResponseSDKType {
-  permission?: PermissionsSDKType;
 }
 /** QueryAccountsRequest is the request type for the Query/Accounts RPC method. */
 export interface QueryAccountsRequest {
@@ -59,10 +52,6 @@ export interface QueryAccountsRequestAmino {
 export interface QueryAccountsRequestAminoMsg {
   type: "cosmos-sdk/QueryAccountsRequest";
   value: QueryAccountsRequestAmino;
-}
-/** QueryAccountsRequest is the request type for the Query/Accounts RPC method. */
-export interface QueryAccountsRequestSDKType {
-  pagination?: PageRequestSDKType;
 }
 /** AccountsResponse is the response type for the Query/Accounts RPC method. */
 export interface AccountsResponse {
@@ -84,11 +73,6 @@ export interface AccountsResponseAminoMsg {
   type: "cosmos-sdk/AccountsResponse";
   value: AccountsResponseAmino;
 }
-/** AccountsResponse is the response type for the Query/Accounts RPC method. */
-export interface AccountsResponseSDKType {
-  accounts: GenesisAccountPermissionsSDKType[];
-  pagination?: PageResponseSDKType;
-}
 /** QueryDisableListRequest is the request type for the Query/DisabledList RPC method. */
 export interface QueryDisabledListRequest {}
 export interface QueryDisabledListRequestProtoMsg {
@@ -101,8 +85,6 @@ export interface QueryDisabledListRequestAminoMsg {
   type: "cosmos-sdk/QueryDisabledListRequest";
   value: QueryDisabledListRequestAmino;
 }
-/** QueryDisableListRequest is the request type for the Query/DisabledList RPC method. */
-export interface QueryDisabledListRequestSDKType {}
 /** DisabledListResponse is the response type for the Query/DisabledList RPC method. */
 export interface DisabledListResponse {
   disabledList: string[];
@@ -119,10 +101,6 @@ export interface DisabledListResponseAminoMsg {
   type: "cosmos-sdk/DisabledListResponse";
   value: DisabledListResponseAmino;
 }
-/** DisabledListResponse is the response type for the Query/DisabledList RPC method. */
-export interface DisabledListResponseSDKType {
-  disabled_list: string[];
-}
 function createBaseQueryAccountRequest(): QueryAccountRequest {
   return {
     address: ""
@@ -130,6 +108,7 @@ function createBaseQueryAccountRequest(): QueryAccountRequest {
 }
 export const QueryAccountRequest = {
   typeUrl: "/cosmos.circuit.v1.QueryAccountRequest",
+  aminoType: "cosmos-sdk/QueryAccountRequest",
   encode(message: QueryAccountRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -153,7 +132,7 @@ export const QueryAccountRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryAccountRequest>): QueryAccountRequest {
+  fromPartial(object: DeepPartial<QueryAccountRequest>): QueryAccountRequest {
     const message = createBaseQueryAccountRequest();
     message.address = object.address ?? "";
     return message;
@@ -199,6 +178,7 @@ function createBaseAccountResponse(): AccountResponse {
 }
 export const AccountResponse = {
   typeUrl: "/cosmos.circuit.v1.AccountResponse",
+  aminoType: "cosmos-sdk/AccountResponse",
   encode(message: AccountResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.permission !== undefined) {
       Permissions.encode(message.permission, writer.uint32(10).fork()).ldelim();
@@ -222,7 +202,7 @@ export const AccountResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<AccountResponse>): AccountResponse {
+  fromPartial(object: DeepPartial<AccountResponse>): AccountResponse {
     const message = createBaseAccountResponse();
     message.permission = object.permission !== undefined && object.permission !== null ? Permissions.fromPartial(object.permission) : undefined;
     return message;
@@ -268,6 +248,7 @@ function createBaseQueryAccountsRequest(): QueryAccountsRequest {
 }
 export const QueryAccountsRequest = {
   typeUrl: "/cosmos.circuit.v1.QueryAccountsRequest",
+  aminoType: "cosmos-sdk/QueryAccountsRequest",
   encode(message: QueryAccountsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
@@ -291,7 +272,7 @@ export const QueryAccountsRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryAccountsRequest>): QueryAccountsRequest {
+  fromPartial(object: DeepPartial<QueryAccountsRequest>): QueryAccountsRequest {
     const message = createBaseQueryAccountsRequest();
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
     return message;
@@ -338,6 +319,7 @@ function createBaseAccountsResponse(): AccountsResponse {
 }
 export const AccountsResponse = {
   typeUrl: "/cosmos.circuit.v1.AccountsResponse",
+  aminoType: "cosmos-sdk/AccountsResponse",
   encode(message: AccountsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.accounts) {
       GenesisAccountPermissions.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -367,7 +349,7 @@ export const AccountsResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<AccountsResponse>): AccountsResponse {
+  fromPartial(object: DeepPartial<AccountsResponse>): AccountsResponse {
     const message = createBaseAccountsResponse();
     message.accounts = object.accounts?.map(e => GenesisAccountPermissions.fromPartial(e)) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
@@ -418,6 +400,7 @@ function createBaseQueryDisabledListRequest(): QueryDisabledListRequest {
 }
 export const QueryDisabledListRequest = {
   typeUrl: "/cosmos.circuit.v1.QueryDisabledListRequest",
+  aminoType: "cosmos-sdk/QueryDisabledListRequest",
   encode(_: QueryDisabledListRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -435,7 +418,7 @@ export const QueryDisabledListRequest = {
     }
     return message;
   },
-  fromPartial(_: Partial<QueryDisabledListRequest>): QueryDisabledListRequest {
+  fromPartial(_: DeepPartial<QueryDisabledListRequest>): QueryDisabledListRequest {
     const message = createBaseQueryDisabledListRequest();
     return message;
   },
@@ -476,6 +459,7 @@ function createBaseDisabledListResponse(): DisabledListResponse {
 }
 export const DisabledListResponse = {
   typeUrl: "/cosmos.circuit.v1.DisabledListResponse",
+  aminoType: "cosmos-sdk/DisabledListResponse",
   encode(message: DisabledListResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.disabledList) {
       writer.uint32(10).string(v!);
@@ -499,7 +483,7 @@ export const DisabledListResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<DisabledListResponse>): DisabledListResponse {
+  fromPartial(object: DeepPartial<DisabledListResponse>): DisabledListResponse {
     const message = createBaseDisabledListResponse();
     message.disabledList = object.disabledList?.map(e => e) || [];
     return message;

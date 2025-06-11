@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { Any, AnyAmino, AnySDKType } from "../../../../google/protobuf/any";
+import { Any, AnyAmino } from "../../../../google/protobuf/any";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /**
  * IdentifiedClientState defines a client state with an additional client
  * identifier field.
@@ -28,14 +29,6 @@ export interface IdentifiedClientStateAmino {
 export interface IdentifiedClientStateAminoMsg {
   type: "cosmos-sdk/IdentifiedClientState";
   value: IdentifiedClientStateAmino;
-}
-/**
- * IdentifiedClientState defines a client state with an additional client
- * identifier field.
- */
-export interface IdentifiedClientStateSDKType {
-  client_id: string;
-  client_state?: AnySDKType;
 }
 /**
  * ConsensusStateWithHeight defines a consensus state with an additional height
@@ -66,14 +59,6 @@ export interface ConsensusStateWithHeightAminoMsg {
   value: ConsensusStateWithHeightAmino;
 }
 /**
- * ConsensusStateWithHeight defines a consensus state with an additional height
- * field.
- */
-export interface ConsensusStateWithHeightSDKType {
-  height: HeightSDKType;
-  consensus_state?: AnySDKType;
-}
-/**
  * ClientConsensusStates defines all the stored consensus states for a given
  * client.
  */
@@ -100,14 +85,6 @@ export interface ClientConsensusStatesAmino {
 export interface ClientConsensusStatesAminoMsg {
   type: "cosmos-sdk/ClientConsensusStates";
   value: ClientConsensusStatesAmino;
-}
-/**
- * ClientConsensusStates defines all the stored consensus states for a given
- * client.
- */
-export interface ClientConsensusStatesSDKType {
-  client_id: string;
-  consensus_states: ConsensusStateWithHeightSDKType[];
 }
 /**
  * Height is a monotonically increasing data type
@@ -159,25 +136,6 @@ export interface HeightAminoMsg {
   type: "cosmos-sdk/Height";
   value: HeightAmino;
 }
-/**
- * Height is a monotonically increasing data type
- * that can be compared against another Height for the purposes of updating and
- * freezing clients
- * 
- * Normally the RevisionHeight is incremented at each height while keeping
- * RevisionNumber the same. However some consensus algorithms may choose to
- * reset the height in certain conditions e.g. hard forks, state-machine
- * breaking changes In these cases, the RevisionNumber is incremented so that
- * height continues to be monitonically increasing even as the RevisionHeight
- * gets reset
- * 
- * Please note that json tags for generated Go code are overridden to explicitly exclude the omitempty jsontag.
- * This enforces the Go json marshaller to always emit zero values for both revision_number and revision_height.
- */
-export interface HeightSDKType {
-  revision_number: bigint;
-  revision_height: bigint;
-}
 /** Params defines the set of IBC light client parameters. */
 export interface Params {
   /**
@@ -204,10 +162,6 @@ export interface ParamsAminoMsg {
   type: "cosmos-sdk/Params";
   value: ParamsAmino;
 }
-/** Params defines the set of IBC light client parameters. */
-export interface ParamsSDKType {
-  allowed_clients: string[];
-}
 function createBaseIdentifiedClientState(): IdentifiedClientState {
   return {
     clientId: "",
@@ -216,6 +170,7 @@ function createBaseIdentifiedClientState(): IdentifiedClientState {
 }
 export const IdentifiedClientState = {
   typeUrl: "/ibc.core.client.v1.IdentifiedClientState",
+  aminoType: "cosmos-sdk/IdentifiedClientState",
   encode(message: IdentifiedClientState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -245,7 +200,7 @@ export const IdentifiedClientState = {
     }
     return message;
   },
-  fromPartial(object: Partial<IdentifiedClientState>): IdentifiedClientState {
+  fromPartial(object: DeepPartial<IdentifiedClientState>): IdentifiedClientState {
     const message = createBaseIdentifiedClientState();
     message.clientId = object.clientId ?? "";
     message.clientState = object.clientState !== undefined && object.clientState !== null ? Any.fromPartial(object.clientState) : undefined;
@@ -297,6 +252,7 @@ function createBaseConsensusStateWithHeight(): ConsensusStateWithHeight {
 }
 export const ConsensusStateWithHeight = {
   typeUrl: "/ibc.core.client.v1.ConsensusStateWithHeight",
+  aminoType: "cosmos-sdk/ConsensusStateWithHeight",
   encode(message: ConsensusStateWithHeight, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.height !== undefined) {
       Height.encode(message.height, writer.uint32(10).fork()).ldelim();
@@ -326,7 +282,7 @@ export const ConsensusStateWithHeight = {
     }
     return message;
   },
-  fromPartial(object: Partial<ConsensusStateWithHeight>): ConsensusStateWithHeight {
+  fromPartial(object: DeepPartial<ConsensusStateWithHeight>): ConsensusStateWithHeight {
     const message = createBaseConsensusStateWithHeight();
     message.height = object.height !== undefined && object.height !== null ? Height.fromPartial(object.height) : undefined;
     message.consensusState = object.consensusState !== undefined && object.consensusState !== null ? Any.fromPartial(object.consensusState) : undefined;
@@ -378,6 +334,7 @@ function createBaseClientConsensusStates(): ClientConsensusStates {
 }
 export const ClientConsensusStates = {
   typeUrl: "/ibc.core.client.v1.ClientConsensusStates",
+  aminoType: "cosmos-sdk/ClientConsensusStates",
   encode(message: ClientConsensusStates, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -407,7 +364,7 @@ export const ClientConsensusStates = {
     }
     return message;
   },
-  fromPartial(object: Partial<ClientConsensusStates>): ClientConsensusStates {
+  fromPartial(object: DeepPartial<ClientConsensusStates>): ClientConsensusStates {
     const message = createBaseClientConsensusStates();
     message.clientId = object.clientId ?? "";
     message.consensusStates = object.consensusStates?.map(e => ConsensusStateWithHeight.fromPartial(e)) || [];
@@ -461,6 +418,7 @@ function createBaseHeight(): Height {
 }
 export const Height = {
   typeUrl: "/ibc.core.client.v1.Height",
+  aminoType: "cosmos-sdk/Height",
   encode(message: Height, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.revisionNumber !== BigInt(0)) {
       writer.uint32(8).uint64(message.revisionNumber);
@@ -490,7 +448,7 @@ export const Height = {
     }
     return message;
   },
-  fromPartial(object: Partial<Height>): Height {
+  fromPartial(object: DeepPartial<Height>): Height {
     const message = createBaseHeight();
     message.revisionNumber = object.revisionNumber !== undefined && object.revisionNumber !== null ? BigInt(object.revisionNumber.toString()) : BigInt(0);
     message.revisionHeight = object.revisionHeight !== undefined && object.revisionHeight !== null ? BigInt(object.revisionHeight.toString()) : BigInt(0);
@@ -537,6 +495,7 @@ function createBaseParams(): Params {
 }
 export const Params = {
   typeUrl: "/ibc.core.client.v1.Params",
+  aminoType: "cosmos-sdk/Params",
   encode(message: Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.allowedClients) {
       writer.uint32(10).string(v!);
@@ -560,7 +519,7 @@ export const Params = {
     }
     return message;
   },
-  fromPartial(object: Partial<Params>): Params {
+  fromPartial(object: DeepPartial<Params>): Params {
     const message = createBaseParams();
     message.allowedClients = object.allowedClients?.map(e => e) || [];
     return message;

@@ -1,9 +1,9 @@
 //@ts-nocheck
-import { Any, AnyAmino, AnySDKType } from "../../../../google/protobuf/any";
-import { Plan, PlanAmino, PlanSDKType } from "../../../../cosmos/upgrade/v1beta1/upgrade";
-import { Params, ParamsAmino, ParamsSDKType } from "./client";
+import { Any, AnyAmino } from "../../../../google/protobuf/any";
+import { Plan, PlanAmino } from "../../../../cosmos/upgrade/v1beta1/upgrade";
+import { Params, ParamsAmino } from "./client";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /** MsgCreateClient defines a message to create an IBC client */
 export interface MsgCreateClient {
   /** light client state */
@@ -36,12 +36,6 @@ export interface MsgCreateClientAminoMsg {
   type: "cosmos-sdk/MsgCreateClient";
   value: MsgCreateClientAmino;
 }
-/** MsgCreateClient defines a message to create an IBC client */
-export interface MsgCreateClientSDKType {
-  client_state?: AnySDKType;
-  consensus_state?: AnySDKType;
-  signer: string;
-}
 /** MsgCreateClientResponse defines the Msg/CreateClient response type. */
 export interface MsgCreateClientResponse {
   clientId: string;
@@ -57,10 +51,6 @@ export interface MsgCreateClientResponseAmino {
 export interface MsgCreateClientResponseAminoMsg {
   type: "cosmos-sdk/MsgCreateClientResponse";
   value: MsgCreateClientResponseAmino;
-}
-/** MsgCreateClientResponse defines the Msg/CreateClient response type. */
-export interface MsgCreateClientResponseSDKType {
-  client_id: string;
 }
 /**
  * MsgUpdateClient defines an sdk.Msg to update a IBC client state using
@@ -94,15 +84,6 @@ export interface MsgUpdateClientAminoMsg {
   type: "cosmos-sdk/MsgUpdateClient";
   value: MsgUpdateClientAmino;
 }
-/**
- * MsgUpdateClient defines an sdk.Msg to update a IBC client state using
- * the given client message.
- */
-export interface MsgUpdateClientSDKType {
-  client_id: string;
-  client_message?: AnySDKType;
-  signer: string;
-}
 /** MsgUpdateClientResponse defines the Msg/UpdateClient response type. */
 export interface MsgUpdateClientResponse {}
 export interface MsgUpdateClientResponseProtoMsg {
@@ -115,8 +96,6 @@ export interface MsgUpdateClientResponseAminoMsg {
   type: "cosmos-sdk/MsgUpdateClientResponse";
   value: MsgUpdateClientResponseAmino;
 }
-/** MsgUpdateClientResponse defines the Msg/UpdateClient response type. */
-export interface MsgUpdateClientResponseSDKType {}
 /**
  * MsgUpgradeClient defines an sdk.Msg to upgrade an IBC client to a new client
  * state
@@ -167,18 +146,6 @@ export interface MsgUpgradeClientAminoMsg {
   type: "cosmos-sdk/MsgUpgradeClient";
   value: MsgUpgradeClientAmino;
 }
-/**
- * MsgUpgradeClient defines an sdk.Msg to upgrade an IBC client to a new client
- * state
- */
-export interface MsgUpgradeClientSDKType {
-  client_id: string;
-  client_state?: AnySDKType;
-  consensus_state?: AnySDKType;
-  proof_upgrade_client: Uint8Array;
-  proof_upgrade_consensus_state: Uint8Array;
-  signer: string;
-}
 /** MsgUpgradeClientResponse defines the Msg/UpgradeClient response type. */
 export interface MsgUpgradeClientResponse {}
 export interface MsgUpgradeClientResponseProtoMsg {
@@ -191,8 +158,6 @@ export interface MsgUpgradeClientResponseAminoMsg {
   type: "cosmos-sdk/MsgUpgradeClientResponse";
   value: MsgUpgradeClientResponseAmino;
 }
-/** MsgUpgradeClientResponse defines the Msg/UpgradeClient response type. */
-export interface MsgUpgradeClientResponseSDKType {}
 /**
  * MsgSubmitMisbehaviour defines an sdk.Msg type that submits Evidence for
  * light client misbehaviour.
@@ -230,17 +195,6 @@ export interface MsgSubmitMisbehaviourAminoMsg {
   value: MsgSubmitMisbehaviourAmino;
 }
 /**
- * MsgSubmitMisbehaviour defines an sdk.Msg type that submits Evidence for
- * light client misbehaviour.
- * This message has been deprecated. Use MsgUpdateClient instead.
- */
-/** @deprecated */
-export interface MsgSubmitMisbehaviourSDKType {
-  client_id: string;
-  misbehaviour?: AnySDKType;
-  signer: string;
-}
-/**
  * MsgSubmitMisbehaviourResponse defines the Msg/SubmitMisbehaviour response
  * type.
  */
@@ -258,11 +212,6 @@ export interface MsgSubmitMisbehaviourResponseAminoMsg {
   type: "cosmos-sdk/MsgSubmitMisbehaviourResponse";
   value: MsgSubmitMisbehaviourResponseAmino;
 }
-/**
- * MsgSubmitMisbehaviourResponse defines the Msg/SubmitMisbehaviour response
- * type.
- */
-export interface MsgSubmitMisbehaviourResponseSDKType {}
 /** MsgRecoverClient defines the message used to recover a frozen or expired client. */
 export interface MsgRecoverClient {
   /** the client identifier for the client to be updated if the proposal passes */
@@ -295,12 +244,6 @@ export interface MsgRecoverClientAminoMsg {
   type: "cosmos-sdk/MsgRecoverClient";
   value: MsgRecoverClientAmino;
 }
-/** MsgRecoverClient defines the message used to recover a frozen or expired client. */
-export interface MsgRecoverClientSDKType {
-  subject_client_id: string;
-  substitute_client_id: string;
-  signer: string;
-}
 /** MsgRecoverClientResponse defines the Msg/RecoverClient response type. */
 export interface MsgRecoverClientResponse {}
 export interface MsgRecoverClientResponseProtoMsg {
@@ -313,8 +256,6 @@ export interface MsgRecoverClientResponseAminoMsg {
   type: "cosmos-sdk/MsgRecoverClientResponse";
   value: MsgRecoverClientResponseAmino;
 }
-/** MsgRecoverClientResponse defines the Msg/RecoverClient response type. */
-export interface MsgRecoverClientResponseSDKType {}
 /** MsgIBCSoftwareUpgrade defines the message used to schedule an upgrade of an IBC client using a v1 governance proposal */
 export interface MsgIBCSoftwareUpgrade {
   plan: Plan;
@@ -357,12 +298,6 @@ export interface MsgIBCSoftwareUpgradeAminoMsg {
   type: "cosmos-sdk/MsgIBCSoftwareUpgrade";
   value: MsgIBCSoftwareUpgradeAmino;
 }
-/** MsgIBCSoftwareUpgrade defines the message used to schedule an upgrade of an IBC client using a v1 governance proposal */
-export interface MsgIBCSoftwareUpgradeSDKType {
-  plan: PlanSDKType;
-  upgraded_client_state?: AnySDKType;
-  signer: string;
-}
 /** MsgIBCSoftwareUpgradeResponse defines the Msg/IBCSoftwareUpgrade response type. */
 export interface MsgIBCSoftwareUpgradeResponse {}
 export interface MsgIBCSoftwareUpgradeResponseProtoMsg {
@@ -375,8 +310,6 @@ export interface MsgIBCSoftwareUpgradeResponseAminoMsg {
   type: "cosmos-sdk/MsgIBCSoftwareUpgradeResponse";
   value: MsgIBCSoftwareUpgradeResponseAmino;
 }
-/** MsgIBCSoftwareUpgradeResponse defines the Msg/IBCSoftwareUpgrade response type. */
-export interface MsgIBCSoftwareUpgradeResponseSDKType {}
 /** MsgUpdateParams defines the sdk.Msg type to update the client parameters. */
 export interface MsgUpdateParams {
   /** signer address */
@@ -407,11 +340,6 @@ export interface MsgUpdateParamsAminoMsg {
   type: "cosmos-sdk/MsgUpdateParams";
   value: MsgUpdateParamsAmino;
 }
-/** MsgUpdateParams defines the sdk.Msg type to update the client parameters. */
-export interface MsgUpdateParamsSDKType {
-  signer: string;
-  params: ParamsSDKType;
-}
 /** MsgUpdateParamsResponse defines the MsgUpdateParams response type. */
 export interface MsgUpdateParamsResponse {}
 export interface MsgUpdateParamsResponseProtoMsg {
@@ -424,8 +352,6 @@ export interface MsgUpdateParamsResponseAminoMsg {
   type: "cosmos-sdk/MsgUpdateParamsResponse";
   value: MsgUpdateParamsResponseAmino;
 }
-/** MsgUpdateParamsResponse defines the MsgUpdateParams response type. */
-export interface MsgUpdateParamsResponseSDKType {}
 /** MsgDeleteClientCreator defines a message to delete the client creator of a client */
 export interface MsgDeleteClientCreator {
   /** client identifier */
@@ -448,11 +374,6 @@ export interface MsgDeleteClientCreatorAminoMsg {
   type: "cosmos-sdk/MsgDeleteClientCreator";
   value: MsgDeleteClientCreatorAmino;
 }
-/** MsgDeleteClientCreator defines a message to delete the client creator of a client */
-export interface MsgDeleteClientCreatorSDKType {
-  client_id: string;
-  signer: string;
-}
 /** MsgDeleteClientCreatorResponse defines the Msg/DeleteClientCreator response type. */
 export interface MsgDeleteClientCreatorResponse {}
 export interface MsgDeleteClientCreatorResponseProtoMsg {
@@ -465,8 +386,6 @@ export interface MsgDeleteClientCreatorResponseAminoMsg {
   type: "cosmos-sdk/MsgDeleteClientCreatorResponse";
   value: MsgDeleteClientCreatorResponseAmino;
 }
-/** MsgDeleteClientCreatorResponse defines the Msg/DeleteClientCreator response type. */
-export interface MsgDeleteClientCreatorResponseSDKType {}
 function createBaseMsgCreateClient(): MsgCreateClient {
   return {
     clientState: undefined,
@@ -476,6 +395,7 @@ function createBaseMsgCreateClient(): MsgCreateClient {
 }
 export const MsgCreateClient = {
   typeUrl: "/ibc.core.client.v1.MsgCreateClient",
+  aminoType: "cosmos-sdk/MsgCreateClient",
   encode(message: MsgCreateClient, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientState !== undefined) {
       Any.encode(message.clientState, writer.uint32(10).fork()).ldelim();
@@ -511,7 +431,7 @@ export const MsgCreateClient = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgCreateClient>): MsgCreateClient {
+  fromPartial(object: DeepPartial<MsgCreateClient>): MsgCreateClient {
     const message = createBaseMsgCreateClient();
     message.clientState = object.clientState !== undefined && object.clientState !== null ? Any.fromPartial(object.clientState) : undefined;
     message.consensusState = object.consensusState !== undefined && object.consensusState !== null ? Any.fromPartial(object.consensusState) : undefined;
@@ -567,6 +487,7 @@ function createBaseMsgCreateClientResponse(): MsgCreateClientResponse {
 }
 export const MsgCreateClientResponse = {
   typeUrl: "/ibc.core.client.v1.MsgCreateClientResponse",
+  aminoType: "cosmos-sdk/MsgCreateClientResponse",
   encode(message: MsgCreateClientResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -590,7 +511,7 @@ export const MsgCreateClientResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgCreateClientResponse>): MsgCreateClientResponse {
+  fromPartial(object: DeepPartial<MsgCreateClientResponse>): MsgCreateClientResponse {
     const message = createBaseMsgCreateClientResponse();
     message.clientId = object.clientId ?? "";
     return message;
@@ -638,6 +559,7 @@ function createBaseMsgUpdateClient(): MsgUpdateClient {
 }
 export const MsgUpdateClient = {
   typeUrl: "/ibc.core.client.v1.MsgUpdateClient",
+  aminoType: "cosmos-sdk/MsgUpdateClient",
   encode(message: MsgUpdateClient, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -673,7 +595,7 @@ export const MsgUpdateClient = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpdateClient>): MsgUpdateClient {
+  fromPartial(object: DeepPartial<MsgUpdateClient>): MsgUpdateClient {
     const message = createBaseMsgUpdateClient();
     message.clientId = object.clientId ?? "";
     message.clientMessage = object.clientMessage !== undefined && object.clientMessage !== null ? Any.fromPartial(object.clientMessage) : undefined;
@@ -727,6 +649,7 @@ function createBaseMsgUpdateClientResponse(): MsgUpdateClientResponse {
 }
 export const MsgUpdateClientResponse = {
   typeUrl: "/ibc.core.client.v1.MsgUpdateClientResponse",
+  aminoType: "cosmos-sdk/MsgUpdateClientResponse",
   encode(_: MsgUpdateClientResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -744,7 +667,7 @@ export const MsgUpdateClientResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpdateClientResponse>): MsgUpdateClientResponse {
+  fromPartial(_: DeepPartial<MsgUpdateClientResponse>): MsgUpdateClientResponse {
     const message = createBaseMsgUpdateClientResponse();
     return message;
   },
@@ -790,6 +713,7 @@ function createBaseMsgUpgradeClient(): MsgUpgradeClient {
 }
 export const MsgUpgradeClient = {
   typeUrl: "/ibc.core.client.v1.MsgUpgradeClient",
+  aminoType: "cosmos-sdk/MsgUpgradeClient",
   encode(message: MsgUpgradeClient, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -843,7 +767,7 @@ export const MsgUpgradeClient = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpgradeClient>): MsgUpgradeClient {
+  fromPartial(object: DeepPartial<MsgUpgradeClient>): MsgUpgradeClient {
     const message = createBaseMsgUpgradeClient();
     message.clientId = object.clientId ?? "";
     message.clientState = object.clientState !== undefined && object.clientState !== null ? Any.fromPartial(object.clientState) : undefined;
@@ -912,6 +836,7 @@ function createBaseMsgUpgradeClientResponse(): MsgUpgradeClientResponse {
 }
 export const MsgUpgradeClientResponse = {
   typeUrl: "/ibc.core.client.v1.MsgUpgradeClientResponse",
+  aminoType: "cosmos-sdk/MsgUpgradeClientResponse",
   encode(_: MsgUpgradeClientResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -929,7 +854,7 @@ export const MsgUpgradeClientResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpgradeClientResponse>): MsgUpgradeClientResponse {
+  fromPartial(_: DeepPartial<MsgUpgradeClientResponse>): MsgUpgradeClientResponse {
     const message = createBaseMsgUpgradeClientResponse();
     return message;
   },
@@ -972,6 +897,7 @@ function createBaseMsgSubmitMisbehaviour(): MsgSubmitMisbehaviour {
 }
 export const MsgSubmitMisbehaviour = {
   typeUrl: "/ibc.core.client.v1.MsgSubmitMisbehaviour",
+  aminoType: "cosmos-sdk/MsgSubmitMisbehaviour",
   encode(message: MsgSubmitMisbehaviour, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -1007,7 +933,7 @@ export const MsgSubmitMisbehaviour = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgSubmitMisbehaviour>): MsgSubmitMisbehaviour {
+  fromPartial(object: DeepPartial<MsgSubmitMisbehaviour>): MsgSubmitMisbehaviour {
     const message = createBaseMsgSubmitMisbehaviour();
     message.clientId = object.clientId ?? "";
     message.misbehaviour = object.misbehaviour !== undefined && object.misbehaviour !== null ? Any.fromPartial(object.misbehaviour) : undefined;
@@ -1061,6 +987,7 @@ function createBaseMsgSubmitMisbehaviourResponse(): MsgSubmitMisbehaviourRespons
 }
 export const MsgSubmitMisbehaviourResponse = {
   typeUrl: "/ibc.core.client.v1.MsgSubmitMisbehaviourResponse",
+  aminoType: "cosmos-sdk/MsgSubmitMisbehaviourResponse",
   encode(_: MsgSubmitMisbehaviourResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1078,7 +1005,7 @@ export const MsgSubmitMisbehaviourResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgSubmitMisbehaviourResponse>): MsgSubmitMisbehaviourResponse {
+  fromPartial(_: DeepPartial<MsgSubmitMisbehaviourResponse>): MsgSubmitMisbehaviourResponse {
     const message = createBaseMsgSubmitMisbehaviourResponse();
     return message;
   },
@@ -1121,6 +1048,7 @@ function createBaseMsgRecoverClient(): MsgRecoverClient {
 }
 export const MsgRecoverClient = {
   typeUrl: "/ibc.core.client.v1.MsgRecoverClient",
+  aminoType: "cosmos-sdk/MsgRecoverClient",
   encode(message: MsgRecoverClient, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.subjectClientId !== "") {
       writer.uint32(10).string(message.subjectClientId);
@@ -1156,7 +1084,7 @@ export const MsgRecoverClient = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgRecoverClient>): MsgRecoverClient {
+  fromPartial(object: DeepPartial<MsgRecoverClient>): MsgRecoverClient {
     const message = createBaseMsgRecoverClient();
     message.subjectClientId = object.subjectClientId ?? "";
     message.substituteClientId = object.substituteClientId ?? "";
@@ -1210,6 +1138,7 @@ function createBaseMsgRecoverClientResponse(): MsgRecoverClientResponse {
 }
 export const MsgRecoverClientResponse = {
   typeUrl: "/ibc.core.client.v1.MsgRecoverClientResponse",
+  aminoType: "cosmos-sdk/MsgRecoverClientResponse",
   encode(_: MsgRecoverClientResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1227,7 +1156,7 @@ export const MsgRecoverClientResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgRecoverClientResponse>): MsgRecoverClientResponse {
+  fromPartial(_: DeepPartial<MsgRecoverClientResponse>): MsgRecoverClientResponse {
     const message = createBaseMsgRecoverClientResponse();
     return message;
   },
@@ -1270,6 +1199,7 @@ function createBaseMsgIBCSoftwareUpgrade(): MsgIBCSoftwareUpgrade {
 }
 export const MsgIBCSoftwareUpgrade = {
   typeUrl: "/ibc.core.client.v1.MsgIBCSoftwareUpgrade",
+  aminoType: "cosmos-sdk/MsgIBCSoftwareUpgrade",
   encode(message: MsgIBCSoftwareUpgrade, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.plan !== undefined) {
       Plan.encode(message.plan, writer.uint32(10).fork()).ldelim();
@@ -1305,7 +1235,7 @@ export const MsgIBCSoftwareUpgrade = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgIBCSoftwareUpgrade>): MsgIBCSoftwareUpgrade {
+  fromPartial(object: DeepPartial<MsgIBCSoftwareUpgrade>): MsgIBCSoftwareUpgrade {
     const message = createBaseMsgIBCSoftwareUpgrade();
     message.plan = object.plan !== undefined && object.plan !== null ? Plan.fromPartial(object.plan) : undefined;
     message.upgradedClientState = object.upgradedClientState !== undefined && object.upgradedClientState !== null ? Any.fromPartial(object.upgradedClientState) : undefined;
@@ -1359,6 +1289,7 @@ function createBaseMsgIBCSoftwareUpgradeResponse(): MsgIBCSoftwareUpgradeRespons
 }
 export const MsgIBCSoftwareUpgradeResponse = {
   typeUrl: "/ibc.core.client.v1.MsgIBCSoftwareUpgradeResponse",
+  aminoType: "cosmos-sdk/MsgIBCSoftwareUpgradeResponse",
   encode(_: MsgIBCSoftwareUpgradeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1376,7 +1307,7 @@ export const MsgIBCSoftwareUpgradeResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgIBCSoftwareUpgradeResponse>): MsgIBCSoftwareUpgradeResponse {
+  fromPartial(_: DeepPartial<MsgIBCSoftwareUpgradeResponse>): MsgIBCSoftwareUpgradeResponse {
     const message = createBaseMsgIBCSoftwareUpgradeResponse();
     return message;
   },
@@ -1418,6 +1349,7 @@ function createBaseMsgUpdateParams(): MsgUpdateParams {
 }
 export const MsgUpdateParams = {
   typeUrl: "/ibc.core.client.v1.MsgUpdateParams",
+  aminoType: "cosmos-sdk/MsgUpdateParams",
   encode(message: MsgUpdateParams, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.signer !== "") {
       writer.uint32(10).string(message.signer);
@@ -1447,7 +1379,7 @@ export const MsgUpdateParams = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpdateParams>): MsgUpdateParams {
+  fromPartial(object: DeepPartial<MsgUpdateParams>): MsgUpdateParams {
     const message = createBaseMsgUpdateParams();
     message.signer = object.signer ?? "";
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
@@ -1496,6 +1428,7 @@ function createBaseMsgUpdateParamsResponse(): MsgUpdateParamsResponse {
 }
 export const MsgUpdateParamsResponse = {
   typeUrl: "/ibc.core.client.v1.MsgUpdateParamsResponse",
+  aminoType: "cosmos-sdk/MsgUpdateParamsResponse",
   encode(_: MsgUpdateParamsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1513,7 +1446,7 @@ export const MsgUpdateParamsResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
+  fromPartial(_: DeepPartial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
     const message = createBaseMsgUpdateParamsResponse();
     return message;
   },
@@ -1555,6 +1488,7 @@ function createBaseMsgDeleteClientCreator(): MsgDeleteClientCreator {
 }
 export const MsgDeleteClientCreator = {
   typeUrl: "/ibc.core.client.v1.MsgDeleteClientCreator",
+  aminoType: "cosmos-sdk/MsgDeleteClientCreator",
   encode(message: MsgDeleteClientCreator, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -1584,7 +1518,7 @@ export const MsgDeleteClientCreator = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgDeleteClientCreator>): MsgDeleteClientCreator {
+  fromPartial(object: DeepPartial<MsgDeleteClientCreator>): MsgDeleteClientCreator {
     const message = createBaseMsgDeleteClientCreator();
     message.clientId = object.clientId ?? "";
     message.signer = object.signer ?? "";
@@ -1633,6 +1567,7 @@ function createBaseMsgDeleteClientCreatorResponse(): MsgDeleteClientCreatorRespo
 }
 export const MsgDeleteClientCreatorResponse = {
   typeUrl: "/ibc.core.client.v1.MsgDeleteClientCreatorResponse",
+  aminoType: "cosmos-sdk/MsgDeleteClientCreatorResponse",
   encode(_: MsgDeleteClientCreatorResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1650,7 +1585,7 @@ export const MsgDeleteClientCreatorResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgDeleteClientCreatorResponse>): MsgDeleteClientCreatorResponse {
+  fromPartial(_: DeepPartial<MsgDeleteClientCreatorResponse>): MsgDeleteClientCreatorResponse {
     const message = createBaseMsgDeleteClientCreatorResponse();
     return message;
   },

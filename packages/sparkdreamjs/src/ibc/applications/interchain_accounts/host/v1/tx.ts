@@ -1,7 +1,7 @@
 //@ts-nocheck
-import { Params, ParamsAmino, ParamsSDKType, QueryRequest, QueryRequestAmino, QueryRequestSDKType } from "./host";
+import { Params, ParamsAmino, QueryRequest, QueryRequestAmino } from "./host";
 import { BinaryReader, BinaryWriter } from "../../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../../helpers";
 /** MsgUpdateParams defines the payload for Msg/UpdateParams */
 export interface MsgUpdateParams {
   /** signer address */
@@ -32,11 +32,6 @@ export interface MsgUpdateParamsAminoMsg {
   type: "cosmos-sdk/MsgUpdateParams";
   value: MsgUpdateParamsAmino;
 }
-/** MsgUpdateParams defines the payload for Msg/UpdateParams */
-export interface MsgUpdateParamsSDKType {
-  signer: string;
-  params: ParamsSDKType;
-}
 /** MsgUpdateParamsResponse defines the response for Msg/UpdateParams */
 export interface MsgUpdateParamsResponse {}
 export interface MsgUpdateParamsResponseProtoMsg {
@@ -49,8 +44,6 @@ export interface MsgUpdateParamsResponseAminoMsg {
   type: "cosmos-sdk/MsgUpdateParamsResponse";
   value: MsgUpdateParamsResponseAmino;
 }
-/** MsgUpdateParamsResponse defines the response for Msg/UpdateParams */
-export interface MsgUpdateParamsResponseSDKType {}
 /** MsgModuleQuerySafe defines the payload for Msg/ModuleQuerySafe */
 export interface MsgModuleQuerySafe {
   /** signer address */
@@ -72,11 +65,6 @@ export interface MsgModuleQuerySafeAmino {
 export interface MsgModuleQuerySafeAminoMsg {
   type: "cosmos-sdk/MsgModuleQuerySafe";
   value: MsgModuleQuerySafeAmino;
-}
-/** MsgModuleQuerySafe defines the payload for Msg/ModuleQuerySafe */
-export interface MsgModuleQuerySafeSDKType {
-  signer: string;
-  requests: QueryRequestSDKType[];
 }
 /** MsgModuleQuerySafeResponse defines the response for Msg/ModuleQuerySafe */
 export interface MsgModuleQuerySafeResponse {
@@ -100,11 +88,6 @@ export interface MsgModuleQuerySafeResponseAminoMsg {
   type: "cosmos-sdk/MsgModuleQuerySafeResponse";
   value: MsgModuleQuerySafeResponseAmino;
 }
-/** MsgModuleQuerySafeResponse defines the response for Msg/ModuleQuerySafe */
-export interface MsgModuleQuerySafeResponseSDKType {
-  height: bigint;
-  responses: Uint8Array[];
-}
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
     signer: "",
@@ -113,6 +96,7 @@ function createBaseMsgUpdateParams(): MsgUpdateParams {
 }
 export const MsgUpdateParams = {
   typeUrl: "/ibc.applications.interchain_accounts.host.v1.MsgUpdateParams",
+  aminoType: "cosmos-sdk/MsgUpdateParams",
   encode(message: MsgUpdateParams, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.signer !== "") {
       writer.uint32(10).string(message.signer);
@@ -142,7 +126,7 @@ export const MsgUpdateParams = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpdateParams>): MsgUpdateParams {
+  fromPartial(object: DeepPartial<MsgUpdateParams>): MsgUpdateParams {
     const message = createBaseMsgUpdateParams();
     message.signer = object.signer ?? "";
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
@@ -191,6 +175,7 @@ function createBaseMsgUpdateParamsResponse(): MsgUpdateParamsResponse {
 }
 export const MsgUpdateParamsResponse = {
   typeUrl: "/ibc.applications.interchain_accounts.host.v1.MsgUpdateParamsResponse",
+  aminoType: "cosmos-sdk/MsgUpdateParamsResponse",
   encode(_: MsgUpdateParamsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -208,7 +193,7 @@ export const MsgUpdateParamsResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
+  fromPartial(_: DeepPartial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
     const message = createBaseMsgUpdateParamsResponse();
     return message;
   },
@@ -250,6 +235,7 @@ function createBaseMsgModuleQuerySafe(): MsgModuleQuerySafe {
 }
 export const MsgModuleQuerySafe = {
   typeUrl: "/ibc.applications.interchain_accounts.host.v1.MsgModuleQuerySafe",
+  aminoType: "cosmos-sdk/MsgModuleQuerySafe",
   encode(message: MsgModuleQuerySafe, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.signer !== "") {
       writer.uint32(10).string(message.signer);
@@ -279,7 +265,7 @@ export const MsgModuleQuerySafe = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgModuleQuerySafe>): MsgModuleQuerySafe {
+  fromPartial(object: DeepPartial<MsgModuleQuerySafe>): MsgModuleQuerySafe {
     const message = createBaseMsgModuleQuerySafe();
     message.signer = object.signer ?? "";
     message.requests = object.requests?.map(e => QueryRequest.fromPartial(e)) || [];
@@ -333,6 +319,7 @@ function createBaseMsgModuleQuerySafeResponse(): MsgModuleQuerySafeResponse {
 }
 export const MsgModuleQuerySafeResponse = {
   typeUrl: "/ibc.applications.interchain_accounts.host.v1.MsgModuleQuerySafeResponse",
+  aminoType: "cosmos-sdk/MsgModuleQuerySafeResponse",
   encode(message: MsgModuleQuerySafeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.height !== BigInt(0)) {
       writer.uint32(8).uint64(message.height);
@@ -362,7 +349,7 @@ export const MsgModuleQuerySafeResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgModuleQuerySafeResponse>): MsgModuleQuerySafeResponse {
+  fromPartial(object: DeepPartial<MsgModuleQuerySafeResponse>): MsgModuleQuerySafeResponse {
     const message = createBaseMsgModuleQuerySafeResponse();
     message.height = object.height !== undefined && object.height !== null ? BigInt(object.height.toString()) : BigInt(0);
     message.responses = object.responses?.map(e => e) || [];

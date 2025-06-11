@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /**
  * Metadata defines a set of protocol specific data encoded into the ICS27 channel version bytestring
  * See ICS004: https://github.com/cosmos/ibc/tree/master/spec/core/ics-004-channel-and-packet-semantics#Versioning
@@ -50,18 +51,6 @@ export interface MetadataAminoMsg {
   type: "cosmos-sdk/Metadata";
   value: MetadataAmino;
 }
-/**
- * Metadata defines a set of protocol specific data encoded into the ICS27 channel version bytestring
- * See ICS004: https://github.com/cosmos/ibc/tree/master/spec/core/ics-004-channel-and-packet-semantics#Versioning
- */
-export interface MetadataSDKType {
-  version: string;
-  controller_connection_id: string;
-  host_connection_id: string;
-  address: string;
-  encoding: string;
-  tx_type: string;
-}
 function createBaseMetadata(): Metadata {
   return {
     version: "",
@@ -74,6 +63,7 @@ function createBaseMetadata(): Metadata {
 }
 export const Metadata = {
   typeUrl: "/ibc.applications.interchain_accounts.v1.Metadata",
+  aminoType: "cosmos-sdk/Metadata",
   encode(message: Metadata, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.version !== "") {
       writer.uint32(10).string(message.version);
@@ -127,7 +117,7 @@ export const Metadata = {
     }
     return message;
   },
-  fromPartial(object: Partial<Metadata>): Metadata {
+  fromPartial(object: DeepPartial<Metadata>): Metadata {
     const message = createBaseMetadata();
     message.version = object.version ?? "";
     message.controllerConnectionId = object.controllerConnectionId ?? "";

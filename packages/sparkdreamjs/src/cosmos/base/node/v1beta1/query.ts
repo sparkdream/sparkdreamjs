@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { Timestamp } from "../../../../google/protobuf/timestamp";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { toTimestamp, fromTimestamp, bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, toTimestamp, fromTimestamp, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /** ConfigRequest defines the request structure for the Config gRPC query. */
 export interface ConfigRequest {}
 export interface ConfigRequestProtoMsg {
@@ -14,8 +14,6 @@ export interface ConfigRequestAminoMsg {
   type: "cosmos-sdk/ConfigRequest";
   value: ConfigRequestAmino;
 }
-/** ConfigRequest defines the request structure for the Config gRPC query. */
-export interface ConfigRequestSDKType {}
 /** ConfigResponse defines the response structure for the Config gRPC query. */
 export interface ConfigResponse {
   minimumGasPrice: string;
@@ -38,13 +36,6 @@ export interface ConfigResponseAminoMsg {
   type: "cosmos-sdk/ConfigResponse";
   value: ConfigResponseAmino;
 }
-/** ConfigResponse defines the response structure for the Config gRPC query. */
-export interface ConfigResponseSDKType {
-  minimum_gas_price: string;
-  pruning_keep_recent: string;
-  pruning_interval: string;
-  halt_height: bigint;
-}
 /** StateRequest defines the request structure for the status of a node. */
 export interface StatusRequest {}
 export interface StatusRequestProtoMsg {
@@ -57,8 +48,6 @@ export interface StatusRequestAminoMsg {
   type: "cosmos-sdk/StatusRequest";
   value: StatusRequestAmino;
 }
-/** StateRequest defines the request structure for the status of a node. */
-export interface StatusRequestSDKType {}
 /** StateResponse defines the response structure for the status of a node. */
 export interface StatusResponse {
   /** earliest block height available in the store */
@@ -93,19 +82,12 @@ export interface StatusResponseAminoMsg {
   type: "cosmos-sdk/StatusResponse";
   value: StatusResponseAmino;
 }
-/** StateResponse defines the response structure for the status of a node. */
-export interface StatusResponseSDKType {
-  earliest_store_height: bigint;
-  height: bigint;
-  timestamp?: Date;
-  app_hash: Uint8Array;
-  validator_hash: Uint8Array;
-}
 function createBaseConfigRequest(): ConfigRequest {
   return {};
 }
 export const ConfigRequest = {
   typeUrl: "/cosmos.base.node.v1beta1.ConfigRequest",
+  aminoType: "cosmos-sdk/ConfigRequest",
   encode(_: ConfigRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -123,7 +105,7 @@ export const ConfigRequest = {
     }
     return message;
   },
-  fromPartial(_: Partial<ConfigRequest>): ConfigRequest {
+  fromPartial(_: DeepPartial<ConfigRequest>): ConfigRequest {
     const message = createBaseConfigRequest();
     return message;
   },
@@ -167,6 +149,7 @@ function createBaseConfigResponse(): ConfigResponse {
 }
 export const ConfigResponse = {
   typeUrl: "/cosmos.base.node.v1beta1.ConfigResponse",
+  aminoType: "cosmos-sdk/ConfigResponse",
   encode(message: ConfigResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.minimumGasPrice !== "") {
       writer.uint32(10).string(message.minimumGasPrice);
@@ -208,7 +191,7 @@ export const ConfigResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<ConfigResponse>): ConfigResponse {
+  fromPartial(object: DeepPartial<ConfigResponse>): ConfigResponse {
     const message = createBaseConfigResponse();
     message.minimumGasPrice = object.minimumGasPrice ?? "";
     message.pruningKeepRecent = object.pruningKeepRecent ?? "";
@@ -267,6 +250,7 @@ function createBaseStatusRequest(): StatusRequest {
 }
 export const StatusRequest = {
   typeUrl: "/cosmos.base.node.v1beta1.StatusRequest",
+  aminoType: "cosmos-sdk/StatusRequest",
   encode(_: StatusRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -284,7 +268,7 @@ export const StatusRequest = {
     }
     return message;
   },
-  fromPartial(_: Partial<StatusRequest>): StatusRequest {
+  fromPartial(_: DeepPartial<StatusRequest>): StatusRequest {
     const message = createBaseStatusRequest();
     return message;
   },
@@ -329,6 +313,7 @@ function createBaseStatusResponse(): StatusResponse {
 }
 export const StatusResponse = {
   typeUrl: "/cosmos.base.node.v1beta1.StatusResponse",
+  aminoType: "cosmos-sdk/StatusResponse",
   encode(message: StatusResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.earliestStoreHeight !== BigInt(0)) {
       writer.uint32(8).uint64(message.earliestStoreHeight);
@@ -376,7 +361,7 @@ export const StatusResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<StatusResponse>): StatusResponse {
+  fromPartial(object: DeepPartial<StatusResponse>): StatusResponse {
     const message = createBaseStatusResponse();
     message.earliestStoreHeight = object.earliestStoreHeight !== undefined && object.earliestStoreHeight !== null ? BigInt(object.earliestStoreHeight.toString()) : BigInt(0);
     message.height = object.height !== undefined && object.height !== null ? BigInt(object.height.toString()) : BigInt(0);

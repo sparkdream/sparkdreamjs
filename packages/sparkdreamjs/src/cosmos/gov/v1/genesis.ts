@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { Deposit, DepositAmino, DepositSDKType, Vote, VoteAmino, VoteSDKType, Proposal, ProposalAmino, ProposalSDKType, DepositParams, DepositParamsAmino, DepositParamsSDKType, VotingParams, VotingParamsAmino, VotingParamsSDKType, TallyParams, TallyParamsAmino, TallyParamsSDKType, Params, ParamsAmino, ParamsSDKType } from "./gov";
+import { Deposit, DepositAmino, Vote, VoteAmino, Proposal, ProposalAmino, DepositParams, DepositParamsAmino, VotingParams, VotingParamsAmino, TallyParams, TallyParamsAmino, Params, ParamsAmino } from "./gov";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** GenesisState defines the gov module's genesis state. */
 export interface GenesisState {
   /** starting_proposal_id is the ID of the starting proposal. */
@@ -97,21 +98,6 @@ export interface GenesisStateAminoMsg {
   type: "cosmos-sdk/v1/GenesisState";
   value: GenesisStateAmino;
 }
-/** GenesisState defines the gov module's genesis state. */
-export interface GenesisStateSDKType {
-  starting_proposal_id: bigint;
-  deposits: DepositSDKType[];
-  votes: VoteSDKType[];
-  proposals: ProposalSDKType[];
-  /** @deprecated */
-  deposit_params?: DepositParamsSDKType;
-  /** @deprecated */
-  voting_params?: VotingParamsSDKType;
-  /** @deprecated */
-  tally_params?: TallyParamsSDKType;
-  params?: ParamsSDKType;
-  constitution: string;
-}
 function createBaseGenesisState(): GenesisState {
   return {
     startingProposalId: BigInt(0),
@@ -127,6 +113,7 @@ function createBaseGenesisState(): GenesisState {
 }
 export const GenesisState = {
   typeUrl: "/cosmos.gov.v1.GenesisState",
+  aminoType: "cosmos-sdk/v1/GenesisState",
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.startingProposalId !== BigInt(0)) {
       writer.uint32(8).uint64(message.startingProposalId);
@@ -198,7 +185,7 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisState>): GenesisState {
+  fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = createBaseGenesisState();
     message.startingProposalId = object.startingProposalId !== undefined && object.startingProposalId !== null ? BigInt(object.startingProposalId.toString()) : BigInt(0);
     message.deposits = object.deposits?.map(e => Deposit.fromPartial(e)) || [];

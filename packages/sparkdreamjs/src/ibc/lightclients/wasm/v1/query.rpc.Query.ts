@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Rpc } from "../../../../helpers";
+import { TxRpc } from "../../../../types";
 import { BinaryReader } from "../../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
 import { QueryChecksumsRequest, QueryChecksumsResponse, QueryCodeRequest, QueryCodeResponse } from "./query";
@@ -11,24 +11,24 @@ export interface Query {
   code(request: QueryCodeRequest): Promise<QueryCodeResponse>;
 }
 export class QueryClientImpl implements Query {
-  private readonly rpc: Rpc;
-  constructor(rpc: Rpc) {
+  private readonly rpc: TxRpc;
+  constructor(rpc: TxRpc) {
     this.rpc = rpc;
-    this.checksums = this.checksums.bind(this);
-    this.code = this.code.bind(this);
   }
-  checksums(request: QueryChecksumsRequest = {
+  /* Get all Wasm checksums */
+  checksums = async (request: QueryChecksumsRequest = {
     pagination: undefined
-  }): Promise<QueryChecksumsResponse> {
+  }): Promise<QueryChecksumsResponse> => {
     const data = QueryChecksumsRequest.encode(request).finish();
     const promise = this.rpc.request("ibc.lightclients.wasm.v1.Query", "Checksums", data);
     return promise.then(data => QueryChecksumsResponse.decode(new BinaryReader(data)));
-  }
-  code(request: QueryCodeRequest): Promise<QueryCodeResponse> {
+  };
+  /* Get Wasm code for given checksum */
+  code = async (request: QueryCodeRequest): Promise<QueryCodeResponse> => {
     const data = QueryCodeRequest.encode(request).finish();
     const promise = this.rpc.request("ibc.lightclients.wasm.v1.Query", "Code", data);
     return promise.then(data => QueryCodeResponse.decode(new BinaryReader(data)));
-  }
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);

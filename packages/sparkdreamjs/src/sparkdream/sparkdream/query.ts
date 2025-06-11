@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { Params, ParamsAmino, ParamsSDKType } from "./params";
+import { Params, ParamsAmino } from "./params";
 import { BinaryReader, BinaryWriter } from "../../binary";
+import { DeepPartial } from "../../helpers";
 /** QueryParamsRequest is request type for the Query/Params RPC method. */
 export interface QueryParamsRequest {}
 export interface QueryParamsRequestProtoMsg {
@@ -13,8 +14,6 @@ export interface QueryParamsRequestAminoMsg {
   type: "/sparkdream.sparkdream.QueryParamsRequest";
   value: QueryParamsRequestAmino;
 }
-/** QueryParamsRequest is request type for the Query/Params RPC method. */
-export interface QueryParamsRequestSDKType {}
 /** QueryParamsResponse is response type for the Query/Params RPC method. */
 export interface QueryParamsResponse {
   /** params holds all the parameters of this module. */
@@ -32,10 +31,6 @@ export interface QueryParamsResponseAmino {
 export interface QueryParamsResponseAminoMsg {
   type: "/sparkdream.sparkdream.QueryParamsResponse";
   value: QueryParamsResponseAmino;
-}
-/** QueryParamsResponse is response type for the Query/Params RPC method. */
-export interface QueryParamsResponseSDKType {
-  params: ParamsSDKType;
 }
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
@@ -59,7 +54,7 @@ export const QueryParamsRequest = {
     }
     return message;
   },
-  fromPartial(_: Partial<QueryParamsRequest>): QueryParamsRequest {
+  fromPartial(_: DeepPartial<QueryParamsRequest>): QueryParamsRequest {
     const message = createBaseQueryParamsRequest();
     return message;
   },
@@ -117,7 +112,7 @@ export const QueryParamsResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryParamsResponse>): QueryParamsResponse {
+  fromPartial(object: DeepPartial<QueryParamsResponse>): QueryParamsResponse {
     const message = createBaseQueryParamsResponse();
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
     return message;

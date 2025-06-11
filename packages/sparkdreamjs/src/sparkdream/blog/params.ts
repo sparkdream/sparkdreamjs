@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../binary";
+import { DeepPartial } from "../../helpers";
 /** Params defines the parameters for the module. */
 export interface Params {}
 export interface ParamsProtoMsg {
@@ -12,13 +13,12 @@ export interface ParamsAminoMsg {
   type: "sparkdream/x/blog/Params";
   value: ParamsAmino;
 }
-/** Params defines the parameters for the module. */
-export interface ParamsSDKType {}
 function createBaseParams(): Params {
   return {};
 }
 export const Params = {
   typeUrl: "/sparkdream.blog.Params",
+  aminoType: "sparkdream/x/blog/Params",
   encode(_: Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -36,7 +36,7 @@ export const Params = {
     }
     return message;
   },
-  fromPartial(_: Partial<Params>): Params {
+  fromPartial(_: DeepPartial<Params>): Params {
     const message = createBaseParams();
     return message;
   },

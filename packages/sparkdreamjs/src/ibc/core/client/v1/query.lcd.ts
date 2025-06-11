@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryClientStateRequest, QueryClientStateResponseSDKType, QueryClientStatesRequest, QueryClientStatesResponseSDKType, QueryConsensusStateRequest, QueryConsensusStateResponseSDKType, QueryConsensusStatesRequest, QueryConsensusStatesResponseSDKType, QueryConsensusStateHeightsRequest, QueryConsensusStateHeightsResponseSDKType, QueryClientStatusRequest, QueryClientStatusResponseSDKType, QueryClientParamsRequest, QueryClientParamsResponseSDKType, QueryClientCreatorRequest, QueryClientCreatorResponseSDKType, QueryUpgradedClientStateRequest, QueryUpgradedClientStateResponseSDKType, QueryUpgradedConsensusStateRequest, QueryUpgradedConsensusStateResponseSDKType } from "./query";
+import { QueryClientStateRequest, QueryClientStateResponse, QueryClientStatesRequest, QueryClientStatesResponse, QueryConsensusStateRequest, QueryConsensusStateResponse, QueryConsensusStatesRequest, QueryConsensusStatesResponse, QueryConsensusStateHeightsRequest, QueryConsensusStateHeightsResponse, QueryClientStatusRequest, QueryClientStatusResponse, QueryClientParamsRequest, QueryClientParamsResponse, QueryClientCreatorRequest, QueryClientCreatorResponse, QueryUpgradedClientStateRequest, QueryUpgradedClientStateResponse, QueryUpgradedConsensusStateRequest, QueryUpgradedConsensusStateResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -10,26 +10,16 @@ export class LCDQueryClient {
     requestClient: LCDClient;
   }) {
     this.req = requestClient;
-    this.clientState = this.clientState.bind(this);
-    this.clientStates = this.clientStates.bind(this);
-    this.consensusState = this.consensusState.bind(this);
-    this.consensusStates = this.consensusStates.bind(this);
-    this.consensusStateHeights = this.consensusStateHeights.bind(this);
-    this.clientStatus = this.clientStatus.bind(this);
-    this.clientParams = this.clientParams.bind(this);
-    this.clientCreator = this.clientCreator.bind(this);
-    this.upgradedClientState = this.upgradedClientState.bind(this);
-    this.upgradedConsensusState = this.upgradedConsensusState.bind(this);
   }
   /* ClientState queries an IBC light client. */
-  async clientState(params: QueryClientStateRequest): Promise<QueryClientStateResponseSDKType> {
+  clientState = async (params: QueryClientStateRequest): Promise<QueryClientStateResponse> => {
     const endpoint = `ibc/core/client/v1/client_states/${params.clientId}`;
-    return await this.req.get<QueryClientStateResponseSDKType>(endpoint);
-  }
+    return await this.req.get<QueryClientStateResponse>(endpoint);
+  };
   /* ClientStates queries all the IBC light clients of a chain. */
-  async clientStates(params: QueryClientStatesRequest = {
+  clientStates = async (params: QueryClientStatesRequest = {
     pagination: undefined
-  }): Promise<QueryClientStatesResponseSDKType> {
+  }): Promise<QueryClientStatesResponse> => {
     const options: any = {
       params: {}
     };
@@ -37,11 +27,11 @@ export class LCDQueryClient {
       setPaginationParams(options, params.pagination);
     }
     const endpoint = `ibc/core/client/v1/client_states`;
-    return await this.req.get<QueryClientStatesResponseSDKType>(endpoint, options);
-  }
+    return await this.req.get<QueryClientStatesResponse>(endpoint, options);
+  };
   /* ConsensusState queries a consensus state associated with a client state at
    a given height. */
-  async consensusState(params: QueryConsensusStateRequest): Promise<QueryConsensusStateResponseSDKType> {
+  consensusState = async (params: QueryConsensusStateRequest): Promise<QueryConsensusStateResponse> => {
     const options: any = {
       params: {}
     };
@@ -49,11 +39,11 @@ export class LCDQueryClient {
       options.params.latest_height = params.latestHeight;
     }
     const endpoint = `ibc/core/client/v1/consensus_states/${params.clientId}/revision/${params.revisionNumber}/height/${params.revisionHeight}`;
-    return await this.req.get<QueryConsensusStateResponseSDKType>(endpoint, options);
-  }
+    return await this.req.get<QueryConsensusStateResponse>(endpoint, options);
+  };
   /* ConsensusStates queries all the consensus state associated with a given
    client. */
-  async consensusStates(params: QueryConsensusStatesRequest): Promise<QueryConsensusStatesResponseSDKType> {
+  consensusStates = async (params: QueryConsensusStatesRequest): Promise<QueryConsensusStatesResponse> => {
     const options: any = {
       params: {}
     };
@@ -61,10 +51,10 @@ export class LCDQueryClient {
       setPaginationParams(options, params.pagination);
     }
     const endpoint = `ibc/core/client/v1/consensus_states/${params.clientId}`;
-    return await this.req.get<QueryConsensusStatesResponseSDKType>(endpoint, options);
-  }
+    return await this.req.get<QueryConsensusStatesResponse>(endpoint, options);
+  };
   /* ConsensusStateHeights queries the height of every consensus states associated with a given client. */
-  async consensusStateHeights(params: QueryConsensusStateHeightsRequest): Promise<QueryConsensusStateHeightsResponseSDKType> {
+  consensusStateHeights = async (params: QueryConsensusStateHeightsRequest): Promise<QueryConsensusStateHeightsResponse> => {
     const options: any = {
       params: {}
     };
@@ -72,31 +62,31 @@ export class LCDQueryClient {
       setPaginationParams(options, params.pagination);
     }
     const endpoint = `ibc/core/client/v1/consensus_states/${params.clientId}/heights`;
-    return await this.req.get<QueryConsensusStateHeightsResponseSDKType>(endpoint, options);
-  }
+    return await this.req.get<QueryConsensusStateHeightsResponse>(endpoint, options);
+  };
   /* Status queries the status of an IBC client. */
-  async clientStatus(params: QueryClientStatusRequest): Promise<QueryClientStatusResponseSDKType> {
+  clientStatus = async (params: QueryClientStatusRequest): Promise<QueryClientStatusResponse> => {
     const endpoint = `ibc/core/client/v1/client_status/${params.clientId}`;
-    return await this.req.get<QueryClientStatusResponseSDKType>(endpoint);
-  }
+    return await this.req.get<QueryClientStatusResponse>(endpoint);
+  };
   /* ClientParams queries all parameters of the ibc client submodule. */
-  async clientParams(_params: QueryClientParamsRequest = {}): Promise<QueryClientParamsResponseSDKType> {
+  clientParams = async (_params: QueryClientParamsRequest = {}): Promise<QueryClientParamsResponse> => {
     const endpoint = `ibc/core/client/v1/params`;
-    return await this.req.get<QueryClientParamsResponseSDKType>(endpoint);
-  }
+    return await this.req.get<QueryClientParamsResponse>(endpoint);
+  };
   /* ClientCreator queries the creator of a given client. */
-  async clientCreator(params: QueryClientCreatorRequest): Promise<QueryClientCreatorResponseSDKType> {
+  clientCreator = async (params: QueryClientCreatorRequest): Promise<QueryClientCreatorResponse> => {
     const endpoint = `ibc/core/client/v1/client_creator/${params.clientId}`;
-    return await this.req.get<QueryClientCreatorResponseSDKType>(endpoint);
-  }
+    return await this.req.get<QueryClientCreatorResponse>(endpoint);
+  };
   /* UpgradedClientState queries an Upgraded IBC light client. */
-  async upgradedClientState(_params: QueryUpgradedClientStateRequest = {}): Promise<QueryUpgradedClientStateResponseSDKType> {
+  upgradedClientState = async (_params: QueryUpgradedClientStateRequest = {}): Promise<QueryUpgradedClientStateResponse> => {
     const endpoint = `ibc/core/client/v1/upgraded_client_states`;
-    return await this.req.get<QueryUpgradedClientStateResponseSDKType>(endpoint);
-  }
+    return await this.req.get<QueryUpgradedClientStateResponse>(endpoint);
+  };
   /* UpgradedConsensusState queries an Upgraded IBC consensus state. */
-  async upgradedConsensusState(_params: QueryUpgradedConsensusStateRequest = {}): Promise<QueryUpgradedConsensusStateResponseSDKType> {
+  upgradedConsensusState = async (_params: QueryUpgradedConsensusStateRequest = {}): Promise<QueryUpgradedConsensusStateResponse> => {
     const endpoint = `ibc/core/client/v1/upgraded_consensus_states`;
-    return await this.req.get<QueryUpgradedConsensusStateResponseSDKType>(endpoint);
-  }
+    return await this.req.get<QueryUpgradedConsensusStateResponse>(endpoint);
+  };
 }

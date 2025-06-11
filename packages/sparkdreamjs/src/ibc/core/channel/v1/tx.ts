@@ -1,8 +1,8 @@
 //@ts-nocheck
-import { Channel, ChannelAmino, ChannelSDKType, Packet, PacketAmino, PacketSDKType } from "./channel";
-import { Height, HeightAmino, HeightSDKType } from "../../client/v1/client";
+import { Channel, ChannelAmino, Packet, PacketAmino } from "./channel";
+import { Height, HeightAmino } from "../../client/v1/client";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /** ResponseResultType defines the possible outcomes of the execution of a message */
 export enum ResponseResultType {
   /** RESPONSE_RESULT_TYPE_UNSPECIFIED - Default zero value enumeration */
@@ -15,7 +15,6 @@ export enum ResponseResultType {
   RESPONSE_RESULT_TYPE_FAILURE = 3,
   UNRECOGNIZED = -1,
 }
-export const ResponseResultTypeSDKType = ResponseResultType;
 export const ResponseResultTypeAmino = ResponseResultType;
 export function responseResultTypeFromJSON(object: any): ResponseResultType {
   switch (object) {
@@ -78,15 +77,6 @@ export interface MsgChannelOpenInitAminoMsg {
   type: "cosmos-sdk/MsgChannelOpenInit";
   value: MsgChannelOpenInitAmino;
 }
-/**
- * MsgChannelOpenInit defines an sdk.Msg to initialize a channel handshake. It
- * is called by a relayer on Chain A.
- */
-export interface MsgChannelOpenInitSDKType {
-  port_id: string;
-  channel: ChannelSDKType;
-  signer: string;
-}
 /** MsgChannelOpenInitResponse defines the Msg/ChannelOpenInit response type. */
 export interface MsgChannelOpenInitResponse {
   channelId: string;
@@ -104,11 +94,6 @@ export interface MsgChannelOpenInitResponseAmino {
 export interface MsgChannelOpenInitResponseAminoMsg {
   type: "cosmos-sdk/MsgChannelOpenInitResponse";
   value: MsgChannelOpenInitResponseAmino;
-}
-/** MsgChannelOpenInitResponse defines the Msg/ChannelOpenInit response type. */
-export interface MsgChannelOpenInitResponseSDKType {
-  channel_id: string;
-  version: string;
 }
 /**
  * MsgChannelOpenInit defines a msg sent by a Relayer to try to open a channel
@@ -152,21 +137,6 @@ export interface MsgChannelOpenTryAminoMsg {
   type: "cosmos-sdk/MsgChannelOpenTry";
   value: MsgChannelOpenTryAmino;
 }
-/**
- * MsgChannelOpenInit defines a msg sent by a Relayer to try to open a channel
- * on Chain B. The version field within the Channel field has been deprecated. Its
- * value will be ignored by core IBC.
- */
-export interface MsgChannelOpenTrySDKType {
-  port_id: string;
-  /** @deprecated */
-  previous_channel_id: string;
-  channel: ChannelSDKType;
-  counterparty_version: string;
-  proof_init: Uint8Array;
-  proof_height: HeightSDKType;
-  signer: string;
-}
 /** MsgChannelOpenTryResponse defines the Msg/ChannelOpenTry response type. */
 export interface MsgChannelOpenTryResponse {
   version: string;
@@ -184,11 +154,6 @@ export interface MsgChannelOpenTryResponseAmino {
 export interface MsgChannelOpenTryResponseAminoMsg {
   type: "cosmos-sdk/MsgChannelOpenTryResponse";
   value: MsgChannelOpenTryResponseAmino;
-}
-/** MsgChannelOpenTryResponse defines the Msg/ChannelOpenTry response type. */
-export interface MsgChannelOpenTryResponseSDKType {
-  version: string;
-  channel_id: string;
 }
 /**
  * MsgChannelOpenAck defines a msg sent by a Relayer to Chain A to acknowledge
@@ -224,19 +189,6 @@ export interface MsgChannelOpenAckAminoMsg {
   type: "cosmos-sdk/MsgChannelOpenAck";
   value: MsgChannelOpenAckAmino;
 }
-/**
- * MsgChannelOpenAck defines a msg sent by a Relayer to Chain A to acknowledge
- * the change of channel state to TRYOPEN on Chain B.
- */
-export interface MsgChannelOpenAckSDKType {
-  port_id: string;
-  channel_id: string;
-  counterparty_channel_id: string;
-  counterparty_version: string;
-  proof_try: Uint8Array;
-  proof_height: HeightSDKType;
-  signer: string;
-}
 /** MsgChannelOpenAckResponse defines the Msg/ChannelOpenAck response type. */
 export interface MsgChannelOpenAckResponse {}
 export interface MsgChannelOpenAckResponseProtoMsg {
@@ -249,8 +201,6 @@ export interface MsgChannelOpenAckResponseAminoMsg {
   type: "cosmos-sdk/MsgChannelOpenAckResponse";
   value: MsgChannelOpenAckResponseAmino;
 }
-/** MsgChannelOpenAckResponse defines the Msg/ChannelOpenAck response type. */
-export interface MsgChannelOpenAckResponseSDKType {}
 /**
  * MsgChannelOpenConfirm defines a msg sent by a Relayer to Chain B to
  * acknowledge the change of channel state to OPEN on Chain A.
@@ -282,17 +232,6 @@ export interface MsgChannelOpenConfirmAminoMsg {
   value: MsgChannelOpenConfirmAmino;
 }
 /**
- * MsgChannelOpenConfirm defines a msg sent by a Relayer to Chain B to
- * acknowledge the change of channel state to OPEN on Chain A.
- */
-export interface MsgChannelOpenConfirmSDKType {
-  port_id: string;
-  channel_id: string;
-  proof_ack: Uint8Array;
-  proof_height: HeightSDKType;
-  signer: string;
-}
-/**
  * MsgChannelOpenConfirmResponse defines the Msg/ChannelOpenConfirm response
  * type.
  */
@@ -310,11 +249,6 @@ export interface MsgChannelOpenConfirmResponseAminoMsg {
   type: "cosmos-sdk/MsgChannelOpenConfirmResponse";
   value: MsgChannelOpenConfirmResponseAmino;
 }
-/**
- * MsgChannelOpenConfirmResponse defines the Msg/ChannelOpenConfirm response
- * type.
- */
-export interface MsgChannelOpenConfirmResponseSDKType {}
 /**
  * MsgChannelCloseInit defines a msg sent by a Relayer to Chain A
  * to close a channel with Chain B.
@@ -341,15 +275,6 @@ export interface MsgChannelCloseInitAminoMsg {
   type: "cosmos-sdk/MsgChannelCloseInit";
   value: MsgChannelCloseInitAmino;
 }
-/**
- * MsgChannelCloseInit defines a msg sent by a Relayer to Chain A
- * to close a channel with Chain B.
- */
-export interface MsgChannelCloseInitSDKType {
-  port_id: string;
-  channel_id: string;
-  signer: string;
-}
 /** MsgChannelCloseInitResponse defines the Msg/ChannelCloseInit response type. */
 export interface MsgChannelCloseInitResponse {}
 export interface MsgChannelCloseInitResponseProtoMsg {
@@ -362,8 +287,6 @@ export interface MsgChannelCloseInitResponseAminoMsg {
   type: "cosmos-sdk/MsgChannelCloseInitResponse";
   value: MsgChannelCloseInitResponseAmino;
 }
-/** MsgChannelCloseInitResponse defines the Msg/ChannelCloseInit response type. */
-export interface MsgChannelCloseInitResponseSDKType {}
 /**
  * MsgChannelCloseConfirm defines a msg sent by a Relayer to Chain B
  * to acknowledge the change of channel state to CLOSED on Chain A.
@@ -395,17 +318,6 @@ export interface MsgChannelCloseConfirmAminoMsg {
   value: MsgChannelCloseConfirmAmino;
 }
 /**
- * MsgChannelCloseConfirm defines a msg sent by a Relayer to Chain B
- * to acknowledge the change of channel state to CLOSED on Chain A.
- */
-export interface MsgChannelCloseConfirmSDKType {
-  port_id: string;
-  channel_id: string;
-  proof_init: Uint8Array;
-  proof_height: HeightSDKType;
-  signer: string;
-}
-/**
  * MsgChannelCloseConfirmResponse defines the Msg/ChannelCloseConfirm response
  * type.
  */
@@ -423,11 +335,6 @@ export interface MsgChannelCloseConfirmResponseAminoMsg {
   type: "cosmos-sdk/MsgChannelCloseConfirmResponse";
   value: MsgChannelCloseConfirmResponseAmino;
 }
-/**
- * MsgChannelCloseConfirmResponse defines the Msg/ChannelCloseConfirm response
- * type.
- */
-export interface MsgChannelCloseConfirmResponseSDKType {}
 /** MsgRecvPacket receives incoming IBC packet */
 export interface MsgRecvPacket {
   packet: Packet;
@@ -450,13 +357,6 @@ export interface MsgRecvPacketAminoMsg {
   type: "cosmos-sdk/MsgRecvPacket";
   value: MsgRecvPacketAmino;
 }
-/** MsgRecvPacket receives incoming IBC packet */
-export interface MsgRecvPacketSDKType {
-  packet: PacketSDKType;
-  proof_commitment: Uint8Array;
-  proof_height: HeightSDKType;
-  signer: string;
-}
 /** MsgRecvPacketResponse defines the Msg/RecvPacket response type. */
 export interface MsgRecvPacketResponse {
   result: ResponseResultType;
@@ -472,10 +372,6 @@ export interface MsgRecvPacketResponseAmino {
 export interface MsgRecvPacketResponseAminoMsg {
   type: "cosmos-sdk/MsgRecvPacketResponse";
   value: MsgRecvPacketResponseAmino;
-}
-/** MsgRecvPacketResponse defines the Msg/RecvPacket response type. */
-export interface MsgRecvPacketResponseSDKType {
-  result: ResponseResultType;
 }
 /** MsgTimeout receives timed-out packet */
 export interface MsgTimeout {
@@ -501,14 +397,6 @@ export interface MsgTimeoutAminoMsg {
   type: "cosmos-sdk/MsgTimeout";
   value: MsgTimeoutAmino;
 }
-/** MsgTimeout receives timed-out packet */
-export interface MsgTimeoutSDKType {
-  packet: PacketSDKType;
-  proof_unreceived: Uint8Array;
-  proof_height: HeightSDKType;
-  next_sequence_recv: bigint;
-  signer: string;
-}
 /** MsgTimeoutResponse defines the Msg/Timeout response type. */
 export interface MsgTimeoutResponse {
   result: ResponseResultType;
@@ -524,10 +412,6 @@ export interface MsgTimeoutResponseAmino {
 export interface MsgTimeoutResponseAminoMsg {
   type: "cosmos-sdk/MsgTimeoutResponse";
   value: MsgTimeoutResponseAmino;
-}
-/** MsgTimeoutResponse defines the Msg/Timeout response type. */
-export interface MsgTimeoutResponseSDKType {
-  result: ResponseResultType;
 }
 /** MsgTimeoutOnClose timed-out packet upon counterparty channel closure. */
 export interface MsgTimeoutOnClose {
@@ -555,15 +439,6 @@ export interface MsgTimeoutOnCloseAminoMsg {
   type: "cosmos-sdk/MsgTimeoutOnClose";
   value: MsgTimeoutOnCloseAmino;
 }
-/** MsgTimeoutOnClose timed-out packet upon counterparty channel closure. */
-export interface MsgTimeoutOnCloseSDKType {
-  packet: PacketSDKType;
-  proof_unreceived: Uint8Array;
-  proof_close: Uint8Array;
-  proof_height: HeightSDKType;
-  next_sequence_recv: bigint;
-  signer: string;
-}
 /** MsgTimeoutOnCloseResponse defines the Msg/TimeoutOnClose response type. */
 export interface MsgTimeoutOnCloseResponse {
   result: ResponseResultType;
@@ -579,10 +454,6 @@ export interface MsgTimeoutOnCloseResponseAmino {
 export interface MsgTimeoutOnCloseResponseAminoMsg {
   type: "cosmos-sdk/MsgTimeoutOnCloseResponse";
   value: MsgTimeoutOnCloseResponseAmino;
-}
-/** MsgTimeoutOnCloseResponse defines the Msg/TimeoutOnClose response type. */
-export interface MsgTimeoutOnCloseResponseSDKType {
-  result: ResponseResultType;
 }
 /** MsgAcknowledgement receives incoming IBC acknowledgement */
 export interface MsgAcknowledgement {
@@ -608,14 +479,6 @@ export interface MsgAcknowledgementAminoMsg {
   type: "cosmos-sdk/MsgAcknowledgement";
   value: MsgAcknowledgementAmino;
 }
-/** MsgAcknowledgement receives incoming IBC acknowledgement */
-export interface MsgAcknowledgementSDKType {
-  packet: PacketSDKType;
-  acknowledgement: Uint8Array;
-  proof_acked: Uint8Array;
-  proof_height: HeightSDKType;
-  signer: string;
-}
 /** MsgAcknowledgementResponse defines the Msg/Acknowledgement response type. */
 export interface MsgAcknowledgementResponse {
   result: ResponseResultType;
@@ -632,10 +495,6 @@ export interface MsgAcknowledgementResponseAminoMsg {
   type: "cosmos-sdk/MsgAcknowledgementResponse";
   value: MsgAcknowledgementResponseAmino;
 }
-/** MsgAcknowledgementResponse defines the Msg/Acknowledgement response type. */
-export interface MsgAcknowledgementResponseSDKType {
-  result: ResponseResultType;
-}
 function createBaseMsgChannelOpenInit(): MsgChannelOpenInit {
   return {
     portId: "",
@@ -645,6 +504,7 @@ function createBaseMsgChannelOpenInit(): MsgChannelOpenInit {
 }
 export const MsgChannelOpenInit = {
   typeUrl: "/ibc.core.channel.v1.MsgChannelOpenInit",
+  aminoType: "cosmos-sdk/MsgChannelOpenInit",
   encode(message: MsgChannelOpenInit, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.portId !== "") {
       writer.uint32(10).string(message.portId);
@@ -680,7 +540,7 @@ export const MsgChannelOpenInit = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgChannelOpenInit>): MsgChannelOpenInit {
+  fromPartial(object: DeepPartial<MsgChannelOpenInit>): MsgChannelOpenInit {
     const message = createBaseMsgChannelOpenInit();
     message.portId = object.portId ?? "";
     message.channel = object.channel !== undefined && object.channel !== null ? Channel.fromPartial(object.channel) : undefined;
@@ -737,6 +597,7 @@ function createBaseMsgChannelOpenInitResponse(): MsgChannelOpenInitResponse {
 }
 export const MsgChannelOpenInitResponse = {
   typeUrl: "/ibc.core.channel.v1.MsgChannelOpenInitResponse",
+  aminoType: "cosmos-sdk/MsgChannelOpenInitResponse",
   encode(message: MsgChannelOpenInitResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.channelId !== "") {
       writer.uint32(10).string(message.channelId);
@@ -766,7 +627,7 @@ export const MsgChannelOpenInitResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgChannelOpenInitResponse>): MsgChannelOpenInitResponse {
+  fromPartial(object: DeepPartial<MsgChannelOpenInitResponse>): MsgChannelOpenInitResponse {
     const message = createBaseMsgChannelOpenInitResponse();
     message.channelId = object.channelId ?? "";
     message.version = object.version ?? "";
@@ -823,6 +684,7 @@ function createBaseMsgChannelOpenTry(): MsgChannelOpenTry {
 }
 export const MsgChannelOpenTry = {
   typeUrl: "/ibc.core.channel.v1.MsgChannelOpenTry",
+  aminoType: "cosmos-sdk/MsgChannelOpenTry",
   encode(message: MsgChannelOpenTry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.portId !== "") {
       writer.uint32(10).string(message.portId);
@@ -882,7 +744,7 @@ export const MsgChannelOpenTry = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgChannelOpenTry>): MsgChannelOpenTry {
+  fromPartial(object: DeepPartial<MsgChannelOpenTry>): MsgChannelOpenTry {
     const message = createBaseMsgChannelOpenTry();
     message.portId = object.portId ?? "";
     message.previousChannelId = object.previousChannelId ?? "";
@@ -959,6 +821,7 @@ function createBaseMsgChannelOpenTryResponse(): MsgChannelOpenTryResponse {
 }
 export const MsgChannelOpenTryResponse = {
   typeUrl: "/ibc.core.channel.v1.MsgChannelOpenTryResponse",
+  aminoType: "cosmos-sdk/MsgChannelOpenTryResponse",
   encode(message: MsgChannelOpenTryResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.version !== "") {
       writer.uint32(10).string(message.version);
@@ -988,7 +851,7 @@ export const MsgChannelOpenTryResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgChannelOpenTryResponse>): MsgChannelOpenTryResponse {
+  fromPartial(object: DeepPartial<MsgChannelOpenTryResponse>): MsgChannelOpenTryResponse {
     const message = createBaseMsgChannelOpenTryResponse();
     message.version = object.version ?? "";
     message.channelId = object.channelId ?? "";
@@ -1045,6 +908,7 @@ function createBaseMsgChannelOpenAck(): MsgChannelOpenAck {
 }
 export const MsgChannelOpenAck = {
   typeUrl: "/ibc.core.channel.v1.MsgChannelOpenAck",
+  aminoType: "cosmos-sdk/MsgChannelOpenAck",
   encode(message: MsgChannelOpenAck, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.portId !== "") {
       writer.uint32(10).string(message.portId);
@@ -1104,7 +968,7 @@ export const MsgChannelOpenAck = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgChannelOpenAck>): MsgChannelOpenAck {
+  fromPartial(object: DeepPartial<MsgChannelOpenAck>): MsgChannelOpenAck {
     const message = createBaseMsgChannelOpenAck();
     message.portId = object.portId ?? "";
     message.channelId = object.channelId ?? "";
@@ -1178,6 +1042,7 @@ function createBaseMsgChannelOpenAckResponse(): MsgChannelOpenAckResponse {
 }
 export const MsgChannelOpenAckResponse = {
   typeUrl: "/ibc.core.channel.v1.MsgChannelOpenAckResponse",
+  aminoType: "cosmos-sdk/MsgChannelOpenAckResponse",
   encode(_: MsgChannelOpenAckResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1195,7 +1060,7 @@ export const MsgChannelOpenAckResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgChannelOpenAckResponse>): MsgChannelOpenAckResponse {
+  fromPartial(_: DeepPartial<MsgChannelOpenAckResponse>): MsgChannelOpenAckResponse {
     const message = createBaseMsgChannelOpenAckResponse();
     return message;
   },
@@ -1240,6 +1105,7 @@ function createBaseMsgChannelOpenConfirm(): MsgChannelOpenConfirm {
 }
 export const MsgChannelOpenConfirm = {
   typeUrl: "/ibc.core.channel.v1.MsgChannelOpenConfirm",
+  aminoType: "cosmos-sdk/MsgChannelOpenConfirm",
   encode(message: MsgChannelOpenConfirm, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.portId !== "") {
       writer.uint32(10).string(message.portId);
@@ -1287,7 +1153,7 @@ export const MsgChannelOpenConfirm = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgChannelOpenConfirm>): MsgChannelOpenConfirm {
+  fromPartial(object: DeepPartial<MsgChannelOpenConfirm>): MsgChannelOpenConfirm {
     const message = createBaseMsgChannelOpenConfirm();
     message.portId = object.portId ?? "";
     message.channelId = object.channelId ?? "";
@@ -1351,6 +1217,7 @@ function createBaseMsgChannelOpenConfirmResponse(): MsgChannelOpenConfirmRespons
 }
 export const MsgChannelOpenConfirmResponse = {
   typeUrl: "/ibc.core.channel.v1.MsgChannelOpenConfirmResponse",
+  aminoType: "cosmos-sdk/MsgChannelOpenConfirmResponse",
   encode(_: MsgChannelOpenConfirmResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1368,7 +1235,7 @@ export const MsgChannelOpenConfirmResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgChannelOpenConfirmResponse>): MsgChannelOpenConfirmResponse {
+  fromPartial(_: DeepPartial<MsgChannelOpenConfirmResponse>): MsgChannelOpenConfirmResponse {
     const message = createBaseMsgChannelOpenConfirmResponse();
     return message;
   },
@@ -1411,6 +1278,7 @@ function createBaseMsgChannelCloseInit(): MsgChannelCloseInit {
 }
 export const MsgChannelCloseInit = {
   typeUrl: "/ibc.core.channel.v1.MsgChannelCloseInit",
+  aminoType: "cosmos-sdk/MsgChannelCloseInit",
   encode(message: MsgChannelCloseInit, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.portId !== "") {
       writer.uint32(10).string(message.portId);
@@ -1446,7 +1314,7 @@ export const MsgChannelCloseInit = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgChannelCloseInit>): MsgChannelCloseInit {
+  fromPartial(object: DeepPartial<MsgChannelCloseInit>): MsgChannelCloseInit {
     const message = createBaseMsgChannelCloseInit();
     message.portId = object.portId ?? "";
     message.channelId = object.channelId ?? "";
@@ -1500,6 +1368,7 @@ function createBaseMsgChannelCloseInitResponse(): MsgChannelCloseInitResponse {
 }
 export const MsgChannelCloseInitResponse = {
   typeUrl: "/ibc.core.channel.v1.MsgChannelCloseInitResponse",
+  aminoType: "cosmos-sdk/MsgChannelCloseInitResponse",
   encode(_: MsgChannelCloseInitResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1517,7 +1386,7 @@ export const MsgChannelCloseInitResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgChannelCloseInitResponse>): MsgChannelCloseInitResponse {
+  fromPartial(_: DeepPartial<MsgChannelCloseInitResponse>): MsgChannelCloseInitResponse {
     const message = createBaseMsgChannelCloseInitResponse();
     return message;
   },
@@ -1562,6 +1431,7 @@ function createBaseMsgChannelCloseConfirm(): MsgChannelCloseConfirm {
 }
 export const MsgChannelCloseConfirm = {
   typeUrl: "/ibc.core.channel.v1.MsgChannelCloseConfirm",
+  aminoType: "cosmos-sdk/MsgChannelCloseConfirm",
   encode(message: MsgChannelCloseConfirm, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.portId !== "") {
       writer.uint32(10).string(message.portId);
@@ -1609,7 +1479,7 @@ export const MsgChannelCloseConfirm = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgChannelCloseConfirm>): MsgChannelCloseConfirm {
+  fromPartial(object: DeepPartial<MsgChannelCloseConfirm>): MsgChannelCloseConfirm {
     const message = createBaseMsgChannelCloseConfirm();
     message.portId = object.portId ?? "";
     message.channelId = object.channelId ?? "";
@@ -1673,6 +1543,7 @@ function createBaseMsgChannelCloseConfirmResponse(): MsgChannelCloseConfirmRespo
 }
 export const MsgChannelCloseConfirmResponse = {
   typeUrl: "/ibc.core.channel.v1.MsgChannelCloseConfirmResponse",
+  aminoType: "cosmos-sdk/MsgChannelCloseConfirmResponse",
   encode(_: MsgChannelCloseConfirmResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1690,7 +1561,7 @@ export const MsgChannelCloseConfirmResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgChannelCloseConfirmResponse>): MsgChannelCloseConfirmResponse {
+  fromPartial(_: DeepPartial<MsgChannelCloseConfirmResponse>): MsgChannelCloseConfirmResponse {
     const message = createBaseMsgChannelCloseConfirmResponse();
     return message;
   },
@@ -1734,6 +1605,7 @@ function createBaseMsgRecvPacket(): MsgRecvPacket {
 }
 export const MsgRecvPacket = {
   typeUrl: "/ibc.core.channel.v1.MsgRecvPacket",
+  aminoType: "cosmos-sdk/MsgRecvPacket",
   encode(message: MsgRecvPacket, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.packet !== undefined) {
       Packet.encode(message.packet, writer.uint32(10).fork()).ldelim();
@@ -1775,7 +1647,7 @@ export const MsgRecvPacket = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgRecvPacket>): MsgRecvPacket {
+  fromPartial(object: DeepPartial<MsgRecvPacket>): MsgRecvPacket {
     const message = createBaseMsgRecvPacket();
     message.packet = object.packet !== undefined && object.packet !== null ? Packet.fromPartial(object.packet) : undefined;
     message.proofCommitment = object.proofCommitment ?? new Uint8Array();
@@ -1836,6 +1708,7 @@ function createBaseMsgRecvPacketResponse(): MsgRecvPacketResponse {
 }
 export const MsgRecvPacketResponse = {
   typeUrl: "/ibc.core.channel.v1.MsgRecvPacketResponse",
+  aminoType: "cosmos-sdk/MsgRecvPacketResponse",
   encode(message: MsgRecvPacketResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.result !== 0) {
       writer.uint32(8).int32(message.result);
@@ -1859,7 +1732,7 @@ export const MsgRecvPacketResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgRecvPacketResponse>): MsgRecvPacketResponse {
+  fromPartial(object: DeepPartial<MsgRecvPacketResponse>): MsgRecvPacketResponse {
     const message = createBaseMsgRecvPacketResponse();
     message.result = object.result ?? 0;
     return message;
@@ -1909,6 +1782,7 @@ function createBaseMsgTimeout(): MsgTimeout {
 }
 export const MsgTimeout = {
   typeUrl: "/ibc.core.channel.v1.MsgTimeout",
+  aminoType: "cosmos-sdk/MsgTimeout",
   encode(message: MsgTimeout, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.packet !== undefined) {
       Packet.encode(message.packet, writer.uint32(10).fork()).ldelim();
@@ -1956,7 +1830,7 @@ export const MsgTimeout = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgTimeout>): MsgTimeout {
+  fromPartial(object: DeepPartial<MsgTimeout>): MsgTimeout {
     const message = createBaseMsgTimeout();
     message.packet = object.packet !== undefined && object.packet !== null ? Packet.fromPartial(object.packet) : undefined;
     message.proofUnreceived = object.proofUnreceived ?? new Uint8Array();
@@ -2022,6 +1896,7 @@ function createBaseMsgTimeoutResponse(): MsgTimeoutResponse {
 }
 export const MsgTimeoutResponse = {
   typeUrl: "/ibc.core.channel.v1.MsgTimeoutResponse",
+  aminoType: "cosmos-sdk/MsgTimeoutResponse",
   encode(message: MsgTimeoutResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.result !== 0) {
       writer.uint32(8).int32(message.result);
@@ -2045,7 +1920,7 @@ export const MsgTimeoutResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgTimeoutResponse>): MsgTimeoutResponse {
+  fromPartial(object: DeepPartial<MsgTimeoutResponse>): MsgTimeoutResponse {
     const message = createBaseMsgTimeoutResponse();
     message.result = object.result ?? 0;
     return message;
@@ -2096,6 +1971,7 @@ function createBaseMsgTimeoutOnClose(): MsgTimeoutOnClose {
 }
 export const MsgTimeoutOnClose = {
   typeUrl: "/ibc.core.channel.v1.MsgTimeoutOnClose",
+  aminoType: "cosmos-sdk/MsgTimeoutOnClose",
   encode(message: MsgTimeoutOnClose, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.packet !== undefined) {
       Packet.encode(message.packet, writer.uint32(10).fork()).ldelim();
@@ -2149,7 +2025,7 @@ export const MsgTimeoutOnClose = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgTimeoutOnClose>): MsgTimeoutOnClose {
+  fromPartial(object: DeepPartial<MsgTimeoutOnClose>): MsgTimeoutOnClose {
     const message = createBaseMsgTimeoutOnClose();
     message.packet = object.packet !== undefined && object.packet !== null ? Packet.fromPartial(object.packet) : undefined;
     message.proofUnreceived = object.proofUnreceived ?? new Uint8Array();
@@ -2220,6 +2096,7 @@ function createBaseMsgTimeoutOnCloseResponse(): MsgTimeoutOnCloseResponse {
 }
 export const MsgTimeoutOnCloseResponse = {
   typeUrl: "/ibc.core.channel.v1.MsgTimeoutOnCloseResponse",
+  aminoType: "cosmos-sdk/MsgTimeoutOnCloseResponse",
   encode(message: MsgTimeoutOnCloseResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.result !== 0) {
       writer.uint32(8).int32(message.result);
@@ -2243,7 +2120,7 @@ export const MsgTimeoutOnCloseResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgTimeoutOnCloseResponse>): MsgTimeoutOnCloseResponse {
+  fromPartial(object: DeepPartial<MsgTimeoutOnCloseResponse>): MsgTimeoutOnCloseResponse {
     const message = createBaseMsgTimeoutOnCloseResponse();
     message.result = object.result ?? 0;
     return message;
@@ -2293,6 +2170,7 @@ function createBaseMsgAcknowledgement(): MsgAcknowledgement {
 }
 export const MsgAcknowledgement = {
   typeUrl: "/ibc.core.channel.v1.MsgAcknowledgement",
+  aminoType: "cosmos-sdk/MsgAcknowledgement",
   encode(message: MsgAcknowledgement, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.packet !== undefined) {
       Packet.encode(message.packet, writer.uint32(10).fork()).ldelim();
@@ -2340,7 +2218,7 @@ export const MsgAcknowledgement = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgAcknowledgement>): MsgAcknowledgement {
+  fromPartial(object: DeepPartial<MsgAcknowledgement>): MsgAcknowledgement {
     const message = createBaseMsgAcknowledgement();
     message.packet = object.packet !== undefined && object.packet !== null ? Packet.fromPartial(object.packet) : undefined;
     message.acknowledgement = object.acknowledgement ?? new Uint8Array();
@@ -2406,6 +2284,7 @@ function createBaseMsgAcknowledgementResponse(): MsgAcknowledgementResponse {
 }
 export const MsgAcknowledgementResponse = {
   typeUrl: "/ibc.core.channel.v1.MsgAcknowledgementResponse",
+  aminoType: "cosmos-sdk/MsgAcknowledgementResponse",
   encode(message: MsgAcknowledgementResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.result !== 0) {
       writer.uint32(8).int32(message.result);
@@ -2429,7 +2308,7 @@ export const MsgAcknowledgementResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgAcknowledgementResponse>): MsgAcknowledgementResponse {
+  fromPartial(object: DeepPartial<MsgAcknowledgementResponse>): MsgAcknowledgementResponse {
     const message = createBaseMsgAcknowledgementResponse();
     message.result = object.result ?? 0;
     return message;

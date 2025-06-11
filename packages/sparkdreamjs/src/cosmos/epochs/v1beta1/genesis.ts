@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { Timestamp } from "../../../google/protobuf/timestamp";
-import { Duration, DurationAmino, DurationSDKType } from "../../../google/protobuf/duration";
+import { Duration, DurationAmino } from "../../../google/protobuf/duration";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { toTimestamp, fromTimestamp } from "../../../helpers";
+import { toTimestamp, fromTimestamp, DeepPartial } from "../../../helpers";
 /**
  * EpochInfo is a struct that describes the data going into
  * a timer defined by the x/epochs module.
@@ -127,19 +127,6 @@ export interface EpochInfoAminoMsg {
   type: "cosmos-sdk/EpochInfo";
   value: EpochInfoAmino;
 }
-/**
- * EpochInfo is a struct that describes the data going into
- * a timer defined by the x/epochs module.
- */
-export interface EpochInfoSDKType {
-  identifier: string;
-  start_time: Date;
-  duration: DurationSDKType;
-  current_epoch: bigint;
-  current_epoch_start_time: Date;
-  epoch_counting_started: boolean;
-  current_epoch_start_height: bigint;
-}
 /** GenesisState defines the epochs module's genesis state. */
 export interface GenesisState {
   epochs: EpochInfo[];
@@ -156,10 +143,6 @@ export interface GenesisStateAminoMsg {
   type: "cosmos-sdk/GenesisState";
   value: GenesisStateAmino;
 }
-/** GenesisState defines the epochs module's genesis state. */
-export interface GenesisStateSDKType {
-  epochs: EpochInfoSDKType[];
-}
 function createBaseEpochInfo(): EpochInfo {
   return {
     identifier: "",
@@ -173,6 +156,7 @@ function createBaseEpochInfo(): EpochInfo {
 }
 export const EpochInfo = {
   typeUrl: "/cosmos.epochs.v1beta1.EpochInfo",
+  aminoType: "cosmos-sdk/EpochInfo",
   encode(message: EpochInfo, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.identifier !== "") {
       writer.uint32(10).string(message.identifier);
@@ -232,7 +216,7 @@ export const EpochInfo = {
     }
     return message;
   },
-  fromPartial(object: Partial<EpochInfo>): EpochInfo {
+  fromPartial(object: DeepPartial<EpochInfo>): EpochInfo {
     const message = createBaseEpochInfo();
     message.identifier = object.identifier ?? "";
     message.startTime = object.startTime ?? undefined;
@@ -308,6 +292,7 @@ function createBaseGenesisState(): GenesisState {
 }
 export const GenesisState = {
   typeUrl: "/cosmos.epochs.v1beta1.GenesisState",
+  aminoType: "cosmos-sdk/GenesisState",
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.epochs) {
       EpochInfo.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -331,7 +316,7 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisState>): GenesisState {
+  fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = createBaseGenesisState();
     message.epochs = object.epochs?.map(e => EpochInfo.fromPartial(e)) || [];
     return message;

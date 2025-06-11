@@ -1,7 +1,7 @@
 //@ts-nocheck
-import { ResponseCommit, ResponseCommitAmino, ResponseCommitSDKType, RequestFinalizeBlock, RequestFinalizeBlockAmino, RequestFinalizeBlockSDKType, ResponseFinalizeBlock, ResponseFinalizeBlockAmino, ResponseFinalizeBlockSDKType } from "../../../tendermint/abci/types";
+import { ResponseCommit, ResponseCommitAmino, RequestFinalizeBlock, RequestFinalizeBlockAmino, ResponseFinalizeBlock, ResponseFinalizeBlockAmino } from "../../../tendermint/abci/types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /**
  * StoreKVPair is a KVStore KVPair used for listening to state changes (Sets and Deletes)
  * It optionally includes the StoreKey for the originating KVStore and a Boolean flag to distinguish between Sets and
@@ -41,19 +41,6 @@ export interface StoreKVPairAminoMsg {
   value: StoreKVPairAmino;
 }
 /**
- * StoreKVPair is a KVStore KVPair used for listening to state changes (Sets and Deletes)
- * It optionally includes the StoreKey for the originating KVStore and a Boolean flag to distinguish between Sets and
- * Deletes
- * 
- * Since: cosmos-sdk 0.43
- */
-export interface StoreKVPairSDKType {
-  store_key: string;
-  delete: boolean;
-  key: Uint8Array;
-  value: Uint8Array;
-}
-/**
  * BlockMetadata contains all the abci event data of a block
  * the file streamer dump them into files together with the state changes.
  */
@@ -81,15 +68,6 @@ export interface BlockMetadataAminoMsg {
   type: "cosmos-sdk/BlockMetadata";
   value: BlockMetadataAmino;
 }
-/**
- * BlockMetadata contains all the abci event data of a block
- * the file streamer dump them into files together with the state changes.
- */
-export interface BlockMetadataSDKType {
-  response_commit?: ResponseCommitSDKType;
-  request_finalize_block?: RequestFinalizeBlockSDKType;
-  response_finalize_block?: ResponseFinalizeBlockSDKType;
-}
 function createBaseStoreKVPair(): StoreKVPair {
   return {
     storeKey: "",
@@ -100,6 +78,7 @@ function createBaseStoreKVPair(): StoreKVPair {
 }
 export const StoreKVPair = {
   typeUrl: "/cosmos.store.v1beta1.StoreKVPair",
+  aminoType: "cosmos-sdk/StoreKVPair",
   encode(message: StoreKVPair, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.storeKey !== "") {
       writer.uint32(10).string(message.storeKey);
@@ -141,7 +120,7 @@ export const StoreKVPair = {
     }
     return message;
   },
-  fromPartial(object: Partial<StoreKVPair>): StoreKVPair {
+  fromPartial(object: DeepPartial<StoreKVPair>): StoreKVPair {
     const message = createBaseStoreKVPair();
     message.storeKey = object.storeKey ?? "";
     message.delete = object.delete ?? false;
@@ -204,6 +183,7 @@ function createBaseBlockMetadata(): BlockMetadata {
 }
 export const BlockMetadata = {
   typeUrl: "/cosmos.store.v1beta1.BlockMetadata",
+  aminoType: "cosmos-sdk/BlockMetadata",
   encode(message: BlockMetadata, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.responseCommit !== undefined) {
       ResponseCommit.encode(message.responseCommit, writer.uint32(50).fork()).ldelim();
@@ -239,7 +219,7 @@ export const BlockMetadata = {
     }
     return message;
   },
-  fromPartial(object: Partial<BlockMetadata>): BlockMetadata {
+  fromPartial(object: DeepPartial<BlockMetadata>): BlockMetadata {
     const message = createBaseBlockMetadata();
     message.responseCommit = object.responseCommit !== undefined && object.responseCommit !== null ? ResponseCommit.fromPartial(object.responseCommit) : undefined;
     message.requestFinalizeBlock = object.requestFinalizeBlock !== undefined && object.requestFinalizeBlock !== null ? RequestFinalizeBlock.fromPartial(object.requestFinalizeBlock) : undefined;

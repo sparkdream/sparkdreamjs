@@ -1,6 +1,7 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { Decimal } from "@cosmjs/math";
+import { DeepPartial } from "../../../helpers";
+import { Decimal } from "@interchainjs/math";
 /**
  * Coin defines a token with a denomination and an amount.
  * 
@@ -28,16 +29,6 @@ export interface CoinAmino {
 export interface CoinAminoMsg {
   type: "cosmos-sdk/Coin";
   value: CoinAmino;
-}
-/**
- * Coin defines a token with a denomination and an amount.
- * 
- * NOTE: The amount field is an Int which implements the custom method
- * signatures required by gogoproto.
- */
-export interface CoinSDKType {
-  denom: string;
-  amount: string;
 }
 /**
  * DecCoin defines a token with a denomination and a decimal amount.
@@ -68,16 +59,6 @@ export interface DecCoinAminoMsg {
   value: DecCoinAmino;
 }
 /**
- * DecCoin defines a token with a denomination and a decimal amount.
- * 
- * NOTE: The amount field is an Dec which implements the custom method
- * signatures required by gogoproto.
- */
-export interface DecCoinSDKType {
-  denom: string;
-  amount: string;
-}
-/**
  * IntProto defines a Protobuf wrapper around an Int object.
  * Deprecated: Prefer to use math.Int directly. It supports binary Marshal and Unmarshal.
  */
@@ -98,13 +79,6 @@ export interface IntProtoAmino {
 export interface IntProtoAminoMsg {
   type: "cosmos-sdk/IntProto";
   value: IntProtoAmino;
-}
-/**
- * IntProto defines a Protobuf wrapper around an Int object.
- * Deprecated: Prefer to use math.Int directly. It supports binary Marshal and Unmarshal.
- */
-export interface IntProtoSDKType {
-  int: string;
 }
 /**
  * DecProto defines a Protobuf wrapper around a Dec object.
@@ -128,13 +102,6 @@ export interface DecProtoAminoMsg {
   type: "cosmos-sdk/DecProto";
   value: DecProtoAmino;
 }
-/**
- * DecProto defines a Protobuf wrapper around a Dec object.
- * Deprecated: Prefer to use math.LegacyDec directly. It supports binary Marshal and Unmarshal.
- */
-export interface DecProtoSDKType {
-  dec: string;
-}
 function createBaseCoin(): Coin {
   return {
     denom: "",
@@ -143,6 +110,7 @@ function createBaseCoin(): Coin {
 }
 export const Coin = {
   typeUrl: "/cosmos.base.v1beta1.Coin",
+  aminoType: "cosmos-sdk/Coin",
   encode(message: Coin, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.denom !== "") {
       writer.uint32(10).string(message.denom);
@@ -172,7 +140,7 @@ export const Coin = {
     }
     return message;
   },
-  fromPartial(object: Partial<Coin>): Coin {
+  fromPartial(object: DeepPartial<Coin>): Coin {
     const message = createBaseCoin();
     message.denom = object.denom ?? "";
     message.amount = object.amount ?? "";
@@ -224,6 +192,7 @@ function createBaseDecCoin(): DecCoin {
 }
 export const DecCoin = {
   typeUrl: "/cosmos.base.v1beta1.DecCoin",
+  aminoType: "cosmos-sdk/DecCoin",
   encode(message: DecCoin, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.denom !== "") {
       writer.uint32(10).string(message.denom);
@@ -253,7 +222,7 @@ export const DecCoin = {
     }
     return message;
   },
-  fromPartial(object: Partial<DecCoin>): DecCoin {
+  fromPartial(object: DeepPartial<DecCoin>): DecCoin {
     const message = createBaseDecCoin();
     message.denom = object.denom ?? "";
     message.amount = object.amount ?? "";
@@ -304,6 +273,7 @@ function createBaseIntProto(): IntProto {
 }
 export const IntProto = {
   typeUrl: "/cosmos.base.v1beta1.IntProto",
+  aminoType: "cosmos-sdk/IntProto",
   encode(message: IntProto, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.int !== "") {
       writer.uint32(10).string(message.int);
@@ -327,7 +297,7 @@ export const IntProto = {
     }
     return message;
   },
-  fromPartial(object: Partial<IntProto>): IntProto {
+  fromPartial(object: DeepPartial<IntProto>): IntProto {
     const message = createBaseIntProto();
     message.int = object.int ?? "";
     return message;
@@ -373,6 +343,7 @@ function createBaseDecProto(): DecProto {
 }
 export const DecProto = {
   typeUrl: "/cosmos.base.v1beta1.DecProto",
+  aminoType: "cosmos-sdk/DecProto",
   encode(message: DecProto, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.dec !== "") {
       writer.uint32(10).string(Decimal.fromUserInput(message.dec, 18).atomics);
@@ -396,7 +367,7 @@ export const DecProto = {
     }
     return message;
   },
-  fromPartial(object: Partial<DecProto>): DecProto {
+  fromPartial(object: DeepPartial<DecProto>): DecProto {
     const message = createBaseDecProto();
     message.dec = object.dec ?? "";
     return message;

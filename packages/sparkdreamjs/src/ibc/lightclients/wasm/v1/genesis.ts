@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /** GenesisState defines 08-wasm's keeper genesis state */
 export interface GenesisState {
   /** uploaded light client wasm contracts */
@@ -18,10 +18,6 @@ export interface GenesisStateAmino {
 export interface GenesisStateAminoMsg {
   type: "cosmos-sdk/GenesisState";
   value: GenesisStateAmino;
-}
-/** GenesisState defines 08-wasm's keeper genesis state */
-export interface GenesisStateSDKType {
-  contracts: ContractSDKType[];
 }
 /** Contract stores contract code */
 export interface Contract {
@@ -41,10 +37,6 @@ export interface ContractAminoMsg {
   type: "cosmos-sdk/Contract";
   value: ContractAmino;
 }
-/** Contract stores contract code */
-export interface ContractSDKType {
-  code_bytes: Uint8Array;
-}
 function createBaseGenesisState(): GenesisState {
   return {
     contracts: []
@@ -52,6 +44,7 @@ function createBaseGenesisState(): GenesisState {
 }
 export const GenesisState = {
   typeUrl: "/ibc.lightclients.wasm.v1.GenesisState",
+  aminoType: "cosmos-sdk/GenesisState",
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.contracts) {
       Contract.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -75,7 +68,7 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisState>): GenesisState {
+  fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = createBaseGenesisState();
     message.contracts = object.contracts?.map(e => Contract.fromPartial(e)) || [];
     return message;
@@ -123,6 +116,7 @@ function createBaseContract(): Contract {
 }
 export const Contract = {
   typeUrl: "/ibc.lightclients.wasm.v1.Contract",
+  aminoType: "cosmos-sdk/Contract",
   encode(message: Contract, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.codeBytes.length !== 0) {
       writer.uint32(10).bytes(message.codeBytes);
@@ -146,7 +140,7 @@ export const Contract = {
     }
     return message;
   },
-  fromPartial(object: Partial<Contract>): Contract {
+  fromPartial(object: DeepPartial<Contract>): Contract {
     const message = createBaseContract();
     message.codeBytes = object.codeBytes ?? new Uint8Array();
     return message;

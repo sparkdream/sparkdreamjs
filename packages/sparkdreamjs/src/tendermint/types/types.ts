@@ -1,10 +1,10 @@
 //@ts-nocheck
-import { Proof, ProofAmino, ProofSDKType } from "../crypto/proof";
-import { Consensus, ConsensusAmino, ConsensusSDKType } from "../version/types";
+import { Proof, ProofAmino } from "../crypto/proof";
+import { Consensus, ConsensusAmino } from "../version/types";
 import { Timestamp } from "../../google/protobuf/timestamp";
-import { BlockIDFlag, ValidatorSet, ValidatorSetAmino, ValidatorSetSDKType } from "./validator";
+import { BlockIDFlag, ValidatorSet, ValidatorSetAmino } from "./validator";
 import { BinaryReader, BinaryWriter } from "../../binary";
-import { bytesFromBase64, base64FromBytes, toTimestamp, fromTimestamp } from "../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes, toTimestamp, fromTimestamp } from "../../helpers";
 /** SignedMsgType is a type of signed message in the consensus. */
 export enum SignedMsgType {
   SIGNED_MSG_TYPE_UNKNOWN = 0,
@@ -15,7 +15,6 @@ export enum SignedMsgType {
   SIGNED_MSG_TYPE_PROPOSAL = 32,
   UNRECOGNIZED = -1,
 }
-export const SignedMsgTypeSDKType = SignedMsgType;
 export const SignedMsgTypeAmino = SignedMsgType;
 export function signedMsgTypeFromJSON(object: any): SignedMsgType {
   switch (object) {
@@ -70,11 +69,6 @@ export interface PartSetHeaderAminoMsg {
   type: "/tendermint.types.PartSetHeader";
   value: PartSetHeaderAmino;
 }
-/** PartsetHeader */
-export interface PartSetHeaderSDKType {
-  total: number;
-  hash: Uint8Array;
-}
 export interface Part {
   index: number;
   bytes: Uint8Array;
@@ -93,11 +87,6 @@ export interface PartAminoMsg {
   type: "/tendermint.types.Part";
   value: PartAmino;
 }
-export interface PartSDKType {
-  index: number;
-  bytes: Uint8Array;
-  proof: ProofSDKType;
-}
 /** BlockID */
 export interface BlockID {
   hash: Uint8Array;
@@ -115,11 +104,6 @@ export interface BlockIDAmino {
 export interface BlockIDAminoMsg {
   type: "/tendermint.types.BlockID";
   value: BlockIDAmino;
-}
-/** BlockID */
-export interface BlockIDSDKType {
-  hash: Uint8Array;
-  part_set_header: PartSetHeaderSDKType;
 }
 /** Header defines the structure of a block header. */
 export interface Header {
@@ -185,23 +169,6 @@ export interface HeaderAminoMsg {
   type: "/tendermint.types.Header";
   value: HeaderAmino;
 }
-/** Header defines the structure of a block header. */
-export interface HeaderSDKType {
-  version: ConsensusSDKType;
-  chain_id: string;
-  height: bigint;
-  time: Date;
-  last_block_id: BlockIDSDKType;
-  last_commit_hash: Uint8Array;
-  data_hash: Uint8Array;
-  validators_hash: Uint8Array;
-  next_validators_hash: Uint8Array;
-  consensus_hash: Uint8Array;
-  app_hash: Uint8Array;
-  last_results_hash: Uint8Array;
-  evidence_hash: Uint8Array;
-  proposer_address: Uint8Array;
-}
 /** Data contains the set of transactions included in the block */
 export interface Data {
   /**
@@ -227,10 +194,6 @@ export interface DataAmino {
 export interface DataAminoMsg {
   type: "/tendermint.types.Data";
   value: DataAmino;
-}
-/** Data contains the set of transactions included in the block */
-export interface DataSDKType {
-  txs: Uint8Array[];
 }
 /**
  * Vote represents a prevote or precommit vote from validators for
@@ -300,22 +263,6 @@ export interface VoteAminoMsg {
   type: "/tendermint.types.Vote";
   value: VoteAmino;
 }
-/**
- * Vote represents a prevote or precommit vote from validators for
- * consensus.
- */
-export interface VoteSDKType {
-  type: SignedMsgType;
-  height: bigint;
-  round: number;
-  block_id: BlockIDSDKType;
-  timestamp: Date;
-  validator_address: Uint8Array;
-  validator_index: number;
-  signature: Uint8Array;
-  extension: Uint8Array;
-  extension_signature: Uint8Array;
-}
 /** Commit contains the evidence that a block was committed by a set of validators. */
 export interface Commit {
   height: bigint;
@@ -337,13 +284,6 @@ export interface CommitAmino {
 export interface CommitAminoMsg {
   type: "/tendermint.types.Commit";
   value: CommitAmino;
-}
-/** Commit contains the evidence that a block was committed by a set of validators. */
-export interface CommitSDKType {
-  height: bigint;
-  round: number;
-  block_id: BlockIDSDKType;
-  signatures: CommitSigSDKType[];
 }
 /** CommitSig is a part of the Vote included in a Commit. */
 export interface CommitSig {
@@ -367,13 +307,6 @@ export interface CommitSigAminoMsg {
   type: "/tendermint.types.CommitSig";
   value: CommitSigAmino;
 }
-/** CommitSig is a part of the Vote included in a Commit. */
-export interface CommitSigSDKType {
-  block_id_flag: BlockIDFlag;
-  validator_address: Uint8Array;
-  timestamp: Date;
-  signature: Uint8Array;
-}
 export interface ExtendedCommit {
   height: bigint;
   round: number;
@@ -393,12 +326,6 @@ export interface ExtendedCommitAmino {
 export interface ExtendedCommitAminoMsg {
   type: "/tendermint.types.ExtendedCommit";
   value: ExtendedCommitAmino;
-}
-export interface ExtendedCommitSDKType {
-  height: bigint;
-  round: number;
-  block_id: BlockIDSDKType;
-  extended_signatures: ExtendedCommitSigSDKType[];
 }
 /**
  * ExtendedCommitSig retains all the same fields as CommitSig but adds vote
@@ -438,19 +365,6 @@ export interface ExtendedCommitSigAminoMsg {
   type: "/tendermint.types.ExtendedCommitSig";
   value: ExtendedCommitSigAmino;
 }
-/**
- * ExtendedCommitSig retains all the same fields as CommitSig but adds vote
- * extension-related fields. We use two signatures to ensure backwards compatibility.
- * That is the digest of the original signature is still the same in prior versions
- */
-export interface ExtendedCommitSigSDKType {
-  block_id_flag: BlockIDFlag;
-  validator_address: Uint8Array;
-  timestamp: Date;
-  signature: Uint8Array;
-  extension: Uint8Array;
-  extension_signature: Uint8Array;
-}
 export interface Proposal {
   type: SignedMsgType;
   height: bigint;
@@ -477,15 +391,6 @@ export interface ProposalAminoMsg {
   type: "/tendermint.types.Proposal";
   value: ProposalAmino;
 }
-export interface ProposalSDKType {
-  type: SignedMsgType;
-  height: bigint;
-  round: number;
-  pol_round: number;
-  block_id: BlockIDSDKType;
-  timestamp: Date;
-  signature: Uint8Array;
-}
 export interface SignedHeader {
   header?: Header;
   commit?: Commit;
@@ -502,10 +407,6 @@ export interface SignedHeaderAminoMsg {
   type: "/tendermint.types.SignedHeader";
   value: SignedHeaderAmino;
 }
-export interface SignedHeaderSDKType {
-  header?: HeaderSDKType;
-  commit?: CommitSDKType;
-}
 export interface LightBlock {
   signedHeader?: SignedHeader;
   validatorSet?: ValidatorSet;
@@ -521,10 +422,6 @@ export interface LightBlockAmino {
 export interface LightBlockAminoMsg {
   type: "/tendermint.types.LightBlock";
   value: LightBlockAmino;
-}
-export interface LightBlockSDKType {
-  signed_header?: SignedHeaderSDKType;
-  validator_set?: ValidatorSetSDKType;
 }
 export interface BlockMeta {
   blockId: BlockID;
@@ -546,12 +443,6 @@ export interface BlockMetaAminoMsg {
   type: "/tendermint.types.BlockMeta";
   value: BlockMetaAmino;
 }
-export interface BlockMetaSDKType {
-  block_id: BlockIDSDKType;
-  block_size: bigint;
-  header: HeaderSDKType;
-  num_txs: bigint;
-}
 /** TxProof represents a Merkle proof of the presence of a transaction in the Merkle tree. */
 export interface TxProof {
   rootHash: Uint8Array;
@@ -571,12 +462,6 @@ export interface TxProofAmino {
 export interface TxProofAminoMsg {
   type: "/tendermint.types.TxProof";
   value: TxProofAmino;
-}
-/** TxProof represents a Merkle proof of the presence of a transaction in the Merkle tree. */
-export interface TxProofSDKType {
-  root_hash: Uint8Array;
-  data: Uint8Array;
-  proof?: ProofSDKType;
 }
 function createBasePartSetHeader(): PartSetHeader {
   return {
@@ -615,7 +500,7 @@ export const PartSetHeader = {
     }
     return message;
   },
-  fromPartial(object: Partial<PartSetHeader>): PartSetHeader {
+  fromPartial(object: DeepPartial<PartSetHeader>): PartSetHeader {
     const message = createBasePartSetHeader();
     message.total = object.total ?? 0;
     message.hash = object.hash ?? new Uint8Array();
@@ -697,7 +582,7 @@ export const Part = {
     }
     return message;
   },
-  fromPartial(object: Partial<Part>): Part {
+  fromPartial(object: DeepPartial<Part>): Part {
     const message = createBasePart();
     message.index = object.index ?? 0;
     message.bytes = object.bytes ?? new Uint8Array();
@@ -777,7 +662,7 @@ export const BlockID = {
     }
     return message;
   },
-  fromPartial(object: Partial<BlockID>): BlockID {
+  fromPartial(object: DeepPartial<BlockID>): BlockID {
     const message = createBaseBlockID();
     message.hash = object.hash ?? new Uint8Array();
     message.partSetHeader = object.partSetHeader !== undefined && object.partSetHeader !== null ? PartSetHeader.fromPartial(object.partSetHeader) : undefined;
@@ -936,7 +821,7 @@ export const Header = {
     }
     return message;
   },
-  fromPartial(object: Partial<Header>): Header {
+  fromPartial(object: DeepPartial<Header>): Header {
     const message = createBaseHeader();
     message.version = object.version !== undefined && object.version !== null ? Consensus.fromPartial(object.version) : undefined;
     message.chainId = object.chainId ?? "";
@@ -1064,7 +949,7 @@ export const Data = {
     }
     return message;
   },
-  fromPartial(object: Partial<Data>): Data {
+  fromPartial(object: DeepPartial<Data>): Data {
     const message = createBaseData();
     message.txs = object.txs?.map(e => e) || [];
     return message;
@@ -1192,7 +1077,7 @@ export const Vote = {
     }
     return message;
   },
-  fromPartial(object: Partial<Vote>): Vote {
+  fromPartial(object: DeepPartial<Vote>): Vote {
     const message = createBaseVote();
     message.type = object.type ?? 0;
     message.height = object.height !== undefined && object.height !== null ? BigInt(object.height.toString()) : BigInt(0);
@@ -1321,7 +1206,7 @@ export const Commit = {
     }
     return message;
   },
-  fromPartial(object: Partial<Commit>): Commit {
+  fromPartial(object: DeepPartial<Commit>): Commit {
     const message = createBaseCommit();
     message.height = object.height !== undefined && object.height !== null ? BigInt(object.height.toString()) : BigInt(0);
     message.round = object.round ?? 0;
@@ -1422,7 +1307,7 @@ export const CommitSig = {
     }
     return message;
   },
-  fromPartial(object: Partial<CommitSig>): CommitSig {
+  fromPartial(object: DeepPartial<CommitSig>): CommitSig {
     const message = createBaseCommitSig();
     message.blockIdFlag = object.blockIdFlag ?? 0;
     message.validatorAddress = object.validatorAddress ?? new Uint8Array();
@@ -1521,7 +1406,7 @@ export const ExtendedCommit = {
     }
     return message;
   },
-  fromPartial(object: Partial<ExtendedCommit>): ExtendedCommit {
+  fromPartial(object: DeepPartial<ExtendedCommit>): ExtendedCommit {
     const message = createBaseExtendedCommit();
     message.height = object.height !== undefined && object.height !== null ? BigInt(object.height.toString()) : BigInt(0);
     message.round = object.round ?? 0;
@@ -1636,7 +1521,7 @@ export const ExtendedCommitSig = {
     }
     return message;
   },
-  fromPartial(object: Partial<ExtendedCommitSig>): ExtendedCommitSig {
+  fromPartial(object: DeepPartial<ExtendedCommitSig>): ExtendedCommitSig {
     const message = createBaseExtendedCommitSig();
     message.blockIdFlag = object.blockIdFlag ?? 0;
     message.validatorAddress = object.validatorAddress ?? new Uint8Array();
@@ -1766,7 +1651,7 @@ export const Proposal = {
     }
     return message;
   },
-  fromPartial(object: Partial<Proposal>): Proposal {
+  fromPartial(object: DeepPartial<Proposal>): Proposal {
     const message = createBaseProposal();
     message.type = object.type ?? 0;
     message.height = object.height !== undefined && object.height !== null ? BigInt(object.height.toString()) : BigInt(0);
@@ -1866,7 +1751,7 @@ export const SignedHeader = {
     }
     return message;
   },
-  fromPartial(object: Partial<SignedHeader>): SignedHeader {
+  fromPartial(object: DeepPartial<SignedHeader>): SignedHeader {
     const message = createBaseSignedHeader();
     message.header = object.header !== undefined && object.header !== null ? Header.fromPartial(object.header) : undefined;
     message.commit = object.commit !== undefined && object.commit !== null ? Commit.fromPartial(object.commit) : undefined;
@@ -1941,7 +1826,7 @@ export const LightBlock = {
     }
     return message;
   },
-  fromPartial(object: Partial<LightBlock>): LightBlock {
+  fromPartial(object: DeepPartial<LightBlock>): LightBlock {
     const message = createBaseLightBlock();
     message.signedHeader = object.signedHeader !== undefined && object.signedHeader !== null ? SignedHeader.fromPartial(object.signedHeader) : undefined;
     message.validatorSet = object.validatorSet !== undefined && object.validatorSet !== null ? ValidatorSet.fromPartial(object.validatorSet) : undefined;
@@ -2030,7 +1915,7 @@ export const BlockMeta = {
     }
     return message;
   },
-  fromPartial(object: Partial<BlockMeta>): BlockMeta {
+  fromPartial(object: DeepPartial<BlockMeta>): BlockMeta {
     const message = createBaseBlockMeta();
     message.blockId = object.blockId !== undefined && object.blockId !== null ? BlockID.fromPartial(object.blockId) : undefined;
     message.blockSize = object.blockSize !== undefined && object.blockSize !== null ? BigInt(object.blockSize.toString()) : BigInt(0);
@@ -2122,7 +2007,7 @@ export const TxProof = {
     }
     return message;
   },
-  fromPartial(object: Partial<TxProof>): TxProof {
+  fromPartial(object: DeepPartial<TxProof>): TxProof {
     const message = createBaseTxProof();
     message.rootHash = object.rootHash ?? new Uint8Array();
     message.data = object.data ?? new Uint8Array();

@@ -1,7 +1,8 @@
 //@ts-nocheck
-import { RequestFinalizeBlock, RequestFinalizeBlockAmino, RequestFinalizeBlockSDKType, ResponseFinalizeBlock, ResponseFinalizeBlockAmino, ResponseFinalizeBlockSDKType, ResponseCommit, ResponseCommitAmino, ResponseCommitSDKType } from "../../../../tendermint/abci/types";
-import { StoreKVPair, StoreKVPairAmino, StoreKVPairSDKType } from "../../v1beta1/listening";
+import { RequestFinalizeBlock, RequestFinalizeBlockAmino, ResponseFinalizeBlock, ResponseFinalizeBlockAmino, ResponseCommit, ResponseCommitAmino } from "../../../../tendermint/abci/types";
+import { StoreKVPair, StoreKVPairAmino } from "../../v1beta1/listening";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /** ListenEndBlockRequest is the request type for the ListenEndBlock RPC method */
 export interface ListenFinalizeBlockRequest {
   req?: RequestFinalizeBlock;
@@ -20,11 +21,6 @@ export interface ListenFinalizeBlockRequestAminoMsg {
   type: "cosmos-sdk/ListenFinalizeBlockRequest";
   value: ListenFinalizeBlockRequestAmino;
 }
-/** ListenEndBlockRequest is the request type for the ListenEndBlock RPC method */
-export interface ListenFinalizeBlockRequestSDKType {
-  req?: RequestFinalizeBlockSDKType;
-  res?: ResponseFinalizeBlockSDKType;
-}
 /** ListenEndBlockResponse is the response type for the ListenEndBlock RPC method */
 export interface ListenFinalizeBlockResponse {}
 export interface ListenFinalizeBlockResponseProtoMsg {
@@ -37,8 +33,6 @@ export interface ListenFinalizeBlockResponseAminoMsg {
   type: "cosmos-sdk/ListenFinalizeBlockResponse";
   value: ListenFinalizeBlockResponseAmino;
 }
-/** ListenEndBlockResponse is the response type for the ListenEndBlock RPC method */
-export interface ListenFinalizeBlockResponseSDKType {}
 /** ListenCommitRequest is the request type for the ListenCommit RPC method */
 export interface ListenCommitRequest {
   /** explicitly pass in block height as ResponseCommit does not contain this info */
@@ -61,12 +55,6 @@ export interface ListenCommitRequestAminoMsg {
   type: "cosmos-sdk/ListenCommitRequest";
   value: ListenCommitRequestAmino;
 }
-/** ListenCommitRequest is the request type for the ListenCommit RPC method */
-export interface ListenCommitRequestSDKType {
-  block_height: bigint;
-  res?: ResponseCommitSDKType;
-  change_set: StoreKVPairSDKType[];
-}
 /** ListenCommitResponse is the response type for the ListenCommit RPC method */
 export interface ListenCommitResponse {}
 export interface ListenCommitResponseProtoMsg {
@@ -79,8 +67,6 @@ export interface ListenCommitResponseAminoMsg {
   type: "cosmos-sdk/ListenCommitResponse";
   value: ListenCommitResponseAmino;
 }
-/** ListenCommitResponse is the response type for the ListenCommit RPC method */
-export interface ListenCommitResponseSDKType {}
 function createBaseListenFinalizeBlockRequest(): ListenFinalizeBlockRequest {
   return {
     req: undefined,
@@ -89,6 +75,7 @@ function createBaseListenFinalizeBlockRequest(): ListenFinalizeBlockRequest {
 }
 export const ListenFinalizeBlockRequest = {
   typeUrl: "/cosmos.store.streaming.abci.ListenFinalizeBlockRequest",
+  aminoType: "cosmos-sdk/ListenFinalizeBlockRequest",
   encode(message: ListenFinalizeBlockRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.req !== undefined) {
       RequestFinalizeBlock.encode(message.req, writer.uint32(10).fork()).ldelim();
@@ -118,7 +105,7 @@ export const ListenFinalizeBlockRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<ListenFinalizeBlockRequest>): ListenFinalizeBlockRequest {
+  fromPartial(object: DeepPartial<ListenFinalizeBlockRequest>): ListenFinalizeBlockRequest {
     const message = createBaseListenFinalizeBlockRequest();
     message.req = object.req !== undefined && object.req !== null ? RequestFinalizeBlock.fromPartial(object.req) : undefined;
     message.res = object.res !== undefined && object.res !== null ? ResponseFinalizeBlock.fromPartial(object.res) : undefined;
@@ -167,6 +154,7 @@ function createBaseListenFinalizeBlockResponse(): ListenFinalizeBlockResponse {
 }
 export const ListenFinalizeBlockResponse = {
   typeUrl: "/cosmos.store.streaming.abci.ListenFinalizeBlockResponse",
+  aminoType: "cosmos-sdk/ListenFinalizeBlockResponse",
   encode(_: ListenFinalizeBlockResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -184,7 +172,7 @@ export const ListenFinalizeBlockResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<ListenFinalizeBlockResponse>): ListenFinalizeBlockResponse {
+  fromPartial(_: DeepPartial<ListenFinalizeBlockResponse>): ListenFinalizeBlockResponse {
     const message = createBaseListenFinalizeBlockResponse();
     return message;
   },
@@ -227,6 +215,7 @@ function createBaseListenCommitRequest(): ListenCommitRequest {
 }
 export const ListenCommitRequest = {
   typeUrl: "/cosmos.store.streaming.abci.ListenCommitRequest",
+  aminoType: "cosmos-sdk/ListenCommitRequest",
   encode(message: ListenCommitRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.blockHeight !== BigInt(0)) {
       writer.uint32(8).int64(message.blockHeight);
@@ -262,7 +251,7 @@ export const ListenCommitRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<ListenCommitRequest>): ListenCommitRequest {
+  fromPartial(object: DeepPartial<ListenCommitRequest>): ListenCommitRequest {
     const message = createBaseListenCommitRequest();
     message.blockHeight = object.blockHeight !== undefined && object.blockHeight !== null ? BigInt(object.blockHeight.toString()) : BigInt(0);
     message.res = object.res !== undefined && object.res !== null ? ResponseCommit.fromPartial(object.res) : undefined;
@@ -318,6 +307,7 @@ function createBaseListenCommitResponse(): ListenCommitResponse {
 }
 export const ListenCommitResponse = {
   typeUrl: "/cosmos.store.streaming.abci.ListenCommitResponse",
+  aminoType: "cosmos-sdk/ListenCommitResponse",
   encode(_: ListenCommitResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -335,7 +325,7 @@ export const ListenCommitResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<ListenCommitResponse>): ListenCommitResponse {
+  fromPartial(_: DeepPartial<ListenCommitResponse>): ListenCommitResponse {
     const message = createBaseListenCommitResponse();
     return message;
   },

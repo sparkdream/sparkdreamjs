@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /** Module is the config object of the staking module. */
 export interface Module {
   /**
@@ -38,13 +39,6 @@ export interface ModuleAminoMsg {
   type: "cosmos-sdk/Module";
   value: ModuleAmino;
 }
-/** Module is the config object of the staking module. */
-export interface ModuleSDKType {
-  hooks_order: string[];
-  authority: string;
-  bech32_prefix_validator: string;
-  bech32_prefix_consensus: string;
-}
 function createBaseModule(): Module {
   return {
     hooksOrder: [],
@@ -55,6 +49,7 @@ function createBaseModule(): Module {
 }
 export const Module = {
   typeUrl: "/cosmos.staking.module.v1.Module",
+  aminoType: "cosmos-sdk/Module",
   encode(message: Module, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.hooksOrder) {
       writer.uint32(10).string(v!);
@@ -96,7 +91,7 @@ export const Module = {
     }
     return message;
   },
-  fromPartial(object: Partial<Module>): Module {
+  fromPartial(object: DeepPartial<Module>): Module {
     const message = createBaseModule();
     message.hooksOrder = object.hooksOrder?.map(e => e) || [];
     message.authority = object.authority ?? "";

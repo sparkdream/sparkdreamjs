@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { Duration, DurationAmino, DurationSDKType } from "../../../../google/protobuf/duration";
+import { Duration, DurationAmino } from "../../../../google/protobuf/duration";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /** Module is the config object of the group module. */
 export interface Module {
   /**
@@ -35,11 +36,6 @@ export interface ModuleAminoMsg {
   type: "cosmos-sdk/Module";
   value: ModuleAmino;
 }
-/** Module is the config object of the group module. */
-export interface ModuleSDKType {
-  max_execution_period: DurationSDKType;
-  max_metadata_len: bigint;
-}
 function createBaseModule(): Module {
   return {
     maxExecutionPeriod: Duration.fromPartial({}),
@@ -48,6 +44,7 @@ function createBaseModule(): Module {
 }
 export const Module = {
   typeUrl: "/cosmos.group.module.v1.Module",
+  aminoType: "cosmos-sdk/Module",
   encode(message: Module, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.maxExecutionPeriod !== undefined) {
       Duration.encode(message.maxExecutionPeriod, writer.uint32(10).fork()).ldelim();
@@ -77,7 +74,7 @@ export const Module = {
     }
     return message;
   },
-  fromPartial(object: Partial<Module>): Module {
+  fromPartial(object: DeepPartial<Module>): Module {
     const message = createBaseModule();
     message.maxExecutionPeriod = object.maxExecutionPeriod !== undefined && object.maxExecutionPeriod !== null ? Duration.fromPartial(object.maxExecutionPeriod) : undefined;
     message.maxMetadataLen = object.maxMetadataLen !== undefined && object.maxMetadataLen !== null ? BigInt(object.maxMetadataLen.toString()) : BigInt(0);

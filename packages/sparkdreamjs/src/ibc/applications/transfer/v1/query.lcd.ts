@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponseSDKType, QueryDenomsRequest, QueryDenomsResponseSDKType, QueryDenomRequest, QueryDenomResponseSDKType, QueryDenomHashRequest, QueryDenomHashResponseSDKType, QueryEscrowAddressRequest, QueryEscrowAddressResponseSDKType, QueryTotalEscrowForDenomRequest, QueryTotalEscrowForDenomResponseSDKType } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryDenomsRequest, QueryDenomsResponse, QueryDenomRequest, QueryDenomResponse, QueryDenomHashRequest, QueryDenomHashResponse, QueryEscrowAddressRequest, QueryEscrowAddressResponse, QueryTotalEscrowForDenomRequest, QueryTotalEscrowForDenomResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -10,22 +10,16 @@ export class LCDQueryClient {
     requestClient: LCDClient;
   }) {
     this.req = requestClient;
-    this.params = this.params.bind(this);
-    this.denoms = this.denoms.bind(this);
-    this.denom = this.denom.bind(this);
-    this.denomHash = this.denomHash.bind(this);
-    this.escrowAddress = this.escrowAddress.bind(this);
-    this.totalEscrowForDenom = this.totalEscrowForDenom.bind(this);
   }
   /* Params queries all parameters of the ibc-transfer module. */
-  async params(_params: QueryParamsRequest = {}): Promise<QueryParamsResponseSDKType> {
+  params = async (_params: QueryParamsRequest = {}): Promise<QueryParamsResponse> => {
     const endpoint = `ibc/apps/transfer/v1/params`;
-    return await this.req.get<QueryParamsResponseSDKType>(endpoint);
-  }
+    return await this.req.get<QueryParamsResponse>(endpoint);
+  };
   /* Denoms queries all denominations */
-  async denoms(params: QueryDenomsRequest = {
+  denoms = async (params: QueryDenomsRequest = {
     pagination: undefined
-  }): Promise<QueryDenomsResponseSDKType> {
+  }): Promise<QueryDenomsResponse> => {
     const options: any = {
       params: {}
     };
@@ -33,10 +27,10 @@ export class LCDQueryClient {
       setPaginationParams(options, params.pagination);
     }
     const endpoint = `ibc/apps/transfer/v1/denoms`;
-    return await this.req.get<QueryDenomsResponseSDKType>(endpoint, options);
-  }
+    return await this.req.get<QueryDenomsResponse>(endpoint, options);
+  };
   /* Denom queries a denomination */
-  async denom(params: QueryDenomRequest): Promise<QueryDenomResponseSDKType> {
+  denom = async (params: QueryDenomRequest): Promise<QueryDenomResponse> => {
     const options: any = {
       params: {}
     };
@@ -44,10 +38,10 @@ export class LCDQueryClient {
       options.params.hash = params.hash;
     }
     const endpoint = `ibc/apps/transfer/v1/denoms/${params.hash}`;
-    return await this.req.get<QueryDenomResponseSDKType>(endpoint, options);
-  }
+    return await this.req.get<QueryDenomResponse>(endpoint, options);
+  };
   /* DenomHash queries a denomination hash information. */
-  async denomHash(params: QueryDenomHashRequest): Promise<QueryDenomHashResponseSDKType> {
+  denomHash = async (params: QueryDenomHashRequest): Promise<QueryDenomHashResponse> => {
     const options: any = {
       params: {}
     };
@@ -55,15 +49,15 @@ export class LCDQueryClient {
       options.params.trace = params.trace;
     }
     const endpoint = `ibc/apps/transfer/v1/denom_hashes/${params.trace}`;
-    return await this.req.get<QueryDenomHashResponseSDKType>(endpoint, options);
-  }
+    return await this.req.get<QueryDenomHashResponse>(endpoint, options);
+  };
   /* EscrowAddress returns the escrow address for a particular port and channel id. */
-  async escrowAddress(params: QueryEscrowAddressRequest): Promise<QueryEscrowAddressResponseSDKType> {
+  escrowAddress = async (params: QueryEscrowAddressRequest): Promise<QueryEscrowAddressResponse> => {
     const endpoint = `ibc/apps/transfer/v1/channels/${params.channelId}/ports/${params.portId}/escrow_address`;
-    return await this.req.get<QueryEscrowAddressResponseSDKType>(endpoint);
-  }
+    return await this.req.get<QueryEscrowAddressResponse>(endpoint);
+  };
   /* TotalEscrowForDenom returns the total amount of tokens in escrow based on the denom. */
-  async totalEscrowForDenom(params: QueryTotalEscrowForDenomRequest): Promise<QueryTotalEscrowForDenomResponseSDKType> {
+  totalEscrowForDenom = async (params: QueryTotalEscrowForDenomRequest): Promise<QueryTotalEscrowForDenomResponse> => {
     const options: any = {
       params: {}
     };
@@ -71,6 +65,6 @@ export class LCDQueryClient {
       options.params.denom = params.denom;
     }
     const endpoint = `ibc/apps/transfer/v1/total_escrow/${params.denom}`;
-    return await this.req.get<QueryTotalEscrowForDenomResponseSDKType>(endpoint, options);
-  }
+    return await this.req.get<QueryTotalEscrowForDenomResponse>(endpoint, options);
+  };
 }

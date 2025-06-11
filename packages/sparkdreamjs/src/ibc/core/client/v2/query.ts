@@ -1,7 +1,8 @@
 //@ts-nocheck
-import { CounterpartyInfo, CounterpartyInfoAmino, CounterpartyInfoSDKType } from "./counterparty";
-import { Config, ConfigAmino, ConfigSDKType } from "./config";
+import { CounterpartyInfo, CounterpartyInfoAmino } from "./counterparty";
+import { Config, ConfigAmino } from "./config";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /**
  * QueryCounterpartyInfoRequest is the request type for the Query/CounterpartyInfo RPC
  * method
@@ -27,13 +28,6 @@ export interface QueryCounterpartyInfoRequestAminoMsg {
   value: QueryCounterpartyInfoRequestAmino;
 }
 /**
- * QueryCounterpartyInfoRequest is the request type for the Query/CounterpartyInfo RPC
- * method
- */
-export interface QueryCounterpartyInfoRequestSDKType {
-  client_id: string;
-}
-/**
  * QueryCounterpartyInfoResponse is the response type for the
  * Query/CounterpartyInfo RPC method.
  */
@@ -55,13 +49,6 @@ export interface QueryCounterpartyInfoResponseAminoMsg {
   type: "cosmos-sdk/QueryCounterpartyInfoResponse";
   value: QueryCounterpartyInfoResponseAmino;
 }
-/**
- * QueryCounterpartyInfoResponse is the response type for the
- * Query/CounterpartyInfo RPC method.
- */
-export interface QueryCounterpartyInfoResponseSDKType {
-  counterparty_info?: CounterpartyInfoSDKType;
-}
 /** QueryConfigRequest is the request type for the Query/Config RPC method */
 export interface QueryConfigRequest {
   /** client state unique identifier */
@@ -80,10 +67,6 @@ export interface QueryConfigRequestAminoMsg {
   type: "cosmos-sdk/QueryConfigRequest";
   value: QueryConfigRequestAmino;
 }
-/** QueryConfigRequest is the request type for the Query/Config RPC method */
-export interface QueryConfigRequestSDKType {
-  client_id: string;
-}
 /** QueryConfigResponse is the response type for the Query/Config RPC method */
 export interface QueryConfigResponse {
   config?: Config;
@@ -100,10 +83,6 @@ export interface QueryConfigResponseAminoMsg {
   type: "cosmos-sdk/QueryConfigResponse";
   value: QueryConfigResponseAmino;
 }
-/** QueryConfigResponse is the response type for the Query/Config RPC method */
-export interface QueryConfigResponseSDKType {
-  config?: ConfigSDKType;
-}
 function createBaseQueryCounterpartyInfoRequest(): QueryCounterpartyInfoRequest {
   return {
     clientId: ""
@@ -111,6 +90,7 @@ function createBaseQueryCounterpartyInfoRequest(): QueryCounterpartyInfoRequest 
 }
 export const QueryCounterpartyInfoRequest = {
   typeUrl: "/ibc.core.client.v2.QueryCounterpartyInfoRequest",
+  aminoType: "cosmos-sdk/QueryCounterpartyInfoRequest",
   encode(message: QueryCounterpartyInfoRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -134,7 +114,7 @@ export const QueryCounterpartyInfoRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryCounterpartyInfoRequest>): QueryCounterpartyInfoRequest {
+  fromPartial(object: DeepPartial<QueryCounterpartyInfoRequest>): QueryCounterpartyInfoRequest {
     const message = createBaseQueryCounterpartyInfoRequest();
     message.clientId = object.clientId ?? "";
     return message;
@@ -180,6 +160,7 @@ function createBaseQueryCounterpartyInfoResponse(): QueryCounterpartyInfoRespons
 }
 export const QueryCounterpartyInfoResponse = {
   typeUrl: "/ibc.core.client.v2.QueryCounterpartyInfoResponse",
+  aminoType: "cosmos-sdk/QueryCounterpartyInfoResponse",
   encode(message: QueryCounterpartyInfoResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.counterpartyInfo !== undefined) {
       CounterpartyInfo.encode(message.counterpartyInfo, writer.uint32(10).fork()).ldelim();
@@ -203,7 +184,7 @@ export const QueryCounterpartyInfoResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryCounterpartyInfoResponse>): QueryCounterpartyInfoResponse {
+  fromPartial(object: DeepPartial<QueryCounterpartyInfoResponse>): QueryCounterpartyInfoResponse {
     const message = createBaseQueryCounterpartyInfoResponse();
     message.counterpartyInfo = object.counterpartyInfo !== undefined && object.counterpartyInfo !== null ? CounterpartyInfo.fromPartial(object.counterpartyInfo) : undefined;
     return message;
@@ -249,6 +230,7 @@ function createBaseQueryConfigRequest(): QueryConfigRequest {
 }
 export const QueryConfigRequest = {
   typeUrl: "/ibc.core.client.v2.QueryConfigRequest",
+  aminoType: "cosmos-sdk/QueryConfigRequest",
   encode(message: QueryConfigRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -272,7 +254,7 @@ export const QueryConfigRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryConfigRequest>): QueryConfigRequest {
+  fromPartial(object: DeepPartial<QueryConfigRequest>): QueryConfigRequest {
     const message = createBaseQueryConfigRequest();
     message.clientId = object.clientId ?? "";
     return message;
@@ -318,6 +300,7 @@ function createBaseQueryConfigResponse(): QueryConfigResponse {
 }
 export const QueryConfigResponse = {
   typeUrl: "/ibc.core.client.v2.QueryConfigResponse",
+  aminoType: "cosmos-sdk/QueryConfigResponse",
   encode(message: QueryConfigResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.config !== undefined) {
       Config.encode(message.config, writer.uint32(10).fork()).ldelim();
@@ -341,7 +324,7 @@ export const QueryConfigResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryConfigResponse>): QueryConfigResponse {
+  fromPartial(object: DeepPartial<QueryConfigResponse>): QueryConfigResponse {
     const message = createBaseQueryConfigResponse();
     message.config = object.config !== undefined && object.config !== null ? Config.fromPartial(object.config) : undefined;
     return message;

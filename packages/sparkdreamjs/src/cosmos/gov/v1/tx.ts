@@ -1,14 +1,14 @@
 //@ts-nocheck
-import { Any, AnyProtoMsg, AnyAmino, AnySDKType } from "../../../google/protobuf/any";
-import { Coin, CoinAmino, CoinSDKType } from "../../base/v1beta1/coin";
-import { VoteOption, WeightedVoteOption, WeightedVoteOptionAmino, WeightedVoteOptionSDKType, Params, ParamsAmino, ParamsSDKType } from "./gov";
+import { Any, AnyProtoMsg, AnyAmino } from "../../../google/protobuf/any";
+import { Coin, CoinAmino } from "../../base/v1beta1/coin";
+import { VoteOption, WeightedVoteOption, WeightedVoteOptionAmino, Params, ParamsAmino } from "./gov";
 import { Timestamp } from "../../../google/protobuf/timestamp";
-import { CommunityPoolSpendProposal, CommunityPoolSpendProposalProtoMsg, CommunityPoolSpendProposalSDKType, CommunityPoolSpendProposalWithDeposit, CommunityPoolSpendProposalWithDepositProtoMsg, CommunityPoolSpendProposalWithDepositSDKType } from "../../distribution/v1beta1/distribution";
-import { TextProposal, TextProposalProtoMsg, TextProposalSDKType } from "../v1beta1/gov";
-import { ParameterChangeProposal, ParameterChangeProposalProtoMsg, ParameterChangeProposalSDKType } from "../../params/v1beta1/params";
-import { SoftwareUpgradeProposal, SoftwareUpgradeProposalProtoMsg, SoftwareUpgradeProposalSDKType, CancelSoftwareUpgradeProposal, CancelSoftwareUpgradeProposalProtoMsg, CancelSoftwareUpgradeProposalSDKType } from "../../upgrade/v1beta1/upgrade";
+import { CommunityPoolSpendProposal, CommunityPoolSpendProposalProtoMsg, CommunityPoolSpendProposalWithDeposit, CommunityPoolSpendProposalWithDepositProtoMsg } from "../../distribution/v1beta1/distribution";
+import { TextProposal, TextProposalProtoMsg } from "../v1beta1/gov";
+import { ParameterChangeProposal, ParameterChangeProposalProtoMsg } from "../../params/v1beta1/params";
+import { SoftwareUpgradeProposal, SoftwareUpgradeProposalProtoMsg, CancelSoftwareUpgradeProposal, CancelSoftwareUpgradeProposalProtoMsg } from "../../upgrade/v1beta1/upgrade";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { toTimestamp, fromTimestamp } from "../../../helpers";
+import { DeepPartial, toTimestamp, fromTimestamp } from "../../../helpers";
 /**
  * MsgSubmitProposal defines an sdk.Msg type that supports submitting arbitrary
  * proposal Content.
@@ -81,19 +81,6 @@ export interface MsgSubmitProposalAminoMsg {
   type: "cosmos-sdk/v1/MsgSubmitProposal";
   value: MsgSubmitProposalAmino;
 }
-/**
- * MsgSubmitProposal defines an sdk.Msg type that supports submitting arbitrary
- * proposal Content.
- */
-export interface MsgSubmitProposalSDKType {
-  messages: AnySDKType[];
-  initial_deposit: CoinSDKType[];
-  proposer: string;
-  metadata: string;
-  title: string;
-  summary: string;
-  expedited: boolean;
-}
 /** MsgSubmitProposalResponse defines the Msg/SubmitProposal response type. */
 export interface MsgSubmitProposalResponse {
   /** proposal_id defines the unique id of the proposal. */
@@ -111,10 +98,6 @@ export interface MsgSubmitProposalResponseAmino {
 export interface MsgSubmitProposalResponseAminoMsg {
   type: "cosmos-sdk/v1/MsgSubmitProposalResponse";
   value: MsgSubmitProposalResponseAmino;
-}
-/** MsgSubmitProposalResponse defines the Msg/SubmitProposal response type. */
-export interface MsgSubmitProposalResponseSDKType {
-  proposal_id: bigint;
 }
 /**
  * MsgExecLegacyContent is used to wrap the legacy content field into a message.
@@ -147,14 +130,6 @@ export interface MsgExecLegacyContentAminoMsg {
   type: "cosmos-sdk/v1/MsgExecLegacyContent";
   value: MsgExecLegacyContentAmino;
 }
-/**
- * MsgExecLegacyContent is used to wrap the legacy content field into a message.
- * This ensures backwards compatibility with v1beta1.MsgSubmitProposal.
- */
-export interface MsgExecLegacyContentSDKType {
-  content?: CommunityPoolSpendProposalSDKType | CommunityPoolSpendProposalWithDepositSDKType | TextProposalSDKType | ParameterChangeProposalSDKType | SoftwareUpgradeProposalSDKType | CancelSoftwareUpgradeProposalSDKType | AnySDKType | undefined;
-  authority: string;
-}
 /** MsgExecLegacyContentResponse defines the Msg/ExecLegacyContent response type. */
 export interface MsgExecLegacyContentResponse {}
 export interface MsgExecLegacyContentResponseProtoMsg {
@@ -167,8 +142,6 @@ export interface MsgExecLegacyContentResponseAminoMsg {
   type: "cosmos-sdk/v1/MsgExecLegacyContentResponse";
   value: MsgExecLegacyContentResponseAmino;
 }
-/** MsgExecLegacyContentResponse defines the Msg/ExecLegacyContent response type. */
-export interface MsgExecLegacyContentResponseSDKType {}
 /** MsgVote defines a message to cast a vote. */
 export interface MsgVote {
   /** proposal_id defines the unique id of the proposal. */
@@ -199,13 +172,6 @@ export interface MsgVoteAminoMsg {
   type: "cosmos-sdk/v1/MsgVote";
   value: MsgVoteAmino;
 }
-/** MsgVote defines a message to cast a vote. */
-export interface MsgVoteSDKType {
-  proposal_id: bigint;
-  voter: string;
-  option: VoteOption;
-  metadata: string;
-}
 /** MsgVoteResponse defines the Msg/Vote response type. */
 export interface MsgVoteResponse {}
 export interface MsgVoteResponseProtoMsg {
@@ -218,8 +184,6 @@ export interface MsgVoteResponseAminoMsg {
   type: "cosmos-sdk/v1/MsgVoteResponse";
   value: MsgVoteResponseAmino;
 }
-/** MsgVoteResponse defines the Msg/Vote response type. */
-export interface MsgVoteResponseSDKType {}
 /** MsgVoteWeighted defines a message to cast a vote. */
 export interface MsgVoteWeighted {
   /** proposal_id defines the unique id of the proposal. */
@@ -250,13 +214,6 @@ export interface MsgVoteWeightedAminoMsg {
   type: "cosmos-sdk/v1/MsgVoteWeighted";
   value: MsgVoteWeightedAmino;
 }
-/** MsgVoteWeighted defines a message to cast a vote. */
-export interface MsgVoteWeightedSDKType {
-  proposal_id: bigint;
-  voter: string;
-  options: WeightedVoteOptionSDKType[];
-  metadata: string;
-}
 /** MsgVoteWeightedResponse defines the Msg/VoteWeighted response type. */
 export interface MsgVoteWeightedResponse {}
 export interface MsgVoteWeightedResponseProtoMsg {
@@ -269,8 +226,6 @@ export interface MsgVoteWeightedResponseAminoMsg {
   type: "cosmos-sdk/v1/MsgVoteWeightedResponse";
   value: MsgVoteWeightedResponseAmino;
 }
-/** MsgVoteWeightedResponse defines the Msg/VoteWeighted response type. */
-export interface MsgVoteWeightedResponseSDKType {}
 /** MsgDeposit defines a message to submit a deposit to an existing proposal. */
 export interface MsgDeposit {
   /** proposal_id defines the unique id of the proposal. */
@@ -297,12 +252,6 @@ export interface MsgDepositAminoMsg {
   type: "cosmos-sdk/v1/MsgDeposit";
   value: MsgDepositAmino;
 }
-/** MsgDeposit defines a message to submit a deposit to an existing proposal. */
-export interface MsgDepositSDKType {
-  proposal_id: bigint;
-  depositor: string;
-  amount: CoinSDKType[];
-}
 /** MsgDepositResponse defines the Msg/Deposit response type. */
 export interface MsgDepositResponse {}
 export interface MsgDepositResponseProtoMsg {
@@ -315,8 +264,6 @@ export interface MsgDepositResponseAminoMsg {
   type: "cosmos-sdk/v1/MsgDepositResponse";
   value: MsgDepositResponseAmino;
 }
-/** MsgDepositResponse defines the Msg/Deposit response type. */
-export interface MsgDepositResponseSDKType {}
 /**
  * MsgUpdateParams is the Msg/UpdateParams request type.
  * 
@@ -356,15 +303,6 @@ export interface MsgUpdateParamsAminoMsg {
   value: MsgUpdateParamsAmino;
 }
 /**
- * MsgUpdateParams is the Msg/UpdateParams request type.
- * 
- * Since: cosmos-sdk 0.47
- */
-export interface MsgUpdateParamsSDKType {
-  authority: string;
-  params: ParamsSDKType;
-}
-/**
  * MsgUpdateParamsResponse defines the response structure for executing a
  * MsgUpdateParams message.
  * 
@@ -386,13 +324,6 @@ export interface MsgUpdateParamsResponseAminoMsg {
   type: "cosmos-sdk/v1/MsgUpdateParamsResponse";
   value: MsgUpdateParamsResponseAmino;
 }
-/**
- * MsgUpdateParamsResponse defines the response structure for executing a
- * MsgUpdateParams message.
- * 
- * Since: cosmos-sdk 0.47
- */
-export interface MsgUpdateParamsResponseSDKType {}
 /**
  * MsgCancelProposal is the Msg/CancelProposal request type.
  * 
@@ -422,15 +353,6 @@ export interface MsgCancelProposalAmino {
 export interface MsgCancelProposalAminoMsg {
   type: "cosmos-sdk/v1/MsgCancelProposal";
   value: MsgCancelProposalAmino;
-}
-/**
- * MsgCancelProposal is the Msg/CancelProposal request type.
- * 
- * Since: cosmos-sdk 0.50
- */
-export interface MsgCancelProposalSDKType {
-  proposal_id: bigint;
-  proposer: string;
 }
 /**
  * MsgCancelProposalResponse defines the response structure for executing a
@@ -468,17 +390,6 @@ export interface MsgCancelProposalResponseAminoMsg {
   type: "cosmos-sdk/v1/MsgCancelProposalResponse";
   value: MsgCancelProposalResponseAmino;
 }
-/**
- * MsgCancelProposalResponse defines the response structure for executing a
- * MsgCancelProposal message.
- * 
- * Since: cosmos-sdk 0.50
- */
-export interface MsgCancelProposalResponseSDKType {
-  proposal_id: bigint;
-  canceled_time: Date;
-  canceled_height: bigint;
-}
 function createBaseMsgSubmitProposal(): MsgSubmitProposal {
   return {
     messages: [],
@@ -492,6 +403,7 @@ function createBaseMsgSubmitProposal(): MsgSubmitProposal {
 }
 export const MsgSubmitProposal = {
   typeUrl: "/cosmos.gov.v1.MsgSubmitProposal",
+  aminoType: "cosmos-sdk/v1/MsgSubmitProposal",
   encode(message: MsgSubmitProposal, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.messages) {
       Any.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -551,7 +463,7 @@ export const MsgSubmitProposal = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgSubmitProposal>): MsgSubmitProposal {
+  fromPartial(object: DeepPartial<MsgSubmitProposal>): MsgSubmitProposal {
     const message = createBaseMsgSubmitProposal();
     message.messages = object.messages?.map(e => Any.fromPartial(e)) || [];
     message.initialDeposit = object.initialDeposit?.map(e => Coin.fromPartial(e)) || [];
@@ -631,6 +543,7 @@ function createBaseMsgSubmitProposalResponse(): MsgSubmitProposalResponse {
 }
 export const MsgSubmitProposalResponse = {
   typeUrl: "/cosmos.gov.v1.MsgSubmitProposalResponse",
+  aminoType: "cosmos-sdk/v1/MsgSubmitProposalResponse",
   encode(message: MsgSubmitProposalResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.proposalId !== BigInt(0)) {
       writer.uint32(8).uint64(message.proposalId);
@@ -654,7 +567,7 @@ export const MsgSubmitProposalResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgSubmitProposalResponse>): MsgSubmitProposalResponse {
+  fromPartial(object: DeepPartial<MsgSubmitProposalResponse>): MsgSubmitProposalResponse {
     const message = createBaseMsgSubmitProposalResponse();
     message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
     return message;
@@ -701,6 +614,7 @@ function createBaseMsgExecLegacyContent(): MsgExecLegacyContent {
 }
 export const MsgExecLegacyContent = {
   typeUrl: "/cosmos.gov.v1.MsgExecLegacyContent",
+  aminoType: "cosmos-sdk/v1/MsgExecLegacyContent",
   encode(message: MsgExecLegacyContent, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.content !== undefined) {
       Any.encode(message.content as Any, writer.uint32(10).fork()).ldelim();
@@ -730,7 +644,7 @@ export const MsgExecLegacyContent = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgExecLegacyContent>): MsgExecLegacyContent {
+  fromPartial(object: DeepPartial<MsgExecLegacyContent>): MsgExecLegacyContent {
     const message = createBaseMsgExecLegacyContent();
     message.content = object.content !== undefined && object.content !== null ? Any.fromPartial(object.content) : undefined;
     message.authority = object.authority ?? "";
@@ -779,6 +693,7 @@ function createBaseMsgExecLegacyContentResponse(): MsgExecLegacyContentResponse 
 }
 export const MsgExecLegacyContentResponse = {
   typeUrl: "/cosmos.gov.v1.MsgExecLegacyContentResponse",
+  aminoType: "cosmos-sdk/v1/MsgExecLegacyContentResponse",
   encode(_: MsgExecLegacyContentResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -796,7 +711,7 @@ export const MsgExecLegacyContentResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgExecLegacyContentResponse>): MsgExecLegacyContentResponse {
+  fromPartial(_: DeepPartial<MsgExecLegacyContentResponse>): MsgExecLegacyContentResponse {
     const message = createBaseMsgExecLegacyContentResponse();
     return message;
   },
@@ -840,6 +755,7 @@ function createBaseMsgVote(): MsgVote {
 }
 export const MsgVote = {
   typeUrl: "/cosmos.gov.v1.MsgVote",
+  aminoType: "cosmos-sdk/v1/MsgVote",
   encode(message: MsgVote, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.proposalId !== BigInt(0)) {
       writer.uint32(8).uint64(message.proposalId);
@@ -881,7 +797,7 @@ export const MsgVote = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgVote>): MsgVote {
+  fromPartial(object: DeepPartial<MsgVote>): MsgVote {
     const message = createBaseMsgVote();
     message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
     message.voter = object.voter ?? "";
@@ -940,6 +856,7 @@ function createBaseMsgVoteResponse(): MsgVoteResponse {
 }
 export const MsgVoteResponse = {
   typeUrl: "/cosmos.gov.v1.MsgVoteResponse",
+  aminoType: "cosmos-sdk/v1/MsgVoteResponse",
   encode(_: MsgVoteResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -957,7 +874,7 @@ export const MsgVoteResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgVoteResponse>): MsgVoteResponse {
+  fromPartial(_: DeepPartial<MsgVoteResponse>): MsgVoteResponse {
     const message = createBaseMsgVoteResponse();
     return message;
   },
@@ -1001,6 +918,7 @@ function createBaseMsgVoteWeighted(): MsgVoteWeighted {
 }
 export const MsgVoteWeighted = {
   typeUrl: "/cosmos.gov.v1.MsgVoteWeighted",
+  aminoType: "cosmos-sdk/v1/MsgVoteWeighted",
   encode(message: MsgVoteWeighted, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.proposalId !== BigInt(0)) {
       writer.uint32(8).uint64(message.proposalId);
@@ -1042,7 +960,7 @@ export const MsgVoteWeighted = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgVoteWeighted>): MsgVoteWeighted {
+  fromPartial(object: DeepPartial<MsgVoteWeighted>): MsgVoteWeighted {
     const message = createBaseMsgVoteWeighted();
     message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
     message.voter = object.voter ?? "";
@@ -1103,6 +1021,7 @@ function createBaseMsgVoteWeightedResponse(): MsgVoteWeightedResponse {
 }
 export const MsgVoteWeightedResponse = {
   typeUrl: "/cosmos.gov.v1.MsgVoteWeightedResponse",
+  aminoType: "cosmos-sdk/v1/MsgVoteWeightedResponse",
   encode(_: MsgVoteWeightedResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1120,7 +1039,7 @@ export const MsgVoteWeightedResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgVoteWeightedResponse>): MsgVoteWeightedResponse {
+  fromPartial(_: DeepPartial<MsgVoteWeightedResponse>): MsgVoteWeightedResponse {
     const message = createBaseMsgVoteWeightedResponse();
     return message;
   },
@@ -1163,6 +1082,7 @@ function createBaseMsgDeposit(): MsgDeposit {
 }
 export const MsgDeposit = {
   typeUrl: "/cosmos.gov.v1.MsgDeposit",
+  aminoType: "cosmos-sdk/v1/MsgDeposit",
   encode(message: MsgDeposit, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.proposalId !== BigInt(0)) {
       writer.uint32(8).uint64(message.proposalId);
@@ -1198,7 +1118,7 @@ export const MsgDeposit = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgDeposit>): MsgDeposit {
+  fromPartial(object: DeepPartial<MsgDeposit>): MsgDeposit {
     const message = createBaseMsgDeposit();
     message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
     message.depositor = object.depositor ?? "";
@@ -1254,6 +1174,7 @@ function createBaseMsgDepositResponse(): MsgDepositResponse {
 }
 export const MsgDepositResponse = {
   typeUrl: "/cosmos.gov.v1.MsgDepositResponse",
+  aminoType: "cosmos-sdk/v1/MsgDepositResponse",
   encode(_: MsgDepositResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1271,7 +1192,7 @@ export const MsgDepositResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgDepositResponse>): MsgDepositResponse {
+  fromPartial(_: DeepPartial<MsgDepositResponse>): MsgDepositResponse {
     const message = createBaseMsgDepositResponse();
     return message;
   },
@@ -1313,6 +1234,7 @@ function createBaseMsgUpdateParams(): MsgUpdateParams {
 }
 export const MsgUpdateParams = {
   typeUrl: "/cosmos.gov.v1.MsgUpdateParams",
+  aminoType: "cosmos-sdk/x/gov/v1/MsgUpdateParams",
   encode(message: MsgUpdateParams, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -1342,7 +1264,7 @@ export const MsgUpdateParams = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpdateParams>): MsgUpdateParams {
+  fromPartial(object: DeepPartial<MsgUpdateParams>): MsgUpdateParams {
     const message = createBaseMsgUpdateParams();
     message.authority = object.authority ?? "";
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
@@ -1391,6 +1313,7 @@ function createBaseMsgUpdateParamsResponse(): MsgUpdateParamsResponse {
 }
 export const MsgUpdateParamsResponse = {
   typeUrl: "/cosmos.gov.v1.MsgUpdateParamsResponse",
+  aminoType: "cosmos-sdk/v1/MsgUpdateParamsResponse",
   encode(_: MsgUpdateParamsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1408,7 +1331,7 @@ export const MsgUpdateParamsResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
+  fromPartial(_: DeepPartial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
     const message = createBaseMsgUpdateParamsResponse();
     return message;
   },
@@ -1450,6 +1373,7 @@ function createBaseMsgCancelProposal(): MsgCancelProposal {
 }
 export const MsgCancelProposal = {
   typeUrl: "/cosmos.gov.v1.MsgCancelProposal",
+  aminoType: "cosmos-sdk/v1/MsgCancelProposal",
   encode(message: MsgCancelProposal, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.proposalId !== BigInt(0)) {
       writer.uint32(8).uint64(message.proposalId);
@@ -1479,7 +1403,7 @@ export const MsgCancelProposal = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgCancelProposal>): MsgCancelProposal {
+  fromPartial(object: DeepPartial<MsgCancelProposal>): MsgCancelProposal {
     const message = createBaseMsgCancelProposal();
     message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
     message.proposer = object.proposer ?? "";
@@ -1532,6 +1456,7 @@ function createBaseMsgCancelProposalResponse(): MsgCancelProposalResponse {
 }
 export const MsgCancelProposalResponse = {
   typeUrl: "/cosmos.gov.v1.MsgCancelProposalResponse",
+  aminoType: "cosmos-sdk/v1/MsgCancelProposalResponse",
   encode(message: MsgCancelProposalResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.proposalId !== BigInt(0)) {
       writer.uint32(8).uint64(message.proposalId);
@@ -1567,7 +1492,7 @@ export const MsgCancelProposalResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgCancelProposalResponse>): MsgCancelProposalResponse {
+  fromPartial(object: DeepPartial<MsgCancelProposalResponse>): MsgCancelProposalResponse {
     const message = createBaseMsgCancelProposalResponse();
     message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
     message.canceledTime = object.canceledTime ?? undefined;

@@ -1,7 +1,7 @@
 //@ts-nocheck
-import { Op, OpAmino, OpSDKType } from "./benchmark";
+import { Op, OpAmino } from "./benchmark";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /** MsgLoadTestOps defines a message containing a sequence of load test operations. */
 export interface MsgLoadTest {
   caller: Uint8Array;
@@ -19,11 +19,6 @@ export interface MsgLoadTestAmino {
 export interface MsgLoadTestAminoMsg {
   type: "cosmos-sdk/tools/benchmark/v1/MsgLoadTest";
   value: MsgLoadTestAmino;
-}
-/** MsgLoadTestOps defines a message containing a sequence of load test operations. */
-export interface MsgLoadTestSDKType {
-  caller: Uint8Array;
-  ops: OpSDKType[];
 }
 /** MsgLoadTestResponse defines a message containing the results of a load test operation. */
 export interface MsgLoadTestResponse {
@@ -43,11 +38,6 @@ export interface MsgLoadTestResponseAminoMsg {
   type: "cosmos-sdk/MsgLoadTestResponse";
   value: MsgLoadTestResponseAmino;
 }
-/** MsgLoadTestResponse defines a message containing the results of a load test operation. */
-export interface MsgLoadTestResponseSDKType {
-  total_time: bigint;
-  total_errors: bigint;
-}
 function createBaseMsgLoadTest(): MsgLoadTest {
   return {
     caller: new Uint8Array(),
@@ -56,6 +46,7 @@ function createBaseMsgLoadTest(): MsgLoadTest {
 }
 export const MsgLoadTest = {
   typeUrl: "/cosmos.benchmark.v1.MsgLoadTest",
+  aminoType: "cosmos-sdk/tools/benchmark/v1/MsgLoadTest",
   encode(message: MsgLoadTest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.caller.length !== 0) {
       writer.uint32(10).bytes(message.caller);
@@ -85,7 +76,7 @@ export const MsgLoadTest = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgLoadTest>): MsgLoadTest {
+  fromPartial(object: DeepPartial<MsgLoadTest>): MsgLoadTest {
     const message = createBaseMsgLoadTest();
     message.caller = object.caller ?? new Uint8Array();
     message.ops = object.ops?.map(e => Op.fromPartial(e)) || [];
@@ -139,6 +130,7 @@ function createBaseMsgLoadTestResponse(): MsgLoadTestResponse {
 }
 export const MsgLoadTestResponse = {
   typeUrl: "/cosmos.benchmark.v1.MsgLoadTestResponse",
+  aminoType: "cosmos-sdk/MsgLoadTestResponse",
   encode(message: MsgLoadTestResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.totalTime !== BigInt(0)) {
       writer.uint32(8).uint64(message.totalTime);
@@ -168,7 +160,7 @@ export const MsgLoadTestResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgLoadTestResponse>): MsgLoadTestResponse {
+  fromPartial(object: DeepPartial<MsgLoadTestResponse>): MsgLoadTestResponse {
     const message = createBaseMsgLoadTestResponse();
     message.totalTime = object.totalTime !== undefined && object.totalTime !== null ? BigInt(object.totalTime.toString()) : BigInt(0);
     message.totalErrors = object.totalErrors !== undefined && object.totalErrors !== null ? BigInt(object.totalErrors.toString()) : BigInt(0);

@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../../helpers";
 /** Pairs defines a repeated slice of Pair objects. */
 export interface Pairs {
   pairs: Pair[];
@@ -16,10 +16,6 @@ export interface PairsAmino {
 export interface PairsAminoMsg {
   type: "cosmos-sdk/Pairs";
   value: PairsAmino;
-}
-/** Pairs defines a repeated slice of Pair objects. */
-export interface PairsSDKType {
-  pairs: PairSDKType[];
 }
 /** Pair defines a key/value bytes tuple. */
 export interface Pair {
@@ -39,11 +35,6 @@ export interface PairAminoMsg {
   type: "cosmos-sdk/Pair";
   value: PairAmino;
 }
-/** Pair defines a key/value bytes tuple. */
-export interface PairSDKType {
-  key: Uint8Array;
-  value: Uint8Array;
-}
 function createBasePairs(): Pairs {
   return {
     pairs: []
@@ -51,6 +42,7 @@ function createBasePairs(): Pairs {
 }
 export const Pairs = {
   typeUrl: "/cosmos.store.internal.kv.v1beta1.Pairs",
+  aminoType: "cosmos-sdk/Pairs",
   encode(message: Pairs, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.pairs) {
       Pair.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -74,7 +66,7 @@ export const Pairs = {
     }
     return message;
   },
-  fromPartial(object: Partial<Pairs>): Pairs {
+  fromPartial(object: DeepPartial<Pairs>): Pairs {
     const message = createBasePairs();
     message.pairs = object.pairs?.map(e => Pair.fromPartial(e)) || [];
     return message;
@@ -123,6 +115,7 @@ function createBasePair(): Pair {
 }
 export const Pair = {
   typeUrl: "/cosmos.store.internal.kv.v1beta1.Pair",
+  aminoType: "cosmos-sdk/Pair",
   encode(message: Pair, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.key.length !== 0) {
       writer.uint32(10).bytes(message.key);
@@ -152,7 +145,7 @@ export const Pair = {
     }
     return message;
   },
-  fromPartial(object: Partial<Pair>): Pair {
+  fromPartial(object: DeepPartial<Pair>): Pair {
     const message = createBasePair();
     message.key = object.key ?? new Uint8Array();
     message.value = object.value ?? new Uint8Array();

@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { Coin, CoinAmino, CoinSDKType } from "../../../../cosmos/base/v1beta1/coin";
+import { Coin, CoinAmino } from "../../../../cosmos/base/v1beta1/coin";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /** Allocation defines the spend limit for a particular port and channel */
 export interface Allocation {
   /** the port on which the packet will be sent */
@@ -41,20 +42,11 @@ export interface AllocationAminoMsg {
   type: "cosmos-sdk/Allocation";
   value: AllocationAmino;
 }
-/** Allocation defines the spend limit for a particular port and channel */
-export interface AllocationSDKType {
-  source_port: string;
-  source_channel: string;
-  spend_limit: CoinSDKType[];
-  allow_list: string[];
-  allowed_packet_data: string[];
-}
 /**
  * TransferAuthorization allows the grantee to spend up to spend_limit coins from
  * the granter's account for ibc transfer on a specific channel
  */
 export interface TransferAuthorization {
-  $typeUrl?: "/ibc.applications.transfer.v1.TransferAuthorization";
   /** port and channel amounts */
   allocations: Allocation[];
 }
@@ -74,14 +66,6 @@ export interface TransferAuthorizationAminoMsg {
   type: "cosmos-sdk/TransferAuthorization";
   value: TransferAuthorizationAmino;
 }
-/**
- * TransferAuthorization allows the grantee to spend up to spend_limit coins from
- * the granter's account for ibc transfer on a specific channel
- */
-export interface TransferAuthorizationSDKType {
-  $typeUrl?: "/ibc.applications.transfer.v1.TransferAuthorization";
-  allocations: AllocationSDKType[];
-}
 function createBaseAllocation(): Allocation {
   return {
     sourcePort: "",
@@ -93,6 +77,7 @@ function createBaseAllocation(): Allocation {
 }
 export const Allocation = {
   typeUrl: "/ibc.applications.transfer.v1.Allocation",
+  aminoType: "cosmos-sdk/Allocation",
   encode(message: Allocation, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sourcePort !== "") {
       writer.uint32(10).string(message.sourcePort);
@@ -140,7 +125,7 @@ export const Allocation = {
     }
     return message;
   },
-  fromPartial(object: Partial<Allocation>): Allocation {
+  fromPartial(object: DeepPartial<Allocation>): Allocation {
     const message = createBaseAllocation();
     message.sourcePort = object.sourcePort ?? "";
     message.sourceChannel = object.sourceChannel ?? "";
@@ -207,12 +192,12 @@ export const Allocation = {
 };
 function createBaseTransferAuthorization(): TransferAuthorization {
   return {
-    $typeUrl: "/ibc.applications.transfer.v1.TransferAuthorization",
     allocations: []
   };
 }
 export const TransferAuthorization = {
   typeUrl: "/ibc.applications.transfer.v1.TransferAuthorization",
+  aminoType: "cosmos-sdk/TransferAuthorization",
   encode(message: TransferAuthorization, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.allocations) {
       Allocation.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -236,7 +221,7 @@ export const TransferAuthorization = {
     }
     return message;
   },
-  fromPartial(object: Partial<TransferAuthorization>): TransferAuthorization {
+  fromPartial(object: DeepPartial<TransferAuthorization>): TransferAuthorization {
     const message = createBaseTransferAuthorization();
     message.allocations = object.allocations?.map(e => Allocation.fromPartial(e)) || [];
     return message;

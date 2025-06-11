@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /** Module is the config object of the gov module. */
 export interface Module {
   /**
@@ -28,11 +29,6 @@ export interface ModuleAminoMsg {
   type: "cosmos-sdk/Module";
   value: ModuleAmino;
 }
-/** Module is the config object of the gov module. */
-export interface ModuleSDKType {
-  max_metadata_len: bigint;
-  authority: string;
-}
 function createBaseModule(): Module {
   return {
     maxMetadataLen: BigInt(0),
@@ -41,6 +37,7 @@ function createBaseModule(): Module {
 }
 export const Module = {
   typeUrl: "/cosmos.gov.module.v1.Module",
+  aminoType: "cosmos-sdk/Module",
   encode(message: Module, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.maxMetadataLen !== BigInt(0)) {
       writer.uint32(8).uint64(message.maxMetadataLen);
@@ -70,7 +67,7 @@ export const Module = {
     }
     return message;
   },
-  fromPartial(object: Partial<Module>): Module {
+  fromPartial(object: DeepPartial<Module>): Module {
     const message = createBaseModule();
     message.maxMetadataLen = object.maxMetadataLen !== undefined && object.maxMetadataLen !== null ? BigInt(object.maxMetadataLen.toString()) : BigInt(0);
     message.authority = object.authority ?? "";

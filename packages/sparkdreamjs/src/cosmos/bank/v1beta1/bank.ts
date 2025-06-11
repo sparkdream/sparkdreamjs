@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { Coin, CoinAmino, CoinSDKType } from "../../base/v1beta1/coin";
+import { Coin, CoinAmino } from "../../base/v1beta1/coin";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** Params defines the parameters for the bank module. */
 export interface Params {
   /**
@@ -35,12 +36,6 @@ export interface ParamsAminoMsg {
   type: "cosmos-sdk/x/bank/Params";
   value: ParamsAmino;
 }
-/** Params defines the parameters for the bank module. */
-export interface ParamsSDKType {
-  /** @deprecated */
-  send_enabled: SendEnabledSDKType[];
-  default_send_enabled: boolean;
-}
 /**
  * SendEnabled maps coin denom to a send_enabled status (whether a denom is
  * sendable).
@@ -65,14 +60,6 @@ export interface SendEnabledAminoMsg {
   type: "cosmos-sdk/SendEnabled";
   value: SendEnabledAmino;
 }
-/**
- * SendEnabled maps coin denom to a send_enabled status (whether a denom is
- * sendable).
- */
-export interface SendEnabledSDKType {
-  denom: string;
-  enabled: boolean;
-}
 /** Input models transaction input. */
 export interface Input {
   address: string;
@@ -90,11 +77,6 @@ export interface InputAmino {
 export interface InputAminoMsg {
   type: "cosmos-sdk/Input";
   value: InputAmino;
-}
-/** Input models transaction input. */
-export interface InputSDKType {
-  address: string;
-  coins: CoinSDKType[];
 }
 /** Output models transaction outputs. */
 export interface Output {
@@ -114,11 +96,6 @@ export interface OutputAminoMsg {
   type: "cosmos-sdk/Output";
   value: OutputAmino;
 }
-/** Output models transaction outputs. */
-export interface OutputSDKType {
-  address: string;
-  coins: CoinSDKType[];
-}
 /**
  * Supply represents a struct that passively keeps track of the total supply
  * amounts in the network.
@@ -126,7 +103,6 @@ export interface OutputSDKType {
  */
 /** @deprecated */
 export interface Supply {
-  $typeUrl?: "/cosmos.bank.v1beta1.Supply";
   total: Coin[];
 }
 export interface SupplyProtoMsg {
@@ -145,16 +121,6 @@ export interface SupplyAmino {
 export interface SupplyAminoMsg {
   type: "cosmos-sdk/Supply";
   value: SupplyAmino;
-}
-/**
- * Supply represents a struct that passively keeps track of the total supply
- * amounts in the network.
- * This message is deprecated now that supply is indexed by denom.
- */
-/** @deprecated */
-export interface SupplySDKType {
-  $typeUrl?: "/cosmos.bank.v1beta1.Supply";
-  total: CoinSDKType[];
 }
 /**
  * DenomUnit represents a struct that describes a given
@@ -199,15 +165,6 @@ export interface DenomUnitAmino {
 export interface DenomUnitAminoMsg {
   type: "cosmos-sdk/DenomUnit";
   value: DenomUnitAmino;
-}
-/**
- * DenomUnit represents a struct that describes a given
- * denomination unit of the basic token.
- */
-export interface DenomUnitSDKType {
-  denom: string;
-  exponent: number;
-  aliases: string[];
 }
 /**
  * Metadata represents a struct that describes
@@ -301,20 +258,6 @@ export interface MetadataAminoMsg {
   type: "cosmos-sdk/Metadata";
   value: MetadataAmino;
 }
-/**
- * Metadata represents a struct that describes
- * a basic token.
- */
-export interface MetadataSDKType {
-  description: string;
-  denom_units: DenomUnitSDKType[];
-  base: string;
-  display: string;
-  name: string;
-  symbol: string;
-  uri: string;
-  uri_hash: string;
-}
 function createBaseParams(): Params {
   return {
     sendEnabled: [],
@@ -323,6 +266,7 @@ function createBaseParams(): Params {
 }
 export const Params = {
   typeUrl: "/cosmos.bank.v1beta1.Params",
+  aminoType: "cosmos-sdk/x/bank/Params",
   encode(message: Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.sendEnabled) {
       SendEnabled.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -352,7 +296,7 @@ export const Params = {
     }
     return message;
   },
-  fromPartial(object: Partial<Params>): Params {
+  fromPartial(object: DeepPartial<Params>): Params {
     const message = createBaseParams();
     message.sendEnabled = object.sendEnabled?.map(e => SendEnabled.fromPartial(e)) || [];
     message.defaultSendEnabled = object.defaultSendEnabled ?? false;
@@ -406,6 +350,7 @@ function createBaseSendEnabled(): SendEnabled {
 }
 export const SendEnabled = {
   typeUrl: "/cosmos.bank.v1beta1.SendEnabled",
+  aminoType: "cosmos-sdk/SendEnabled",
   encode(message: SendEnabled, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.denom !== "") {
       writer.uint32(10).string(message.denom);
@@ -435,7 +380,7 @@ export const SendEnabled = {
     }
     return message;
   },
-  fromPartial(object: Partial<SendEnabled>): SendEnabled {
+  fromPartial(object: DeepPartial<SendEnabled>): SendEnabled {
     const message = createBaseSendEnabled();
     message.denom = object.denom ?? "";
     message.enabled = object.enabled ?? false;
@@ -487,6 +432,7 @@ function createBaseInput(): Input {
 }
 export const Input = {
   typeUrl: "/cosmos.bank.v1beta1.Input",
+  aminoType: "cosmos-sdk/Input",
   encode(message: Input, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -516,7 +462,7 @@ export const Input = {
     }
     return message;
   },
-  fromPartial(object: Partial<Input>): Input {
+  fromPartial(object: DeepPartial<Input>): Input {
     const message = createBaseInput();
     message.address = object.address ?? "";
     message.coins = object.coins?.map(e => Coin.fromPartial(e)) || [];
@@ -570,6 +516,7 @@ function createBaseOutput(): Output {
 }
 export const Output = {
   typeUrl: "/cosmos.bank.v1beta1.Output",
+  aminoType: "cosmos-sdk/Output",
   encode(message: Output, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -599,7 +546,7 @@ export const Output = {
     }
     return message;
   },
-  fromPartial(object: Partial<Output>): Output {
+  fromPartial(object: DeepPartial<Output>): Output {
     const message = createBaseOutput();
     message.address = object.address ?? "";
     message.coins = object.coins?.map(e => Coin.fromPartial(e)) || [];
@@ -647,12 +594,12 @@ export const Output = {
 };
 function createBaseSupply(): Supply {
   return {
-    $typeUrl: "/cosmos.bank.v1beta1.Supply",
     total: []
   };
 }
 export const Supply = {
   typeUrl: "/cosmos.bank.v1beta1.Supply",
+  aminoType: "cosmos-sdk/Supply",
   encode(message: Supply, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.total) {
       Coin.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -676,7 +623,7 @@ export const Supply = {
     }
     return message;
   },
-  fromPartial(object: Partial<Supply>): Supply {
+  fromPartial(object: DeepPartial<Supply>): Supply {
     const message = createBaseSupply();
     message.total = object.total?.map(e => Coin.fromPartial(e)) || [];
     return message;
@@ -726,6 +673,7 @@ function createBaseDenomUnit(): DenomUnit {
 }
 export const DenomUnit = {
   typeUrl: "/cosmos.bank.v1beta1.DenomUnit",
+  aminoType: "cosmos-sdk/DenomUnit",
   encode(message: DenomUnit, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.denom !== "") {
       writer.uint32(10).string(message.denom);
@@ -761,7 +709,7 @@ export const DenomUnit = {
     }
     return message;
   },
-  fromPartial(object: Partial<DenomUnit>): DenomUnit {
+  fromPartial(object: DeepPartial<DenomUnit>): DenomUnit {
     const message = createBaseDenomUnit();
     message.denom = object.denom ?? "";
     message.exponent = object.exponent ?? 0;
@@ -826,6 +774,7 @@ function createBaseMetadata(): Metadata {
 }
 export const Metadata = {
   typeUrl: "/cosmos.bank.v1beta1.Metadata",
+  aminoType: "cosmos-sdk/Metadata",
   encode(message: Metadata, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.description !== "") {
       writer.uint32(10).string(message.description);
@@ -891,7 +840,7 @@ export const Metadata = {
     }
     return message;
   },
-  fromPartial(object: Partial<Metadata>): Metadata {
+  fromPartial(object: DeepPartial<Metadata>): Metadata {
     const message = createBaseMetadata();
     message.description = object.description ?? "";
     message.denomUnits = object.denomUnits?.map(e => DenomUnit.fromPartial(e)) || [];

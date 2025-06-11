@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { CounterpartyInfo, CounterpartyInfoAmino, CounterpartyInfoSDKType } from "./counterparty";
+import { CounterpartyInfo, CounterpartyInfoAmino } from "./counterparty";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /** GenesisCounterpartyInfo defines the state associating a client with a counterparty. */
 export interface GenesisCounterpartyInfo {
   /** ClientId is the ID of the given client. */
@@ -23,11 +24,6 @@ export interface GenesisCounterpartyInfoAminoMsg {
   type: "cosmos-sdk/GenesisCounterpartyInfo";
   value: GenesisCounterpartyInfoAmino;
 }
-/** GenesisCounterpartyInfo defines the state associating a client with a counterparty. */
-export interface GenesisCounterpartyInfoSDKType {
-  client_id: string;
-  counterparty_info: CounterpartyInfoSDKType;
-}
 /** GenesisState defines the ibc client v2 submodule's genesis state. */
 export interface GenesisState {
   /** counterparty info for each client */
@@ -46,10 +42,6 @@ export interface GenesisStateAminoMsg {
   type: "cosmos-sdk/GenesisState";
   value: GenesisStateAmino;
 }
-/** GenesisState defines the ibc client v2 submodule's genesis state. */
-export interface GenesisStateSDKType {
-  counterparty_infos: GenesisCounterpartyInfoSDKType[];
-}
 function createBaseGenesisCounterpartyInfo(): GenesisCounterpartyInfo {
   return {
     clientId: "",
@@ -58,6 +50,7 @@ function createBaseGenesisCounterpartyInfo(): GenesisCounterpartyInfo {
 }
 export const GenesisCounterpartyInfo = {
   typeUrl: "/ibc.core.client.v2.GenesisCounterpartyInfo",
+  aminoType: "cosmos-sdk/GenesisCounterpartyInfo",
   encode(message: GenesisCounterpartyInfo, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -87,7 +80,7 @@ export const GenesisCounterpartyInfo = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisCounterpartyInfo>): GenesisCounterpartyInfo {
+  fromPartial(object: DeepPartial<GenesisCounterpartyInfo>): GenesisCounterpartyInfo {
     const message = createBaseGenesisCounterpartyInfo();
     message.clientId = object.clientId ?? "";
     message.counterpartyInfo = object.counterpartyInfo !== undefined && object.counterpartyInfo !== null ? CounterpartyInfo.fromPartial(object.counterpartyInfo) : undefined;
@@ -138,6 +131,7 @@ function createBaseGenesisState(): GenesisState {
 }
 export const GenesisState = {
   typeUrl: "/ibc.core.client.v2.GenesisState",
+  aminoType: "cosmos-sdk/GenesisState",
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.counterpartyInfos) {
       GenesisCounterpartyInfo.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -161,7 +155,7 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisState>): GenesisState {
+  fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = createBaseGenesisState();
     message.counterpartyInfos = object.counterpartyInfos?.map(e => GenesisCounterpartyInfo.fromPartial(e)) || [];
     return message;

@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /** MsgStoreCode defines the request type for the StoreCode rpc. */
 export interface MsgStoreCode {
   /** signer address */
@@ -23,11 +23,6 @@ export interface MsgStoreCodeAminoMsg {
   type: "cosmos-sdk/MsgStoreCode";
   value: MsgStoreCodeAmino;
 }
-/** MsgStoreCode defines the request type for the StoreCode rpc. */
-export interface MsgStoreCodeSDKType {
-  signer: string;
-  wasm_byte_code: Uint8Array;
-}
 /** MsgStoreCodeResponse defines the response type for the StoreCode rpc */
 export interface MsgStoreCodeResponse {
   /** checksum is the sha256 hash of the stored code */
@@ -45,10 +40,6 @@ export interface MsgStoreCodeResponseAmino {
 export interface MsgStoreCodeResponseAminoMsg {
   type: "cosmos-sdk/MsgStoreCodeResponse";
   value: MsgStoreCodeResponseAmino;
-}
-/** MsgStoreCodeResponse defines the response type for the StoreCode rpc */
-export interface MsgStoreCodeResponseSDKType {
-  checksum: Uint8Array;
 }
 /** MsgRemoveChecksum defines the request type for the MsgRemoveChecksum rpc. */
 export interface MsgRemoveChecksum {
@@ -72,11 +63,6 @@ export interface MsgRemoveChecksumAminoMsg {
   type: "cosmos-sdk/MsgRemoveChecksum";
   value: MsgRemoveChecksumAmino;
 }
-/** MsgRemoveChecksum defines the request type for the MsgRemoveChecksum rpc. */
-export interface MsgRemoveChecksumSDKType {
-  signer: string;
-  checksum: Uint8Array;
-}
 /** MsgStoreChecksumResponse defines the response type for the StoreCode rpc */
 export interface MsgRemoveChecksumResponse {}
 export interface MsgRemoveChecksumResponseProtoMsg {
@@ -89,8 +75,6 @@ export interface MsgRemoveChecksumResponseAminoMsg {
   type: "cosmos-sdk/MsgRemoveChecksumResponse";
   value: MsgRemoveChecksumResponseAmino;
 }
-/** MsgStoreChecksumResponse defines the response type for the StoreCode rpc */
-export interface MsgRemoveChecksumResponseSDKType {}
 /** MsgMigrateContract defines the request type for the MigrateContract rpc. */
 export interface MsgMigrateContract {
   /** signer address */
@@ -121,13 +105,6 @@ export interface MsgMigrateContractAminoMsg {
   type: "cosmos-sdk/MsgMigrateContract";
   value: MsgMigrateContractAmino;
 }
-/** MsgMigrateContract defines the request type for the MigrateContract rpc. */
-export interface MsgMigrateContractSDKType {
-  signer: string;
-  client_id: string;
-  checksum: Uint8Array;
-  msg: Uint8Array;
-}
 /** MsgMigrateContractResponse defines the response type for the MigrateContract rpc */
 export interface MsgMigrateContractResponse {}
 export interface MsgMigrateContractResponseProtoMsg {
@@ -140,8 +117,6 @@ export interface MsgMigrateContractResponseAminoMsg {
   type: "cosmos-sdk/MsgMigrateContractResponse";
   value: MsgMigrateContractResponseAmino;
 }
-/** MsgMigrateContractResponse defines the response type for the MigrateContract rpc */
-export interface MsgMigrateContractResponseSDKType {}
 function createBaseMsgStoreCode(): MsgStoreCode {
   return {
     signer: "",
@@ -150,6 +125,7 @@ function createBaseMsgStoreCode(): MsgStoreCode {
 }
 export const MsgStoreCode = {
   typeUrl: "/ibc.lightclients.wasm.v1.MsgStoreCode",
+  aminoType: "cosmos-sdk/MsgStoreCode",
   encode(message: MsgStoreCode, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.signer !== "") {
       writer.uint32(10).string(message.signer);
@@ -179,7 +155,7 @@ export const MsgStoreCode = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgStoreCode>): MsgStoreCode {
+  fromPartial(object: DeepPartial<MsgStoreCode>): MsgStoreCode {
     const message = createBaseMsgStoreCode();
     message.signer = object.signer ?? "";
     message.wasmByteCode = object.wasmByteCode ?? new Uint8Array();
@@ -230,6 +206,7 @@ function createBaseMsgStoreCodeResponse(): MsgStoreCodeResponse {
 }
 export const MsgStoreCodeResponse = {
   typeUrl: "/ibc.lightclients.wasm.v1.MsgStoreCodeResponse",
+  aminoType: "cosmos-sdk/MsgStoreCodeResponse",
   encode(message: MsgStoreCodeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.checksum.length !== 0) {
       writer.uint32(10).bytes(message.checksum);
@@ -253,7 +230,7 @@ export const MsgStoreCodeResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgStoreCodeResponse>): MsgStoreCodeResponse {
+  fromPartial(object: DeepPartial<MsgStoreCodeResponse>): MsgStoreCodeResponse {
     const message = createBaseMsgStoreCodeResponse();
     message.checksum = object.checksum ?? new Uint8Array();
     return message;
@@ -300,6 +277,7 @@ function createBaseMsgRemoveChecksum(): MsgRemoveChecksum {
 }
 export const MsgRemoveChecksum = {
   typeUrl: "/ibc.lightclients.wasm.v1.MsgRemoveChecksum",
+  aminoType: "cosmos-sdk/MsgRemoveChecksum",
   encode(message: MsgRemoveChecksum, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.signer !== "") {
       writer.uint32(10).string(message.signer);
@@ -329,7 +307,7 @@ export const MsgRemoveChecksum = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgRemoveChecksum>): MsgRemoveChecksum {
+  fromPartial(object: DeepPartial<MsgRemoveChecksum>): MsgRemoveChecksum {
     const message = createBaseMsgRemoveChecksum();
     message.signer = object.signer ?? "";
     message.checksum = object.checksum ?? new Uint8Array();
@@ -378,6 +356,7 @@ function createBaseMsgRemoveChecksumResponse(): MsgRemoveChecksumResponse {
 }
 export const MsgRemoveChecksumResponse = {
   typeUrl: "/ibc.lightclients.wasm.v1.MsgRemoveChecksumResponse",
+  aminoType: "cosmos-sdk/MsgRemoveChecksumResponse",
   encode(_: MsgRemoveChecksumResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -395,7 +374,7 @@ export const MsgRemoveChecksumResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgRemoveChecksumResponse>): MsgRemoveChecksumResponse {
+  fromPartial(_: DeepPartial<MsgRemoveChecksumResponse>): MsgRemoveChecksumResponse {
     const message = createBaseMsgRemoveChecksumResponse();
     return message;
   },
@@ -439,6 +418,7 @@ function createBaseMsgMigrateContract(): MsgMigrateContract {
 }
 export const MsgMigrateContract = {
   typeUrl: "/ibc.lightclients.wasm.v1.MsgMigrateContract",
+  aminoType: "cosmos-sdk/MsgMigrateContract",
   encode(message: MsgMigrateContract, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.signer !== "") {
       writer.uint32(10).string(message.signer);
@@ -480,7 +460,7 @@ export const MsgMigrateContract = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgMigrateContract>): MsgMigrateContract {
+  fromPartial(object: DeepPartial<MsgMigrateContract>): MsgMigrateContract {
     const message = createBaseMsgMigrateContract();
     message.signer = object.signer ?? "";
     message.clientId = object.clientId ?? "";
@@ -539,6 +519,7 @@ function createBaseMsgMigrateContractResponse(): MsgMigrateContractResponse {
 }
 export const MsgMigrateContractResponse = {
   typeUrl: "/ibc.lightclients.wasm.v1.MsgMigrateContractResponse",
+  aminoType: "cosmos-sdk/MsgMigrateContractResponse",
   encode(_: MsgMigrateContractResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -556,7 +537,7 @@ export const MsgMigrateContractResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgMigrateContractResponse>): MsgMigrateContractResponse {
+  fromPartial(_: DeepPartial<MsgMigrateContractResponse>): MsgMigrateContractResponse {
     const message = createBaseMsgMigrateContractResponse();
     return message;
   },

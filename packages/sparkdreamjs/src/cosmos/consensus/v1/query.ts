@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { ConsensusParams, ConsensusParamsAmino, ConsensusParamsSDKType } from "../../../tendermint/types/params";
+import { ConsensusParams, ConsensusParamsAmino } from "../../../tendermint/types/params";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** QueryParamsRequest defines the request type for querying x/consensus parameters. */
 export interface QueryParamsRequest {}
 export interface QueryParamsRequestProtoMsg {
@@ -13,8 +14,6 @@ export interface QueryParamsRequestAminoMsg {
   type: "cosmos-sdk/QueryParamsRequest";
   value: QueryParamsRequestAmino;
 }
-/** QueryParamsRequest defines the request type for querying x/consensus parameters. */
-export interface QueryParamsRequestSDKType {}
 /** QueryParamsResponse defines the response type for querying x/consensus parameters. */
 export interface QueryParamsResponse {
   /**
@@ -41,15 +40,12 @@ export interface QueryParamsResponseAminoMsg {
   type: "cosmos-sdk/QueryParamsResponse";
   value: QueryParamsResponseAmino;
 }
-/** QueryParamsResponse defines the response type for querying x/consensus parameters. */
-export interface QueryParamsResponseSDKType {
-  params?: ConsensusParamsSDKType;
-}
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
 }
 export const QueryParamsRequest = {
   typeUrl: "/cosmos.consensus.v1.QueryParamsRequest",
+  aminoType: "cosmos-sdk/QueryParamsRequest",
   encode(_: QueryParamsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -67,7 +63,7 @@ export const QueryParamsRequest = {
     }
     return message;
   },
-  fromPartial(_: Partial<QueryParamsRequest>): QueryParamsRequest {
+  fromPartial(_: DeepPartial<QueryParamsRequest>): QueryParamsRequest {
     const message = createBaseQueryParamsRequest();
     return message;
   },
@@ -108,6 +104,7 @@ function createBaseQueryParamsResponse(): QueryParamsResponse {
 }
 export const QueryParamsResponse = {
   typeUrl: "/cosmos.consensus.v1.QueryParamsResponse",
+  aminoType: "cosmos-sdk/QueryParamsResponse",
   encode(message: QueryParamsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.params !== undefined) {
       ConsensusParams.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -131,7 +128,7 @@ export const QueryParamsResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryParamsResponse>): QueryParamsResponse {
+  fromPartial(object: DeepPartial<QueryParamsResponse>): QueryParamsResponse {
     const message = createBaseQueryParamsResponse();
     message.params = object.params !== undefined && object.params !== null ? ConsensusParams.fromPartial(object.params) : undefined;
     return message;

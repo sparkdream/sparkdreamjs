@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /** Token defines a struct which represents a token to be transferred. */
 export interface Token {
   /** the token denomination */
@@ -21,11 +22,6 @@ export interface TokenAmino {
 export interface TokenAminoMsg {
   type: "cosmos-sdk/Token";
   value: TokenAmino;
-}
-/** Token defines a struct which represents a token to be transferred. */
-export interface TokenSDKType {
-  denom: DenomSDKType;
-  amount: string;
 }
 /** Denom holds the base denom of a Token and a trace of the chains it was sent through. */
 export interface Denom {
@@ -49,11 +45,6 @@ export interface DenomAminoMsg {
   type: "cosmos-sdk/Denom";
   value: DenomAmino;
 }
-/** Denom holds the base denom of a Token and a trace of the chains it was sent through. */
-export interface DenomSDKType {
-  base: string;
-  trace: HopSDKType[];
-}
 /** Hop defines a port ID, channel ID pair specifying a unique "hop" in a trace */
 export interface Hop {
   portId: string;
@@ -72,11 +63,6 @@ export interface HopAminoMsg {
   type: "cosmos-sdk/Hop";
   value: HopAmino;
 }
-/** Hop defines a port ID, channel ID pair specifying a unique "hop" in a trace */
-export interface HopSDKType {
-  port_id: string;
-  channel_id: string;
-}
 function createBaseToken(): Token {
   return {
     denom: Denom.fromPartial({}),
@@ -85,6 +71,7 @@ function createBaseToken(): Token {
 }
 export const Token = {
   typeUrl: "/ibc.applications.transfer.v1.Token",
+  aminoType: "cosmos-sdk/Token",
   encode(message: Token, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.denom !== undefined) {
       Denom.encode(message.denom, writer.uint32(10).fork()).ldelim();
@@ -114,7 +101,7 @@ export const Token = {
     }
     return message;
   },
-  fromPartial(object: Partial<Token>): Token {
+  fromPartial(object: DeepPartial<Token>): Token {
     const message = createBaseToken();
     message.denom = object.denom !== undefined && object.denom !== null ? Denom.fromPartial(object.denom) : undefined;
     message.amount = object.amount ?? "";
@@ -166,6 +153,7 @@ function createBaseDenom(): Denom {
 }
 export const Denom = {
   typeUrl: "/ibc.applications.transfer.v1.Denom",
+  aminoType: "cosmos-sdk/Denom",
   encode(message: Denom, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.base !== "") {
       writer.uint32(10).string(message.base);
@@ -195,7 +183,7 @@ export const Denom = {
     }
     return message;
   },
-  fromPartial(object: Partial<Denom>): Denom {
+  fromPartial(object: DeepPartial<Denom>): Denom {
     const message = createBaseDenom();
     message.base = object.base ?? "";
     message.trace = object.trace?.map(e => Hop.fromPartial(e)) || [];
@@ -249,6 +237,7 @@ function createBaseHop(): Hop {
 }
 export const Hop = {
   typeUrl: "/ibc.applications.transfer.v1.Hop",
+  aminoType: "cosmos-sdk/Hop",
   encode(message: Hop, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.portId !== "") {
       writer.uint32(10).string(message.portId);
@@ -278,7 +267,7 @@ export const Hop = {
     }
     return message;
   },
-  fromPartial(object: Partial<Hop>): Hop {
+  fromPartial(object: DeepPartial<Hop>): Hop {
     const message = createBaseHop();
     message.portId = object.portId ?? "";
     message.channelId = object.channelId ?? "";

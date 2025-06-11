@@ -1,10 +1,10 @@
 //@ts-nocheck
-import { Coin, CoinAmino, CoinSDKType } from "../../base/v1beta1/coin";
+import { Coin, CoinAmino } from "../../base/v1beta1/coin";
 import { Timestamp } from "../../../google/protobuf/timestamp";
-import { Params, ParamsAmino, ParamsSDKType } from "./types";
+import { Params, ParamsAmino } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { Decimal } from "@cosmjs/math";
-import { toTimestamp, fromTimestamp } from "../../../helpers";
+import { DeepPartial, toTimestamp, fromTimestamp } from "../../../helpers";
+import { Decimal } from "@interchainjs/math";
 /**
  * MsgFundCommunityPool allows an account to directly
  * fund the community pool.
@@ -29,14 +29,6 @@ export interface MsgFundCommunityPoolAminoMsg {
   type: "cosmos-sdk/MsgFundCommunityPool";
   value: MsgFundCommunityPoolAmino;
 }
-/**
- * MsgFundCommunityPool allows an account to directly
- * fund the community pool.
- */
-export interface MsgFundCommunityPoolSDKType {
-  depositor: string;
-  amount: CoinSDKType[];
-}
 /** MsgFundCommunityPoolResponse defines the Msg/FundCommunityPool response type. */
 export interface MsgFundCommunityPoolResponse {}
 export interface MsgFundCommunityPoolResponseProtoMsg {
@@ -49,8 +41,6 @@ export interface MsgFundCommunityPoolResponseAminoMsg {
   type: "cosmos-sdk/MsgFundCommunityPoolResponse";
   value: MsgFundCommunityPoolResponseAmino;
 }
-/** MsgFundCommunityPoolResponse defines the Msg/FundCommunityPool response type. */
-export interface MsgFundCommunityPoolResponseSDKType {}
 /**
  * MsgCommunityPoolSpend defines a message for sending tokens from the community
  * pool to another account. This message is typically executed via a governance
@@ -82,16 +72,6 @@ export interface MsgCommunityPoolSpendAminoMsg {
   value: MsgCommunityPoolSpendAmino;
 }
 /**
- * MsgCommunityPoolSpend defines a message for sending tokens from the community
- * pool to another account. This message is typically executed via a governance
- * proposal with the governance module being the executing authority.
- */
-export interface MsgCommunityPoolSpendSDKType {
-  authority: string;
-  recipient: string;
-  amount: CoinSDKType[];
-}
-/**
  * MsgCommunityPoolSpendResponse defines the response to executing a
  * MsgCommunityPoolSpend message.
  */
@@ -109,11 +89,6 @@ export interface MsgCommunityPoolSpendResponseAminoMsg {
   type: "cosmos-sdk/MsgCommunityPoolSpendResponse";
   value: MsgCommunityPoolSpendResponseAmino;
 }
-/**
- * MsgCommunityPoolSpendResponse defines the response to executing a
- * MsgCommunityPoolSpend message.
- */
-export interface MsgCommunityPoolSpendResponseSDKType {}
 /** MsgCreateContinuousFund defines a message for adding continuous funds. */
 export interface MsgCreateContinuousFund {
   /** Authority is the address that controls the module (defaults to x/gov unless overwritten). */
@@ -144,13 +119,6 @@ export interface MsgCreateContinuousFundAminoMsg {
   type: "cosmos-sdk/MsgCreateContinuousFund";
   value: MsgCreateContinuousFundAmino;
 }
-/** MsgCreateContinuousFund defines a message for adding continuous funds. */
-export interface MsgCreateContinuousFundSDKType {
-  authority: string;
-  recipient: string;
-  percentage: string;
-  expiry?: Date;
-}
 /**
  * MsgCreateContinuousFundResponse defines the response to executing a
  * MsgCreateContinuousFund message.
@@ -169,11 +137,6 @@ export interface MsgCreateContinuousFundResponseAminoMsg {
   type: "cosmos-sdk/MsgCreateContinuousFundResponse";
   value: MsgCreateContinuousFundResponseAmino;
 }
-/**
- * MsgCreateContinuousFundResponse defines the response to executing a
- * MsgCreateContinuousFund message.
- */
-export interface MsgCreateContinuousFundResponseSDKType {}
 /** MsgCancelContinuousFund defines a message to cancel continuous funds for a specific recipient. */
 export interface MsgCancelContinuousFund {
   /** Authority is the account address of authority. */
@@ -195,11 +158,6 @@ export interface MsgCancelContinuousFundAmino {
 export interface MsgCancelContinuousFundAminoMsg {
   type: "cosmos-sdk/MsgCancelContinuousFund";
   value: MsgCancelContinuousFundAmino;
-}
-/** MsgCancelContinuousFund defines a message to cancel continuous funds for a specific recipient. */
-export interface MsgCancelContinuousFundSDKType {
-  authority: string;
-  recipient: string;
 }
 /**
  * MsgCancelContinuousFundResponse defines the response to executing a
@@ -233,15 +191,6 @@ export interface MsgCancelContinuousFundResponseAminoMsg {
   type: "cosmos-sdk/MsgCancelContinuousFundResponse";
   value: MsgCancelContinuousFundResponseAmino;
 }
-/**
- * MsgCancelContinuousFundResponse defines the response to executing a
- * MsgCancelContinuousFund message.
- */
-export interface MsgCancelContinuousFundResponseSDKType {
-  canceled_time: Date;
-  canceled_height: bigint;
-  recipient: string;
-}
 /** MsgUpdateParams is the Msg/UpdateParams request type. */
 export interface MsgUpdateParams {
   /** authority is the address that controls the module (defaults to x/gov unless overwritten). */
@@ -272,11 +221,6 @@ export interface MsgUpdateParamsAminoMsg {
   type: "cosmos-sdk/MsgUpdateParams";
   value: MsgUpdateParamsAmino;
 }
-/** MsgUpdateParams is the Msg/UpdateParams request type. */
-export interface MsgUpdateParamsSDKType {
-  authority: string;
-  params: ParamsSDKType;
-}
 /**
  * MsgUpdateParamsResponse defines the response structure for executing a
  * MsgUpdateParams message.
@@ -295,11 +239,6 @@ export interface MsgUpdateParamsResponseAminoMsg {
   type: "cosmos-sdk/MsgUpdateParamsResponse";
   value: MsgUpdateParamsResponseAmino;
 }
-/**
- * MsgUpdateParamsResponse defines the response structure for executing a
- * MsgUpdateParams message.
- */
-export interface MsgUpdateParamsResponseSDKType {}
 function createBaseMsgFundCommunityPool(): MsgFundCommunityPool {
   return {
     depositor: "",
@@ -308,6 +247,7 @@ function createBaseMsgFundCommunityPool(): MsgFundCommunityPool {
 }
 export const MsgFundCommunityPool = {
   typeUrl: "/cosmos.protocolpool.v1.MsgFundCommunityPool",
+  aminoType: "cosmos-sdk/MsgFundCommunityPool",
   encode(message: MsgFundCommunityPool, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.depositor !== "") {
       writer.uint32(10).string(message.depositor);
@@ -337,7 +277,7 @@ export const MsgFundCommunityPool = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgFundCommunityPool>): MsgFundCommunityPool {
+  fromPartial(object: DeepPartial<MsgFundCommunityPool>): MsgFundCommunityPool {
     const message = createBaseMsgFundCommunityPool();
     message.depositor = object.depositor ?? "";
     message.amount = object.amount?.map(e => Coin.fromPartial(e)) || [];
@@ -388,6 +328,7 @@ function createBaseMsgFundCommunityPoolResponse(): MsgFundCommunityPoolResponse 
 }
 export const MsgFundCommunityPoolResponse = {
   typeUrl: "/cosmos.protocolpool.v1.MsgFundCommunityPoolResponse",
+  aminoType: "cosmos-sdk/MsgFundCommunityPoolResponse",
   encode(_: MsgFundCommunityPoolResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -405,7 +346,7 @@ export const MsgFundCommunityPoolResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgFundCommunityPoolResponse>): MsgFundCommunityPoolResponse {
+  fromPartial(_: DeepPartial<MsgFundCommunityPoolResponse>): MsgFundCommunityPoolResponse {
     const message = createBaseMsgFundCommunityPoolResponse();
     return message;
   },
@@ -448,6 +389,7 @@ function createBaseMsgCommunityPoolSpend(): MsgCommunityPoolSpend {
 }
 export const MsgCommunityPoolSpend = {
   typeUrl: "/cosmos.protocolpool.v1.MsgCommunityPoolSpend",
+  aminoType: "cosmos-sdk/MsgCommunityPoolSpend",
   encode(message: MsgCommunityPoolSpend, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -483,7 +425,7 @@ export const MsgCommunityPoolSpend = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgCommunityPoolSpend>): MsgCommunityPoolSpend {
+  fromPartial(object: DeepPartial<MsgCommunityPoolSpend>): MsgCommunityPoolSpend {
     const message = createBaseMsgCommunityPoolSpend();
     message.authority = object.authority ?? "";
     message.recipient = object.recipient ?? "";
@@ -539,6 +481,7 @@ function createBaseMsgCommunityPoolSpendResponse(): MsgCommunityPoolSpendRespons
 }
 export const MsgCommunityPoolSpendResponse = {
   typeUrl: "/cosmos.protocolpool.v1.MsgCommunityPoolSpendResponse",
+  aminoType: "cosmos-sdk/MsgCommunityPoolSpendResponse",
   encode(_: MsgCommunityPoolSpendResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -556,7 +499,7 @@ export const MsgCommunityPoolSpendResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgCommunityPoolSpendResponse>): MsgCommunityPoolSpendResponse {
+  fromPartial(_: DeepPartial<MsgCommunityPoolSpendResponse>): MsgCommunityPoolSpendResponse {
     const message = createBaseMsgCommunityPoolSpendResponse();
     return message;
   },
@@ -600,6 +543,7 @@ function createBaseMsgCreateContinuousFund(): MsgCreateContinuousFund {
 }
 export const MsgCreateContinuousFund = {
   typeUrl: "/cosmos.protocolpool.v1.MsgCreateContinuousFund",
+  aminoType: "cosmos-sdk/MsgCreateContinuousFund",
   encode(message: MsgCreateContinuousFund, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -641,7 +585,7 @@ export const MsgCreateContinuousFund = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgCreateContinuousFund>): MsgCreateContinuousFund {
+  fromPartial(object: DeepPartial<MsgCreateContinuousFund>): MsgCreateContinuousFund {
     const message = createBaseMsgCreateContinuousFund();
     message.authority = object.authority ?? "";
     message.recipient = object.recipient ?? "";
@@ -700,6 +644,7 @@ function createBaseMsgCreateContinuousFundResponse(): MsgCreateContinuousFundRes
 }
 export const MsgCreateContinuousFundResponse = {
   typeUrl: "/cosmos.protocolpool.v1.MsgCreateContinuousFundResponse",
+  aminoType: "cosmos-sdk/MsgCreateContinuousFundResponse",
   encode(_: MsgCreateContinuousFundResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -717,7 +662,7 @@ export const MsgCreateContinuousFundResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgCreateContinuousFundResponse>): MsgCreateContinuousFundResponse {
+  fromPartial(_: DeepPartial<MsgCreateContinuousFundResponse>): MsgCreateContinuousFundResponse {
     const message = createBaseMsgCreateContinuousFundResponse();
     return message;
   },
@@ -759,6 +704,7 @@ function createBaseMsgCancelContinuousFund(): MsgCancelContinuousFund {
 }
 export const MsgCancelContinuousFund = {
   typeUrl: "/cosmos.protocolpool.v1.MsgCancelContinuousFund",
+  aminoType: "cosmos-sdk/MsgCancelContinuousFund",
   encode(message: MsgCancelContinuousFund, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -788,7 +734,7 @@ export const MsgCancelContinuousFund = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgCancelContinuousFund>): MsgCancelContinuousFund {
+  fromPartial(object: DeepPartial<MsgCancelContinuousFund>): MsgCancelContinuousFund {
     const message = createBaseMsgCancelContinuousFund();
     message.authority = object.authority ?? "";
     message.recipient = object.recipient ?? "";
@@ -841,6 +787,7 @@ function createBaseMsgCancelContinuousFundResponse(): MsgCancelContinuousFundRes
 }
 export const MsgCancelContinuousFundResponse = {
   typeUrl: "/cosmos.protocolpool.v1.MsgCancelContinuousFundResponse",
+  aminoType: "cosmos-sdk/MsgCancelContinuousFundResponse",
   encode(message: MsgCancelContinuousFundResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.canceledTime !== undefined) {
       Timestamp.encode(toTimestamp(message.canceledTime), writer.uint32(10).fork()).ldelim();
@@ -876,7 +823,7 @@ export const MsgCancelContinuousFundResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgCancelContinuousFundResponse>): MsgCancelContinuousFundResponse {
+  fromPartial(object: DeepPartial<MsgCancelContinuousFundResponse>): MsgCancelContinuousFundResponse {
     const message = createBaseMsgCancelContinuousFundResponse();
     message.canceledTime = object.canceledTime ?? undefined;
     message.canceledHeight = object.canceledHeight !== undefined && object.canceledHeight !== null ? BigInt(object.canceledHeight.toString()) : BigInt(0);
@@ -933,6 +880,7 @@ function createBaseMsgUpdateParams(): MsgUpdateParams {
 }
 export const MsgUpdateParams = {
   typeUrl: "/cosmos.protocolpool.v1.MsgUpdateParams",
+  aminoType: "cosmos-sdk/MsgUpdateParams",
   encode(message: MsgUpdateParams, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -962,7 +910,7 @@ export const MsgUpdateParams = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpdateParams>): MsgUpdateParams {
+  fromPartial(object: DeepPartial<MsgUpdateParams>): MsgUpdateParams {
     const message = createBaseMsgUpdateParams();
     message.authority = object.authority ?? "";
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
@@ -1011,6 +959,7 @@ function createBaseMsgUpdateParamsResponse(): MsgUpdateParamsResponse {
 }
 export const MsgUpdateParamsResponse = {
   typeUrl: "/cosmos.protocolpool.v1.MsgUpdateParamsResponse",
+  aminoType: "cosmos-sdk/MsgUpdateParamsResponse",
   encode(_: MsgUpdateParamsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1028,7 +977,7 @@ export const MsgUpdateParamsResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
+  fromPartial(_: DeepPartial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
     const message = createBaseMsgUpdateParamsResponse();
     return message;
   },

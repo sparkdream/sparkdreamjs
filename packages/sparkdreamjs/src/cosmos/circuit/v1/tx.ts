@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { Permissions, PermissionsAmino, PermissionsSDKType } from "./types";
+import { Permissions, PermissionsAmino } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** MsgAuthorizeCircuitBreaker defines the Msg/AuthorizeCircuitBreaker request type. */
 export interface MsgAuthorizeCircuitBreaker {
   /**
@@ -41,12 +42,6 @@ export interface MsgAuthorizeCircuitBreakerAminoMsg {
   type: "cosmos-sdk/MsgAuthorizeCircuitBreaker";
   value: MsgAuthorizeCircuitBreakerAmino;
 }
-/** MsgAuthorizeCircuitBreaker defines the Msg/AuthorizeCircuitBreaker request type. */
-export interface MsgAuthorizeCircuitBreakerSDKType {
-  granter: string;
-  grantee: string;
-  permissions?: PermissionsSDKType;
-}
 /** MsgAuthorizeCircuitBreakerResponse defines the Msg/AuthorizeCircuitBreaker response type. */
 export interface MsgAuthorizeCircuitBreakerResponse {
   success: boolean;
@@ -62,10 +57,6 @@ export interface MsgAuthorizeCircuitBreakerResponseAmino {
 export interface MsgAuthorizeCircuitBreakerResponseAminoMsg {
   type: "cosmos-sdk/MsgAuthorizeCircuitBreakerResponse";
   value: MsgAuthorizeCircuitBreakerResponseAmino;
-}
-/** MsgAuthorizeCircuitBreakerResponse defines the Msg/AuthorizeCircuitBreaker response type. */
-export interface MsgAuthorizeCircuitBreakerResponseSDKType {
-  success: boolean;
 }
 /** MsgTripCircuitBreaker defines the Msg/TripCircuitBreaker request type. */
 export interface MsgTripCircuitBreaker {
@@ -101,11 +92,6 @@ export interface MsgTripCircuitBreakerAminoMsg {
   type: "cosmos-sdk/MsgTripCircuitBreaker";
   value: MsgTripCircuitBreakerAmino;
 }
-/** MsgTripCircuitBreaker defines the Msg/TripCircuitBreaker request type. */
-export interface MsgTripCircuitBreakerSDKType {
-  authority: string;
-  msg_type_urls: string[];
-}
 /** MsgTripCircuitBreakerResponse defines the Msg/TripCircuitBreaker response type. */
 export interface MsgTripCircuitBreakerResponse {
   success: boolean;
@@ -121,10 +107,6 @@ export interface MsgTripCircuitBreakerResponseAmino {
 export interface MsgTripCircuitBreakerResponseAminoMsg {
   type: "cosmos-sdk/MsgTripCircuitBreakerResponse";
   value: MsgTripCircuitBreakerResponseAmino;
-}
-/** MsgTripCircuitBreakerResponse defines the Msg/TripCircuitBreaker response type. */
-export interface MsgTripCircuitBreakerResponseSDKType {
-  success: boolean;
 }
 /** MsgResetCircuitBreaker defines the Msg/ResetCircuitBreaker request type. */
 export interface MsgResetCircuitBreaker {
@@ -156,11 +138,6 @@ export interface MsgResetCircuitBreakerAminoMsg {
   type: "cosmos-sdk/MsgResetCircuitBreaker";
   value: MsgResetCircuitBreakerAmino;
 }
-/** MsgResetCircuitBreaker defines the Msg/ResetCircuitBreaker request type. */
-export interface MsgResetCircuitBreakerSDKType {
-  authority: string;
-  msg_type_urls: string[];
-}
 /** MsgResetCircuitBreakerResponse defines the Msg/ResetCircuitBreaker response type. */
 export interface MsgResetCircuitBreakerResponse {
   success: boolean;
@@ -177,10 +154,6 @@ export interface MsgResetCircuitBreakerResponseAminoMsg {
   type: "cosmos-sdk/MsgResetCircuitBreakerResponse";
   value: MsgResetCircuitBreakerResponseAmino;
 }
-/** MsgResetCircuitBreakerResponse defines the Msg/ResetCircuitBreaker response type. */
-export interface MsgResetCircuitBreakerResponseSDKType {
-  success: boolean;
-}
 function createBaseMsgAuthorizeCircuitBreaker(): MsgAuthorizeCircuitBreaker {
   return {
     granter: "",
@@ -190,6 +163,7 @@ function createBaseMsgAuthorizeCircuitBreaker(): MsgAuthorizeCircuitBreaker {
 }
 export const MsgAuthorizeCircuitBreaker = {
   typeUrl: "/cosmos.circuit.v1.MsgAuthorizeCircuitBreaker",
+  aminoType: "cosmos-sdk/MsgAuthorizeCircuitBreaker",
   encode(message: MsgAuthorizeCircuitBreaker, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.granter !== "") {
       writer.uint32(10).string(message.granter);
@@ -225,7 +199,7 @@ export const MsgAuthorizeCircuitBreaker = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgAuthorizeCircuitBreaker>): MsgAuthorizeCircuitBreaker {
+  fromPartial(object: DeepPartial<MsgAuthorizeCircuitBreaker>): MsgAuthorizeCircuitBreaker {
     const message = createBaseMsgAuthorizeCircuitBreaker();
     message.granter = object.granter ?? "";
     message.grantee = object.grantee ?? "";
@@ -281,6 +255,7 @@ function createBaseMsgAuthorizeCircuitBreakerResponse(): MsgAuthorizeCircuitBrea
 }
 export const MsgAuthorizeCircuitBreakerResponse = {
   typeUrl: "/cosmos.circuit.v1.MsgAuthorizeCircuitBreakerResponse",
+  aminoType: "cosmos-sdk/MsgAuthorizeCircuitBreakerResponse",
   encode(message: MsgAuthorizeCircuitBreakerResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.success === true) {
       writer.uint32(8).bool(message.success);
@@ -304,7 +279,7 @@ export const MsgAuthorizeCircuitBreakerResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgAuthorizeCircuitBreakerResponse>): MsgAuthorizeCircuitBreakerResponse {
+  fromPartial(object: DeepPartial<MsgAuthorizeCircuitBreakerResponse>): MsgAuthorizeCircuitBreakerResponse {
     const message = createBaseMsgAuthorizeCircuitBreakerResponse();
     message.success = object.success ?? false;
     return message;
@@ -351,6 +326,7 @@ function createBaseMsgTripCircuitBreaker(): MsgTripCircuitBreaker {
 }
 export const MsgTripCircuitBreaker = {
   typeUrl: "/cosmos.circuit.v1.MsgTripCircuitBreaker",
+  aminoType: "cosmos-sdk/MsgTripCircuitBreaker",
   encode(message: MsgTripCircuitBreaker, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -380,7 +356,7 @@ export const MsgTripCircuitBreaker = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgTripCircuitBreaker>): MsgTripCircuitBreaker {
+  fromPartial(object: DeepPartial<MsgTripCircuitBreaker>): MsgTripCircuitBreaker {
     const message = createBaseMsgTripCircuitBreaker();
     message.authority = object.authority ?? "";
     message.msgTypeUrls = object.msgTypeUrls?.map(e => e) || [];
@@ -433,6 +409,7 @@ function createBaseMsgTripCircuitBreakerResponse(): MsgTripCircuitBreakerRespons
 }
 export const MsgTripCircuitBreakerResponse = {
   typeUrl: "/cosmos.circuit.v1.MsgTripCircuitBreakerResponse",
+  aminoType: "cosmos-sdk/MsgTripCircuitBreakerResponse",
   encode(message: MsgTripCircuitBreakerResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.success === true) {
       writer.uint32(8).bool(message.success);
@@ -456,7 +433,7 @@ export const MsgTripCircuitBreakerResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgTripCircuitBreakerResponse>): MsgTripCircuitBreakerResponse {
+  fromPartial(object: DeepPartial<MsgTripCircuitBreakerResponse>): MsgTripCircuitBreakerResponse {
     const message = createBaseMsgTripCircuitBreakerResponse();
     message.success = object.success ?? false;
     return message;
@@ -503,6 +480,7 @@ function createBaseMsgResetCircuitBreaker(): MsgResetCircuitBreaker {
 }
 export const MsgResetCircuitBreaker = {
   typeUrl: "/cosmos.circuit.v1.MsgResetCircuitBreaker",
+  aminoType: "cosmos-sdk/MsgResetCircuitBreaker",
   encode(message: MsgResetCircuitBreaker, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -532,7 +510,7 @@ export const MsgResetCircuitBreaker = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgResetCircuitBreaker>): MsgResetCircuitBreaker {
+  fromPartial(object: DeepPartial<MsgResetCircuitBreaker>): MsgResetCircuitBreaker {
     const message = createBaseMsgResetCircuitBreaker();
     message.authority = object.authority ?? "";
     message.msgTypeUrls = object.msgTypeUrls?.map(e => e) || [];
@@ -585,6 +563,7 @@ function createBaseMsgResetCircuitBreakerResponse(): MsgResetCircuitBreakerRespo
 }
 export const MsgResetCircuitBreakerResponse = {
   typeUrl: "/cosmos.circuit.v1.MsgResetCircuitBreakerResponse",
+  aminoType: "cosmos-sdk/MsgResetCircuitBreakerResponse",
   encode(message: MsgResetCircuitBreakerResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.success === true) {
       writer.uint32(8).bool(message.success);
@@ -608,7 +587,7 @@ export const MsgResetCircuitBreakerResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgResetCircuitBreakerResponse>): MsgResetCircuitBreakerResponse {
+  fromPartial(object: DeepPartial<MsgResetCircuitBreakerResponse>): MsgResetCircuitBreakerResponse {
     const message = createBaseMsgResetCircuitBreakerResponse();
     message.success = object.success ?? false;
     return message;

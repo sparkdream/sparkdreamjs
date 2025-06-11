@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** Level is the permission level. */
 export enum Permissions_Level {
   /**
@@ -26,7 +27,6 @@ export enum Permissions_Level {
   LEVEL_SUPER_ADMIN = 3,
   UNRECOGNIZED = -1,
 }
-export const Permissions_LevelSDKType = Permissions_Level;
 export const Permissions_LevelAmino = Permissions_Level;
 export function permissions_LevelFromJSON(object: any): Permissions_Level {
   switch (object) {
@@ -99,14 +99,6 @@ export interface PermissionsAminoMsg {
   type: "cosmos-sdk/Permissions";
   value: PermissionsAmino;
 }
-/**
- * Permissions are the permissions that an account has to trip
- * or reset the circuit breaker.
- */
-export interface PermissionsSDKType {
-  level: Permissions_Level;
-  limit_type_urls: string[];
-}
 /** GenesisAccountPermissions is the account permissions for the circuit breaker in genesis */
 export interface GenesisAccountPermissions {
   address: string;
@@ -124,11 +116,6 @@ export interface GenesisAccountPermissionsAmino {
 export interface GenesisAccountPermissionsAminoMsg {
   type: "cosmos-sdk/GenesisAccountPermissions";
   value: GenesisAccountPermissionsAmino;
-}
-/** GenesisAccountPermissions is the account permissions for the circuit breaker in genesis */
-export interface GenesisAccountPermissionsSDKType {
-  address: string;
-  permissions?: PermissionsSDKType;
 }
 /** GenesisState is the state that must be provided at genesis. */
 export interface GenesisState {
@@ -148,11 +135,6 @@ export interface GenesisStateAminoMsg {
   type: "cosmos-sdk/GenesisState";
   value: GenesisStateAmino;
 }
-/** GenesisState is the state that must be provided at genesis. */
-export interface GenesisStateSDKType {
-  account_permissions: GenesisAccountPermissionsSDKType[];
-  disabled_type_urls: string[];
-}
 function createBasePermissions(): Permissions {
   return {
     level: 0,
@@ -161,6 +143,7 @@ function createBasePermissions(): Permissions {
 }
 export const Permissions = {
   typeUrl: "/cosmos.circuit.v1.Permissions",
+  aminoType: "cosmos-sdk/Permissions",
   encode(message: Permissions, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.level !== 0) {
       writer.uint32(8).int32(message.level);
@@ -190,7 +173,7 @@ export const Permissions = {
     }
     return message;
   },
-  fromPartial(object: Partial<Permissions>): Permissions {
+  fromPartial(object: DeepPartial<Permissions>): Permissions {
     const message = createBasePermissions();
     message.level = object.level ?? 0;
     message.limitTypeUrls = object.limitTypeUrls?.map(e => e) || [];
@@ -244,6 +227,7 @@ function createBaseGenesisAccountPermissions(): GenesisAccountPermissions {
 }
 export const GenesisAccountPermissions = {
   typeUrl: "/cosmos.circuit.v1.GenesisAccountPermissions",
+  aminoType: "cosmos-sdk/GenesisAccountPermissions",
   encode(message: GenesisAccountPermissions, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -273,7 +257,7 @@ export const GenesisAccountPermissions = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisAccountPermissions>): GenesisAccountPermissions {
+  fromPartial(object: DeepPartial<GenesisAccountPermissions>): GenesisAccountPermissions {
     const message = createBaseGenesisAccountPermissions();
     message.address = object.address ?? "";
     message.permissions = object.permissions !== undefined && object.permissions !== null ? Permissions.fromPartial(object.permissions) : undefined;
@@ -325,6 +309,7 @@ function createBaseGenesisState(): GenesisState {
 }
 export const GenesisState = {
   typeUrl: "/cosmos.circuit.v1.GenesisState",
+  aminoType: "cosmos-sdk/GenesisState",
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.accountPermissions) {
       GenesisAccountPermissions.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -354,7 +339,7 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisState>): GenesisState {
+  fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = createBaseGenesisState();
     message.accountPermissions = object.accountPermissions?.map(e => GenesisAccountPermissions.fromPartial(e)) || [];
     message.disabledTypeUrls = object.disabledTypeUrls?.map(e => e) || [];

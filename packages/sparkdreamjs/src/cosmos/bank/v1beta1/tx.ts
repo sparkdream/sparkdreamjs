@@ -1,7 +1,8 @@
 //@ts-nocheck
-import { Coin, CoinAmino, CoinSDKType } from "../../base/v1beta1/coin";
-import { Input, InputAmino, InputSDKType, Output, OutputAmino, OutputSDKType, Params, ParamsAmino, ParamsSDKType, SendEnabled, SendEnabledAmino, SendEnabledSDKType } from "./bank";
+import { Coin, CoinAmino } from "../../base/v1beta1/coin";
+import { Input, InputAmino, Output, OutputAmino, Params, ParamsAmino, SendEnabled, SendEnabledAmino } from "./bank";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** MsgSend represents a message to send coins from one account to another. */
 export interface MsgSend {
   fromAddress: string;
@@ -22,12 +23,6 @@ export interface MsgSendAminoMsg {
   type: "cosmos-sdk/MsgSend";
   value: MsgSendAmino;
 }
-/** MsgSend represents a message to send coins from one account to another. */
-export interface MsgSendSDKType {
-  from_address: string;
-  to_address: string;
-  amount: CoinSDKType[];
-}
 /** MsgSendResponse defines the Msg/Send response type. */
 export interface MsgSendResponse {}
 export interface MsgSendResponseProtoMsg {
@@ -40,8 +35,6 @@ export interface MsgSendResponseAminoMsg {
   type: "cosmos-sdk/MsgSendResponse";
   value: MsgSendResponseAmino;
 }
-/** MsgSendResponse defines the Msg/Send response type. */
-export interface MsgSendResponseSDKType {}
 /** MsgMultiSend represents an arbitrary multi-in, multi-out send message. */
 export interface MsgMultiSend {
   /**
@@ -68,11 +61,6 @@ export interface MsgMultiSendAminoMsg {
   type: "cosmos-sdk/MsgMultiSend";
   value: MsgMultiSendAmino;
 }
-/** MsgMultiSend represents an arbitrary multi-in, multi-out send message. */
-export interface MsgMultiSendSDKType {
-  inputs: InputSDKType[];
-  outputs: OutputSDKType[];
-}
 /** MsgMultiSendResponse defines the Msg/MultiSend response type. */
 export interface MsgMultiSendResponse {}
 export interface MsgMultiSendResponseProtoMsg {
@@ -85,8 +73,6 @@ export interface MsgMultiSendResponseAminoMsg {
   type: "cosmos-sdk/MsgMultiSendResponse";
   value: MsgMultiSendResponseAmino;
 }
-/** MsgMultiSendResponse defines the Msg/MultiSend response type. */
-export interface MsgMultiSendResponseSDKType {}
 /**
  * MsgUpdateParams is the Msg/UpdateParams request type.
  * 
@@ -126,15 +112,6 @@ export interface MsgUpdateParamsAminoMsg {
   value: MsgUpdateParamsAmino;
 }
 /**
- * MsgUpdateParams is the Msg/UpdateParams request type.
- * 
- * Since: cosmos-sdk 0.47
- */
-export interface MsgUpdateParamsSDKType {
-  authority: string;
-  params: ParamsSDKType;
-}
-/**
  * MsgUpdateParamsResponse defines the response structure for executing a
  * MsgUpdateParams message.
  * 
@@ -156,13 +133,6 @@ export interface MsgUpdateParamsResponseAminoMsg {
   type: "cosmos-sdk/MsgUpdateParamsResponse";
   value: MsgUpdateParamsResponseAmino;
 }
-/**
- * MsgUpdateParamsResponse defines the response structure for executing a
- * MsgUpdateParams message.
- * 
- * Since: cosmos-sdk 0.47
- */
-export interface MsgUpdateParamsResponseSDKType {}
 /**
  * MsgSetSendEnabled is the Msg/SetSendEnabled request type.
  * 
@@ -216,20 +186,6 @@ export interface MsgSetSendEnabledAminoMsg {
   value: MsgSetSendEnabledAmino;
 }
 /**
- * MsgSetSendEnabled is the Msg/SetSendEnabled request type.
- * 
- * Only entries to add/update/delete need to be included.
- * Existing SendEnabled entries that are not included in this
- * message are left unchanged.
- * 
- * Since: cosmos-sdk 0.47
- */
-export interface MsgSetSendEnabledSDKType {
-  authority: string;
-  send_enabled: SendEnabledSDKType[];
-  use_default_for: string[];
-}
-/**
  * MsgSetSendEnabledResponse defines the Msg/SetSendEnabled response type.
  * 
  * Since: cosmos-sdk 0.47
@@ -249,12 +205,6 @@ export interface MsgSetSendEnabledResponseAminoMsg {
   type: "cosmos-sdk/MsgSetSendEnabledResponse";
   value: MsgSetSendEnabledResponseAmino;
 }
-/**
- * MsgSetSendEnabledResponse defines the Msg/SetSendEnabled response type.
- * 
- * Since: cosmos-sdk 0.47
- */
-export interface MsgSetSendEnabledResponseSDKType {}
 function createBaseMsgSend(): MsgSend {
   return {
     fromAddress: "",
@@ -264,6 +214,7 @@ function createBaseMsgSend(): MsgSend {
 }
 export const MsgSend = {
   typeUrl: "/cosmos.bank.v1beta1.MsgSend",
+  aminoType: "cosmos-sdk/MsgSend",
   encode(message: MsgSend, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.fromAddress !== "") {
       writer.uint32(10).string(message.fromAddress);
@@ -299,7 +250,7 @@ export const MsgSend = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgSend>): MsgSend {
+  fromPartial(object: DeepPartial<MsgSend>): MsgSend {
     const message = createBaseMsgSend();
     message.fromAddress = object.fromAddress ?? "";
     message.toAddress = object.toAddress ?? "";
@@ -355,6 +306,7 @@ function createBaseMsgSendResponse(): MsgSendResponse {
 }
 export const MsgSendResponse = {
   typeUrl: "/cosmos.bank.v1beta1.MsgSendResponse",
+  aminoType: "cosmos-sdk/MsgSendResponse",
   encode(_: MsgSendResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -372,7 +324,7 @@ export const MsgSendResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgSendResponse>): MsgSendResponse {
+  fromPartial(_: DeepPartial<MsgSendResponse>): MsgSendResponse {
     const message = createBaseMsgSendResponse();
     return message;
   },
@@ -414,6 +366,7 @@ function createBaseMsgMultiSend(): MsgMultiSend {
 }
 export const MsgMultiSend = {
   typeUrl: "/cosmos.bank.v1beta1.MsgMultiSend",
+  aminoType: "cosmos-sdk/MsgMultiSend",
   encode(message: MsgMultiSend, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.inputs) {
       Input.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -443,7 +396,7 @@ export const MsgMultiSend = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgMultiSend>): MsgMultiSend {
+  fromPartial(object: DeepPartial<MsgMultiSend>): MsgMultiSend {
     const message = createBaseMsgMultiSend();
     message.inputs = object.inputs?.map(e => Input.fromPartial(e)) || [];
     message.outputs = object.outputs?.map(e => Output.fromPartial(e)) || [];
@@ -496,6 +449,7 @@ function createBaseMsgMultiSendResponse(): MsgMultiSendResponse {
 }
 export const MsgMultiSendResponse = {
   typeUrl: "/cosmos.bank.v1beta1.MsgMultiSendResponse",
+  aminoType: "cosmos-sdk/MsgMultiSendResponse",
   encode(_: MsgMultiSendResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -513,7 +467,7 @@ export const MsgMultiSendResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgMultiSendResponse>): MsgMultiSendResponse {
+  fromPartial(_: DeepPartial<MsgMultiSendResponse>): MsgMultiSendResponse {
     const message = createBaseMsgMultiSendResponse();
     return message;
   },
@@ -555,6 +509,7 @@ function createBaseMsgUpdateParams(): MsgUpdateParams {
 }
 export const MsgUpdateParams = {
   typeUrl: "/cosmos.bank.v1beta1.MsgUpdateParams",
+  aminoType: "cosmos-sdk/x/bank/MsgUpdateParams",
   encode(message: MsgUpdateParams, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -584,7 +539,7 @@ export const MsgUpdateParams = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpdateParams>): MsgUpdateParams {
+  fromPartial(object: DeepPartial<MsgUpdateParams>): MsgUpdateParams {
     const message = createBaseMsgUpdateParams();
     message.authority = object.authority ?? "";
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
@@ -633,6 +588,7 @@ function createBaseMsgUpdateParamsResponse(): MsgUpdateParamsResponse {
 }
 export const MsgUpdateParamsResponse = {
   typeUrl: "/cosmos.bank.v1beta1.MsgUpdateParamsResponse",
+  aminoType: "cosmos-sdk/MsgUpdateParamsResponse",
   encode(_: MsgUpdateParamsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -650,7 +606,7 @@ export const MsgUpdateParamsResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
+  fromPartial(_: DeepPartial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
     const message = createBaseMsgUpdateParamsResponse();
     return message;
   },
@@ -693,6 +649,7 @@ function createBaseMsgSetSendEnabled(): MsgSetSendEnabled {
 }
 export const MsgSetSendEnabled = {
   typeUrl: "/cosmos.bank.v1beta1.MsgSetSendEnabled",
+  aminoType: "cosmos-sdk/MsgSetSendEnabled",
   encode(message: MsgSetSendEnabled, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -728,7 +685,7 @@ export const MsgSetSendEnabled = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgSetSendEnabled>): MsgSetSendEnabled {
+  fromPartial(object: DeepPartial<MsgSetSendEnabled>): MsgSetSendEnabled {
     const message = createBaseMsgSetSendEnabled();
     message.authority = object.authority ?? "";
     message.sendEnabled = object.sendEnabled?.map(e => SendEnabled.fromPartial(e)) || [];
@@ -786,6 +743,7 @@ function createBaseMsgSetSendEnabledResponse(): MsgSetSendEnabledResponse {
 }
 export const MsgSetSendEnabledResponse = {
   typeUrl: "/cosmos.bank.v1beta1.MsgSetSendEnabledResponse",
+  aminoType: "cosmos-sdk/MsgSetSendEnabledResponse",
   encode(_: MsgSetSendEnabledResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -803,7 +761,7 @@ export const MsgSetSendEnabledResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgSetSendEnabledResponse>): MsgSetSendEnabledResponse {
+  fromPartial(_: DeepPartial<MsgSetSendEnabledResponse>): MsgSetSendEnabledResponse {
     const message = createBaseMsgSetSendEnabledResponse();
     return message;
   },

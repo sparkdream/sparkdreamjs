@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponseSDKType } from "./query";
+import { QueryParamsRequest, QueryParamsResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -9,11 +9,10 @@ export class LCDQueryClient {
     requestClient: LCDClient;
   }) {
     this.req = requestClient;
-    this.params = this.params.bind(this);
   }
   /* Params queries the parameters of x/consensus module. */
-  async params(_params: QueryParamsRequest = {}): Promise<QueryParamsResponseSDKType> {
+  params = async (_params: QueryParamsRequest = {}): Promise<QueryParamsResponse> => {
     const endpoint = `cosmos/consensus/v1/params`;
-    return await this.req.get<QueryParamsResponseSDKType>(endpoint);
-  }
+    return await this.req.get<QueryParamsResponse>(endpoint);
+  };
 }

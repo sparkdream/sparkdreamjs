@@ -1,7 +1,7 @@
 //@ts-nocheck
-import { Config, ConfigAmino, ConfigSDKType } from "./config";
+import { Config, ConfigAmino } from "./config";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /** MsgRegisterCounterparty defines a message to register a counterparty on a client */
 export interface MsgRegisterCounterparty {
   /** client identifier */
@@ -32,13 +32,6 @@ export interface MsgRegisterCounterpartyAminoMsg {
   type: "cosmos-sdk/MsgRegisterCounterparty";
   value: MsgRegisterCounterpartyAmino;
 }
-/** MsgRegisterCounterparty defines a message to register a counterparty on a client */
-export interface MsgRegisterCounterpartySDKType {
-  client_id: string;
-  counterparty_merkle_prefix: Uint8Array[];
-  counterparty_client_id: string;
-  signer: string;
-}
 /** MsgRegisterCounterpartyResponse defines the Msg/RegisterCounterparty response type. */
 export interface MsgRegisterCounterpartyResponse {}
 export interface MsgRegisterCounterpartyResponseProtoMsg {
@@ -51,8 +44,6 @@ export interface MsgRegisterCounterpartyResponseAminoMsg {
   type: "cosmos-sdk/MsgRegisterCounterpartyResponse";
   value: MsgRegisterCounterpartyResponseAmino;
 }
-/** MsgRegisterCounterpartyResponse defines the Msg/RegisterCounterparty response type. */
-export interface MsgRegisterCounterpartyResponseSDKType {}
 /** MsgUpdateClientConfig defines the sdk.Msg type to update the configuration for a given client */
 export interface MsgUpdateClientConfig {
   /** client identifier */
@@ -87,12 +78,6 @@ export interface MsgUpdateClientConfigAminoMsg {
   type: "cosmos-sdk/MsgUpdateClientConfig";
   value: MsgUpdateClientConfigAmino;
 }
-/** MsgUpdateClientConfig defines the sdk.Msg type to update the configuration for a given client */
-export interface MsgUpdateClientConfigSDKType {
-  client_id: string;
-  config: ConfigSDKType;
-  signer: string;
-}
 /** MsgUpdateClientConfigResponse defines the MsgUpdateClientConfig response type. */
 export interface MsgUpdateClientConfigResponse {}
 export interface MsgUpdateClientConfigResponseProtoMsg {
@@ -105,8 +90,6 @@ export interface MsgUpdateClientConfigResponseAminoMsg {
   type: "cosmos-sdk/MsgUpdateClientConfigResponse";
   value: MsgUpdateClientConfigResponseAmino;
 }
-/** MsgUpdateClientConfigResponse defines the MsgUpdateClientConfig response type. */
-export interface MsgUpdateClientConfigResponseSDKType {}
 function createBaseMsgRegisterCounterparty(): MsgRegisterCounterparty {
   return {
     clientId: "",
@@ -117,6 +100,7 @@ function createBaseMsgRegisterCounterparty(): MsgRegisterCounterparty {
 }
 export const MsgRegisterCounterparty = {
   typeUrl: "/ibc.core.client.v2.MsgRegisterCounterparty",
+  aminoType: "cosmos-sdk/MsgRegisterCounterparty",
   encode(message: MsgRegisterCounterparty, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -158,7 +142,7 @@ export const MsgRegisterCounterparty = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgRegisterCounterparty>): MsgRegisterCounterparty {
+  fromPartial(object: DeepPartial<MsgRegisterCounterparty>): MsgRegisterCounterparty {
     const message = createBaseMsgRegisterCounterparty();
     message.clientId = object.clientId ?? "";
     message.counterpartyMerklePrefix = object.counterpartyMerklePrefix?.map(e => e) || [];
@@ -219,6 +203,7 @@ function createBaseMsgRegisterCounterpartyResponse(): MsgRegisterCounterpartyRes
 }
 export const MsgRegisterCounterpartyResponse = {
   typeUrl: "/ibc.core.client.v2.MsgRegisterCounterpartyResponse",
+  aminoType: "cosmos-sdk/MsgRegisterCounterpartyResponse",
   encode(_: MsgRegisterCounterpartyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -236,7 +221,7 @@ export const MsgRegisterCounterpartyResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgRegisterCounterpartyResponse>): MsgRegisterCounterpartyResponse {
+  fromPartial(_: DeepPartial<MsgRegisterCounterpartyResponse>): MsgRegisterCounterpartyResponse {
     const message = createBaseMsgRegisterCounterpartyResponse();
     return message;
   },
@@ -279,6 +264,7 @@ function createBaseMsgUpdateClientConfig(): MsgUpdateClientConfig {
 }
 export const MsgUpdateClientConfig = {
   typeUrl: "/ibc.core.client.v2.MsgUpdateClientConfig",
+  aminoType: "cosmos-sdk/MsgUpdateClientConfig",
   encode(message: MsgUpdateClientConfig, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -314,7 +300,7 @@ export const MsgUpdateClientConfig = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpdateClientConfig>): MsgUpdateClientConfig {
+  fromPartial(object: DeepPartial<MsgUpdateClientConfig>): MsgUpdateClientConfig {
     const message = createBaseMsgUpdateClientConfig();
     message.clientId = object.clientId ?? "";
     message.config = object.config !== undefined && object.config !== null ? Config.fromPartial(object.config) : undefined;
@@ -368,6 +354,7 @@ function createBaseMsgUpdateClientConfigResponse(): MsgUpdateClientConfigRespons
 }
 export const MsgUpdateClientConfigResponse = {
   typeUrl: "/ibc.core.client.v2.MsgUpdateClientConfigResponse",
+  aminoType: "cosmos-sdk/MsgUpdateClientConfigResponse",
   encode(_: MsgUpdateClientConfigResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -385,7 +372,7 @@ export const MsgUpdateClientConfigResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpdateClientConfigResponse>): MsgUpdateClientConfigResponse {
+  fromPartial(_: DeepPartial<MsgUpdateClientConfigResponse>): MsgUpdateClientConfigResponse {
     const message = createBaseMsgUpdateClientConfigResponse();
     return message;
   },

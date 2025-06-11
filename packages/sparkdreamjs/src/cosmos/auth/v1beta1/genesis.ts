@@ -1,7 +1,8 @@
 //@ts-nocheck
-import { Params, ParamsAmino, ParamsSDKType } from "./auth";
-import { Any, AnyAmino, AnySDKType } from "../../../google/protobuf/any";
+import { Params, ParamsAmino } from "./auth";
+import { Any, AnyAmino } from "../../../google/protobuf/any";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** GenesisState defines the auth module's genesis state. */
 export interface GenesisState {
   /** params defines all the parameters of the module. */
@@ -24,11 +25,6 @@ export interface GenesisStateAminoMsg {
   type: "cosmos-sdk/GenesisState";
   value: GenesisStateAmino;
 }
-/** GenesisState defines the auth module's genesis state. */
-export interface GenesisStateSDKType {
-  params: ParamsSDKType;
-  accounts: AnySDKType[];
-}
 function createBaseGenesisState(): GenesisState {
   return {
     params: Params.fromPartial({}),
@@ -37,6 +33,7 @@ function createBaseGenesisState(): GenesisState {
 }
 export const GenesisState = {
   typeUrl: "/cosmos.auth.v1beta1.GenesisState",
+  aminoType: "cosmos-sdk/GenesisState",
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -66,7 +63,7 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisState>): GenesisState {
+  fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = createBaseGenesisState();
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
     message.accounts = object.accounts?.map(e => Any.fromPartial(e)) || [];

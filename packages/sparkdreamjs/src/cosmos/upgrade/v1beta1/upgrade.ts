@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { Timestamp } from "../../../google/protobuf/timestamp";
-import { Any, AnyAmino, AnySDKType } from "../../../google/protobuf/any";
+import { Any, AnyAmino } from "../../../google/protobuf/any";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { toTimestamp, fromTimestamp } from "../../../helpers";
+import { toTimestamp, fromTimestamp, DeepPartial } from "../../../helpers";
 /** Plan specifies information about a planned upgrade and when it should occur. */
 export interface Plan {
   /**
@@ -79,16 +79,6 @@ export interface PlanAminoMsg {
   type: "cosmos-sdk/Plan";
   value: PlanAmino;
 }
-/** Plan specifies information about a planned upgrade and when it should occur. */
-export interface PlanSDKType {
-  name: string;
-  /** @deprecated */
-  time: Date;
-  height: bigint;
-  info: string;
-  /** @deprecated */
-  upgraded_client_state?: AnySDKType;
-}
 /**
  * SoftwareUpgradeProposal is a gov Content type for initiating a software
  * upgrade.
@@ -97,7 +87,6 @@ export interface PlanSDKType {
  */
 /** @deprecated */
 export interface SoftwareUpgradeProposal {
-  $typeUrl?: "/cosmos.upgrade.v1beta1.SoftwareUpgradeProposal";
   /** title of the proposal */
   title: string;
   /** description of the proposal */
@@ -129,19 +118,6 @@ export interface SoftwareUpgradeProposalAminoMsg {
   value: SoftwareUpgradeProposalAmino;
 }
 /**
- * SoftwareUpgradeProposal is a gov Content type for initiating a software
- * upgrade.
- * Deprecated: This legacy proposal is deprecated in favor of Msg-based gov
- * proposals, see MsgSoftwareUpgrade.
- */
-/** @deprecated */
-export interface SoftwareUpgradeProposalSDKType {
-  $typeUrl?: "/cosmos.upgrade.v1beta1.SoftwareUpgradeProposal";
-  title: string;
-  description: string;
-  plan: PlanSDKType;
-}
-/**
  * CancelSoftwareUpgradeProposal is a gov Content type for cancelling a software
  * upgrade.
  * Deprecated: This legacy proposal is deprecated in favor of Msg-based gov
@@ -149,7 +125,6 @@ export interface SoftwareUpgradeProposalSDKType {
  */
 /** @deprecated */
 export interface CancelSoftwareUpgradeProposal {
-  $typeUrl?: "/cosmos.upgrade.v1beta1.CancelSoftwareUpgradeProposal";
   /** title of the proposal */
   title: string;
   /** description of the proposal */
@@ -175,18 +150,6 @@ export interface CancelSoftwareUpgradeProposalAmino {
 export interface CancelSoftwareUpgradeProposalAminoMsg {
   type: "cosmos-sdk/CancelSoftwareUpgradeProposal";
   value: CancelSoftwareUpgradeProposalAmino;
-}
-/**
- * CancelSoftwareUpgradeProposal is a gov Content type for cancelling a software
- * upgrade.
- * Deprecated: This legacy proposal is deprecated in favor of Msg-based gov
- * proposals, see MsgCancelUpgrade.
- */
-/** @deprecated */
-export interface CancelSoftwareUpgradeProposalSDKType {
-  $typeUrl?: "/cosmos.upgrade.v1beta1.CancelSoftwareUpgradeProposal";
-  title: string;
-  description: string;
 }
 /**
  * ModuleVersion specifies a module and its consensus version.
@@ -218,15 +181,6 @@ export interface ModuleVersionAminoMsg {
   type: "cosmos-sdk/ModuleVersion";
   value: ModuleVersionAmino;
 }
-/**
- * ModuleVersion specifies a module and its consensus version.
- * 
- * Since: cosmos-sdk 0.43
- */
-export interface ModuleVersionSDKType {
-  name: string;
-  version: bigint;
-}
 function createBasePlan(): Plan {
   return {
     name: "",
@@ -238,6 +192,7 @@ function createBasePlan(): Plan {
 }
 export const Plan = {
   typeUrl: "/cosmos.upgrade.v1beta1.Plan",
+  aminoType: "cosmos-sdk/Plan",
   encode(message: Plan, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -285,7 +240,7 @@ export const Plan = {
     }
     return message;
   },
-  fromPartial(object: Partial<Plan>): Plan {
+  fromPartial(object: DeepPartial<Plan>): Plan {
     const message = createBasePlan();
     message.name = object.name ?? "";
     message.time = object.time ?? undefined;
@@ -346,7 +301,6 @@ export const Plan = {
 };
 function createBaseSoftwareUpgradeProposal(): SoftwareUpgradeProposal {
   return {
-    $typeUrl: "/cosmos.upgrade.v1beta1.SoftwareUpgradeProposal",
     title: "",
     description: "",
     plan: Plan.fromPartial({})
@@ -354,6 +308,7 @@ function createBaseSoftwareUpgradeProposal(): SoftwareUpgradeProposal {
 }
 export const SoftwareUpgradeProposal = {
   typeUrl: "/cosmos.upgrade.v1beta1.SoftwareUpgradeProposal",
+  aminoType: "cosmos-sdk/SoftwareUpgradeProposal",
   encode(message: SoftwareUpgradeProposal, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.title !== "") {
       writer.uint32(10).string(message.title);
@@ -389,7 +344,7 @@ export const SoftwareUpgradeProposal = {
     }
     return message;
   },
-  fromPartial(object: Partial<SoftwareUpgradeProposal>): SoftwareUpgradeProposal {
+  fromPartial(object: DeepPartial<SoftwareUpgradeProposal>): SoftwareUpgradeProposal {
     const message = createBaseSoftwareUpgradeProposal();
     message.title = object.title ?? "";
     message.description = object.description ?? "";
@@ -440,13 +395,13 @@ export const SoftwareUpgradeProposal = {
 };
 function createBaseCancelSoftwareUpgradeProposal(): CancelSoftwareUpgradeProposal {
   return {
-    $typeUrl: "/cosmos.upgrade.v1beta1.CancelSoftwareUpgradeProposal",
     title: "",
     description: ""
   };
 }
 export const CancelSoftwareUpgradeProposal = {
   typeUrl: "/cosmos.upgrade.v1beta1.CancelSoftwareUpgradeProposal",
+  aminoType: "cosmos-sdk/CancelSoftwareUpgradeProposal",
   encode(message: CancelSoftwareUpgradeProposal, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.title !== "") {
       writer.uint32(10).string(message.title);
@@ -476,7 +431,7 @@ export const CancelSoftwareUpgradeProposal = {
     }
     return message;
   },
-  fromPartial(object: Partial<CancelSoftwareUpgradeProposal>): CancelSoftwareUpgradeProposal {
+  fromPartial(object: DeepPartial<CancelSoftwareUpgradeProposal>): CancelSoftwareUpgradeProposal {
     const message = createBaseCancelSoftwareUpgradeProposal();
     message.title = object.title ?? "";
     message.description = object.description ?? "";
@@ -528,6 +483,7 @@ function createBaseModuleVersion(): ModuleVersion {
 }
 export const ModuleVersion = {
   typeUrl: "/cosmos.upgrade.v1beta1.ModuleVersion",
+  aminoType: "cosmos-sdk/ModuleVersion",
   encode(message: ModuleVersion, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -557,7 +513,7 @@ export const ModuleVersion = {
     }
     return message;
   },
-  fromPartial(object: Partial<ModuleVersion>): ModuleVersion {
+  fromPartial(object: DeepPartial<ModuleVersion>): ModuleVersion {
     const message = createBaseModuleVersion();
     message.name = object.name ?? "";
     message.version = object.version !== undefined && object.version !== null ? BigInt(object.version.toString()) : BigInt(0);

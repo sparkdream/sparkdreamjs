@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryChecksumsRequest, QueryChecksumsResponseSDKType, QueryCodeRequest, QueryCodeResponseSDKType } from "./query";
+import { QueryChecksumsRequest, QueryChecksumsResponse, QueryCodeRequest, QueryCodeResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -10,13 +10,11 @@ export class LCDQueryClient {
     requestClient: LCDClient;
   }) {
     this.req = requestClient;
-    this.checksums = this.checksums.bind(this);
-    this.code = this.code.bind(this);
   }
   /* Get all Wasm checksums */
-  async checksums(params: QueryChecksumsRequest = {
+  checksums = async (params: QueryChecksumsRequest = {
     pagination: undefined
-  }): Promise<QueryChecksumsResponseSDKType> {
+  }): Promise<QueryChecksumsResponse> => {
     const options: any = {
       params: {}
     };
@@ -24,11 +22,11 @@ export class LCDQueryClient {
       setPaginationParams(options, params.pagination);
     }
     const endpoint = `ibc/lightclients/wasm/v1/checksums`;
-    return await this.req.get<QueryChecksumsResponseSDKType>(endpoint, options);
-  }
+    return await this.req.get<QueryChecksumsResponse>(endpoint, options);
+  };
   /* Get Wasm code for given checksum */
-  async code(params: QueryCodeRequest): Promise<QueryCodeResponseSDKType> {
+  code = async (params: QueryCodeRequest): Promise<QueryCodeResponse> => {
     const endpoint = `ibc/lightclients/wasm/v1/checksums/${params.checksum}/code`;
-    return await this.req.get<QueryCodeResponseSDKType>(endpoint);
-  }
+    return await this.req.get<QueryCodeResponse>(endpoint);
+  };
 }

@@ -1,9 +1,9 @@
 //@ts-nocheck
-import { BaseAccount, BaseAccountAmino, BaseAccountSDKType } from "../../../../cosmos/auth/v1beta1/auth";
+import { BaseAccount, BaseAccountAmino } from "../../../../cosmos/auth/v1beta1/auth";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /** An InterchainAccount is defined as a BaseAccount & the address of the account owner on the controller chain */
 export interface InterchainAccount {
-  $typeUrl?: "/ibc.applications.interchain_accounts.v1.InterchainAccount";
   baseAccount?: BaseAccount;
   accountOwner: string;
 }
@@ -20,21 +20,15 @@ export interface InterchainAccountAminoMsg {
   type: "cosmos-sdk/InterchainAccount";
   value: InterchainAccountAmino;
 }
-/** An InterchainAccount is defined as a BaseAccount & the address of the account owner on the controller chain */
-export interface InterchainAccountSDKType {
-  $typeUrl?: "/ibc.applications.interchain_accounts.v1.InterchainAccount";
-  base_account?: BaseAccountSDKType;
-  account_owner: string;
-}
 function createBaseInterchainAccount(): InterchainAccount {
   return {
-    $typeUrl: "/ibc.applications.interchain_accounts.v1.InterchainAccount",
     baseAccount: undefined,
     accountOwner: ""
   };
 }
 export const InterchainAccount = {
   typeUrl: "/ibc.applications.interchain_accounts.v1.InterchainAccount",
+  aminoType: "cosmos-sdk/InterchainAccount",
   encode(message: InterchainAccount, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.baseAccount !== undefined) {
       BaseAccount.encode(message.baseAccount, writer.uint32(10).fork()).ldelim();
@@ -64,7 +58,7 @@ export const InterchainAccount = {
     }
     return message;
   },
-  fromPartial(object: Partial<InterchainAccount>): InterchainAccount {
+  fromPartial(object: DeepPartial<InterchainAccount>): InterchainAccount {
     const message = createBaseInterchainAccount();
     message.baseAccount = object.baseAccount !== undefined && object.baseAccount !== null ? BaseAccount.fromPartial(object.baseAccount) : undefined;
     message.accountOwner = object.accountOwner ?? "";

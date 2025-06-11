@@ -1,7 +1,8 @@
 //@ts-nocheck
-import { Coin, CoinAmino, CoinSDKType } from "../../base/v1beta1/coin";
-import { ContinuousFund, ContinuousFundAmino, ContinuousFundSDKType, Params, ParamsAmino, ParamsSDKType } from "./types";
+import { Coin, CoinAmino } from "../../base/v1beta1/coin";
+import { ContinuousFund, ContinuousFundAmino, Params, ParamsAmino } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /**
  * QueryCommunityPoolRequest is the request type for the Query/CommunityPool RPC
  * method.
@@ -20,11 +21,6 @@ export interface QueryCommunityPoolRequestAminoMsg {
   type: "cosmos-sdk/QueryCommunityPoolRequest";
   value: QueryCommunityPoolRequestAmino;
 }
-/**
- * QueryCommunityPoolRequest is the request type for the Query/CommunityPool RPC
- * method.
- */
-export interface QueryCommunityPoolRequestSDKType {}
 /**
  * QueryCommunityPoolResponse is the response type for the Query/CommunityPool
  * RPC method.
@@ -48,13 +44,6 @@ export interface QueryCommunityPoolResponseAmino {
 export interface QueryCommunityPoolResponseAminoMsg {
   type: "cosmos-sdk/QueryCommunityPoolResponse";
   value: QueryCommunityPoolResponseAmino;
-}
-/**
- * QueryCommunityPoolResponse is the response type for the Query/CommunityPool
- * RPC method.
- */
-export interface QueryCommunityPoolResponseSDKType {
-  pool: CoinSDKType[];
 }
 /**
  * QueryContinuousFundRequest is the request type for the Query/ContinuousFund
@@ -81,13 +70,6 @@ export interface QueryContinuousFundRequestAminoMsg {
   value: QueryContinuousFundRequestAmino;
 }
 /**
- * QueryContinuousFundRequest is the request type for the Query/ContinuousFund
- * RPC method.
- */
-export interface QueryContinuousFundRequestSDKType {
-  recipient: string;
-}
-/**
  * QueryUnclaimedBudgetResponse is the response type for the Query/ContinuousFund
  * RPC method.
  */
@@ -112,13 +94,6 @@ export interface QueryContinuousFundResponseAminoMsg {
   value: QueryContinuousFundResponseAmino;
 }
 /**
- * QueryUnclaimedBudgetResponse is the response type for the Query/ContinuousFund
- * RPC method.
- */
-export interface QueryContinuousFundResponseSDKType {
-  continuous_fund: ContinuousFundSDKType;
-}
-/**
  * QueryContinuousFundRequest is the request type for the Query/ContinuousFunds
  * RPC method.
  */
@@ -136,11 +111,6 @@ export interface QueryContinuousFundsRequestAminoMsg {
   type: "cosmos-sdk/QueryContinuousFundsRequest";
   value: QueryContinuousFundsRequestAmino;
 }
-/**
- * QueryContinuousFundRequest is the request type for the Query/ContinuousFunds
- * RPC method.
- */
-export interface QueryContinuousFundsRequestSDKType {}
 /**
  * QueryUnclaimedBudgetResponse is the response type for the Query/ContinuousFunds
  * RPC method.
@@ -165,13 +135,6 @@ export interface QueryContinuousFundsResponseAminoMsg {
   type: "cosmos-sdk/QueryContinuousFundsResponse";
   value: QueryContinuousFundsResponseAmino;
 }
-/**
- * QueryUnclaimedBudgetResponse is the response type for the Query/ContinuousFunds
- * RPC method.
- */
-export interface QueryContinuousFundsResponseSDKType {
-  continuous_funds: ContinuousFundSDKType[];
-}
 /** QueryParamsRequest is the response type for the Query/Params RPC method. */
 export interface QueryParamsRequest {}
 export interface QueryParamsRequestProtoMsg {
@@ -184,8 +147,6 @@ export interface QueryParamsRequestAminoMsg {
   type: "cosmos-sdk/QueryParamsRequest";
   value: QueryParamsRequestAmino;
 }
-/** QueryParamsRequest is the response type for the Query/Params RPC method. */
-export interface QueryParamsRequestSDKType {}
 /** QueryParamsResponse is the response type for the Query/Params RPC method. */
 export interface QueryParamsResponse {
   params: Params;
@@ -202,15 +163,12 @@ export interface QueryParamsResponseAminoMsg {
   type: "cosmos-sdk/QueryParamsResponse";
   value: QueryParamsResponseAmino;
 }
-/** QueryParamsResponse is the response type for the Query/Params RPC method. */
-export interface QueryParamsResponseSDKType {
-  params: ParamsSDKType;
-}
 function createBaseQueryCommunityPoolRequest(): QueryCommunityPoolRequest {
   return {};
 }
 export const QueryCommunityPoolRequest = {
   typeUrl: "/cosmos.protocolpool.v1.QueryCommunityPoolRequest",
+  aminoType: "cosmos-sdk/QueryCommunityPoolRequest",
   encode(_: QueryCommunityPoolRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -228,7 +186,7 @@ export const QueryCommunityPoolRequest = {
     }
     return message;
   },
-  fromPartial(_: Partial<QueryCommunityPoolRequest>): QueryCommunityPoolRequest {
+  fromPartial(_: DeepPartial<QueryCommunityPoolRequest>): QueryCommunityPoolRequest {
     const message = createBaseQueryCommunityPoolRequest();
     return message;
   },
@@ -269,6 +227,7 @@ function createBaseQueryCommunityPoolResponse(): QueryCommunityPoolResponse {
 }
 export const QueryCommunityPoolResponse = {
   typeUrl: "/cosmos.protocolpool.v1.QueryCommunityPoolResponse",
+  aminoType: "cosmos-sdk/QueryCommunityPoolResponse",
   encode(message: QueryCommunityPoolResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.pool) {
       Coin.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -292,7 +251,7 @@ export const QueryCommunityPoolResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryCommunityPoolResponse>): QueryCommunityPoolResponse {
+  fromPartial(object: DeepPartial<QueryCommunityPoolResponse>): QueryCommunityPoolResponse {
     const message = createBaseQueryCommunityPoolResponse();
     message.pool = object.pool?.map(e => Coin.fromPartial(e)) || [];
     return message;
@@ -340,6 +299,7 @@ function createBaseQueryContinuousFundRequest(): QueryContinuousFundRequest {
 }
 export const QueryContinuousFundRequest = {
   typeUrl: "/cosmos.protocolpool.v1.QueryContinuousFundRequest",
+  aminoType: "cosmos-sdk/QueryContinuousFundRequest",
   encode(message: QueryContinuousFundRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.recipient !== "") {
       writer.uint32(10).string(message.recipient);
@@ -363,7 +323,7 @@ export const QueryContinuousFundRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryContinuousFundRequest>): QueryContinuousFundRequest {
+  fromPartial(object: DeepPartial<QueryContinuousFundRequest>): QueryContinuousFundRequest {
     const message = createBaseQueryContinuousFundRequest();
     message.recipient = object.recipient ?? "";
     return message;
@@ -409,6 +369,7 @@ function createBaseQueryContinuousFundResponse(): QueryContinuousFundResponse {
 }
 export const QueryContinuousFundResponse = {
   typeUrl: "/cosmos.protocolpool.v1.QueryContinuousFundResponse",
+  aminoType: "cosmos-sdk/QueryContinuousFundResponse",
   encode(message: QueryContinuousFundResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.continuousFund !== undefined) {
       ContinuousFund.encode(message.continuousFund, writer.uint32(10).fork()).ldelim();
@@ -432,7 +393,7 @@ export const QueryContinuousFundResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryContinuousFundResponse>): QueryContinuousFundResponse {
+  fromPartial(object: DeepPartial<QueryContinuousFundResponse>): QueryContinuousFundResponse {
     const message = createBaseQueryContinuousFundResponse();
     message.continuousFund = object.continuousFund !== undefined && object.continuousFund !== null ? ContinuousFund.fromPartial(object.continuousFund) : undefined;
     return message;
@@ -476,6 +437,7 @@ function createBaseQueryContinuousFundsRequest(): QueryContinuousFundsRequest {
 }
 export const QueryContinuousFundsRequest = {
   typeUrl: "/cosmos.protocolpool.v1.QueryContinuousFundsRequest",
+  aminoType: "cosmos-sdk/QueryContinuousFundsRequest",
   encode(_: QueryContinuousFundsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -493,7 +455,7 @@ export const QueryContinuousFundsRequest = {
     }
     return message;
   },
-  fromPartial(_: Partial<QueryContinuousFundsRequest>): QueryContinuousFundsRequest {
+  fromPartial(_: DeepPartial<QueryContinuousFundsRequest>): QueryContinuousFundsRequest {
     const message = createBaseQueryContinuousFundsRequest();
     return message;
   },
@@ -534,6 +496,7 @@ function createBaseQueryContinuousFundsResponse(): QueryContinuousFundsResponse 
 }
 export const QueryContinuousFundsResponse = {
   typeUrl: "/cosmos.protocolpool.v1.QueryContinuousFundsResponse",
+  aminoType: "cosmos-sdk/QueryContinuousFundsResponse",
   encode(message: QueryContinuousFundsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.continuousFunds) {
       ContinuousFund.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -557,7 +520,7 @@ export const QueryContinuousFundsResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryContinuousFundsResponse>): QueryContinuousFundsResponse {
+  fromPartial(object: DeepPartial<QueryContinuousFundsResponse>): QueryContinuousFundsResponse {
     const message = createBaseQueryContinuousFundsResponse();
     message.continuousFunds = object.continuousFunds?.map(e => ContinuousFund.fromPartial(e)) || [];
     return message;
@@ -603,6 +566,7 @@ function createBaseQueryParamsRequest(): QueryParamsRequest {
 }
 export const QueryParamsRequest = {
   typeUrl: "/cosmos.protocolpool.v1.QueryParamsRequest",
+  aminoType: "cosmos-sdk/QueryParamsRequest",
   encode(_: QueryParamsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -620,7 +584,7 @@ export const QueryParamsRequest = {
     }
     return message;
   },
-  fromPartial(_: Partial<QueryParamsRequest>): QueryParamsRequest {
+  fromPartial(_: DeepPartial<QueryParamsRequest>): QueryParamsRequest {
     const message = createBaseQueryParamsRequest();
     return message;
   },
@@ -661,6 +625,7 @@ function createBaseQueryParamsResponse(): QueryParamsResponse {
 }
 export const QueryParamsResponse = {
   typeUrl: "/cosmos.protocolpool.v1.QueryParamsResponse",
+  aminoType: "cosmos-sdk/QueryParamsResponse",
   encode(message: QueryParamsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -684,7 +649,7 @@ export const QueryParamsResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryParamsResponse>): QueryParamsResponse {
+  fromPartial(object: DeepPartial<QueryParamsResponse>): QueryParamsResponse {
     const message = createBaseQueryParamsResponse();
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
     return message;

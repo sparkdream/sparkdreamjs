@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** ModuleDescriptor describes an app module. */
 export interface ModuleDescriptor {
   /**
@@ -59,12 +60,6 @@ export interface ModuleDescriptorAmino {
 export interface ModuleDescriptorAminoMsg {
   type: "cosmos-sdk/ModuleDescriptor";
   value: ModuleDescriptorAmino;
-}
-/** ModuleDescriptor describes an app module. */
-export interface ModuleDescriptorSDKType {
-  go_import: string;
-  use_package: PackageReferenceSDKType[];
-  can_migrate_from: MigrateFromInfoSDKType[];
 }
 /** PackageReference is a reference to a protobuf package used by a module. */
 export interface PackageReference {
@@ -160,11 +155,6 @@ export interface PackageReferenceAminoMsg {
   type: "cosmos-sdk/PackageReference";
   value: PackageReferenceAmino;
 }
-/** PackageReference is a reference to a protobuf package used by a module. */
-export interface PackageReferenceSDKType {
-  name: string;
-  revision: number;
-}
 /**
  * MigrateFromInfo is information on a module version that a newer module
  * can migrate from.
@@ -195,13 +185,6 @@ export interface MigrateFromInfoAminoMsg {
   type: "cosmos-sdk/MigrateFromInfo";
   value: MigrateFromInfoAmino;
 }
-/**
- * MigrateFromInfo is information on a module version that a newer module
- * can migrate from.
- */
-export interface MigrateFromInfoSDKType {
-  module: string;
-}
 function createBaseModuleDescriptor(): ModuleDescriptor {
   return {
     goImport: "",
@@ -211,6 +194,7 @@ function createBaseModuleDescriptor(): ModuleDescriptor {
 }
 export const ModuleDescriptor = {
   typeUrl: "/cosmos.app.v1alpha1.ModuleDescriptor",
+  aminoType: "cosmos-sdk/ModuleDescriptor",
   encode(message: ModuleDescriptor, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.goImport !== "") {
       writer.uint32(10).string(message.goImport);
@@ -246,7 +230,7 @@ export const ModuleDescriptor = {
     }
     return message;
   },
-  fromPartial(object: Partial<ModuleDescriptor>): ModuleDescriptor {
+  fromPartial(object: DeepPartial<ModuleDescriptor>): ModuleDescriptor {
     const message = createBaseModuleDescriptor();
     message.goImport = object.goImport ?? "";
     message.usePackage = object.usePackage?.map(e => PackageReference.fromPartial(e)) || [];
@@ -307,6 +291,7 @@ function createBasePackageReference(): PackageReference {
 }
 export const PackageReference = {
   typeUrl: "/cosmos.app.v1alpha1.PackageReference",
+  aminoType: "cosmos-sdk/PackageReference",
   encode(message: PackageReference, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -336,7 +321,7 @@ export const PackageReference = {
     }
     return message;
   },
-  fromPartial(object: Partial<PackageReference>): PackageReference {
+  fromPartial(object: DeepPartial<PackageReference>): PackageReference {
     const message = createBasePackageReference();
     message.name = object.name ?? "";
     message.revision = object.revision ?? 0;
@@ -387,6 +372,7 @@ function createBaseMigrateFromInfo(): MigrateFromInfo {
 }
 export const MigrateFromInfo = {
   typeUrl: "/cosmos.app.v1alpha1.MigrateFromInfo",
+  aminoType: "cosmos-sdk/MigrateFromInfo",
   encode(message: MigrateFromInfo, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.module !== "") {
       writer.uint32(10).string(message.module);
@@ -410,7 +396,7 @@ export const MigrateFromInfo = {
     }
     return message;
   },
-  fromPartial(object: Partial<MigrateFromInfo>): MigrateFromInfo {
+  fromPartial(object: DeepPartial<MigrateFromInfo>): MigrateFromInfo {
     const message = createBaseMigrateFromInfo();
     message.module = object.module ?? "";
     return message;

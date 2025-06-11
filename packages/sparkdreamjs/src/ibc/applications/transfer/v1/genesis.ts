@@ -1,8 +1,9 @@
 //@ts-nocheck
-import { Denom, DenomAmino, DenomSDKType } from "./token";
-import { Params, ParamsAmino, ParamsSDKType } from "./transfer";
-import { Coin, CoinAmino, CoinSDKType } from "../../../../cosmos/base/v1beta1/coin";
+import { Denom, DenomAmino } from "./token";
+import { Params, ParamsAmino } from "./transfer";
+import { Coin, CoinAmino } from "../../../../cosmos/base/v1beta1/coin";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /** GenesisState defines the ibc-transfer genesis state */
 export interface GenesisState {
   portId: string;
@@ -33,13 +34,6 @@ export interface GenesisStateAminoMsg {
   type: "cosmos-sdk/GenesisState";
   value: GenesisStateAmino;
 }
-/** GenesisState defines the ibc-transfer genesis state */
-export interface GenesisStateSDKType {
-  port_id: string;
-  denoms: DenomSDKType[];
-  params: ParamsSDKType;
-  total_escrowed: CoinSDKType[];
-}
 function createBaseGenesisState(): GenesisState {
   return {
     portId: "",
@@ -50,6 +44,7 @@ function createBaseGenesisState(): GenesisState {
 }
 export const GenesisState = {
   typeUrl: "/ibc.applications.transfer.v1.GenesisState",
+  aminoType: "cosmos-sdk/GenesisState",
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.portId !== "") {
       writer.uint32(10).string(message.portId);
@@ -91,7 +86,7 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisState>): GenesisState {
+  fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = createBaseGenesisState();
     message.portId = object.portId ?? "";
     message.denoms = object.denoms?.map(e => Denom.fromPartial(e)) || [];

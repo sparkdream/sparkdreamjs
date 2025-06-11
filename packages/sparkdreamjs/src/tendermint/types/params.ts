@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { Duration, DurationAmino, DurationSDKType } from "../../google/protobuf/duration";
+import { Duration, DurationAmino } from "../../google/protobuf/duration";
 import { BinaryReader, BinaryWriter } from "../../binary";
+import { DeepPartial } from "../../helpers";
 /**
  * ConsensusParams contains consensus critical parameters that determine the
  * validity of blocks.
@@ -30,17 +31,6 @@ export interface ConsensusParamsAmino {
 export interface ConsensusParamsAminoMsg {
   type: "/tendermint.types.ConsensusParams";
   value: ConsensusParamsAmino;
-}
-/**
- * ConsensusParams contains consensus critical parameters that determine the
- * validity of blocks.
- */
-export interface ConsensusParamsSDKType {
-  block?: BlockParamsSDKType;
-  evidence?: EvidenceParamsSDKType;
-  validator?: ValidatorParamsSDKType;
-  version?: VersionParamsSDKType;
-  abci?: ABCIParamsSDKType;
 }
 /** BlockParams contains limits on the block size. */
 export interface BlockParams {
@@ -75,11 +65,6 @@ export interface BlockParamsAmino {
 export interface BlockParamsAminoMsg {
   type: "/tendermint.types.BlockParams";
   value: BlockParamsAmino;
-}
-/** BlockParams contains limits on the block size. */
-export interface BlockParamsSDKType {
-  max_bytes: bigint;
-  max_gas: bigint;
 }
 /** EvidenceParams determine how we handle evidence of malfeasance. */
 export interface EvidenceParams {
@@ -137,12 +122,6 @@ export interface EvidenceParamsAminoMsg {
   type: "/tendermint.types.EvidenceParams";
   value: EvidenceParamsAmino;
 }
-/** EvidenceParams determine how we handle evidence of malfeasance. */
-export interface EvidenceParamsSDKType {
-  max_age_num_blocks: bigint;
-  max_age_duration: DurationSDKType;
-  max_bytes: bigint;
-}
 /**
  * ValidatorParams restrict the public key types validators can use.
  * NOTE: uses ABCI pubkey naming, not Amino names.
@@ -165,13 +144,6 @@ export interface ValidatorParamsAminoMsg {
   type: "/tendermint.types.ValidatorParams";
   value: ValidatorParamsAmino;
 }
-/**
- * ValidatorParams restrict the public key types validators can use.
- * NOTE: uses ABCI pubkey naming, not Amino names.
- */
-export interface ValidatorParamsSDKType {
-  pub_key_types: string[];
-}
 /** VersionParams contains the ABCI application version. */
 export interface VersionParams {
   app: bigint;
@@ -187,10 +159,6 @@ export interface VersionParamsAmino {
 export interface VersionParamsAminoMsg {
   type: "/tendermint.types.VersionParams";
   value: VersionParamsAmino;
-}
-/** VersionParams contains the ABCI application version. */
-export interface VersionParamsSDKType {
-  app: bigint;
 }
 /**
  * HashedParams is a subset of ConsensusParams.
@@ -217,15 +185,6 @@ export interface HashedParamsAmino {
 export interface HashedParamsAminoMsg {
   type: "/tendermint.types.HashedParams";
   value: HashedParamsAmino;
-}
-/**
- * HashedParams is a subset of ConsensusParams.
- * 
- * It is hashed into the Header.ConsensusHash.
- */
-export interface HashedParamsSDKType {
-  block_max_bytes: bigint;
-  block_max_gas: bigint;
 }
 /** ABCIParams configure functionality specific to the Application Blockchain Interface. */
 export interface ABCIParams {
@@ -264,10 +223,6 @@ export interface ABCIParamsAmino {
 export interface ABCIParamsAminoMsg {
   type: "/tendermint.types.ABCIParams";
   value: ABCIParamsAmino;
-}
-/** ABCIParams configure functionality specific to the Application Blockchain Interface. */
-export interface ABCIParamsSDKType {
-  vote_extensions_enable_height: bigint;
 }
 function createBaseConsensusParams(): ConsensusParams {
   return {
@@ -327,7 +282,7 @@ export const ConsensusParams = {
     }
     return message;
   },
-  fromPartial(object: Partial<ConsensusParams>): ConsensusParams {
+  fromPartial(object: DeepPartial<ConsensusParams>): ConsensusParams {
     const message = createBaseConsensusParams();
     message.block = object.block !== undefined && object.block !== null ? BlockParams.fromPartial(object.block) : undefined;
     message.evidence = object.evidence !== undefined && object.evidence !== null ? EvidenceParams.fromPartial(object.evidence) : undefined;
@@ -417,7 +372,7 @@ export const BlockParams = {
     }
     return message;
   },
-  fromPartial(object: Partial<BlockParams>): BlockParams {
+  fromPartial(object: DeepPartial<BlockParams>): BlockParams {
     const message = createBaseBlockParams();
     message.maxBytes = object.maxBytes !== undefined && object.maxBytes !== null ? BigInt(object.maxBytes.toString()) : BigInt(0);
     message.maxGas = object.maxGas !== undefined && object.maxGas !== null ? BigInt(object.maxGas.toString()) : BigInt(0);
@@ -499,7 +454,7 @@ export const EvidenceParams = {
     }
     return message;
   },
-  fromPartial(object: Partial<EvidenceParams>): EvidenceParams {
+  fromPartial(object: DeepPartial<EvidenceParams>): EvidenceParams {
     const message = createBaseEvidenceParams();
     message.maxAgeNumBlocks = object.maxAgeNumBlocks !== undefined && object.maxAgeNumBlocks !== null ? BigInt(object.maxAgeNumBlocks.toString()) : BigInt(0);
     message.maxAgeDuration = object.maxAgeDuration !== undefined && object.maxAgeDuration !== null ? Duration.fromPartial(object.maxAgeDuration) : undefined;
@@ -572,7 +527,7 @@ export const ValidatorParams = {
     }
     return message;
   },
-  fromPartial(object: Partial<ValidatorParams>): ValidatorParams {
+  fromPartial(object: DeepPartial<ValidatorParams>): ValidatorParams {
     const message = createBaseValidatorParams();
     message.pubKeyTypes = object.pubKeyTypes?.map(e => e) || [];
     return message;
@@ -637,7 +592,7 @@ export const VersionParams = {
     }
     return message;
   },
-  fromPartial(object: Partial<VersionParams>): VersionParams {
+  fromPartial(object: DeepPartial<VersionParams>): VersionParams {
     const message = createBaseVersionParams();
     message.app = object.app !== undefined && object.app !== null ? BigInt(object.app.toString()) : BigInt(0);
     return message;
@@ -707,7 +662,7 @@ export const HashedParams = {
     }
     return message;
   },
-  fromPartial(object: Partial<HashedParams>): HashedParams {
+  fromPartial(object: DeepPartial<HashedParams>): HashedParams {
     const message = createBaseHashedParams();
     message.blockMaxBytes = object.blockMaxBytes !== undefined && object.blockMaxBytes !== null ? BigInt(object.blockMaxBytes.toString()) : BigInt(0);
     message.blockMaxGas = object.blockMaxGas !== undefined && object.blockMaxGas !== null ? BigInt(object.blockMaxGas.toString()) : BigInt(0);
@@ -775,7 +730,7 @@ export const ABCIParams = {
     }
     return message;
   },
-  fromPartial(object: Partial<ABCIParams>): ABCIParams {
+  fromPartial(object: DeepPartial<ABCIParams>): ABCIParams {
     const message = createBaseABCIParams();
     message.voteExtensionsEnableHeight = object.voteExtensionsEnableHeight !== undefined && object.voteExtensionsEnableHeight !== null ? BigInt(object.voteExtensionsEnableHeight.toString()) : BigInt(0);
     return message;

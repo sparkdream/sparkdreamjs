@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Rpc } from "../../../../helpers";
+import { TxRpc } from "../../../../types";
 import { BinaryReader } from "../../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
 import { QueryClientStateRequest, QueryClientStateResponse, QueryClientStatesRequest, QueryClientStatesResponse, QueryConsensusStateRequest, QueryConsensusStateResponse, QueryConsensusStatesRequest, QueryConsensusStatesResponse, QueryConsensusStateHeightsRequest, QueryConsensusStateHeightsResponse, QueryClientStatusRequest, QueryClientStatusResponse, QueryClientParamsRequest, QueryClientParamsResponse, QueryClientCreatorRequest, QueryClientCreatorResponse, QueryUpgradedClientStateRequest, QueryUpgradedClientStateResponse, QueryUpgradedConsensusStateRequest, QueryUpgradedConsensusStateResponse, QueryVerifyMembershipRequest, QueryVerifyMembershipResponse } from "./query";
@@ -35,78 +35,80 @@ export interface Query {
   verifyMembership(request: QueryVerifyMembershipRequest): Promise<QueryVerifyMembershipResponse>;
 }
 export class QueryClientImpl implements Query {
-  private readonly rpc: Rpc;
-  constructor(rpc: Rpc) {
+  private readonly rpc: TxRpc;
+  constructor(rpc: TxRpc) {
     this.rpc = rpc;
-    this.clientState = this.clientState.bind(this);
-    this.clientStates = this.clientStates.bind(this);
-    this.consensusState = this.consensusState.bind(this);
-    this.consensusStates = this.consensusStates.bind(this);
-    this.consensusStateHeights = this.consensusStateHeights.bind(this);
-    this.clientStatus = this.clientStatus.bind(this);
-    this.clientParams = this.clientParams.bind(this);
-    this.clientCreator = this.clientCreator.bind(this);
-    this.upgradedClientState = this.upgradedClientState.bind(this);
-    this.upgradedConsensusState = this.upgradedConsensusState.bind(this);
-    this.verifyMembership = this.verifyMembership.bind(this);
   }
-  clientState(request: QueryClientStateRequest): Promise<QueryClientStateResponse> {
+  /* ClientState queries an IBC light client. */
+  clientState = async (request: QueryClientStateRequest): Promise<QueryClientStateResponse> => {
     const data = QueryClientStateRequest.encode(request).finish();
     const promise = this.rpc.request("ibc.core.client.v1.Query", "ClientState", data);
     return promise.then(data => QueryClientStateResponse.decode(new BinaryReader(data)));
-  }
-  clientStates(request: QueryClientStatesRequest = {
+  };
+  /* ClientStates queries all the IBC light clients of a chain. */
+  clientStates = async (request: QueryClientStatesRequest = {
     pagination: undefined
-  }): Promise<QueryClientStatesResponse> {
+  }): Promise<QueryClientStatesResponse> => {
     const data = QueryClientStatesRequest.encode(request).finish();
     const promise = this.rpc.request("ibc.core.client.v1.Query", "ClientStates", data);
     return promise.then(data => QueryClientStatesResponse.decode(new BinaryReader(data)));
-  }
-  consensusState(request: QueryConsensusStateRequest): Promise<QueryConsensusStateResponse> {
+  };
+  /* ConsensusState queries a consensus state associated with a client state at
+   a given height. */
+  consensusState = async (request: QueryConsensusStateRequest): Promise<QueryConsensusStateResponse> => {
     const data = QueryConsensusStateRequest.encode(request).finish();
     const promise = this.rpc.request("ibc.core.client.v1.Query", "ConsensusState", data);
     return promise.then(data => QueryConsensusStateResponse.decode(new BinaryReader(data)));
-  }
-  consensusStates(request: QueryConsensusStatesRequest): Promise<QueryConsensusStatesResponse> {
+  };
+  /* ConsensusStates queries all the consensus state associated with a given
+   client. */
+  consensusStates = async (request: QueryConsensusStatesRequest): Promise<QueryConsensusStatesResponse> => {
     const data = QueryConsensusStatesRequest.encode(request).finish();
     const promise = this.rpc.request("ibc.core.client.v1.Query", "ConsensusStates", data);
     return promise.then(data => QueryConsensusStatesResponse.decode(new BinaryReader(data)));
-  }
-  consensusStateHeights(request: QueryConsensusStateHeightsRequest): Promise<QueryConsensusStateHeightsResponse> {
+  };
+  /* ConsensusStateHeights queries the height of every consensus states associated with a given client. */
+  consensusStateHeights = async (request: QueryConsensusStateHeightsRequest): Promise<QueryConsensusStateHeightsResponse> => {
     const data = QueryConsensusStateHeightsRequest.encode(request).finish();
     const promise = this.rpc.request("ibc.core.client.v1.Query", "ConsensusStateHeights", data);
     return promise.then(data => QueryConsensusStateHeightsResponse.decode(new BinaryReader(data)));
-  }
-  clientStatus(request: QueryClientStatusRequest): Promise<QueryClientStatusResponse> {
+  };
+  /* Status queries the status of an IBC client. */
+  clientStatus = async (request: QueryClientStatusRequest): Promise<QueryClientStatusResponse> => {
     const data = QueryClientStatusRequest.encode(request).finish();
     const promise = this.rpc.request("ibc.core.client.v1.Query", "ClientStatus", data);
     return promise.then(data => QueryClientStatusResponse.decode(new BinaryReader(data)));
-  }
-  clientParams(request: QueryClientParamsRequest = {}): Promise<QueryClientParamsResponse> {
+  };
+  /* ClientParams queries all parameters of the ibc client submodule. */
+  clientParams = async (request: QueryClientParamsRequest = {}): Promise<QueryClientParamsResponse> => {
     const data = QueryClientParamsRequest.encode(request).finish();
     const promise = this.rpc.request("ibc.core.client.v1.Query", "ClientParams", data);
     return promise.then(data => QueryClientParamsResponse.decode(new BinaryReader(data)));
-  }
-  clientCreator(request: QueryClientCreatorRequest): Promise<QueryClientCreatorResponse> {
+  };
+  /* ClientCreator queries the creator of a given client. */
+  clientCreator = async (request: QueryClientCreatorRequest): Promise<QueryClientCreatorResponse> => {
     const data = QueryClientCreatorRequest.encode(request).finish();
     const promise = this.rpc.request("ibc.core.client.v1.Query", "ClientCreator", data);
     return promise.then(data => QueryClientCreatorResponse.decode(new BinaryReader(data)));
-  }
-  upgradedClientState(request: QueryUpgradedClientStateRequest = {}): Promise<QueryUpgradedClientStateResponse> {
+  };
+  /* UpgradedClientState queries an Upgraded IBC light client. */
+  upgradedClientState = async (request: QueryUpgradedClientStateRequest = {}): Promise<QueryUpgradedClientStateResponse> => {
     const data = QueryUpgradedClientStateRequest.encode(request).finish();
     const promise = this.rpc.request("ibc.core.client.v1.Query", "UpgradedClientState", data);
     return promise.then(data => QueryUpgradedClientStateResponse.decode(new BinaryReader(data)));
-  }
-  upgradedConsensusState(request: QueryUpgradedConsensusStateRequest = {}): Promise<QueryUpgradedConsensusStateResponse> {
+  };
+  /* UpgradedConsensusState queries an Upgraded IBC consensus state. */
+  upgradedConsensusState = async (request: QueryUpgradedConsensusStateRequest = {}): Promise<QueryUpgradedConsensusStateResponse> => {
     const data = QueryUpgradedConsensusStateRequest.encode(request).finish();
     const promise = this.rpc.request("ibc.core.client.v1.Query", "UpgradedConsensusState", data);
     return promise.then(data => QueryUpgradedConsensusStateResponse.decode(new BinaryReader(data)));
-  }
-  verifyMembership(request: QueryVerifyMembershipRequest): Promise<QueryVerifyMembershipResponse> {
+  };
+  /* VerifyMembership queries an IBC light client for proof verification of a value at a given key path. */
+  verifyMembership = async (request: QueryVerifyMembershipRequest): Promise<QueryVerifyMembershipResponse> => {
     const data = QueryVerifyMembershipRequest.encode(request).finish();
     const promise = this.rpc.request("ibc.core.client.v1.Query", "VerifyMembership", data);
     return promise.then(data => QueryVerifyMembershipResponse.decode(new BinaryReader(data)));
-  }
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);

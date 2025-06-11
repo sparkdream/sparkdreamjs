@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 export interface GenesisState_InFlightPacketsEntry {
   key: string;
   value?: InFlightPacket;
@@ -16,10 +16,6 @@ export interface GenesisState_InFlightPacketsEntryAmino {
 export interface GenesisState_InFlightPacketsEntryAminoMsg {
   type: string;
   value: GenesisState_InFlightPacketsEntryAmino;
-}
-export interface GenesisState_InFlightPacketsEntrySDKType {
-  key: string;
-  value?: InFlightPacketSDKType;
 }
 /** GenesisState defines the packetforward genesis state */
 export interface GenesisState {
@@ -52,12 +48,6 @@ export interface GenesisStateAmino {
 export interface GenesisStateAminoMsg {
   type: "cosmos-sdk/GenesisState";
   value: GenesisStateAmino;
-}
-/** GenesisState defines the packetforward genesis state */
-export interface GenesisStateSDKType {
-  in_flight_packets: {
-    [key: string]: InFlightPacketSDKType;
-  };
 }
 /**
  * InFlightPacket contains information about original packet for
@@ -103,24 +93,6 @@ export interface InFlightPacketAminoMsg {
   type: "cosmos-sdk/InFlightPacket";
   value: InFlightPacketAmino;
 }
-/**
- * InFlightPacket contains information about original packet for
- * writing the acknowledgement and refunding if necessary.
- */
-export interface InFlightPacketSDKType {
-  original_sender_address: string;
-  refund_channel_id: string;
-  refund_port_id: string;
-  packet_src_channel_id: string;
-  packet_src_port_id: string;
-  packet_timeout_timestamp: bigint;
-  packet_timeout_height: string;
-  packet_data: Uint8Array;
-  refund_sequence: bigint;
-  retries_remaining: number;
-  timeout: bigint;
-  nonrefundable: boolean;
-}
 function createBaseGenesisState_InFlightPacketsEntry(): GenesisState_InFlightPacketsEntry {
   return {
     key: "",
@@ -157,7 +129,7 @@ export const GenesisState_InFlightPacketsEntry = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisState_InFlightPacketsEntry>): GenesisState_InFlightPacketsEntry {
+  fromPartial(object: DeepPartial<GenesisState_InFlightPacketsEntry>): GenesisState_InFlightPacketsEntry {
     const message = createBaseGenesisState_InFlightPacketsEntry();
     message.key = object.key ?? "";
     message.value = object.value !== undefined && object.value !== null ? InFlightPacket.fromPartial(object.value) : undefined;
@@ -196,6 +168,7 @@ function createBaseGenesisState(): GenesisState {
 }
 export const GenesisState = {
   typeUrl: "/ibc.applications.packet_forward_middleware.v1.GenesisState",
+  aminoType: "cosmos-sdk/GenesisState",
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     Object.entries(message.inFlightPackets).forEach(([key, value]) => {
       GenesisState_InFlightPacketsEntry.encode({
@@ -225,7 +198,7 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisState>): GenesisState {
+  fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = createBaseGenesisState();
     message.inFlightPackets = Object.entries(object.inFlightPackets ?? {}).reduce<{
       [key: string]: InFlightPacket;
@@ -299,6 +272,7 @@ function createBaseInFlightPacket(): InFlightPacket {
 }
 export const InFlightPacket = {
   typeUrl: "/ibc.applications.packet_forward_middleware.v1.InFlightPacket",
+  aminoType: "cosmos-sdk/InFlightPacket",
   encode(message: InFlightPacket, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.originalSenderAddress !== "") {
       writer.uint32(10).string(message.originalSenderAddress);
@@ -388,7 +362,7 @@ export const InFlightPacket = {
     }
     return message;
   },
-  fromPartial(object: Partial<InFlightPacket>): InFlightPacket {
+  fromPartial(object: DeepPartial<InFlightPacket>): InFlightPacket {
     const message = createBaseInFlightPacket();
     message.originalSenderAddress = object.originalSenderAddress ?? "";
     message.refundChannelId = object.refundChannelId ?? "";

@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { EpochInfo, EpochInfoAmino, EpochInfoSDKType } from "./genesis";
+import { EpochInfo, EpochInfoAmino } from "./genesis";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /**
  * QueryEpochInfosRequest defines the gRPC request structure for
  * querying all epoch info.
@@ -19,11 +20,6 @@ export interface QueryEpochInfosRequestAminoMsg {
   type: "cosmos-sdk/QueryEpochInfosRequest";
   value: QueryEpochInfosRequestAmino;
 }
-/**
- * QueryEpochInfosRequest defines the gRPC request structure for
- * querying all epoch info.
- */
-export interface QueryEpochInfosRequestSDKType {}
 /**
  * QueryEpochInfosRequest defines the gRPC response structure for
  * querying all epoch info.
@@ -45,13 +41,6 @@ export interface QueryEpochInfosResponseAmino {
 export interface QueryEpochInfosResponseAminoMsg {
   type: "cosmos-sdk/QueryEpochInfosResponse";
   value: QueryEpochInfosResponseAmino;
-}
-/**
- * QueryEpochInfosRequest defines the gRPC response structure for
- * querying all epoch info.
- */
-export interface QueryEpochInfosResponseSDKType {
-  epochs: EpochInfoSDKType[];
 }
 /**
  * QueryCurrentEpochRequest defines the gRPC request structure for
@@ -76,13 +65,6 @@ export interface QueryCurrentEpochRequestAminoMsg {
   value: QueryCurrentEpochRequestAmino;
 }
 /**
- * QueryCurrentEpochRequest defines the gRPC request structure for
- * querying an epoch by its identifier.
- */
-export interface QueryCurrentEpochRequestSDKType {
-  identifier: string;
-}
-/**
  * QueryCurrentEpochResponse defines the gRPC response structure for
  * querying an epoch by its identifier.
  */
@@ -104,18 +86,12 @@ export interface QueryCurrentEpochResponseAminoMsg {
   type: "cosmos-sdk/QueryCurrentEpochResponse";
   value: QueryCurrentEpochResponseAmino;
 }
-/**
- * QueryCurrentEpochResponse defines the gRPC response structure for
- * querying an epoch by its identifier.
- */
-export interface QueryCurrentEpochResponseSDKType {
-  current_epoch: bigint;
-}
 function createBaseQueryEpochInfosRequest(): QueryEpochInfosRequest {
   return {};
 }
 export const QueryEpochInfosRequest = {
   typeUrl: "/cosmos.epochs.v1beta1.QueryEpochInfosRequest",
+  aminoType: "cosmos-sdk/QueryEpochInfosRequest",
   encode(_: QueryEpochInfosRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -133,7 +109,7 @@ export const QueryEpochInfosRequest = {
     }
     return message;
   },
-  fromPartial(_: Partial<QueryEpochInfosRequest>): QueryEpochInfosRequest {
+  fromPartial(_: DeepPartial<QueryEpochInfosRequest>): QueryEpochInfosRequest {
     const message = createBaseQueryEpochInfosRequest();
     return message;
   },
@@ -174,6 +150,7 @@ function createBaseQueryEpochInfosResponse(): QueryEpochInfosResponse {
 }
 export const QueryEpochInfosResponse = {
   typeUrl: "/cosmos.epochs.v1beta1.QueryEpochInfosResponse",
+  aminoType: "cosmos-sdk/QueryEpochInfosResponse",
   encode(message: QueryEpochInfosResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.epochs) {
       EpochInfo.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -197,7 +174,7 @@ export const QueryEpochInfosResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryEpochInfosResponse>): QueryEpochInfosResponse {
+  fromPartial(object: DeepPartial<QueryEpochInfosResponse>): QueryEpochInfosResponse {
     const message = createBaseQueryEpochInfosResponse();
     message.epochs = object.epochs?.map(e => EpochInfo.fromPartial(e)) || [];
     return message;
@@ -245,6 +222,7 @@ function createBaseQueryCurrentEpochRequest(): QueryCurrentEpochRequest {
 }
 export const QueryCurrentEpochRequest = {
   typeUrl: "/cosmos.epochs.v1beta1.QueryCurrentEpochRequest",
+  aminoType: "cosmos-sdk/QueryCurrentEpochRequest",
   encode(message: QueryCurrentEpochRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.identifier !== "") {
       writer.uint32(10).string(message.identifier);
@@ -268,7 +246,7 @@ export const QueryCurrentEpochRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryCurrentEpochRequest>): QueryCurrentEpochRequest {
+  fromPartial(object: DeepPartial<QueryCurrentEpochRequest>): QueryCurrentEpochRequest {
     const message = createBaseQueryCurrentEpochRequest();
     message.identifier = object.identifier ?? "";
     return message;
@@ -314,6 +292,7 @@ function createBaseQueryCurrentEpochResponse(): QueryCurrentEpochResponse {
 }
 export const QueryCurrentEpochResponse = {
   typeUrl: "/cosmos.epochs.v1beta1.QueryCurrentEpochResponse",
+  aminoType: "cosmos-sdk/QueryCurrentEpochResponse",
   encode(message: QueryCurrentEpochResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.currentEpoch !== BigInt(0)) {
       writer.uint32(8).int64(message.currentEpoch);
@@ -337,7 +316,7 @@ export const QueryCurrentEpochResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryCurrentEpochResponse>): QueryCurrentEpochResponse {
+  fromPartial(object: DeepPartial<QueryCurrentEpochResponse>): QueryCurrentEpochResponse {
     const message = createBaseQueryCurrentEpochResponse();
     message.currentEpoch = object.currentEpoch !== undefined && object.currentEpoch !== null ? BigInt(object.currentEpoch.toString()) : BigInt(0);
     return message;

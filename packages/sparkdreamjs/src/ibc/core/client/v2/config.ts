@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /**
  * Config is a **per-client** configuration struct that sets which relayers are allowed to relay v2 IBC messages
  * for a given client.
@@ -28,15 +29,6 @@ export interface ConfigAminoMsg {
   type: "cosmos-sdk/Config";
   value: ConfigAmino;
 }
-/**
- * Config is a **per-client** configuration struct that sets which relayers are allowed to relay v2 IBC messages
- * for a given client.
- * If it is set, then only relayers in the allow list can send v2 messages
- * If it is not set, then the client allows permissionless relaying of v2 messages
- */
-export interface ConfigSDKType {
-  allowed_relayers: string[];
-}
 function createBaseConfig(): Config {
   return {
     allowedRelayers: []
@@ -44,6 +36,7 @@ function createBaseConfig(): Config {
 }
 export const Config = {
   typeUrl: "/ibc.core.client.v2.Config",
+  aminoType: "cosmos-sdk/Config",
   encode(message: Config, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.allowedRelayers) {
       writer.uint32(10).string(v!);
@@ -67,7 +60,7 @@ export const Config = {
     }
     return message;
   },
-  fromPartial(object: Partial<Config>): Config {
+  fromPartial(object: DeepPartial<Config>): Config {
     const message = createBaseConfig();
     message.allowedRelayers = object.allowedRelayers?.map(e => e) || [];
     return message;

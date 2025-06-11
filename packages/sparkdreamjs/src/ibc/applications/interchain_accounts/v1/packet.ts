@@ -1,7 +1,7 @@
 //@ts-nocheck
-import { Any, AnyAmino, AnySDKType } from "../../../../google/protobuf/any";
+import { Any, AnyAmino } from "../../../../google/protobuf/any";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /**
  * Type defines a classification of message issued from a controller chain to its associated interchain accounts
  * host
@@ -13,7 +13,6 @@ export enum Type {
   TYPE_EXECUTE_TX = 1,
   UNRECOGNIZED = -1,
 }
-export const TypeSDKType = Type;
 export const TypeAmino = Type;
 export function typeFromJSON(object: any): Type {
   switch (object) {
@@ -60,12 +59,6 @@ export interface InterchainAccountPacketDataAminoMsg {
   type: "cosmos-sdk/InterchainAccountPacketData";
   value: InterchainAccountPacketDataAmino;
 }
-/** InterchainAccountPacketData is comprised of a raw transaction, type of transaction and optional memo field. */
-export interface InterchainAccountPacketDataSDKType {
-  type: Type;
-  data: Uint8Array;
-  memo: string;
-}
 /** CosmosTx contains a list of sdk.Msg's. It should be used when sending transactions to an SDK host chain. */
 export interface CosmosTx {
   messages: Any[];
@@ -82,10 +75,6 @@ export interface CosmosTxAminoMsg {
   type: "cosmos-sdk/CosmosTx";
   value: CosmosTxAmino;
 }
-/** CosmosTx contains a list of sdk.Msg's. It should be used when sending transactions to an SDK host chain. */
-export interface CosmosTxSDKType {
-  messages: AnySDKType[];
-}
 function createBaseInterchainAccountPacketData(): InterchainAccountPacketData {
   return {
     type: 0,
@@ -95,6 +84,7 @@ function createBaseInterchainAccountPacketData(): InterchainAccountPacketData {
 }
 export const InterchainAccountPacketData = {
   typeUrl: "/ibc.applications.interchain_accounts.v1.InterchainAccountPacketData",
+  aminoType: "cosmos-sdk/InterchainAccountPacketData",
   encode(message: InterchainAccountPacketData, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.type !== 0) {
       writer.uint32(8).int32(message.type);
@@ -130,7 +120,7 @@ export const InterchainAccountPacketData = {
     }
     return message;
   },
-  fromPartial(object: Partial<InterchainAccountPacketData>): InterchainAccountPacketData {
+  fromPartial(object: DeepPartial<InterchainAccountPacketData>): InterchainAccountPacketData {
     const message = createBaseInterchainAccountPacketData();
     message.type = object.type ?? 0;
     message.data = object.data ?? new Uint8Array();
@@ -186,6 +176,7 @@ function createBaseCosmosTx(): CosmosTx {
 }
 export const CosmosTx = {
   typeUrl: "/ibc.applications.interchain_accounts.v1.CosmosTx",
+  aminoType: "cosmos-sdk/CosmosTx",
   encode(message: CosmosTx, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.messages) {
       Any.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -209,7 +200,7 @@ export const CosmosTx = {
     }
     return message;
   },
-  fromPartial(object: Partial<CosmosTx>): CosmosTx {
+  fromPartial(object: DeepPartial<CosmosTx>): CosmosTx {
     const message = createBaseCosmosTx();
     message.messages = object.messages?.map(e => Any.fromPartial(e)) || [];
     return message;

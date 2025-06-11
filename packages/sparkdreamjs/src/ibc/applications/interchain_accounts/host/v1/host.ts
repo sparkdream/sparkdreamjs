@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../../helpers";
 /**
  * Params defines the set of on-chain interchain accounts parameters.
  * The following parameters may be used to disable the host submodule.
@@ -28,14 +28,6 @@ export interface ParamsAmino {
 export interface ParamsAminoMsg {
   type: "cosmos-sdk/Params";
   value: ParamsAmino;
-}
-/**
- * Params defines the set of on-chain interchain accounts parameters.
- * The following parameters may be used to disable the host submodule.
- */
-export interface ParamsSDKType {
-  host_enabled: boolean;
-  allow_messages: string[];
 }
 /**
  * QueryRequest defines the parameters for a particular query request
@@ -77,14 +69,6 @@ export interface QueryRequestAminoMsg {
   type: "cosmos-sdk/QueryRequest";
   value: QueryRequestAmino;
 }
-/**
- * QueryRequest defines the parameters for a particular query request
- * by an interchain account.
- */
-export interface QueryRequestSDKType {
-  path: string;
-  data: Uint8Array;
-}
 function createBaseParams(): Params {
   return {
     hostEnabled: false,
@@ -93,6 +77,7 @@ function createBaseParams(): Params {
 }
 export const Params = {
   typeUrl: "/ibc.applications.interchain_accounts.host.v1.Params",
+  aminoType: "cosmos-sdk/Params",
   encode(message: Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.hostEnabled === true) {
       writer.uint32(8).bool(message.hostEnabled);
@@ -122,7 +107,7 @@ export const Params = {
     }
     return message;
   },
-  fromPartial(object: Partial<Params>): Params {
+  fromPartial(object: DeepPartial<Params>): Params {
     const message = createBaseParams();
     message.hostEnabled = object.hostEnabled ?? false;
     message.allowMessages = object.allowMessages?.map(e => e) || [];
@@ -176,6 +161,7 @@ function createBaseQueryRequest(): QueryRequest {
 }
 export const QueryRequest = {
   typeUrl: "/ibc.applications.interchain_accounts.host.v1.QueryRequest",
+  aminoType: "cosmos-sdk/QueryRequest",
   encode(message: QueryRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.path !== "") {
       writer.uint32(10).string(message.path);
@@ -205,7 +191,7 @@ export const QueryRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryRequest>): QueryRequest {
+  fromPartial(object: DeepPartial<QueryRequest>): QueryRequest {
     const message = createBaseQueryRequest();
     message.path = object.path ?? "";
     message.data = object.data ?? new Uint8Array();

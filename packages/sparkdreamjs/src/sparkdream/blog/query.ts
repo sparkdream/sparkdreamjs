@@ -1,8 +1,9 @@
 //@ts-nocheck
-import { PageRequest, PageRequestAmino, PageRequestSDKType, PageResponse, PageResponseAmino, PageResponseSDKType } from "../../cosmos/base/query/v1beta1/pagination";
-import { Params, ParamsAmino, ParamsSDKType } from "./params";
-import { Post, PostAmino, PostSDKType } from "./post";
+import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "../../cosmos/base/query/v1beta1/pagination";
+import { Params, ParamsAmino } from "./params";
+import { Post, PostAmino } from "./post";
 import { BinaryReader, BinaryWriter } from "../../binary";
+import { DeepPartial } from "../../helpers";
 /** QueryParamsRequest is request type for the Query/Params RPC method. */
 export interface QueryParamsRequest {}
 export interface QueryParamsRequestProtoMsg {
@@ -15,8 +16,6 @@ export interface QueryParamsRequestAminoMsg {
   type: "/sparkdream.blog.QueryParamsRequest";
   value: QueryParamsRequestAmino;
 }
-/** QueryParamsRequest is request type for the Query/Params RPC method. */
-export interface QueryParamsRequestSDKType {}
 /** QueryParamsResponse is response type for the Query/Params RPC method. */
 export interface QueryParamsResponse {
   /** params holds all the parameters of this module. */
@@ -35,10 +34,6 @@ export interface QueryParamsResponseAminoMsg {
   type: "/sparkdream.blog.QueryParamsResponse";
   value: QueryParamsResponseAmino;
 }
-/** QueryParamsResponse is response type for the Query/Params RPC method. */
-export interface QueryParamsResponseSDKType {
-  params: ParamsSDKType;
-}
 export interface QueryShowPostRequest {
   id: bigint;
 }
@@ -52,9 +47,6 @@ export interface QueryShowPostRequestAmino {
 export interface QueryShowPostRequestAminoMsg {
   type: "/sparkdream.blog.QueryShowPostRequest";
   value: QueryShowPostRequestAmino;
-}
-export interface QueryShowPostRequestSDKType {
-  id: bigint;
 }
 export interface QueryShowPostResponse {
   post: Post;
@@ -70,9 +62,6 @@ export interface QueryShowPostResponseAminoMsg {
   type: "/sparkdream.blog.QueryShowPostResponse";
   value: QueryShowPostResponseAmino;
 }
-export interface QueryShowPostResponseSDKType {
-  post: PostSDKType;
-}
 export interface QueryListPostRequest {
   pagination?: PageRequest;
 }
@@ -86,9 +75,6 @@ export interface QueryListPostRequestAmino {
 export interface QueryListPostRequestAminoMsg {
   type: "/sparkdream.blog.QueryListPostRequest";
   value: QueryListPostRequestAmino;
-}
-export interface QueryListPostRequestSDKType {
-  pagination?: PageRequestSDKType;
 }
 export interface QueryListPostResponse {
   post: Post[];
@@ -105,10 +91,6 @@ export interface QueryListPostResponseAmino {
 export interface QueryListPostResponseAminoMsg {
   type: "/sparkdream.blog.QueryListPostResponse";
   value: QueryListPostResponseAmino;
-}
-export interface QueryListPostResponseSDKType {
-  post: PostSDKType[];
-  pagination?: PageResponseSDKType;
 }
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
@@ -132,7 +114,7 @@ export const QueryParamsRequest = {
     }
     return message;
   },
-  fromPartial(_: Partial<QueryParamsRequest>): QueryParamsRequest {
+  fromPartial(_: DeepPartial<QueryParamsRequest>): QueryParamsRequest {
     const message = createBaseQueryParamsRequest();
     return message;
   },
@@ -190,7 +172,7 @@ export const QueryParamsResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryParamsResponse>): QueryParamsResponse {
+  fromPartial(object: DeepPartial<QueryParamsResponse>): QueryParamsResponse {
     const message = createBaseQueryParamsResponse();
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
     return message;
@@ -253,7 +235,7 @@ export const QueryShowPostRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryShowPostRequest>): QueryShowPostRequest {
+  fromPartial(object: DeepPartial<QueryShowPostRequest>): QueryShowPostRequest {
     const message = createBaseQueryShowPostRequest();
     message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
     return message;
@@ -316,7 +298,7 @@ export const QueryShowPostResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryShowPostResponse>): QueryShowPostResponse {
+  fromPartial(object: DeepPartial<QueryShowPostResponse>): QueryShowPostResponse {
     const message = createBaseQueryShowPostResponse();
     message.post = object.post !== undefined && object.post !== null ? Post.fromPartial(object.post) : undefined;
     return message;
@@ -379,7 +361,7 @@ export const QueryListPostRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryListPostRequest>): QueryListPostRequest {
+  fromPartial(object: DeepPartial<QueryListPostRequest>): QueryListPostRequest {
     const message = createBaseQueryListPostRequest();
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
     return message;
@@ -449,7 +431,7 @@ export const QueryListPostResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryListPostResponse>): QueryListPostResponse {
+  fromPartial(object: DeepPartial<QueryListPostResponse>): QueryListPostResponse {
     const message = createBaseQueryListPostResponse();
     message.post = object.post?.map(e => Post.fromPartial(e)) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;

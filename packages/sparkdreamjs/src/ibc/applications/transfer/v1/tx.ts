@@ -1,7 +1,8 @@
 //@ts-nocheck
-import { Coin, CoinAmino, CoinSDKType } from "../../../../cosmos/base/v1beta1/coin";
-import { Height, HeightAmino, HeightSDKType, Params, ParamsAmino, ParamsSDKType } from "../../../core/client/v1/client";
+import { Coin, CoinAmino } from "../../../../cosmos/base/v1beta1/coin";
+import { Height, HeightAmino, Params, ParamsAmino } from "../../../core/client/v1/client";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /**
  * MsgTransfer defines a msg to transfer fungible tokens (i.e Coins) between
  * ICS20 enabled chains. See ICS Spec here:
@@ -76,22 +77,6 @@ export interface MsgTransferAminoMsg {
   type: "cosmos-sdk/MsgTransfer";
   value: MsgTransferAmino;
 }
-/**
- * MsgTransfer defines a msg to transfer fungible tokens (i.e Coins) between
- * ICS20 enabled chains. See ICS Spec here:
- * https://github.com/cosmos/ibc/tree/master/spec/app/ics-020-fungible-token-transfer#data-structures
- */
-export interface MsgTransferSDKType {
-  source_port: string;
-  source_channel: string;
-  token: CoinSDKType;
-  sender: string;
-  receiver: string;
-  timeout_height: HeightSDKType;
-  timeout_timestamp: bigint;
-  memo: string;
-  encoding: string;
-}
 /** MsgTransferResponse defines the Msg/Transfer response type. */
 export interface MsgTransferResponse {
   /** sequence number of the transfer packet sent */
@@ -109,10 +94,6 @@ export interface MsgTransferResponseAmino {
 export interface MsgTransferResponseAminoMsg {
   type: "cosmos-sdk/MsgTransferResponse";
   value: MsgTransferResponseAmino;
-}
-/** MsgTransferResponse defines the Msg/Transfer response type. */
-export interface MsgTransferResponseSDKType {
-  sequence: bigint;
 }
 /** MsgUpdateParams is the Msg/UpdateParams request type. */
 export interface MsgUpdateParams {
@@ -144,11 +125,6 @@ export interface MsgUpdateParamsAminoMsg {
   type: "cosmos-sdk/MsgUpdateParams";
   value: MsgUpdateParamsAmino;
 }
-/** MsgUpdateParams is the Msg/UpdateParams request type. */
-export interface MsgUpdateParamsSDKType {
-  signer: string;
-  params: ParamsSDKType;
-}
 /**
  * MsgUpdateParamsResponse defines the response structure for executing a
  * MsgUpdateParams message.
@@ -167,11 +143,6 @@ export interface MsgUpdateParamsResponseAminoMsg {
   type: "cosmos-sdk/MsgUpdateParamsResponse";
   value: MsgUpdateParamsResponseAmino;
 }
-/**
- * MsgUpdateParamsResponse defines the response structure for executing a
- * MsgUpdateParams message.
- */
-export interface MsgUpdateParamsResponseSDKType {}
 function createBaseMsgTransfer(): MsgTransfer {
   return {
     sourcePort: "",
@@ -187,6 +158,7 @@ function createBaseMsgTransfer(): MsgTransfer {
 }
 export const MsgTransfer = {
   typeUrl: "/ibc.applications.transfer.v1.MsgTransfer",
+  aminoType: "cosmos-sdk/MsgTransfer",
   encode(message: MsgTransfer, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sourcePort !== "") {
       writer.uint32(10).string(message.sourcePort);
@@ -258,7 +230,7 @@ export const MsgTransfer = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgTransfer>): MsgTransfer {
+  fromPartial(object: DeepPartial<MsgTransfer>): MsgTransfer {
     const message = createBaseMsgTransfer();
     message.sourcePort = object.sourcePort ?? "";
     message.sourceChannel = object.sourceChannel ?? "";
@@ -344,6 +316,7 @@ function createBaseMsgTransferResponse(): MsgTransferResponse {
 }
 export const MsgTransferResponse = {
   typeUrl: "/ibc.applications.transfer.v1.MsgTransferResponse",
+  aminoType: "cosmos-sdk/MsgTransferResponse",
   encode(message: MsgTransferResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sequence !== BigInt(0)) {
       writer.uint32(8).uint64(message.sequence);
@@ -367,7 +340,7 @@ export const MsgTransferResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgTransferResponse>): MsgTransferResponse {
+  fromPartial(object: DeepPartial<MsgTransferResponse>): MsgTransferResponse {
     const message = createBaseMsgTransferResponse();
     message.sequence = object.sequence !== undefined && object.sequence !== null ? BigInt(object.sequence.toString()) : BigInt(0);
     return message;
@@ -414,6 +387,7 @@ function createBaseMsgUpdateParams(): MsgUpdateParams {
 }
 export const MsgUpdateParams = {
   typeUrl: "/ibc.applications.transfer.v1.MsgUpdateParams",
+  aminoType: "cosmos-sdk/MsgUpdateParams",
   encode(message: MsgUpdateParams, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.signer !== "") {
       writer.uint32(10).string(message.signer);
@@ -443,7 +417,7 @@ export const MsgUpdateParams = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpdateParams>): MsgUpdateParams {
+  fromPartial(object: DeepPartial<MsgUpdateParams>): MsgUpdateParams {
     const message = createBaseMsgUpdateParams();
     message.signer = object.signer ?? "";
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
@@ -492,6 +466,7 @@ function createBaseMsgUpdateParamsResponse(): MsgUpdateParamsResponse {
 }
 export const MsgUpdateParamsResponse = {
   typeUrl: "/ibc.applications.transfer.v1.MsgUpdateParamsResponse",
+  aminoType: "cosmos-sdk/MsgUpdateParamsResponse",
   encode(_: MsgUpdateParamsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -509,7 +484,7 @@ export const MsgUpdateParamsResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
+  fromPartial(_: DeepPartial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
     const message = createBaseMsgUpdateParamsResponse();
     return message;
   },

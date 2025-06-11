@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /** Module is the config object of the consensus module. */
 export interface Module {
   /** authority defines the custom module authority. If not set, defaults to the governance module. */
@@ -18,10 +19,6 @@ export interface ModuleAminoMsg {
   type: "cosmos-sdk/Module";
   value: ModuleAmino;
 }
-/** Module is the config object of the consensus module. */
-export interface ModuleSDKType {
-  authority: string;
-}
 function createBaseModule(): Module {
   return {
     authority: ""
@@ -29,6 +26,7 @@ function createBaseModule(): Module {
 }
 export const Module = {
   typeUrl: "/cosmos.protocolpool.module.v1.Module",
+  aminoType: "cosmos-sdk/Module",
   encode(message: Module, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -52,7 +50,7 @@ export const Module = {
     }
     return message;
   },
-  fromPartial(object: Partial<Module>): Module {
+  fromPartial(object: DeepPartial<Module>): Module {
     const message = createBaseModule();
     message.authority = object.authority ?? "";
     return message;

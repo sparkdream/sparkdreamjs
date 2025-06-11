@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { LCDClient } from "@cosmology/lcd";
-import { ConfigRequest, ConfigResponseSDKType, StatusRequest, StatusResponseSDKType } from "./query";
+import { ConfigRequest, ConfigResponse, StatusRequest, StatusResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -9,17 +9,15 @@ export class LCDQueryClient {
     requestClient: LCDClient;
   }) {
     this.req = requestClient;
-    this.config = this.config.bind(this);
-    this.status = this.status.bind(this);
   }
   /* Config queries for the operator configuration. */
-  async config(_params: ConfigRequest = {}): Promise<ConfigResponseSDKType> {
+  config = async (_params: ConfigRequest = {}): Promise<ConfigResponse> => {
     const endpoint = `cosmos/base/node/v1beta1/config`;
-    return await this.req.get<ConfigResponseSDKType>(endpoint);
-  }
+    return await this.req.get<ConfigResponse>(endpoint);
+  };
   /* Status queries for the node status. */
-  async status(_params: StatusRequest = {}): Promise<StatusResponseSDKType> {
+  status = async (_params: StatusRequest = {}): Promise<StatusResponse> => {
     const endpoint = `cosmos/base/node/v1beta1/status`;
-    return await this.req.get<StatusResponseSDKType>(endpoint);
-  }
+    return await this.req.get<StatusResponse>(endpoint);
+  };
 }

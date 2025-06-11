@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { LCDClient } from "@cosmology/lcd";
-import { QueryCounterpartyInfoRequest, QueryCounterpartyInfoResponseSDKType, QueryConfigRequest, QueryConfigResponseSDKType } from "./query";
+import { QueryCounterpartyInfoRequest, QueryCounterpartyInfoResponse, QueryConfigRequest, QueryConfigResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -9,17 +9,15 @@ export class LCDQueryClient {
     requestClient: LCDClient;
   }) {
     this.req = requestClient;
-    this.counterpartyInfo = this.counterpartyInfo.bind(this);
-    this.config = this.config.bind(this);
   }
   /* CounterpartyInfo queries an IBC light counter party info. */
-  async counterpartyInfo(params: QueryCounterpartyInfoRequest): Promise<QueryCounterpartyInfoResponseSDKType> {
+  counterpartyInfo = async (params: QueryCounterpartyInfoRequest): Promise<QueryCounterpartyInfoResponse> => {
     const endpoint = `ibc/core/client/v2/counterparty_info/${params.clientId}`;
-    return await this.req.get<QueryCounterpartyInfoResponseSDKType>(endpoint);
-  }
+    return await this.req.get<QueryCounterpartyInfoResponse>(endpoint);
+  };
   /* Config queries the IBC client v2 configuration for a given client. */
-  async config(params: QueryConfigRequest): Promise<QueryConfigResponseSDKType> {
+  config = async (params: QueryConfigRequest): Promise<QueryConfigResponse> => {
     const endpoint = `ibc/core/client/v2/config/${params.clientId}`;
-    return await this.req.get<QueryConfigResponseSDKType>(endpoint);
-  }
+    return await this.req.get<QueryConfigResponse>(endpoint);
+  };
 }

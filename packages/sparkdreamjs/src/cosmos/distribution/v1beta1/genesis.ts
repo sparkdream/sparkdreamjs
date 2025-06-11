@@ -1,7 +1,8 @@
 //@ts-nocheck
-import { DecCoin, DecCoinAmino, DecCoinSDKType } from "../../base/v1beta1/coin";
-import { ValidatorAccumulatedCommission, ValidatorAccumulatedCommissionAmino, ValidatorAccumulatedCommissionSDKType, ValidatorHistoricalRewards, ValidatorHistoricalRewardsAmino, ValidatorHistoricalRewardsSDKType, ValidatorCurrentRewards, ValidatorCurrentRewardsAmino, ValidatorCurrentRewardsSDKType, DelegatorStartingInfo, DelegatorStartingInfoAmino, DelegatorStartingInfoSDKType, ValidatorSlashEvent, ValidatorSlashEventAmino, ValidatorSlashEventSDKType, Params, ParamsAmino, ParamsSDKType, FeePool, FeePoolAmino, FeePoolSDKType } from "./distribution";
+import { DecCoin, DecCoinAmino } from "../../base/v1beta1/coin";
+import { ValidatorAccumulatedCommission, ValidatorAccumulatedCommissionAmino, ValidatorHistoricalRewards, ValidatorHistoricalRewardsAmino, ValidatorCurrentRewards, ValidatorCurrentRewardsAmino, DelegatorStartingInfo, DelegatorStartingInfoAmino, ValidatorSlashEvent, ValidatorSlashEventAmino, Params, ParamsAmino, FeePool, FeePoolAmino } from "./distribution";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /**
  * DelegatorWithdrawInfo is the address for where distributions rewards are
  * withdrawn to by default this struct is only used at genesis to feed in
@@ -32,15 +33,6 @@ export interface DelegatorWithdrawInfoAminoMsg {
   type: "cosmos-sdk/DelegatorWithdrawInfo";
   value: DelegatorWithdrawInfoAmino;
 }
-/**
- * DelegatorWithdrawInfo is the address for where distributions rewards are
- * withdrawn to by default this struct is only used at genesis to feed in
- * default withdraw addresses.
- */
-export interface DelegatorWithdrawInfoSDKType {
-  delegator_address: string;
-  withdraw_address: string;
-}
 /** ValidatorOutstandingRewardsRecord is used for import/export via genesis json. */
 export interface ValidatorOutstandingRewardsRecord {
   /** validator_address is the address of the validator. */
@@ -62,11 +54,6 @@ export interface ValidatorOutstandingRewardsRecordAmino {
 export interface ValidatorOutstandingRewardsRecordAminoMsg {
   type: "cosmos-sdk/ValidatorOutstandingRewardsRecord";
   value: ValidatorOutstandingRewardsRecordAmino;
-}
-/** ValidatorOutstandingRewardsRecord is used for import/export via genesis json. */
-export interface ValidatorOutstandingRewardsRecordSDKType {
-  validator_address: string;
-  outstanding_rewards: DecCoinSDKType[];
 }
 /**
  * ValidatorAccumulatedCommissionRecord is used for import / export via genesis
@@ -95,14 +82,6 @@ export interface ValidatorAccumulatedCommissionRecordAmino {
 export interface ValidatorAccumulatedCommissionRecordAminoMsg {
   type: "cosmos-sdk/ValidatorAccumulatedCommissionRecord";
   value: ValidatorAccumulatedCommissionRecordAmino;
-}
-/**
- * ValidatorAccumulatedCommissionRecord is used for import / export via genesis
- * json.
- */
-export interface ValidatorAccumulatedCommissionRecordSDKType {
-  validator_address: string;
-  accumulated: ValidatorAccumulatedCommissionSDKType;
 }
 /**
  * ValidatorHistoricalRewardsRecord is used for import / export via genesis
@@ -136,15 +115,6 @@ export interface ValidatorHistoricalRewardsRecordAminoMsg {
   type: "cosmos-sdk/ValidatorHistoricalRewardsRecord";
   value: ValidatorHistoricalRewardsRecordAmino;
 }
-/**
- * ValidatorHistoricalRewardsRecord is used for import / export via genesis
- * json.
- */
-export interface ValidatorHistoricalRewardsRecordSDKType {
-  validator_address: string;
-  period: bigint;
-  rewards: ValidatorHistoricalRewardsSDKType;
-}
 /** ValidatorCurrentRewardsRecord is used for import / export via genesis json. */
 export interface ValidatorCurrentRewardsRecord {
   /** validator_address is the address of the validator. */
@@ -166,11 +136,6 @@ export interface ValidatorCurrentRewardsRecordAmino {
 export interface ValidatorCurrentRewardsRecordAminoMsg {
   type: "cosmos-sdk/ValidatorCurrentRewardsRecord";
   value: ValidatorCurrentRewardsRecordAmino;
-}
-/** ValidatorCurrentRewardsRecord is used for import / export via genesis json. */
-export interface ValidatorCurrentRewardsRecordSDKType {
-  validator_address: string;
-  rewards: ValidatorCurrentRewardsSDKType;
 }
 /** DelegatorStartingInfoRecord used for import / export via genesis json. */
 export interface DelegatorStartingInfoRecord {
@@ -197,12 +162,6 @@ export interface DelegatorStartingInfoRecordAmino {
 export interface DelegatorStartingInfoRecordAminoMsg {
   type: "cosmos-sdk/DelegatorStartingInfoRecord";
   value: DelegatorStartingInfoRecordAmino;
-}
-/** DelegatorStartingInfoRecord used for import / export via genesis json. */
-export interface DelegatorStartingInfoRecordSDKType {
-  delegator_address: string;
-  validator_address: string;
-  starting_info: DelegatorStartingInfoSDKType;
 }
 /** ValidatorSlashEventRecord is used for import / export via genesis json. */
 export interface ValidatorSlashEventRecord {
@@ -233,13 +192,6 @@ export interface ValidatorSlashEventRecordAmino {
 export interface ValidatorSlashEventRecordAminoMsg {
   type: "cosmos-sdk/ValidatorSlashEventRecord";
   value: ValidatorSlashEventRecordAmino;
-}
-/** ValidatorSlashEventRecord is used for import / export via genesis json. */
-export interface ValidatorSlashEventRecordSDKType {
-  validator_address: string;
-  height: bigint;
-  period: bigint;
-  validator_slash_event: ValidatorSlashEventSDKType;
 }
 /** GenesisState defines the distribution module's genesis state. */
 export interface GenesisState {
@@ -295,19 +247,6 @@ export interface GenesisStateAminoMsg {
   type: "cosmos-sdk/GenesisState";
   value: GenesisStateAmino;
 }
-/** GenesisState defines the distribution module's genesis state. */
-export interface GenesisStateSDKType {
-  params: ParamsSDKType;
-  fee_pool: FeePoolSDKType;
-  delegator_withdraw_infos: DelegatorWithdrawInfoSDKType[];
-  previous_proposer: string;
-  outstanding_rewards: ValidatorOutstandingRewardsRecordSDKType[];
-  validator_accumulated_commissions: ValidatorAccumulatedCommissionRecordSDKType[];
-  validator_historical_rewards: ValidatorHistoricalRewardsRecordSDKType[];
-  validator_current_rewards: ValidatorCurrentRewardsRecordSDKType[];
-  delegator_starting_infos: DelegatorStartingInfoRecordSDKType[];
-  validator_slash_events: ValidatorSlashEventRecordSDKType[];
-}
 function createBaseDelegatorWithdrawInfo(): DelegatorWithdrawInfo {
   return {
     delegatorAddress: "",
@@ -316,6 +255,7 @@ function createBaseDelegatorWithdrawInfo(): DelegatorWithdrawInfo {
 }
 export const DelegatorWithdrawInfo = {
   typeUrl: "/cosmos.distribution.v1beta1.DelegatorWithdrawInfo",
+  aminoType: "cosmos-sdk/DelegatorWithdrawInfo",
   encode(message: DelegatorWithdrawInfo, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.delegatorAddress !== "") {
       writer.uint32(10).string(message.delegatorAddress);
@@ -345,7 +285,7 @@ export const DelegatorWithdrawInfo = {
     }
     return message;
   },
-  fromPartial(object: Partial<DelegatorWithdrawInfo>): DelegatorWithdrawInfo {
+  fromPartial(object: DeepPartial<DelegatorWithdrawInfo>): DelegatorWithdrawInfo {
     const message = createBaseDelegatorWithdrawInfo();
     message.delegatorAddress = object.delegatorAddress ?? "";
     message.withdrawAddress = object.withdrawAddress ?? "";
@@ -397,6 +337,7 @@ function createBaseValidatorOutstandingRewardsRecord(): ValidatorOutstandingRewa
 }
 export const ValidatorOutstandingRewardsRecord = {
   typeUrl: "/cosmos.distribution.v1beta1.ValidatorOutstandingRewardsRecord",
+  aminoType: "cosmos-sdk/ValidatorOutstandingRewardsRecord",
   encode(message: ValidatorOutstandingRewardsRecord, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.validatorAddress !== "") {
       writer.uint32(10).string(message.validatorAddress);
@@ -426,7 +367,7 @@ export const ValidatorOutstandingRewardsRecord = {
     }
     return message;
   },
-  fromPartial(object: Partial<ValidatorOutstandingRewardsRecord>): ValidatorOutstandingRewardsRecord {
+  fromPartial(object: DeepPartial<ValidatorOutstandingRewardsRecord>): ValidatorOutstandingRewardsRecord {
     const message = createBaseValidatorOutstandingRewardsRecord();
     message.validatorAddress = object.validatorAddress ?? "";
     message.outstandingRewards = object.outstandingRewards?.map(e => DecCoin.fromPartial(e)) || [];
@@ -480,6 +421,7 @@ function createBaseValidatorAccumulatedCommissionRecord(): ValidatorAccumulatedC
 }
 export const ValidatorAccumulatedCommissionRecord = {
   typeUrl: "/cosmos.distribution.v1beta1.ValidatorAccumulatedCommissionRecord",
+  aminoType: "cosmos-sdk/ValidatorAccumulatedCommissionRecord",
   encode(message: ValidatorAccumulatedCommissionRecord, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.validatorAddress !== "") {
       writer.uint32(10).string(message.validatorAddress);
@@ -509,7 +451,7 @@ export const ValidatorAccumulatedCommissionRecord = {
     }
     return message;
   },
-  fromPartial(object: Partial<ValidatorAccumulatedCommissionRecord>): ValidatorAccumulatedCommissionRecord {
+  fromPartial(object: DeepPartial<ValidatorAccumulatedCommissionRecord>): ValidatorAccumulatedCommissionRecord {
     const message = createBaseValidatorAccumulatedCommissionRecord();
     message.validatorAddress = object.validatorAddress ?? "";
     message.accumulated = object.accumulated !== undefined && object.accumulated !== null ? ValidatorAccumulatedCommission.fromPartial(object.accumulated) : undefined;
@@ -562,6 +504,7 @@ function createBaseValidatorHistoricalRewardsRecord(): ValidatorHistoricalReward
 }
 export const ValidatorHistoricalRewardsRecord = {
   typeUrl: "/cosmos.distribution.v1beta1.ValidatorHistoricalRewardsRecord",
+  aminoType: "cosmos-sdk/ValidatorHistoricalRewardsRecord",
   encode(message: ValidatorHistoricalRewardsRecord, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.validatorAddress !== "") {
       writer.uint32(10).string(message.validatorAddress);
@@ -597,7 +540,7 @@ export const ValidatorHistoricalRewardsRecord = {
     }
     return message;
   },
-  fromPartial(object: Partial<ValidatorHistoricalRewardsRecord>): ValidatorHistoricalRewardsRecord {
+  fromPartial(object: DeepPartial<ValidatorHistoricalRewardsRecord>): ValidatorHistoricalRewardsRecord {
     const message = createBaseValidatorHistoricalRewardsRecord();
     message.validatorAddress = object.validatorAddress ?? "";
     message.period = object.period !== undefined && object.period !== null ? BigInt(object.period.toString()) : BigInt(0);
@@ -654,6 +597,7 @@ function createBaseValidatorCurrentRewardsRecord(): ValidatorCurrentRewardsRecor
 }
 export const ValidatorCurrentRewardsRecord = {
   typeUrl: "/cosmos.distribution.v1beta1.ValidatorCurrentRewardsRecord",
+  aminoType: "cosmos-sdk/ValidatorCurrentRewardsRecord",
   encode(message: ValidatorCurrentRewardsRecord, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.validatorAddress !== "") {
       writer.uint32(10).string(message.validatorAddress);
@@ -683,7 +627,7 @@ export const ValidatorCurrentRewardsRecord = {
     }
     return message;
   },
-  fromPartial(object: Partial<ValidatorCurrentRewardsRecord>): ValidatorCurrentRewardsRecord {
+  fromPartial(object: DeepPartial<ValidatorCurrentRewardsRecord>): ValidatorCurrentRewardsRecord {
     const message = createBaseValidatorCurrentRewardsRecord();
     message.validatorAddress = object.validatorAddress ?? "";
     message.rewards = object.rewards !== undefined && object.rewards !== null ? ValidatorCurrentRewards.fromPartial(object.rewards) : undefined;
@@ -736,6 +680,7 @@ function createBaseDelegatorStartingInfoRecord(): DelegatorStartingInfoRecord {
 }
 export const DelegatorStartingInfoRecord = {
   typeUrl: "/cosmos.distribution.v1beta1.DelegatorStartingInfoRecord",
+  aminoType: "cosmos-sdk/DelegatorStartingInfoRecord",
   encode(message: DelegatorStartingInfoRecord, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.delegatorAddress !== "") {
       writer.uint32(10).string(message.delegatorAddress);
@@ -771,7 +716,7 @@ export const DelegatorStartingInfoRecord = {
     }
     return message;
   },
-  fromPartial(object: Partial<DelegatorStartingInfoRecord>): DelegatorStartingInfoRecord {
+  fromPartial(object: DeepPartial<DelegatorStartingInfoRecord>): DelegatorStartingInfoRecord {
     const message = createBaseDelegatorStartingInfoRecord();
     message.delegatorAddress = object.delegatorAddress ?? "";
     message.validatorAddress = object.validatorAddress ?? "";
@@ -830,6 +775,7 @@ function createBaseValidatorSlashEventRecord(): ValidatorSlashEventRecord {
 }
 export const ValidatorSlashEventRecord = {
   typeUrl: "/cosmos.distribution.v1beta1.ValidatorSlashEventRecord",
+  aminoType: "cosmos-sdk/ValidatorSlashEventRecord",
   encode(message: ValidatorSlashEventRecord, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.validatorAddress !== "") {
       writer.uint32(10).string(message.validatorAddress);
@@ -871,7 +817,7 @@ export const ValidatorSlashEventRecord = {
     }
     return message;
   },
-  fromPartial(object: Partial<ValidatorSlashEventRecord>): ValidatorSlashEventRecord {
+  fromPartial(object: DeepPartial<ValidatorSlashEventRecord>): ValidatorSlashEventRecord {
     const message = createBaseValidatorSlashEventRecord();
     message.validatorAddress = object.validatorAddress ?? "";
     message.height = object.height !== undefined && object.height !== null ? BigInt(object.height.toString()) : BigInt(0);
@@ -941,6 +887,7 @@ function createBaseGenesisState(): GenesisState {
 }
 export const GenesisState = {
   typeUrl: "/cosmos.distribution.v1beta1.GenesisState",
+  aminoType: "cosmos-sdk/GenesisState",
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -1018,7 +965,7 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisState>): GenesisState {
+  fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = createBaseGenesisState();
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
     message.feePool = object.feePool !== undefined && object.feePool !== null ? FeePool.fromPartial(object.feePool) : undefined;

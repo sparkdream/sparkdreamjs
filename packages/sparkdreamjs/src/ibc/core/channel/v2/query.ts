@@ -1,9 +1,9 @@
 //@ts-nocheck
-import { PageRequest, PageRequestAmino, PageRequestSDKType, PageResponse, PageResponseAmino, PageResponseSDKType } from "../../../../cosmos/base/query/v1beta1/pagination";
-import { Height, HeightAmino, HeightSDKType } from "../../client/v1/client";
-import { PacketState, PacketStateAmino, PacketStateSDKType } from "./genesis";
+import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "../../../../cosmos/base/query/v1beta1/pagination";
+import { Height, HeightAmino } from "../../client/v1/client";
+import { PacketState, PacketStateAmino } from "./genesis";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /** QueryNextSequenceSendRequest is the request type for the Query/QueryNextSequenceSend RPC method */
 export interface QueryNextSequenceSendRequest {
   /** client unique identifier */
@@ -21,10 +21,6 @@ export interface QueryNextSequenceSendRequestAmino {
 export interface QueryNextSequenceSendRequestAminoMsg {
   type: "cosmos-sdk/QueryNextSequenceSendRequest";
   value: QueryNextSequenceSendRequestAmino;
-}
-/** QueryNextSequenceSendRequest is the request type for the Query/QueryNextSequenceSend RPC method */
-export interface QueryNextSequenceSendRequestSDKType {
-  client_id: string;
 }
 /** QueryNextSequenceSendResponse is the response type for the Query/QueryNextSequenceSend RPC method */
 export interface QueryNextSequenceSendResponse {
@@ -52,12 +48,6 @@ export interface QueryNextSequenceSendResponseAminoMsg {
   type: "cosmos-sdk/QueryNextSequenceSendResponse";
   value: QueryNextSequenceSendResponseAmino;
 }
-/** QueryNextSequenceSendResponse is the response type for the Query/QueryNextSequenceSend RPC method */
-export interface QueryNextSequenceSendResponseSDKType {
-  next_sequence_send: bigint;
-  proof: Uint8Array;
-  proof_height: HeightSDKType;
-}
 /** QueryPacketCommitmentRequest is the request type for the Query/PacketCommitment RPC method. */
 export interface QueryPacketCommitmentRequest {
   /** client unique identifier */
@@ -79,11 +69,6 @@ export interface QueryPacketCommitmentRequestAmino {
 export interface QueryPacketCommitmentRequestAminoMsg {
   type: "cosmos-sdk/QueryPacketCommitmentRequest";
   value: QueryPacketCommitmentRequestAmino;
-}
-/** QueryPacketCommitmentRequest is the request type for the Query/PacketCommitment RPC method. */
-export interface QueryPacketCommitmentRequestSDKType {
-  client_id: string;
-  sequence: bigint;
 }
 /** QueryPacketCommitmentResponse is the response type for the Query/PacketCommitment RPC method. */
 export interface QueryPacketCommitmentResponse {
@@ -111,12 +96,6 @@ export interface QueryPacketCommitmentResponseAminoMsg {
   type: "cosmos-sdk/QueryPacketCommitmentResponse";
   value: QueryPacketCommitmentResponseAmino;
 }
-/** QueryPacketCommitmentResponse is the response type for the Query/PacketCommitment RPC method. */
-export interface QueryPacketCommitmentResponseSDKType {
-  commitment: Uint8Array;
-  proof: Uint8Array;
-  proof_height: HeightSDKType;
-}
 /** QueryPacketCommitmentsRequest is the request type for the Query/PacketCommitments RPC method. */
 export interface QueryPacketCommitmentsRequest {
   /** client unique identifier */
@@ -138,11 +117,6 @@ export interface QueryPacketCommitmentsRequestAmino {
 export interface QueryPacketCommitmentsRequestAminoMsg {
   type: "cosmos-sdk/QueryPacketCommitmentsRequest";
   value: QueryPacketCommitmentsRequestAmino;
-}
-/** QueryPacketCommitmentsRequest is the request type for the Query/PacketCommitments RPC method. */
-export interface QueryPacketCommitmentsRequestSDKType {
-  client_id: string;
-  pagination?: PageRequestSDKType;
 }
 /** QueryPacketCommitmentResponse is the response type for the Query/PacketCommitment RPC method. */
 export interface QueryPacketCommitmentsResponse {
@@ -170,12 +144,6 @@ export interface QueryPacketCommitmentsResponseAminoMsg {
   type: "cosmos-sdk/QueryPacketCommitmentsResponse";
   value: QueryPacketCommitmentsResponseAmino;
 }
-/** QueryPacketCommitmentResponse is the response type for the Query/PacketCommitment RPC method. */
-export interface QueryPacketCommitmentsResponseSDKType {
-  commitments: PacketStateSDKType[];
-  pagination?: PageResponseSDKType;
-  height: HeightSDKType;
-}
 /** QueryPacketAcknowledgementRequest is the request type for the Query/PacketAcknowledgement RPC method. */
 export interface QueryPacketAcknowledgementRequest {
   /** client unique identifier */
@@ -197,11 +165,6 @@ export interface QueryPacketAcknowledgementRequestAmino {
 export interface QueryPacketAcknowledgementRequestAminoMsg {
   type: "cosmos-sdk/QueryPacketAcknowledgementRequest";
   value: QueryPacketAcknowledgementRequestAmino;
-}
-/** QueryPacketAcknowledgementRequest is the request type for the Query/PacketAcknowledgement RPC method. */
-export interface QueryPacketAcknowledgementRequestSDKType {
-  client_id: string;
-  sequence: bigint;
 }
 /** QueryPacketAcknowledgementResponse is the response type for the Query/PacketAcknowledgement RPC method. */
 export interface QueryPacketAcknowledgementResponse {
@@ -228,12 +191,6 @@ export interface QueryPacketAcknowledgementResponseAmino {
 export interface QueryPacketAcknowledgementResponseAminoMsg {
   type: "cosmos-sdk/QueryPacketAcknowledgementResponse";
   value: QueryPacketAcknowledgementResponseAmino;
-}
-/** QueryPacketAcknowledgementResponse is the response type for the Query/PacketAcknowledgement RPC method. */
-export interface QueryPacketAcknowledgementResponseSDKType {
-  acknowledgement: Uint8Array;
-  proof: Uint8Array;
-  proof_height: HeightSDKType;
 }
 /**
  * QueryPacketAcknowledgementsRequest is the request type for the
@@ -268,15 +225,6 @@ export interface QueryPacketAcknowledgementsRequestAminoMsg {
   value: QueryPacketAcknowledgementsRequestAmino;
 }
 /**
- * QueryPacketAcknowledgementsRequest is the request type for the
- * Query/QueryPacketCommitments RPC method
- */
-export interface QueryPacketAcknowledgementsRequestSDKType {
-  client_id: string;
-  pagination?: PageRequestSDKType;
-  packet_commitment_sequences: bigint[];
-}
-/**
  * QueryPacketAcknowledgemetsResponse is the request type for the
  * Query/QueryPacketAcknowledgements RPC method
  */
@@ -306,15 +254,6 @@ export interface QueryPacketAcknowledgementsResponseAminoMsg {
   type: "cosmos-sdk/QueryPacketAcknowledgementsResponse";
   value: QueryPacketAcknowledgementsResponseAmino;
 }
-/**
- * QueryPacketAcknowledgemetsResponse is the request type for the
- * Query/QueryPacketAcknowledgements RPC method
- */
-export interface QueryPacketAcknowledgementsResponseSDKType {
-  acknowledgements: PacketStateSDKType[];
-  pagination?: PageResponseSDKType;
-  height: HeightSDKType;
-}
 /** QueryPacketReceiptRequest is the request type for the Query/PacketReceipt RPC method. */
 export interface QueryPacketReceiptRequest {
   /** client unique identifier */
@@ -336,11 +275,6 @@ export interface QueryPacketReceiptRequestAmino {
 export interface QueryPacketReceiptRequestAminoMsg {
   type: "cosmos-sdk/QueryPacketReceiptRequest";
   value: QueryPacketReceiptRequestAmino;
-}
-/** QueryPacketReceiptRequest is the request type for the Query/PacketReceipt RPC method. */
-export interface QueryPacketReceiptRequestSDKType {
-  client_id: string;
-  sequence: bigint;
 }
 /** QueryPacketReceiptResponse is the response type for the Query/PacketReceipt RPC method. */
 export interface QueryPacketReceiptResponse {
@@ -368,12 +302,6 @@ export interface QueryPacketReceiptResponseAminoMsg {
   type: "cosmos-sdk/QueryPacketReceiptResponse";
   value: QueryPacketReceiptResponseAmino;
 }
-/** QueryPacketReceiptResponse is the response type for the Query/PacketReceipt RPC method. */
-export interface QueryPacketReceiptResponseSDKType {
-  received: boolean;
-  proof: Uint8Array;
-  proof_height: HeightSDKType;
-}
 /** QueryUnreceivedPacketsRequest is the request type for the Query/UnreceivedPackets RPC method */
 export interface QueryUnreceivedPacketsRequest {
   /** client unique identifier */
@@ -396,11 +324,6 @@ export interface QueryUnreceivedPacketsRequestAminoMsg {
   type: "cosmos-sdk/QueryUnreceivedPacketsRequest";
   value: QueryUnreceivedPacketsRequestAmino;
 }
-/** QueryUnreceivedPacketsRequest is the request type for the Query/UnreceivedPackets RPC method */
-export interface QueryUnreceivedPacketsRequestSDKType {
-  client_id: string;
-  sequences: bigint[];
-}
 /** QueryUnreceivedPacketsResponse is the response type for the Query/UnreceivedPacketCommitments RPC method */
 export interface QueryUnreceivedPacketsResponse {
   /** list of unreceived packet sequences */
@@ -422,11 +345,6 @@ export interface QueryUnreceivedPacketsResponseAmino {
 export interface QueryUnreceivedPacketsResponseAminoMsg {
   type: "cosmos-sdk/QueryUnreceivedPacketsResponse";
   value: QueryUnreceivedPacketsResponseAmino;
-}
-/** QueryUnreceivedPacketsResponse is the response type for the Query/UnreceivedPacketCommitments RPC method */
-export interface QueryUnreceivedPacketsResponseSDKType {
-  sequences: bigint[];
-  height: HeightSDKType;
 }
 /**
  * QueryUnreceivedAcks is the request type for the
@@ -457,14 +375,6 @@ export interface QueryUnreceivedAcksRequestAminoMsg {
   value: QueryUnreceivedAcksRequestAmino;
 }
 /**
- * QueryUnreceivedAcks is the request type for the
- * Query/UnreceivedAcks RPC method
- */
-export interface QueryUnreceivedAcksRequestSDKType {
-  client_id: string;
-  packet_ack_sequences: bigint[];
-}
-/**
  * QueryUnreceivedAcksResponse is the response type for the
  * Query/UnreceivedAcks RPC method
  */
@@ -492,14 +402,6 @@ export interface QueryUnreceivedAcksResponseAminoMsg {
   type: "cosmos-sdk/QueryUnreceivedAcksResponse";
   value: QueryUnreceivedAcksResponseAmino;
 }
-/**
- * QueryUnreceivedAcksResponse is the response type for the
- * Query/UnreceivedAcks RPC method
- */
-export interface QueryUnreceivedAcksResponseSDKType {
-  sequences: bigint[];
-  height: HeightSDKType;
-}
 function createBaseQueryNextSequenceSendRequest(): QueryNextSequenceSendRequest {
   return {
     clientId: ""
@@ -507,6 +409,7 @@ function createBaseQueryNextSequenceSendRequest(): QueryNextSequenceSendRequest 
 }
 export const QueryNextSequenceSendRequest = {
   typeUrl: "/ibc.core.channel.v2.QueryNextSequenceSendRequest",
+  aminoType: "cosmos-sdk/QueryNextSequenceSendRequest",
   encode(message: QueryNextSequenceSendRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -530,7 +433,7 @@ export const QueryNextSequenceSendRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryNextSequenceSendRequest>): QueryNextSequenceSendRequest {
+  fromPartial(object: DeepPartial<QueryNextSequenceSendRequest>): QueryNextSequenceSendRequest {
     const message = createBaseQueryNextSequenceSendRequest();
     message.clientId = object.clientId ?? "";
     return message;
@@ -578,6 +481,7 @@ function createBaseQueryNextSequenceSendResponse(): QueryNextSequenceSendRespons
 }
 export const QueryNextSequenceSendResponse = {
   typeUrl: "/ibc.core.channel.v2.QueryNextSequenceSendResponse",
+  aminoType: "cosmos-sdk/QueryNextSequenceSendResponse",
   encode(message: QueryNextSequenceSendResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.nextSequenceSend !== BigInt(0)) {
       writer.uint32(8).uint64(message.nextSequenceSend);
@@ -613,7 +517,7 @@ export const QueryNextSequenceSendResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryNextSequenceSendResponse>): QueryNextSequenceSendResponse {
+  fromPartial(object: DeepPartial<QueryNextSequenceSendResponse>): QueryNextSequenceSendResponse {
     const message = createBaseQueryNextSequenceSendResponse();
     message.nextSequenceSend = object.nextSequenceSend !== undefined && object.nextSequenceSend !== null ? BigInt(object.nextSequenceSend.toString()) : BigInt(0);
     message.proof = object.proof ?? new Uint8Array();
@@ -670,6 +574,7 @@ function createBaseQueryPacketCommitmentRequest(): QueryPacketCommitmentRequest 
 }
 export const QueryPacketCommitmentRequest = {
   typeUrl: "/ibc.core.channel.v2.QueryPacketCommitmentRequest",
+  aminoType: "cosmos-sdk/QueryPacketCommitmentRequest",
   encode(message: QueryPacketCommitmentRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -699,7 +604,7 @@ export const QueryPacketCommitmentRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryPacketCommitmentRequest>): QueryPacketCommitmentRequest {
+  fromPartial(object: DeepPartial<QueryPacketCommitmentRequest>): QueryPacketCommitmentRequest {
     const message = createBaseQueryPacketCommitmentRequest();
     message.clientId = object.clientId ?? "";
     message.sequence = object.sequence !== undefined && object.sequence !== null ? BigInt(object.sequence.toString()) : BigInt(0);
@@ -752,6 +657,7 @@ function createBaseQueryPacketCommitmentResponse(): QueryPacketCommitmentRespons
 }
 export const QueryPacketCommitmentResponse = {
   typeUrl: "/ibc.core.channel.v2.QueryPacketCommitmentResponse",
+  aminoType: "cosmos-sdk/QueryPacketCommitmentResponse",
   encode(message: QueryPacketCommitmentResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.commitment.length !== 0) {
       writer.uint32(10).bytes(message.commitment);
@@ -787,7 +693,7 @@ export const QueryPacketCommitmentResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryPacketCommitmentResponse>): QueryPacketCommitmentResponse {
+  fromPartial(object: DeepPartial<QueryPacketCommitmentResponse>): QueryPacketCommitmentResponse {
     const message = createBaseQueryPacketCommitmentResponse();
     message.commitment = object.commitment ?? new Uint8Array();
     message.proof = object.proof ?? new Uint8Array();
@@ -844,6 +750,7 @@ function createBaseQueryPacketCommitmentsRequest(): QueryPacketCommitmentsReques
 }
 export const QueryPacketCommitmentsRequest = {
   typeUrl: "/ibc.core.channel.v2.QueryPacketCommitmentsRequest",
+  aminoType: "cosmos-sdk/QueryPacketCommitmentsRequest",
   encode(message: QueryPacketCommitmentsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -873,7 +780,7 @@ export const QueryPacketCommitmentsRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryPacketCommitmentsRequest>): QueryPacketCommitmentsRequest {
+  fromPartial(object: DeepPartial<QueryPacketCommitmentsRequest>): QueryPacketCommitmentsRequest {
     const message = createBaseQueryPacketCommitmentsRequest();
     message.clientId = object.clientId ?? "";
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
@@ -926,6 +833,7 @@ function createBaseQueryPacketCommitmentsResponse(): QueryPacketCommitmentsRespo
 }
 export const QueryPacketCommitmentsResponse = {
   typeUrl: "/ibc.core.channel.v2.QueryPacketCommitmentsResponse",
+  aminoType: "cosmos-sdk/QueryPacketCommitmentsResponse",
   encode(message: QueryPacketCommitmentsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.commitments) {
       PacketState.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -961,7 +869,7 @@ export const QueryPacketCommitmentsResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryPacketCommitmentsResponse>): QueryPacketCommitmentsResponse {
+  fromPartial(object: DeepPartial<QueryPacketCommitmentsResponse>): QueryPacketCommitmentsResponse {
     const message = createBaseQueryPacketCommitmentsResponse();
     message.commitments = object.commitments?.map(e => PacketState.fromPartial(e)) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
@@ -1020,6 +928,7 @@ function createBaseQueryPacketAcknowledgementRequest(): QueryPacketAcknowledgeme
 }
 export const QueryPacketAcknowledgementRequest = {
   typeUrl: "/ibc.core.channel.v2.QueryPacketAcknowledgementRequest",
+  aminoType: "cosmos-sdk/QueryPacketAcknowledgementRequest",
   encode(message: QueryPacketAcknowledgementRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -1049,7 +958,7 @@ export const QueryPacketAcknowledgementRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryPacketAcknowledgementRequest>): QueryPacketAcknowledgementRequest {
+  fromPartial(object: DeepPartial<QueryPacketAcknowledgementRequest>): QueryPacketAcknowledgementRequest {
     const message = createBaseQueryPacketAcknowledgementRequest();
     message.clientId = object.clientId ?? "";
     message.sequence = object.sequence !== undefined && object.sequence !== null ? BigInt(object.sequence.toString()) : BigInt(0);
@@ -1102,6 +1011,7 @@ function createBaseQueryPacketAcknowledgementResponse(): QueryPacketAcknowledgem
 }
 export const QueryPacketAcknowledgementResponse = {
   typeUrl: "/ibc.core.channel.v2.QueryPacketAcknowledgementResponse",
+  aminoType: "cosmos-sdk/QueryPacketAcknowledgementResponse",
   encode(message: QueryPacketAcknowledgementResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.acknowledgement.length !== 0) {
       writer.uint32(10).bytes(message.acknowledgement);
@@ -1137,7 +1047,7 @@ export const QueryPacketAcknowledgementResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryPacketAcknowledgementResponse>): QueryPacketAcknowledgementResponse {
+  fromPartial(object: DeepPartial<QueryPacketAcknowledgementResponse>): QueryPacketAcknowledgementResponse {
     const message = createBaseQueryPacketAcknowledgementResponse();
     message.acknowledgement = object.acknowledgement ?? new Uint8Array();
     message.proof = object.proof ?? new Uint8Array();
@@ -1195,6 +1105,7 @@ function createBaseQueryPacketAcknowledgementsRequest(): QueryPacketAcknowledgem
 }
 export const QueryPacketAcknowledgementsRequest = {
   typeUrl: "/ibc.core.channel.v2.QueryPacketAcknowledgementsRequest",
+  aminoType: "cosmos-sdk/QueryPacketAcknowledgementsRequest",
   encode(message: QueryPacketAcknowledgementsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -1239,7 +1150,7 @@ export const QueryPacketAcknowledgementsRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryPacketAcknowledgementsRequest>): QueryPacketAcknowledgementsRequest {
+  fromPartial(object: DeepPartial<QueryPacketAcknowledgementsRequest>): QueryPacketAcknowledgementsRequest {
     const message = createBaseQueryPacketAcknowledgementsRequest();
     message.clientId = object.clientId ?? "";
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
@@ -1299,6 +1210,7 @@ function createBaseQueryPacketAcknowledgementsResponse(): QueryPacketAcknowledge
 }
 export const QueryPacketAcknowledgementsResponse = {
   typeUrl: "/ibc.core.channel.v2.QueryPacketAcknowledgementsResponse",
+  aminoType: "cosmos-sdk/QueryPacketAcknowledgementsResponse",
   encode(message: QueryPacketAcknowledgementsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.acknowledgements) {
       PacketState.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -1334,7 +1246,7 @@ export const QueryPacketAcknowledgementsResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryPacketAcknowledgementsResponse>): QueryPacketAcknowledgementsResponse {
+  fromPartial(object: DeepPartial<QueryPacketAcknowledgementsResponse>): QueryPacketAcknowledgementsResponse {
     const message = createBaseQueryPacketAcknowledgementsResponse();
     message.acknowledgements = object.acknowledgements?.map(e => PacketState.fromPartial(e)) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
@@ -1393,6 +1305,7 @@ function createBaseQueryPacketReceiptRequest(): QueryPacketReceiptRequest {
 }
 export const QueryPacketReceiptRequest = {
   typeUrl: "/ibc.core.channel.v2.QueryPacketReceiptRequest",
+  aminoType: "cosmos-sdk/QueryPacketReceiptRequest",
   encode(message: QueryPacketReceiptRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -1422,7 +1335,7 @@ export const QueryPacketReceiptRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryPacketReceiptRequest>): QueryPacketReceiptRequest {
+  fromPartial(object: DeepPartial<QueryPacketReceiptRequest>): QueryPacketReceiptRequest {
     const message = createBaseQueryPacketReceiptRequest();
     message.clientId = object.clientId ?? "";
     message.sequence = object.sequence !== undefined && object.sequence !== null ? BigInt(object.sequence.toString()) : BigInt(0);
@@ -1475,6 +1388,7 @@ function createBaseQueryPacketReceiptResponse(): QueryPacketReceiptResponse {
 }
 export const QueryPacketReceiptResponse = {
   typeUrl: "/ibc.core.channel.v2.QueryPacketReceiptResponse",
+  aminoType: "cosmos-sdk/QueryPacketReceiptResponse",
   encode(message: QueryPacketReceiptResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.received === true) {
       writer.uint32(16).bool(message.received);
@@ -1510,7 +1424,7 @@ export const QueryPacketReceiptResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryPacketReceiptResponse>): QueryPacketReceiptResponse {
+  fromPartial(object: DeepPartial<QueryPacketReceiptResponse>): QueryPacketReceiptResponse {
     const message = createBaseQueryPacketReceiptResponse();
     message.received = object.received ?? false;
     message.proof = object.proof ?? new Uint8Array();
@@ -1567,6 +1481,7 @@ function createBaseQueryUnreceivedPacketsRequest(): QueryUnreceivedPacketsReques
 }
 export const QueryUnreceivedPacketsRequest = {
   typeUrl: "/ibc.core.channel.v2.QueryUnreceivedPacketsRequest",
+  aminoType: "cosmos-sdk/QueryUnreceivedPacketsRequest",
   encode(message: QueryUnreceivedPacketsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -1605,7 +1520,7 @@ export const QueryUnreceivedPacketsRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryUnreceivedPacketsRequest>): QueryUnreceivedPacketsRequest {
+  fromPartial(object: DeepPartial<QueryUnreceivedPacketsRequest>): QueryUnreceivedPacketsRequest {
     const message = createBaseQueryUnreceivedPacketsRequest();
     message.clientId = object.clientId ?? "";
     message.sequences = object.sequences?.map(e => BigInt(e.toString())) || [];
@@ -1659,6 +1574,7 @@ function createBaseQueryUnreceivedPacketsResponse(): QueryUnreceivedPacketsRespo
 }
 export const QueryUnreceivedPacketsResponse = {
   typeUrl: "/ibc.core.channel.v2.QueryUnreceivedPacketsResponse",
+  aminoType: "cosmos-sdk/QueryUnreceivedPacketsResponse",
   encode(message: QueryUnreceivedPacketsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     writer.uint32(10).fork();
     for (const v of message.sequences) {
@@ -1697,7 +1613,7 @@ export const QueryUnreceivedPacketsResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryUnreceivedPacketsResponse>): QueryUnreceivedPacketsResponse {
+  fromPartial(object: DeepPartial<QueryUnreceivedPacketsResponse>): QueryUnreceivedPacketsResponse {
     const message = createBaseQueryUnreceivedPacketsResponse();
     message.sequences = object.sequences?.map(e => BigInt(e.toString())) || [];
     message.height = object.height !== undefined && object.height !== null ? Height.fromPartial(object.height) : undefined;
@@ -1751,6 +1667,7 @@ function createBaseQueryUnreceivedAcksRequest(): QueryUnreceivedAcksRequest {
 }
 export const QueryUnreceivedAcksRequest = {
   typeUrl: "/ibc.core.channel.v2.QueryUnreceivedAcksRequest",
+  aminoType: "cosmos-sdk/QueryUnreceivedAcksRequest",
   encode(message: QueryUnreceivedAcksRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -1789,7 +1706,7 @@ export const QueryUnreceivedAcksRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryUnreceivedAcksRequest>): QueryUnreceivedAcksRequest {
+  fromPartial(object: DeepPartial<QueryUnreceivedAcksRequest>): QueryUnreceivedAcksRequest {
     const message = createBaseQueryUnreceivedAcksRequest();
     message.clientId = object.clientId ?? "";
     message.packetAckSequences = object.packetAckSequences?.map(e => BigInt(e.toString())) || [];
@@ -1843,6 +1760,7 @@ function createBaseQueryUnreceivedAcksResponse(): QueryUnreceivedAcksResponse {
 }
 export const QueryUnreceivedAcksResponse = {
   typeUrl: "/ibc.core.channel.v2.QueryUnreceivedAcksResponse",
+  aminoType: "cosmos-sdk/QueryUnreceivedAcksResponse",
   encode(message: QueryUnreceivedAcksResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     writer.uint32(10).fork();
     for (const v of message.sequences) {
@@ -1881,7 +1799,7 @@ export const QueryUnreceivedAcksResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryUnreceivedAcksResponse>): QueryUnreceivedAcksResponse {
+  fromPartial(object: DeepPartial<QueryUnreceivedAcksResponse>): QueryUnreceivedAcksResponse {
     const message = createBaseQueryUnreceivedAcksResponse();
     message.sequences = object.sequences?.map(e => BigInt(e.toString())) || [];
     message.height = object.height !== undefined && object.height !== null ? Height.fromPartial(object.height) : undefined;

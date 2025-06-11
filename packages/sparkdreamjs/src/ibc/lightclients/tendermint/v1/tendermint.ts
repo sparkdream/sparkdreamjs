@@ -1,13 +1,13 @@
 //@ts-nocheck
-import { Duration, DurationAmino, DurationSDKType } from "../../../../google/protobuf/duration";
-import { Height, HeightAmino, HeightSDKType } from "../../../core/client/v1/client";
-import { ProofSpec, ProofSpecAmino, ProofSpecSDKType } from "../../../../cosmos/ics23/v1/proofs";
+import { Duration, DurationAmino } from "../../../../google/protobuf/duration";
+import { Height, HeightAmino } from "../../../core/client/v1/client";
+import { ProofSpec, ProofSpecAmino } from "../../../../cosmos/ics23/v1/proofs";
 import { Timestamp } from "../../../../google/protobuf/timestamp";
-import { MerkleRoot, MerkleRootAmino, MerkleRootSDKType } from "../../../core/commitment/v1/commitment";
-import { SignedHeader, SignedHeaderAmino, SignedHeaderSDKType } from "../../../../tendermint/types/types";
-import { ValidatorSet, ValidatorSetAmino, ValidatorSetSDKType } from "../../../../tendermint/types/validator";
+import { MerkleRoot, MerkleRootAmino } from "../../../core/commitment/v1/commitment";
+import { SignedHeader, SignedHeaderAmino } from "../../../../tendermint/types/types";
+import { ValidatorSet, ValidatorSetAmino } from "../../../../tendermint/types/validator";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { toTimestamp, fromTimestamp, bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, toTimestamp, fromTimestamp, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /**
  * ClientState from Tendermint tracks the current validator set, latest height,
  * and a possible frozen height.
@@ -94,25 +94,6 @@ export interface ClientStateAminoMsg {
   type: "cosmos-sdk/ClientState";
   value: ClientStateAmino;
 }
-/**
- * ClientState from Tendermint tracks the current validator set, latest height,
- * and a possible frozen height.
- */
-export interface ClientStateSDKType {
-  chain_id: string;
-  trust_level: FractionSDKType;
-  trusting_period: DurationSDKType;
-  unbonding_period: DurationSDKType;
-  max_clock_drift: DurationSDKType;
-  frozen_height: HeightSDKType;
-  latest_height: HeightSDKType;
-  proof_specs: ProofSpecSDKType[];
-  upgrade_path: string[];
-  /** @deprecated */
-  allow_update_after_expiry: boolean;
-  /** @deprecated */
-  allow_update_after_misbehaviour: boolean;
-}
 /** ConsensusState defines the consensus state from Tendermint. */
 export interface ConsensusState {
   /**
@@ -143,12 +124,6 @@ export interface ConsensusStateAminoMsg {
   type: "cosmos-sdk/ConsensusState";
   value: ConsensusStateAmino;
 }
-/** ConsensusState defines the consensus state from Tendermint. */
-export interface ConsensusStateSDKType {
-  timestamp: Date;
-  root: MerkleRootSDKType;
-  next_validators_hash: Uint8Array;
-}
 /**
  * Misbehaviour is a wrapper over two conflicting Headers
  * that implements Misbehaviour interface expected by ICS-02
@@ -178,16 +153,6 @@ export interface MisbehaviourAmino {
 export interface MisbehaviourAminoMsg {
   type: "cosmos-sdk/Misbehaviour";
   value: MisbehaviourAmino;
-}
-/**
- * Misbehaviour is a wrapper over two conflicting Headers
- * that implements Misbehaviour interface expected by ICS-02
- */
-export interface MisbehaviourSDKType {
-  /** @deprecated */
-  client_id: string;
-  header_1?: HeaderSDKType;
-  header_2?: HeaderSDKType;
 }
 /**
  * Header defines the Tendermint client consensus Header.
@@ -238,26 +203,6 @@ export interface HeaderAminoMsg {
   value: HeaderAmino;
 }
 /**
- * Header defines the Tendermint client consensus Header.
- * It encapsulates all the information necessary to update from a trusted
- * Tendermint ConsensusState. The inclusion of TrustedHeight and
- * TrustedValidators allows this update to process correctly, so long as the
- * ConsensusState for the TrustedHeight exists, this removes race conditions
- * among relayers The SignedHeader and ValidatorSet are the new untrusted update
- * fields for the client. The TrustedHeight is the height of a stored
- * ConsensusState on the client that will be used to verify the new untrusted
- * header. The Trusted ConsensusState must be within the unbonding period of
- * current time in order to correctly verify, and the TrustedValidators must
- * hash to TrustedConsensusState.NextValidatorsHash since that is the last
- * trusted validator set at the TrustedHeight.
- */
-export interface HeaderSDKType {
-  signed_header?: SignedHeaderSDKType;
-  validator_set?: ValidatorSetSDKType;
-  trusted_height: HeightSDKType;
-  trusted_validators?: ValidatorSetSDKType;
-}
-/**
  * Fraction defines the protobuf message type for tmmath.Fraction that only
  * supports positive values.
  */
@@ -281,14 +226,6 @@ export interface FractionAminoMsg {
   type: "cosmos-sdk/Fraction";
   value: FractionAmino;
 }
-/**
- * Fraction defines the protobuf message type for tmmath.Fraction that only
- * supports positive values.
- */
-export interface FractionSDKType {
-  numerator: bigint;
-  denominator: bigint;
-}
 function createBaseClientState(): ClientState {
   return {
     chainId: "",
@@ -306,6 +243,7 @@ function createBaseClientState(): ClientState {
 }
 export const ClientState = {
   typeUrl: "/ibc.lightclients.tendermint.v1.ClientState",
+  aminoType: "cosmos-sdk/ClientState",
   encode(message: ClientState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.chainId !== "") {
       writer.uint32(10).string(message.chainId);
@@ -389,7 +327,7 @@ export const ClientState = {
     }
     return message;
   },
-  fromPartial(object: Partial<ClientState>): ClientState {
+  fromPartial(object: DeepPartial<ClientState>): ClientState {
     const message = createBaseClientState();
     message.chainId = object.chainId ?? "";
     message.trustLevel = object.trustLevel !== undefined && object.trustLevel !== null ? Fraction.fromPartial(object.trustLevel) : undefined;
@@ -491,6 +429,7 @@ function createBaseConsensusState(): ConsensusState {
 }
 export const ConsensusState = {
   typeUrl: "/ibc.lightclients.tendermint.v1.ConsensusState",
+  aminoType: "cosmos-sdk/ConsensusState",
   encode(message: ConsensusState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.timestamp !== undefined) {
       Timestamp.encode(toTimestamp(message.timestamp), writer.uint32(10).fork()).ldelim();
@@ -526,7 +465,7 @@ export const ConsensusState = {
     }
     return message;
   },
-  fromPartial(object: Partial<ConsensusState>): ConsensusState {
+  fromPartial(object: DeepPartial<ConsensusState>): ConsensusState {
     const message = createBaseConsensusState();
     message.timestamp = object.timestamp ?? undefined;
     message.root = object.root !== undefined && object.root !== null ? MerkleRoot.fromPartial(object.root) : undefined;
@@ -584,6 +523,7 @@ function createBaseMisbehaviour(): Misbehaviour {
 }
 export const Misbehaviour = {
   typeUrl: "/ibc.lightclients.tendermint.v1.Misbehaviour",
+  aminoType: "cosmos-sdk/Misbehaviour",
   encode(message: Misbehaviour, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -619,7 +559,7 @@ export const Misbehaviour = {
     }
     return message;
   },
-  fromPartial(object: Partial<Misbehaviour>): Misbehaviour {
+  fromPartial(object: DeepPartial<Misbehaviour>): Misbehaviour {
     const message = createBaseMisbehaviour();
     message.clientId = object.clientId ?? "";
     message.header1 = object.header1 !== undefined && object.header1 !== null ? Header.fromPartial(object.header1) : undefined;
@@ -678,6 +618,7 @@ function createBaseHeader(): Header {
 }
 export const Header = {
   typeUrl: "/ibc.lightclients.tendermint.v1.Header",
+  aminoType: "cosmos-sdk/Header",
   encode(message: Header, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.signedHeader !== undefined) {
       SignedHeader.encode(message.signedHeader, writer.uint32(10).fork()).ldelim();
@@ -719,7 +660,7 @@ export const Header = {
     }
     return message;
   },
-  fromPartial(object: Partial<Header>): Header {
+  fromPartial(object: DeepPartial<Header>): Header {
     const message = createBaseHeader();
     message.signedHeader = object.signedHeader !== undefined && object.signedHeader !== null ? SignedHeader.fromPartial(object.signedHeader) : undefined;
     message.validatorSet = object.validatorSet !== undefined && object.validatorSet !== null ? ValidatorSet.fromPartial(object.validatorSet) : undefined;
@@ -781,6 +722,7 @@ function createBaseFraction(): Fraction {
 }
 export const Fraction = {
   typeUrl: "/ibc.lightclients.tendermint.v1.Fraction",
+  aminoType: "cosmos-sdk/Fraction",
   encode(message: Fraction, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.numerator !== BigInt(0)) {
       writer.uint32(8).uint64(message.numerator);
@@ -810,7 +752,7 @@ export const Fraction = {
     }
     return message;
   },
-  fromPartial(object: Partial<Fraction>): Fraction {
+  fromPartial(object: DeepPartial<Fraction>): Fraction {
     const message = createBaseFraction();
     message.numerator = object.numerator !== undefined && object.numerator !== null ? BigInt(object.numerator.toString()) : BigInt(0);
     message.denominator = object.denominator !== undefined && object.denominator !== null ? BigInt(object.denominator.toString()) : BigInt(0);

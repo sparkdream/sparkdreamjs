@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { Params, ParamsAmino, ParamsSDKType } from "./params";
+import { Params, ParamsAmino } from "./params";
 import { BinaryReader, BinaryWriter } from "../../binary";
+import { DeepPartial } from "../../helpers";
 /** GenesisState defines the blog module's genesis state. */
 export interface GenesisState {
   /** params defines all the parameters of the module. */
@@ -18,10 +19,6 @@ export interface GenesisStateAmino {
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.blog.GenesisState";
   value: GenesisStateAmino;
-}
-/** GenesisState defines the blog module's genesis state. */
-export interface GenesisStateSDKType {
-  params: ParamsSDKType;
 }
 function createBaseGenesisState(): GenesisState {
   return {
@@ -53,7 +50,7 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisState>): GenesisState {
+  fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = createBaseGenesisState();
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
     return message;

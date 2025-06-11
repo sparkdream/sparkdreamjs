@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { GroupInfo, GroupInfoAmino, GroupInfoSDKType, GroupMember, GroupMemberAmino, GroupMemberSDKType, GroupPolicyInfo, GroupPolicyInfoAmino, GroupPolicyInfoSDKType, Proposal, ProposalAmino, ProposalSDKType, Vote, VoteAmino, VoteSDKType } from "./types";
+import { GroupInfo, GroupInfoAmino, GroupMember, GroupMemberAmino, GroupPolicyInfo, GroupPolicyInfoAmino, Proposal, ProposalAmino, Vote, VoteAmino } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** GenesisState defines the group module's genesis state. */
 export interface GenesisState {
   /**
@@ -65,17 +66,6 @@ export interface GenesisStateAminoMsg {
   type: "cosmos-sdk/GenesisState";
   value: GenesisStateAmino;
 }
-/** GenesisState defines the group module's genesis state. */
-export interface GenesisStateSDKType {
-  group_seq: bigint;
-  groups: GroupInfoSDKType[];
-  group_members: GroupMemberSDKType[];
-  group_policy_seq: bigint;
-  group_policies: GroupPolicyInfoSDKType[];
-  proposal_seq: bigint;
-  proposals: ProposalSDKType[];
-  votes: VoteSDKType[];
-}
 function createBaseGenesisState(): GenesisState {
   return {
     groupSeq: BigInt(0),
@@ -90,6 +80,7 @@ function createBaseGenesisState(): GenesisState {
 }
 export const GenesisState = {
   typeUrl: "/cosmos.group.v1.GenesisState",
+  aminoType: "cosmos-sdk/GenesisState",
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.groupSeq !== BigInt(0)) {
       writer.uint32(8).uint64(message.groupSeq);
@@ -155,7 +146,7 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisState>): GenesisState {
+  fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = createBaseGenesisState();
     message.groupSeq = object.groupSeq !== undefined && object.groupSeq !== null ? BigInt(object.groupSeq.toString()) : BigInt(0);
     message.groups = object.groups?.map(e => GroupInfo.fromPartial(e)) || [];

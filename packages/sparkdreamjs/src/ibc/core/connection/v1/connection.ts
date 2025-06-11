@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { MerklePrefix, MerklePrefixAmino, MerklePrefixSDKType } from "../../commitment/v1/commitment";
+import { MerklePrefix, MerklePrefixAmino } from "../../commitment/v1/commitment";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /**
  * State defines if a connection is in one of the following states:
  * INIT, TRYOPEN, OPEN or UNINITIALIZED.
@@ -19,7 +20,6 @@ export enum State {
   STATE_OPEN = 3,
   UNRECOGNIZED = -1,
 }
-export const StateSDKType = State;
 export const StateAmino = State;
 export function stateFromJSON(object: any): State {
   switch (object) {
@@ -115,19 +115,6 @@ export interface ConnectionEndAminoMsg {
   value: ConnectionEndAmino;
 }
 /**
- * ConnectionEnd defines a stateful object on a chain connected to another
- * separate one.
- * NOTE: there must only be 2 defined ConnectionEnds to establish
- * a connection between two chains.
- */
-export interface ConnectionEndSDKType {
-  client_id: string;
-  versions: VersionSDKType[];
-  state: State;
-  counterparty: CounterpartySDKType;
-  delay_period: bigint;
-}
-/**
  * IdentifiedConnection defines a connection with additional connection
  * identifier field.
  */
@@ -177,18 +164,6 @@ export interface IdentifiedConnectionAminoMsg {
   type: "cosmos-sdk/IdentifiedConnection";
   value: IdentifiedConnectionAmino;
 }
-/**
- * IdentifiedConnection defines a connection with additional connection
- * identifier field.
- */
-export interface IdentifiedConnectionSDKType {
-  id: string;
-  client_id: string;
-  versions: VersionSDKType[];
-  state: State;
-  counterparty: CounterpartySDKType;
-  delay_period: bigint;
-}
 /** Counterparty defines the counterparty chain associated with a connection end. */
 export interface Counterparty {
   /**
@@ -227,12 +202,6 @@ export interface CounterpartyAminoMsg {
   type: "cosmos-sdk/Counterparty";
   value: CounterpartyAmino;
 }
-/** Counterparty defines the counterparty chain associated with a connection end. */
-export interface CounterpartySDKType {
-  client_id: string;
-  connection_id: string;
-  prefix: MerklePrefixSDKType;
-}
 /** ClientPaths define all the connection paths for a client state. */
 export interface ClientPaths {
   /** list of connection paths */
@@ -250,10 +219,6 @@ export interface ClientPathsAmino {
 export interface ClientPathsAminoMsg {
   type: "cosmos-sdk/ClientPaths";
   value: ClientPathsAmino;
-}
-/** ClientPaths define all the connection paths for a client state. */
-export interface ClientPathsSDKType {
-  paths: string[];
 }
 /** ConnectionPaths define all the connection paths for a given client state. */
 export interface ConnectionPaths {
@@ -276,11 +241,6 @@ export interface ConnectionPathsAmino {
 export interface ConnectionPathsAminoMsg {
   type: "cosmos-sdk/ConnectionPaths";
   value: ConnectionPathsAmino;
-}
-/** ConnectionPaths define all the connection paths for a given client state. */
-export interface ConnectionPathsSDKType {
-  client_id: string;
-  paths: string[];
 }
 /**
  * Version defines the versioning scheme used to negotiate the IBC version in
@@ -310,14 +270,6 @@ export interface VersionAminoMsg {
   type: "cosmos-sdk/Version";
   value: VersionAmino;
 }
-/**
- * Version defines the versioning scheme used to negotiate the IBC version in
- * the connection handshake.
- */
-export interface VersionSDKType {
-  identifier: string;
-  features: string[];
-}
 /** Params defines the set of Connection parameters. */
 export interface Params {
   /**
@@ -344,10 +296,6 @@ export interface ParamsAminoMsg {
   type: "cosmos-sdk/Params";
   value: ParamsAmino;
 }
-/** Params defines the set of Connection parameters. */
-export interface ParamsSDKType {
-  max_expected_time_per_block: bigint;
-}
 function createBaseConnectionEnd(): ConnectionEnd {
   return {
     clientId: "",
@@ -359,6 +307,7 @@ function createBaseConnectionEnd(): ConnectionEnd {
 }
 export const ConnectionEnd = {
   typeUrl: "/ibc.core.connection.v1.ConnectionEnd",
+  aminoType: "cosmos-sdk/ConnectionEnd",
   encode(message: ConnectionEnd, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -406,7 +355,7 @@ export const ConnectionEnd = {
     }
     return message;
   },
-  fromPartial(object: Partial<ConnectionEnd>): ConnectionEnd {
+  fromPartial(object: DeepPartial<ConnectionEnd>): ConnectionEnd {
     const message = createBaseConnectionEnd();
     message.clientId = object.clientId ?? "";
     message.versions = object.versions?.map(e => Version.fromPartial(e)) || [];
@@ -479,6 +428,7 @@ function createBaseIdentifiedConnection(): IdentifiedConnection {
 }
 export const IdentifiedConnection = {
   typeUrl: "/ibc.core.connection.v1.IdentifiedConnection",
+  aminoType: "cosmos-sdk/IdentifiedConnection",
   encode(message: IdentifiedConnection, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
@@ -532,7 +482,7 @@ export const IdentifiedConnection = {
     }
     return message;
   },
-  fromPartial(object: Partial<IdentifiedConnection>): IdentifiedConnection {
+  fromPartial(object: DeepPartial<IdentifiedConnection>): IdentifiedConnection {
     const message = createBaseIdentifiedConnection();
     message.id = object.id ?? "";
     message.clientId = object.clientId ?? "";
@@ -607,6 +557,7 @@ function createBaseCounterparty(): Counterparty {
 }
 export const Counterparty = {
   typeUrl: "/ibc.core.connection.v1.Counterparty",
+  aminoType: "cosmos-sdk/Counterparty",
   encode(message: Counterparty, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -642,7 +593,7 @@ export const Counterparty = {
     }
     return message;
   },
-  fromPartial(object: Partial<Counterparty>): Counterparty {
+  fromPartial(object: DeepPartial<Counterparty>): Counterparty {
     const message = createBaseCounterparty();
     message.clientId = object.clientId ?? "";
     message.connectionId = object.connectionId ?? "";
@@ -698,6 +649,7 @@ function createBaseClientPaths(): ClientPaths {
 }
 export const ClientPaths = {
   typeUrl: "/ibc.core.connection.v1.ClientPaths",
+  aminoType: "cosmos-sdk/ClientPaths",
   encode(message: ClientPaths, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.paths) {
       writer.uint32(10).string(v!);
@@ -721,7 +673,7 @@ export const ClientPaths = {
     }
     return message;
   },
-  fromPartial(object: Partial<ClientPaths>): ClientPaths {
+  fromPartial(object: DeepPartial<ClientPaths>): ClientPaths {
     const message = createBaseClientPaths();
     message.paths = object.paths?.map(e => e) || [];
     return message;
@@ -770,6 +722,7 @@ function createBaseConnectionPaths(): ConnectionPaths {
 }
 export const ConnectionPaths = {
   typeUrl: "/ibc.core.connection.v1.ConnectionPaths",
+  aminoType: "cosmos-sdk/ConnectionPaths",
   encode(message: ConnectionPaths, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -799,7 +752,7 @@ export const ConnectionPaths = {
     }
     return message;
   },
-  fromPartial(object: Partial<ConnectionPaths>): ConnectionPaths {
+  fromPartial(object: DeepPartial<ConnectionPaths>): ConnectionPaths {
     const message = createBaseConnectionPaths();
     message.clientId = object.clientId ?? "";
     message.paths = object.paths?.map(e => e) || [];
@@ -853,6 +806,7 @@ function createBaseVersion(): Version {
 }
 export const Version = {
   typeUrl: "/ibc.core.connection.v1.Version",
+  aminoType: "cosmos-sdk/Version",
   encode(message: Version, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.identifier !== "") {
       writer.uint32(10).string(message.identifier);
@@ -882,7 +836,7 @@ export const Version = {
     }
     return message;
   },
-  fromPartial(object: Partial<Version>): Version {
+  fromPartial(object: DeepPartial<Version>): Version {
     const message = createBaseVersion();
     message.identifier = object.identifier ?? "";
     message.features = object.features?.map(e => e) || [];
@@ -935,6 +889,7 @@ function createBaseParams(): Params {
 }
 export const Params = {
   typeUrl: "/ibc.core.connection.v1.Params",
+  aminoType: "cosmos-sdk/Params",
   encode(message: Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.maxExpectedTimePerBlock !== BigInt(0)) {
       writer.uint32(8).uint64(message.maxExpectedTimePerBlock);
@@ -958,7 +913,7 @@ export const Params = {
     }
     return message;
   },
-  fromPartial(object: Partial<Params>): Params {
+  fromPartial(object: DeepPartial<Params>): Params {
     const message = createBaseParams();
     message.maxExpectedTimePerBlock = object.maxExpectedTimePerBlock !== undefined && object.maxExpectedTimePerBlock !== null ? BigInt(object.maxExpectedTimePerBlock.toString()) : BigInt(0);
     return message;

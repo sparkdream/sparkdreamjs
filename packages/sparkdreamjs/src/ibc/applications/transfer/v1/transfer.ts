@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /**
  * Params defines the set of IBC transfer parameters.
  * NOTE: To prevent a single token from being transferred, set the
@@ -44,16 +45,6 @@ export interface ParamsAminoMsg {
   type: "cosmos-sdk/Params";
   value: ParamsAmino;
 }
-/**
- * Params defines the set of IBC transfer parameters.
- * NOTE: To prevent a single token from being transferred, set the
- * TransfersEnabled parameter to true and then set the bank module's SendEnabled
- * parameter for the denomination to false.
- */
-export interface ParamsSDKType {
-  send_enabled: boolean;
-  receive_enabled: boolean;
-}
 function createBaseParams(): Params {
   return {
     sendEnabled: false,
@@ -62,6 +53,7 @@ function createBaseParams(): Params {
 }
 export const Params = {
   typeUrl: "/ibc.applications.transfer.v1.Params",
+  aminoType: "cosmos-sdk/Params",
   encode(message: Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sendEnabled === true) {
       writer.uint32(8).bool(message.sendEnabled);
@@ -91,7 +83,7 @@ export const Params = {
     }
     return message;
   },
-  fromPartial(object: Partial<Params>): Params {
+  fromPartial(object: DeepPartial<Params>): Params {
     const message = createBaseParams();
     message.sendEnabled = object.sendEnabled ?? false;
     message.receiveEnabled = object.receiveEnabled ?? false;

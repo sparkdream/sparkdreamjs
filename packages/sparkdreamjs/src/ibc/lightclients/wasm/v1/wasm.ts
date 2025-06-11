@@ -1,7 +1,7 @@
 //@ts-nocheck
-import { Height, HeightAmino, HeightSDKType } from "../../../core/client/v1/client";
+import { Height, HeightAmino } from "../../../core/client/v1/client";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /** Wasm light client's Client state */
 export interface ClientState {
   /**
@@ -30,12 +30,6 @@ export interface ClientStateAminoMsg {
   type: "cosmos-sdk/ClientState";
   value: ClientStateAmino;
 }
-/** Wasm light client's Client state */
-export interface ClientStateSDKType {
-  data: Uint8Array;
-  checksum: Uint8Array;
-  latest_height: HeightSDKType;
-}
 /** Wasm light client's ConsensusState */
 export interface ConsensusState {
   /**
@@ -60,10 +54,6 @@ export interface ConsensusStateAminoMsg {
   type: "cosmos-sdk/ConsensusState";
   value: ConsensusStateAmino;
 }
-/** Wasm light client's ConsensusState */
-export interface ConsensusStateSDKType {
-  data: Uint8Array;
-}
 /** Wasm light client message (either header(s) or misbehaviour) */
 export interface ClientMessage {
   data: Uint8Array;
@@ -79,10 +69,6 @@ export interface ClientMessageAmino {
 export interface ClientMessageAminoMsg {
   type: "cosmos-sdk/ClientMessage";
   value: ClientMessageAmino;
-}
-/** Wasm light client message (either header(s) or misbehaviour) */
-export interface ClientMessageSDKType {
-  data: Uint8Array;
 }
 /**
  * Checksums defines a list of all checksums that are stored
@@ -112,16 +98,6 @@ export interface ChecksumsAminoMsg {
   type: "cosmos-sdk/Checksums";
   value: ChecksumsAmino;
 }
-/**
- * Checksums defines a list of all checksums that are stored
- * 
- * Deprecated: This message is deprecated in favor of storing the checksums
- * using a Collections.KeySet.
- */
-/** @deprecated */
-export interface ChecksumsSDKType {
-  checksums: Uint8Array[];
-}
 function createBaseClientState(): ClientState {
   return {
     data: new Uint8Array(),
@@ -131,6 +107,7 @@ function createBaseClientState(): ClientState {
 }
 export const ClientState = {
   typeUrl: "/ibc.lightclients.wasm.v1.ClientState",
+  aminoType: "cosmos-sdk/ClientState",
   encode(message: ClientState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.data.length !== 0) {
       writer.uint32(10).bytes(message.data);
@@ -166,7 +143,7 @@ export const ClientState = {
     }
     return message;
   },
-  fromPartial(object: Partial<ClientState>): ClientState {
+  fromPartial(object: DeepPartial<ClientState>): ClientState {
     const message = createBaseClientState();
     message.data = object.data ?? new Uint8Array();
     message.checksum = object.checksum ?? new Uint8Array();
@@ -222,6 +199,7 @@ function createBaseConsensusState(): ConsensusState {
 }
 export const ConsensusState = {
   typeUrl: "/ibc.lightclients.wasm.v1.ConsensusState",
+  aminoType: "cosmos-sdk/ConsensusState",
   encode(message: ConsensusState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.data.length !== 0) {
       writer.uint32(10).bytes(message.data);
@@ -245,7 +223,7 @@ export const ConsensusState = {
     }
     return message;
   },
-  fromPartial(object: Partial<ConsensusState>): ConsensusState {
+  fromPartial(object: DeepPartial<ConsensusState>): ConsensusState {
     const message = createBaseConsensusState();
     message.data = object.data ?? new Uint8Array();
     return message;
@@ -291,6 +269,7 @@ function createBaseClientMessage(): ClientMessage {
 }
 export const ClientMessage = {
   typeUrl: "/ibc.lightclients.wasm.v1.ClientMessage",
+  aminoType: "cosmos-sdk/ClientMessage",
   encode(message: ClientMessage, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.data.length !== 0) {
       writer.uint32(10).bytes(message.data);
@@ -314,7 +293,7 @@ export const ClientMessage = {
     }
     return message;
   },
-  fromPartial(object: Partial<ClientMessage>): ClientMessage {
+  fromPartial(object: DeepPartial<ClientMessage>): ClientMessage {
     const message = createBaseClientMessage();
     message.data = object.data ?? new Uint8Array();
     return message;
@@ -360,6 +339,7 @@ function createBaseChecksums(): Checksums {
 }
 export const Checksums = {
   typeUrl: "/ibc.lightclients.wasm.v1.Checksums",
+  aminoType: "cosmos-sdk/Checksums",
   encode(message: Checksums, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.checksums) {
       writer.uint32(10).bytes(v!);
@@ -383,7 +363,7 @@ export const Checksums = {
     }
     return message;
   },
-  fromPartial(object: Partial<Checksums>): Checksums {
+  fromPartial(object: DeepPartial<Checksums>): Checksums {
     const message = createBaseChecksums();
     message.checksums = object.checksums?.map(e => e) || [];
     return message;

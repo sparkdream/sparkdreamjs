@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../binary";
+import { DeepPartial } from "../../helpers";
 export interface Post {
   title: string;
   body: string;
@@ -19,12 +20,6 @@ export interface PostAmino {
 export interface PostAminoMsg {
   type: "/sparkdream.blog.Post";
   value: PostAmino;
-}
-export interface PostSDKType {
-  title: string;
-  body: string;
-  creator: string;
-  id: bigint;
 }
 function createBasePost(): Post {
   return {
@@ -77,7 +72,7 @@ export const Post = {
     }
     return message;
   },
-  fromPartial(object: Partial<Post>): Post {
+  fromPartial(object: DeepPartial<Post>): Post {
     const message = createBasePost();
     message.title = object.title ?? "";
     message.body = object.body ?? "";

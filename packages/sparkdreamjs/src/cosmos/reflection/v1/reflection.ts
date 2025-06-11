@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { FileDescriptorProto, FileDescriptorProtoAmino, FileDescriptorProtoSDKType } from "../../../google/protobuf/descriptor";
+import { FileDescriptorProto, FileDescriptorProtoAmino } from "../../../google/protobuf/descriptor";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** FileDescriptorsRequest is the Query/FileDescriptors request type. */
 export interface FileDescriptorsRequest {}
 export interface FileDescriptorsRequestProtoMsg {
@@ -13,8 +14,6 @@ export interface FileDescriptorsRequestAminoMsg {
   type: "cosmos-sdk/FileDescriptorsRequest";
   value: FileDescriptorsRequestAmino;
 }
-/** FileDescriptorsRequest is the Query/FileDescriptors request type. */
-export interface FileDescriptorsRequestSDKType {}
 /** FileDescriptorsResponse is the Query/FileDescriptors response type. */
 export interface FileDescriptorsResponse {
   /** files is the file descriptors. */
@@ -33,15 +32,12 @@ export interface FileDescriptorsResponseAminoMsg {
   type: "cosmos-sdk/FileDescriptorsResponse";
   value: FileDescriptorsResponseAmino;
 }
-/** FileDescriptorsResponse is the Query/FileDescriptors response type. */
-export interface FileDescriptorsResponseSDKType {
-  files: FileDescriptorProtoSDKType[];
-}
 function createBaseFileDescriptorsRequest(): FileDescriptorsRequest {
   return {};
 }
 export const FileDescriptorsRequest = {
   typeUrl: "/cosmos.reflection.v1.FileDescriptorsRequest",
+  aminoType: "cosmos-sdk/FileDescriptorsRequest",
   encode(_: FileDescriptorsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -59,7 +55,7 @@ export const FileDescriptorsRequest = {
     }
     return message;
   },
-  fromPartial(_: Partial<FileDescriptorsRequest>): FileDescriptorsRequest {
+  fromPartial(_: DeepPartial<FileDescriptorsRequest>): FileDescriptorsRequest {
     const message = createBaseFileDescriptorsRequest();
     return message;
   },
@@ -100,6 +96,7 @@ function createBaseFileDescriptorsResponse(): FileDescriptorsResponse {
 }
 export const FileDescriptorsResponse = {
   typeUrl: "/cosmos.reflection.v1.FileDescriptorsResponse",
+  aminoType: "cosmos-sdk/FileDescriptorsResponse",
   encode(message: FileDescriptorsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.files) {
       FileDescriptorProto.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -123,7 +120,7 @@ export const FileDescriptorsResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<FileDescriptorsResponse>): FileDescriptorsResponse {
+  fromPartial(object: DeepPartial<FileDescriptorsResponse>): FileDescriptorsResponse {
     const message = createBaseFileDescriptorsResponse();
     message.files = object.files?.map(e => FileDescriptorProto.fromPartial(e)) || [];
     return message;

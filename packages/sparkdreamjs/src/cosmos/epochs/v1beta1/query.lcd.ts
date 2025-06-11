@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { LCDClient } from "@cosmology/lcd";
-import { QueryEpochInfosRequest, QueryEpochInfosResponseSDKType, QueryCurrentEpochRequest, QueryCurrentEpochResponseSDKType } from "./query";
+import { QueryEpochInfosRequest, QueryEpochInfosResponse, QueryCurrentEpochRequest, QueryCurrentEpochResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -9,16 +9,14 @@ export class LCDQueryClient {
     requestClient: LCDClient;
   }) {
     this.req = requestClient;
-    this.epochInfos = this.epochInfos.bind(this);
-    this.currentEpoch = this.currentEpoch.bind(this);
   }
   /* EpochInfos provide running epochInfos */
-  async epochInfos(_params: QueryEpochInfosRequest = {}): Promise<QueryEpochInfosResponseSDKType> {
+  epochInfos = async (_params: QueryEpochInfosRequest = {}): Promise<QueryEpochInfosResponse> => {
     const endpoint = `cosmos/epochs/v1beta1/epochs`;
-    return await this.req.get<QueryEpochInfosResponseSDKType>(endpoint);
-  }
+    return await this.req.get<QueryEpochInfosResponse>(endpoint);
+  };
   /* CurrentEpoch provide current epoch of specified identifier */
-  async currentEpoch(params: QueryCurrentEpochRequest): Promise<QueryCurrentEpochResponseSDKType> {
+  currentEpoch = async (params: QueryCurrentEpochRequest): Promise<QueryCurrentEpochResponse> => {
     const options: any = {
       params: {}
     };
@@ -26,6 +24,6 @@ export class LCDQueryClient {
       options.params.identifier = params.identifier;
     }
     const endpoint = `cosmos/epochs/v1beta1/current_epoch`;
-    return await this.req.get<QueryCurrentEpochResponseSDKType>(endpoint, options);
-  }
+    return await this.req.get<QueryCurrentEpochResponse>(endpoint, options);
+  };
 }

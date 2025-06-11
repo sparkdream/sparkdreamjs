@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /** Snapshot contains Tendermint state sync snapshot info. */
 export interface Snapshot {
   height: bigint;
@@ -25,14 +25,6 @@ export interface SnapshotAminoMsg {
   type: "cosmos-sdk/Snapshot";
   value: SnapshotAmino;
 }
-/** Snapshot contains Tendermint state sync snapshot info. */
-export interface SnapshotSDKType {
-  height: bigint;
-  format: number;
-  chunks: number;
-  hash: Uint8Array;
-  metadata: MetadataSDKType;
-}
 /** Metadata contains SDK-specific snapshot metadata. */
 export interface Metadata {
   /** SHA-256 chunk hashes */
@@ -50,10 +42,6 @@ export interface MetadataAmino {
 export interface MetadataAminoMsg {
   type: "cosmos-sdk/Metadata";
   value: MetadataAmino;
-}
-/** Metadata contains SDK-specific snapshot metadata. */
-export interface MetadataSDKType {
-  chunk_hashes: Uint8Array[];
 }
 /**
  * SnapshotItem is an item contained in a rootmulti.Store snapshot.
@@ -86,17 +74,6 @@ export interface SnapshotItemAminoMsg {
   value: SnapshotItemAmino;
 }
 /**
- * SnapshotItem is an item contained in a rootmulti.Store snapshot.
- * 
- * Since: cosmos-sdk 0.46
- */
-export interface SnapshotItemSDKType {
-  store?: SnapshotStoreItemSDKType;
-  iavl?: SnapshotIAVLItemSDKType;
-  extension?: SnapshotExtensionMetaSDKType;
-  extension_payload?: SnapshotExtensionPayloadSDKType;
-}
-/**
  * SnapshotStoreItem contains metadata about a snapshotted store.
  * 
  * Since: cosmos-sdk 0.46
@@ -119,14 +96,6 @@ export interface SnapshotStoreItemAmino {
 export interface SnapshotStoreItemAminoMsg {
   type: "cosmos-sdk/SnapshotStoreItem";
   value: SnapshotStoreItemAmino;
-}
-/**
- * SnapshotStoreItem contains metadata about a snapshotted store.
- * 
- * Since: cosmos-sdk 0.46
- */
-export interface SnapshotStoreItemSDKType {
-  name: string;
 }
 /**
  * SnapshotIAVLItem is an exported IAVL node.
@@ -163,17 +132,6 @@ export interface SnapshotIAVLItemAminoMsg {
   value: SnapshotIAVLItemAmino;
 }
 /**
- * SnapshotIAVLItem is an exported IAVL node.
- * 
- * Since: cosmos-sdk 0.46
- */
-export interface SnapshotIAVLItemSDKType {
-  key: Uint8Array;
-  value: Uint8Array;
-  version: bigint;
-  height: number;
-}
-/**
  * SnapshotExtensionMeta contains metadata about an external snapshotter.
  * 
  * Since: cosmos-sdk 0.46
@@ -200,15 +158,6 @@ export interface SnapshotExtensionMetaAminoMsg {
   value: SnapshotExtensionMetaAmino;
 }
 /**
- * SnapshotExtensionMeta contains metadata about an external snapshotter.
- * 
- * Since: cosmos-sdk 0.46
- */
-export interface SnapshotExtensionMetaSDKType {
-  name: string;
-  format: number;
-}
-/**
  * SnapshotExtensionPayload contains payloads of an external snapshotter.
  * 
  * Since: cosmos-sdk 0.46
@@ -232,14 +181,6 @@ export interface SnapshotExtensionPayloadAminoMsg {
   type: "cosmos-sdk/SnapshotExtensionPayload";
   value: SnapshotExtensionPayloadAmino;
 }
-/**
- * SnapshotExtensionPayload contains payloads of an external snapshotter.
- * 
- * Since: cosmos-sdk 0.46
- */
-export interface SnapshotExtensionPayloadSDKType {
-  payload: Uint8Array;
-}
 function createBaseSnapshot(): Snapshot {
   return {
     height: BigInt(0),
@@ -251,6 +192,7 @@ function createBaseSnapshot(): Snapshot {
 }
 export const Snapshot = {
   typeUrl: "/cosmos.store.snapshots.v1.Snapshot",
+  aminoType: "cosmos-sdk/Snapshot",
   encode(message: Snapshot, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.height !== BigInt(0)) {
       writer.uint32(8).uint64(message.height);
@@ -298,7 +240,7 @@ export const Snapshot = {
     }
     return message;
   },
-  fromPartial(object: Partial<Snapshot>): Snapshot {
+  fromPartial(object: DeepPartial<Snapshot>): Snapshot {
     const message = createBaseSnapshot();
     message.height = object.height !== undefined && object.height !== null ? BigInt(object.height.toString()) : BigInt(0);
     message.format = object.format ?? 0;
@@ -364,6 +306,7 @@ function createBaseMetadata(): Metadata {
 }
 export const Metadata = {
   typeUrl: "/cosmos.store.snapshots.v1.Metadata",
+  aminoType: "cosmos-sdk/Metadata",
   encode(message: Metadata, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.chunkHashes) {
       writer.uint32(10).bytes(v!);
@@ -387,7 +330,7 @@ export const Metadata = {
     }
     return message;
   },
-  fromPartial(object: Partial<Metadata>): Metadata {
+  fromPartial(object: DeepPartial<Metadata>): Metadata {
     const message = createBaseMetadata();
     message.chunkHashes = object.chunkHashes?.map(e => e) || [];
     return message;
@@ -438,6 +381,7 @@ function createBaseSnapshotItem(): SnapshotItem {
 }
 export const SnapshotItem = {
   typeUrl: "/cosmos.store.snapshots.v1.SnapshotItem",
+  aminoType: "cosmos-sdk/SnapshotItem",
   encode(message: SnapshotItem, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.store !== undefined) {
       SnapshotStoreItem.encode(message.store, writer.uint32(10).fork()).ldelim();
@@ -479,7 +423,7 @@ export const SnapshotItem = {
     }
     return message;
   },
-  fromPartial(object: Partial<SnapshotItem>): SnapshotItem {
+  fromPartial(object: DeepPartial<SnapshotItem>): SnapshotItem {
     const message = createBaseSnapshotItem();
     message.store = object.store !== undefined && object.store !== null ? SnapshotStoreItem.fromPartial(object.store) : undefined;
     message.iavl = object.iavl !== undefined && object.iavl !== null ? SnapshotIAVLItem.fromPartial(object.iavl) : undefined;
@@ -540,6 +484,7 @@ function createBaseSnapshotStoreItem(): SnapshotStoreItem {
 }
 export const SnapshotStoreItem = {
   typeUrl: "/cosmos.store.snapshots.v1.SnapshotStoreItem",
+  aminoType: "cosmos-sdk/SnapshotStoreItem",
   encode(message: SnapshotStoreItem, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -563,7 +508,7 @@ export const SnapshotStoreItem = {
     }
     return message;
   },
-  fromPartial(object: Partial<SnapshotStoreItem>): SnapshotStoreItem {
+  fromPartial(object: DeepPartial<SnapshotStoreItem>): SnapshotStoreItem {
     const message = createBaseSnapshotStoreItem();
     message.name = object.name ?? "";
     return message;
@@ -612,6 +557,7 @@ function createBaseSnapshotIAVLItem(): SnapshotIAVLItem {
 }
 export const SnapshotIAVLItem = {
   typeUrl: "/cosmos.store.snapshots.v1.SnapshotIAVLItem",
+  aminoType: "cosmos-sdk/SnapshotIAVLItem",
   encode(message: SnapshotIAVLItem, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.key.length !== 0) {
       writer.uint32(10).bytes(message.key);
@@ -653,7 +599,7 @@ export const SnapshotIAVLItem = {
     }
     return message;
   },
-  fromPartial(object: Partial<SnapshotIAVLItem>): SnapshotIAVLItem {
+  fromPartial(object: DeepPartial<SnapshotIAVLItem>): SnapshotIAVLItem {
     const message = createBaseSnapshotIAVLItem();
     message.key = object.key ?? new Uint8Array();
     message.value = object.value ?? new Uint8Array();
@@ -715,6 +661,7 @@ function createBaseSnapshotExtensionMeta(): SnapshotExtensionMeta {
 }
 export const SnapshotExtensionMeta = {
   typeUrl: "/cosmos.store.snapshots.v1.SnapshotExtensionMeta",
+  aminoType: "cosmos-sdk/SnapshotExtensionMeta",
   encode(message: SnapshotExtensionMeta, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -744,7 +691,7 @@ export const SnapshotExtensionMeta = {
     }
     return message;
   },
-  fromPartial(object: Partial<SnapshotExtensionMeta>): SnapshotExtensionMeta {
+  fromPartial(object: DeepPartial<SnapshotExtensionMeta>): SnapshotExtensionMeta {
     const message = createBaseSnapshotExtensionMeta();
     message.name = object.name ?? "";
     message.format = object.format ?? 0;
@@ -795,6 +742,7 @@ function createBaseSnapshotExtensionPayload(): SnapshotExtensionPayload {
 }
 export const SnapshotExtensionPayload = {
   typeUrl: "/cosmos.store.snapshots.v1.SnapshotExtensionPayload",
+  aminoType: "cosmos-sdk/SnapshotExtensionPayload",
   encode(message: SnapshotExtensionPayload, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.payload.length !== 0) {
       writer.uint32(10).bytes(message.payload);
@@ -818,7 +766,7 @@ export const SnapshotExtensionPayload = {
     }
     return message;
   },
-  fromPartial(object: Partial<SnapshotExtensionPayload>): SnapshotExtensionPayload {
+  fromPartial(object: DeepPartial<SnapshotExtensionPayload>): SnapshotExtensionPayload {
     const message = createBaseSnapshotExtensionPayload();
     message.payload = object.payload ?? new Uint8Array();
     return message;

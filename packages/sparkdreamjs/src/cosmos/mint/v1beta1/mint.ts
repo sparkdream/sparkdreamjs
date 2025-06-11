@@ -1,6 +1,7 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { Decimal } from "@cosmjs/math";
+import { Decimal } from "@interchainjs/math";
+import { DeepPartial } from "../../../helpers";
 /** Minter represents the minting state. */
 export interface Minter {
   /** current annual inflation rate */
@@ -22,11 +23,6 @@ export interface MinterAmino {
 export interface MinterAminoMsg {
   type: "cosmos-sdk/Minter";
   value: MinterAmino;
-}
-/** Minter represents the minting state. */
-export interface MinterSDKType {
-  inflation: string;
-  annual_provisions: string;
 }
 /** Params defines the parameters for the x/mint module. */
 export interface Params {
@@ -66,15 +62,6 @@ export interface ParamsAminoMsg {
   type: "cosmos-sdk/x/mint/Params";
   value: ParamsAmino;
 }
-/** Params defines the parameters for the x/mint module. */
-export interface ParamsSDKType {
-  mint_denom: string;
-  inflation_rate_change: string;
-  inflation_max: string;
-  inflation_min: string;
-  goal_bonded: string;
-  blocks_per_year: bigint;
-}
 function createBaseMinter(): Minter {
   return {
     inflation: "",
@@ -83,6 +70,7 @@ function createBaseMinter(): Minter {
 }
 export const Minter = {
   typeUrl: "/cosmos.mint.v1beta1.Minter",
+  aminoType: "cosmos-sdk/Minter",
   encode(message: Minter, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.inflation !== "") {
       writer.uint32(10).string(Decimal.fromUserInput(message.inflation, 18).atomics);
@@ -112,7 +100,7 @@ export const Minter = {
     }
     return message;
   },
-  fromPartial(object: Partial<Minter>): Minter {
+  fromPartial(object: DeepPartial<Minter>): Minter {
     const message = createBaseMinter();
     message.inflation = object.inflation ?? "";
     message.annualProvisions = object.annualProvisions ?? "";
@@ -168,6 +156,7 @@ function createBaseParams(): Params {
 }
 export const Params = {
   typeUrl: "/cosmos.mint.v1beta1.Params",
+  aminoType: "cosmos-sdk/x/mint/Params",
   encode(message: Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.mintDenom !== "") {
       writer.uint32(10).string(message.mintDenom);
@@ -221,7 +210,7 @@ export const Params = {
     }
     return message;
   },
-  fromPartial(object: Partial<Params>): Params {
+  fromPartial(object: DeepPartial<Params>): Params {
     const message = createBaseParams();
     message.mintDenom = object.mintDenom ?? "";
     message.inflationRateChange = object.inflationRateChange ?? "";

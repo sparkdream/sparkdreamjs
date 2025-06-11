@@ -1,9 +1,9 @@
 //@ts-nocheck
 import { Timestamp } from "../../../google/protobuf/timestamp";
-import { Duration, DurationAmino, DurationSDKType } from "../../../google/protobuf/duration";
-import { Any, AnyProtoMsg, AnyAmino, AnySDKType } from "../../../google/protobuf/any";
+import { Duration, DurationAmino } from "../../../google/protobuf/duration";
+import { Any, AnyProtoMsg, AnyAmino } from "../../../google/protobuf/any";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { toTimestamp, fromTimestamp } from "../../../helpers";
+import { toTimestamp, fromTimestamp, DeepPartial } from "../../../helpers";
 /** VoteOption enumerates the valid vote options for a given proposal. */
 export enum VoteOption {
   /**
@@ -21,7 +21,6 @@ export enum VoteOption {
   VOTE_OPTION_NO_WITH_VETO = 4,
   UNRECOGNIZED = -1,
 }
-export const VoteOptionSDKType = VoteOption;
 export const VoteOptionAmino = VoteOption;
 export function voteOptionFromJSON(object: any): VoteOption {
   switch (object) {
@@ -91,7 +90,6 @@ export enum ProposalStatus {
   PROPOSAL_STATUS_WITHDRAWN = 5,
   UNRECOGNIZED = -1,
 }
-export const ProposalStatusSDKType = ProposalStatus;
 export const ProposalStatusAmino = ProposalStatus;
 export function proposalStatusFromJSON(object: any): ProposalStatus {
   switch (object) {
@@ -150,7 +148,6 @@ export enum ProposalExecutorResult {
   PROPOSAL_EXECUTOR_RESULT_FAILURE = 3,
   UNRECOGNIZED = -1,
 }
-export const ProposalExecutorResultSDKType = ProposalExecutorResult;
 export const ProposalExecutorResultAmino = ProposalExecutorResult;
 export function proposalExecutorResultFromJSON(object: any): ProposalExecutorResult {
   switch (object) {
@@ -224,16 +221,6 @@ export interface MemberAminoMsg {
   value: MemberAmino;
 }
 /**
- * Member represents a group member with an account address,
- * non-zero weight, metadata and added_at timestamp.
- */
-export interface MemberSDKType {
-  address: string;
-  weight: string;
-  metadata: string;
-  added_at: Date;
-}
-/**
  * MemberRequest represents a group member to be used in Msg server requests.
  * Contrary to `Member`, it doesn't have any `added_at` field
  * since this field cannot be set as part of requests.
@@ -268,16 +255,6 @@ export interface MemberRequestAminoMsg {
   value: MemberRequestAmino;
 }
 /**
- * MemberRequest represents a group member to be used in Msg server requests.
- * Contrary to `Member`, it doesn't have any `added_at` field
- * since this field cannot be set as part of requests.
- */
-export interface MemberRequestSDKType {
-  address: string;
-  weight: string;
-  metadata: string;
-}
-/**
  * ThresholdDecisionPolicy is a decision policy where a proposal passes when it
  * satisfies the two following conditions:
  * 1. The sum of all `YES` voter's weights is greater or equal than the defined
@@ -286,7 +263,6 @@ export interface MemberRequestSDKType {
  *    given by `windows`.
  */
 export interface ThresholdDecisionPolicy {
-  $typeUrl?: "/cosmos.group.v1.ThresholdDecisionPolicy";
   /**
    * threshold is the minimum weighted sum of `YES` votes that must be met or
    * exceeded for a proposal to succeed.
@@ -321,19 +297,6 @@ export interface ThresholdDecisionPolicyAminoMsg {
   value: ThresholdDecisionPolicyAmino;
 }
 /**
- * ThresholdDecisionPolicy is a decision policy where a proposal passes when it
- * satisfies the two following conditions:
- * 1. The sum of all `YES` voter's weights is greater or equal than the defined
- *    `threshold`.
- * 2. The voting and execution periods of the proposal respect the parameters
- *    given by `windows`.
- */
-export interface ThresholdDecisionPolicySDKType {
-  $typeUrl?: "/cosmos.group.v1.ThresholdDecisionPolicy";
-  threshold: string;
-  windows?: DecisionPolicyWindowsSDKType;
-}
-/**
  * PercentageDecisionPolicy is a decision policy where a proposal passes when
  * it satisfies the two following conditions:
  * 1. The percentage of all `YES` voters' weights out of the total group weight
@@ -342,7 +305,6 @@ export interface ThresholdDecisionPolicySDKType {
  *    given by `windows`.
  */
 export interface PercentageDecisionPolicy {
-  $typeUrl?: "/cosmos.group.v1.PercentageDecisionPolicy";
   /**
    * percentage is the minimum percentage of the weighted sum of `YES` votes must
    * meet for a proposal to succeed.
@@ -375,19 +337,6 @@ export interface PercentageDecisionPolicyAmino {
 export interface PercentageDecisionPolicyAminoMsg {
   type: "cosmos-sdk/PercentageDecisionPolicy";
   value: PercentageDecisionPolicyAmino;
-}
-/**
- * PercentageDecisionPolicy is a decision policy where a proposal passes when
- * it satisfies the two following conditions:
- * 1. The percentage of all `YES` voters' weights out of the total group weight
- *    is greater or equal than the given `percentage`.
- * 2. The voting and execution periods of the proposal respect the parameters
- *    given by `windows`.
- */
-export interface PercentageDecisionPolicySDKType {
-  $typeUrl?: "/cosmos.group.v1.PercentageDecisionPolicy";
-  percentage: string;
-  windows?: DecisionPolicyWindowsSDKType;
 }
 /** DecisionPolicyWindows defines the different windows for voting and execution. */
 export interface DecisionPolicyWindows {
@@ -440,11 +389,6 @@ export interface DecisionPolicyWindowsAmino {
 export interface DecisionPolicyWindowsAminoMsg {
   type: "cosmos-sdk/DecisionPolicyWindows";
   value: DecisionPolicyWindowsAmino;
-}
-/** DecisionPolicyWindows defines the different windows for voting and execution. */
-export interface DecisionPolicyWindowsSDKType {
-  voting_period: DurationSDKType;
-  min_execution_period: DurationSDKType;
 }
 /** GroupInfo represents the high-level on-chain information for a group. */
 export interface GroupInfo {
@@ -500,15 +444,6 @@ export interface GroupInfoAminoMsg {
   type: "cosmos-sdk/GroupInfo";
   value: GroupInfoAmino;
 }
-/** GroupInfo represents the high-level on-chain information for a group. */
-export interface GroupInfoSDKType {
-  id: bigint;
-  admin: string;
-  metadata: string;
-  version: bigint;
-  total_weight: string;
-  created_at: Date;
-}
 /** GroupMember represents the relationship between a group and a member. */
 export interface GroupMember {
   /** group_id is the unique ID of the group. */
@@ -530,11 +465,6 @@ export interface GroupMemberAmino {
 export interface GroupMemberAminoMsg {
   type: "cosmos-sdk/GroupMember";
   value: GroupMemberAmino;
-}
-/** GroupMember represents the relationship between a group and a member. */
-export interface GroupMemberSDKType {
-  group_id: bigint;
-  member?: MemberSDKType;
 }
 /** GroupPolicyInfo represents the high-level on-chain information for a group policy. */
 export interface GroupPolicyInfo {
@@ -594,16 +524,6 @@ export interface GroupPolicyInfoAmino {
 export interface GroupPolicyInfoAminoMsg {
   type: "cosmos-sdk/GroupPolicyInfo";
   value: GroupPolicyInfoAmino;
-}
-/** GroupPolicyInfo represents the high-level on-chain information for a group policy. */
-export interface GroupPolicyInfoSDKType {
-  address: string;
-  group_id: bigint;
-  admin: string;
-  metadata: string;
-  version: bigint;
-  decision_policy?: ThresholdDecisionPolicySDKType | PercentageDecisionPolicySDKType | AnySDKType | undefined;
-  created_at: Date;
 }
 /**
  * Proposal defines a group proposal. Any member of a group can submit a proposal
@@ -747,28 +667,6 @@ export interface ProposalAminoMsg {
   type: "cosmos-sdk/Proposal";
   value: ProposalAmino;
 }
-/**
- * Proposal defines a group proposal. Any member of a group can submit a proposal
- * for a group policy to decide upon.
- * A proposal consists of a set of `sdk.Msg`s that will be executed if the proposal
- * passes as well as some optional metadata associated with the proposal.
- */
-export interface ProposalSDKType {
-  id: bigint;
-  group_policy_address: string;
-  metadata: string;
-  proposers: string[];
-  submit_time: Date;
-  group_version: bigint;
-  group_policy_version: bigint;
-  status: ProposalStatus;
-  final_tally_result: TallyResultSDKType;
-  voting_period_end: Date;
-  executor_result: ProposalExecutorResult;
-  messages: AnySDKType[];
-  title: string;
-  summary: string;
-}
 /** TallyResult represents the sum of weighted votes for each vote option. */
 export interface TallyResult {
   /** yes_count is the weighted sum of yes votes. */
@@ -798,13 +696,6 @@ export interface TallyResultAmino {
 export interface TallyResultAminoMsg {
   type: "cosmos-sdk/TallyResult";
   value: TallyResultAmino;
-}
-/** TallyResult represents the sum of weighted votes for each vote option. */
-export interface TallyResultSDKType {
-  yes_count: string;
-  abstain_count: string;
-  no_count: string;
-  no_with_veto_count: string;
 }
 /** Vote represents a vote for a proposal.string metadata */
 export interface Vote {
@@ -846,14 +737,6 @@ export interface VoteAminoMsg {
   type: "cosmos-sdk/Vote";
   value: VoteAmino;
 }
-/** Vote represents a vote for a proposal.string metadata */
-export interface VoteSDKType {
-  proposal_id: bigint;
-  voter: string;
-  option: VoteOption;
-  metadata: string;
-  submit_time: Date;
-}
 function createBaseMember(): Member {
   return {
     address: "",
@@ -864,6 +747,7 @@ function createBaseMember(): Member {
 }
 export const Member = {
   typeUrl: "/cosmos.group.v1.Member",
+  aminoType: "cosmos-sdk/Member",
   encode(message: Member, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -905,7 +789,7 @@ export const Member = {
     }
     return message;
   },
-  fromPartial(object: Partial<Member>): Member {
+  fromPartial(object: DeepPartial<Member>): Member {
     const message = createBaseMember();
     message.address = object.address ?? "";
     message.weight = object.weight ?? "";
@@ -968,6 +852,7 @@ function createBaseMemberRequest(): MemberRequest {
 }
 export const MemberRequest = {
   typeUrl: "/cosmos.group.v1.MemberRequest",
+  aminoType: "cosmos-sdk/MemberRequest",
   encode(message: MemberRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -1003,7 +888,7 @@ export const MemberRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<MemberRequest>): MemberRequest {
+  fromPartial(object: DeepPartial<MemberRequest>): MemberRequest {
     const message = createBaseMemberRequest();
     message.address = object.address ?? "";
     message.weight = object.weight ?? "";
@@ -1054,13 +939,13 @@ export const MemberRequest = {
 };
 function createBaseThresholdDecisionPolicy(): ThresholdDecisionPolicy {
   return {
-    $typeUrl: "/cosmos.group.v1.ThresholdDecisionPolicy",
     threshold: "",
     windows: undefined
   };
 }
 export const ThresholdDecisionPolicy = {
   typeUrl: "/cosmos.group.v1.ThresholdDecisionPolicy",
+  aminoType: "cosmos-sdk/ThresholdDecisionPolicy",
   encode(message: ThresholdDecisionPolicy, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.threshold !== "") {
       writer.uint32(10).string(message.threshold);
@@ -1090,7 +975,7 @@ export const ThresholdDecisionPolicy = {
     }
     return message;
   },
-  fromPartial(object: Partial<ThresholdDecisionPolicy>): ThresholdDecisionPolicy {
+  fromPartial(object: DeepPartial<ThresholdDecisionPolicy>): ThresholdDecisionPolicy {
     const message = createBaseThresholdDecisionPolicy();
     message.threshold = object.threshold ?? "";
     message.windows = object.windows !== undefined && object.windows !== null ? DecisionPolicyWindows.fromPartial(object.windows) : undefined;
@@ -1136,13 +1021,13 @@ export const ThresholdDecisionPolicy = {
 };
 function createBasePercentageDecisionPolicy(): PercentageDecisionPolicy {
   return {
-    $typeUrl: "/cosmos.group.v1.PercentageDecisionPolicy",
     percentage: "",
     windows: undefined
   };
 }
 export const PercentageDecisionPolicy = {
   typeUrl: "/cosmos.group.v1.PercentageDecisionPolicy",
+  aminoType: "cosmos-sdk/PercentageDecisionPolicy",
   encode(message: PercentageDecisionPolicy, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.percentage !== "") {
       writer.uint32(10).string(message.percentage);
@@ -1172,7 +1057,7 @@ export const PercentageDecisionPolicy = {
     }
     return message;
   },
-  fromPartial(object: Partial<PercentageDecisionPolicy>): PercentageDecisionPolicy {
+  fromPartial(object: DeepPartial<PercentageDecisionPolicy>): PercentageDecisionPolicy {
     const message = createBasePercentageDecisionPolicy();
     message.percentage = object.percentage ?? "";
     message.windows = object.windows !== undefined && object.windows !== null ? DecisionPolicyWindows.fromPartial(object.windows) : undefined;
@@ -1224,6 +1109,7 @@ function createBaseDecisionPolicyWindows(): DecisionPolicyWindows {
 }
 export const DecisionPolicyWindows = {
   typeUrl: "/cosmos.group.v1.DecisionPolicyWindows",
+  aminoType: "cosmos-sdk/DecisionPolicyWindows",
   encode(message: DecisionPolicyWindows, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.votingPeriod !== undefined) {
       Duration.encode(message.votingPeriod, writer.uint32(10).fork()).ldelim();
@@ -1253,7 +1139,7 @@ export const DecisionPolicyWindows = {
     }
     return message;
   },
-  fromPartial(object: Partial<DecisionPolicyWindows>): DecisionPolicyWindows {
+  fromPartial(object: DeepPartial<DecisionPolicyWindows>): DecisionPolicyWindows {
     const message = createBaseDecisionPolicyWindows();
     message.votingPeriod = object.votingPeriod !== undefined && object.votingPeriod !== null ? Duration.fromPartial(object.votingPeriod) : undefined;
     message.minExecutionPeriod = object.minExecutionPeriod !== undefined && object.minExecutionPeriod !== null ? Duration.fromPartial(object.minExecutionPeriod) : undefined;
@@ -1309,6 +1195,7 @@ function createBaseGroupInfo(): GroupInfo {
 }
 export const GroupInfo = {
   typeUrl: "/cosmos.group.v1.GroupInfo",
+  aminoType: "cosmos-sdk/GroupInfo",
   encode(message: GroupInfo, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.id !== BigInt(0)) {
       writer.uint32(8).uint64(message.id);
@@ -1362,7 +1249,7 @@ export const GroupInfo = {
     }
     return message;
   },
-  fromPartial(object: Partial<GroupInfo>): GroupInfo {
+  fromPartial(object: DeepPartial<GroupInfo>): GroupInfo {
     const message = createBaseGroupInfo();
     message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
     message.admin = object.admin ?? "";
@@ -1434,6 +1321,7 @@ function createBaseGroupMember(): GroupMember {
 }
 export const GroupMember = {
   typeUrl: "/cosmos.group.v1.GroupMember",
+  aminoType: "cosmos-sdk/GroupMember",
   encode(message: GroupMember, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.groupId !== BigInt(0)) {
       writer.uint32(8).uint64(message.groupId);
@@ -1463,7 +1351,7 @@ export const GroupMember = {
     }
     return message;
   },
-  fromPartial(object: Partial<GroupMember>): GroupMember {
+  fromPartial(object: DeepPartial<GroupMember>): GroupMember {
     const message = createBaseGroupMember();
     message.groupId = object.groupId !== undefined && object.groupId !== null ? BigInt(object.groupId.toString()) : BigInt(0);
     message.member = object.member !== undefined && object.member !== null ? Member.fromPartial(object.member) : undefined;
@@ -1520,6 +1408,7 @@ function createBaseGroupPolicyInfo(): GroupPolicyInfo {
 }
 export const GroupPolicyInfo = {
   typeUrl: "/cosmos.group.v1.GroupPolicyInfo",
+  aminoType: "cosmos-sdk/GroupPolicyInfo",
   encode(message: GroupPolicyInfo, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -1579,7 +1468,7 @@ export const GroupPolicyInfo = {
     }
     return message;
   },
-  fromPartial(object: Partial<GroupPolicyInfo>): GroupPolicyInfo {
+  fromPartial(object: DeepPartial<GroupPolicyInfo>): GroupPolicyInfo {
     const message = createBaseGroupPolicyInfo();
     message.address = object.address ?? "";
     message.groupId = object.groupId !== undefined && object.groupId !== null ? BigInt(object.groupId.toString()) : BigInt(0);
@@ -1668,6 +1557,7 @@ function createBaseProposal(): Proposal {
 }
 export const Proposal = {
   typeUrl: "/cosmos.group.v1.Proposal",
+  aminoType: "cosmos-sdk/Proposal",
   encode(message: Proposal, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.id !== BigInt(0)) {
       writer.uint32(8).uint64(message.id);
@@ -1769,7 +1659,7 @@ export const Proposal = {
     }
     return message;
   },
-  fromPartial(object: Partial<Proposal>): Proposal {
+  fromPartial(object: DeepPartial<Proposal>): Proposal {
     const message = createBaseProposal();
     message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
     message.groupPolicyAddress = object.groupPolicyAddress ?? "";
@@ -1887,6 +1777,7 @@ function createBaseTallyResult(): TallyResult {
 }
 export const TallyResult = {
   typeUrl: "/cosmos.group.v1.TallyResult",
+  aminoType: "cosmos-sdk/TallyResult",
   encode(message: TallyResult, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.yesCount !== "") {
       writer.uint32(10).string(message.yesCount);
@@ -1928,7 +1819,7 @@ export const TallyResult = {
     }
     return message;
   },
-  fromPartial(object: Partial<TallyResult>): TallyResult {
+  fromPartial(object: DeepPartial<TallyResult>): TallyResult {
     const message = createBaseTallyResult();
     message.yesCount = object.yesCount ?? "";
     message.abstainCount = object.abstainCount ?? "";
@@ -1993,6 +1884,7 @@ function createBaseVote(): Vote {
 }
 export const Vote = {
   typeUrl: "/cosmos.group.v1.Vote",
+  aminoType: "cosmos-sdk/Vote",
   encode(message: Vote, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.proposalId !== BigInt(0)) {
       writer.uint32(8).uint64(message.proposalId);
@@ -2040,7 +1932,7 @@ export const Vote = {
     }
     return message;
   },
-  fromPartial(object: Partial<Vote>): Vote {
+  fromPartial(object: DeepPartial<Vote>): Vote {
     const message = createBaseVote();
     message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
     message.voter = object.voter ?? "";

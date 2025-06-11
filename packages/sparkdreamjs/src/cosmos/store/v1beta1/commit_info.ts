@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { Timestamp } from "../../../google/protobuf/timestamp";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { toTimestamp, fromTimestamp, bytesFromBase64, base64FromBytes } from "../../../helpers";
+import { toTimestamp, fromTimestamp, DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /**
  * CommitInfo defines commit information used by the multi-store when committing
  * a version/height.
@@ -29,15 +29,6 @@ export interface CommitInfoAminoMsg {
   value: CommitInfoAmino;
 }
 /**
- * CommitInfo defines commit information used by the multi-store when committing
- * a version/height.
- */
-export interface CommitInfoSDKType {
-  version: bigint;
-  store_infos: StoreInfoSDKType[];
-  timestamp: Date;
-}
-/**
  * StoreInfo defines store-specific commit information. It contains a reference
  * between a store name and the commit ID.
  */
@@ -60,14 +51,6 @@ export interface StoreInfoAmino {
 export interface StoreInfoAminoMsg {
   type: "cosmos-sdk/StoreInfo";
   value: StoreInfoAmino;
-}
-/**
- * StoreInfo defines store-specific commit information. It contains a reference
- * between a store name and the commit ID.
- */
-export interface StoreInfoSDKType {
-  name: string;
-  commit_id: CommitIDSDKType;
 }
 /**
  * CommitID defines the commitment information when a specific store is
@@ -93,14 +76,6 @@ export interface CommitIDAminoMsg {
   type: "cosmos-sdk/CommitID";
   value: CommitIDAmino;
 }
-/**
- * CommitID defines the commitment information when a specific store is
- * committed.
- */
-export interface CommitIDSDKType {
-  version: bigint;
-  hash: Uint8Array;
-}
 function createBaseCommitInfo(): CommitInfo {
   return {
     version: BigInt(0),
@@ -110,6 +85,7 @@ function createBaseCommitInfo(): CommitInfo {
 }
 export const CommitInfo = {
   typeUrl: "/cosmos.store.v1beta1.CommitInfo",
+  aminoType: "cosmos-sdk/CommitInfo",
   encode(message: CommitInfo, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.version !== BigInt(0)) {
       writer.uint32(8).int64(message.version);
@@ -145,7 +121,7 @@ export const CommitInfo = {
     }
     return message;
   },
-  fromPartial(object: Partial<CommitInfo>): CommitInfo {
+  fromPartial(object: DeepPartial<CommitInfo>): CommitInfo {
     const message = createBaseCommitInfo();
     message.version = object.version !== undefined && object.version !== null ? BigInt(object.version.toString()) : BigInt(0);
     message.storeInfos = object.storeInfos?.map(e => StoreInfo.fromPartial(e)) || [];
@@ -204,6 +180,7 @@ function createBaseStoreInfo(): StoreInfo {
 }
 export const StoreInfo = {
   typeUrl: "/cosmos.store.v1beta1.StoreInfo",
+  aminoType: "cosmos-sdk/StoreInfo",
   encode(message: StoreInfo, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -233,7 +210,7 @@ export const StoreInfo = {
     }
     return message;
   },
-  fromPartial(object: Partial<StoreInfo>): StoreInfo {
+  fromPartial(object: DeepPartial<StoreInfo>): StoreInfo {
     const message = createBaseStoreInfo();
     message.name = object.name ?? "";
     message.commitId = object.commitId !== undefined && object.commitId !== null ? CommitID.fromPartial(object.commitId) : undefined;
@@ -285,6 +262,7 @@ function createBaseCommitID(): CommitID {
 }
 export const CommitID = {
   typeUrl: "/cosmos.store.v1beta1.CommitID",
+  aminoType: "cosmos-sdk/CommitID",
   encode(message: CommitID, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.version !== BigInt(0)) {
       writer.uint32(8).int64(message.version);
@@ -314,7 +292,7 @@ export const CommitID = {
     }
     return message;
   },
-  fromPartial(object: Partial<CommitID>): CommitID {
+  fromPartial(object: DeepPartial<CommitID>): CommitID {
     const message = createBaseCommitID();
     message.version = object.version !== undefined && object.version !== null ? BigInt(object.version.toString()) : BigInt(0);
     message.hash = object.hash ?? new Uint8Array();

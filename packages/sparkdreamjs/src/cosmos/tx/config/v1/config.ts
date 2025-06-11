@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /** Config is the config object of the x/auth/tx package. */
 export interface Config {
   /**
@@ -34,11 +35,6 @@ export interface ConfigAminoMsg {
   type: "cosmos-sdk/Config";
   value: ConfigAmino;
 }
-/** Config is the config object of the x/auth/tx package. */
-export interface ConfigSDKType {
-  skip_ante_handler: boolean;
-  skip_post_handler: boolean;
-}
 function createBaseConfig(): Config {
   return {
     skipAnteHandler: false,
@@ -47,6 +43,7 @@ function createBaseConfig(): Config {
 }
 export const Config = {
   typeUrl: "/cosmos.tx.config.v1.Config",
+  aminoType: "cosmos-sdk/Config",
   encode(message: Config, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.skipAnteHandler === true) {
       writer.uint32(8).bool(message.skipAnteHandler);
@@ -76,7 +73,7 @@ export const Config = {
     }
     return message;
   },
-  fromPartial(object: Partial<Config>): Config {
+  fromPartial(object: DeepPartial<Config>): Config {
     const message = createBaseConfig();
     message.skipAnteHandler = object.skipAnteHandler ?? false;
     message.skipPostHandler = object.skipPostHandler ?? false;

@@ -1,7 +1,8 @@
 //@ts-nocheck
-import { Params, ParamsAmino, ParamsSDKType, Metadata, MetadataAmino, MetadataSDKType, SendEnabled, SendEnabledAmino, SendEnabledSDKType } from "./bank";
-import { Coin, CoinAmino, CoinSDKType } from "../../base/v1beta1/coin";
+import { Params, ParamsAmino, Metadata, MetadataAmino, SendEnabled, SendEnabledAmino } from "./bank";
+import { Coin, CoinAmino } from "../../base/v1beta1/coin";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** GenesisState defines the bank module's genesis state. */
 export interface GenesisState {
   /** params defines all the parameters of the module. */
@@ -50,14 +51,6 @@ export interface GenesisStateAminoMsg {
   type: "cosmos-sdk/GenesisState";
   value: GenesisStateAmino;
 }
-/** GenesisState defines the bank module's genesis state. */
-export interface GenesisStateSDKType {
-  params: ParamsSDKType;
-  balances: BalanceSDKType[];
-  supply: CoinSDKType[];
-  denom_metadata: MetadataSDKType[];
-  send_enabled: SendEnabledSDKType[];
-}
 /**
  * Balance defines an account address and balance pair used in the bank module's
  * genesis state.
@@ -86,14 +79,6 @@ export interface BalanceAminoMsg {
   type: "cosmos-sdk/Balance";
   value: BalanceAmino;
 }
-/**
- * Balance defines an account address and balance pair used in the bank module's
- * genesis state.
- */
-export interface BalanceSDKType {
-  address: string;
-  coins: CoinSDKType[];
-}
 function createBaseGenesisState(): GenesisState {
   return {
     params: Params.fromPartial({}),
@@ -105,6 +90,7 @@ function createBaseGenesisState(): GenesisState {
 }
 export const GenesisState = {
   typeUrl: "/cosmos.bank.v1beta1.GenesisState",
+  aminoType: "cosmos-sdk/GenesisState",
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -152,7 +138,7 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisState>): GenesisState {
+  fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = createBaseGenesisState();
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
     message.balances = object.balances?.map(e => Balance.fromPartial(e)) || [];
@@ -227,6 +213,7 @@ function createBaseBalance(): Balance {
 }
 export const Balance = {
   typeUrl: "/cosmos.bank.v1beta1.Balance",
+  aminoType: "cosmos-sdk/Balance",
   encode(message: Balance, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -256,7 +243,7 @@ export const Balance = {
     }
     return message;
   },
-  fromPartial(object: Partial<Balance>): Balance {
+  fromPartial(object: DeepPartial<Balance>): Balance {
     const message = createBaseBalance();
     message.address = object.address ?? "";
     message.coins = object.coins?.map(e => Coin.fromPartial(e)) || [];

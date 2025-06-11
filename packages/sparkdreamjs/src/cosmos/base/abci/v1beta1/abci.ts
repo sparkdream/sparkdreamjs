@@ -1,9 +1,9 @@
 //@ts-nocheck
-import { Any, AnyAmino, AnySDKType } from "../../../../google/protobuf/any";
-import { Event, EventAmino, EventSDKType } from "../../../../tendermint/abci/types";
-import { Block, BlockAmino, BlockSDKType } from "../../../../tendermint/types/block";
+import { Any, AnyAmino } from "../../../../google/protobuf/any";
+import { Event, EventAmino } from "../../../../tendermint/abci/types";
+import { Block, BlockAmino } from "../../../../tendermint/types/block";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /**
  * TxResponse defines a structure containing relevant tx data and metadata. The
  * tags are stringified and the log is JSON decoded.
@@ -104,25 +104,6 @@ export interface TxResponseAminoMsg {
   type: "cosmos-sdk/TxResponse";
   value: TxResponseAmino;
 }
-/**
- * TxResponse defines a structure containing relevant tx data and metadata. The
- * tags are stringified and the log is JSON decoded.
- */
-export interface TxResponseSDKType {
-  height: bigint;
-  txhash: string;
-  codespace: string;
-  code: number;
-  data: string;
-  raw_log: string;
-  logs: ABCIMessageLogSDKType[];
-  info: string;
-  gas_wanted: bigint;
-  gas_used: bigint;
-  tx?: AnySDKType;
-  timestamp: string;
-  events: EventSDKType[];
-}
 /** ABCIMessageLog defines a structure containing an indexed tx ABCI message log. */
 export interface ABCIMessageLog {
   msgIndex: number;
@@ -151,12 +132,6 @@ export interface ABCIMessageLogAminoMsg {
   type: "cosmos-sdk/ABCIMessageLog";
   value: ABCIMessageLogAmino;
 }
-/** ABCIMessageLog defines a structure containing an indexed tx ABCI message log. */
-export interface ABCIMessageLogSDKType {
-  msg_index: number;
-  log: string;
-  events: StringEventSDKType[];
-}
 /**
  * StringEvent defines en Event object wrapper where all the attributes
  * contain key/value pairs that are strings instead of raw bytes.
@@ -182,14 +157,6 @@ export interface StringEventAminoMsg {
   value: StringEventAmino;
 }
 /**
- * StringEvent defines en Event object wrapper where all the attributes
- * contain key/value pairs that are strings instead of raw bytes.
- */
-export interface StringEventSDKType {
-  type: string;
-  attributes: AttributeSDKType[];
-}
-/**
  * Attribute defines an attribute wrapper where the key and value are
  * strings instead of raw bytes.
  */
@@ -213,14 +180,6 @@ export interface AttributeAminoMsg {
   type: "cosmos-sdk/Attribute";
   value: AttributeAmino;
 }
-/**
- * Attribute defines an attribute wrapper where the key and value are
- * strings instead of raw bytes.
- */
-export interface AttributeSDKType {
-  key: string;
-  value: string;
-}
 /** GasInfo defines tx execution gas context. */
 export interface GasInfo {
   /** GasWanted is the maximum units of work we allow this tx to perform. */
@@ -242,11 +201,6 @@ export interface GasInfoAmino {
 export interface GasInfoAminoMsg {
   type: "cosmos-sdk/GasInfo";
   value: GasInfoAmino;
-}
-/** GasInfo defines tx execution gas context. */
-export interface GasInfoSDKType {
-  gas_wanted: bigint;
-  gas_used: bigint;
 }
 /** Result is the union of ResponseFormat and ResponseCheckTx. */
 export interface Result {
@@ -304,14 +258,6 @@ export interface ResultAminoMsg {
   type: "cosmos-sdk/Result";
   value: ResultAmino;
 }
-/** Result is the union of ResponseFormat and ResponseCheckTx. */
-export interface ResultSDKType {
-  /** @deprecated */
-  data: Uint8Array;
-  log: string;
-  events: EventSDKType[];
-  msg_responses: AnySDKType[];
-}
 /**
  * SimulationResponse defines the response generated when a transaction is
  * successfully simulated.
@@ -335,14 +281,6 @@ export interface SimulationResponseAmino {
 export interface SimulationResponseAminoMsg {
   type: "cosmos-sdk/SimulationResponse";
   value: SimulationResponseAmino;
-}
-/**
- * SimulationResponse defines the response generated when a transaction is
- * successfully simulated.
- */
-export interface SimulationResponseSDKType {
-  gas_info: GasInfoSDKType;
-  result?: ResultSDKType;
 }
 /**
  * MsgData defines the data returned in a Result object during message
@@ -369,15 +307,6 @@ export interface MsgDataAmino {
 export interface MsgDataAminoMsg {
   type: "cosmos-sdk/MsgData";
   value: MsgDataAmino;
-}
-/**
- * MsgData defines the data returned in a Result object during message
- * execution.
- */
-/** @deprecated */
-export interface MsgDataSDKType {
-  msg_type: string;
-  data: Uint8Array;
 }
 /**
  * TxMsgData defines a list of MsgData. A transaction will have a MsgData object
@@ -417,15 +346,6 @@ export interface TxMsgDataAminoMsg {
   type: "cosmos-sdk/TxMsgData";
   value: TxMsgDataAmino;
 }
-/**
- * TxMsgData defines a list of MsgData. A transaction will have a MsgData object
- * for each message.
- */
-export interface TxMsgDataSDKType {
-  /** @deprecated */
-  data: MsgDataSDKType[];
-  msg_responses: AnySDKType[];
-}
 /** SearchTxsResult defines a structure for querying txs pageable */
 export interface SearchTxsResult {
   /** Count of all txs */
@@ -463,15 +383,6 @@ export interface SearchTxsResultAmino {
 export interface SearchTxsResultAminoMsg {
   type: "cosmos-sdk/SearchTxsResult";
   value: SearchTxsResultAmino;
-}
-/** SearchTxsResult defines a structure for querying txs pageable */
-export interface SearchTxsResultSDKType {
-  total_count: bigint;
-  count: bigint;
-  page_number: bigint;
-  page_total: bigint;
-  limit: bigint;
-  txs: TxResponseSDKType[];
 }
 /** SearchBlocksResult defines a structure for querying blocks pageable */
 export interface SearchBlocksResult {
@@ -511,15 +422,6 @@ export interface SearchBlocksResultAminoMsg {
   type: "cosmos-sdk/SearchBlocksResult";
   value: SearchBlocksResultAmino;
 }
-/** SearchBlocksResult defines a structure for querying blocks pageable */
-export interface SearchBlocksResultSDKType {
-  total_count: bigint;
-  count: bigint;
-  page_number: bigint;
-  page_total: bigint;
-  limit: bigint;
-  blocks: BlockSDKType[];
-}
 function createBaseTxResponse(): TxResponse {
   return {
     height: BigInt(0),
@@ -539,6 +441,7 @@ function createBaseTxResponse(): TxResponse {
 }
 export const TxResponse = {
   typeUrl: "/cosmos.base.abci.v1beta1.TxResponse",
+  aminoType: "cosmos-sdk/TxResponse",
   encode(message: TxResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.height !== BigInt(0)) {
       writer.uint32(8).int64(message.height);
@@ -634,7 +537,7 @@ export const TxResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<TxResponse>): TxResponse {
+  fromPartial(object: DeepPartial<TxResponse>): TxResponse {
     const message = createBaseTxResponse();
     message.height = object.height !== undefined && object.height !== null ? BigInt(object.height.toString()) : BigInt(0);
     message.txhash = object.txhash ?? "";
@@ -746,6 +649,7 @@ function createBaseABCIMessageLog(): ABCIMessageLog {
 }
 export const ABCIMessageLog = {
   typeUrl: "/cosmos.base.abci.v1beta1.ABCIMessageLog",
+  aminoType: "cosmos-sdk/ABCIMessageLog",
   encode(message: ABCIMessageLog, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.msgIndex !== 0) {
       writer.uint32(8).uint32(message.msgIndex);
@@ -781,7 +685,7 @@ export const ABCIMessageLog = {
     }
     return message;
   },
-  fromPartial(object: Partial<ABCIMessageLog>): ABCIMessageLog {
+  fromPartial(object: DeepPartial<ABCIMessageLog>): ABCIMessageLog {
     const message = createBaseABCIMessageLog();
     message.msgIndex = object.msgIndex ?? 0;
     message.log = object.log ?? "";
@@ -840,6 +744,7 @@ function createBaseStringEvent(): StringEvent {
 }
 export const StringEvent = {
   typeUrl: "/cosmos.base.abci.v1beta1.StringEvent",
+  aminoType: "cosmos-sdk/StringEvent",
   encode(message: StringEvent, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.type !== "") {
       writer.uint32(10).string(message.type);
@@ -869,7 +774,7 @@ export const StringEvent = {
     }
     return message;
   },
-  fromPartial(object: Partial<StringEvent>): StringEvent {
+  fromPartial(object: DeepPartial<StringEvent>): StringEvent {
     const message = createBaseStringEvent();
     message.type = object.type ?? "";
     message.attributes = object.attributes?.map(e => Attribute.fromPartial(e)) || [];
@@ -923,6 +828,7 @@ function createBaseAttribute(): Attribute {
 }
 export const Attribute = {
   typeUrl: "/cosmos.base.abci.v1beta1.Attribute",
+  aminoType: "cosmos-sdk/Attribute",
   encode(message: Attribute, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.key !== "") {
       writer.uint32(10).string(message.key);
@@ -952,7 +858,7 @@ export const Attribute = {
     }
     return message;
   },
-  fromPartial(object: Partial<Attribute>): Attribute {
+  fromPartial(object: DeepPartial<Attribute>): Attribute {
     const message = createBaseAttribute();
     message.key = object.key ?? "";
     message.value = object.value ?? "";
@@ -1004,6 +910,7 @@ function createBaseGasInfo(): GasInfo {
 }
 export const GasInfo = {
   typeUrl: "/cosmos.base.abci.v1beta1.GasInfo",
+  aminoType: "cosmos-sdk/GasInfo",
   encode(message: GasInfo, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.gasWanted !== BigInt(0)) {
       writer.uint32(8).uint64(message.gasWanted);
@@ -1033,7 +940,7 @@ export const GasInfo = {
     }
     return message;
   },
-  fromPartial(object: Partial<GasInfo>): GasInfo {
+  fromPartial(object: DeepPartial<GasInfo>): GasInfo {
     const message = createBaseGasInfo();
     message.gasWanted = object.gasWanted !== undefined && object.gasWanted !== null ? BigInt(object.gasWanted.toString()) : BigInt(0);
     message.gasUsed = object.gasUsed !== undefined && object.gasUsed !== null ? BigInt(object.gasUsed.toString()) : BigInt(0);
@@ -1087,6 +994,7 @@ function createBaseResult(): Result {
 }
 export const Result = {
   typeUrl: "/cosmos.base.abci.v1beta1.Result",
+  aminoType: "cosmos-sdk/Result",
   encode(message: Result, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.data.length !== 0) {
       writer.uint32(10).bytes(message.data);
@@ -1128,7 +1036,7 @@ export const Result = {
     }
     return message;
   },
-  fromPartial(object: Partial<Result>): Result {
+  fromPartial(object: DeepPartial<Result>): Result {
     const message = createBaseResult();
     message.data = object.data ?? new Uint8Array();
     message.log = object.log ?? "";
@@ -1194,6 +1102,7 @@ function createBaseSimulationResponse(): SimulationResponse {
 }
 export const SimulationResponse = {
   typeUrl: "/cosmos.base.abci.v1beta1.SimulationResponse",
+  aminoType: "cosmos-sdk/SimulationResponse",
   encode(message: SimulationResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.gasInfo !== undefined) {
       GasInfo.encode(message.gasInfo, writer.uint32(10).fork()).ldelim();
@@ -1223,7 +1132,7 @@ export const SimulationResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<SimulationResponse>): SimulationResponse {
+  fromPartial(object: DeepPartial<SimulationResponse>): SimulationResponse {
     const message = createBaseSimulationResponse();
     message.gasInfo = object.gasInfo !== undefined && object.gasInfo !== null ? GasInfo.fromPartial(object.gasInfo) : undefined;
     message.result = object.result !== undefined && object.result !== null ? Result.fromPartial(object.result) : undefined;
@@ -1275,6 +1184,7 @@ function createBaseMsgData(): MsgData {
 }
 export const MsgData = {
   typeUrl: "/cosmos.base.abci.v1beta1.MsgData",
+  aminoType: "cosmos-sdk/MsgData",
   encode(message: MsgData, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.msgType !== "") {
       writer.uint32(10).string(message.msgType);
@@ -1304,7 +1214,7 @@ export const MsgData = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgData>): MsgData {
+  fromPartial(object: DeepPartial<MsgData>): MsgData {
     const message = createBaseMsgData();
     message.msgType = object.msgType ?? "";
     message.data = object.data ?? new Uint8Array();
@@ -1356,6 +1266,7 @@ function createBaseTxMsgData(): TxMsgData {
 }
 export const TxMsgData = {
   typeUrl: "/cosmos.base.abci.v1beta1.TxMsgData",
+  aminoType: "cosmos-sdk/TxMsgData",
   encode(message: TxMsgData, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.data) {
       MsgData.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -1385,7 +1296,7 @@ export const TxMsgData = {
     }
     return message;
   },
-  fromPartial(object: Partial<TxMsgData>): TxMsgData {
+  fromPartial(object: DeepPartial<TxMsgData>): TxMsgData {
     const message = createBaseTxMsgData();
     message.data = object.data?.map(e => MsgData.fromPartial(e)) || [];
     message.msgResponses = object.msgResponses?.map(e => Any.fromPartial(e)) || [];
@@ -1445,6 +1356,7 @@ function createBaseSearchTxsResult(): SearchTxsResult {
 }
 export const SearchTxsResult = {
   typeUrl: "/cosmos.base.abci.v1beta1.SearchTxsResult",
+  aminoType: "cosmos-sdk/SearchTxsResult",
   encode(message: SearchTxsResult, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.totalCount !== BigInt(0)) {
       writer.uint32(8).uint64(message.totalCount);
@@ -1498,7 +1410,7 @@ export const SearchTxsResult = {
     }
     return message;
   },
-  fromPartial(object: Partial<SearchTxsResult>): SearchTxsResult {
+  fromPartial(object: DeepPartial<SearchTxsResult>): SearchTxsResult {
     const message = createBaseSearchTxsResult();
     message.totalCount = object.totalCount !== undefined && object.totalCount !== null ? BigInt(object.totalCount.toString()) : BigInt(0);
     message.count = object.count !== undefined && object.count !== null ? BigInt(object.count.toString()) : BigInt(0);
@@ -1576,6 +1488,7 @@ function createBaseSearchBlocksResult(): SearchBlocksResult {
 }
 export const SearchBlocksResult = {
   typeUrl: "/cosmos.base.abci.v1beta1.SearchBlocksResult",
+  aminoType: "cosmos-sdk/SearchBlocksResult",
   encode(message: SearchBlocksResult, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.totalCount !== BigInt(0)) {
       writer.uint32(8).int64(message.totalCount);
@@ -1629,7 +1542,7 @@ export const SearchBlocksResult = {
     }
     return message;
   },
-  fromPartial(object: Partial<SearchBlocksResult>): SearchBlocksResult {
+  fromPartial(object: DeepPartial<SearchBlocksResult>): SearchBlocksResult {
     const message = createBaseSearchBlocksResult();
     message.totalCount = object.totalCount !== undefined && object.totalCount !== null ? BigInt(object.totalCount.toString()) : BigInt(0);
     message.count = object.count !== undefined && object.count !== null ? BigInt(object.count.toString()) : BigInt(0);

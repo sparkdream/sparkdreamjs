@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../../binary";
+import { DeepPartial } from "../../../../../helpers";
 /**
  * Params defines the set of on-chain interchain accounts parameters.
  * The following parameters may be used to disable the controller submodule.
@@ -24,13 +25,6 @@ export interface ParamsAminoMsg {
   type: "cosmos-sdk/Params";
   value: ParamsAmino;
 }
-/**
- * Params defines the set of on-chain interchain accounts parameters.
- * The following parameters may be used to disable the controller submodule.
- */
-export interface ParamsSDKType {
-  controller_enabled: boolean;
-}
 function createBaseParams(): Params {
   return {
     controllerEnabled: false
@@ -38,6 +32,7 @@ function createBaseParams(): Params {
 }
 export const Params = {
   typeUrl: "/ibc.applications.interchain_accounts.controller.v1.Params",
+  aminoType: "cosmos-sdk/Params",
   encode(message: Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.controllerEnabled === true) {
       writer.uint32(8).bool(message.controllerEnabled);
@@ -61,7 +56,7 @@ export const Params = {
     }
     return message;
   },
-  fromPartial(object: Partial<Params>): Params {
+  fromPartial(object: DeepPartial<Params>): Params {
     const message = createBaseParams();
     message.controllerEnabled = object.controllerEnabled ?? false;
     return message;

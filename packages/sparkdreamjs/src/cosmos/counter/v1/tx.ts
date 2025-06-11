@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** MsgIncreaseCounter defines a count Msg service counter. */
 export interface MsgIncreaseCounter {
   /** signer is the address that controls the module (defaults to x/gov unless overwritten). */
@@ -22,11 +23,6 @@ export interface MsgIncreaseCounterAminoMsg {
   type: "cosmos-sdk/increase_counter";
   value: MsgIncreaseCounterAmino;
 }
-/** MsgIncreaseCounter defines a count Msg service counter. */
-export interface MsgIncreaseCounterSDKType {
-  signer: string;
-  count: bigint;
-}
 /** MsgIncreaseCountResponse is the Msg/Counter response type. */
 export interface MsgIncreaseCountResponse {
   /** new_count is the number of times the counter was incremented. */
@@ -45,10 +41,6 @@ export interface MsgIncreaseCountResponseAminoMsg {
   type: "cosmos-sdk/MsgIncreaseCountResponse";
   value: MsgIncreaseCountResponseAmino;
 }
-/** MsgIncreaseCountResponse is the Msg/Counter response type. */
-export interface MsgIncreaseCountResponseSDKType {
-  new_count: bigint;
-}
 function createBaseMsgIncreaseCounter(): MsgIncreaseCounter {
   return {
     signer: "",
@@ -57,6 +49,7 @@ function createBaseMsgIncreaseCounter(): MsgIncreaseCounter {
 }
 export const MsgIncreaseCounter = {
   typeUrl: "/cosmos.counter.v1.MsgIncreaseCounter",
+  aminoType: "cosmos-sdk/increase_counter",
   encode(message: MsgIncreaseCounter, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.signer !== "") {
       writer.uint32(10).string(message.signer);
@@ -86,7 +79,7 @@ export const MsgIncreaseCounter = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgIncreaseCounter>): MsgIncreaseCounter {
+  fromPartial(object: DeepPartial<MsgIncreaseCounter>): MsgIncreaseCounter {
     const message = createBaseMsgIncreaseCounter();
     message.signer = object.signer ?? "";
     message.count = object.count !== undefined && object.count !== null ? BigInt(object.count.toString()) : BigInt(0);
@@ -137,6 +130,7 @@ function createBaseMsgIncreaseCountResponse(): MsgIncreaseCountResponse {
 }
 export const MsgIncreaseCountResponse = {
   typeUrl: "/cosmos.counter.v1.MsgIncreaseCountResponse",
+  aminoType: "cosmos-sdk/MsgIncreaseCountResponse",
   encode(message: MsgIncreaseCountResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.newCount !== BigInt(0)) {
       writer.uint32(8).int64(message.newCount);
@@ -160,7 +154,7 @@ export const MsgIncreaseCountResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgIncreaseCountResponse>): MsgIncreaseCountResponse {
+  fromPartial(object: DeepPartial<MsgIncreaseCountResponse>): MsgIncreaseCountResponse {
     const message = createBaseMsgIncreaseCountResponse();
     message.newCount = object.newCount !== undefined && object.newCount !== null ? BigInt(object.newCount.toString()) : BigInt(0);
     return message;

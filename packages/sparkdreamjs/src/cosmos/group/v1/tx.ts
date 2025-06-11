@@ -1,7 +1,8 @@
 //@ts-nocheck
-import { MemberRequest, MemberRequestAmino, MemberRequestSDKType, VoteOption, ProposalExecutorResult, ThresholdDecisionPolicy, ThresholdDecisionPolicyProtoMsg, ThresholdDecisionPolicySDKType, PercentageDecisionPolicy, PercentageDecisionPolicyProtoMsg, PercentageDecisionPolicySDKType } from "./types";
-import { Any, AnyProtoMsg, AnyAmino, AnySDKType } from "../../../google/protobuf/any";
+import { MemberRequest, MemberRequestAmino, VoteOption, ProposalExecutorResult, ThresholdDecisionPolicy, ThresholdDecisionPolicyProtoMsg, PercentageDecisionPolicy, PercentageDecisionPolicyProtoMsg } from "./types";
+import { Any, AnyProtoMsg, AnyAmino } from "../../../google/protobuf/any";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** Exec defines modes of execution of a proposal on creation or on new vote. */
 export enum Exec {
   /**
@@ -18,7 +19,6 @@ export enum Exec {
   EXEC_TRY = 1,
   UNRECOGNIZED = -1,
 }
-export const ExecSDKType = Exec;
 export const ExecAmino = Exec;
 export function execFromJSON(object: any): Exec {
   switch (object) {
@@ -71,12 +71,6 @@ export interface MsgCreateGroupAminoMsg {
   type: "cosmos-sdk/MsgCreateGroup";
   value: MsgCreateGroupAmino;
 }
-/** MsgCreateGroup is the Msg/CreateGroup request type. */
-export interface MsgCreateGroupSDKType {
-  admin: string;
-  members: MemberRequestSDKType[];
-  metadata: string;
-}
 /** MsgCreateGroupResponse is the Msg/CreateGroup response type. */
 export interface MsgCreateGroupResponse {
   /** group_id is the unique ID of the newly created group. */
@@ -94,10 +88,6 @@ export interface MsgCreateGroupResponseAmino {
 export interface MsgCreateGroupResponseAminoMsg {
   type: "cosmos-sdk/MsgCreateGroupResponse";
   value: MsgCreateGroupResponseAmino;
-}
-/** MsgCreateGroupResponse is the Msg/CreateGroup response type. */
-export interface MsgCreateGroupResponseSDKType {
-  group_id: bigint;
 }
 /** MsgUpdateGroupMembers is the Msg/UpdateGroupMembers request type. */
 export interface MsgUpdateGroupMembers {
@@ -131,12 +121,6 @@ export interface MsgUpdateGroupMembersAminoMsg {
   type: "cosmos-sdk/MsgUpdateGroupMembers";
   value: MsgUpdateGroupMembersAmino;
 }
-/** MsgUpdateGroupMembers is the Msg/UpdateGroupMembers request type. */
-export interface MsgUpdateGroupMembersSDKType {
-  admin: string;
-  group_id: bigint;
-  member_updates: MemberRequestSDKType[];
-}
 /** MsgUpdateGroupMembersResponse is the Msg/UpdateGroupMembers response type. */
 export interface MsgUpdateGroupMembersResponse {}
 export interface MsgUpdateGroupMembersResponseProtoMsg {
@@ -149,8 +133,6 @@ export interface MsgUpdateGroupMembersResponseAminoMsg {
   type: "cosmos-sdk/MsgUpdateGroupMembersResponse";
   value: MsgUpdateGroupMembersResponseAmino;
 }
-/** MsgUpdateGroupMembersResponse is the Msg/UpdateGroupMembers response type. */
-export interface MsgUpdateGroupMembersResponseSDKType {}
 /** MsgUpdateGroupAdmin is the Msg/UpdateGroupAdmin request type. */
 export interface MsgUpdateGroupAdmin {
   /** admin is the current account address of the group admin. */
@@ -177,12 +159,6 @@ export interface MsgUpdateGroupAdminAminoMsg {
   type: "cosmos-sdk/MsgUpdateGroupAdmin";
   value: MsgUpdateGroupAdminAmino;
 }
-/** MsgUpdateGroupAdmin is the Msg/UpdateGroupAdmin request type. */
-export interface MsgUpdateGroupAdminSDKType {
-  admin: string;
-  group_id: bigint;
-  new_admin: string;
-}
 /** MsgUpdateGroupAdminResponse is the Msg/UpdateGroupAdmin response type. */
 export interface MsgUpdateGroupAdminResponse {}
 export interface MsgUpdateGroupAdminResponseProtoMsg {
@@ -195,8 +171,6 @@ export interface MsgUpdateGroupAdminResponseAminoMsg {
   type: "cosmos-sdk/MsgUpdateGroupAdminResponse";
   value: MsgUpdateGroupAdminResponseAmino;
 }
-/** MsgUpdateGroupAdminResponse is the Msg/UpdateGroupAdmin response type. */
-export interface MsgUpdateGroupAdminResponseSDKType {}
 /** MsgUpdateGroupMetadata is the Msg/UpdateGroupMetadata request type. */
 export interface MsgUpdateGroupMetadata {
   /** admin is the account address of the group admin. */
@@ -223,12 +197,6 @@ export interface MsgUpdateGroupMetadataAminoMsg {
   type: "cosmos-sdk/MsgUpdateGroupMetadata";
   value: MsgUpdateGroupMetadataAmino;
 }
-/** MsgUpdateGroupMetadata is the Msg/UpdateGroupMetadata request type. */
-export interface MsgUpdateGroupMetadataSDKType {
-  admin: string;
-  group_id: bigint;
-  metadata: string;
-}
 /** MsgUpdateGroupMetadataResponse is the Msg/UpdateGroupMetadata response type. */
 export interface MsgUpdateGroupMetadataResponse {}
 export interface MsgUpdateGroupMetadataResponseProtoMsg {
@@ -241,8 +209,6 @@ export interface MsgUpdateGroupMetadataResponseAminoMsg {
   type: "cosmos-sdk/MsgUpdateGroupMetadataResponse";
   value: MsgUpdateGroupMetadataResponseAmino;
 }
-/** MsgUpdateGroupMetadataResponse is the Msg/UpdateGroupMetadata response type. */
-export interface MsgUpdateGroupMetadataResponseSDKType {}
 /** MsgCreateGroupPolicy is the Msg/CreateGroupPolicy request type. */
 export interface MsgCreateGroupPolicy {
   /** admin is the account address of the group admin. */
@@ -276,13 +242,6 @@ export interface MsgCreateGroupPolicyAminoMsg {
   type: "cosmos-sdk/MsgCreateGroupPolicy";
   value: MsgCreateGroupPolicyAmino;
 }
-/** MsgCreateGroupPolicy is the Msg/CreateGroupPolicy request type. */
-export interface MsgCreateGroupPolicySDKType {
-  admin: string;
-  group_id: bigint;
-  metadata: string;
-  decision_policy?: ThresholdDecisionPolicySDKType | PercentageDecisionPolicySDKType | AnySDKType | undefined;
-}
 /** MsgCreateGroupPolicyResponse is the Msg/CreateGroupPolicy response type. */
 export interface MsgCreateGroupPolicyResponse {
   /** address is the account address of the newly created group policy. */
@@ -300,10 +259,6 @@ export interface MsgCreateGroupPolicyResponseAmino {
 export interface MsgCreateGroupPolicyResponseAminoMsg {
   type: "cosmos-sdk/MsgCreateGroupPolicyResponse";
   value: MsgCreateGroupPolicyResponseAmino;
-}
-/** MsgCreateGroupPolicyResponse is the Msg/CreateGroupPolicy response type. */
-export interface MsgCreateGroupPolicyResponseSDKType {
-  address: string;
 }
 /** MsgUpdateGroupPolicyAdmin is the Msg/UpdateGroupPolicyAdmin request type. */
 export interface MsgUpdateGroupPolicyAdmin {
@@ -331,12 +286,6 @@ export interface MsgUpdateGroupPolicyAdminAminoMsg {
   type: "cosmos-sdk/MsgUpdateGroupPolicyAdmin";
   value: MsgUpdateGroupPolicyAdminAmino;
 }
-/** MsgUpdateGroupPolicyAdmin is the Msg/UpdateGroupPolicyAdmin request type. */
-export interface MsgUpdateGroupPolicyAdminSDKType {
-  admin: string;
-  group_policy_address: string;
-  new_admin: string;
-}
 /** MsgUpdateGroupPolicyAdminResponse is the Msg/UpdateGroupPolicyAdmin response type. */
 export interface MsgUpdateGroupPolicyAdminResponse {}
 export interface MsgUpdateGroupPolicyAdminResponseProtoMsg {
@@ -349,8 +298,6 @@ export interface MsgUpdateGroupPolicyAdminResponseAminoMsg {
   type: "cosmos-sdk/MsgUpdateGroupPolicyAdminResponse";
   value: MsgUpdateGroupPolicyAdminResponseAmino;
 }
-/** MsgUpdateGroupPolicyAdminResponse is the Msg/UpdateGroupPolicyAdmin response type. */
-export interface MsgUpdateGroupPolicyAdminResponseSDKType {}
 /** MsgCreateGroupWithPolicy is the Msg/CreateGroupWithPolicy request type. */
 export interface MsgCreateGroupWithPolicy {
   /** admin is the account address of the group and group policy admin. */
@@ -398,15 +345,6 @@ export interface MsgCreateGroupWithPolicyAminoMsg {
   type: "cosmos-sdk/MsgCreateGroupWithPolicy";
   value: MsgCreateGroupWithPolicyAmino;
 }
-/** MsgCreateGroupWithPolicy is the Msg/CreateGroupWithPolicy request type. */
-export interface MsgCreateGroupWithPolicySDKType {
-  admin: string;
-  members: MemberRequestSDKType[];
-  group_metadata: string;
-  group_policy_metadata: string;
-  group_policy_as_admin: boolean;
-  decision_policy?: ThresholdDecisionPolicySDKType | PercentageDecisionPolicySDKType | AnySDKType | undefined;
-}
 /** MsgCreateGroupWithPolicyResponse is the Msg/CreateGroupWithPolicy response type. */
 export interface MsgCreateGroupWithPolicyResponse {
   /** group_id is the unique ID of the newly created group with policy. */
@@ -428,11 +366,6 @@ export interface MsgCreateGroupWithPolicyResponseAmino {
 export interface MsgCreateGroupWithPolicyResponseAminoMsg {
   type: "cosmos-sdk/MsgCreateGroupWithPolicyResponse";
   value: MsgCreateGroupWithPolicyResponseAmino;
-}
-/** MsgCreateGroupWithPolicyResponse is the Msg/CreateGroupWithPolicy response type. */
-export interface MsgCreateGroupWithPolicyResponseSDKType {
-  group_id: bigint;
-  group_policy_address: string;
 }
 /** MsgUpdateGroupPolicyDecisionPolicy is the Msg/UpdateGroupPolicyDecisionPolicy request type. */
 export interface MsgUpdateGroupPolicyDecisionPolicy {
@@ -463,12 +396,6 @@ export interface MsgUpdateGroupPolicyDecisionPolicyAminoMsg {
   type: "cosmos-sdk/MsgUpdateGroupDecisionPolicy";
   value: MsgUpdateGroupPolicyDecisionPolicyAmino;
 }
-/** MsgUpdateGroupPolicyDecisionPolicy is the Msg/UpdateGroupPolicyDecisionPolicy request type. */
-export interface MsgUpdateGroupPolicyDecisionPolicySDKType {
-  admin: string;
-  group_policy_address: string;
-  decision_policy?: ThresholdDecisionPolicySDKType | PercentageDecisionPolicySDKType | AnySDKType | undefined;
-}
 /** MsgUpdateGroupPolicyDecisionPolicyResponse is the Msg/UpdateGroupPolicyDecisionPolicy response type. */
 export interface MsgUpdateGroupPolicyDecisionPolicyResponse {}
 export interface MsgUpdateGroupPolicyDecisionPolicyResponseProtoMsg {
@@ -481,8 +408,6 @@ export interface MsgUpdateGroupPolicyDecisionPolicyResponseAminoMsg {
   type: "cosmos-sdk/MsgUpdateGroupPolicyDecisionPolicyResponse";
   value: MsgUpdateGroupPolicyDecisionPolicyResponseAmino;
 }
-/** MsgUpdateGroupPolicyDecisionPolicyResponse is the Msg/UpdateGroupPolicyDecisionPolicy response type. */
-export interface MsgUpdateGroupPolicyDecisionPolicyResponseSDKType {}
 /** MsgUpdateGroupPolicyMetadata is the Msg/UpdateGroupPolicyMetadata request type. */
 export interface MsgUpdateGroupPolicyMetadata {
   /** admin is the account address of the group admin. */
@@ -509,12 +434,6 @@ export interface MsgUpdateGroupPolicyMetadataAminoMsg {
   type: "cosmos-sdk/MsgUpdateGroupPolicyMetadata";
   value: MsgUpdateGroupPolicyMetadataAmino;
 }
-/** MsgUpdateGroupPolicyMetadata is the Msg/UpdateGroupPolicyMetadata request type. */
-export interface MsgUpdateGroupPolicyMetadataSDKType {
-  admin: string;
-  group_policy_address: string;
-  metadata: string;
-}
 /** MsgUpdateGroupPolicyMetadataResponse is the Msg/UpdateGroupPolicyMetadata response type. */
 export interface MsgUpdateGroupPolicyMetadataResponse {}
 export interface MsgUpdateGroupPolicyMetadataResponseProtoMsg {
@@ -527,8 +446,6 @@ export interface MsgUpdateGroupPolicyMetadataResponseAminoMsg {
   type: "cosmos-sdk/MsgUpdateGroupPolicyMetadataResponse";
   value: MsgUpdateGroupPolicyMetadataResponseAmino;
 }
-/** MsgUpdateGroupPolicyMetadataResponse is the Msg/UpdateGroupPolicyMetadata response type. */
-export interface MsgUpdateGroupPolicyMetadataResponseSDKType {}
 /** MsgSubmitProposal is the Msg/SubmitProposal request type. */
 export interface MsgSubmitProposal {
   /** group_policy_address is the account address of group policy. */
@@ -601,16 +518,6 @@ export interface MsgSubmitProposalAminoMsg {
   type: "cosmos-sdk/group/MsgSubmitProposal";
   value: MsgSubmitProposalAmino;
 }
-/** MsgSubmitProposal is the Msg/SubmitProposal request type. */
-export interface MsgSubmitProposalSDKType {
-  group_policy_address: string;
-  proposers: string[];
-  metadata: string;
-  messages: AnySDKType[];
-  exec: Exec;
-  title: string;
-  summary: string;
-}
 /** MsgSubmitProposalResponse is the Msg/SubmitProposal response type. */
 export interface MsgSubmitProposalResponse {
   /** proposal is the unique ID of the proposal. */
@@ -628,10 +535,6 @@ export interface MsgSubmitProposalResponseAmino {
 export interface MsgSubmitProposalResponseAminoMsg {
   type: "cosmos-sdk/MsgSubmitProposalResponse";
   value: MsgSubmitProposalResponseAmino;
-}
-/** MsgSubmitProposalResponse is the Msg/SubmitProposal response type. */
-export interface MsgSubmitProposalResponseSDKType {
-  proposal_id: bigint;
 }
 /** MsgWithdrawProposal is the Msg/WithdrawProposal request type. */
 export interface MsgWithdrawProposal {
@@ -655,11 +558,6 @@ export interface MsgWithdrawProposalAminoMsg {
   type: "cosmos-sdk/group/MsgWithdrawProposal";
   value: MsgWithdrawProposalAmino;
 }
-/** MsgWithdrawProposal is the Msg/WithdrawProposal request type. */
-export interface MsgWithdrawProposalSDKType {
-  proposal_id: bigint;
-  address: string;
-}
 /** MsgWithdrawProposalResponse is the Msg/WithdrawProposal response type. */
 export interface MsgWithdrawProposalResponse {}
 export interface MsgWithdrawProposalResponseProtoMsg {
@@ -672,8 +570,6 @@ export interface MsgWithdrawProposalResponseAminoMsg {
   type: "cosmos-sdk/MsgWithdrawProposalResponse";
   value: MsgWithdrawProposalResponseAmino;
 }
-/** MsgWithdrawProposalResponse is the Msg/WithdrawProposal response type. */
-export interface MsgWithdrawProposalResponseSDKType {}
 /** MsgVote is the Msg/Vote request type. */
 export interface MsgVote {
   /** proposal is the unique ID of the proposal. */
@@ -714,14 +610,6 @@ export interface MsgVoteAminoMsg {
   type: "cosmos-sdk/group/MsgVote";
   value: MsgVoteAmino;
 }
-/** MsgVote is the Msg/Vote request type. */
-export interface MsgVoteSDKType {
-  proposal_id: bigint;
-  voter: string;
-  option: VoteOption;
-  metadata: string;
-  exec: Exec;
-}
 /** MsgVoteResponse is the Msg/Vote response type. */
 export interface MsgVoteResponse {}
 export interface MsgVoteResponseProtoMsg {
@@ -734,8 +622,6 @@ export interface MsgVoteResponseAminoMsg {
   type: "cosmos-sdk/MsgVoteResponse";
   value: MsgVoteResponseAmino;
 }
-/** MsgVoteResponse is the Msg/Vote response type. */
-export interface MsgVoteResponseSDKType {}
 /** MsgExec is the Msg/Exec request type. */
 export interface MsgExec {
   /** proposal is the unique ID of the proposal. */
@@ -758,11 +644,6 @@ export interface MsgExecAminoMsg {
   type: "cosmos-sdk/group/MsgExec";
   value: MsgExecAmino;
 }
-/** MsgExec is the Msg/Exec request type. */
-export interface MsgExecSDKType {
-  proposal_id: bigint;
-  executor: string;
-}
 /** MsgExecResponse is the Msg/Exec request type. */
 export interface MsgExecResponse {
   /** result is the final result of the proposal execution. */
@@ -780,10 +661,6 @@ export interface MsgExecResponseAmino {
 export interface MsgExecResponseAminoMsg {
   type: "cosmos-sdk/MsgExecResponse";
   value: MsgExecResponseAmino;
-}
-/** MsgExecResponse is the Msg/Exec request type. */
-export interface MsgExecResponseSDKType {
-  result: ProposalExecutorResult;
 }
 /** MsgLeaveGroup is the Msg/LeaveGroup request type. */
 export interface MsgLeaveGroup {
@@ -807,11 +684,6 @@ export interface MsgLeaveGroupAminoMsg {
   type: "cosmos-sdk/group/MsgLeaveGroup";
   value: MsgLeaveGroupAmino;
 }
-/** MsgLeaveGroup is the Msg/LeaveGroup request type. */
-export interface MsgLeaveGroupSDKType {
-  address: string;
-  group_id: bigint;
-}
 /** MsgLeaveGroupResponse is the Msg/LeaveGroup response type. */
 export interface MsgLeaveGroupResponse {}
 export interface MsgLeaveGroupResponseProtoMsg {
@@ -824,8 +696,6 @@ export interface MsgLeaveGroupResponseAminoMsg {
   type: "cosmos-sdk/MsgLeaveGroupResponse";
   value: MsgLeaveGroupResponseAmino;
 }
-/** MsgLeaveGroupResponse is the Msg/LeaveGroup response type. */
-export interface MsgLeaveGroupResponseSDKType {}
 function createBaseMsgCreateGroup(): MsgCreateGroup {
   return {
     admin: "",
@@ -835,6 +705,7 @@ function createBaseMsgCreateGroup(): MsgCreateGroup {
 }
 export const MsgCreateGroup = {
   typeUrl: "/cosmos.group.v1.MsgCreateGroup",
+  aminoType: "cosmos-sdk/MsgCreateGroup",
   encode(message: MsgCreateGroup, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.admin !== "") {
       writer.uint32(10).string(message.admin);
@@ -870,7 +741,7 @@ export const MsgCreateGroup = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgCreateGroup>): MsgCreateGroup {
+  fromPartial(object: DeepPartial<MsgCreateGroup>): MsgCreateGroup {
     const message = createBaseMsgCreateGroup();
     message.admin = object.admin ?? "";
     message.members = object.members?.map(e => MemberRequest.fromPartial(e)) || [];
@@ -928,6 +799,7 @@ function createBaseMsgCreateGroupResponse(): MsgCreateGroupResponse {
 }
 export const MsgCreateGroupResponse = {
   typeUrl: "/cosmos.group.v1.MsgCreateGroupResponse",
+  aminoType: "cosmos-sdk/MsgCreateGroupResponse",
   encode(message: MsgCreateGroupResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.groupId !== BigInt(0)) {
       writer.uint32(8).uint64(message.groupId);
@@ -951,7 +823,7 @@ export const MsgCreateGroupResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgCreateGroupResponse>): MsgCreateGroupResponse {
+  fromPartial(object: DeepPartial<MsgCreateGroupResponse>): MsgCreateGroupResponse {
     const message = createBaseMsgCreateGroupResponse();
     message.groupId = object.groupId !== undefined && object.groupId !== null ? BigInt(object.groupId.toString()) : BigInt(0);
     return message;
@@ -999,6 +871,7 @@ function createBaseMsgUpdateGroupMembers(): MsgUpdateGroupMembers {
 }
 export const MsgUpdateGroupMembers = {
   typeUrl: "/cosmos.group.v1.MsgUpdateGroupMembers",
+  aminoType: "cosmos-sdk/MsgUpdateGroupMembers",
   encode(message: MsgUpdateGroupMembers, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.admin !== "") {
       writer.uint32(10).string(message.admin);
@@ -1034,7 +907,7 @@ export const MsgUpdateGroupMembers = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpdateGroupMembers>): MsgUpdateGroupMembers {
+  fromPartial(object: DeepPartial<MsgUpdateGroupMembers>): MsgUpdateGroupMembers {
     const message = createBaseMsgUpdateGroupMembers();
     message.admin = object.admin ?? "";
     message.groupId = object.groupId !== undefined && object.groupId !== null ? BigInt(object.groupId.toString()) : BigInt(0);
@@ -1090,6 +963,7 @@ function createBaseMsgUpdateGroupMembersResponse(): MsgUpdateGroupMembersRespons
 }
 export const MsgUpdateGroupMembersResponse = {
   typeUrl: "/cosmos.group.v1.MsgUpdateGroupMembersResponse",
+  aminoType: "cosmos-sdk/MsgUpdateGroupMembersResponse",
   encode(_: MsgUpdateGroupMembersResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1107,7 +981,7 @@ export const MsgUpdateGroupMembersResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpdateGroupMembersResponse>): MsgUpdateGroupMembersResponse {
+  fromPartial(_: DeepPartial<MsgUpdateGroupMembersResponse>): MsgUpdateGroupMembersResponse {
     const message = createBaseMsgUpdateGroupMembersResponse();
     return message;
   },
@@ -1150,6 +1024,7 @@ function createBaseMsgUpdateGroupAdmin(): MsgUpdateGroupAdmin {
 }
 export const MsgUpdateGroupAdmin = {
   typeUrl: "/cosmos.group.v1.MsgUpdateGroupAdmin",
+  aminoType: "cosmos-sdk/MsgUpdateGroupAdmin",
   encode(message: MsgUpdateGroupAdmin, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.admin !== "") {
       writer.uint32(10).string(message.admin);
@@ -1185,7 +1060,7 @@ export const MsgUpdateGroupAdmin = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpdateGroupAdmin>): MsgUpdateGroupAdmin {
+  fromPartial(object: DeepPartial<MsgUpdateGroupAdmin>): MsgUpdateGroupAdmin {
     const message = createBaseMsgUpdateGroupAdmin();
     message.admin = object.admin ?? "";
     message.groupId = object.groupId !== undefined && object.groupId !== null ? BigInt(object.groupId.toString()) : BigInt(0);
@@ -1239,6 +1114,7 @@ function createBaseMsgUpdateGroupAdminResponse(): MsgUpdateGroupAdminResponse {
 }
 export const MsgUpdateGroupAdminResponse = {
   typeUrl: "/cosmos.group.v1.MsgUpdateGroupAdminResponse",
+  aminoType: "cosmos-sdk/MsgUpdateGroupAdminResponse",
   encode(_: MsgUpdateGroupAdminResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1256,7 +1132,7 @@ export const MsgUpdateGroupAdminResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpdateGroupAdminResponse>): MsgUpdateGroupAdminResponse {
+  fromPartial(_: DeepPartial<MsgUpdateGroupAdminResponse>): MsgUpdateGroupAdminResponse {
     const message = createBaseMsgUpdateGroupAdminResponse();
     return message;
   },
@@ -1299,6 +1175,7 @@ function createBaseMsgUpdateGroupMetadata(): MsgUpdateGroupMetadata {
 }
 export const MsgUpdateGroupMetadata = {
   typeUrl: "/cosmos.group.v1.MsgUpdateGroupMetadata",
+  aminoType: "cosmos-sdk/MsgUpdateGroupMetadata",
   encode(message: MsgUpdateGroupMetadata, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.admin !== "") {
       writer.uint32(10).string(message.admin);
@@ -1334,7 +1211,7 @@ export const MsgUpdateGroupMetadata = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpdateGroupMetadata>): MsgUpdateGroupMetadata {
+  fromPartial(object: DeepPartial<MsgUpdateGroupMetadata>): MsgUpdateGroupMetadata {
     const message = createBaseMsgUpdateGroupMetadata();
     message.admin = object.admin ?? "";
     message.groupId = object.groupId !== undefined && object.groupId !== null ? BigInt(object.groupId.toString()) : BigInt(0);
@@ -1388,6 +1265,7 @@ function createBaseMsgUpdateGroupMetadataResponse(): MsgUpdateGroupMetadataRespo
 }
 export const MsgUpdateGroupMetadataResponse = {
   typeUrl: "/cosmos.group.v1.MsgUpdateGroupMetadataResponse",
+  aminoType: "cosmos-sdk/MsgUpdateGroupMetadataResponse",
   encode(_: MsgUpdateGroupMetadataResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1405,7 +1283,7 @@ export const MsgUpdateGroupMetadataResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpdateGroupMetadataResponse>): MsgUpdateGroupMetadataResponse {
+  fromPartial(_: DeepPartial<MsgUpdateGroupMetadataResponse>): MsgUpdateGroupMetadataResponse {
     const message = createBaseMsgUpdateGroupMetadataResponse();
     return message;
   },
@@ -1449,6 +1327,7 @@ function createBaseMsgCreateGroupPolicy(): MsgCreateGroupPolicy {
 }
 export const MsgCreateGroupPolicy = {
   typeUrl: "/cosmos.group.v1.MsgCreateGroupPolicy",
+  aminoType: "cosmos-sdk/MsgCreateGroupPolicy",
   encode(message: MsgCreateGroupPolicy, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.admin !== "") {
       writer.uint32(10).string(message.admin);
@@ -1490,7 +1369,7 @@ export const MsgCreateGroupPolicy = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgCreateGroupPolicy>): MsgCreateGroupPolicy {
+  fromPartial(object: DeepPartial<MsgCreateGroupPolicy>): MsgCreateGroupPolicy {
     const message = createBaseMsgCreateGroupPolicy();
     message.admin = object.admin ?? "";
     message.groupId = object.groupId !== undefined && object.groupId !== null ? BigInt(object.groupId.toString()) : BigInt(0);
@@ -1551,6 +1430,7 @@ function createBaseMsgCreateGroupPolicyResponse(): MsgCreateGroupPolicyResponse 
 }
 export const MsgCreateGroupPolicyResponse = {
   typeUrl: "/cosmos.group.v1.MsgCreateGroupPolicyResponse",
+  aminoType: "cosmos-sdk/MsgCreateGroupPolicyResponse",
   encode(message: MsgCreateGroupPolicyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -1574,7 +1454,7 @@ export const MsgCreateGroupPolicyResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgCreateGroupPolicyResponse>): MsgCreateGroupPolicyResponse {
+  fromPartial(object: DeepPartial<MsgCreateGroupPolicyResponse>): MsgCreateGroupPolicyResponse {
     const message = createBaseMsgCreateGroupPolicyResponse();
     message.address = object.address ?? "";
     return message;
@@ -1622,6 +1502,7 @@ function createBaseMsgUpdateGroupPolicyAdmin(): MsgUpdateGroupPolicyAdmin {
 }
 export const MsgUpdateGroupPolicyAdmin = {
   typeUrl: "/cosmos.group.v1.MsgUpdateGroupPolicyAdmin",
+  aminoType: "cosmos-sdk/MsgUpdateGroupPolicyAdmin",
   encode(message: MsgUpdateGroupPolicyAdmin, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.admin !== "") {
       writer.uint32(10).string(message.admin);
@@ -1657,7 +1538,7 @@ export const MsgUpdateGroupPolicyAdmin = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpdateGroupPolicyAdmin>): MsgUpdateGroupPolicyAdmin {
+  fromPartial(object: DeepPartial<MsgUpdateGroupPolicyAdmin>): MsgUpdateGroupPolicyAdmin {
     const message = createBaseMsgUpdateGroupPolicyAdmin();
     message.admin = object.admin ?? "";
     message.groupPolicyAddress = object.groupPolicyAddress ?? "";
@@ -1711,6 +1592,7 @@ function createBaseMsgUpdateGroupPolicyAdminResponse(): MsgUpdateGroupPolicyAdmi
 }
 export const MsgUpdateGroupPolicyAdminResponse = {
   typeUrl: "/cosmos.group.v1.MsgUpdateGroupPolicyAdminResponse",
+  aminoType: "cosmos-sdk/MsgUpdateGroupPolicyAdminResponse",
   encode(_: MsgUpdateGroupPolicyAdminResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1728,7 +1610,7 @@ export const MsgUpdateGroupPolicyAdminResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpdateGroupPolicyAdminResponse>): MsgUpdateGroupPolicyAdminResponse {
+  fromPartial(_: DeepPartial<MsgUpdateGroupPolicyAdminResponse>): MsgUpdateGroupPolicyAdminResponse {
     const message = createBaseMsgUpdateGroupPolicyAdminResponse();
     return message;
   },
@@ -1774,6 +1656,7 @@ function createBaseMsgCreateGroupWithPolicy(): MsgCreateGroupWithPolicy {
 }
 export const MsgCreateGroupWithPolicy = {
   typeUrl: "/cosmos.group.v1.MsgCreateGroupWithPolicy",
+  aminoType: "cosmos-sdk/MsgCreateGroupWithPolicy",
   encode(message: MsgCreateGroupWithPolicy, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.admin !== "") {
       writer.uint32(10).string(message.admin);
@@ -1827,7 +1710,7 @@ export const MsgCreateGroupWithPolicy = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgCreateGroupWithPolicy>): MsgCreateGroupWithPolicy {
+  fromPartial(object: DeepPartial<MsgCreateGroupWithPolicy>): MsgCreateGroupWithPolicy {
     const message = createBaseMsgCreateGroupWithPolicy();
     message.admin = object.admin ?? "";
     message.members = object.members?.map(e => MemberRequest.fromPartial(e)) || [];
@@ -1901,6 +1784,7 @@ function createBaseMsgCreateGroupWithPolicyResponse(): MsgCreateGroupWithPolicyR
 }
 export const MsgCreateGroupWithPolicyResponse = {
   typeUrl: "/cosmos.group.v1.MsgCreateGroupWithPolicyResponse",
+  aminoType: "cosmos-sdk/MsgCreateGroupWithPolicyResponse",
   encode(message: MsgCreateGroupWithPolicyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.groupId !== BigInt(0)) {
       writer.uint32(8).uint64(message.groupId);
@@ -1930,7 +1814,7 @@ export const MsgCreateGroupWithPolicyResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgCreateGroupWithPolicyResponse>): MsgCreateGroupWithPolicyResponse {
+  fromPartial(object: DeepPartial<MsgCreateGroupWithPolicyResponse>): MsgCreateGroupWithPolicyResponse {
     const message = createBaseMsgCreateGroupWithPolicyResponse();
     message.groupId = object.groupId !== undefined && object.groupId !== null ? BigInt(object.groupId.toString()) : BigInt(0);
     message.groupPolicyAddress = object.groupPolicyAddress ?? "";
@@ -1983,6 +1867,7 @@ function createBaseMsgUpdateGroupPolicyDecisionPolicy(): MsgUpdateGroupPolicyDec
 }
 export const MsgUpdateGroupPolicyDecisionPolicy = {
   typeUrl: "/cosmos.group.v1.MsgUpdateGroupPolicyDecisionPolicy",
+  aminoType: "cosmos-sdk/MsgUpdateGroupDecisionPolicy",
   encode(message: MsgUpdateGroupPolicyDecisionPolicy, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.admin !== "") {
       writer.uint32(10).string(message.admin);
@@ -2018,7 +1903,7 @@ export const MsgUpdateGroupPolicyDecisionPolicy = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpdateGroupPolicyDecisionPolicy>): MsgUpdateGroupPolicyDecisionPolicy {
+  fromPartial(object: DeepPartial<MsgUpdateGroupPolicyDecisionPolicy>): MsgUpdateGroupPolicyDecisionPolicy {
     const message = createBaseMsgUpdateGroupPolicyDecisionPolicy();
     message.admin = object.admin ?? "";
     message.groupPolicyAddress = object.groupPolicyAddress ?? "";
@@ -2072,6 +1957,7 @@ function createBaseMsgUpdateGroupPolicyDecisionPolicyResponse(): MsgUpdateGroupP
 }
 export const MsgUpdateGroupPolicyDecisionPolicyResponse = {
   typeUrl: "/cosmos.group.v1.MsgUpdateGroupPolicyDecisionPolicyResponse",
+  aminoType: "cosmos-sdk/MsgUpdateGroupPolicyDecisionPolicyResponse",
   encode(_: MsgUpdateGroupPolicyDecisionPolicyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -2089,7 +1975,7 @@ export const MsgUpdateGroupPolicyDecisionPolicyResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpdateGroupPolicyDecisionPolicyResponse>): MsgUpdateGroupPolicyDecisionPolicyResponse {
+  fromPartial(_: DeepPartial<MsgUpdateGroupPolicyDecisionPolicyResponse>): MsgUpdateGroupPolicyDecisionPolicyResponse {
     const message = createBaseMsgUpdateGroupPolicyDecisionPolicyResponse();
     return message;
   },
@@ -2132,6 +2018,7 @@ function createBaseMsgUpdateGroupPolicyMetadata(): MsgUpdateGroupPolicyMetadata 
 }
 export const MsgUpdateGroupPolicyMetadata = {
   typeUrl: "/cosmos.group.v1.MsgUpdateGroupPolicyMetadata",
+  aminoType: "cosmos-sdk/MsgUpdateGroupPolicyMetadata",
   encode(message: MsgUpdateGroupPolicyMetadata, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.admin !== "") {
       writer.uint32(10).string(message.admin);
@@ -2167,7 +2054,7 @@ export const MsgUpdateGroupPolicyMetadata = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpdateGroupPolicyMetadata>): MsgUpdateGroupPolicyMetadata {
+  fromPartial(object: DeepPartial<MsgUpdateGroupPolicyMetadata>): MsgUpdateGroupPolicyMetadata {
     const message = createBaseMsgUpdateGroupPolicyMetadata();
     message.admin = object.admin ?? "";
     message.groupPolicyAddress = object.groupPolicyAddress ?? "";
@@ -2221,6 +2108,7 @@ function createBaseMsgUpdateGroupPolicyMetadataResponse(): MsgUpdateGroupPolicyM
 }
 export const MsgUpdateGroupPolicyMetadataResponse = {
   typeUrl: "/cosmos.group.v1.MsgUpdateGroupPolicyMetadataResponse",
+  aminoType: "cosmos-sdk/MsgUpdateGroupPolicyMetadataResponse",
   encode(_: MsgUpdateGroupPolicyMetadataResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -2238,7 +2126,7 @@ export const MsgUpdateGroupPolicyMetadataResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpdateGroupPolicyMetadataResponse>): MsgUpdateGroupPolicyMetadataResponse {
+  fromPartial(_: DeepPartial<MsgUpdateGroupPolicyMetadataResponse>): MsgUpdateGroupPolicyMetadataResponse {
     const message = createBaseMsgUpdateGroupPolicyMetadataResponse();
     return message;
   },
@@ -2285,6 +2173,7 @@ function createBaseMsgSubmitProposal(): MsgSubmitProposal {
 }
 export const MsgSubmitProposal = {
   typeUrl: "/cosmos.group.v1.MsgSubmitProposal",
+  aminoType: "cosmos-sdk/group/MsgSubmitProposal",
   encode(message: MsgSubmitProposal, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.groupPolicyAddress !== "") {
       writer.uint32(10).string(message.groupPolicyAddress);
@@ -2344,7 +2233,7 @@ export const MsgSubmitProposal = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgSubmitProposal>): MsgSubmitProposal {
+  fromPartial(object: DeepPartial<MsgSubmitProposal>): MsgSubmitProposal {
     const message = createBaseMsgSubmitProposal();
     message.groupPolicyAddress = object.groupPolicyAddress ?? "";
     message.proposers = object.proposers?.map(e => e) || [];
@@ -2424,6 +2313,7 @@ function createBaseMsgSubmitProposalResponse(): MsgSubmitProposalResponse {
 }
 export const MsgSubmitProposalResponse = {
   typeUrl: "/cosmos.group.v1.MsgSubmitProposalResponse",
+  aminoType: "cosmos-sdk/MsgSubmitProposalResponse",
   encode(message: MsgSubmitProposalResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.proposalId !== BigInt(0)) {
       writer.uint32(8).uint64(message.proposalId);
@@ -2447,7 +2337,7 @@ export const MsgSubmitProposalResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgSubmitProposalResponse>): MsgSubmitProposalResponse {
+  fromPartial(object: DeepPartial<MsgSubmitProposalResponse>): MsgSubmitProposalResponse {
     const message = createBaseMsgSubmitProposalResponse();
     message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
     return message;
@@ -2494,6 +2384,7 @@ function createBaseMsgWithdrawProposal(): MsgWithdrawProposal {
 }
 export const MsgWithdrawProposal = {
   typeUrl: "/cosmos.group.v1.MsgWithdrawProposal",
+  aminoType: "cosmos-sdk/group/MsgWithdrawProposal",
   encode(message: MsgWithdrawProposal, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.proposalId !== BigInt(0)) {
       writer.uint32(8).uint64(message.proposalId);
@@ -2523,7 +2414,7 @@ export const MsgWithdrawProposal = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgWithdrawProposal>): MsgWithdrawProposal {
+  fromPartial(object: DeepPartial<MsgWithdrawProposal>): MsgWithdrawProposal {
     const message = createBaseMsgWithdrawProposal();
     message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
     message.address = object.address ?? "";
@@ -2572,6 +2463,7 @@ function createBaseMsgWithdrawProposalResponse(): MsgWithdrawProposalResponse {
 }
 export const MsgWithdrawProposalResponse = {
   typeUrl: "/cosmos.group.v1.MsgWithdrawProposalResponse",
+  aminoType: "cosmos-sdk/MsgWithdrawProposalResponse",
   encode(_: MsgWithdrawProposalResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -2589,7 +2481,7 @@ export const MsgWithdrawProposalResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgWithdrawProposalResponse>): MsgWithdrawProposalResponse {
+  fromPartial(_: DeepPartial<MsgWithdrawProposalResponse>): MsgWithdrawProposalResponse {
     const message = createBaseMsgWithdrawProposalResponse();
     return message;
   },
@@ -2634,6 +2526,7 @@ function createBaseMsgVote(): MsgVote {
 }
 export const MsgVote = {
   typeUrl: "/cosmos.group.v1.MsgVote",
+  aminoType: "cosmos-sdk/group/MsgVote",
   encode(message: MsgVote, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.proposalId !== BigInt(0)) {
       writer.uint32(8).uint64(message.proposalId);
@@ -2681,7 +2574,7 @@ export const MsgVote = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgVote>): MsgVote {
+  fromPartial(object: DeepPartial<MsgVote>): MsgVote {
     const message = createBaseMsgVote();
     message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
     message.voter = object.voter ?? "";
@@ -2745,6 +2638,7 @@ function createBaseMsgVoteResponse(): MsgVoteResponse {
 }
 export const MsgVoteResponse = {
   typeUrl: "/cosmos.group.v1.MsgVoteResponse",
+  aminoType: "cosmos-sdk/MsgVoteResponse",
   encode(_: MsgVoteResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -2762,7 +2656,7 @@ export const MsgVoteResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgVoteResponse>): MsgVoteResponse {
+  fromPartial(_: DeepPartial<MsgVoteResponse>): MsgVoteResponse {
     const message = createBaseMsgVoteResponse();
     return message;
   },
@@ -2804,6 +2698,7 @@ function createBaseMsgExec(): MsgExec {
 }
 export const MsgExec = {
   typeUrl: "/cosmos.group.v1.MsgExec",
+  aminoType: "cosmos-sdk/group/MsgExec",
   encode(message: MsgExec, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.proposalId !== BigInt(0)) {
       writer.uint32(8).uint64(message.proposalId);
@@ -2833,7 +2728,7 @@ export const MsgExec = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgExec>): MsgExec {
+  fromPartial(object: DeepPartial<MsgExec>): MsgExec {
     const message = createBaseMsgExec();
     message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
     message.executor = object.executor ?? "";
@@ -2884,6 +2779,7 @@ function createBaseMsgExecResponse(): MsgExecResponse {
 }
 export const MsgExecResponse = {
   typeUrl: "/cosmos.group.v1.MsgExecResponse",
+  aminoType: "cosmos-sdk/MsgExecResponse",
   encode(message: MsgExecResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.result !== 0) {
       writer.uint32(16).int32(message.result);
@@ -2907,7 +2803,7 @@ export const MsgExecResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgExecResponse>): MsgExecResponse {
+  fromPartial(object: DeepPartial<MsgExecResponse>): MsgExecResponse {
     const message = createBaseMsgExecResponse();
     message.result = object.result ?? 0;
     return message;
@@ -2954,6 +2850,7 @@ function createBaseMsgLeaveGroup(): MsgLeaveGroup {
 }
 export const MsgLeaveGroup = {
   typeUrl: "/cosmos.group.v1.MsgLeaveGroup",
+  aminoType: "cosmos-sdk/group/MsgLeaveGroup",
   encode(message: MsgLeaveGroup, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -2983,7 +2880,7 @@ export const MsgLeaveGroup = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgLeaveGroup>): MsgLeaveGroup {
+  fromPartial(object: DeepPartial<MsgLeaveGroup>): MsgLeaveGroup {
     const message = createBaseMsgLeaveGroup();
     message.address = object.address ?? "";
     message.groupId = object.groupId !== undefined && object.groupId !== null ? BigInt(object.groupId.toString()) : BigInt(0);
@@ -3032,6 +2929,7 @@ function createBaseMsgLeaveGroupResponse(): MsgLeaveGroupResponse {
 }
 export const MsgLeaveGroupResponse = {
   typeUrl: "/cosmos.group.v1.MsgLeaveGroupResponse",
+  aminoType: "cosmos-sdk/MsgLeaveGroupResponse",
   encode(_: MsgLeaveGroupResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -3049,7 +2947,7 @@ export const MsgLeaveGroupResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgLeaveGroupResponse>): MsgLeaveGroupResponse {
+  fromPartial(_: DeepPartial<MsgLeaveGroupResponse>): MsgLeaveGroupResponse {
     const message = createBaseMsgLeaveGroupResponse();
     return message;
   },

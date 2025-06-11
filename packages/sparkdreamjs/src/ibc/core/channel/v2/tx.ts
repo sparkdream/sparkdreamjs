@@ -1,8 +1,8 @@
 //@ts-nocheck
-import { Payload, PayloadAmino, PayloadSDKType, Packet, PacketAmino, PacketSDKType, Acknowledgement, AcknowledgementAmino, AcknowledgementSDKType } from "./packet";
-import { Height, HeightAmino, HeightSDKType } from "../../client/v1/client";
+import { Payload, PayloadAmino, Packet, PacketAmino, Acknowledgement, AcknowledgementAmino } from "./packet";
+import { Height, HeightAmino } from "../../client/v1/client";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /** ResponseResultType defines the possible outcomes of the execution of a message */
 export enum ResponseResultType {
   /** RESPONSE_RESULT_TYPE_UNSPECIFIED - Default zero value enumeration */
@@ -15,7 +15,6 @@ export enum ResponseResultType {
   RESPONSE_RESULT_TYPE_FAILURE = 3,
   UNRECOGNIZED = -1,
 }
-export const ResponseResultTypeSDKType = ResponseResultType;
 export const ResponseResultTypeAmino = ResponseResultType;
 export function responseResultTypeFromJSON(object: any): ResponseResultType {
   switch (object) {
@@ -74,13 +73,6 @@ export interface MsgSendPacketAminoMsg {
   type: "cosmos-sdk/MsgSendPacket";
   value: MsgSendPacketAmino;
 }
-/** MsgSendPacket sends an outgoing IBC packet. */
-export interface MsgSendPacketSDKType {
-  source_client: string;
-  timeout_timestamp: bigint;
-  payloads: PayloadSDKType[];
-  signer: string;
-}
 /** MsgSendPacketResponse defines the Msg/SendPacket response type. */
 export interface MsgSendPacketResponse {
   sequence: bigint;
@@ -96,10 +88,6 @@ export interface MsgSendPacketResponseAmino {
 export interface MsgSendPacketResponseAminoMsg {
   type: "cosmos-sdk/MsgSendPacketResponse";
   value: MsgSendPacketResponseAmino;
-}
-/** MsgSendPacketResponse defines the Msg/SendPacket response type. */
-export interface MsgSendPacketResponseSDKType {
-  sequence: bigint;
 }
 /** MsgRecvPacket receives an incoming IBC packet. */
 export interface MsgRecvPacket {
@@ -123,13 +111,6 @@ export interface MsgRecvPacketAminoMsg {
   type: "cosmos-sdk/MsgRecvPacket";
   value: MsgRecvPacketAmino;
 }
-/** MsgRecvPacket receives an incoming IBC packet. */
-export interface MsgRecvPacketSDKType {
-  packet: PacketSDKType;
-  proof_commitment: Uint8Array;
-  proof_height: HeightSDKType;
-  signer: string;
-}
 /** MsgRecvPacketResponse defines the Msg/RecvPacket response type. */
 export interface MsgRecvPacketResponse {
   result: ResponseResultType;
@@ -145,10 +126,6 @@ export interface MsgRecvPacketResponseAmino {
 export interface MsgRecvPacketResponseAminoMsg {
   type: "cosmos-sdk/MsgRecvPacketResponse";
   value: MsgRecvPacketResponseAmino;
-}
-/** MsgRecvPacketResponse defines the Msg/RecvPacket response type. */
-export interface MsgRecvPacketResponseSDKType {
-  result: ResponseResultType;
 }
 /** MsgTimeout receives timed-out packet */
 export interface MsgTimeout {
@@ -172,13 +149,6 @@ export interface MsgTimeoutAminoMsg {
   type: "cosmos-sdk/MsgTimeout";
   value: MsgTimeoutAmino;
 }
-/** MsgTimeout receives timed-out packet */
-export interface MsgTimeoutSDKType {
-  packet: PacketSDKType;
-  proof_unreceived: Uint8Array;
-  proof_height: HeightSDKType;
-  signer: string;
-}
 /** MsgTimeoutResponse defines the Msg/Timeout response type. */
 export interface MsgTimeoutResponse {
   result: ResponseResultType;
@@ -194,10 +164,6 @@ export interface MsgTimeoutResponseAmino {
 export interface MsgTimeoutResponseAminoMsg {
   type: "cosmos-sdk/MsgTimeoutResponse";
   value: MsgTimeoutResponseAmino;
-}
-/** MsgTimeoutResponse defines the Msg/Timeout response type. */
-export interface MsgTimeoutResponseSDKType {
-  result: ResponseResultType;
 }
 /** MsgAcknowledgement receives incoming IBC acknowledgement. */
 export interface MsgAcknowledgement {
@@ -223,14 +189,6 @@ export interface MsgAcknowledgementAminoMsg {
   type: "cosmos-sdk/MsgAcknowledgement";
   value: MsgAcknowledgementAmino;
 }
-/** MsgAcknowledgement receives incoming IBC acknowledgement. */
-export interface MsgAcknowledgementSDKType {
-  packet: PacketSDKType;
-  acknowledgement: AcknowledgementSDKType;
-  proof_acked: Uint8Array;
-  proof_height: HeightSDKType;
-  signer: string;
-}
 /** MsgAcknowledgementResponse defines the Msg/Acknowledgement response type. */
 export interface MsgAcknowledgementResponse {
   result: ResponseResultType;
@@ -247,10 +205,6 @@ export interface MsgAcknowledgementResponseAminoMsg {
   type: "cosmos-sdk/MsgAcknowledgementResponse";
   value: MsgAcknowledgementResponseAmino;
 }
-/** MsgAcknowledgementResponse defines the Msg/Acknowledgement response type. */
-export interface MsgAcknowledgementResponseSDKType {
-  result: ResponseResultType;
-}
 function createBaseMsgSendPacket(): MsgSendPacket {
   return {
     sourceClient: "",
@@ -261,6 +215,7 @@ function createBaseMsgSendPacket(): MsgSendPacket {
 }
 export const MsgSendPacket = {
   typeUrl: "/ibc.core.channel.v2.MsgSendPacket",
+  aminoType: "cosmos-sdk/MsgSendPacket",
   encode(message: MsgSendPacket, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sourceClient !== "") {
       writer.uint32(10).string(message.sourceClient);
@@ -302,7 +257,7 @@ export const MsgSendPacket = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgSendPacket>): MsgSendPacket {
+  fromPartial(object: DeepPartial<MsgSendPacket>): MsgSendPacket {
     const message = createBaseMsgSendPacket();
     message.sourceClient = object.sourceClient ?? "";
     message.timeoutTimestamp = object.timeoutTimestamp !== undefined && object.timeoutTimestamp !== null ? BigInt(object.timeoutTimestamp.toString()) : BigInt(0);
@@ -365,6 +320,7 @@ function createBaseMsgSendPacketResponse(): MsgSendPacketResponse {
 }
 export const MsgSendPacketResponse = {
   typeUrl: "/ibc.core.channel.v2.MsgSendPacketResponse",
+  aminoType: "cosmos-sdk/MsgSendPacketResponse",
   encode(message: MsgSendPacketResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sequence !== BigInt(0)) {
       writer.uint32(8).uint64(message.sequence);
@@ -388,7 +344,7 @@ export const MsgSendPacketResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgSendPacketResponse>): MsgSendPacketResponse {
+  fromPartial(object: DeepPartial<MsgSendPacketResponse>): MsgSendPacketResponse {
     const message = createBaseMsgSendPacketResponse();
     message.sequence = object.sequence !== undefined && object.sequence !== null ? BigInt(object.sequence.toString()) : BigInt(0);
     return message;
@@ -437,6 +393,7 @@ function createBaseMsgRecvPacket(): MsgRecvPacket {
 }
 export const MsgRecvPacket = {
   typeUrl: "/ibc.core.channel.v2.MsgRecvPacket",
+  aminoType: "cosmos-sdk/MsgRecvPacket",
   encode(message: MsgRecvPacket, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.packet !== undefined) {
       Packet.encode(message.packet, writer.uint32(10).fork()).ldelim();
@@ -478,7 +435,7 @@ export const MsgRecvPacket = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgRecvPacket>): MsgRecvPacket {
+  fromPartial(object: DeepPartial<MsgRecvPacket>): MsgRecvPacket {
     const message = createBaseMsgRecvPacket();
     message.packet = object.packet !== undefined && object.packet !== null ? Packet.fromPartial(object.packet) : undefined;
     message.proofCommitment = object.proofCommitment ?? new Uint8Array();
@@ -539,6 +496,7 @@ function createBaseMsgRecvPacketResponse(): MsgRecvPacketResponse {
 }
 export const MsgRecvPacketResponse = {
   typeUrl: "/ibc.core.channel.v2.MsgRecvPacketResponse",
+  aminoType: "cosmos-sdk/MsgRecvPacketResponse",
   encode(message: MsgRecvPacketResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.result !== 0) {
       writer.uint32(8).int32(message.result);
@@ -562,7 +520,7 @@ export const MsgRecvPacketResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgRecvPacketResponse>): MsgRecvPacketResponse {
+  fromPartial(object: DeepPartial<MsgRecvPacketResponse>): MsgRecvPacketResponse {
     const message = createBaseMsgRecvPacketResponse();
     message.result = object.result ?? 0;
     return message;
@@ -611,6 +569,7 @@ function createBaseMsgTimeout(): MsgTimeout {
 }
 export const MsgTimeout = {
   typeUrl: "/ibc.core.channel.v2.MsgTimeout",
+  aminoType: "cosmos-sdk/MsgTimeout",
   encode(message: MsgTimeout, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.packet !== undefined) {
       Packet.encode(message.packet, writer.uint32(10).fork()).ldelim();
@@ -652,7 +611,7 @@ export const MsgTimeout = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgTimeout>): MsgTimeout {
+  fromPartial(object: DeepPartial<MsgTimeout>): MsgTimeout {
     const message = createBaseMsgTimeout();
     message.packet = object.packet !== undefined && object.packet !== null ? Packet.fromPartial(object.packet) : undefined;
     message.proofUnreceived = object.proofUnreceived ?? new Uint8Array();
@@ -713,6 +672,7 @@ function createBaseMsgTimeoutResponse(): MsgTimeoutResponse {
 }
 export const MsgTimeoutResponse = {
   typeUrl: "/ibc.core.channel.v2.MsgTimeoutResponse",
+  aminoType: "cosmos-sdk/MsgTimeoutResponse",
   encode(message: MsgTimeoutResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.result !== 0) {
       writer.uint32(8).int32(message.result);
@@ -736,7 +696,7 @@ export const MsgTimeoutResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgTimeoutResponse>): MsgTimeoutResponse {
+  fromPartial(object: DeepPartial<MsgTimeoutResponse>): MsgTimeoutResponse {
     const message = createBaseMsgTimeoutResponse();
     message.result = object.result ?? 0;
     return message;
@@ -786,6 +746,7 @@ function createBaseMsgAcknowledgement(): MsgAcknowledgement {
 }
 export const MsgAcknowledgement = {
   typeUrl: "/ibc.core.channel.v2.MsgAcknowledgement",
+  aminoType: "cosmos-sdk/MsgAcknowledgement",
   encode(message: MsgAcknowledgement, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.packet !== undefined) {
       Packet.encode(message.packet, writer.uint32(10).fork()).ldelim();
@@ -833,7 +794,7 @@ export const MsgAcknowledgement = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgAcknowledgement>): MsgAcknowledgement {
+  fromPartial(object: DeepPartial<MsgAcknowledgement>): MsgAcknowledgement {
     const message = createBaseMsgAcknowledgement();
     message.packet = object.packet !== undefined && object.packet !== null ? Packet.fromPartial(object.packet) : undefined;
     message.acknowledgement = object.acknowledgement !== undefined && object.acknowledgement !== null ? Acknowledgement.fromPartial(object.acknowledgement) : undefined;
@@ -899,6 +860,7 @@ function createBaseMsgAcknowledgementResponse(): MsgAcknowledgementResponse {
 }
 export const MsgAcknowledgementResponse = {
   typeUrl: "/ibc.core.channel.v2.MsgAcknowledgementResponse",
+  aminoType: "cosmos-sdk/MsgAcknowledgementResponse",
   encode(message: MsgAcknowledgementResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.result !== 0) {
       writer.uint32(8).int32(message.result);
@@ -922,7 +884,7 @@ export const MsgAcknowledgementResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgAcknowledgementResponse>): MsgAcknowledgementResponse {
+  fromPartial(object: DeepPartial<MsgAcknowledgementResponse>): MsgAcknowledgementResponse {
     const message = createBaseMsgAcknowledgementResponse();
     message.result = object.result ?? 0;
     return message;

@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { Params, ParamsAmino, ParamsSDKType } from "./params";
+import { Params, ParamsAmino } from "./params";
 import { BinaryReader, BinaryWriter } from "../../binary";
+import { DeepPartial } from "../../helpers";
 /** MsgUpdateParams is the Msg/UpdateParams request type. */
 export interface MsgUpdateParams {
   /** authority is the address that controls the module (defaults to x/gov unless overwritten). */
@@ -23,11 +24,6 @@ export interface MsgUpdateParamsAminoMsg {
   type: "sparkdream/x/blog/MsgUpdateParams";
   value: MsgUpdateParamsAmino;
 }
-/** MsgUpdateParams is the Msg/UpdateParams request type. */
-export interface MsgUpdateParamsSDKType {
-  authority: string;
-  params: ParamsSDKType;
-}
 /**
  * MsgUpdateParamsResponse defines the response structure for executing a
  * MsgUpdateParams message.
@@ -46,11 +42,6 @@ export interface MsgUpdateParamsResponseAminoMsg {
   type: "/sparkdream.blog.MsgUpdateParamsResponse";
   value: MsgUpdateParamsResponseAmino;
 }
-/**
- * MsgUpdateParamsResponse defines the response structure for executing a
- * MsgUpdateParams message.
- */
-export interface MsgUpdateParamsResponseSDKType {}
 export interface MsgCreatePost {
   creator: string;
   title: string;
@@ -69,11 +60,6 @@ export interface MsgCreatePostAminoMsg {
   type: "/sparkdream.blog.MsgCreatePost";
   value: MsgCreatePostAmino;
 }
-export interface MsgCreatePostSDKType {
-  creator: string;
-  title: string;
-  body: string;
-}
 export interface MsgCreatePostResponse {
   id: bigint;
 }
@@ -87,9 +73,6 @@ export interface MsgCreatePostResponseAmino {
 export interface MsgCreatePostResponseAminoMsg {
   type: "/sparkdream.blog.MsgCreatePostResponse";
   value: MsgCreatePostResponseAmino;
-}
-export interface MsgCreatePostResponseSDKType {
-  id: bigint;
 }
 export interface MsgUpdatePost {
   creator: string;
@@ -111,12 +94,6 @@ export interface MsgUpdatePostAminoMsg {
   type: "/sparkdream.blog.MsgUpdatePost";
   value: MsgUpdatePostAmino;
 }
-export interface MsgUpdatePostSDKType {
-  creator: string;
-  title: string;
-  body: string;
-  id: bigint;
-}
 export interface MsgUpdatePostResponse {}
 export interface MsgUpdatePostResponseProtoMsg {
   typeUrl: "/sparkdream.blog.MsgUpdatePostResponse";
@@ -127,7 +104,6 @@ export interface MsgUpdatePostResponseAminoMsg {
   type: "/sparkdream.blog.MsgUpdatePostResponse";
   value: MsgUpdatePostResponseAmino;
 }
-export interface MsgUpdatePostResponseSDKType {}
 export interface MsgDeletePost {
   creator: string;
   id: bigint;
@@ -144,10 +120,6 @@ export interface MsgDeletePostAminoMsg {
   type: "/sparkdream.blog.MsgDeletePost";
   value: MsgDeletePostAmino;
 }
-export interface MsgDeletePostSDKType {
-  creator: string;
-  id: bigint;
-}
 export interface MsgDeletePostResponse {}
 export interface MsgDeletePostResponseProtoMsg {
   typeUrl: "/sparkdream.blog.MsgDeletePostResponse";
@@ -158,7 +130,6 @@ export interface MsgDeletePostResponseAminoMsg {
   type: "/sparkdream.blog.MsgDeletePostResponse";
   value: MsgDeletePostResponseAmino;
 }
-export interface MsgDeletePostResponseSDKType {}
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
     authority: "",
@@ -167,6 +138,7 @@ function createBaseMsgUpdateParams(): MsgUpdateParams {
 }
 export const MsgUpdateParams = {
   typeUrl: "/sparkdream.blog.MsgUpdateParams",
+  aminoType: "sparkdream/x/blog/MsgUpdateParams",
   encode(message: MsgUpdateParams, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -196,7 +168,7 @@ export const MsgUpdateParams = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpdateParams>): MsgUpdateParams {
+  fromPartial(object: DeepPartial<MsgUpdateParams>): MsgUpdateParams {
     const message = createBaseMsgUpdateParams();
     message.authority = object.authority ?? "";
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
@@ -262,7 +234,7 @@ export const MsgUpdateParamsResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
+  fromPartial(_: DeepPartial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
     const message = createBaseMsgUpdateParamsResponse();
     return message;
   },
@@ -334,7 +306,7 @@ export const MsgCreatePost = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgCreatePost>): MsgCreatePost {
+  fromPartial(object: DeepPartial<MsgCreatePost>): MsgCreatePost {
     const message = createBaseMsgCreatePost();
     message.creator = object.creator ?? "";
     message.title = object.title ?? "";
@@ -407,7 +379,7 @@ export const MsgCreatePostResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgCreatePostResponse>): MsgCreatePostResponse {
+  fromPartial(object: DeepPartial<MsgCreatePostResponse>): MsgCreatePostResponse {
     const message = createBaseMsgCreatePostResponse();
     message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
     return message;
@@ -491,7 +463,7 @@ export const MsgUpdatePost = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpdatePost>): MsgUpdatePost {
+  fromPartial(object: DeepPartial<MsgUpdatePost>): MsgUpdatePost {
     const message = createBaseMsgUpdatePost();
     message.creator = object.creator ?? "";
     message.title = object.title ?? "";
@@ -561,7 +533,7 @@ export const MsgUpdatePostResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpdatePostResponse>): MsgUpdatePostResponse {
+  fromPartial(_: DeepPartial<MsgUpdatePostResponse>): MsgUpdatePostResponse {
     const message = createBaseMsgUpdatePostResponse();
     return message;
   },
@@ -626,7 +598,7 @@ export const MsgDeletePost = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgDeletePost>): MsgDeletePost {
+  fromPartial(object: DeepPartial<MsgDeletePost>): MsgDeletePost {
     const message = createBaseMsgDeletePost();
     message.creator = object.creator ?? "";
     message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
@@ -686,7 +658,7 @@ export const MsgDeletePostResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgDeletePostResponse>): MsgDeletePostResponse {
+  fromPartial(_: DeepPartial<MsgDeletePostResponse>): MsgDeletePostResponse {
     const message = createBaseMsgDeletePostResponse();
     return message;
   },

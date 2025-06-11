@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /** Module is the config object for the auth module. */
 export interface Module {
   /** bech32_prefix is the bech32 account prefix for the app. */
@@ -25,12 +26,6 @@ export interface ModuleAmino {
 export interface ModuleAminoMsg {
   type: "cosmos-sdk/Module";
   value: ModuleAmino;
-}
-/** Module is the config object for the auth module. */
-export interface ModuleSDKType {
-  bech32_prefix: string;
-  module_account_permissions: ModuleAccountPermissionSDKType[];
-  authority: string;
 }
 /** ModuleAccountPermission represents permissions for a module account. */
 export interface ModuleAccountPermission {
@@ -60,11 +55,6 @@ export interface ModuleAccountPermissionAminoMsg {
   type: "cosmos-sdk/ModuleAccountPermission";
   value: ModuleAccountPermissionAmino;
 }
-/** ModuleAccountPermission represents permissions for a module account. */
-export interface ModuleAccountPermissionSDKType {
-  account: string;
-  permissions: string[];
-}
 function createBaseModule(): Module {
   return {
     bech32Prefix: "",
@@ -74,6 +64,7 @@ function createBaseModule(): Module {
 }
 export const Module = {
   typeUrl: "/cosmos.auth.module.v1.Module",
+  aminoType: "cosmos-sdk/Module",
   encode(message: Module, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.bech32Prefix !== "") {
       writer.uint32(10).string(message.bech32Prefix);
@@ -109,7 +100,7 @@ export const Module = {
     }
     return message;
   },
-  fromPartial(object: Partial<Module>): Module {
+  fromPartial(object: DeepPartial<Module>): Module {
     const message = createBaseModule();
     message.bech32Prefix = object.bech32Prefix ?? "";
     message.moduleAccountPermissions = object.moduleAccountPermissions?.map(e => ModuleAccountPermission.fromPartial(e)) || [];
@@ -168,6 +159,7 @@ function createBaseModuleAccountPermission(): ModuleAccountPermission {
 }
 export const ModuleAccountPermission = {
   typeUrl: "/cosmos.auth.module.v1.ModuleAccountPermission",
+  aminoType: "cosmos-sdk/ModuleAccountPermission",
   encode(message: ModuleAccountPermission, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.account !== "") {
       writer.uint32(10).string(message.account);
@@ -197,7 +189,7 @@ export const ModuleAccountPermission = {
     }
     return message;
   },
-  fromPartial(object: Partial<ModuleAccountPermission>): ModuleAccountPermission {
+  fromPartial(object: DeepPartial<ModuleAccountPermission>): ModuleAccountPermission {
     const message = createBaseModuleAccountPermission();
     message.account = object.account ?? "";
     message.permissions = object.permissions?.map(e => e) || [];

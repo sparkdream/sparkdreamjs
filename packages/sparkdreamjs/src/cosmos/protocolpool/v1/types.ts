@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { Timestamp } from "../../../google/protobuf/timestamp";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { Decimal } from "@cosmjs/math";
-import { toTimestamp, fromTimestamp } from "../../../helpers";
+import { Decimal } from "@interchainjs/math";
+import { toTimestamp, fromTimestamp, DeepPartial } from "../../../helpers";
 /** ContinuousFund defines the fields of continuous fund proposal. */
 export interface ContinuousFund {
   /** Recipient is the address string of the account receiving funds. */
@@ -28,12 +28,6 @@ export interface ContinuousFundAmino {
 export interface ContinuousFundAminoMsg {
   type: "cosmos-sdk/ContinuousFund";
   value: ContinuousFundAmino;
-}
-/** ContinuousFund defines the fields of continuous fund proposal. */
-export interface ContinuousFundSDKType {
-  recipient: string;
-  percentage: string;
-  expiry?: Date;
 }
 /** Params defines the parameters for the protocolpool module. */
 export interface Params {
@@ -69,11 +63,6 @@ export interface ParamsAminoMsg {
   type: "cosmos-sdk/Params";
   value: ParamsAmino;
 }
-/** Params defines the parameters for the protocolpool module. */
-export interface ParamsSDKType {
-  enabled_distribution_denoms: string[];
-  distribution_frequency: bigint;
-}
 function createBaseContinuousFund(): ContinuousFund {
   return {
     recipient: "",
@@ -83,6 +72,7 @@ function createBaseContinuousFund(): ContinuousFund {
 }
 export const ContinuousFund = {
   typeUrl: "/cosmos.protocolpool.v1.ContinuousFund",
+  aminoType: "cosmos-sdk/ContinuousFund",
   encode(message: ContinuousFund, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.recipient !== "") {
       writer.uint32(10).string(message.recipient);
@@ -118,7 +108,7 @@ export const ContinuousFund = {
     }
     return message;
   },
-  fromPartial(object: Partial<ContinuousFund>): ContinuousFund {
+  fromPartial(object: DeepPartial<ContinuousFund>): ContinuousFund {
     const message = createBaseContinuousFund();
     message.recipient = object.recipient ?? "";
     message.percentage = object.percentage ?? "";
@@ -175,6 +165,7 @@ function createBaseParams(): Params {
 }
 export const Params = {
   typeUrl: "/cosmos.protocolpool.v1.Params",
+  aminoType: "cosmos-sdk/Params",
   encode(message: Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.enabledDistributionDenoms) {
       writer.uint32(10).string(v!);
@@ -204,7 +195,7 @@ export const Params = {
     }
     return message;
   },
-  fromPartial(object: Partial<Params>): Params {
+  fromPartial(object: DeepPartial<Params>): Params {
     const message = createBaseParams();
     message.enabledDistributionDenoms = object.enabledDistributionDenoms?.map(e => e) || [];
     message.distributionFrequency = object.distributionFrequency !== undefined && object.distributionFrequency !== null ? BigInt(object.distributionFrequency.toString()) : BigInt(0);

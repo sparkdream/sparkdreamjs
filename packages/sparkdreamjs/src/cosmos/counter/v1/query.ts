@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** QueryGetCountRequest defines the request type for querying x/mock count. */
 export interface QueryGetCountRequest {}
 export interface QueryGetCountRequestProtoMsg {
@@ -12,8 +13,6 @@ export interface QueryGetCountRequestAminoMsg {
   type: "cosmos-sdk/QueryGetCountRequest";
   value: QueryGetCountRequestAmino;
 }
-/** QueryGetCountRequest defines the request type for querying x/mock count. */
-export interface QueryGetCountRequestSDKType {}
 /** QueryGetCountResponse defines the response type for querying x/mock count. */
 export interface QueryGetCountResponse {
   totalCount: bigint;
@@ -30,15 +29,12 @@ export interface QueryGetCountResponseAminoMsg {
   type: "cosmos-sdk/QueryGetCountResponse";
   value: QueryGetCountResponseAmino;
 }
-/** QueryGetCountResponse defines the response type for querying x/mock count. */
-export interface QueryGetCountResponseSDKType {
-  total_count: bigint;
-}
 function createBaseQueryGetCountRequest(): QueryGetCountRequest {
   return {};
 }
 export const QueryGetCountRequest = {
   typeUrl: "/cosmos.counter.v1.QueryGetCountRequest",
+  aminoType: "cosmos-sdk/QueryGetCountRequest",
   encode(_: QueryGetCountRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -56,7 +52,7 @@ export const QueryGetCountRequest = {
     }
     return message;
   },
-  fromPartial(_: Partial<QueryGetCountRequest>): QueryGetCountRequest {
+  fromPartial(_: DeepPartial<QueryGetCountRequest>): QueryGetCountRequest {
     const message = createBaseQueryGetCountRequest();
     return message;
   },
@@ -97,6 +93,7 @@ function createBaseQueryGetCountResponse(): QueryGetCountResponse {
 }
 export const QueryGetCountResponse = {
   typeUrl: "/cosmos.counter.v1.QueryGetCountResponse",
+  aminoType: "cosmos-sdk/QueryGetCountResponse",
   encode(message: QueryGetCountResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.totalCount !== BigInt(0)) {
       writer.uint32(8).int64(message.totalCount);
@@ -120,7 +117,7 @@ export const QueryGetCountResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryGetCountResponse>): QueryGetCountResponse {
+  fromPartial(object: DeepPartial<QueryGetCountResponse>): QueryGetCountResponse {
     const message = createBaseQueryGetCountResponse();
     message.totalCount = object.totalCount !== undefined && object.totalCount !== null ? BigInt(object.totalCount.toString()) : BigInt(0);
     return message;

@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /** Module is the config object of the benchmark module. */
 export interface Module {
   genesisParams?: GeneratorParams;
@@ -15,10 +16,6 @@ export interface ModuleAmino {
 export interface ModuleAminoMsg {
   type: "cosmos-sdk/Module";
   value: ModuleAmino;
-}
-/** Module is the config object of the benchmark module. */
-export interface ModuleSDKType {
-  genesis_params?: GeneratorParamsSDKType;
 }
 /** GenesisParams defines the genesis parameters for the benchmark module. */
 export interface GeneratorParams {
@@ -78,20 +75,6 @@ export interface GeneratorParamsAminoMsg {
   type: "cosmos-sdk/GeneratorParams";
   value: GeneratorParamsAmino;
 }
-/** GenesisParams defines the genesis parameters for the benchmark module. */
-export interface GeneratorParamsSDKType {
-  seed: bigint;
-  bucket_count: bigint;
-  key_mean: bigint;
-  key_std_dev: bigint;
-  value_mean: bigint;
-  value_std_dev: bigint;
-  genesis_count: bigint;
-  insert_weight: number;
-  update_weight: number;
-  get_weight: number;
-  delete_weight: number;
-}
 function createBaseModule(): Module {
   return {
     genesisParams: undefined
@@ -99,6 +82,7 @@ function createBaseModule(): Module {
 }
 export const Module = {
   typeUrl: "/cosmos.benchmark.module.v1.Module",
+  aminoType: "cosmos-sdk/Module",
   encode(message: Module, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.genesisParams !== undefined) {
       GeneratorParams.encode(message.genesisParams, writer.uint32(10).fork()).ldelim();
@@ -122,7 +106,7 @@ export const Module = {
     }
     return message;
   },
-  fromPartial(object: Partial<Module>): Module {
+  fromPartial(object: DeepPartial<Module>): Module {
     const message = createBaseModule();
     message.genesisParams = object.genesisParams !== undefined && object.genesisParams !== null ? GeneratorParams.fromPartial(object.genesisParams) : undefined;
     return message;
@@ -178,6 +162,7 @@ function createBaseGeneratorParams(): GeneratorParams {
 }
 export const GeneratorParams = {
   typeUrl: "/cosmos.benchmark.module.v1.GeneratorParams",
+  aminoType: "cosmos-sdk/GeneratorParams",
   encode(message: GeneratorParams, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.seed !== BigInt(0)) {
       writer.uint32(8).uint64(message.seed);
@@ -261,7 +246,7 @@ export const GeneratorParams = {
     }
     return message;
   },
-  fromPartial(object: Partial<GeneratorParams>): GeneratorParams {
+  fromPartial(object: DeepPartial<GeneratorParams>): GeneratorParams {
     const message = createBaseGeneratorParams();
     message.seed = object.seed !== undefined && object.seed !== null ? BigInt(object.seed.toString()) : BigInt(0);
     message.bucketCount = object.bucketCount !== undefined && object.bucketCount !== null ? BigInt(object.bucketCount.toString()) : BigInt(0);

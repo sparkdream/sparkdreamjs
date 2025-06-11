@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { Coin, CoinAmino, CoinSDKType } from "../../base/v1beta1/coin";
+import { Coin, CoinAmino } from "../../base/v1beta1/coin";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /**
  * AuthorizationType defines the type of staking module authorization type
  * 
@@ -19,7 +20,6 @@ export enum AuthorizationType {
   AUTHORIZATION_TYPE_CANCEL_UNBONDING_DELEGATION = 4,
   UNRECOGNIZED = -1,
 }
-export const AuthorizationTypeSDKType = AuthorizationType;
 export const AuthorizationTypeAmino = AuthorizationType;
 export function authorizationTypeFromJSON(object: any): AuthorizationType {
   switch (object) {
@@ -67,7 +67,6 @@ export function authorizationTypeToJSON(object: AuthorizationType): string {
  * Since: cosmos-sdk 0.43
  */
 export interface StakeAuthorization {
-  $typeUrl?: "/cosmos.staking.v1beta1.StakeAuthorization";
   /**
    * max_tokens specifies the maximum amount of tokens can be delegate to a validator. If it is
    * empty, there is no spend limit and any amount of coins can be delegated.
@@ -112,18 +111,6 @@ export interface StakeAuthorizationAminoMsg {
   type: "cosmos-sdk/StakeAuthorization";
   value: StakeAuthorizationAmino;
 }
-/**
- * StakeAuthorization defines authorization for delegate/undelegate/redelegate.
- * 
- * Since: cosmos-sdk 0.43
- */
-export interface StakeAuthorizationSDKType {
-  $typeUrl?: "/cosmos.staking.v1beta1.StakeAuthorization";
-  max_tokens?: CoinSDKType;
-  allow_list?: StakeAuthorization_ValidatorsSDKType;
-  deny_list?: StakeAuthorization_ValidatorsSDKType;
-  authorization_type: AuthorizationType;
-}
 /** Validators defines list of validator addresses. */
 export interface StakeAuthorization_Validators {
   address: string[];
@@ -140,13 +127,8 @@ export interface StakeAuthorization_ValidatorsAminoMsg {
   type: "cosmos-sdk/Validators";
   value: StakeAuthorization_ValidatorsAmino;
 }
-/** Validators defines list of validator addresses. */
-export interface StakeAuthorization_ValidatorsSDKType {
-  address: string[];
-}
 function createBaseStakeAuthorization(): StakeAuthorization {
   return {
-    $typeUrl: "/cosmos.staking.v1beta1.StakeAuthorization",
     maxTokens: undefined,
     allowList: undefined,
     denyList: undefined,
@@ -155,6 +137,7 @@ function createBaseStakeAuthorization(): StakeAuthorization {
 }
 export const StakeAuthorization = {
   typeUrl: "/cosmos.staking.v1beta1.StakeAuthorization",
+  aminoType: "cosmos-sdk/StakeAuthorization",
   encode(message: StakeAuthorization, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.maxTokens !== undefined) {
       Coin.encode(message.maxTokens, writer.uint32(10).fork()).ldelim();
@@ -196,7 +179,7 @@ export const StakeAuthorization = {
     }
     return message;
   },
-  fromPartial(object: Partial<StakeAuthorization>): StakeAuthorization {
+  fromPartial(object: DeepPartial<StakeAuthorization>): StakeAuthorization {
     const message = createBaseStakeAuthorization();
     message.maxTokens = object.maxTokens !== undefined && object.maxTokens !== null ? Coin.fromPartial(object.maxTokens) : undefined;
     message.allowList = object.allowList !== undefined && object.allowList !== null ? StakeAuthorization_Validators.fromPartial(object.allowList) : undefined;
@@ -257,6 +240,7 @@ function createBaseStakeAuthorization_Validators(): StakeAuthorization_Validator
 }
 export const StakeAuthorization_Validators = {
   typeUrl: "/cosmos.staking.v1beta1.Validators",
+  aminoType: "cosmos-sdk/Validators",
   encode(message: StakeAuthorization_Validators, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.address) {
       writer.uint32(10).string(v!);
@@ -280,7 +264,7 @@ export const StakeAuthorization_Validators = {
     }
     return message;
   },
-  fromPartial(object: Partial<StakeAuthorization_Validators>): StakeAuthorization_Validators {
+  fromPartial(object: DeepPartial<StakeAuthorization_Validators>): StakeAuthorization_Validators {
     const message = createBaseStakeAuthorization_Validators();
     message.address = object.address?.map(e => e) || [];
     return message;

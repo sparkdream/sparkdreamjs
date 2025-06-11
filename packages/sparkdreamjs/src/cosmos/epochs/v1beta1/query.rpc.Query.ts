@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Rpc } from "../../../helpers";
+import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
 import { QueryEpochInfosRequest, QueryEpochInfosResponse, QueryCurrentEpochRequest, QueryCurrentEpochResponse } from "./query";
@@ -11,22 +11,22 @@ export interface Query {
   currentEpoch(request: QueryCurrentEpochRequest): Promise<QueryCurrentEpochResponse>;
 }
 export class QueryClientImpl implements Query {
-  private readonly rpc: Rpc;
-  constructor(rpc: Rpc) {
+  private readonly rpc: TxRpc;
+  constructor(rpc: TxRpc) {
     this.rpc = rpc;
-    this.epochInfos = this.epochInfos.bind(this);
-    this.currentEpoch = this.currentEpoch.bind(this);
   }
-  epochInfos(request: QueryEpochInfosRequest = {}): Promise<QueryEpochInfosResponse> {
+  /* EpochInfos provide running epochInfos */
+  epochInfos = async (request: QueryEpochInfosRequest = {}): Promise<QueryEpochInfosResponse> => {
     const data = QueryEpochInfosRequest.encode(request).finish();
     const promise = this.rpc.request("cosmos.epochs.v1beta1.Query", "EpochInfos", data);
     return promise.then(data => QueryEpochInfosResponse.decode(new BinaryReader(data)));
-  }
-  currentEpoch(request: QueryCurrentEpochRequest): Promise<QueryCurrentEpochResponse> {
+  };
+  /* CurrentEpoch provide current epoch of specified identifier */
+  currentEpoch = async (request: QueryCurrentEpochRequest): Promise<QueryCurrentEpochResponse> => {
     const data = QueryCurrentEpochRequest.encode(request).finish();
     const promise = this.rpc.request("cosmos.epochs.v1beta1.Query", "CurrentEpoch", data);
     return promise.then(data => QueryCurrentEpochResponse.decode(new BinaryReader(data)));
-  }
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);

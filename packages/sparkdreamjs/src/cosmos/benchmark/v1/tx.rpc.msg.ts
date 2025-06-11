@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Rpc } from "../../../helpers";
+import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { MsgLoadTest, MsgLoadTestResponse } from "./tx";
 /** Msg defines the benchmark Msg service. */
@@ -8,14 +8,17 @@ export interface Msg {
   loadTest(request: MsgLoadTest): Promise<MsgLoadTestResponse>;
 }
 export class MsgClientImpl implements Msg {
-  private readonly rpc: Rpc;
-  constructor(rpc: Rpc) {
+  private readonly rpc: TxRpc;
+  constructor(rpc: TxRpc) {
     this.rpc = rpc;
-    this.loadTest = this.loadTest.bind(this);
   }
-  loadTest(request: MsgLoadTest): Promise<MsgLoadTestResponse> {
+  /* LoadTest defines a method for executing a sequence of load test operations. */
+  loadTest = async (request: MsgLoadTest): Promise<MsgLoadTestResponse> => {
     const data = MsgLoadTest.encode(request).finish();
     const promise = this.rpc.request("cosmos.benchmark.v1.Msg", "LoadTest", data);
     return promise.then(data => MsgLoadTestResponse.decode(new BinaryReader(data)));
-  }
+  };
 }
+export const createClientImpl = (rpc: TxRpc) => {
+  return new MsgClientImpl(rpc);
+};

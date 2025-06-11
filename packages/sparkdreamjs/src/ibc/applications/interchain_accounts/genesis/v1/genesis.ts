@@ -1,11 +1,10 @@
 //@ts-nocheck
 import { Params as Params1 } from "../../controller/v1/controller";
 import { ParamsAmino as Params1Amino } from "../../controller/v1/controller";
-import { ParamsSDKType as Params1SDKType } from "../../controller/v1/controller";
 import { Params as Params2 } from "../../host/v1/host";
 import { ParamsAmino as Params2Amino } from "../../host/v1/host";
-import { ParamsSDKType as Params2SDKType } from "../../host/v1/host";
 import { BinaryReader, BinaryWriter } from "../../../../../binary";
+import { DeepPartial } from "../../../../../helpers";
 /** GenesisState defines the interchain accounts genesis state */
 export interface GenesisState {
   controllerGenesisState: ControllerGenesisState;
@@ -23,11 +22,6 @@ export interface GenesisStateAmino {
 export interface GenesisStateAminoMsg {
   type: "cosmos-sdk/GenesisState";
   value: GenesisStateAmino;
-}
-/** GenesisState defines the interchain accounts genesis state */
-export interface GenesisStateSDKType {
-  controller_genesis_state: ControllerGenesisStateSDKType;
-  host_genesis_state: HostGenesisStateSDKType;
 }
 /** ControllerGenesisState defines the interchain accounts controller genesis state */
 export interface ControllerGenesisState {
@@ -51,13 +45,6 @@ export interface ControllerGenesisStateAminoMsg {
   type: "cosmos-sdk/ControllerGenesisState";
   value: ControllerGenesisStateAmino;
 }
-/** ControllerGenesisState defines the interchain accounts controller genesis state */
-export interface ControllerGenesisStateSDKType {
-  active_channels: ActiveChannelSDKType[];
-  interchain_accounts: RegisteredInterchainAccountSDKType[];
-  ports: string[];
-  params: Params1SDKType;
-}
 /** HostGenesisState defines the interchain accounts host genesis state */
 export interface HostGenesisState {
   activeChannels: ActiveChannel[];
@@ -79,13 +66,6 @@ export interface HostGenesisStateAmino {
 export interface HostGenesisStateAminoMsg {
   type: "cosmos-sdk/HostGenesisState";
   value: HostGenesisStateAmino;
-}
-/** HostGenesisState defines the interchain accounts host genesis state */
-export interface HostGenesisStateSDKType {
-  active_channels: ActiveChannelSDKType[];
-  interchain_accounts: RegisteredInterchainAccountSDKType[];
-  port: string;
-  params: Params2SDKType;
 }
 /**
  * ActiveChannel contains a connection ID, port ID and associated active channel ID, as well as a boolean flag to
@@ -115,16 +95,6 @@ export interface ActiveChannelAminoMsg {
   type: "cosmos-sdk/ActiveChannel";
   value: ActiveChannelAmino;
 }
-/**
- * ActiveChannel contains a connection ID, port ID and associated active channel ID, as well as a boolean flag to
- * indicate if the channel is middleware enabled
- */
-export interface ActiveChannelSDKType {
-  connection_id: string;
-  port_id: string;
-  channel_id: string;
-  is_middleware_enabled: boolean;
-}
 /** RegisteredInterchainAccount contains a connection ID, port ID and associated interchain account address */
 export interface RegisteredInterchainAccount {
   connectionId: string;
@@ -145,12 +115,6 @@ export interface RegisteredInterchainAccountAminoMsg {
   type: "cosmos-sdk/RegisteredInterchainAccount";
   value: RegisteredInterchainAccountAmino;
 }
-/** RegisteredInterchainAccount contains a connection ID, port ID and associated interchain account address */
-export interface RegisteredInterchainAccountSDKType {
-  connection_id: string;
-  port_id: string;
-  account_address: string;
-}
 function createBaseGenesisState(): GenesisState {
   return {
     controllerGenesisState: ControllerGenesisState.fromPartial({}),
@@ -159,6 +123,7 @@ function createBaseGenesisState(): GenesisState {
 }
 export const GenesisState = {
   typeUrl: "/ibc.applications.interchain_accounts.genesis.v1.GenesisState",
+  aminoType: "cosmos-sdk/GenesisState",
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.controllerGenesisState !== undefined) {
       ControllerGenesisState.encode(message.controllerGenesisState, writer.uint32(10).fork()).ldelim();
@@ -188,7 +153,7 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisState>): GenesisState {
+  fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = createBaseGenesisState();
     message.controllerGenesisState = object.controllerGenesisState !== undefined && object.controllerGenesisState !== null ? ControllerGenesisState.fromPartial(object.controllerGenesisState) : undefined;
     message.hostGenesisState = object.hostGenesisState !== undefined && object.hostGenesisState !== null ? HostGenesisState.fromPartial(object.hostGenesisState) : undefined;
@@ -242,6 +207,7 @@ function createBaseControllerGenesisState(): ControllerGenesisState {
 }
 export const ControllerGenesisState = {
   typeUrl: "/ibc.applications.interchain_accounts.genesis.v1.ControllerGenesisState",
+  aminoType: "cosmos-sdk/ControllerGenesisState",
   encode(message: ControllerGenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.activeChannels) {
       ActiveChannel.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -283,7 +249,7 @@ export const ControllerGenesisState = {
     }
     return message;
   },
-  fromPartial(object: Partial<ControllerGenesisState>): ControllerGenesisState {
+  fromPartial(object: DeepPartial<ControllerGenesisState>): ControllerGenesisState {
     const message = createBaseControllerGenesisState();
     message.activeChannels = object.activeChannels?.map(e => ActiveChannel.fromPartial(e)) || [];
     message.interchainAccounts = object.interchainAccounts?.map(e => RegisteredInterchainAccount.fromPartial(e)) || [];
@@ -353,6 +319,7 @@ function createBaseHostGenesisState(): HostGenesisState {
 }
 export const HostGenesisState = {
   typeUrl: "/ibc.applications.interchain_accounts.genesis.v1.HostGenesisState",
+  aminoType: "cosmos-sdk/HostGenesisState",
   encode(message: HostGenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.activeChannels) {
       ActiveChannel.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -394,7 +361,7 @@ export const HostGenesisState = {
     }
     return message;
   },
-  fromPartial(object: Partial<HostGenesisState>): HostGenesisState {
+  fromPartial(object: DeepPartial<HostGenesisState>): HostGenesisState {
     const message = createBaseHostGenesisState();
     message.activeChannels = object.activeChannels?.map(e => ActiveChannel.fromPartial(e)) || [];
     message.interchainAccounts = object.interchainAccounts?.map(e => RegisteredInterchainAccount.fromPartial(e)) || [];
@@ -462,6 +429,7 @@ function createBaseActiveChannel(): ActiveChannel {
 }
 export const ActiveChannel = {
   typeUrl: "/ibc.applications.interchain_accounts.genesis.v1.ActiveChannel",
+  aminoType: "cosmos-sdk/ActiveChannel",
   encode(message: ActiveChannel, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.connectionId !== "") {
       writer.uint32(10).string(message.connectionId);
@@ -503,7 +471,7 @@ export const ActiveChannel = {
     }
     return message;
   },
-  fromPartial(object: Partial<ActiveChannel>): ActiveChannel {
+  fromPartial(object: DeepPartial<ActiveChannel>): ActiveChannel {
     const message = createBaseActiveChannel();
     message.connectionId = object.connectionId ?? "";
     message.portId = object.portId ?? "";
@@ -566,6 +534,7 @@ function createBaseRegisteredInterchainAccount(): RegisteredInterchainAccount {
 }
 export const RegisteredInterchainAccount = {
   typeUrl: "/ibc.applications.interchain_accounts.genesis.v1.RegisteredInterchainAccount",
+  aminoType: "cosmos-sdk/RegisteredInterchainAccount",
   encode(message: RegisteredInterchainAccount, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.connectionId !== "") {
       writer.uint32(10).string(message.connectionId);
@@ -601,7 +570,7 @@ export const RegisteredInterchainAccount = {
     }
     return message;
   },
-  fromPartial(object: Partial<RegisteredInterchainAccount>): RegisteredInterchainAccount {
+  fromPartial(object: DeepPartial<RegisteredInterchainAccount>): RegisteredInterchainAccount {
     const message = createBaseRegisteredInterchainAccount();
     message.connectionId = object.connectionId ?? "";
     message.portId = object.portId ?? "";

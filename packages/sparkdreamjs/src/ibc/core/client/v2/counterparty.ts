@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /** CounterpartyInfo defines the key that the counterparty will use to message our client */
 export interface CounterpartyInfo {
   /** merkle prefix key is the prefix that ics provable keys are stored under */
@@ -23,11 +23,6 @@ export interface CounterpartyInfoAminoMsg {
   type: "cosmos-sdk/CounterpartyInfo";
   value: CounterpartyInfoAmino;
 }
-/** CounterpartyInfo defines the key that the counterparty will use to message our client */
-export interface CounterpartyInfoSDKType {
-  merkle_prefix: Uint8Array[];
-  client_id: string;
-}
 function createBaseCounterpartyInfo(): CounterpartyInfo {
   return {
     merklePrefix: [],
@@ -36,6 +31,7 @@ function createBaseCounterpartyInfo(): CounterpartyInfo {
 }
 export const CounterpartyInfo = {
   typeUrl: "/ibc.core.client.v2.CounterpartyInfo",
+  aminoType: "cosmos-sdk/CounterpartyInfo",
   encode(message: CounterpartyInfo, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.merklePrefix) {
       writer.uint32(10).bytes(v!);
@@ -65,7 +61,7 @@ export const CounterpartyInfo = {
     }
     return message;
   },
-  fromPartial(object: Partial<CounterpartyInfo>): CounterpartyInfo {
+  fromPartial(object: DeepPartial<CounterpartyInfo>): CounterpartyInfo {
     const message = createBaseCounterpartyInfo();
     message.merklePrefix = object.merklePrefix?.map(e => e) || [];
     message.clientId = object.clientId ?? "";

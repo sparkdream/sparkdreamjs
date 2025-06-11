@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** EventEpochEnd is an event emitted when an epoch end. */
 export interface EventEpochEnd {
   epochNumber: bigint;
@@ -15,10 +16,6 @@ export interface EventEpochEndAmino {
 export interface EventEpochEndAminoMsg {
   type: "cosmos-sdk/EventEpochEnd";
   value: EventEpochEndAmino;
-}
-/** EventEpochEnd is an event emitted when an epoch end. */
-export interface EventEpochEndSDKType {
-  epoch_number: bigint;
 }
 /** EventEpochStart is an event emitted when an epoch start. */
 export interface EventEpochStart {
@@ -38,11 +35,6 @@ export interface EventEpochStartAminoMsg {
   type: "cosmos-sdk/EventEpochStart";
   value: EventEpochStartAmino;
 }
-/** EventEpochStart is an event emitted when an epoch start. */
-export interface EventEpochStartSDKType {
-  epoch_number: bigint;
-  epoch_start_time: bigint;
-}
 function createBaseEventEpochEnd(): EventEpochEnd {
   return {
     epochNumber: BigInt(0)
@@ -50,6 +42,7 @@ function createBaseEventEpochEnd(): EventEpochEnd {
 }
 export const EventEpochEnd = {
   typeUrl: "/cosmos.epochs.v1beta1.EventEpochEnd",
+  aminoType: "cosmos-sdk/EventEpochEnd",
   encode(message: EventEpochEnd, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.epochNumber !== BigInt(0)) {
       writer.uint32(8).int64(message.epochNumber);
@@ -73,7 +66,7 @@ export const EventEpochEnd = {
     }
     return message;
   },
-  fromPartial(object: Partial<EventEpochEnd>): EventEpochEnd {
+  fromPartial(object: DeepPartial<EventEpochEnd>): EventEpochEnd {
     const message = createBaseEventEpochEnd();
     message.epochNumber = object.epochNumber !== undefined && object.epochNumber !== null ? BigInt(object.epochNumber.toString()) : BigInt(0);
     return message;
@@ -120,6 +113,7 @@ function createBaseEventEpochStart(): EventEpochStart {
 }
 export const EventEpochStart = {
   typeUrl: "/cosmos.epochs.v1beta1.EventEpochStart",
+  aminoType: "cosmos-sdk/EventEpochStart",
   encode(message: EventEpochStart, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.epochNumber !== BigInt(0)) {
       writer.uint32(8).int64(message.epochNumber);
@@ -149,7 +143,7 @@ export const EventEpochStart = {
     }
     return message;
   },
-  fromPartial(object: Partial<EventEpochStart>): EventEpochStart {
+  fromPartial(object: DeepPartial<EventEpochStart>): EventEpochStart {
     const message = createBaseEventEpochStart();
     message.epochNumber = object.epochNumber !== undefined && object.epochNumber !== null ? BigInt(object.epochNumber.toString()) : BigInt(0);
     message.epochStartTime = object.epochStartTime !== undefined && object.epochStartTime !== null ? BigInt(object.epochStartTime.toString()) : BigInt(0);

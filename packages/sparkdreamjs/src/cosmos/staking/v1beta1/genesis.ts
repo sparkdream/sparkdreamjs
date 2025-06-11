@@ -1,7 +1,7 @@
 //@ts-nocheck
-import { Params, ParamsAmino, ParamsSDKType, Validator, ValidatorAmino, ValidatorSDKType, Delegation, DelegationAmino, DelegationSDKType, UnbondingDelegation, UnbondingDelegationAmino, UnbondingDelegationSDKType, Redelegation, RedelegationAmino, RedelegationSDKType } from "./staking";
+import { Params, ParamsAmino, Validator, ValidatorAmino, Delegation, DelegationAmino, UnbondingDelegation, UnbondingDelegationAmino, Redelegation, RedelegationAmino } from "./staking";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /** GenesisState defines the staking module's genesis state. */
 export interface GenesisState {
   /** params defines all the parameters of related to deposit. */
@@ -60,17 +60,6 @@ export interface GenesisStateAminoMsg {
   type: "cosmos-sdk/GenesisState";
   value: GenesisStateAmino;
 }
-/** GenesisState defines the staking module's genesis state. */
-export interface GenesisStateSDKType {
-  params: ParamsSDKType;
-  last_total_power: Uint8Array;
-  last_validator_powers: LastValidatorPowerSDKType[];
-  validators: ValidatorSDKType[];
-  delegations: DelegationSDKType[];
-  unbonding_delegations: UnbondingDelegationSDKType[];
-  redelegations: RedelegationSDKType[];
-  exported: boolean;
-}
 /** LastValidatorPower required for validator set update logic. */
 export interface LastValidatorPower {
   /** address is the address of the validator. */
@@ -93,11 +82,6 @@ export interface LastValidatorPowerAminoMsg {
   type: "cosmos-sdk/LastValidatorPower";
   value: LastValidatorPowerAmino;
 }
-/** LastValidatorPower required for validator set update logic. */
-export interface LastValidatorPowerSDKType {
-  address: string;
-  power: bigint;
-}
 function createBaseGenesisState(): GenesisState {
   return {
     params: Params.fromPartial({}),
@@ -112,6 +96,7 @@ function createBaseGenesisState(): GenesisState {
 }
 export const GenesisState = {
   typeUrl: "/cosmos.staking.v1beta1.GenesisState",
+  aminoType: "cosmos-sdk/GenesisState",
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -177,7 +162,7 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisState>): GenesisState {
+  fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = createBaseGenesisState();
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
     message.lastTotalPower = object.lastTotalPower ?? new Uint8Array();
@@ -269,6 +254,7 @@ function createBaseLastValidatorPower(): LastValidatorPower {
 }
 export const LastValidatorPower = {
   typeUrl: "/cosmos.staking.v1beta1.LastValidatorPower",
+  aminoType: "cosmos-sdk/LastValidatorPower",
   encode(message: LastValidatorPower, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -298,7 +284,7 @@ export const LastValidatorPower = {
     }
     return message;
   },
-  fromPartial(object: Partial<LastValidatorPower>): LastValidatorPower {
+  fromPartial(object: DeepPartial<LastValidatorPower>): LastValidatorPower {
     const message = createBaseLastValidatorPower();
     message.address = object.address ?? "";
     message.power = object.power !== undefined && object.power !== null ? BigInt(object.power.toString()) : BigInt(0);

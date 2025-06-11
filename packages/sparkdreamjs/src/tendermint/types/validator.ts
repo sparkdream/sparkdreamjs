@@ -1,7 +1,7 @@
 //@ts-nocheck
-import { PublicKey, PublicKeyAmino, PublicKeySDKType } from "../crypto/keys";
+import { PublicKey, PublicKeyAmino } from "../crypto/keys";
 import { BinaryReader, BinaryWriter } from "../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../helpers";
 /** BlockIdFlag indicates which BlockID the signature is for */
 export enum BlockIDFlag {
   /** BLOCK_ID_FLAG_UNKNOWN - indicates an error condition */
@@ -13,7 +13,6 @@ export enum BlockIDFlag {
   BLOCK_ID_FLAG_NIL = 3,
   UNRECOGNIZED = -1,
 }
-export const BlockIDFlagSDKType = BlockIDFlag;
 export const BlockIDFlagAmino = BlockIDFlag;
 export function blockIDFlagFromJSON(object: any): BlockIDFlag {
   switch (object) {
@@ -68,11 +67,6 @@ export interface ValidatorSetAminoMsg {
   type: "/tendermint.types.ValidatorSet";
   value: ValidatorSetAmino;
 }
-export interface ValidatorSetSDKType {
-  validators: ValidatorSDKType[];
-  proposer?: ValidatorSDKType;
-  total_voting_power: bigint;
-}
 export interface Validator {
   address: Uint8Array;
   pubKey: PublicKey;
@@ -93,12 +87,6 @@ export interface ValidatorAminoMsg {
   type: "/tendermint.types.Validator";
   value: ValidatorAmino;
 }
-export interface ValidatorSDKType {
-  address: Uint8Array;
-  pub_key: PublicKeySDKType;
-  voting_power: bigint;
-  proposer_priority: bigint;
-}
 export interface SimpleValidator {
   pubKey?: PublicKey;
   votingPower: bigint;
@@ -114,10 +102,6 @@ export interface SimpleValidatorAmino {
 export interface SimpleValidatorAminoMsg {
   type: "/tendermint.types.SimpleValidator";
   value: SimpleValidatorAmino;
-}
-export interface SimpleValidatorSDKType {
-  pub_key?: PublicKeySDKType;
-  voting_power: bigint;
 }
 function createBaseValidatorSet(): ValidatorSet {
   return {
@@ -163,7 +147,7 @@ export const ValidatorSet = {
     }
     return message;
   },
-  fromPartial(object: Partial<ValidatorSet>): ValidatorSet {
+  fromPartial(object: DeepPartial<ValidatorSet>): ValidatorSet {
     const message = createBaseValidatorSet();
     message.validators = object.validators?.map(e => Validator.fromPartial(e)) || [];
     message.proposer = object.proposer !== undefined && object.proposer !== null ? Validator.fromPartial(object.proposer) : undefined;
@@ -259,7 +243,7 @@ export const Validator = {
     }
     return message;
   },
-  fromPartial(object: Partial<Validator>): Validator {
+  fromPartial(object: DeepPartial<Validator>): Validator {
     const message = createBaseValidator();
     message.address = object.address ?? new Uint8Array();
     message.pubKey = object.pubKey !== undefined && object.pubKey !== null ? PublicKey.fromPartial(object.pubKey) : undefined;
@@ -344,7 +328,7 @@ export const SimpleValidator = {
     }
     return message;
   },
-  fromPartial(object: Partial<SimpleValidator>): SimpleValidator {
+  fromPartial(object: DeepPartial<SimpleValidator>): SimpleValidator {
     const message = createBaseSimpleValidator();
     message.pubKey = object.pubKey !== undefined && object.pubKey !== null ? PublicKey.fromPartial(object.pubKey) : undefined;
     message.votingPower = object.votingPower !== undefined && object.votingPower !== null ? BigInt(object.votingPower.toString()) : BigInt(0);

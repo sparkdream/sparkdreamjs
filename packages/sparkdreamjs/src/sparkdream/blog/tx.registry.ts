@@ -1,7 +1,8 @@
 //@ts-nocheck
-import { GeneratedType, Registry } from "@cosmjs/proto-signing";
+import { TelescopeGeneratedType } from "../../types";
+import { Registry } from "@cosmjs/proto-signing";
 import { MsgUpdateParams, MsgCreatePost, MsgUpdatePost, MsgDeletePost } from "./tx";
-export const registry: ReadonlyArray<[string, GeneratedType]> = [["/sparkdream.blog.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.blog.MsgCreatePost", MsgCreatePost], ["/sparkdream.blog.MsgUpdatePost", MsgUpdatePost], ["/sparkdream.blog.MsgDeletePost", MsgDeletePost]];
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.blog.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.blog.MsgCreatePost", MsgCreatePost], ["/sparkdream.blog.MsgUpdatePost", MsgUpdatePost], ["/sparkdream.blog.MsgDeletePost", MsgDeletePost]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);

@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /**
  * DenomTrace contains the base denomination for ICS20 fungible tokens and the
  * source tracing information path.
@@ -36,15 +37,6 @@ export interface DenomTraceAminoMsg {
   type: "cosmos-sdk/DenomTrace";
   value: DenomTraceAmino;
 }
-/**
- * DenomTrace contains the base denomination for ICS20 fungible tokens and the
- * source tracing information path.
- */
-/** @deprecated */
-export interface DenomTraceSDKType {
-  path: string;
-  base_denom: string;
-}
 function createBaseDenomTrace(): DenomTrace {
   return {
     path: "",
@@ -53,6 +45,7 @@ function createBaseDenomTrace(): DenomTrace {
 }
 export const DenomTrace = {
   typeUrl: "/ibc.applications.transfer.v1.DenomTrace",
+  aminoType: "cosmos-sdk/DenomTrace",
   encode(message: DenomTrace, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.path !== "") {
       writer.uint32(10).string(message.path);
@@ -82,7 +75,7 @@ export const DenomTrace = {
     }
     return message;
   },
-  fromPartial(object: Partial<DenomTrace>): DenomTrace {
+  fromPartial(object: DeepPartial<DenomTrace>): DenomTrace {
     const message = createBaseDenomTrace();
     message.path = object.path ?? "";
     message.baseDenom = object.baseDenom ?? "";

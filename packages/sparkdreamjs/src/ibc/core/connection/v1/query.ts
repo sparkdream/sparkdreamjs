@@ -1,10 +1,10 @@
 //@ts-nocheck
-import { PageRequest, PageRequestAmino, PageRequestSDKType, PageResponse, PageResponseAmino, PageResponseSDKType } from "../../../../cosmos/base/query/v1beta1/pagination";
-import { ConnectionEnd, ConnectionEndAmino, ConnectionEndSDKType, IdentifiedConnection, IdentifiedConnectionAmino, IdentifiedConnectionSDKType } from "./connection";
-import { Height, HeightAmino, HeightSDKType, IdentifiedClientState, IdentifiedClientStateAmino, IdentifiedClientStateSDKType, Params, ParamsAmino, ParamsSDKType } from "../../client/v1/client";
-import { Any, AnyAmino, AnySDKType } from "../../../../google/protobuf/any";
+import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "../../../../cosmos/base/query/v1beta1/pagination";
+import { ConnectionEnd, ConnectionEndAmino, IdentifiedConnection, IdentifiedConnectionAmino } from "./connection";
+import { Height, HeightAmino, IdentifiedClientState, IdentifiedClientStateAmino, Params, ParamsAmino } from "../../client/v1/client";
+import { Any, AnyAmino } from "../../../../google/protobuf/any";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /**
  * QueryConnectionRequest is the request type for the Query/Connection RPC
  * method
@@ -28,13 +28,6 @@ export interface QueryConnectionRequestAmino {
 export interface QueryConnectionRequestAminoMsg {
   type: "cosmos-sdk/QueryConnectionRequest";
   value: QueryConnectionRequestAmino;
-}
-/**
- * QueryConnectionRequest is the request type for the Query/Connection RPC
- * method
- */
-export interface QueryConnectionRequestSDKType {
-  connection_id: string;
 }
 /**
  * QueryConnectionResponse is the response type for the Query/Connection RPC
@@ -71,16 +64,6 @@ export interface QueryConnectionResponseAminoMsg {
   value: QueryConnectionResponseAmino;
 }
 /**
- * QueryConnectionResponse is the response type for the Query/Connection RPC
- * method. Besides the connection end, it includes a proof and the height from
- * which the proof was retrieved.
- */
-export interface QueryConnectionResponseSDKType {
-  connection?: ConnectionEndSDKType;
-  proof: Uint8Array;
-  proof_height: HeightSDKType;
-}
-/**
  * QueryConnectionsRequest is the request type for the Query/Connections RPC
  * method
  */
@@ -101,13 +84,6 @@ export interface QueryConnectionsRequestAmino {
 export interface QueryConnectionsRequestAminoMsg {
   type: "cosmos-sdk/QueryConnectionsRequest";
   value: QueryConnectionsRequestAmino;
-}
-/**
- * QueryConnectionsRequest is the request type for the Query/Connections RPC
- * method
- */
-export interface QueryConnectionsRequestSDKType {
-  pagination?: PageRequestSDKType;
 }
 /**
  * QueryConnectionsResponse is the response type for the Query/Connections RPC
@@ -142,15 +118,6 @@ export interface QueryConnectionsResponseAminoMsg {
   value: QueryConnectionsResponseAmino;
 }
 /**
- * QueryConnectionsResponse is the response type for the Query/Connections RPC
- * method.
- */
-export interface QueryConnectionsResponseSDKType {
-  connections: IdentifiedConnectionSDKType[];
-  pagination?: PageResponseSDKType;
-  height: HeightSDKType;
-}
-/**
  * QueryClientConnectionsRequest is the request type for the
  * Query/ClientConnections RPC method
  */
@@ -173,13 +140,6 @@ export interface QueryClientConnectionsRequestAmino {
 export interface QueryClientConnectionsRequestAminoMsg {
   type: "cosmos-sdk/QueryClientConnectionsRequest";
   value: QueryClientConnectionsRequestAmino;
-}
-/**
- * QueryClientConnectionsRequest is the request type for the
- * Query/ClientConnections RPC method
- */
-export interface QueryClientConnectionsRequestSDKType {
-  client_id: string;
 }
 /**
  * QueryClientConnectionsResponse is the response type for the
@@ -214,15 +174,6 @@ export interface QueryClientConnectionsResponseAminoMsg {
   value: QueryClientConnectionsResponseAmino;
 }
 /**
- * QueryClientConnectionsResponse is the response type for the
- * Query/ClientConnections RPC method
- */
-export interface QueryClientConnectionsResponseSDKType {
-  connection_paths: string[];
-  proof: Uint8Array;
-  proof_height: HeightSDKType;
-}
-/**
  * QueryConnectionClientStateRequest is the request type for the
  * Query/ConnectionClientState RPC method
  */
@@ -245,13 +196,6 @@ export interface QueryConnectionClientStateRequestAmino {
 export interface QueryConnectionClientStateRequestAminoMsg {
   type: "cosmos-sdk/QueryConnectionClientStateRequest";
   value: QueryConnectionClientStateRequestAmino;
-}
-/**
- * QueryConnectionClientStateRequest is the request type for the
- * Query/ConnectionClientState RPC method
- */
-export interface QueryConnectionClientStateRequestSDKType {
-  connection_id: string;
 }
 /**
  * QueryConnectionClientStateResponse is the response type for the
@@ -286,15 +230,6 @@ export interface QueryConnectionClientStateResponseAminoMsg {
   value: QueryConnectionClientStateResponseAmino;
 }
 /**
- * QueryConnectionClientStateResponse is the response type for the
- * Query/ConnectionClientState RPC method
- */
-export interface QueryConnectionClientStateResponseSDKType {
-  identified_client_state?: IdentifiedClientStateSDKType;
-  proof: Uint8Array;
-  proof_height: HeightSDKType;
-}
-/**
  * QueryConnectionConsensusStateRequest is the request type for the
  * Query/ConnectionConsensusState RPC method
  */
@@ -321,15 +256,6 @@ export interface QueryConnectionConsensusStateRequestAmino {
 export interface QueryConnectionConsensusStateRequestAminoMsg {
   type: "cosmos-sdk/QueryConnectionConsensusStateRequest";
   value: QueryConnectionConsensusStateRequestAmino;
-}
-/**
- * QueryConnectionConsensusStateRequest is the request type for the
- * Query/ConnectionConsensusState RPC method
- */
-export interface QueryConnectionConsensusStateRequestSDKType {
-  connection_id: string;
-  revision_number: bigint;
-  revision_height: bigint;
 }
 /**
  * QueryConnectionConsensusStateResponse is the response type for the
@@ -367,16 +293,6 @@ export interface QueryConnectionConsensusStateResponseAminoMsg {
   type: "cosmos-sdk/QueryConnectionConsensusStateResponse";
   value: QueryConnectionConsensusStateResponseAmino;
 }
-/**
- * QueryConnectionConsensusStateResponse is the response type for the
- * Query/ConnectionConsensusState RPC method
- */
-export interface QueryConnectionConsensusStateResponseSDKType {
-  consensus_state?: AnySDKType;
-  client_id: string;
-  proof: Uint8Array;
-  proof_height: HeightSDKType;
-}
 /** QueryConnectionParamsRequest is the request type for the Query/ConnectionParams RPC method. */
 export interface QueryConnectionParamsRequest {}
 export interface QueryConnectionParamsRequestProtoMsg {
@@ -389,8 +305,6 @@ export interface QueryConnectionParamsRequestAminoMsg {
   type: "cosmos-sdk/QueryConnectionParamsRequest";
   value: QueryConnectionParamsRequestAmino;
 }
-/** QueryConnectionParamsRequest is the request type for the Query/ConnectionParams RPC method. */
-export interface QueryConnectionParamsRequestSDKType {}
 /** QueryConnectionParamsResponse is the response type for the Query/ConnectionParams RPC method. */
 export interface QueryConnectionParamsResponse {
   /** params defines the parameters of the module. */
@@ -409,10 +323,6 @@ export interface QueryConnectionParamsResponseAminoMsg {
   type: "cosmos-sdk/QueryConnectionParamsResponse";
   value: QueryConnectionParamsResponseAmino;
 }
-/** QueryConnectionParamsResponse is the response type for the Query/ConnectionParams RPC method. */
-export interface QueryConnectionParamsResponseSDKType {
-  params?: ParamsSDKType;
-}
 function createBaseQueryConnectionRequest(): QueryConnectionRequest {
   return {
     connectionId: ""
@@ -420,6 +330,7 @@ function createBaseQueryConnectionRequest(): QueryConnectionRequest {
 }
 export const QueryConnectionRequest = {
   typeUrl: "/ibc.core.connection.v1.QueryConnectionRequest",
+  aminoType: "cosmos-sdk/QueryConnectionRequest",
   encode(message: QueryConnectionRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.connectionId !== "") {
       writer.uint32(10).string(message.connectionId);
@@ -443,7 +354,7 @@ export const QueryConnectionRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryConnectionRequest>): QueryConnectionRequest {
+  fromPartial(object: DeepPartial<QueryConnectionRequest>): QueryConnectionRequest {
     const message = createBaseQueryConnectionRequest();
     message.connectionId = object.connectionId ?? "";
     return message;
@@ -491,6 +402,7 @@ function createBaseQueryConnectionResponse(): QueryConnectionResponse {
 }
 export const QueryConnectionResponse = {
   typeUrl: "/ibc.core.connection.v1.QueryConnectionResponse",
+  aminoType: "cosmos-sdk/QueryConnectionResponse",
   encode(message: QueryConnectionResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.connection !== undefined) {
       ConnectionEnd.encode(message.connection, writer.uint32(10).fork()).ldelim();
@@ -526,7 +438,7 @@ export const QueryConnectionResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryConnectionResponse>): QueryConnectionResponse {
+  fromPartial(object: DeepPartial<QueryConnectionResponse>): QueryConnectionResponse {
     const message = createBaseQueryConnectionResponse();
     message.connection = object.connection !== undefined && object.connection !== null ? ConnectionEnd.fromPartial(object.connection) : undefined;
     message.proof = object.proof ?? new Uint8Array();
@@ -582,6 +494,7 @@ function createBaseQueryConnectionsRequest(): QueryConnectionsRequest {
 }
 export const QueryConnectionsRequest = {
   typeUrl: "/ibc.core.connection.v1.QueryConnectionsRequest",
+  aminoType: "cosmos-sdk/QueryConnectionsRequest",
   encode(message: QueryConnectionsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
@@ -605,7 +518,7 @@ export const QueryConnectionsRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryConnectionsRequest>): QueryConnectionsRequest {
+  fromPartial(object: DeepPartial<QueryConnectionsRequest>): QueryConnectionsRequest {
     const message = createBaseQueryConnectionsRequest();
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
     return message;
@@ -653,6 +566,7 @@ function createBaseQueryConnectionsResponse(): QueryConnectionsResponse {
 }
 export const QueryConnectionsResponse = {
   typeUrl: "/ibc.core.connection.v1.QueryConnectionsResponse",
+  aminoType: "cosmos-sdk/QueryConnectionsResponse",
   encode(message: QueryConnectionsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.connections) {
       IdentifiedConnection.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -688,7 +602,7 @@ export const QueryConnectionsResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryConnectionsResponse>): QueryConnectionsResponse {
+  fromPartial(object: DeepPartial<QueryConnectionsResponse>): QueryConnectionsResponse {
     const message = createBaseQueryConnectionsResponse();
     message.connections = object.connections?.map(e => IdentifiedConnection.fromPartial(e)) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
@@ -746,6 +660,7 @@ function createBaseQueryClientConnectionsRequest(): QueryClientConnectionsReques
 }
 export const QueryClientConnectionsRequest = {
   typeUrl: "/ibc.core.connection.v1.QueryClientConnectionsRequest",
+  aminoType: "cosmos-sdk/QueryClientConnectionsRequest",
   encode(message: QueryClientConnectionsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -769,7 +684,7 @@ export const QueryClientConnectionsRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryClientConnectionsRequest>): QueryClientConnectionsRequest {
+  fromPartial(object: DeepPartial<QueryClientConnectionsRequest>): QueryClientConnectionsRequest {
     const message = createBaseQueryClientConnectionsRequest();
     message.clientId = object.clientId ?? "";
     return message;
@@ -817,6 +732,7 @@ function createBaseQueryClientConnectionsResponse(): QueryClientConnectionsRespo
 }
 export const QueryClientConnectionsResponse = {
   typeUrl: "/ibc.core.connection.v1.QueryClientConnectionsResponse",
+  aminoType: "cosmos-sdk/QueryClientConnectionsResponse",
   encode(message: QueryClientConnectionsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.connectionPaths) {
       writer.uint32(10).string(v!);
@@ -852,7 +768,7 @@ export const QueryClientConnectionsResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryClientConnectionsResponse>): QueryClientConnectionsResponse {
+  fromPartial(object: DeepPartial<QueryClientConnectionsResponse>): QueryClientConnectionsResponse {
     const message = createBaseQueryClientConnectionsResponse();
     message.connectionPaths = object.connectionPaths?.map(e => e) || [];
     message.proof = object.proof ?? new Uint8Array();
@@ -910,6 +826,7 @@ function createBaseQueryConnectionClientStateRequest(): QueryConnectionClientSta
 }
 export const QueryConnectionClientStateRequest = {
   typeUrl: "/ibc.core.connection.v1.QueryConnectionClientStateRequest",
+  aminoType: "cosmos-sdk/QueryConnectionClientStateRequest",
   encode(message: QueryConnectionClientStateRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.connectionId !== "") {
       writer.uint32(10).string(message.connectionId);
@@ -933,7 +850,7 @@ export const QueryConnectionClientStateRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryConnectionClientStateRequest>): QueryConnectionClientStateRequest {
+  fromPartial(object: DeepPartial<QueryConnectionClientStateRequest>): QueryConnectionClientStateRequest {
     const message = createBaseQueryConnectionClientStateRequest();
     message.connectionId = object.connectionId ?? "";
     return message;
@@ -981,6 +898,7 @@ function createBaseQueryConnectionClientStateResponse(): QueryConnectionClientSt
 }
 export const QueryConnectionClientStateResponse = {
   typeUrl: "/ibc.core.connection.v1.QueryConnectionClientStateResponse",
+  aminoType: "cosmos-sdk/QueryConnectionClientStateResponse",
   encode(message: QueryConnectionClientStateResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.identifiedClientState !== undefined) {
       IdentifiedClientState.encode(message.identifiedClientState, writer.uint32(10).fork()).ldelim();
@@ -1016,7 +934,7 @@ export const QueryConnectionClientStateResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryConnectionClientStateResponse>): QueryConnectionClientStateResponse {
+  fromPartial(object: DeepPartial<QueryConnectionClientStateResponse>): QueryConnectionClientStateResponse {
     const message = createBaseQueryConnectionClientStateResponse();
     message.identifiedClientState = object.identifiedClientState !== undefined && object.identifiedClientState !== null ? IdentifiedClientState.fromPartial(object.identifiedClientState) : undefined;
     message.proof = object.proof ?? new Uint8Array();
@@ -1074,6 +992,7 @@ function createBaseQueryConnectionConsensusStateRequest(): QueryConnectionConsen
 }
 export const QueryConnectionConsensusStateRequest = {
   typeUrl: "/ibc.core.connection.v1.QueryConnectionConsensusStateRequest",
+  aminoType: "cosmos-sdk/QueryConnectionConsensusStateRequest",
   encode(message: QueryConnectionConsensusStateRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.connectionId !== "") {
       writer.uint32(10).string(message.connectionId);
@@ -1109,7 +1028,7 @@ export const QueryConnectionConsensusStateRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryConnectionConsensusStateRequest>): QueryConnectionConsensusStateRequest {
+  fromPartial(object: DeepPartial<QueryConnectionConsensusStateRequest>): QueryConnectionConsensusStateRequest {
     const message = createBaseQueryConnectionConsensusStateRequest();
     message.connectionId = object.connectionId ?? "";
     message.revisionNumber = object.revisionNumber !== undefined && object.revisionNumber !== null ? BigInt(object.revisionNumber.toString()) : BigInt(0);
@@ -1168,6 +1087,7 @@ function createBaseQueryConnectionConsensusStateResponse(): QueryConnectionConse
 }
 export const QueryConnectionConsensusStateResponse = {
   typeUrl: "/ibc.core.connection.v1.QueryConnectionConsensusStateResponse",
+  aminoType: "cosmos-sdk/QueryConnectionConsensusStateResponse",
   encode(message: QueryConnectionConsensusStateResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.consensusState !== undefined) {
       Any.encode(message.consensusState, writer.uint32(10).fork()).ldelim();
@@ -1209,7 +1129,7 @@ export const QueryConnectionConsensusStateResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryConnectionConsensusStateResponse>): QueryConnectionConsensusStateResponse {
+  fromPartial(object: DeepPartial<QueryConnectionConsensusStateResponse>): QueryConnectionConsensusStateResponse {
     const message = createBaseQueryConnectionConsensusStateResponse();
     message.consensusState = object.consensusState !== undefined && object.consensusState !== null ? Any.fromPartial(object.consensusState) : undefined;
     message.clientId = object.clientId ?? "";
@@ -1268,6 +1188,7 @@ function createBaseQueryConnectionParamsRequest(): QueryConnectionParamsRequest 
 }
 export const QueryConnectionParamsRequest = {
   typeUrl: "/ibc.core.connection.v1.QueryConnectionParamsRequest",
+  aminoType: "cosmos-sdk/QueryConnectionParamsRequest",
   encode(_: QueryConnectionParamsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1285,7 +1206,7 @@ export const QueryConnectionParamsRequest = {
     }
     return message;
   },
-  fromPartial(_: Partial<QueryConnectionParamsRequest>): QueryConnectionParamsRequest {
+  fromPartial(_: DeepPartial<QueryConnectionParamsRequest>): QueryConnectionParamsRequest {
     const message = createBaseQueryConnectionParamsRequest();
     return message;
   },
@@ -1326,6 +1247,7 @@ function createBaseQueryConnectionParamsResponse(): QueryConnectionParamsRespons
 }
 export const QueryConnectionParamsResponse = {
   typeUrl: "/ibc.core.connection.v1.QueryConnectionParamsResponse",
+  aminoType: "cosmos-sdk/QueryConnectionParamsResponse",
   encode(message: QueryConnectionParamsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -1349,7 +1271,7 @@ export const QueryConnectionParamsResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryConnectionParamsResponse>): QueryConnectionParamsResponse {
+  fromPartial(object: DeepPartial<QueryConnectionParamsResponse>): QueryConnectionParamsResponse {
     const message = createBaseQueryConnectionParamsResponse();
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
     return message;

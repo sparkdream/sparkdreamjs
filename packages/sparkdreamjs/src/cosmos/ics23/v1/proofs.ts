@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 export enum HashOp {
   /** NO_HASH - NO_HASH is the default if no data passed. Note this is an illegal argument some places. */
   NO_HASH = 0,
@@ -16,7 +16,6 @@ export enum HashOp {
   BLAKE3 = 9,
   UNRECOGNIZED = -1,
 }
-export const HashOpSDKType = HashOp;
 export const HashOpAmino = HashOp;
 export function hashOpFromJSON(object: any): HashOp {
   switch (object) {
@@ -110,7 +109,6 @@ export enum LengthOp {
   REQUIRE_64_BYTES = 8,
   UNRECOGNIZED = -1,
 }
-export const LengthOpSDKType = LengthOp;
 export const LengthOpAmino = LengthOp;
 export function lengthOpFromJSON(object: any): LengthOp {
   switch (object) {
@@ -235,33 +233,6 @@ export interface ExistenceProofAminoMsg {
   value: ExistenceProofAmino;
 }
 /**
- * ExistenceProof takes a key and a value and a set of steps to perform on it.
- * The result of peforming all these steps will provide a "root hash", which can
- * be compared to the value in a header.
- * 
- * Since it is computationally infeasible to produce a hash collission for any of the used
- * cryptographic hash functions, if someone can provide a series of operations to transform
- * a given key and value into a root hash that matches some trusted root, these key and values
- * must be in the referenced merkle tree.
- * 
- * The only possible issue is maliablity in LeafOp, such as providing extra prefix data,
- * which should be controlled by a spec. Eg. with lengthOp as NONE,
- * prefix = FOO, key = BAR, value = CHOICE
- * and
- * prefix = F, key = OOBAR, value = CHOICE
- * would produce the same value.
- * 
- * With LengthOp this is tricker but not impossible. Which is why the "leafPrefixEqual" field
- * in the ProofSpec is valuable to prevent this mutability. And why all trees should
- * length-prefix the data before hashing it.
- */
-export interface ExistenceProofSDKType {
-  key: Uint8Array;
-  value: Uint8Array;
-  leaf?: LeafOpSDKType;
-  path: InnerOpSDKType[];
-}
-/**
  * NonExistenceProof takes a proof of two neighbors, one left of the desired key,
  * one right of the desired key. If both proofs are valid AND they are neighbors,
  * then there is no valid proof for the given key.
@@ -291,16 +262,6 @@ export interface NonExistenceProofAminoMsg {
   type: "cosmos-sdk/NonExistenceProof";
   value: NonExistenceProofAmino;
 }
-/**
- * NonExistenceProof takes a proof of two neighbors, one left of the desired key,
- * one right of the desired key. If both proofs are valid AND they are neighbors,
- * then there is no valid proof for the given key.
- */
-export interface NonExistenceProofSDKType {
-  key: Uint8Array;
-  left?: ExistenceProofSDKType;
-  right?: ExistenceProofSDKType;
-}
 /** CommitmentProof is either an ExistenceProof or a NonExistenceProof, or a Batch of such messages */
 export interface CommitmentProof {
   exist?: ExistenceProof;
@@ -322,13 +283,6 @@ export interface CommitmentProofAmino {
 export interface CommitmentProofAminoMsg {
   type: "cosmos-sdk/CommitmentProof";
   value: CommitmentProofAmino;
-}
-/** CommitmentProof is either an ExistenceProof or a NonExistenceProof, or a Batch of such messages */
-export interface CommitmentProofSDKType {
-  exist?: ExistenceProofSDKType;
-  nonexist?: NonExistenceProofSDKType;
-  batch?: BatchProofSDKType;
-  compressed?: CompressedBatchProofSDKType;
 }
 /**
  * LeafOp represents the raw key-value data we wish to prove, and
@@ -393,29 +347,6 @@ export interface LeafOpAminoMsg {
   value: LeafOpAmino;
 }
 /**
- * LeafOp represents the raw key-value data we wish to prove, and
- * must be flexible to represent the internal transformation from
- * the original key-value pairs into the basis hash, for many existing
- * merkle trees.
- * 
- * key and value are passed in. So that the signature of this operation is:
- * leafOp(key, value) -> output
- * 
- * To process this, first prehash the keys and values if needed (ANY means no hash in this case):
- * hkey = prehashKey(key)
- * hvalue = prehashValue(value)
- * 
- * Then combine the bytes, and hash it
- * output = hash(prefix || length(hkey) || hkey || length(hvalue) || hvalue)
- */
-export interface LeafOpSDKType {
-  hash: HashOp;
-  prehash_key: HashOp;
-  prehash_value: HashOp;
-  length: LengthOp;
-  prefix: Uint8Array;
-}
-/**
  * InnerOp represents a merkle-proof step that is not a leaf.
  * It represents concatenating two children and hashing them to provide the next result.
  * 
@@ -466,28 +397,6 @@ export interface InnerOpAmino {
 export interface InnerOpAminoMsg {
   type: "cosmos-sdk/InnerOp";
   value: InnerOpAmino;
-}
-/**
- * InnerOp represents a merkle-proof step that is not a leaf.
- * It represents concatenating two children and hashing them to provide the next result.
- * 
- * The result of the previous step is passed in, so the signature of this op is:
- * innerOp(child) -> output
- * 
- * The result of applying InnerOp should be:
- * output = op.hash(op.prefix || child || op.suffix)
- * 
- * where the || operator is concatenation of binary data,
- * and child is the result of hashing all the tree below this step.
- * 
- * Any special data, like prepending child with the length, or prepending the entire operation with
- * some value to differentiate from leaf nodes, should be included in prefix and suffix.
- * If either of prefix or suffix is empty, we just treat it as an empty string
- */
-export interface InnerOpSDKType {
-  hash: HashOp;
-  prefix: Uint8Array;
-  suffix: Uint8Array;
 }
 /**
  * ProofSpec defines what the expected parameters are for a given proof type.
@@ -564,25 +473,6 @@ export interface ProofSpecAminoMsg {
   value: ProofSpecAmino;
 }
 /**
- * ProofSpec defines what the expected parameters are for a given proof type.
- * This can be stored in the client and used to validate any incoming proofs.
- * 
- * verify(ProofSpec, Proof) -> Proof | Error
- * 
- * As demonstrated in tests, if we don't fix the algorithm used to calculate the
- * LeafHash for a given tree, there are many possible key-value pairs that can
- * generate a given hash (by interpretting the preimage differently).
- * We need this for proper security, requires client knows a priori what
- * tree format server uses. But not in code, rather a configuration object.
- */
-export interface ProofSpecSDKType {
-  leaf_spec?: LeafOpSDKType;
-  inner_spec?: InnerSpecSDKType;
-  max_depth: number;
-  min_depth: number;
-  prehash_key_before_comparison: boolean;
-}
-/**
  * InnerSpec contains all store-specific structure info to determine if two proofs from a
  * given store are neighbors.
  * 
@@ -642,24 +532,6 @@ export interface InnerSpecAminoMsg {
   type: "cosmos-sdk/InnerSpec";
   value: InnerSpecAmino;
 }
-/**
- * InnerSpec contains all store-specific structure info to determine if two proofs from a
- * given store are neighbors.
- * 
- * This enables:
- * 
- * isLeftMost(spec: InnerSpec, op: InnerOp)
- * isRightMost(spec: InnerSpec, op: InnerOp)
- * isLeftNeighbor(spec: InnerSpec, left: InnerOp, right: InnerOp)
- */
-export interface InnerSpecSDKType {
-  child_order: number[];
-  child_size: number;
-  min_prefix_length: number;
-  max_prefix_length: number;
-  empty_child: Uint8Array;
-  hash: HashOp;
-}
 /** BatchProof is a group of multiple proof types than can be compressed */
 export interface BatchProof {
   entries: BatchEntry[];
@@ -675,10 +547,6 @@ export interface BatchProofAmino {
 export interface BatchProofAminoMsg {
   type: "cosmos-sdk/BatchProof";
   value: BatchProofAmino;
-}
-/** BatchProof is a group of multiple proof types than can be compressed */
-export interface BatchProofSDKType {
-  entries: BatchEntrySDKType[];
 }
 /** Use BatchEntry not CommitmentProof, to avoid recursion */
 export interface BatchEntry {
@@ -698,11 +566,6 @@ export interface BatchEntryAminoMsg {
   type: "cosmos-sdk/BatchEntry";
   value: BatchEntryAmino;
 }
-/** Use BatchEntry not CommitmentProof, to avoid recursion */
-export interface BatchEntrySDKType {
-  exist?: ExistenceProofSDKType;
-  nonexist?: NonExistenceProofSDKType;
-}
 export interface CompressedBatchProof {
   entries: CompressedBatchEntry[];
   lookupInners: InnerOp[];
@@ -718,10 +581,6 @@ export interface CompressedBatchProofAmino {
 export interface CompressedBatchProofAminoMsg {
   type: "cosmos-sdk/CompressedBatchProof";
   value: CompressedBatchProofAmino;
-}
-export interface CompressedBatchProofSDKType {
-  entries: CompressedBatchEntrySDKType[];
-  lookup_inners: InnerOpSDKType[];
 }
 /** Use BatchEntry not CommitmentProof, to avoid recursion */
 export interface CompressedBatchEntry {
@@ -740,11 +599,6 @@ export interface CompressedBatchEntryAmino {
 export interface CompressedBatchEntryAminoMsg {
   type: "cosmos-sdk/CompressedBatchEntry";
   value: CompressedBatchEntryAmino;
-}
-/** Use BatchEntry not CommitmentProof, to avoid recursion */
-export interface CompressedBatchEntrySDKType {
-  exist?: CompressedExistenceProofSDKType;
-  nonexist?: CompressedNonExistenceProofSDKType;
 }
 export interface CompressedExistenceProof {
   key: Uint8Array;
@@ -768,12 +622,6 @@ export interface CompressedExistenceProofAminoMsg {
   type: "cosmos-sdk/CompressedExistenceProof";
   value: CompressedExistenceProofAmino;
 }
-export interface CompressedExistenceProofSDKType {
-  key: Uint8Array;
-  value: Uint8Array;
-  leaf?: LeafOpSDKType;
-  path: number[];
-}
 export interface CompressedNonExistenceProof {
   /** TODO: remove this as unnecessary??? we prove a range */
   key: Uint8Array;
@@ -794,11 +642,6 @@ export interface CompressedNonExistenceProofAminoMsg {
   type: "cosmos-sdk/CompressedNonExistenceProof";
   value: CompressedNonExistenceProofAmino;
 }
-export interface CompressedNonExistenceProofSDKType {
-  key: Uint8Array;
-  left?: CompressedExistenceProofSDKType;
-  right?: CompressedExistenceProofSDKType;
-}
 function createBaseExistenceProof(): ExistenceProof {
   return {
     key: new Uint8Array(),
@@ -809,6 +652,7 @@ function createBaseExistenceProof(): ExistenceProof {
 }
 export const ExistenceProof = {
   typeUrl: "/cosmos.ics23.v1.ExistenceProof",
+  aminoType: "cosmos-sdk/ExistenceProof",
   encode(message: ExistenceProof, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.key.length !== 0) {
       writer.uint32(10).bytes(message.key);
@@ -850,7 +694,7 @@ export const ExistenceProof = {
     }
     return message;
   },
-  fromPartial(object: Partial<ExistenceProof>): ExistenceProof {
+  fromPartial(object: DeepPartial<ExistenceProof>): ExistenceProof {
     const message = createBaseExistenceProof();
     message.key = object.key ?? new Uint8Array();
     message.value = object.value ?? new Uint8Array();
@@ -915,6 +759,7 @@ function createBaseNonExistenceProof(): NonExistenceProof {
 }
 export const NonExistenceProof = {
   typeUrl: "/cosmos.ics23.v1.NonExistenceProof",
+  aminoType: "cosmos-sdk/NonExistenceProof",
   encode(message: NonExistenceProof, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.key.length !== 0) {
       writer.uint32(10).bytes(message.key);
@@ -950,7 +795,7 @@ export const NonExistenceProof = {
     }
     return message;
   },
-  fromPartial(object: Partial<NonExistenceProof>): NonExistenceProof {
+  fromPartial(object: DeepPartial<NonExistenceProof>): NonExistenceProof {
     const message = createBaseNonExistenceProof();
     message.key = object.key ?? new Uint8Array();
     message.left = object.left !== undefined && object.left !== null ? ExistenceProof.fromPartial(object.left) : undefined;
@@ -1009,6 +854,7 @@ function createBaseCommitmentProof(): CommitmentProof {
 }
 export const CommitmentProof = {
   typeUrl: "/cosmos.ics23.v1.CommitmentProof",
+  aminoType: "cosmos-sdk/CommitmentProof",
   encode(message: CommitmentProof, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.exist !== undefined) {
       ExistenceProof.encode(message.exist, writer.uint32(10).fork()).ldelim();
@@ -1050,7 +896,7 @@ export const CommitmentProof = {
     }
     return message;
   },
-  fromPartial(object: Partial<CommitmentProof>): CommitmentProof {
+  fromPartial(object: DeepPartial<CommitmentProof>): CommitmentProof {
     const message = createBaseCommitmentProof();
     message.exist = object.exist !== undefined && object.exist !== null ? ExistenceProof.fromPartial(object.exist) : undefined;
     message.nonexist = object.nonexist !== undefined && object.nonexist !== null ? NonExistenceProof.fromPartial(object.nonexist) : undefined;
@@ -1115,6 +961,7 @@ function createBaseLeafOp(): LeafOp {
 }
 export const LeafOp = {
   typeUrl: "/cosmos.ics23.v1.LeafOp",
+  aminoType: "cosmos-sdk/LeafOp",
   encode(message: LeafOp, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.hash !== 0) {
       writer.uint32(8).int32(message.hash);
@@ -1162,7 +1009,7 @@ export const LeafOp = {
     }
     return message;
   },
-  fromPartial(object: Partial<LeafOp>): LeafOp {
+  fromPartial(object: DeepPartial<LeafOp>): LeafOp {
     const message = createBaseLeafOp();
     message.hash = object.hash ?? 0;
     message.prehashKey = object.prehashKey ?? 0;
@@ -1230,6 +1077,7 @@ function createBaseInnerOp(): InnerOp {
 }
 export const InnerOp = {
   typeUrl: "/cosmos.ics23.v1.InnerOp",
+  aminoType: "cosmos-sdk/InnerOp",
   encode(message: InnerOp, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.hash !== 0) {
       writer.uint32(8).int32(message.hash);
@@ -1265,7 +1113,7 @@ export const InnerOp = {
     }
     return message;
   },
-  fromPartial(object: Partial<InnerOp>): InnerOp {
+  fromPartial(object: DeepPartial<InnerOp>): InnerOp {
     const message = createBaseInnerOp();
     message.hash = object.hash ?? 0;
     message.prefix = object.prefix ?? new Uint8Array();
@@ -1325,6 +1173,7 @@ function createBaseProofSpec(): ProofSpec {
 }
 export const ProofSpec = {
   typeUrl: "/cosmos.ics23.v1.ProofSpec",
+  aminoType: "cosmos-sdk/ProofSpec",
   encode(message: ProofSpec, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.leafSpec !== undefined) {
       LeafOp.encode(message.leafSpec, writer.uint32(10).fork()).ldelim();
@@ -1372,7 +1221,7 @@ export const ProofSpec = {
     }
     return message;
   },
-  fromPartial(object: Partial<ProofSpec>): ProofSpec {
+  fromPartial(object: DeepPartial<ProofSpec>): ProofSpec {
     const message = createBaseProofSpec();
     message.leafSpec = object.leafSpec !== undefined && object.leafSpec !== null ? LeafOp.fromPartial(object.leafSpec) : undefined;
     message.innerSpec = object.innerSpec !== undefined && object.innerSpec !== null ? InnerSpec.fromPartial(object.innerSpec) : undefined;
@@ -1443,6 +1292,7 @@ function createBaseInnerSpec(): InnerSpec {
 }
 export const InnerSpec = {
   typeUrl: "/cosmos.ics23.v1.InnerSpec",
+  aminoType: "cosmos-sdk/InnerSpec",
   encode(message: InnerSpec, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     writer.uint32(10).fork();
     for (const v of message.childOrder) {
@@ -1505,7 +1355,7 @@ export const InnerSpec = {
     }
     return message;
   },
-  fromPartial(object: Partial<InnerSpec>): InnerSpec {
+  fromPartial(object: DeepPartial<InnerSpec>): InnerSpec {
     const message = createBaseInnerSpec();
     message.childOrder = object.childOrder?.map(e => e) || [];
     message.childSize = object.childSize ?? 0;
@@ -1578,6 +1428,7 @@ function createBaseBatchProof(): BatchProof {
 }
 export const BatchProof = {
   typeUrl: "/cosmos.ics23.v1.BatchProof",
+  aminoType: "cosmos-sdk/BatchProof",
   encode(message: BatchProof, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.entries) {
       BatchEntry.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -1601,7 +1452,7 @@ export const BatchProof = {
     }
     return message;
   },
-  fromPartial(object: Partial<BatchProof>): BatchProof {
+  fromPartial(object: DeepPartial<BatchProof>): BatchProof {
     const message = createBaseBatchProof();
     message.entries = object.entries?.map(e => BatchEntry.fromPartial(e)) || [];
     return message;
@@ -1650,6 +1501,7 @@ function createBaseBatchEntry(): BatchEntry {
 }
 export const BatchEntry = {
   typeUrl: "/cosmos.ics23.v1.BatchEntry",
+  aminoType: "cosmos-sdk/BatchEntry",
   encode(message: BatchEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.exist !== undefined) {
       ExistenceProof.encode(message.exist, writer.uint32(10).fork()).ldelim();
@@ -1679,7 +1531,7 @@ export const BatchEntry = {
     }
     return message;
   },
-  fromPartial(object: Partial<BatchEntry>): BatchEntry {
+  fromPartial(object: DeepPartial<BatchEntry>): BatchEntry {
     const message = createBaseBatchEntry();
     message.exist = object.exist !== undefined && object.exist !== null ? ExistenceProof.fromPartial(object.exist) : undefined;
     message.nonexist = object.nonexist !== undefined && object.nonexist !== null ? NonExistenceProof.fromPartial(object.nonexist) : undefined;
@@ -1731,6 +1583,7 @@ function createBaseCompressedBatchProof(): CompressedBatchProof {
 }
 export const CompressedBatchProof = {
   typeUrl: "/cosmos.ics23.v1.CompressedBatchProof",
+  aminoType: "cosmos-sdk/CompressedBatchProof",
   encode(message: CompressedBatchProof, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.entries) {
       CompressedBatchEntry.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -1760,7 +1613,7 @@ export const CompressedBatchProof = {
     }
     return message;
   },
-  fromPartial(object: Partial<CompressedBatchProof>): CompressedBatchProof {
+  fromPartial(object: DeepPartial<CompressedBatchProof>): CompressedBatchProof {
     const message = createBaseCompressedBatchProof();
     message.entries = object.entries?.map(e => CompressedBatchEntry.fromPartial(e)) || [];
     message.lookupInners = object.lookupInners?.map(e => InnerOp.fromPartial(e)) || [];
@@ -1816,6 +1669,7 @@ function createBaseCompressedBatchEntry(): CompressedBatchEntry {
 }
 export const CompressedBatchEntry = {
   typeUrl: "/cosmos.ics23.v1.CompressedBatchEntry",
+  aminoType: "cosmos-sdk/CompressedBatchEntry",
   encode(message: CompressedBatchEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.exist !== undefined) {
       CompressedExistenceProof.encode(message.exist, writer.uint32(10).fork()).ldelim();
@@ -1845,7 +1699,7 @@ export const CompressedBatchEntry = {
     }
     return message;
   },
-  fromPartial(object: Partial<CompressedBatchEntry>): CompressedBatchEntry {
+  fromPartial(object: DeepPartial<CompressedBatchEntry>): CompressedBatchEntry {
     const message = createBaseCompressedBatchEntry();
     message.exist = object.exist !== undefined && object.exist !== null ? CompressedExistenceProof.fromPartial(object.exist) : undefined;
     message.nonexist = object.nonexist !== undefined && object.nonexist !== null ? CompressedNonExistenceProof.fromPartial(object.nonexist) : undefined;
@@ -1899,6 +1753,7 @@ function createBaseCompressedExistenceProof(): CompressedExistenceProof {
 }
 export const CompressedExistenceProof = {
   typeUrl: "/cosmos.ics23.v1.CompressedExistenceProof",
+  aminoType: "cosmos-sdk/CompressedExistenceProof",
   encode(message: CompressedExistenceProof, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.key.length !== 0) {
       writer.uint32(10).bytes(message.key);
@@ -1949,7 +1804,7 @@ export const CompressedExistenceProof = {
     }
     return message;
   },
-  fromPartial(object: Partial<CompressedExistenceProof>): CompressedExistenceProof {
+  fromPartial(object: DeepPartial<CompressedExistenceProof>): CompressedExistenceProof {
     const message = createBaseCompressedExistenceProof();
     message.key = object.key ?? new Uint8Array();
     message.value = object.value ?? new Uint8Array();
@@ -2014,6 +1869,7 @@ function createBaseCompressedNonExistenceProof(): CompressedNonExistenceProof {
 }
 export const CompressedNonExistenceProof = {
   typeUrl: "/cosmos.ics23.v1.CompressedNonExistenceProof",
+  aminoType: "cosmos-sdk/CompressedNonExistenceProof",
   encode(message: CompressedNonExistenceProof, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.key.length !== 0) {
       writer.uint32(10).bytes(message.key);
@@ -2049,7 +1905,7 @@ export const CompressedNonExistenceProof = {
     }
     return message;
   },
-  fromPartial(object: Partial<CompressedNonExistenceProof>): CompressedNonExistenceProof {
+  fromPartial(object: DeepPartial<CompressedNonExistenceProof>): CompressedNonExistenceProof {
     const message = createBaseCompressedNonExistenceProof();
     message.key = object.key ?? new Uint8Array();
     message.left = object.left !== undefined && object.left !== null ? CompressedExistenceProof.fromPartial(object.left) : undefined;

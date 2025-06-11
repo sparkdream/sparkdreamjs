@@ -1,8 +1,9 @@
 //@ts-nocheck
 import { Order } from "../../../../core/channel/v1/channel";
-import { InterchainAccountPacketData, InterchainAccountPacketDataAmino, InterchainAccountPacketDataSDKType } from "../../v1/packet";
-import { Params, ParamsAmino, ParamsSDKType } from "./controller";
+import { InterchainAccountPacketData, InterchainAccountPacketDataAmino } from "../../v1/packet";
+import { Params, ParamsAmino } from "./controller";
 import { BinaryReader, BinaryWriter } from "../../../../../binary";
+import { DeepPartial } from "../../../../../helpers";
 /** MsgRegisterInterchainAccount defines the payload for Msg/RegisterAccount */
 export interface MsgRegisterInterchainAccount {
   owner: string;
@@ -25,13 +26,6 @@ export interface MsgRegisterInterchainAccountAminoMsg {
   type: "cosmos-sdk/MsgRegisterInterchainAccount";
   value: MsgRegisterInterchainAccountAmino;
 }
-/** MsgRegisterInterchainAccount defines the payload for Msg/RegisterAccount */
-export interface MsgRegisterInterchainAccountSDKType {
-  owner: string;
-  connection_id: string;
-  version: string;
-  ordering: Order;
-}
 /** MsgRegisterInterchainAccountResponse defines the response for Msg/RegisterAccount */
 export interface MsgRegisterInterchainAccountResponse {
   channelId: string;
@@ -49,11 +43,6 @@ export interface MsgRegisterInterchainAccountResponseAmino {
 export interface MsgRegisterInterchainAccountResponseAminoMsg {
   type: "cosmos-sdk/MsgRegisterInterchainAccountResponse";
   value: MsgRegisterInterchainAccountResponseAmino;
-}
-/** MsgRegisterInterchainAccountResponse defines the response for Msg/RegisterAccount */
-export interface MsgRegisterInterchainAccountResponseSDKType {
-  channel_id: string;
-  port_id: string;
 }
 /** MsgSendTx defines the payload for Msg/SendTx */
 export interface MsgSendTx {
@@ -85,13 +74,6 @@ export interface MsgSendTxAminoMsg {
   type: "cosmos-sdk/MsgSendTx";
   value: MsgSendTxAmino;
 }
-/** MsgSendTx defines the payload for Msg/SendTx */
-export interface MsgSendTxSDKType {
-  owner: string;
-  connection_id: string;
-  packet_data: InterchainAccountPacketDataSDKType;
-  relative_timeout: bigint;
-}
 /** MsgSendTxResponse defines the response for MsgSendTx */
 export interface MsgSendTxResponse {
   sequence: bigint;
@@ -107,10 +89,6 @@ export interface MsgSendTxResponseAmino {
 export interface MsgSendTxResponseAminoMsg {
   type: "cosmos-sdk/MsgSendTxResponse";
   value: MsgSendTxResponseAmino;
-}
-/** MsgSendTxResponse defines the response for MsgSendTx */
-export interface MsgSendTxResponseSDKType {
-  sequence: bigint;
 }
 /** MsgUpdateParams defines the payload for Msg/UpdateParams */
 export interface MsgUpdateParams {
@@ -142,11 +120,6 @@ export interface MsgUpdateParamsAminoMsg {
   type: "cosmos-sdk/MsgUpdateParams";
   value: MsgUpdateParamsAmino;
 }
-/** MsgUpdateParams defines the payload for Msg/UpdateParams */
-export interface MsgUpdateParamsSDKType {
-  signer: string;
-  params: ParamsSDKType;
-}
 /** MsgUpdateParamsResponse defines the response for Msg/UpdateParams */
 export interface MsgUpdateParamsResponse {}
 export interface MsgUpdateParamsResponseProtoMsg {
@@ -159,8 +132,6 @@ export interface MsgUpdateParamsResponseAminoMsg {
   type: "cosmos-sdk/MsgUpdateParamsResponse";
   value: MsgUpdateParamsResponseAmino;
 }
-/** MsgUpdateParamsResponse defines the response for Msg/UpdateParams */
-export interface MsgUpdateParamsResponseSDKType {}
 function createBaseMsgRegisterInterchainAccount(): MsgRegisterInterchainAccount {
   return {
     owner: "",
@@ -171,6 +142,7 @@ function createBaseMsgRegisterInterchainAccount(): MsgRegisterInterchainAccount 
 }
 export const MsgRegisterInterchainAccount = {
   typeUrl: "/ibc.applications.interchain_accounts.controller.v1.MsgRegisterInterchainAccount",
+  aminoType: "cosmos-sdk/MsgRegisterInterchainAccount",
   encode(message: MsgRegisterInterchainAccount, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.owner !== "") {
       writer.uint32(10).string(message.owner);
@@ -212,7 +184,7 @@ export const MsgRegisterInterchainAccount = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgRegisterInterchainAccount>): MsgRegisterInterchainAccount {
+  fromPartial(object: DeepPartial<MsgRegisterInterchainAccount>): MsgRegisterInterchainAccount {
     const message = createBaseMsgRegisterInterchainAccount();
     message.owner = object.owner ?? "";
     message.connectionId = object.connectionId ?? "";
@@ -274,6 +246,7 @@ function createBaseMsgRegisterInterchainAccountResponse(): MsgRegisterInterchain
 }
 export const MsgRegisterInterchainAccountResponse = {
   typeUrl: "/ibc.applications.interchain_accounts.controller.v1.MsgRegisterInterchainAccountResponse",
+  aminoType: "cosmos-sdk/MsgRegisterInterchainAccountResponse",
   encode(message: MsgRegisterInterchainAccountResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.channelId !== "") {
       writer.uint32(10).string(message.channelId);
@@ -303,7 +276,7 @@ export const MsgRegisterInterchainAccountResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgRegisterInterchainAccountResponse>): MsgRegisterInterchainAccountResponse {
+  fromPartial(object: DeepPartial<MsgRegisterInterchainAccountResponse>): MsgRegisterInterchainAccountResponse {
     const message = createBaseMsgRegisterInterchainAccountResponse();
     message.channelId = object.channelId ?? "";
     message.portId = object.portId ?? "";
@@ -357,6 +330,7 @@ function createBaseMsgSendTx(): MsgSendTx {
 }
 export const MsgSendTx = {
   typeUrl: "/ibc.applications.interchain_accounts.controller.v1.MsgSendTx",
+  aminoType: "cosmos-sdk/MsgSendTx",
   encode(message: MsgSendTx, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.owner !== "") {
       writer.uint32(10).string(message.owner);
@@ -398,7 +372,7 @@ export const MsgSendTx = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgSendTx>): MsgSendTx {
+  fromPartial(object: DeepPartial<MsgSendTx>): MsgSendTx {
     const message = createBaseMsgSendTx();
     message.owner = object.owner ?? "";
     message.connectionId = object.connectionId ?? "";
@@ -459,6 +433,7 @@ function createBaseMsgSendTxResponse(): MsgSendTxResponse {
 }
 export const MsgSendTxResponse = {
   typeUrl: "/ibc.applications.interchain_accounts.controller.v1.MsgSendTxResponse",
+  aminoType: "cosmos-sdk/MsgSendTxResponse",
   encode(message: MsgSendTxResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sequence !== BigInt(0)) {
       writer.uint32(8).uint64(message.sequence);
@@ -482,7 +457,7 @@ export const MsgSendTxResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgSendTxResponse>): MsgSendTxResponse {
+  fromPartial(object: DeepPartial<MsgSendTxResponse>): MsgSendTxResponse {
     const message = createBaseMsgSendTxResponse();
     message.sequence = object.sequence !== undefined && object.sequence !== null ? BigInt(object.sequence.toString()) : BigInt(0);
     return message;
@@ -529,6 +504,7 @@ function createBaseMsgUpdateParams(): MsgUpdateParams {
 }
 export const MsgUpdateParams = {
   typeUrl: "/ibc.applications.interchain_accounts.controller.v1.MsgUpdateParams",
+  aminoType: "cosmos-sdk/MsgUpdateParams",
   encode(message: MsgUpdateParams, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.signer !== "") {
       writer.uint32(10).string(message.signer);
@@ -558,7 +534,7 @@ export const MsgUpdateParams = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpdateParams>): MsgUpdateParams {
+  fromPartial(object: DeepPartial<MsgUpdateParams>): MsgUpdateParams {
     const message = createBaseMsgUpdateParams();
     message.signer = object.signer ?? "";
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
@@ -607,6 +583,7 @@ function createBaseMsgUpdateParamsResponse(): MsgUpdateParamsResponse {
 }
 export const MsgUpdateParamsResponse = {
   typeUrl: "/ibc.applications.interchain_accounts.controller.v1.MsgUpdateParamsResponse",
+  aminoType: "cosmos-sdk/MsgUpdateParamsResponse",
   encode(_: MsgUpdateParamsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -624,7 +601,7 @@ export const MsgUpdateParamsResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
+  fromPartial(_: DeepPartial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
     const message = createBaseMsgUpdateParamsResponse();
     return message;
   },

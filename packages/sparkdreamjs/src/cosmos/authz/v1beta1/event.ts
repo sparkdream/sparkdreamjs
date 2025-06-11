@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** EventGrant is emitted on Msg/Grant */
 export interface EventGrant {
   /** Msg type URL for which an autorization is granted */
@@ -25,12 +26,6 @@ export interface EventGrantAmino {
 export interface EventGrantAminoMsg {
   type: "cosmos-sdk/EventGrant";
   value: EventGrantAmino;
-}
-/** EventGrant is emitted on Msg/Grant */
-export interface EventGrantSDKType {
-  msg_type_url: string;
-  granter: string;
-  grantee: string;
 }
 /** EventRevoke is emitted on Msg/Revoke */
 export interface EventRevoke {
@@ -58,12 +53,6 @@ export interface EventRevokeAminoMsg {
   type: "cosmos-sdk/EventRevoke";
   value: EventRevokeAmino;
 }
-/** EventRevoke is emitted on Msg/Revoke */
-export interface EventRevokeSDKType {
-  msg_type_url: string;
-  granter: string;
-  grantee: string;
-}
 function createBaseEventGrant(): EventGrant {
   return {
     msgTypeUrl: "",
@@ -73,6 +62,7 @@ function createBaseEventGrant(): EventGrant {
 }
 export const EventGrant = {
   typeUrl: "/cosmos.authz.v1beta1.EventGrant",
+  aminoType: "cosmos-sdk/EventGrant",
   encode(message: EventGrant, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.msgTypeUrl !== "") {
       writer.uint32(18).string(message.msgTypeUrl);
@@ -108,7 +98,7 @@ export const EventGrant = {
     }
     return message;
   },
-  fromPartial(object: Partial<EventGrant>): EventGrant {
+  fromPartial(object: DeepPartial<EventGrant>): EventGrant {
     const message = createBaseEventGrant();
     message.msgTypeUrl = object.msgTypeUrl ?? "";
     message.granter = object.granter ?? "";
@@ -166,6 +156,7 @@ function createBaseEventRevoke(): EventRevoke {
 }
 export const EventRevoke = {
   typeUrl: "/cosmos.authz.v1beta1.EventRevoke",
+  aminoType: "cosmos-sdk/EventRevoke",
   encode(message: EventRevoke, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.msgTypeUrl !== "") {
       writer.uint32(18).string(message.msgTypeUrl);
@@ -201,7 +192,7 @@ export const EventRevoke = {
     }
     return message;
   },
-  fromPartial(object: Partial<EventRevoke>): EventRevoke {
+  fromPartial(object: DeepPartial<EventRevoke>): EventRevoke {
     const message = createBaseEventRevoke();
     message.msgTypeUrl = object.msgTypeUrl ?? "";
     message.granter = object.granter ?? "";

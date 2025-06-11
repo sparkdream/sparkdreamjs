@@ -1,7 +1,8 @@
 //@ts-nocheck
-import { GeneratedType, Registry } from "@cosmjs/proto-signing";
+import { TelescopeGeneratedType } from "../../../../types";
+import { Registry } from "@cosmjs/proto-signing";
 import { MsgStoreCode, MsgRemoveChecksum, MsgMigrateContract } from "./tx";
-export const registry: ReadonlyArray<[string, GeneratedType]> = [["/ibc.lightclients.wasm.v1.MsgStoreCode", MsgStoreCode], ["/ibc.lightclients.wasm.v1.MsgRemoveChecksum", MsgRemoveChecksum], ["/ibc.lightclients.wasm.v1.MsgMigrateContract", MsgMigrateContract]];
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/ibc.lightclients.wasm.v1.MsgStoreCode", MsgStoreCode], ["/ibc.lightclients.wasm.v1.MsgRemoveChecksum", MsgRemoveChecksum], ["/ibc.lightclients.wasm.v1.MsgMigrateContract", MsgMigrateContract]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);

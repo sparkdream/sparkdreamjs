@@ -1,12 +1,12 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../binary";
+import { DeepPartial } from "../helpers";
 export enum ScalarType {
   SCALAR_TYPE_UNSPECIFIED = 0,
   SCALAR_TYPE_STRING = 1,
   SCALAR_TYPE_BYTES = 2,
   UNRECOGNIZED = -1,
 }
-export const ScalarTypeSDKType = ScalarType;
 export const ScalarTypeAmino = ScalarType;
 export function scalarTypeFromJSON(object: any): ScalarType {
   switch (object) {
@@ -83,14 +83,6 @@ export interface InterfaceDescriptorAminoMsg {
   value: InterfaceDescriptorAmino;
 }
 /**
- * InterfaceDescriptor describes an interface type to be used with
- * accepts_interface and implements_interface and declared by declare_interface.
- */
-export interface InterfaceDescriptorSDKType {
-  name: string;
-  description: string;
-}
-/**
  * ScalarDescriptor describes an scalar type to be used with
  * the scalar field option and declared by declare_scalar.
  * Scalars extend simple protobuf built-in types with additional
@@ -160,20 +152,6 @@ export interface ScalarDescriptorAminoMsg {
   type: "/cosmos_proto.ScalarDescriptor";
   value: ScalarDescriptorAmino;
 }
-/**
- * ScalarDescriptor describes an scalar type to be used with
- * the scalar field option and declared by declare_scalar.
- * Scalars extend simple protobuf built-in types with additional
- * syntax and semantics, for instance to represent big integers.
- * Scalars should ideally define an encoding such that there is only one
- * valid syntactical representation for a given semantic meaning,
- * i.e. the encoding should be deterministic.
- */
-export interface ScalarDescriptorSDKType {
-  name: string;
-  description: string;
-  field_type: ScalarType[];
-}
 function createBaseInterfaceDescriptor(): InterfaceDescriptor {
   return {
     name: "",
@@ -211,7 +189,7 @@ export const InterfaceDescriptor = {
     }
     return message;
   },
-  fromPartial(object: Partial<InterfaceDescriptor>): InterfaceDescriptor {
+  fromPartial(object: DeepPartial<InterfaceDescriptor>): InterfaceDescriptor {
     const message = createBaseInterfaceDescriptor();
     message.name = object.name ?? "";
     message.description = object.description ?? "";
@@ -302,7 +280,7 @@ export const ScalarDescriptor = {
     }
     return message;
   },
-  fromPartial(object: Partial<ScalarDescriptor>): ScalarDescriptor {
+  fromPartial(object: DeepPartial<ScalarDescriptor>): ScalarDescriptor {
     const message = createBaseScalarDescriptor();
     message.name = object.name ?? "";
     message.description = object.description ?? "";

@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /** Module is the config object for the runtime module. */
 export interface Module {
   /** app_name is the name of the app. */
@@ -112,18 +113,6 @@ export interface ModuleAminoMsg {
   type: "cosmos-sdk/Module";
   value: ModuleAmino;
 }
-/** Module is the config object for the runtime module. */
-export interface ModuleSDKType {
-  app_name: string;
-  begin_blockers: string[];
-  end_blockers: string[];
-  init_genesis: string[];
-  export_genesis: string[];
-  override_store_keys: StoreKeyConfigSDKType[];
-  order_migrations: string[];
-  precommiters: string[];
-  prepare_check_staters: string[];
-}
 /**
  * StoreKeyConfig may be supplied to override the default module store key, which
  * is the module name.
@@ -152,14 +141,6 @@ export interface StoreKeyConfigAminoMsg {
   type: "cosmos-sdk/StoreKeyConfig";
   value: StoreKeyConfigAmino;
 }
-/**
- * StoreKeyConfig may be supplied to override the default module store key, which
- * is the module name.
- */
-export interface StoreKeyConfigSDKType {
-  module_name: string;
-  kv_store_key: string;
-}
 function createBaseModule(): Module {
   return {
     appName: "",
@@ -175,6 +156,7 @@ function createBaseModule(): Module {
 }
 export const Module = {
   typeUrl: "/cosmos.app.runtime.v1alpha1.Module",
+  aminoType: "cosmos-sdk/Module",
   encode(message: Module, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.appName !== "") {
       writer.uint32(10).string(message.appName);
@@ -246,7 +228,7 @@ export const Module = {
     }
     return message;
   },
-  fromPartial(object: Partial<Module>): Module {
+  fromPartial(object: DeepPartial<Module>): Module {
     const message = createBaseModule();
     message.appName = object.appName ?? "";
     message.beginBlockers = object.beginBlockers?.map(e => e) || [];
@@ -349,6 +331,7 @@ function createBaseStoreKeyConfig(): StoreKeyConfig {
 }
 export const StoreKeyConfig = {
   typeUrl: "/cosmos.app.runtime.v1alpha1.StoreKeyConfig",
+  aminoType: "cosmos-sdk/StoreKeyConfig",
   encode(message: StoreKeyConfig, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.moduleName !== "") {
       writer.uint32(10).string(message.moduleName);
@@ -378,7 +361,7 @@ export const StoreKeyConfig = {
     }
     return message;
   },
-  fromPartial(object: Partial<StoreKeyConfig>): StoreKeyConfig {
+  fromPartial(object: DeepPartial<StoreKeyConfig>): StoreKeyConfig {
     const message = createBaseStoreKeyConfig();
     message.moduleName = object.moduleName ?? "";
     message.kvStoreKey = object.kvStoreKey ?? "";

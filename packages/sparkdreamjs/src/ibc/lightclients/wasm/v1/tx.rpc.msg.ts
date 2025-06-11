@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Rpc } from "../../../../helpers";
+import { TxRpc } from "../../../../types";
 import { BinaryReader } from "../../../../binary";
 import { MsgStoreCode, MsgStoreCodeResponse, MsgRemoveChecksum, MsgRemoveChecksumResponse, MsgMigrateContract, MsgMigrateContractResponse } from "./tx";
 /** Msg defines the ibc/08-wasm Msg service. */
@@ -12,26 +12,29 @@ export interface Msg {
   migrateContract(request: MsgMigrateContract): Promise<MsgMigrateContractResponse>;
 }
 export class MsgClientImpl implements Msg {
-  private readonly rpc: Rpc;
-  constructor(rpc: Rpc) {
+  private readonly rpc: TxRpc;
+  constructor(rpc: TxRpc) {
     this.rpc = rpc;
-    this.storeCode = this.storeCode.bind(this);
-    this.removeChecksum = this.removeChecksum.bind(this);
-    this.migrateContract = this.migrateContract.bind(this);
   }
-  storeCode(request: MsgStoreCode): Promise<MsgStoreCodeResponse> {
+  /* StoreCode defines a rpc handler method for MsgStoreCode. */
+  storeCode = async (request: MsgStoreCode): Promise<MsgStoreCodeResponse> => {
     const data = MsgStoreCode.encode(request).finish();
     const promise = this.rpc.request("ibc.lightclients.wasm.v1.Msg", "StoreCode", data);
     return promise.then(data => MsgStoreCodeResponse.decode(new BinaryReader(data)));
-  }
-  removeChecksum(request: MsgRemoveChecksum): Promise<MsgRemoveChecksumResponse> {
+  };
+  /* RemoveChecksum defines a rpc handler method for MsgRemoveChecksum. */
+  removeChecksum = async (request: MsgRemoveChecksum): Promise<MsgRemoveChecksumResponse> => {
     const data = MsgRemoveChecksum.encode(request).finish();
     const promise = this.rpc.request("ibc.lightclients.wasm.v1.Msg", "RemoveChecksum", data);
     return promise.then(data => MsgRemoveChecksumResponse.decode(new BinaryReader(data)));
-  }
-  migrateContract(request: MsgMigrateContract): Promise<MsgMigrateContractResponse> {
+  };
+  /* MigrateContract defines a rpc handler method for MsgMigrateContract. */
+  migrateContract = async (request: MsgMigrateContract): Promise<MsgMigrateContractResponse> => {
     const data = MsgMigrateContract.encode(request).finish();
     const promise = this.rpc.request("ibc.lightclients.wasm.v1.Msg", "MigrateContract", data);
     return promise.then(data => MsgMigrateContractResponse.decode(new BinaryReader(data)));
-  }
+  };
 }
+export const createClientImpl = (rpc: TxRpc) => {
+  return new MsgClientImpl(rpc);
+};

@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../helpers";
 export interface Proof {
   total: bigint;
   index: bigint;
@@ -20,12 +20,6 @@ export interface ProofAmino {
 export interface ProofAminoMsg {
   type: "/tendermint.crypto.Proof";
   value: ProofAmino;
-}
-export interface ProofSDKType {
-  total: bigint;
-  index: bigint;
-  leaf_hash: Uint8Array;
-  aunts: Uint8Array[];
 }
 export interface ValueOp {
   /** Encoded in ProofOp.Key. */
@@ -47,10 +41,6 @@ export interface ValueOpAminoMsg {
   type: "/tendermint.crypto.ValueOp";
   value: ValueOpAmino;
 }
-export interface ValueOpSDKType {
-  key: Uint8Array;
-  proof?: ProofSDKType;
-}
 export interface DominoOp {
   key: string;
   input: string;
@@ -68,11 +58,6 @@ export interface DominoOpAmino {
 export interface DominoOpAminoMsg {
   type: "/tendermint.crypto.DominoOp";
   value: DominoOpAmino;
-}
-export interface DominoOpSDKType {
-  key: string;
-  input: string;
-  output: string;
 }
 /**
  * ProofOp defines an operation used for calculating Merkle root
@@ -102,16 +87,6 @@ export interface ProofOpAminoMsg {
   type: "/tendermint.crypto.ProofOp";
   value: ProofOpAmino;
 }
-/**
- * ProofOp defines an operation used for calculating Merkle root
- * The data could be arbitrary format, providing nessecary data
- * for example neighbouring node hash
- */
-export interface ProofOpSDKType {
-  type: string;
-  key: Uint8Array;
-  data: Uint8Array;
-}
 /** ProofOps is Merkle proof defined by the list of ProofOps */
 export interface ProofOps {
   ops: ProofOp[];
@@ -127,10 +102,6 @@ export interface ProofOpsAmino {
 export interface ProofOpsAminoMsg {
   type: "/tendermint.crypto.ProofOps";
   value: ProofOpsAmino;
-}
-/** ProofOps is Merkle proof defined by the list of ProofOps */
-export interface ProofOpsSDKType {
-  ops: ProofOpSDKType[];
 }
 function createBaseProof(): Proof {
   return {
@@ -183,7 +154,7 @@ export const Proof = {
     }
     return message;
   },
-  fromPartial(object: Partial<Proof>): Proof {
+  fromPartial(object: DeepPartial<Proof>): Proof {
     const message = createBaseProof();
     message.total = object.total !== undefined && object.total !== null ? BigInt(object.total.toString()) : BigInt(0);
     message.index = object.index !== undefined && object.index !== null ? BigInt(object.index.toString()) : BigInt(0);
@@ -270,7 +241,7 @@ export const ValueOp = {
     }
     return message;
   },
-  fromPartial(object: Partial<ValueOp>): ValueOp {
+  fromPartial(object: DeepPartial<ValueOp>): ValueOp {
     const message = createBaseValueOp();
     message.key = object.key ?? new Uint8Array();
     message.proof = object.proof !== undefined && object.proof !== null ? Proof.fromPartial(object.proof) : undefined;
@@ -352,7 +323,7 @@ export const DominoOp = {
     }
     return message;
   },
-  fromPartial(object: Partial<DominoOp>): DominoOp {
+  fromPartial(object: DeepPartial<DominoOp>): DominoOp {
     const message = createBaseDominoOp();
     message.key = object.key ?? "";
     message.input = object.input ?? "";
@@ -439,7 +410,7 @@ export const ProofOp = {
     }
     return message;
   },
-  fromPartial(object: Partial<ProofOp>): ProofOp {
+  fromPartial(object: DeepPartial<ProofOp>): ProofOp {
     const message = createBaseProofOp();
     message.type = object.type ?? "";
     message.key = object.key ?? new Uint8Array();
@@ -512,7 +483,7 @@ export const ProofOps = {
     }
     return message;
   },
-  fromPartial(object: Partial<ProofOps>): ProofOps {
+  fromPartial(object: DeepPartial<ProofOps>): ProofOps {
     const message = createBaseProofOps();
     message.ops = object.ops?.map(e => ProofOp.fromPartial(e)) || [];
     return message;

@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { Any, AnyAmino, AnySDKType } from "../../../google/protobuf/any";
+import { Any, AnyAmino } from "../../../google/protobuf/any";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /**
  * LegacyAminoPubKey specifies a public key type
  * which nests multiple public keys and a threshold,
@@ -27,15 +28,6 @@ export interface LegacyAminoPubKeyAminoMsg {
   type: "tendermint/PubKeyMultisigThreshold";
   value: LegacyAminoPubKeyAmino;
 }
-/**
- * LegacyAminoPubKey specifies a public key type
- * which nests multiple public keys and a threshold,
- * it uses legacy amino address rules.
- */
-export interface LegacyAminoPubKeySDKType {
-  threshold: number;
-  public_keys: AnySDKType[];
-}
 function createBaseLegacyAminoPubKey(): LegacyAminoPubKey {
   return {
     threshold: 0,
@@ -44,6 +36,7 @@ function createBaseLegacyAminoPubKey(): LegacyAminoPubKey {
 }
 export const LegacyAminoPubKey = {
   typeUrl: "/cosmos.crypto.multisig.LegacyAminoPubKey",
+  aminoType: "tendermint/PubKeyMultisigThreshold",
   encode(message: LegacyAminoPubKey, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.threshold !== 0) {
       writer.uint32(8).uint32(message.threshold);
@@ -73,7 +66,7 @@ export const LegacyAminoPubKey = {
     }
     return message;
   },
-  fromPartial(object: Partial<LegacyAminoPubKey>): LegacyAminoPubKey {
+  fromPartial(object: DeepPartial<LegacyAminoPubKey>): LegacyAminoPubKey {
     const message = createBaseLegacyAminoPubKey();
     message.threshold = object.threshold ?? 0;
     message.publicKeys = object.publicKeys?.map(e => Any.fromPartial(e)) || [];

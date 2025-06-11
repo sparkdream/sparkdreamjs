@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** Module is the config object for the module. */
 export interface Module {
   /** authority defines the custom module authority. If not set, defaults to the governance module. */
@@ -17,10 +18,6 @@ export interface ModuleAmino {
 export interface ModuleAminoMsg {
   type: "/sparkdream.sparkdream.module.Module";
   value: ModuleAmino;
-}
-/** Module is the config object for the module. */
-export interface ModuleSDKType {
-  authority: string;
 }
 function createBaseModule(): Module {
   return {
@@ -52,7 +49,7 @@ export const Module = {
     }
     return message;
   },
-  fromPartial(object: Partial<Module>): Module {
+  fromPartial(object: DeepPartial<Module>): Module {
     const message = createBaseModule();
     message.authority = object.authority ?? "";
     return message;

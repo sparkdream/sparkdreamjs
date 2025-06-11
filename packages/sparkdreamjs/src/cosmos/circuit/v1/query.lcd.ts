@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryAccountRequest, AccountResponseSDKType, QueryAccountsRequest, AccountsResponseSDKType, QueryDisabledListRequest, DisabledListResponseSDKType } from "./query";
+import { QueryAccountRequest, AccountResponse, QueryAccountsRequest, AccountsResponse, QueryDisabledListRequest, DisabledListResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -10,19 +10,16 @@ export class LCDQueryClient {
     requestClient: LCDClient;
   }) {
     this.req = requestClient;
-    this.account = this.account.bind(this);
-    this.accounts = this.accounts.bind(this);
-    this.disabledList = this.disabledList.bind(this);
   }
   /* Account returns account permissions. */
-  async account(params: QueryAccountRequest): Promise<AccountResponseSDKType> {
+  account = async (params: QueryAccountRequest): Promise<AccountResponse> => {
     const endpoint = `cosmos/circuit/v1/accounts/${params.address}`;
-    return await this.req.get<AccountResponseSDKType>(endpoint);
-  }
+    return await this.req.get<AccountResponse>(endpoint);
+  };
   /* Account returns account permissions. */
-  async accounts(params: QueryAccountsRequest = {
+  accounts = async (params: QueryAccountsRequest = {
     pagination: undefined
-  }): Promise<AccountsResponseSDKType> {
+  }): Promise<AccountsResponse> => {
     const options: any = {
       params: {}
     };
@@ -30,11 +27,11 @@ export class LCDQueryClient {
       setPaginationParams(options, params.pagination);
     }
     const endpoint = `cosmos/circuit/v1/accounts`;
-    return await this.req.get<AccountsResponseSDKType>(endpoint, options);
-  }
+    return await this.req.get<AccountsResponse>(endpoint, options);
+  };
   /* DisabledList returns a list of disabled message urls */
-  async disabledList(_params: QueryDisabledListRequest = {}): Promise<DisabledListResponseSDKType> {
+  disabledList = async (_params: QueryDisabledListRequest = {}): Promise<DisabledListResponse> => {
     const endpoint = `cosmos/circuit/v1/disable_list`;
-    return await this.req.get<DisabledListResponseSDKType>(endpoint);
-  }
+    return await this.req.get<DisabledListResponse>(endpoint);
+  };
 }

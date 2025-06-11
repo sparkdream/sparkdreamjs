@@ -1,17 +1,16 @@
 //@ts-nocheck
-import { Any, AnyProtoMsg, AnyAmino, AnySDKType } from "../../../google/protobuf/any";
+import { Any, AnyProtoMsg, AnyAmino } from "../../../google/protobuf/any";
 import { Timestamp } from "../../../google/protobuf/timestamp";
-import { SendAuthorization, SendAuthorizationProtoMsg, SendAuthorizationSDKType } from "../../bank/v1beta1/authz";
-import { StakeAuthorization, StakeAuthorizationProtoMsg, StakeAuthorizationSDKType } from "../../staking/v1beta1/authz";
-import { TransferAuthorization, TransferAuthorizationProtoMsg, TransferAuthorizationSDKType } from "../../../ibc/applications/transfer/v1/authz";
+import { SendAuthorization, SendAuthorizationProtoMsg } from "../../bank/v1beta1/authz";
+import { StakeAuthorization, StakeAuthorizationProtoMsg } from "../../staking/v1beta1/authz";
+import { TransferAuthorization, TransferAuthorizationProtoMsg } from "../../../ibc/applications/transfer/v1/authz";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { toTimestamp, fromTimestamp } from "../../../helpers";
+import { DeepPartial, toTimestamp, fromTimestamp } from "../../../helpers";
 /**
  * GenericAuthorization gives the grantee unrestricted permissions to execute
  * the provided method on behalf of the granter's account.
  */
 export interface GenericAuthorization {
-  $typeUrl?: "/cosmos.authz.v1beta1.GenericAuthorization";
   /** Msg, identified by it's type URL, to grant unrestricted permissions to execute */
   msg: string;
 }
@@ -30,14 +29,6 @@ export interface GenericAuthorizationAmino {
 export interface GenericAuthorizationAminoMsg {
   type: "cosmos-sdk/GenericAuthorization";
   value: GenericAuthorizationAmino;
-}
-/**
- * GenericAuthorization gives the grantee unrestricted permissions to execute
- * the provided method on behalf of the granter's account.
- */
-export interface GenericAuthorizationSDKType {
-  $typeUrl?: "/cosmos.authz.v1beta1.GenericAuthorization";
-  msg: string;
 }
 /**
  * Grant gives permissions to execute
@@ -77,14 +68,6 @@ export interface GrantAminoMsg {
   value: GrantAmino;
 }
 /**
- * Grant gives permissions to execute
- * the provide method with expiration time.
- */
-export interface GrantSDKType {
-  authorization?: GenericAuthorizationSDKType | SendAuthorizationSDKType | StakeAuthorizationSDKType | TransferAuthorizationSDKType | AnySDKType | undefined;
-  expiration?: Date;
-}
-/**
  * GrantAuthorization extends a grant with both the addresses of the grantee and granter.
  * It is used in genesis.proto and query.proto
  */
@@ -115,16 +98,6 @@ export interface GrantAuthorizationAminoMsg {
   type: "cosmos-sdk/GrantAuthorization";
   value: GrantAuthorizationAmino;
 }
-/**
- * GrantAuthorization extends a grant with both the addresses of the grantee and granter.
- * It is used in genesis.proto and query.proto
- */
-export interface GrantAuthorizationSDKType {
-  granter: string;
-  grantee: string;
-  authorization?: GenericAuthorizationSDKType | SendAuthorizationSDKType | StakeAuthorizationSDKType | TransferAuthorizationSDKType | AnySDKType | undefined;
-  expiration?: Date;
-}
 /** GrantQueueItem contains the list of TypeURL of a sdk.Msg. */
 export interface GrantQueueItem {
   /** msg_type_urls contains the list of TypeURL of a sdk.Msg. */
@@ -143,18 +116,14 @@ export interface GrantQueueItemAminoMsg {
   type: "cosmos-sdk/GrantQueueItem";
   value: GrantQueueItemAmino;
 }
-/** GrantQueueItem contains the list of TypeURL of a sdk.Msg. */
-export interface GrantQueueItemSDKType {
-  msg_type_urls: string[];
-}
 function createBaseGenericAuthorization(): GenericAuthorization {
   return {
-    $typeUrl: "/cosmos.authz.v1beta1.GenericAuthorization",
     msg: ""
   };
 }
 export const GenericAuthorization = {
   typeUrl: "/cosmos.authz.v1beta1.GenericAuthorization",
+  aminoType: "cosmos-sdk/GenericAuthorization",
   encode(message: GenericAuthorization, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.msg !== "") {
       writer.uint32(10).string(message.msg);
@@ -178,7 +147,7 @@ export const GenericAuthorization = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenericAuthorization>): GenericAuthorization {
+  fromPartial(object: DeepPartial<GenericAuthorization>): GenericAuthorization {
     const message = createBaseGenericAuthorization();
     message.msg = object.msg ?? "";
     return message;
@@ -225,6 +194,7 @@ function createBaseGrant(): Grant {
 }
 export const Grant = {
   typeUrl: "/cosmos.authz.v1beta1.Grant",
+  aminoType: "cosmos-sdk/Grant",
   encode(message: Grant, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authorization !== undefined) {
       Any.encode(message.authorization as Any, writer.uint32(10).fork()).ldelim();
@@ -254,7 +224,7 @@ export const Grant = {
     }
     return message;
   },
-  fromPartial(object: Partial<Grant>): Grant {
+  fromPartial(object: DeepPartial<Grant>): Grant {
     const message = createBaseGrant();
     message.authorization = object.authorization !== undefined && object.authorization !== null ? Any.fromPartial(object.authorization) : undefined;
     message.expiration = object.expiration ?? undefined;
@@ -308,6 +278,7 @@ function createBaseGrantAuthorization(): GrantAuthorization {
 }
 export const GrantAuthorization = {
   typeUrl: "/cosmos.authz.v1beta1.GrantAuthorization",
+  aminoType: "cosmos-sdk/GrantAuthorization",
   encode(message: GrantAuthorization, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.granter !== "") {
       writer.uint32(10).string(message.granter);
@@ -349,7 +320,7 @@ export const GrantAuthorization = {
     }
     return message;
   },
-  fromPartial(object: Partial<GrantAuthorization>): GrantAuthorization {
+  fromPartial(object: DeepPartial<GrantAuthorization>): GrantAuthorization {
     const message = createBaseGrantAuthorization();
     message.granter = object.granter ?? "";
     message.grantee = object.grantee ?? "";
@@ -410,6 +381,7 @@ function createBaseGrantQueueItem(): GrantQueueItem {
 }
 export const GrantQueueItem = {
   typeUrl: "/cosmos.authz.v1beta1.GrantQueueItem",
+  aminoType: "cosmos-sdk/GrantQueueItem",
   encode(message: GrantQueueItem, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.msgTypeUrls) {
       writer.uint32(10).string(v!);
@@ -433,7 +405,7 @@ export const GrantQueueItem = {
     }
     return message;
   },
-  fromPartial(object: Partial<GrantQueueItem>): GrantQueueItem {
+  fromPartial(object: DeepPartial<GrantQueueItem>): GrantQueueItem {
     const message = createBaseGrantQueueItem();
     message.msgTypeUrls = object.msgTypeUrls?.map(e => e) || [];
     return message;

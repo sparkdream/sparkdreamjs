@@ -1,9 +1,9 @@
 //@ts-nocheck
-import { Counterparty, CounterpartyAmino, CounterpartySDKType, Version, VersionAmino, VersionSDKType } from "./connection";
-import { Any, AnyAmino, AnySDKType } from "../../../../google/protobuf/any";
-import { Height, HeightAmino, HeightSDKType, Params, ParamsAmino, ParamsSDKType } from "../../client/v1/client";
+import { Counterparty, CounterpartyAmino, Version, VersionAmino } from "./connection";
+import { Any, AnyAmino } from "../../../../google/protobuf/any";
+import { Height, HeightAmino, Params, ParamsAmino } from "../../client/v1/client";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /**
  * MsgConnectionOpenInit defines the msg sent by an account on Chain A to
  * initialize a connection with Chain B.
@@ -35,17 +35,6 @@ export interface MsgConnectionOpenInitAminoMsg {
   value: MsgConnectionOpenInitAmino;
 }
 /**
- * MsgConnectionOpenInit defines the msg sent by an account on Chain A to
- * initialize a connection with Chain B.
- */
-export interface MsgConnectionOpenInitSDKType {
-  client_id: string;
-  counterparty: CounterpartySDKType;
-  version?: VersionSDKType;
-  delay_period: bigint;
-  signer: string;
-}
-/**
  * MsgConnectionOpenInitResponse defines the Msg/ConnectionOpenInit response
  * type.
  */
@@ -63,11 +52,6 @@ export interface MsgConnectionOpenInitResponseAminoMsg {
   type: "cosmos-sdk/MsgConnectionOpenInitResponse";
   value: MsgConnectionOpenInitResponseAmino;
 }
-/**
- * MsgConnectionOpenInitResponse defines the Msg/ConnectionOpenInit response
- * type.
- */
-export interface MsgConnectionOpenInitResponseSDKType {}
 /**
  * MsgConnectionOpenTry defines a msg sent by a Relayer to try to open a
  * connection on Chain B.
@@ -146,31 +130,6 @@ export interface MsgConnectionOpenTryAminoMsg {
   type: "cosmos-sdk/MsgConnectionOpenTry";
   value: MsgConnectionOpenTryAmino;
 }
-/**
- * MsgConnectionOpenTry defines a msg sent by a Relayer to try to open a
- * connection on Chain B.
- */
-export interface MsgConnectionOpenTrySDKType {
-  client_id: string;
-  /** @deprecated */
-  previous_connection_id: string;
-  /** @deprecated */
-  client_state?: AnySDKType;
-  counterparty: CounterpartySDKType;
-  delay_period: bigint;
-  counterparty_versions: VersionSDKType[];
-  proof_height: HeightSDKType;
-  proof_init: Uint8Array;
-  /** @deprecated */
-  proof_client: Uint8Array;
-  /** @deprecated */
-  proof_consensus: Uint8Array;
-  /** @deprecated */
-  consensus_height: HeightSDKType;
-  signer: string;
-  /** @deprecated */
-  host_consensus_state_proof: Uint8Array;
-}
 /** MsgConnectionOpenTryResponse defines the Msg/ConnectionOpenTry response type. */
 export interface MsgConnectionOpenTryResponse {}
 export interface MsgConnectionOpenTryResponseProtoMsg {
@@ -183,8 +142,6 @@ export interface MsgConnectionOpenTryResponseAminoMsg {
   type: "cosmos-sdk/MsgConnectionOpenTryResponse";
   value: MsgConnectionOpenTryResponseAmino;
 }
-/** MsgConnectionOpenTryResponse defines the Msg/ConnectionOpenTry response type. */
-export interface MsgConnectionOpenTryResponseSDKType {}
 /**
  * MsgConnectionOpenAck defines a msg sent by a Relayer to Chain A to
  * acknowledge the change of connection state to TRYOPEN on Chain B.
@@ -255,28 +212,6 @@ export interface MsgConnectionOpenAckAminoMsg {
   type: "cosmos-sdk/MsgConnectionOpenAck";
   value: MsgConnectionOpenAckAmino;
 }
-/**
- * MsgConnectionOpenAck defines a msg sent by a Relayer to Chain A to
- * acknowledge the change of connection state to TRYOPEN on Chain B.
- */
-export interface MsgConnectionOpenAckSDKType {
-  connection_id: string;
-  counterparty_connection_id: string;
-  version?: VersionSDKType;
-  /** @deprecated */
-  client_state?: AnySDKType;
-  proof_height: HeightSDKType;
-  proof_try: Uint8Array;
-  /** @deprecated */
-  proof_client: Uint8Array;
-  /** @deprecated */
-  proof_consensus: Uint8Array;
-  /** @deprecated */
-  consensus_height: HeightSDKType;
-  signer: string;
-  /** @deprecated */
-  host_consensus_state_proof: Uint8Array;
-}
 /** MsgConnectionOpenAckResponse defines the Msg/ConnectionOpenAck response type. */
 export interface MsgConnectionOpenAckResponse {}
 export interface MsgConnectionOpenAckResponseProtoMsg {
@@ -289,8 +224,6 @@ export interface MsgConnectionOpenAckResponseAminoMsg {
   type: "cosmos-sdk/MsgConnectionOpenAckResponse";
   value: MsgConnectionOpenAckResponseAmino;
 }
-/** MsgConnectionOpenAckResponse defines the Msg/ConnectionOpenAck response type. */
-export interface MsgConnectionOpenAckResponseSDKType {}
 /**
  * MsgConnectionOpenConfirm defines a msg sent by a Relayer to Chain B to
  * acknowledge the change of connection state to OPEN on Chain A.
@@ -322,16 +255,6 @@ export interface MsgConnectionOpenConfirmAminoMsg {
   value: MsgConnectionOpenConfirmAmino;
 }
 /**
- * MsgConnectionOpenConfirm defines a msg sent by a Relayer to Chain B to
- * acknowledge the change of connection state to OPEN on Chain A.
- */
-export interface MsgConnectionOpenConfirmSDKType {
-  connection_id: string;
-  proof_ack: Uint8Array;
-  proof_height: HeightSDKType;
-  signer: string;
-}
-/**
  * MsgConnectionOpenConfirmResponse defines the Msg/ConnectionOpenConfirm
  * response type.
  */
@@ -349,11 +272,6 @@ export interface MsgConnectionOpenConfirmResponseAminoMsg {
   type: "cosmos-sdk/MsgConnectionOpenConfirmResponse";
   value: MsgConnectionOpenConfirmResponseAmino;
 }
-/**
- * MsgConnectionOpenConfirmResponse defines the Msg/ConnectionOpenConfirm
- * response type.
- */
-export interface MsgConnectionOpenConfirmResponseSDKType {}
 /** MsgUpdateParams defines the sdk.Msg type to update the connection parameters. */
 export interface MsgUpdateParams {
   /** signer address */
@@ -384,11 +302,6 @@ export interface MsgUpdateParamsAminoMsg {
   type: "cosmos-sdk/MsgUpdateParams";
   value: MsgUpdateParamsAmino;
 }
-/** MsgUpdateParams defines the sdk.Msg type to update the connection parameters. */
-export interface MsgUpdateParamsSDKType {
-  signer: string;
-  params: ParamsSDKType;
-}
 /** MsgUpdateParamsResponse defines the MsgUpdateParams response type. */
 export interface MsgUpdateParamsResponse {}
 export interface MsgUpdateParamsResponseProtoMsg {
@@ -401,8 +314,6 @@ export interface MsgUpdateParamsResponseAminoMsg {
   type: "cosmos-sdk/MsgUpdateParamsResponse";
   value: MsgUpdateParamsResponseAmino;
 }
-/** MsgUpdateParamsResponse defines the MsgUpdateParams response type. */
-export interface MsgUpdateParamsResponseSDKType {}
 function createBaseMsgConnectionOpenInit(): MsgConnectionOpenInit {
   return {
     clientId: "",
@@ -414,6 +325,7 @@ function createBaseMsgConnectionOpenInit(): MsgConnectionOpenInit {
 }
 export const MsgConnectionOpenInit = {
   typeUrl: "/ibc.core.connection.v1.MsgConnectionOpenInit",
+  aminoType: "cosmos-sdk/MsgConnectionOpenInit",
   encode(message: MsgConnectionOpenInit, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -461,7 +373,7 @@ export const MsgConnectionOpenInit = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgConnectionOpenInit>): MsgConnectionOpenInit {
+  fromPartial(object: DeepPartial<MsgConnectionOpenInit>): MsgConnectionOpenInit {
     const message = createBaseMsgConnectionOpenInit();
     message.clientId = object.clientId ?? "";
     message.counterparty = object.counterparty !== undefined && object.counterparty !== null ? Counterparty.fromPartial(object.counterparty) : undefined;
@@ -525,6 +437,7 @@ function createBaseMsgConnectionOpenInitResponse(): MsgConnectionOpenInitRespons
 }
 export const MsgConnectionOpenInitResponse = {
   typeUrl: "/ibc.core.connection.v1.MsgConnectionOpenInitResponse",
+  aminoType: "cosmos-sdk/MsgConnectionOpenInitResponse",
   encode(_: MsgConnectionOpenInitResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -542,7 +455,7 @@ export const MsgConnectionOpenInitResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgConnectionOpenInitResponse>): MsgConnectionOpenInitResponse {
+  fromPartial(_: DeepPartial<MsgConnectionOpenInitResponse>): MsgConnectionOpenInitResponse {
     const message = createBaseMsgConnectionOpenInitResponse();
     return message;
   },
@@ -595,6 +508,7 @@ function createBaseMsgConnectionOpenTry(): MsgConnectionOpenTry {
 }
 export const MsgConnectionOpenTry = {
   typeUrl: "/ibc.core.connection.v1.MsgConnectionOpenTry",
+  aminoType: "cosmos-sdk/MsgConnectionOpenTry",
   encode(message: MsgConnectionOpenTry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -690,7 +604,7 @@ export const MsgConnectionOpenTry = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgConnectionOpenTry>): MsgConnectionOpenTry {
+  fromPartial(object: DeepPartial<MsgConnectionOpenTry>): MsgConnectionOpenTry {
     const message = createBaseMsgConnectionOpenTry();
     message.clientId = object.clientId ?? "";
     message.previousConnectionId = object.previousConnectionId ?? "";
@@ -796,6 +710,7 @@ function createBaseMsgConnectionOpenTryResponse(): MsgConnectionOpenTryResponse 
 }
 export const MsgConnectionOpenTryResponse = {
   typeUrl: "/ibc.core.connection.v1.MsgConnectionOpenTryResponse",
+  aminoType: "cosmos-sdk/MsgConnectionOpenTryResponse",
   encode(_: MsgConnectionOpenTryResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -813,7 +728,7 @@ export const MsgConnectionOpenTryResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgConnectionOpenTryResponse>): MsgConnectionOpenTryResponse {
+  fromPartial(_: DeepPartial<MsgConnectionOpenTryResponse>): MsgConnectionOpenTryResponse {
     const message = createBaseMsgConnectionOpenTryResponse();
     return message;
   },
@@ -864,6 +779,7 @@ function createBaseMsgConnectionOpenAck(): MsgConnectionOpenAck {
 }
 export const MsgConnectionOpenAck = {
   typeUrl: "/ibc.core.connection.v1.MsgConnectionOpenAck",
+  aminoType: "cosmos-sdk/MsgConnectionOpenAck",
   encode(message: MsgConnectionOpenAck, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.connectionId !== "") {
       writer.uint32(10).string(message.connectionId);
@@ -947,7 +863,7 @@ export const MsgConnectionOpenAck = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgConnectionOpenAck>): MsgConnectionOpenAck {
+  fromPartial(object: DeepPartial<MsgConnectionOpenAck>): MsgConnectionOpenAck {
     const message = createBaseMsgConnectionOpenAck();
     message.connectionId = object.connectionId ?? "";
     message.counterpartyConnectionId = object.counterpartyConnectionId ?? "";
@@ -1041,6 +957,7 @@ function createBaseMsgConnectionOpenAckResponse(): MsgConnectionOpenAckResponse 
 }
 export const MsgConnectionOpenAckResponse = {
   typeUrl: "/ibc.core.connection.v1.MsgConnectionOpenAckResponse",
+  aminoType: "cosmos-sdk/MsgConnectionOpenAckResponse",
   encode(_: MsgConnectionOpenAckResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1058,7 +975,7 @@ export const MsgConnectionOpenAckResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgConnectionOpenAckResponse>): MsgConnectionOpenAckResponse {
+  fromPartial(_: DeepPartial<MsgConnectionOpenAckResponse>): MsgConnectionOpenAckResponse {
     const message = createBaseMsgConnectionOpenAckResponse();
     return message;
   },
@@ -1102,6 +1019,7 @@ function createBaseMsgConnectionOpenConfirm(): MsgConnectionOpenConfirm {
 }
 export const MsgConnectionOpenConfirm = {
   typeUrl: "/ibc.core.connection.v1.MsgConnectionOpenConfirm",
+  aminoType: "cosmos-sdk/MsgConnectionOpenConfirm",
   encode(message: MsgConnectionOpenConfirm, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.connectionId !== "") {
       writer.uint32(10).string(message.connectionId);
@@ -1143,7 +1061,7 @@ export const MsgConnectionOpenConfirm = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgConnectionOpenConfirm>): MsgConnectionOpenConfirm {
+  fromPartial(object: DeepPartial<MsgConnectionOpenConfirm>): MsgConnectionOpenConfirm {
     const message = createBaseMsgConnectionOpenConfirm();
     message.connectionId = object.connectionId ?? "";
     message.proofAck = object.proofAck ?? new Uint8Array();
@@ -1202,6 +1120,7 @@ function createBaseMsgConnectionOpenConfirmResponse(): MsgConnectionOpenConfirmR
 }
 export const MsgConnectionOpenConfirmResponse = {
   typeUrl: "/ibc.core.connection.v1.MsgConnectionOpenConfirmResponse",
+  aminoType: "cosmos-sdk/MsgConnectionOpenConfirmResponse",
   encode(_: MsgConnectionOpenConfirmResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1219,7 +1138,7 @@ export const MsgConnectionOpenConfirmResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgConnectionOpenConfirmResponse>): MsgConnectionOpenConfirmResponse {
+  fromPartial(_: DeepPartial<MsgConnectionOpenConfirmResponse>): MsgConnectionOpenConfirmResponse {
     const message = createBaseMsgConnectionOpenConfirmResponse();
     return message;
   },
@@ -1261,6 +1180,7 @@ function createBaseMsgUpdateParams(): MsgUpdateParams {
 }
 export const MsgUpdateParams = {
   typeUrl: "/ibc.core.connection.v1.MsgUpdateParams",
+  aminoType: "cosmos-sdk/MsgUpdateParams",
   encode(message: MsgUpdateParams, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.signer !== "") {
       writer.uint32(10).string(message.signer);
@@ -1290,7 +1210,7 @@ export const MsgUpdateParams = {
     }
     return message;
   },
-  fromPartial(object: Partial<MsgUpdateParams>): MsgUpdateParams {
+  fromPartial(object: DeepPartial<MsgUpdateParams>): MsgUpdateParams {
     const message = createBaseMsgUpdateParams();
     message.signer = object.signer ?? "";
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
@@ -1339,6 +1259,7 @@ function createBaseMsgUpdateParamsResponse(): MsgUpdateParamsResponse {
 }
 export const MsgUpdateParamsResponse = {
   typeUrl: "/ibc.core.connection.v1.MsgUpdateParamsResponse",
+  aminoType: "cosmos-sdk/MsgUpdateParamsResponse",
   encode(_: MsgUpdateParamsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1356,7 +1277,7 @@ export const MsgUpdateParamsResponse = {
     }
     return message;
   },
-  fromPartial(_: Partial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
+  fromPartial(_: DeepPartial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
     const message = createBaseMsgUpdateParamsResponse();
     return message;
   },

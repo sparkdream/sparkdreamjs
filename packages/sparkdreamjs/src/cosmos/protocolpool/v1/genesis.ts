@@ -1,6 +1,7 @@
 //@ts-nocheck
-import { ContinuousFund, ContinuousFundAmino, ContinuousFundSDKType, Params, ParamsAmino, ParamsSDKType } from "./types";
+import { ContinuousFund, ContinuousFundAmino, Params, ParamsAmino } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** GenesisState defines the protocolpool module's genesis state. */
 export interface GenesisState {
   /** ContinuousFunds defines the continuous funds at genesis. */
@@ -29,11 +30,6 @@ export interface GenesisStateAminoMsg {
   type: "cosmos-sdk/GenesisState";
   value: GenesisStateAmino;
 }
-/** GenesisState defines the protocolpool module's genesis state. */
-export interface GenesisStateSDKType {
-  continuous_funds: ContinuousFundSDKType[];
-  params: ParamsSDKType;
-}
 function createBaseGenesisState(): GenesisState {
   return {
     continuousFunds: [],
@@ -42,6 +38,7 @@ function createBaseGenesisState(): GenesisState {
 }
 export const GenesisState = {
   typeUrl: "/cosmos.protocolpool.v1.GenesisState",
+  aminoType: "cosmos-sdk/GenesisState",
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.continuousFunds) {
       ContinuousFund.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -71,7 +68,7 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisState>): GenesisState {
+  fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = createBaseGenesisState();
     message.continuousFunds = object.continuousFunds?.map(e => ContinuousFund.fromPartial(e)) || [];
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;

@@ -1,14 +1,14 @@
 //@ts-nocheck
-import { Header, HeaderAmino, HeaderSDKType } from "../../../tendermint/types/types";
+import { Header, HeaderAmino } from "../../../tendermint/types/types";
 import { Timestamp } from "../../../google/protobuf/timestamp";
-import { Any, AnyProtoMsg, AnyAmino, AnySDKType } from "../../../google/protobuf/any";
-import { Duration, DurationAmino, DurationSDKType } from "../../../google/protobuf/duration";
-import { Coin, CoinAmino, CoinSDKType } from "../../base/v1beta1/coin";
-import { ValidatorUpdate, ValidatorUpdateAmino, ValidatorUpdateSDKType } from "../../../tendermint/abci/types";
+import { Any, AnyProtoMsg, AnyAmino } from "../../../google/protobuf/any";
+import { Duration, DurationAmino } from "../../../google/protobuf/duration";
+import { Coin, CoinAmino } from "../../base/v1beta1/coin";
+import { ValidatorUpdate, ValidatorUpdateAmino } from "../../../tendermint/abci/types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { Decimal } from "@cosmjs/math";
-import { toTimestamp, fromTimestamp } from "../../../helpers";
-import { encodePubkey, decodePubkey } from "@cosmjs/proto-signing";
+import { DeepPartial, toTimestamp, fromTimestamp } from "../../../helpers";
+import { Decimal } from "@interchainjs/math";
+import { encodePubkey, decodePubkey } from "@interchainjs/pubkey";
 import { Pubkey } from "@cosmjs/amino";
 /** BondStatus is the status of a validator. */
 export enum BondStatus {
@@ -22,7 +22,6 @@ export enum BondStatus {
   BOND_STATUS_BONDED = 3,
   UNRECOGNIZED = -1,
 }
-export const BondStatusSDKType = BondStatus;
 export const BondStatusAmino = BondStatus;
 export function bondStatusFromJSON(object: any): BondStatus {
   switch (object) {
@@ -69,7 +68,6 @@ export enum Infraction {
   INFRACTION_DOWNTIME = 2,
   UNRECOGNIZED = -1,
 }
-export const InfractionSDKType = Infraction;
 export const InfractionAmino = Infraction;
 export function infractionFromJSON(object: any): Infraction {
   switch (object) {
@@ -130,16 +128,6 @@ export interface HistoricalInfoAminoMsg {
   value: HistoricalInfoAmino;
 }
 /**
- * HistoricalInfo contains header and validator information for a given block.
- * It is stored as part of staking module's state, which persists the `n` most
- * recent HistoricalInfo
- * (`n` is set by the staking module's `historical_entries` parameter).
- */
-export interface HistoricalInfoSDKType {
-  header: HeaderSDKType;
-  valset: ValidatorSDKType[];
-}
-/**
  * CommissionRates defines the initial commission rates to be used for creating
  * a validator.
  */
@@ -171,15 +159,6 @@ export interface CommissionRatesAminoMsg {
   type: "cosmos-sdk/CommissionRates";
   value: CommissionRatesAmino;
 }
-/**
- * CommissionRates defines the initial commission rates to be used for creating
- * a validator.
- */
-export interface CommissionRatesSDKType {
-  rate: string;
-  max_rate: string;
-  max_change_rate: string;
-}
 /** Commission defines commission parameters for a given validator. */
 export interface Commission {
   /** commission_rates defines the initial commission rates to be used for creating a validator. */
@@ -201,11 +180,6 @@ export interface CommissionAmino {
 export interface CommissionAminoMsg {
   type: "cosmos-sdk/Commission";
   value: CommissionAmino;
-}
-/** Commission defines commission parameters for a given validator. */
-export interface CommissionSDKType {
-  commission_rates: CommissionRatesSDKType;
-  update_time: Date;
 }
 /** Description defines a validator description. */
 export interface Description {
@@ -240,14 +214,6 @@ export interface DescriptionAmino {
 export interface DescriptionAminoMsg {
   type: "cosmos-sdk/Description";
   value: DescriptionAmino;
-}
-/** Description defines a validator description. */
-export interface DescriptionSDKType {
-  moniker: string;
-  identity: string;
-  website: string;
-  security_contact: string;
-  details: string;
 }
 /**
  * Validator defines a validator, together with the total amount of the
@@ -344,31 +310,6 @@ export interface ValidatorAminoMsg {
   type: "cosmos-sdk/Validator";
   value: ValidatorAmino;
 }
-/**
- * Validator defines a validator, together with the total amount of the
- * Validator's bond shares and their exchange rate to coins. Slashing results in
- * a decrease in the exchange rate, allowing correct calculation of future
- * undelegations without iterating over delegators. When coins are delegated to
- * this validator, the validator is credited with a delegation whose number of
- * bond shares is based on the amount of coins delegated divided by the current
- * exchange rate. Voting power can be calculated as total bonded shares
- * multiplied by exchange rate.
- */
-export interface ValidatorSDKType {
-  operator_address: string;
-  consensus_pubkey?: AnySDKType | undefined;
-  jailed: boolean;
-  status: BondStatus;
-  tokens: string;
-  delegator_shares: string;
-  description: DescriptionSDKType;
-  unbonding_height: bigint;
-  unbonding_time: Date;
-  commission: CommissionSDKType;
-  min_self_delegation: string;
-  unbonding_on_hold_ref_count: bigint;
-  unbonding_ids: bigint[];
-}
 /** ValAddresses defines a repeated set of validator addresses. */
 export interface ValAddresses {
   addresses: string[];
@@ -384,10 +325,6 @@ export interface ValAddressesAmino {
 export interface ValAddressesAminoMsg {
   type: "cosmos-sdk/ValAddresses";
   value: ValAddressesAmino;
-}
-/** ValAddresses defines a repeated set of validator addresses. */
-export interface ValAddressesSDKType {
-  addresses: string[];
 }
 /**
  * DVPair is struct that just has a delegator-validator pair with no other data.
@@ -415,15 +352,6 @@ export interface DVPairAminoMsg {
   type: "cosmos-sdk/DVPair";
   value: DVPairAmino;
 }
-/**
- * DVPair is struct that just has a delegator-validator pair with no other data.
- * It is intended to be used as a marshalable pointer. For example, a DVPair can
- * be used to construct the key to getting an UnbondingDelegation from state.
- */
-export interface DVPairSDKType {
-  delegator_address: string;
-  validator_address: string;
-}
 /** DVPairs defines an array of DVPair objects. */
 export interface DVPairs {
   pairs: DVPair[];
@@ -439,10 +367,6 @@ export interface DVPairsAmino {
 export interface DVPairsAminoMsg {
   type: "cosmos-sdk/DVPairs";
   value: DVPairsAmino;
-}
-/** DVPairs defines an array of DVPair objects. */
-export interface DVPairsSDKType {
-  pairs: DVPairSDKType[];
 }
 /**
  * DVVTriplet is struct that just has a delegator-validator-validator triplet
@@ -474,17 +398,6 @@ export interface DVVTripletAminoMsg {
   type: "cosmos-sdk/DVVTriplet";
   value: DVVTripletAmino;
 }
-/**
- * DVVTriplet is struct that just has a delegator-validator-validator triplet
- * with no other data. It is intended to be used as a marshalable pointer. For
- * example, a DVVTriplet can be used to construct the key to getting a
- * Redelegation from state.
- */
-export interface DVVTripletSDKType {
-  delegator_address: string;
-  validator_src_address: string;
-  validator_dst_address: string;
-}
 /** DVVTriplets defines an array of DVVTriplet objects. */
 export interface DVVTriplets {
   triplets: DVVTriplet[];
@@ -500,10 +413,6 @@ export interface DVVTripletsAmino {
 export interface DVVTripletsAminoMsg {
   type: "cosmos-sdk/DVVTriplets";
   value: DVVTripletsAmino;
-}
-/** DVVTriplets defines an array of DVVTriplet objects. */
-export interface DVVTripletsSDKType {
-  triplets: DVVTripletSDKType[];
 }
 /**
  * Delegation represents the bond with tokens held by an account. It is
@@ -540,16 +449,6 @@ export interface DelegationAminoMsg {
   value: DelegationAmino;
 }
 /**
- * Delegation represents the bond with tokens held by an account. It is
- * owned by one delegator, and is associated with the voting power of one
- * validator.
- */
-export interface DelegationSDKType {
-  delegator_address: string;
-  validator_address: string;
-  shares: string;
-}
-/**
  * UnbondingDelegation stores all of a single delegator's unbonding bonds
  * for a single validator in an time-ordered list.
  */
@@ -580,15 +479,6 @@ export interface UnbondingDelegationAmino {
 export interface UnbondingDelegationAminoMsg {
   type: "cosmos-sdk/UnbondingDelegation";
   value: UnbondingDelegationAmino;
-}
-/**
- * UnbondingDelegation stores all of a single delegator's unbonding bonds
- * for a single validator in an time-ordered list.
- */
-export interface UnbondingDelegationSDKType {
-  delegator_address: string;
-  validator_address: string;
-  entries: UnbondingDelegationEntrySDKType[];
 }
 /** UnbondingDelegationEntry defines an unbonding object with relevant metadata. */
 export interface UnbondingDelegationEntry {
@@ -628,15 +518,6 @@ export interface UnbondingDelegationEntryAminoMsg {
   type: "cosmos-sdk/UnbondingDelegationEntry";
   value: UnbondingDelegationEntryAmino;
 }
-/** UnbondingDelegationEntry defines an unbonding object with relevant metadata. */
-export interface UnbondingDelegationEntrySDKType {
-  creation_height: bigint;
-  completion_time: Date;
-  initial_balance: string;
-  balance: string;
-  unbonding_id: bigint;
-  unbonding_on_hold_ref_count: bigint;
-}
 /** RedelegationEntry defines a redelegation object with relevant metadata. */
 export interface RedelegationEntry {
   /** creation_height  defines the height which the redelegation took place. */
@@ -675,15 +556,6 @@ export interface RedelegationEntryAminoMsg {
   type: "cosmos-sdk/RedelegationEntry";
   value: RedelegationEntryAmino;
 }
-/** RedelegationEntry defines a redelegation object with relevant metadata. */
-export interface RedelegationEntrySDKType {
-  creation_height: bigint;
-  completion_time: Date;
-  initial_balance: string;
-  shares_dst: string;
-  unbonding_id: bigint;
-  unbonding_on_hold_ref_count: bigint;
-}
 /**
  * Redelegation contains the list of a particular delegator's redelegating bonds
  * from a particular source validator to a particular destination validator.
@@ -719,16 +591,6 @@ export interface RedelegationAmino {
 export interface RedelegationAminoMsg {
   type: "cosmos-sdk/Redelegation";
   value: RedelegationAmino;
-}
-/**
- * Redelegation contains the list of a particular delegator's redelegating bonds
- * from a particular source validator to a particular destination validator.
- */
-export interface RedelegationSDKType {
-  delegator_address: string;
-  validator_src_address: string;
-  validator_dst_address: string;
-  entries: RedelegationEntrySDKType[];
 }
 /** Params defines the parameters for the x/staking module. */
 export interface Params {
@@ -768,15 +630,6 @@ export interface ParamsAminoMsg {
   type: "cosmos-sdk/x/staking/Params";
   value: ParamsAmino;
 }
-/** Params defines the parameters for the x/staking module. */
-export interface ParamsSDKType {
-  unbonding_time: DurationSDKType;
-  max_validators: number;
-  max_entries: number;
-  historical_entries: number;
-  bond_denom: string;
-  min_commission_rate: string;
-}
 /**
  * DelegationResponse is equivalent to Delegation except that it contains a
  * balance in addition to shares which is more suitable for client responses.
@@ -800,14 +653,6 @@ export interface DelegationResponseAmino {
 export interface DelegationResponseAminoMsg {
   type: "cosmos-sdk/DelegationResponse";
   value: DelegationResponseAmino;
-}
-/**
- * DelegationResponse is equivalent to Delegation except that it contains a
- * balance in addition to shares which is more suitable for client responses.
- */
-export interface DelegationResponseSDKType {
-  delegation: DelegationSDKType;
-  balance: CoinSDKType;
 }
 /**
  * RedelegationEntryResponse is equivalent to a RedelegationEntry except that it
@@ -836,15 +681,6 @@ export interface RedelegationEntryResponseAminoMsg {
   value: RedelegationEntryResponseAmino;
 }
 /**
- * RedelegationEntryResponse is equivalent to a RedelegationEntry except that it
- * contains a balance in addition to shares which is more suitable for client
- * responses.
- */
-export interface RedelegationEntryResponseSDKType {
-  redelegation_entry: RedelegationEntrySDKType;
-  balance: string;
-}
-/**
  * RedelegationResponse is equivalent to a Redelegation except that its entries
  * contain a balance in addition to shares which is more suitable for client
  * responses.
@@ -871,15 +707,6 @@ export interface RedelegationResponseAminoMsg {
   value: RedelegationResponseAmino;
 }
 /**
- * RedelegationResponse is equivalent to a Redelegation except that its entries
- * contain a balance in addition to shares which is more suitable for client
- * responses.
- */
-export interface RedelegationResponseSDKType {
-  redelegation: RedelegationSDKType;
-  entries: RedelegationEntryResponseSDKType[];
-}
-/**
  * Pool is used for tracking bonded and not-bonded token supply of the bond
  * denomination.
  */
@@ -904,14 +731,6 @@ export interface PoolAminoMsg {
   value: PoolAmino;
 }
 /**
- * Pool is used for tracking bonded and not-bonded token supply of the bond
- * denomination.
- */
-export interface PoolSDKType {
-  not_bonded_tokens: string;
-  bonded_tokens: string;
-}
-/**
  * ValidatorUpdates defines an array of abci.ValidatorUpdate objects.
  * TODO: explore moving this to proto/cosmos/base to separate modules from tendermint dependence
  */
@@ -933,13 +752,6 @@ export interface ValidatorUpdatesAminoMsg {
   type: "cosmos-sdk/ValidatorUpdates";
   value: ValidatorUpdatesAmino;
 }
-/**
- * ValidatorUpdates defines an array of abci.ValidatorUpdate objects.
- * TODO: explore moving this to proto/cosmos/base to separate modules from tendermint dependence
- */
-export interface ValidatorUpdatesSDKType {
-  updates: ValidatorUpdateSDKType[];
-}
 function createBaseHistoricalInfo(): HistoricalInfo {
   return {
     header: Header.fromPartial({}),
@@ -948,6 +760,7 @@ function createBaseHistoricalInfo(): HistoricalInfo {
 }
 export const HistoricalInfo = {
   typeUrl: "/cosmos.staking.v1beta1.HistoricalInfo",
+  aminoType: "cosmos-sdk/HistoricalInfo",
   encode(message: HistoricalInfo, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.header !== undefined) {
       Header.encode(message.header, writer.uint32(10).fork()).ldelim();
@@ -977,7 +790,7 @@ export const HistoricalInfo = {
     }
     return message;
   },
-  fromPartial(object: Partial<HistoricalInfo>): HistoricalInfo {
+  fromPartial(object: DeepPartial<HistoricalInfo>): HistoricalInfo {
     const message = createBaseHistoricalInfo();
     message.header = object.header !== undefined && object.header !== null ? Header.fromPartial(object.header) : undefined;
     message.valset = object.valset?.map(e => Validator.fromPartial(e)) || [];
@@ -1032,6 +845,7 @@ function createBaseCommissionRates(): CommissionRates {
 }
 export const CommissionRates = {
   typeUrl: "/cosmos.staking.v1beta1.CommissionRates",
+  aminoType: "cosmos-sdk/CommissionRates",
   encode(message: CommissionRates, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.rate !== "") {
       writer.uint32(10).string(Decimal.fromUserInput(message.rate, 18).atomics);
@@ -1067,7 +881,7 @@ export const CommissionRates = {
     }
     return message;
   },
-  fromPartial(object: Partial<CommissionRates>): CommissionRates {
+  fromPartial(object: DeepPartial<CommissionRates>): CommissionRates {
     const message = createBaseCommissionRates();
     message.rate = object.rate ?? "";
     message.maxRate = object.maxRate ?? "";
@@ -1124,6 +938,7 @@ function createBaseCommission(): Commission {
 }
 export const Commission = {
   typeUrl: "/cosmos.staking.v1beta1.Commission",
+  aminoType: "cosmos-sdk/Commission",
   encode(message: Commission, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.commissionRates !== undefined) {
       CommissionRates.encode(message.commissionRates, writer.uint32(10).fork()).ldelim();
@@ -1153,7 +968,7 @@ export const Commission = {
     }
     return message;
   },
-  fromPartial(object: Partial<Commission>): Commission {
+  fromPartial(object: DeepPartial<Commission>): Commission {
     const message = createBaseCommission();
     message.commissionRates = object.commissionRates !== undefined && object.commissionRates !== null ? CommissionRates.fromPartial(object.commissionRates) : undefined;
     message.updateTime = object.updateTime ?? undefined;
@@ -1208,6 +1023,7 @@ function createBaseDescription(): Description {
 }
 export const Description = {
   typeUrl: "/cosmos.staking.v1beta1.Description",
+  aminoType: "cosmos-sdk/Description",
   encode(message: Description, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.moniker !== "") {
       writer.uint32(10).string(message.moniker);
@@ -1255,7 +1071,7 @@ export const Description = {
     }
     return message;
   },
-  fromPartial(object: Partial<Description>): Description {
+  fromPartial(object: DeepPartial<Description>): Description {
     const message = createBaseDescription();
     message.moniker = object.moniker ?? "";
     message.identity = object.identity ?? "";
@@ -1333,6 +1149,7 @@ function createBaseValidator(): Validator {
 }
 export const Validator = {
   typeUrl: "/cosmos.staking.v1beta1.Validator",
+  aminoType: "cosmos-sdk/Validator",
   encode(message: Validator, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.operatorAddress !== "") {
       writer.uint32(10).string(message.operatorAddress);
@@ -1437,7 +1254,7 @@ export const Validator = {
     }
     return message;
   },
-  fromPartial(object: Partial<Validator>): Validator {
+  fromPartial(object: DeepPartial<Validator>): Validator {
     const message = createBaseValidator();
     message.operatorAddress = object.operatorAddress ?? "";
     message.consensusPubkey = object.consensusPubkey !== undefined && object.consensusPubkey !== null ? Any.fromPartial(object.consensusPubkey) : undefined;
@@ -1545,6 +1362,7 @@ function createBaseValAddresses(): ValAddresses {
 }
 export const ValAddresses = {
   typeUrl: "/cosmos.staking.v1beta1.ValAddresses",
+  aminoType: "cosmos-sdk/ValAddresses",
   encode(message: ValAddresses, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.addresses) {
       writer.uint32(10).string(v!);
@@ -1568,7 +1386,7 @@ export const ValAddresses = {
     }
     return message;
   },
-  fromPartial(object: Partial<ValAddresses>): ValAddresses {
+  fromPartial(object: DeepPartial<ValAddresses>): ValAddresses {
     const message = createBaseValAddresses();
     message.addresses = object.addresses?.map(e => e) || [];
     return message;
@@ -1617,6 +1435,7 @@ function createBaseDVPair(): DVPair {
 }
 export const DVPair = {
   typeUrl: "/cosmos.staking.v1beta1.DVPair",
+  aminoType: "cosmos-sdk/DVPair",
   encode(message: DVPair, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.delegatorAddress !== "") {
       writer.uint32(10).string(message.delegatorAddress);
@@ -1646,7 +1465,7 @@ export const DVPair = {
     }
     return message;
   },
-  fromPartial(object: Partial<DVPair>): DVPair {
+  fromPartial(object: DeepPartial<DVPair>): DVPair {
     const message = createBaseDVPair();
     message.delegatorAddress = object.delegatorAddress ?? "";
     message.validatorAddress = object.validatorAddress ?? "";
@@ -1697,6 +1516,7 @@ function createBaseDVPairs(): DVPairs {
 }
 export const DVPairs = {
   typeUrl: "/cosmos.staking.v1beta1.DVPairs",
+  aminoType: "cosmos-sdk/DVPairs",
   encode(message: DVPairs, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.pairs) {
       DVPair.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -1720,7 +1540,7 @@ export const DVPairs = {
     }
     return message;
   },
-  fromPartial(object: Partial<DVPairs>): DVPairs {
+  fromPartial(object: DeepPartial<DVPairs>): DVPairs {
     const message = createBaseDVPairs();
     message.pairs = object.pairs?.map(e => DVPair.fromPartial(e)) || [];
     return message;
@@ -1770,6 +1590,7 @@ function createBaseDVVTriplet(): DVVTriplet {
 }
 export const DVVTriplet = {
   typeUrl: "/cosmos.staking.v1beta1.DVVTriplet",
+  aminoType: "cosmos-sdk/DVVTriplet",
   encode(message: DVVTriplet, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.delegatorAddress !== "") {
       writer.uint32(10).string(message.delegatorAddress);
@@ -1805,7 +1626,7 @@ export const DVVTriplet = {
     }
     return message;
   },
-  fromPartial(object: Partial<DVVTriplet>): DVVTriplet {
+  fromPartial(object: DeepPartial<DVVTriplet>): DVVTriplet {
     const message = createBaseDVVTriplet();
     message.delegatorAddress = object.delegatorAddress ?? "";
     message.validatorSrcAddress = object.validatorSrcAddress ?? "";
@@ -1861,6 +1682,7 @@ function createBaseDVVTriplets(): DVVTriplets {
 }
 export const DVVTriplets = {
   typeUrl: "/cosmos.staking.v1beta1.DVVTriplets",
+  aminoType: "cosmos-sdk/DVVTriplets",
   encode(message: DVVTriplets, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.triplets) {
       DVVTriplet.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -1884,7 +1706,7 @@ export const DVVTriplets = {
     }
     return message;
   },
-  fromPartial(object: Partial<DVVTriplets>): DVVTriplets {
+  fromPartial(object: DeepPartial<DVVTriplets>): DVVTriplets {
     const message = createBaseDVVTriplets();
     message.triplets = object.triplets?.map(e => DVVTriplet.fromPartial(e)) || [];
     return message;
@@ -1934,6 +1756,7 @@ function createBaseDelegation(): Delegation {
 }
 export const Delegation = {
   typeUrl: "/cosmos.staking.v1beta1.Delegation",
+  aminoType: "cosmos-sdk/Delegation",
   encode(message: Delegation, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.delegatorAddress !== "") {
       writer.uint32(10).string(message.delegatorAddress);
@@ -1969,7 +1792,7 @@ export const Delegation = {
     }
     return message;
   },
-  fromPartial(object: Partial<Delegation>): Delegation {
+  fromPartial(object: DeepPartial<Delegation>): Delegation {
     const message = createBaseDelegation();
     message.delegatorAddress = object.delegatorAddress ?? "";
     message.validatorAddress = object.validatorAddress ?? "";
@@ -2027,6 +1850,7 @@ function createBaseUnbondingDelegation(): UnbondingDelegation {
 }
 export const UnbondingDelegation = {
   typeUrl: "/cosmos.staking.v1beta1.UnbondingDelegation",
+  aminoType: "cosmos-sdk/UnbondingDelegation",
   encode(message: UnbondingDelegation, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.delegatorAddress !== "") {
       writer.uint32(10).string(message.delegatorAddress);
@@ -2062,7 +1886,7 @@ export const UnbondingDelegation = {
     }
     return message;
   },
-  fromPartial(object: Partial<UnbondingDelegation>): UnbondingDelegation {
+  fromPartial(object: DeepPartial<UnbondingDelegation>): UnbondingDelegation {
     const message = createBaseUnbondingDelegation();
     message.delegatorAddress = object.delegatorAddress ?? "";
     message.validatorAddress = object.validatorAddress ?? "";
@@ -2125,6 +1949,7 @@ function createBaseUnbondingDelegationEntry(): UnbondingDelegationEntry {
 }
 export const UnbondingDelegationEntry = {
   typeUrl: "/cosmos.staking.v1beta1.UnbondingDelegationEntry",
+  aminoType: "cosmos-sdk/UnbondingDelegationEntry",
   encode(message: UnbondingDelegationEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creationHeight !== BigInt(0)) {
       writer.uint32(8).int64(message.creationHeight);
@@ -2178,7 +2003,7 @@ export const UnbondingDelegationEntry = {
     }
     return message;
   },
-  fromPartial(object: Partial<UnbondingDelegationEntry>): UnbondingDelegationEntry {
+  fromPartial(object: DeepPartial<UnbondingDelegationEntry>): UnbondingDelegationEntry {
     const message = createBaseUnbondingDelegationEntry();
     message.creationHeight = object.creationHeight !== undefined && object.creationHeight !== null ? BigInt(object.creationHeight.toString()) : BigInt(0);
     message.completionTime = object.completionTime ?? undefined;
@@ -2254,6 +2079,7 @@ function createBaseRedelegationEntry(): RedelegationEntry {
 }
 export const RedelegationEntry = {
   typeUrl: "/cosmos.staking.v1beta1.RedelegationEntry",
+  aminoType: "cosmos-sdk/RedelegationEntry",
   encode(message: RedelegationEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creationHeight !== BigInt(0)) {
       writer.uint32(8).int64(message.creationHeight);
@@ -2307,7 +2133,7 @@ export const RedelegationEntry = {
     }
     return message;
   },
-  fromPartial(object: Partial<RedelegationEntry>): RedelegationEntry {
+  fromPartial(object: DeepPartial<RedelegationEntry>): RedelegationEntry {
     const message = createBaseRedelegationEntry();
     message.creationHeight = object.creationHeight !== undefined && object.creationHeight !== null ? BigInt(object.creationHeight.toString()) : BigInt(0);
     message.completionTime = object.completionTime ?? undefined;
@@ -2381,6 +2207,7 @@ function createBaseRedelegation(): Redelegation {
 }
 export const Redelegation = {
   typeUrl: "/cosmos.staking.v1beta1.Redelegation",
+  aminoType: "cosmos-sdk/Redelegation",
   encode(message: Redelegation, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.delegatorAddress !== "") {
       writer.uint32(10).string(message.delegatorAddress);
@@ -2422,7 +2249,7 @@ export const Redelegation = {
     }
     return message;
   },
-  fromPartial(object: Partial<Redelegation>): Redelegation {
+  fromPartial(object: DeepPartial<Redelegation>): Redelegation {
     const message = createBaseRedelegation();
     message.delegatorAddress = object.delegatorAddress ?? "";
     message.validatorSrcAddress = object.validatorSrcAddress ?? "";
@@ -2490,6 +2317,7 @@ function createBaseParams(): Params {
 }
 export const Params = {
   typeUrl: "/cosmos.staking.v1beta1.Params",
+  aminoType: "cosmos-sdk/x/staking/Params",
   encode(message: Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.unbondingTime !== undefined) {
       Duration.encode(message.unbondingTime, writer.uint32(10).fork()).ldelim();
@@ -2543,7 +2371,7 @@ export const Params = {
     }
     return message;
   },
-  fromPartial(object: Partial<Params>): Params {
+  fromPartial(object: DeepPartial<Params>): Params {
     const message = createBaseParams();
     message.unbondingTime = object.unbondingTime !== undefined && object.unbondingTime !== null ? Duration.fromPartial(object.unbondingTime) : undefined;
     message.maxValidators = object.maxValidators ?? 0;
@@ -2615,6 +2443,7 @@ function createBaseDelegationResponse(): DelegationResponse {
 }
 export const DelegationResponse = {
   typeUrl: "/cosmos.staking.v1beta1.DelegationResponse",
+  aminoType: "cosmos-sdk/DelegationResponse",
   encode(message: DelegationResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.delegation !== undefined) {
       Delegation.encode(message.delegation, writer.uint32(10).fork()).ldelim();
@@ -2644,7 +2473,7 @@ export const DelegationResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<DelegationResponse>): DelegationResponse {
+  fromPartial(object: DeepPartial<DelegationResponse>): DelegationResponse {
     const message = createBaseDelegationResponse();
     message.delegation = object.delegation !== undefined && object.delegation !== null ? Delegation.fromPartial(object.delegation) : undefined;
     message.balance = object.balance !== undefined && object.balance !== null ? Coin.fromPartial(object.balance) : undefined;
@@ -2696,6 +2525,7 @@ function createBaseRedelegationEntryResponse(): RedelegationEntryResponse {
 }
 export const RedelegationEntryResponse = {
   typeUrl: "/cosmos.staking.v1beta1.RedelegationEntryResponse",
+  aminoType: "cosmos-sdk/RedelegationEntryResponse",
   encode(message: RedelegationEntryResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.redelegationEntry !== undefined) {
       RedelegationEntry.encode(message.redelegationEntry, writer.uint32(10).fork()).ldelim();
@@ -2725,7 +2555,7 @@ export const RedelegationEntryResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<RedelegationEntryResponse>): RedelegationEntryResponse {
+  fromPartial(object: DeepPartial<RedelegationEntryResponse>): RedelegationEntryResponse {
     const message = createBaseRedelegationEntryResponse();
     message.redelegationEntry = object.redelegationEntry !== undefined && object.redelegationEntry !== null ? RedelegationEntry.fromPartial(object.redelegationEntry) : undefined;
     message.balance = object.balance ?? "";
@@ -2777,6 +2607,7 @@ function createBaseRedelegationResponse(): RedelegationResponse {
 }
 export const RedelegationResponse = {
   typeUrl: "/cosmos.staking.v1beta1.RedelegationResponse",
+  aminoType: "cosmos-sdk/RedelegationResponse",
   encode(message: RedelegationResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.redelegation !== undefined) {
       Redelegation.encode(message.redelegation, writer.uint32(10).fork()).ldelim();
@@ -2806,7 +2637,7 @@ export const RedelegationResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<RedelegationResponse>): RedelegationResponse {
+  fromPartial(object: DeepPartial<RedelegationResponse>): RedelegationResponse {
     const message = createBaseRedelegationResponse();
     message.redelegation = object.redelegation !== undefined && object.redelegation !== null ? Redelegation.fromPartial(object.redelegation) : undefined;
     message.entries = object.entries?.map(e => RedelegationEntryResponse.fromPartial(e)) || [];
@@ -2860,6 +2691,7 @@ function createBasePool(): Pool {
 }
 export const Pool = {
   typeUrl: "/cosmos.staking.v1beta1.Pool",
+  aminoType: "cosmos-sdk/Pool",
   encode(message: Pool, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.notBondedTokens !== "") {
       writer.uint32(10).string(message.notBondedTokens);
@@ -2889,7 +2721,7 @@ export const Pool = {
     }
     return message;
   },
-  fromPartial(object: Partial<Pool>): Pool {
+  fromPartial(object: DeepPartial<Pool>): Pool {
     const message = createBasePool();
     message.notBondedTokens = object.notBondedTokens ?? "";
     message.bondedTokens = object.bondedTokens ?? "";
@@ -2940,6 +2772,7 @@ function createBaseValidatorUpdates(): ValidatorUpdates {
 }
 export const ValidatorUpdates = {
   typeUrl: "/cosmos.staking.v1beta1.ValidatorUpdates",
+  aminoType: "cosmos-sdk/ValidatorUpdates",
   encode(message: ValidatorUpdates, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.updates) {
       ValidatorUpdate.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -2963,7 +2796,7 @@ export const ValidatorUpdates = {
     }
     return message;
   },
-  fromPartial(object: Partial<ValidatorUpdates>): ValidatorUpdates {
+  fromPartial(object: DeepPartial<ValidatorUpdates>): ValidatorUpdates {
     const message = createBaseValidatorUpdates();
     message.updates = object.updates?.map(e => ValidatorUpdate.fromPartial(e)) || [];
     return message;

@@ -1,7 +1,7 @@
 //@ts-nocheck
-import { Any, AnyAmino, AnySDKType } from "../../../../google/protobuf/any";
+import { Any, AnyAmino } from "../../../../google/protobuf/any";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /**
  * ClientState defines a solo machine client that tracks the current consensus
  * state and if the client is frozen.
@@ -31,15 +31,6 @@ export interface ClientStateAmino {
 export interface ClientStateAminoMsg {
   type: "cosmos-sdk/ClientState";
   value: ClientStateAmino;
-}
-/**
- * ClientState defines a solo machine client that tracks the current consensus
- * state and if the client is frozen.
- */
-export interface ClientStateSDKType {
-  sequence: bigint;
-  is_frozen: boolean;
-  consensus_state?: ConsensusStateSDKType;
 }
 /**
  * ConsensusState defines a solo machine consensus state. The sequence of a
@@ -81,16 +72,6 @@ export interface ConsensusStateAminoMsg {
   type: "cosmos-sdk/ConsensusState";
   value: ConsensusStateAmino;
 }
-/**
- * ConsensusState defines a solo machine consensus state. The sequence of a
- * consensus state is contained in the "height" key used in storing the
- * consensus state.
- */
-export interface ConsensusStateSDKType {
-  public_key?: AnySDKType;
-  diversifier: string;
-  timestamp: bigint;
-}
 /** Header defines a solo machine consensus header */
 export interface Header {
   timestamp: bigint;
@@ -112,13 +93,6 @@ export interface HeaderAmino {
 export interface HeaderAminoMsg {
   type: "cosmos-sdk/Header";
   value: HeaderAmino;
-}
-/** Header defines a solo machine consensus header */
-export interface HeaderSDKType {
-  timestamp: bigint;
-  signature: Uint8Array;
-  new_public_key?: AnySDKType;
-  new_diversifier: string;
 }
 /**
  * Misbehaviour defines misbehaviour for a solo machine which consists
@@ -145,15 +119,6 @@ export interface MisbehaviourAmino {
 export interface MisbehaviourAminoMsg {
   type: "cosmos-sdk/Misbehaviour";
   value: MisbehaviourAmino;
-}
-/**
- * Misbehaviour defines misbehaviour for a solo machine which consists
- * of a sequence and two signatures over different messages at that sequence.
- */
-export interface MisbehaviourSDKType {
-  sequence: bigint;
-  signature_one?: SignatureAndDataSDKType;
-  signature_two?: SignatureAndDataSDKType;
 }
 /**
  * SignatureAndData contains a signature and the data signed over to create that
@@ -184,16 +149,6 @@ export interface SignatureAndDataAminoMsg {
   value: SignatureAndDataAmino;
 }
 /**
- * SignatureAndData contains a signature and the data signed over to create that
- * signature.
- */
-export interface SignatureAndDataSDKType {
-  signature: Uint8Array;
-  path: Uint8Array;
-  data: Uint8Array;
-  timestamp: bigint;
-}
-/**
  * TimestampedSignatureData contains the signature data and the timestamp of the
  * signature.
  */
@@ -216,14 +171,6 @@ export interface TimestampedSignatureDataAmino {
 export interface TimestampedSignatureDataAminoMsg {
   type: "cosmos-sdk/TimestampedSignatureData";
   value: TimestampedSignatureDataAmino;
-}
-/**
- * TimestampedSignatureData contains the signature data and the timestamp of the
- * signature.
- */
-export interface TimestampedSignatureDataSDKType {
-  signature_data: Uint8Array;
-  timestamp: bigint;
 }
 /** SignBytes defines the signed bytes used for signature verification. */
 export interface SignBytes {
@@ -259,14 +206,6 @@ export interface SignBytesAminoMsg {
   type: "cosmos-sdk/SignBytes";
   value: SignBytesAmino;
 }
-/** SignBytes defines the signed bytes used for signature verification. */
-export interface SignBytesSDKType {
-  sequence: bigint;
-  timestamp: bigint;
-  diversifier: string;
-  path: Uint8Array;
-  data: Uint8Array;
-}
 /** HeaderData returns the SignBytes data for update verification. */
 export interface HeaderData {
   /** header public key */
@@ -289,11 +228,6 @@ export interface HeaderDataAminoMsg {
   type: "cosmos-sdk/HeaderData";
   value: HeaderDataAmino;
 }
-/** HeaderData returns the SignBytes data for update verification. */
-export interface HeaderDataSDKType {
-  new_pub_key?: AnySDKType;
-  new_diversifier: string;
-}
 function createBaseClientState(): ClientState {
   return {
     sequence: BigInt(0),
@@ -303,6 +237,7 @@ function createBaseClientState(): ClientState {
 }
 export const ClientState = {
   typeUrl: "/ibc.lightclients.solomachine.v3.ClientState",
+  aminoType: "cosmos-sdk/ClientState",
   encode(message: ClientState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sequence !== BigInt(0)) {
       writer.uint32(8).uint64(message.sequence);
@@ -338,7 +273,7 @@ export const ClientState = {
     }
     return message;
   },
-  fromPartial(object: Partial<ClientState>): ClientState {
+  fromPartial(object: DeepPartial<ClientState>): ClientState {
     const message = createBaseClientState();
     message.sequence = object.sequence !== undefined && object.sequence !== null ? BigInt(object.sequence.toString()) : BigInt(0);
     message.isFrozen = object.isFrozen ?? false;
@@ -396,6 +331,7 @@ function createBaseConsensusState(): ConsensusState {
 }
 export const ConsensusState = {
   typeUrl: "/ibc.lightclients.solomachine.v3.ConsensusState",
+  aminoType: "cosmos-sdk/ConsensusState",
   encode(message: ConsensusState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.publicKey !== undefined) {
       Any.encode(message.publicKey, writer.uint32(10).fork()).ldelim();
@@ -431,7 +367,7 @@ export const ConsensusState = {
     }
     return message;
   },
-  fromPartial(object: Partial<ConsensusState>): ConsensusState {
+  fromPartial(object: DeepPartial<ConsensusState>): ConsensusState {
     const message = createBaseConsensusState();
     message.publicKey = object.publicKey !== undefined && object.publicKey !== null ? Any.fromPartial(object.publicKey) : undefined;
     message.diversifier = object.diversifier ?? "";
@@ -490,6 +426,7 @@ function createBaseHeader(): Header {
 }
 export const Header = {
   typeUrl: "/ibc.lightclients.solomachine.v3.Header",
+  aminoType: "cosmos-sdk/Header",
   encode(message: Header, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.timestamp !== BigInt(0)) {
       writer.uint32(8).uint64(message.timestamp);
@@ -531,7 +468,7 @@ export const Header = {
     }
     return message;
   },
-  fromPartial(object: Partial<Header>): Header {
+  fromPartial(object: DeepPartial<Header>): Header {
     const message = createBaseHeader();
     message.timestamp = object.timestamp !== undefined && object.timestamp !== null ? BigInt(object.timestamp.toString()) : BigInt(0);
     message.signature = object.signature ?? new Uint8Array();
@@ -594,6 +531,7 @@ function createBaseMisbehaviour(): Misbehaviour {
 }
 export const Misbehaviour = {
   typeUrl: "/ibc.lightclients.solomachine.v3.Misbehaviour",
+  aminoType: "cosmos-sdk/Misbehaviour",
   encode(message: Misbehaviour, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sequence !== BigInt(0)) {
       writer.uint32(8).uint64(message.sequence);
@@ -629,7 +567,7 @@ export const Misbehaviour = {
     }
     return message;
   },
-  fromPartial(object: Partial<Misbehaviour>): Misbehaviour {
+  fromPartial(object: DeepPartial<Misbehaviour>): Misbehaviour {
     const message = createBaseMisbehaviour();
     message.sequence = object.sequence !== undefined && object.sequence !== null ? BigInt(object.sequence.toString()) : BigInt(0);
     message.signatureOne = object.signatureOne !== undefined && object.signatureOne !== null ? SignatureAndData.fromPartial(object.signatureOne) : undefined;
@@ -688,6 +626,7 @@ function createBaseSignatureAndData(): SignatureAndData {
 }
 export const SignatureAndData = {
   typeUrl: "/ibc.lightclients.solomachine.v3.SignatureAndData",
+  aminoType: "cosmos-sdk/SignatureAndData",
   encode(message: SignatureAndData, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.signature.length !== 0) {
       writer.uint32(10).bytes(message.signature);
@@ -729,7 +668,7 @@ export const SignatureAndData = {
     }
     return message;
   },
-  fromPartial(object: Partial<SignatureAndData>): SignatureAndData {
+  fromPartial(object: DeepPartial<SignatureAndData>): SignatureAndData {
     const message = createBaseSignatureAndData();
     message.signature = object.signature ?? new Uint8Array();
     message.path = object.path ?? new Uint8Array();
@@ -791,6 +730,7 @@ function createBaseTimestampedSignatureData(): TimestampedSignatureData {
 }
 export const TimestampedSignatureData = {
   typeUrl: "/ibc.lightclients.solomachine.v3.TimestampedSignatureData",
+  aminoType: "cosmos-sdk/TimestampedSignatureData",
   encode(message: TimestampedSignatureData, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.signatureData.length !== 0) {
       writer.uint32(10).bytes(message.signatureData);
@@ -820,7 +760,7 @@ export const TimestampedSignatureData = {
     }
     return message;
   },
-  fromPartial(object: Partial<TimestampedSignatureData>): TimestampedSignatureData {
+  fromPartial(object: DeepPartial<TimestampedSignatureData>): TimestampedSignatureData {
     const message = createBaseTimestampedSignatureData();
     message.signatureData = object.signatureData ?? new Uint8Array();
     message.timestamp = object.timestamp !== undefined && object.timestamp !== null ? BigInt(object.timestamp.toString()) : BigInt(0);
@@ -875,6 +815,7 @@ function createBaseSignBytes(): SignBytes {
 }
 export const SignBytes = {
   typeUrl: "/ibc.lightclients.solomachine.v3.SignBytes",
+  aminoType: "cosmos-sdk/SignBytes",
   encode(message: SignBytes, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sequence !== BigInt(0)) {
       writer.uint32(8).uint64(message.sequence);
@@ -922,7 +863,7 @@ export const SignBytes = {
     }
     return message;
   },
-  fromPartial(object: Partial<SignBytes>): SignBytes {
+  fromPartial(object: DeepPartial<SignBytes>): SignBytes {
     const message = createBaseSignBytes();
     message.sequence = object.sequence !== undefined && object.sequence !== null ? BigInt(object.sequence.toString()) : BigInt(0);
     message.timestamp = object.timestamp !== undefined && object.timestamp !== null ? BigInt(object.timestamp.toString()) : BigInt(0);
@@ -989,6 +930,7 @@ function createBaseHeaderData(): HeaderData {
 }
 export const HeaderData = {
   typeUrl: "/ibc.lightclients.solomachine.v3.HeaderData",
+  aminoType: "cosmos-sdk/HeaderData",
   encode(message: HeaderData, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.newPubKey !== undefined) {
       Any.encode(message.newPubKey, writer.uint32(10).fork()).ldelim();
@@ -1018,7 +960,7 @@ export const HeaderData = {
     }
     return message;
   },
-  fromPartial(object: Partial<HeaderData>): HeaderData {
+  fromPartial(object: DeepPartial<HeaderData>): HeaderData {
     const message = createBaseHeaderData();
     message.newPubKey = object.newPubKey !== undefined && object.newPubKey !== null ? Any.fromPartial(object.newPubKey) : undefined;
     message.newDiversifier = object.newDiversifier ?? "";

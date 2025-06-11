@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /**
  * Module defines the ORM module which adds providers to the app container for
  * ORM ModuleDB's and in the future will automatically register query
@@ -20,17 +21,12 @@ export interface ModuleAminoMsg {
   type: "cosmos-sdk/Module";
   value: ModuleAmino;
 }
-/**
- * Module defines the ORM module which adds providers to the app container for
- * ORM ModuleDB's and in the future will automatically register query
- * services for modules that use the ORM.
- */
-export interface ModuleSDKType {}
 function createBaseModule(): Module {
   return {};
 }
 export const Module = {
   typeUrl: "/cosmos.orm.module.v1alpha1.Module",
+  aminoType: "cosmos-sdk/Module",
   encode(_: Module, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -48,7 +44,7 @@ export const Module = {
     }
     return message;
   },
-  fromPartial(_: Partial<Module>): Module {
+  fromPartial(_: DeepPartial<Module>): Module {
     const message = createBaseModule();
     return message;
   },

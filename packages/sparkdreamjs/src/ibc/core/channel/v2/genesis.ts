@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /** GenesisState defines the ibc channel/v2 submodule's genesis state. */
 export interface GenesisState {
   acknowledgements: PacketState[];
@@ -24,14 +24,6 @@ export interface GenesisStateAmino {
 export interface GenesisStateAminoMsg {
   type: "cosmos-sdk/GenesisState";
   value: GenesisStateAmino;
-}
-/** GenesisState defines the ibc channel/v2 submodule's genesis state. */
-export interface GenesisStateSDKType {
-  acknowledgements: PacketStateSDKType[];
-  commitments: PacketStateSDKType[];
-  receipts: PacketStateSDKType[];
-  async_packets: PacketStateSDKType[];
-  send_sequences: PacketSequenceSDKType[];
 }
 /**
  * PacketState defines the generic type necessary to retrieve and store
@@ -69,17 +61,6 @@ export interface PacketStateAminoMsg {
   type: "cosmos-sdk/PacketState";
   value: PacketStateAmino;
 }
-/**
- * PacketState defines the generic type necessary to retrieve and store
- * packet commitments, acknowledgements, and receipts.
- * Caller is responsible for knowing the context necessary to interpret this
- * state as a commitment, acknowledgement, or a receipt.
- */
-export interface PacketStateSDKType {
-  client_id: string;
-  sequence: bigint;
-  data: Uint8Array;
-}
 /** PacketSequence defines the genesis type necessary to retrieve and store next send sequences. */
 export interface PacketSequence {
   /** client unique identifier. */
@@ -102,11 +83,6 @@ export interface PacketSequenceAminoMsg {
   type: "cosmos-sdk/PacketSequence";
   value: PacketSequenceAmino;
 }
-/** PacketSequence defines the genesis type necessary to retrieve and store next send sequences. */
-export interface PacketSequenceSDKType {
-  client_id: string;
-  sequence: bigint;
-}
 function createBaseGenesisState(): GenesisState {
   return {
     acknowledgements: [],
@@ -118,6 +94,7 @@ function createBaseGenesisState(): GenesisState {
 }
 export const GenesisState = {
   typeUrl: "/ibc.core.channel.v2.GenesisState",
+  aminoType: "cosmos-sdk/GenesisState",
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.acknowledgements) {
       PacketState.encode(v!, writer.uint32(18).fork()).ldelim();
@@ -165,7 +142,7 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisState>): GenesisState {
+  fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = createBaseGenesisState();
     message.acknowledgements = object.acknowledgements?.map(e => PacketState.fromPartial(e)) || [];
     message.commitments = object.commitments?.map(e => PacketState.fromPartial(e)) || [];
@@ -243,6 +220,7 @@ function createBasePacketState(): PacketState {
 }
 export const PacketState = {
   typeUrl: "/ibc.core.channel.v2.PacketState",
+  aminoType: "cosmos-sdk/PacketState",
   encode(message: PacketState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -278,7 +256,7 @@ export const PacketState = {
     }
     return message;
   },
-  fromPartial(object: Partial<PacketState>): PacketState {
+  fromPartial(object: DeepPartial<PacketState>): PacketState {
     const message = createBasePacketState();
     message.clientId = object.clientId ?? "";
     message.sequence = object.sequence !== undefined && object.sequence !== null ? BigInt(object.sequence.toString()) : BigInt(0);
@@ -335,6 +313,7 @@ function createBasePacketSequence(): PacketSequence {
 }
 export const PacketSequence = {
   typeUrl: "/ibc.core.channel.v2.PacketSequence",
+  aminoType: "cosmos-sdk/PacketSequence",
   encode(message: PacketSequence, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -364,7 +343,7 @@ export const PacketSequence = {
     }
     return message;
   },
-  fromPartial(object: Partial<PacketSequence>): PacketSequence {
+  fromPartial(object: DeepPartial<PacketSequence>): PacketSequence {
     const message = createBasePacketSequence();
     message.clientId = object.clientId ?? "";
     message.sequence = object.sequence !== undefined && object.sequence !== null ? BigInt(object.sequence.toString()) : BigInt(0);

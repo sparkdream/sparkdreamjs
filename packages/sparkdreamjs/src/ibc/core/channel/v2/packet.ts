@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /** PacketStatus specifies the status of a RecvPacketResult. */
 export enum PacketStatus {
   /** PACKET_STATUS_UNSPECIFIED - PACKET_STATUS_UNSPECIFIED indicates an unknown packet status. */
@@ -13,7 +13,6 @@ export enum PacketStatus {
   PACKET_STATUS_ASYNC = 3,
   UNRECOGNIZED = -1,
 }
-export const PacketStatusSDKType = PacketStatus;
 export const PacketStatusAmino = PacketStatus;
 export function packetStatusFromJSON(object: any): PacketStatus {
   switch (object) {
@@ -92,14 +91,6 @@ export interface PacketAminoMsg {
   type: "cosmos-sdk/Packet";
   value: PacketAmino;
 }
-/** Packet defines a type that carries data across different chains through IBC */
-export interface PacketSDKType {
-  sequence: bigint;
-  source_client: string;
-  destination_client: string;
-  timeout_timestamp: bigint;
-  payloads: PayloadSDKType[];
-}
 /** Payload contains the source and destination ports and payload for the application (version, encoding, raw bytes) */
 export interface Payload {
   /** specifies the source port of the packet. */
@@ -134,14 +125,6 @@ export interface PayloadAminoMsg {
   type: "cosmos-sdk/Payload";
   value: PayloadAmino;
 }
-/** Payload contains the source and destination ports and payload for the application (version, encoding, raw bytes) */
-export interface PayloadSDKType {
-  source_port: string;
-  destination_port: string;
-  version: string;
-  encoding: string;
-  value: Uint8Array;
-}
 /**
  * Acknowledgement contains a list of all ack results associated with a single packet.
  * In the case of a successful receive, the acknowledgement will contain an app acknowledgement
@@ -172,17 +155,6 @@ export interface AcknowledgementAminoMsg {
   type: "cosmos-sdk/Acknowledgement";
   value: AcknowledgementAmino;
 }
-/**
- * Acknowledgement contains a list of all ack results associated with a single packet.
- * In the case of a successful receive, the acknowledgement will contain an app acknowledgement
- * for each application that received a payload in the same order that the payloads were sent
- * in the packet.
- * If the receive is not successful, the acknowledgement will contain a single app acknowledgment
- * which will be a constant error acknowledgment as defined by the IBC v2 protocol.
- */
-export interface AcknowledgementSDKType {
-  app_acknowledgements: Uint8Array[];
-}
 /** RecvPacketResult speecifies the status of a packet as well as the acknowledgement bytes. */
 export interface RecvPacketResult {
   /** status of the packet */
@@ -205,11 +177,6 @@ export interface RecvPacketResultAminoMsg {
   type: "cosmos-sdk/RecvPacketResult";
   value: RecvPacketResultAmino;
 }
-/** RecvPacketResult speecifies the status of a packet as well as the acknowledgement bytes. */
-export interface RecvPacketResultSDKType {
-  status: PacketStatus;
-  acknowledgement: Uint8Array;
-}
 function createBasePacket(): Packet {
   return {
     sequence: BigInt(0),
@@ -221,6 +188,7 @@ function createBasePacket(): Packet {
 }
 export const Packet = {
   typeUrl: "/ibc.core.channel.v2.Packet",
+  aminoType: "cosmos-sdk/Packet",
   encode(message: Packet, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sequence !== BigInt(0)) {
       writer.uint32(8).uint64(message.sequence);
@@ -268,7 +236,7 @@ export const Packet = {
     }
     return message;
   },
-  fromPartial(object: Partial<Packet>): Packet {
+  fromPartial(object: DeepPartial<Packet>): Packet {
     const message = createBasePacket();
     message.sequence = object.sequence !== undefined && object.sequence !== null ? BigInt(object.sequence.toString()) : BigInt(0);
     message.sourceClient = object.sourceClient ?? "";
@@ -340,6 +308,7 @@ function createBasePayload(): Payload {
 }
 export const Payload = {
   typeUrl: "/ibc.core.channel.v2.Payload",
+  aminoType: "cosmos-sdk/Payload",
   encode(message: Payload, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sourcePort !== "") {
       writer.uint32(10).string(message.sourcePort);
@@ -387,7 +356,7 @@ export const Payload = {
     }
     return message;
   },
-  fromPartial(object: Partial<Payload>): Payload {
+  fromPartial(object: DeepPartial<Payload>): Payload {
     const message = createBasePayload();
     message.sourcePort = object.sourcePort ?? "";
     message.destinationPort = object.destinationPort ?? "";
@@ -453,6 +422,7 @@ function createBaseAcknowledgement(): Acknowledgement {
 }
 export const Acknowledgement = {
   typeUrl: "/ibc.core.channel.v2.Acknowledgement",
+  aminoType: "cosmos-sdk/Acknowledgement",
   encode(message: Acknowledgement, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.appAcknowledgements) {
       writer.uint32(10).bytes(v!);
@@ -476,7 +446,7 @@ export const Acknowledgement = {
     }
     return message;
   },
-  fromPartial(object: Partial<Acknowledgement>): Acknowledgement {
+  fromPartial(object: DeepPartial<Acknowledgement>): Acknowledgement {
     const message = createBaseAcknowledgement();
     message.appAcknowledgements = object.appAcknowledgements?.map(e => e) || [];
     return message;
@@ -525,6 +495,7 @@ function createBaseRecvPacketResult(): RecvPacketResult {
 }
 export const RecvPacketResult = {
   typeUrl: "/ibc.core.channel.v2.RecvPacketResult",
+  aminoType: "cosmos-sdk/RecvPacketResult",
   encode(message: RecvPacketResult, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.status !== 0) {
       writer.uint32(8).int32(message.status);
@@ -554,7 +525,7 @@ export const RecvPacketResult = {
     }
     return message;
   },
-  fromPartial(object: Partial<RecvPacketResult>): RecvPacketResult {
+  fromPartial(object: DeepPartial<RecvPacketResult>): RecvPacketResult {
     const message = createBaseRecvPacketResult();
     message.status = object.status ?? 0;
     message.acknowledgement = object.acknowledgement ?? new Uint8Array();

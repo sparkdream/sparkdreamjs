@@ -1,7 +1,7 @@
 //@ts-nocheck
-import { CommitmentProof, CommitmentProofAmino, CommitmentProofSDKType } from "../../../../cosmos/ics23/v1/proofs";
+import { CommitmentProof, CommitmentProofAmino } from "../../../../cosmos/ics23/v1/proofs";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /**
  * MerkleRoot defines a merkle root hash.
  * In the Cosmos SDK, the AppHash of a block header becomes the root.
@@ -23,13 +23,6 @@ export interface MerkleRootAmino {
 export interface MerkleRootAminoMsg {
   type: "cosmos-sdk/MerkleRoot";
   value: MerkleRootAmino;
-}
-/**
- * MerkleRoot defines a merkle root hash.
- * In the Cosmos SDK, the AppHash of a block header becomes the root.
- */
-export interface MerkleRootSDKType {
-  hash: Uint8Array;
 }
 /**
  * MerklePrefix is merkle path prefixed to the key.
@@ -54,14 +47,6 @@ export interface MerklePrefixAmino {
 export interface MerklePrefixAminoMsg {
   type: "cosmos-sdk/MerklePrefix";
   value: MerklePrefixAmino;
-}
-/**
- * MerklePrefix is merkle path prefixed to the key.
- * The constructed key from the Path and the key will be append(Path.KeyPath,
- * append(Path.KeyPrefix, key...))
- */
-export interface MerklePrefixSDKType {
-  key_prefix: Uint8Array;
 }
 /**
  * MerkleProof is a wrapper type over a chain of CommitmentProofs.
@@ -91,16 +76,6 @@ export interface MerkleProofAminoMsg {
   type: "cosmos-sdk/MerkleProof";
   value: MerkleProofAmino;
 }
-/**
- * MerkleProof is a wrapper type over a chain of CommitmentProofs.
- * It demonstrates membership or non-membership for an element or set of
- * elements, verifiable in conjunction with a known commitment root. Proofs
- * should be succinct.
- * MerkleProofs are ordered from leaf-to-root
- */
-export interface MerkleProofSDKType {
-  proofs: CommitmentProofSDKType[];
-}
 function createBaseMerkleRoot(): MerkleRoot {
   return {
     hash: new Uint8Array()
@@ -108,6 +83,7 @@ function createBaseMerkleRoot(): MerkleRoot {
 }
 export const MerkleRoot = {
   typeUrl: "/ibc.core.commitment.v1.MerkleRoot",
+  aminoType: "cosmos-sdk/MerkleRoot",
   encode(message: MerkleRoot, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.hash.length !== 0) {
       writer.uint32(10).bytes(message.hash);
@@ -131,7 +107,7 @@ export const MerkleRoot = {
     }
     return message;
   },
-  fromPartial(object: Partial<MerkleRoot>): MerkleRoot {
+  fromPartial(object: DeepPartial<MerkleRoot>): MerkleRoot {
     const message = createBaseMerkleRoot();
     message.hash = object.hash ?? new Uint8Array();
     return message;
@@ -177,6 +153,7 @@ function createBaseMerklePrefix(): MerklePrefix {
 }
 export const MerklePrefix = {
   typeUrl: "/ibc.core.commitment.v1.MerklePrefix",
+  aminoType: "cosmos-sdk/MerklePrefix",
   encode(message: MerklePrefix, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.keyPrefix.length !== 0) {
       writer.uint32(10).bytes(message.keyPrefix);
@@ -200,7 +177,7 @@ export const MerklePrefix = {
     }
     return message;
   },
-  fromPartial(object: Partial<MerklePrefix>): MerklePrefix {
+  fromPartial(object: DeepPartial<MerklePrefix>): MerklePrefix {
     const message = createBaseMerklePrefix();
     message.keyPrefix = object.keyPrefix ?? new Uint8Array();
     return message;
@@ -246,6 +223,7 @@ function createBaseMerkleProof(): MerkleProof {
 }
 export const MerkleProof = {
   typeUrl: "/ibc.core.commitment.v1.MerkleProof",
+  aminoType: "cosmos-sdk/MerkleProof",
   encode(message: MerkleProof, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.proofs) {
       CommitmentProof.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -269,7 +247,7 @@ export const MerkleProof = {
     }
     return message;
   },
-  fromPartial(object: Partial<MerkleProof>): MerkleProof {
+  fromPartial(object: DeepPartial<MerkleProof>): MerkleProof {
     const message = createBaseMerkleProof();
     message.proofs = object.proofs?.map(e => CommitmentProof.fromPartial(e)) || [];
     return message;

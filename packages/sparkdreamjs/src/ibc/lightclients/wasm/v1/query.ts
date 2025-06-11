@@ -1,7 +1,7 @@
 //@ts-nocheck
-import { PageRequest, PageRequestAmino, PageRequestSDKType, PageResponse, PageResponseAmino, PageResponseSDKType } from "../../../../cosmos/base/query/v1beta1/pagination";
+import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "../../../../cosmos/base/query/v1beta1/pagination";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /** QueryChecksumsRequest is the request type for the Query/Checksums RPC method. */
 export interface QueryChecksumsRequest {
   /** pagination defines an optional pagination for the request. */
@@ -19,10 +19,6 @@ export interface QueryChecksumsRequestAmino {
 export interface QueryChecksumsRequestAminoMsg {
   type: "cosmos-sdk/QueryChecksumsRequest";
   value: QueryChecksumsRequestAmino;
-}
-/** QueryChecksumsRequest is the request type for the Query/Checksums RPC method. */
-export interface QueryChecksumsRequestSDKType {
-  pagination?: PageRequestSDKType;
 }
 /** QueryChecksumsResponse is the response type for the Query/Checksums RPC method. */
 export interface QueryChecksumsResponse {
@@ -46,11 +42,6 @@ export interface QueryChecksumsResponseAminoMsg {
   type: "cosmos-sdk/QueryChecksumsResponse";
   value: QueryChecksumsResponseAmino;
 }
-/** QueryChecksumsResponse is the response type for the Query/Checksums RPC method. */
-export interface QueryChecksumsResponseSDKType {
-  checksums: string[];
-  pagination?: PageResponseSDKType;
-}
 /** QueryCodeRequest is the request type for the Query/Code RPC method. */
 export interface QueryCodeRequest {
   /** checksum is a hex encoded string of the code stored. */
@@ -69,10 +60,6 @@ export interface QueryCodeRequestAminoMsg {
   type: "cosmos-sdk/QueryCodeRequest";
   value: QueryCodeRequestAmino;
 }
-/** QueryCodeRequest is the request type for the Query/Code RPC method. */
-export interface QueryCodeRequestSDKType {
-  checksum: string;
-}
 /** QueryCodeResponse is the response type for the Query/Code RPC method. */
 export interface QueryCodeResponse {
   data: Uint8Array;
@@ -89,10 +76,6 @@ export interface QueryCodeResponseAminoMsg {
   type: "cosmos-sdk/QueryCodeResponse";
   value: QueryCodeResponseAmino;
 }
-/** QueryCodeResponse is the response type for the Query/Code RPC method. */
-export interface QueryCodeResponseSDKType {
-  data: Uint8Array;
-}
 function createBaseQueryChecksumsRequest(): QueryChecksumsRequest {
   return {
     pagination: undefined
@@ -100,6 +83,7 @@ function createBaseQueryChecksumsRequest(): QueryChecksumsRequest {
 }
 export const QueryChecksumsRequest = {
   typeUrl: "/ibc.lightclients.wasm.v1.QueryChecksumsRequest",
+  aminoType: "cosmos-sdk/QueryChecksumsRequest",
   encode(message: QueryChecksumsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
@@ -123,7 +107,7 @@ export const QueryChecksumsRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryChecksumsRequest>): QueryChecksumsRequest {
+  fromPartial(object: DeepPartial<QueryChecksumsRequest>): QueryChecksumsRequest {
     const message = createBaseQueryChecksumsRequest();
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
     return message;
@@ -170,6 +154,7 @@ function createBaseQueryChecksumsResponse(): QueryChecksumsResponse {
 }
 export const QueryChecksumsResponse = {
   typeUrl: "/ibc.lightclients.wasm.v1.QueryChecksumsResponse",
+  aminoType: "cosmos-sdk/QueryChecksumsResponse",
   encode(message: QueryChecksumsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.checksums) {
       writer.uint32(10).string(v!);
@@ -199,7 +184,7 @@ export const QueryChecksumsResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryChecksumsResponse>): QueryChecksumsResponse {
+  fromPartial(object: DeepPartial<QueryChecksumsResponse>): QueryChecksumsResponse {
     const message = createBaseQueryChecksumsResponse();
     message.checksums = object.checksums?.map(e => e) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
@@ -252,6 +237,7 @@ function createBaseQueryCodeRequest(): QueryCodeRequest {
 }
 export const QueryCodeRequest = {
   typeUrl: "/ibc.lightclients.wasm.v1.QueryCodeRequest",
+  aminoType: "cosmos-sdk/QueryCodeRequest",
   encode(message: QueryCodeRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.checksum !== "") {
       writer.uint32(10).string(message.checksum);
@@ -275,7 +261,7 @@ export const QueryCodeRequest = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryCodeRequest>): QueryCodeRequest {
+  fromPartial(object: DeepPartial<QueryCodeRequest>): QueryCodeRequest {
     const message = createBaseQueryCodeRequest();
     message.checksum = object.checksum ?? "";
     return message;
@@ -321,6 +307,7 @@ function createBaseQueryCodeResponse(): QueryCodeResponse {
 }
 export const QueryCodeResponse = {
   typeUrl: "/ibc.lightclients.wasm.v1.QueryCodeResponse",
+  aminoType: "cosmos-sdk/QueryCodeResponse",
   encode(message: QueryCodeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.data.length !== 0) {
       writer.uint32(10).bytes(message.data);
@@ -344,7 +331,7 @@ export const QueryCodeResponse = {
     }
     return message;
   },
-  fromPartial(object: Partial<QueryCodeResponse>): QueryCodeResponse {
+  fromPartial(object: DeepPartial<QueryCodeResponse>): QueryCodeResponse {
     const message = createBaseQueryCodeResponse();
     message.data = object.data ?? new Uint8Array();
     return message;

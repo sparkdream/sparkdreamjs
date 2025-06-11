@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Rpc } from "../../../../helpers";
+import { TxRpc } from "../../../../types";
 import { BinaryReader } from "../../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
 import { GetRequest, GetResponse, ListRequest, ListResponse } from "./query";
@@ -11,22 +11,22 @@ export interface Query {
   list(request: ListRequest): Promise<ListResponse>;
 }
 export class QueryClientImpl implements Query {
-  private readonly rpc: Rpc;
-  constructor(rpc: Rpc) {
+  private readonly rpc: TxRpc;
+  constructor(rpc: TxRpc) {
     this.rpc = rpc;
-    this.get = this.get.bind(this);
-    this.list = this.list.bind(this);
   }
-  get(request: GetRequest): Promise<GetResponse> {
+  /* Get queries an ORM table against an unique index. */
+  get = async (request: GetRequest): Promise<GetResponse> => {
     const data = GetRequest.encode(request).finish();
     const promise = this.rpc.request("cosmos.orm.query.v1alpha1.Query", "Get", data);
     return promise.then(data => GetResponse.decode(new BinaryReader(data)));
-  }
-  list(request: ListRequest): Promise<ListResponse> {
+  };
+  /* List queries an ORM table against an index. */
+  list = async (request: ListRequest): Promise<ListResponse> => {
     const data = ListRequest.encode(request).finish();
     const promise = this.rpc.request("cosmos.orm.query.v1alpha1.Query", "List", data);
     return promise.then(data => ListResponse.decode(new BinaryReader(data)));
-  }
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);

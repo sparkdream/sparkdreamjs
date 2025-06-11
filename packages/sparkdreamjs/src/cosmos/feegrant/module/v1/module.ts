@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /** Module is the config object of the feegrant module. */
 export interface Module {}
 export interface ModuleProtoMsg {
@@ -12,13 +13,12 @@ export interface ModuleAminoMsg {
   type: "cosmos-sdk/Module";
   value: ModuleAmino;
 }
-/** Module is the config object of the feegrant module. */
-export interface ModuleSDKType {}
 function createBaseModule(): Module {
   return {};
 }
 export const Module = {
   typeUrl: "/cosmos.feegrant.module.v1.Module",
+  aminoType: "cosmos-sdk/Module",
   encode(_: Module, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -36,7 +36,7 @@ export const Module = {
     }
     return message;
   },
-  fromPartial(_: Partial<Module>): Module {
+  fromPartial(_: DeepPartial<Module>): Module {
     const message = createBaseModule();
     return message;
   },

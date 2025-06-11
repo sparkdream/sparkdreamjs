@@ -1,9 +1,9 @@
 //@ts-nocheck
-import { Vote, VoteAmino, VoteSDKType, LightBlock, LightBlockAmino, LightBlockSDKType } from "./types";
+import { Vote, VoteAmino, LightBlock, LightBlockAmino } from "./types";
 import { Timestamp } from "../../google/protobuf/timestamp";
-import { Validator, ValidatorAmino, ValidatorSDKType } from "./validator";
+import { Validator, ValidatorAmino } from "./validator";
 import { BinaryReader, BinaryWriter } from "../../binary";
-import { toTimestamp, fromTimestamp } from "../../helpers";
+import { DeepPartial, toTimestamp, fromTimestamp } from "../../helpers";
 export interface Evidence {
   duplicateVoteEvidence?: DuplicateVoteEvidence;
   lightClientAttackEvidence?: LightClientAttackEvidence;
@@ -19,10 +19,6 @@ export interface EvidenceAmino {
 export interface EvidenceAminoMsg {
   type: "/tendermint.types.Evidence";
   value: EvidenceAmino;
-}
-export interface EvidenceSDKType {
-  duplicate_vote_evidence?: DuplicateVoteEvidenceSDKType;
-  light_client_attack_evidence?: LightClientAttackEvidenceSDKType;
 }
 /** DuplicateVoteEvidence contains evidence of a validator signed two conflicting votes. */
 export interface DuplicateVoteEvidence {
@@ -48,14 +44,6 @@ export interface DuplicateVoteEvidenceAminoMsg {
   type: "/tendermint.types.DuplicateVoteEvidence";
   value: DuplicateVoteEvidenceAmino;
 }
-/** DuplicateVoteEvidence contains evidence of a validator signed two conflicting votes. */
-export interface DuplicateVoteEvidenceSDKType {
-  vote_a?: VoteSDKType;
-  vote_b?: VoteSDKType;
-  total_voting_power: bigint;
-  validator_power: bigint;
-  timestamp: Date;
-}
 /** LightClientAttackEvidence contains evidence of a set of validators attempting to mislead a light client. */
 export interface LightClientAttackEvidence {
   conflictingBlock?: LightBlock;
@@ -80,14 +68,6 @@ export interface LightClientAttackEvidenceAminoMsg {
   type: "/tendermint.types.LightClientAttackEvidence";
   value: LightClientAttackEvidenceAmino;
 }
-/** LightClientAttackEvidence contains evidence of a set of validators attempting to mislead a light client. */
-export interface LightClientAttackEvidenceSDKType {
-  conflicting_block?: LightBlockSDKType;
-  common_height: bigint;
-  byzantine_validators: ValidatorSDKType[];
-  total_voting_power: bigint;
-  timestamp: Date;
-}
 export interface EvidenceList {
   evidence: Evidence[];
 }
@@ -101,9 +81,6 @@ export interface EvidenceListAmino {
 export interface EvidenceListAminoMsg {
   type: "/tendermint.types.EvidenceList";
   value: EvidenceListAmino;
-}
-export interface EvidenceListSDKType {
-  evidence: EvidenceSDKType[];
 }
 function createBaseEvidence(): Evidence {
   return {
@@ -142,7 +119,7 @@ export const Evidence = {
     }
     return message;
   },
-  fromPartial(object: Partial<Evidence>): Evidence {
+  fromPartial(object: DeepPartial<Evidence>): Evidence {
     const message = createBaseEvidence();
     message.duplicateVoteEvidence = object.duplicateVoteEvidence !== undefined && object.duplicateVoteEvidence !== null ? DuplicateVoteEvidence.fromPartial(object.duplicateVoteEvidence) : undefined;
     message.lightClientAttackEvidence = object.lightClientAttackEvidence !== undefined && object.lightClientAttackEvidence !== null ? LightClientAttackEvidence.fromPartial(object.lightClientAttackEvidence) : undefined;
@@ -238,7 +215,7 @@ export const DuplicateVoteEvidence = {
     }
     return message;
   },
-  fromPartial(object: Partial<DuplicateVoteEvidence>): DuplicateVoteEvidence {
+  fromPartial(object: DeepPartial<DuplicateVoteEvidence>): DuplicateVoteEvidence {
     const message = createBaseDuplicateVoteEvidence();
     message.voteA = object.voteA !== undefined && object.voteA !== null ? Vote.fromPartial(object.voteA) : undefined;
     message.voteB = object.voteB !== undefined && object.voteB !== null ? Vote.fromPartial(object.voteB) : undefined;
@@ -349,7 +326,7 @@ export const LightClientAttackEvidence = {
     }
     return message;
   },
-  fromPartial(object: Partial<LightClientAttackEvidence>): LightClientAttackEvidence {
+  fromPartial(object: DeepPartial<LightClientAttackEvidence>): LightClientAttackEvidence {
     const message = createBaseLightClientAttackEvidence();
     message.conflictingBlock = object.conflictingBlock !== undefined && object.conflictingBlock !== null ? LightBlock.fromPartial(object.conflictingBlock) : undefined;
     message.commonHeight = object.commonHeight !== undefined && object.commonHeight !== null ? BigInt(object.commonHeight.toString()) : BigInt(0);
@@ -434,7 +411,7 @@ export const EvidenceList = {
     }
     return message;
   },
-  fromPartial(object: Partial<EvidenceList>): EvidenceList {
+  fromPartial(object: DeepPartial<EvidenceList>): EvidenceList {
     const message = createBaseEvidenceList();
     message.evidence = object.evidence?.map(e => Evidence.fromPartial(e)) || [];
     return message;
