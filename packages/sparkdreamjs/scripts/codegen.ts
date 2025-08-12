@@ -13,12 +13,37 @@ export const options: TelescopeInput = {
   protoDirs,
   outPath,
   options: {
+    classesUseArrowFunctions: true,
+    env: 'v-next',
+    useInterchainJs: true,
+    useSDKTypes: false,
     interfaces: {
       enabled: true,
       useUnionTypes: true
     },
     prototypes: {
       enabled: true,
+      enableRegistryLoader: true,
+      enableMessageComposer: true,
+      parser: {
+        keepCase: false
+      },
+      addTypeUrlToDecoders: false,
+      addTypeUrlToObjects: true,
+      addAminoTypeToObjects: true,
+      typingsFormat: {
+        duration: 'duration',
+        timestamp: 'date',
+        useExact: false,
+        useDeepPartial: true,
+        num64: 'bigint',
+        customTypes: {
+          useCosmosSDKDec: true,
+          useEnhancedDecimal: false
+        },
+        useTelescopeGeneratedType: true,
+        autoFixUndefinedEnumDefault: true
+      },
       excluded: {
         packages: [
           'ibc.applications.fee.v1', // issue with parsing protos (LCD routes with nested objects in params)
