@@ -1,0 +1,55 @@
+//@ts-nocheck
+import { TxRpc } from "../../../types";
+import { BinaryReader } from "../../../binary";
+import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
+import { QueryParamsRequest, QueryParamsResponse, QueryShowPostRequest, QueryShowPostResponse, QueryListPostRequest, QueryListPostResponse } from "./query";
+/** Query defines the gRPC querier service. */
+export interface Query {
+  /** Parameters queries the parameters of the module. */
+  params(request?: QueryParamsRequest): Promise<QueryParamsResponse>;
+  /** ShowPost Queries a list of ShowPost items. */
+  showPost(request: QueryShowPostRequest): Promise<QueryShowPostResponse>;
+  /** ListPost Queries a list of ListPost items. */
+  listPost(request?: QueryListPostRequest): Promise<QueryListPostResponse>;
+}
+export class QueryClientImpl implements Query {
+  private readonly rpc: TxRpc;
+  constructor(rpc: TxRpc) {
+    this.rpc = rpc;
+  }
+  /* Parameters queries the parameters of the module. */
+  params = async (request: QueryParamsRequest = {}): Promise<QueryParamsResponse> => {
+    const data = QueryParamsRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.blog.v1.Query", "Params", data);
+    return promise.then(data => QueryParamsResponse.decode(new BinaryReader(data)));
+  };
+  /* ShowPost Queries a list of ShowPost items. */
+  showPost = async (request: QueryShowPostRequest): Promise<QueryShowPostResponse> => {
+    const data = QueryShowPostRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.blog.v1.Query", "ShowPost", data);
+    return promise.then(data => QueryShowPostResponse.decode(new BinaryReader(data)));
+  };
+  /* ListPost Queries a list of ListPost items. */
+  listPost = async (request: QueryListPostRequest = {
+    pagination: undefined
+  }): Promise<QueryListPostResponse> => {
+    const data = QueryListPostRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.blog.v1.Query", "ListPost", data);
+    return promise.then(data => QueryListPostResponse.decode(new BinaryReader(data)));
+  };
+}
+export const createRpcQueryExtension = (base: QueryClient) => {
+  const rpc = createProtobufRpcClient(base);
+  const queryService = new QueryClientImpl(rpc);
+  return {
+    params(request?: QueryParamsRequest): Promise<QueryParamsResponse> {
+      return queryService.params(request);
+    },
+    showPost(request: QueryShowPostRequest): Promise<QueryShowPostResponse> {
+      return queryService.showPost(request);
+    },
+    listPost(request?: QueryListPostRequest): Promise<QueryListPostResponse> {
+      return queryService.listPost(request);
+    }
+  };
+};
