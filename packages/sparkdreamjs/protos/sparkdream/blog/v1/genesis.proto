@@ -4,6 +4,8 @@ package sparkdream.blog.v1;
 import "amino/amino.proto";
 import "gogoproto/gogo.proto";
 import "sparkdream/blog/v1/params.proto";
+import "sparkdream/blog/v1/post.proto";
+import "sparkdream/blog/v1/types.proto";
 
 option go_package = "sparkdream/x/blog/types";
 
@@ -14,4 +16,22 @@ message GenesisState {
     (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true
   ];
+
+  // posts is the list of all posts.
+  repeated Post posts = 2 [(gogoproto.nullable) = false];
+
+  // post_count is the next auto-increment ID for posts.
+  uint64 post_count = 3;
+
+  // replies is the list of all replies.
+  repeated Reply replies = 4 [(gogoproto.nullable) = false];
+
+  // reply_count is the next auto-increment ID for replies.
+  uint64 reply_count = 5;
+
+  // reactions is the list of all individual reactions.
+  repeated Reaction reactions = 6 [(gogoproto.nullable) = false];
+
+  // reaction_counts is the list of all aggregate reaction counts.
+  repeated GenesisReactionCounts reaction_counts = 7 [(gogoproto.nullable) = false];
 }

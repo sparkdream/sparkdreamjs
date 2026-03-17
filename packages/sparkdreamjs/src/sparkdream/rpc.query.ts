@@ -72,8 +72,44 @@ export const createRPCQueryClient = async ({
       blog: {
         v1: (await import("./blog/v1/query.rpc.Query")).createRpcQueryExtension(client)
       },
+      collect: {
+        v1: (await import("./collect/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
+      commons: {
+        v1: (await import("./commons/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
+      ecosystem: {
+        v1: (await import("./ecosystem/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
+      forum: {
+        v1: (await import("./forum/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
+      futarchy: {
+        v1: (await import("./futarchy/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
+      name: {
+        v1: (await import("./name/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
+      rep: {
+        v1: (await import("./rep/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
+      reveal: {
+        v1: (await import("./reveal/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
+      season: {
+        v1: (await import("./season/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
+      session: {
+        v1: (await import("./session/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
+      shield: {
+        v1: (await import("./shield/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
       sparkdream: {
         v1: (await import("./sparkdream/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
+      split: {
+        v1: (await import("./split/v1/query.rpc.Query")).createRpcQueryExtension(client)
       }
     }
   };

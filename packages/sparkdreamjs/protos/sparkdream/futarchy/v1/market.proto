@@ -1,0 +1,34 @@
+syntax = "proto3";
+package sparkdream.futarchy.v1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "sparkdream/x/futarchy/types";
+
+// Market defines the Market message.
+message Market {
+  // Metadata
+  uint64 index = 1;
+  string creator = 2;
+  string symbol = 3;
+  string question = 4;
+
+  // Configuration
+  string denom = 5;
+  string min_tick = 6 [(gogoproto.customtype) = "cosmossdk.io/math.Int"];
+
+  // Temporal properties
+  int64 end_block = 7;
+  int64 redemption_blocks = 8;
+  int64 resolution_height = 9;
+  string status = 10;
+
+  // LMSR state
+  string b_value = 11 [(gogoproto.customtype) = "cosmossdk.io/math.LegacyDec"];
+  string pool_yes = 12 [(gogoproto.customtype) = "cosmossdk.io/math.Int"];
+  string pool_no = 13 [(gogoproto.customtype) = "cosmossdk.io/math.Int"];
+
+  // Liquidity tracking
+  string initial_liquidity = 14 [(gogoproto.customtype) = "cosmossdk.io/math.Int"];
+  string liquidity_withdrawn = 15 [(gogoproto.customtype) = "cosmossdk.io/math.Int"];
+}

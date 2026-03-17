@@ -60,8 +60,44 @@ export const createRPCMsgClient = async ({
     blog: {
       v1: new (await import("./blog/v1/tx.rpc.msg")).MsgClientImpl(rpc)
     },
+    collect: {
+      v1: new (await import("./collect/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    },
+    commons: {
+      v1: new (await import("./commons/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    },
+    ecosystem: {
+      v1: new (await import("./ecosystem/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    },
+    forum: {
+      v1: new (await import("./forum/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    },
+    futarchy: {
+      v1: new (await import("./futarchy/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    },
+    name: {
+      v1: new (await import("./name/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    },
+    rep: {
+      v1: new (await import("./rep/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    },
+    reveal: {
+      v1: new (await import("./reveal/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    },
+    season: {
+      v1: new (await import("./season/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    },
+    session: {
+      v1: new (await import("./session/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    },
+    shield: {
+      v1: new (await import("./shield/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    },
     sparkdream: {
       v1: new (await import("./sparkdream/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    },
+    split: {
+      v1: new (await import("./split/v1/tx.rpc.msg")).MsgClientImpl(rpc)
     }
   }
 });

@@ -107,8 +107,68 @@ export const createLCDClient = async ({
           requestClient
         })
       },
+      collect: {
+        v1: new (await import("./collect/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
+      commons: {
+        v1: new (await import("./commons/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
+      ecosystem: {
+        v1: new (await import("./ecosystem/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
+      forum: {
+        v1: new (await import("./forum/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
+      futarchy: {
+        v1: new (await import("./futarchy/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
+      name: {
+        v1: new (await import("./name/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
+      rep: {
+        v1: new (await import("./rep/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
+      reveal: {
+        v1: new (await import("./reveal/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
+      season: {
+        v1: new (await import("./season/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
+      session: {
+        v1: new (await import("./session/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
+      shield: {
+        v1: new (await import("./shield/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
       sparkdream: {
         v1: new (await import("./sparkdream/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
+      split: {
+        v1: new (await import("./split/v1/query.lcd")).LCDQueryClient({
           requestClient
         })
       }

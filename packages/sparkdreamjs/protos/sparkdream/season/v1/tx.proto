@@ -1,0 +1,712 @@
+syntax = "proto3";
+
+package sparkdream.season.v1;
+
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "sparkdream/season/v1/params.proto";
+
+option go_package = "sparkdream/x/season/types";
+
+// Msg defines the Msg service.
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  // UpdateParams defines a (governance) operation for updating the module
+  // parameters. The authority defaults to the x/gov module account.
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
+
+  // UpdateOperationalParams defines an operation for updating the module
+  // operational parameters. Can be called by the Operations Committee.
+  rpc UpdateOperationalParams(MsgUpdateOperationalParams) returns (MsgUpdateOperationalParamsResponse);
+
+  // SetDisplayName defines the SetDisplayName RPC.
+  rpc SetDisplayName(MsgSetDisplayName) returns (MsgSetDisplayNameResponse);
+
+  // SetUsername defines the SetUsername RPC.
+  rpc SetUsername(MsgSetUsername) returns (MsgSetUsernameResponse);
+
+  // SetDisplayTitle defines the SetDisplayTitle RPC.
+  rpc SetDisplayTitle(MsgSetDisplayTitle) returns (MsgSetDisplayTitleResponse);
+
+  // CreateGuild defines the CreateGuild RPC.
+  rpc CreateGuild(MsgCreateGuild) returns (MsgCreateGuildResponse);
+
+  // JoinGuild defines the JoinGuild RPC.
+  rpc JoinGuild(MsgJoinGuild) returns (MsgJoinGuildResponse);
+
+  // LeaveGuild defines the LeaveGuild RPC.
+  rpc LeaveGuild(MsgLeaveGuild) returns (MsgLeaveGuildResponse);
+
+  // TransferGuildFounder defines the TransferGuildFounder RPC.
+  rpc TransferGuildFounder(MsgTransferGuildFounder) returns (MsgTransferGuildFounderResponse);
+
+  // DissolveGuild defines the DissolveGuild RPC.
+  rpc DissolveGuild(MsgDissolveGuild) returns (MsgDissolveGuildResponse);
+
+  // PromoteToOfficer defines the PromoteToOfficer RPC.
+  rpc PromoteToOfficer(MsgPromoteToOfficer) returns (MsgPromoteToOfficerResponse);
+
+  // DemoteOfficer defines the DemoteOfficer RPC.
+  rpc DemoteOfficer(MsgDemoteOfficer) returns (MsgDemoteOfficerResponse);
+
+  // InviteToGuild defines the InviteToGuild RPC.
+  rpc InviteToGuild(MsgInviteToGuild) returns (MsgInviteToGuildResponse);
+
+  // AcceptGuildInvite defines the AcceptGuildInvite RPC.
+  rpc AcceptGuildInvite(MsgAcceptGuildInvite) returns (MsgAcceptGuildInviteResponse);
+
+  // RevokeGuildInvite defines the RevokeGuildInvite RPC.
+  rpc RevokeGuildInvite(MsgRevokeGuildInvite) returns (MsgRevokeGuildInviteResponse);
+
+  // SetGuildInviteOnly defines the SetGuildInviteOnly RPC.
+  rpc SetGuildInviteOnly(MsgSetGuildInviteOnly) returns (MsgSetGuildInviteOnlyResponse);
+
+  // UpdateGuildDescription defines the UpdateGuildDescription RPC.
+  rpc UpdateGuildDescription(MsgUpdateGuildDescription) returns (MsgUpdateGuildDescriptionResponse);
+
+  // KickFromGuild defines the KickFromGuild RPC.
+  rpc KickFromGuild(MsgKickFromGuild) returns (MsgKickFromGuildResponse);
+
+  // ClaimGuildFounder defines the ClaimGuildFounder RPC.
+  rpc ClaimGuildFounder(MsgClaimGuildFounder) returns (MsgClaimGuildFounderResponse);
+
+  // StartQuest defines the StartQuest RPC.
+  rpc StartQuest(MsgStartQuest) returns (MsgStartQuestResponse);
+
+  // ClaimQuestReward defines the ClaimQuestReward RPC.
+  rpc ClaimQuestReward(MsgClaimQuestReward) returns (MsgClaimQuestRewardResponse);
+
+  // AbandonQuest defines the AbandonQuest RPC.
+  rpc AbandonQuest(MsgAbandonQuest) returns (MsgAbandonQuestResponse);
+
+  // CreateQuest defines the CreateQuest RPC.
+  rpc CreateQuest(MsgCreateQuest) returns (MsgCreateQuestResponse);
+
+  // DeactivateQuest defines the DeactivateQuest RPC.
+  rpc DeactivateQuest(MsgDeactivateQuest) returns (MsgDeactivateQuestResponse);
+
+  // ExtendSeason defines the ExtendSeason RPC.
+  rpc ExtendSeason(MsgExtendSeason) returns (MsgExtendSeasonResponse);
+
+  // SetNextSeasonInfo defines the SetNextSeasonInfo RPC.
+  rpc SetNextSeasonInfo(MsgSetNextSeasonInfo) returns (MsgSetNextSeasonInfoResponse);
+
+  // AbortSeasonTransition defines the AbortSeasonTransition RPC.
+  rpc AbortSeasonTransition(MsgAbortSeasonTransition) returns (MsgAbortSeasonTransitionResponse);
+
+  // RetrySeasonTransition defines the RetrySeasonTransition RPC.
+  rpc RetrySeasonTransition(MsgRetrySeasonTransition) returns (MsgRetrySeasonTransitionResponse);
+
+  // SkipTransitionPhase defines the SkipTransitionPhase RPC.
+  rpc SkipTransitionPhase(MsgSkipTransitionPhase) returns (MsgSkipTransitionPhaseResponse);
+
+  // ReportDisplayName defines the ReportDisplayName RPC.
+  rpc ReportDisplayName(MsgReportDisplayName) returns (MsgReportDisplayNameResponse);
+
+  // AppealDisplayNameModeration defines the AppealDisplayNameModeration RPC.
+  rpc AppealDisplayNameModeration(MsgAppealDisplayNameModeration) returns (MsgAppealDisplayNameModerationResponse);
+
+  // Achievement management (Commons Council / Operations Committee)
+  rpc CreateAchievement(MsgCreateAchievement) returns (MsgCreateAchievementResponse);
+  rpc UpdateAchievement(MsgUpdateAchievement) returns (MsgUpdateAchievementResponse);
+  rpc DeleteAchievement(MsgDeleteAchievement) returns (MsgDeleteAchievementResponse);
+
+  // Title management (Commons Council / Operations Committee)
+  rpc CreateTitle(MsgCreateTitle) returns (MsgCreateTitleResponse);
+  rpc UpdateTitle(MsgUpdateTitle) returns (MsgUpdateTitleResponse);
+  rpc DeleteTitle(MsgDeleteTitle) returns (MsgDeleteTitleResponse);
+
+  // UpdateQuest allows updating quest details (Commons Council / Operations Committee)
+  rpc UpdateQuest(MsgUpdateQuest) returns (MsgUpdateQuestResponse);
+
+  // ResolveDisplayNameAppeal defines the ResolveDisplayNameAppeal RPC.
+  rpc ResolveDisplayNameAppeal(MsgResolveDisplayNameAppeal) returns (MsgResolveDisplayNameAppealResponse);
+
+  // ResolveUnappealedModeration resolves a display name moderation where the appeal period
+  // expired without an appeal being filed. The report is upheld and the reporter's stake is returned.
+  rpc ResolveUnappealedModeration(MsgResolveUnappealedModeration) returns (MsgResolveUnappealedModerationResponse);
+
+  // Nominate creates a retroactive public goods funding nomination.
+  rpc Nominate(MsgNominate) returns (MsgNominateResponse);
+
+  // StakeNomination stakes DREAM on a nomination.
+  rpc StakeNomination(MsgStakeNomination) returns (MsgStakeNominationResponse);
+
+  // UnstakeNomination removes a DREAM stake from a nomination.
+  rpc UnstakeNomination(MsgUnstakeNomination) returns (MsgUnstakeNominationResponse);
+}
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sparkdream/x/season/MsgUpdateParams";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // params defines the module parameters to update.
+
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+message MsgUpdateParamsResponse {}
+
+// MsgUpdateOperationalParams is the Msg/UpdateOperationalParams request type.
+message MsgUpdateOperationalParams {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sparkdream/x/season/MsgUpdateOperationalParams";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // operational_params defines the operational parameters to update.
+  SeasonOperationalParams operational_params = 2 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// MsgUpdateOperationalParamsResponse defines the response structure for executing a
+// MsgUpdateOperationalParams message.
+message MsgUpdateOperationalParamsResponse {}
+
+// MsgSetDisplayName defines the MsgSetDisplayName message.
+message MsgSetDisplayName {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string name = 2;
+}
+
+// MsgSetDisplayNameResponse defines the MsgSetDisplayNameResponse message.
+message MsgSetDisplayNameResponse {}
+
+// MsgSetUsername defines the MsgSetUsername message.
+message MsgSetUsername {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string username = 2;
+}
+
+// MsgSetUsernameResponse defines the MsgSetUsernameResponse message.
+message MsgSetUsernameResponse {}
+
+// MsgSetDisplayTitle defines the MsgSetDisplayTitle message.
+message MsgSetDisplayTitle {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string title_id = 2;
+}
+
+// MsgSetDisplayTitleResponse defines the MsgSetDisplayTitleResponse message.
+message MsgSetDisplayTitleResponse {}
+
+// MsgCreateGuild defines the MsgCreateGuild message.
+message MsgCreateGuild {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string name = 2;
+  string description = 3;
+  bool invite_only = 4;
+}
+
+// MsgCreateGuildResponse defines the MsgCreateGuildResponse message.
+message MsgCreateGuildResponse {}
+
+// MsgJoinGuild defines the MsgJoinGuild message.
+message MsgJoinGuild {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 guild_id = 2;
+}
+
+// MsgJoinGuildResponse defines the MsgJoinGuildResponse message.
+message MsgJoinGuildResponse {}
+
+// MsgLeaveGuild defines the MsgLeaveGuild message.
+message MsgLeaveGuild {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// MsgLeaveGuildResponse defines the MsgLeaveGuildResponse message.
+message MsgLeaveGuildResponse {}
+
+// MsgTransferGuildFounder defines the MsgTransferGuildFounder message.
+message MsgTransferGuildFounder {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 guild_id = 2;
+  string new_founder = 3;
+}
+
+// MsgTransferGuildFounderResponse defines the MsgTransferGuildFounderResponse message.
+message MsgTransferGuildFounderResponse {}
+
+// MsgDissolveGuild defines the MsgDissolveGuild message.
+message MsgDissolveGuild {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 guild_id = 2;
+}
+
+// MsgDissolveGuildResponse defines the MsgDissolveGuildResponse message.
+message MsgDissolveGuildResponse {}
+
+// MsgPromoteToOfficer defines the MsgPromoteToOfficer message.
+message MsgPromoteToOfficer {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 guild_id = 2;
+  string member = 3;
+}
+
+// MsgPromoteToOfficerResponse defines the MsgPromoteToOfficerResponse message.
+message MsgPromoteToOfficerResponse {}
+
+// MsgDemoteOfficer defines the MsgDemoteOfficer message.
+message MsgDemoteOfficer {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 guild_id = 2;
+  string officer = 3;
+}
+
+// MsgDemoteOfficerResponse defines the MsgDemoteOfficerResponse message.
+message MsgDemoteOfficerResponse {}
+
+// MsgInviteToGuild defines the MsgInviteToGuild message.
+message MsgInviteToGuild {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 guild_id = 2;
+  string invitee = 3;
+}
+
+// MsgInviteToGuildResponse defines the MsgInviteToGuildResponse message.
+message MsgInviteToGuildResponse {}
+
+// MsgAcceptGuildInvite defines the MsgAcceptGuildInvite message.
+message MsgAcceptGuildInvite {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 guild_id = 2;
+}
+
+// MsgAcceptGuildInviteResponse defines the MsgAcceptGuildInviteResponse message.
+message MsgAcceptGuildInviteResponse {}
+
+// MsgRevokeGuildInvite defines the MsgRevokeGuildInvite message.
+message MsgRevokeGuildInvite {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 guild_id = 2;
+  string invitee = 3;
+}
+
+// MsgRevokeGuildInviteResponse defines the MsgRevokeGuildInviteResponse message.
+message MsgRevokeGuildInviteResponse {}
+
+// MsgSetGuildInviteOnly defines the MsgSetGuildInviteOnly message.
+message MsgSetGuildInviteOnly {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 guild_id = 2;
+  bool invite_only = 3;
+}
+
+// MsgSetGuildInviteOnlyResponse defines the MsgSetGuildInviteOnlyResponse message.
+message MsgSetGuildInviteOnlyResponse {}
+
+// MsgUpdateGuildDescription defines the MsgUpdateGuildDescription message.
+message MsgUpdateGuildDescription {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 guild_id = 2;
+  string description = 3;
+}
+
+// MsgUpdateGuildDescriptionResponse defines the MsgUpdateGuildDescriptionResponse message.
+message MsgUpdateGuildDescriptionResponse {}
+
+// MsgKickFromGuild defines the MsgKickFromGuild message.
+message MsgKickFromGuild {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 guild_id = 2;
+  string member = 3;
+  string reason = 4;
+}
+
+// MsgKickFromGuildResponse defines the MsgKickFromGuildResponse message.
+message MsgKickFromGuildResponse {}
+
+// MsgClaimGuildFounder defines the MsgClaimGuildFounder message.
+message MsgClaimGuildFounder {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 guild_id = 2;
+}
+
+// MsgClaimGuildFounderResponse defines the MsgClaimGuildFounderResponse message.
+message MsgClaimGuildFounderResponse {}
+
+// MsgStartQuest defines the MsgStartQuest message.
+message MsgStartQuest {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string quest_id = 2;
+}
+
+// MsgStartQuestResponse defines the MsgStartQuestResponse message.
+message MsgStartQuestResponse {}
+
+// MsgClaimQuestReward defines the MsgClaimQuestReward message.
+message MsgClaimQuestReward {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string quest_id = 2;
+}
+
+// MsgClaimQuestRewardResponse defines the MsgClaimQuestRewardResponse message.
+message MsgClaimQuestRewardResponse {}
+
+// MsgAbandonQuest defines the MsgAbandonQuest message.
+message MsgAbandonQuest {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string quest_id = 2;
+}
+
+// MsgAbandonQuestResponse defines the MsgAbandonQuestResponse message.
+message MsgAbandonQuestResponse {}
+
+// MsgCreateQuest defines the MsgCreateQuest message (governance-gated).
+message MsgCreateQuest {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sparkdream/x/season/MsgCreateQuest";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string quest_id = 2;
+  string name = 3;
+  string description = 4;
+  uint64 xp_reward = 5;
+  bool repeatable = 6;
+  uint64 cooldown_epochs = 7;
+  uint64 season = 8;
+  int64 start_block = 9;
+  int64 end_block = 10;
+  uint64 min_level = 11;
+  string required_achievement = 12;
+  string prerequisite_quest = 13;
+  string quest_chain = 14;
+}
+
+// MsgCreateQuestResponse defines the MsgCreateQuestResponse message.
+message MsgCreateQuestResponse {}
+
+// MsgDeactivateQuest defines the MsgDeactivateQuest message (governance-gated).
+message MsgDeactivateQuest {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sparkdream/x/season/MsgDeactivateQuest";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string quest_id = 2;
+}
+
+// MsgDeactivateQuestResponse defines the MsgDeactivateQuestResponse message.
+message MsgDeactivateQuestResponse {}
+
+// MsgExtendSeason defines the MsgExtendSeason message (governance-gated).
+message MsgExtendSeason {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sparkdream/x/season/MsgExtendSeason";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 extension_epochs = 2;
+  string reason = 3;
+}
+
+// MsgExtendSeasonResponse defines the MsgExtendSeasonResponse message.
+message MsgExtendSeasonResponse {}
+
+// MsgSetNextSeasonInfo defines the MsgSetNextSeasonInfo message (governance-gated).
+message MsgSetNextSeasonInfo {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sparkdream/x/season/MsgSetNextSeasonInfo";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string name = 2;
+  string theme = 3;
+}
+
+// MsgSetNextSeasonInfoResponse defines the MsgSetNextSeasonInfoResponse message.
+message MsgSetNextSeasonInfoResponse {}
+
+// MsgAbortSeasonTransition defines the MsgAbortSeasonTransition message (governance-gated).
+message MsgAbortSeasonTransition {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sparkdream/x/season/MsgAbortSeasonTransition";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// MsgAbortSeasonTransitionResponse defines the MsgAbortSeasonTransitionResponse message.
+message MsgAbortSeasonTransitionResponse {}
+
+// MsgRetrySeasonTransition defines the MsgRetrySeasonTransition message (governance-gated).
+message MsgRetrySeasonTransition {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sparkdream/x/season/MsgRetrySeasonTransition";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// MsgRetrySeasonTransitionResponse defines the MsgRetrySeasonTransitionResponse message.
+message MsgRetrySeasonTransitionResponse {}
+
+// MsgSkipTransitionPhase defines the MsgSkipTransitionPhase message (governance-gated).
+message MsgSkipTransitionPhase {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sparkdream/x/season/MsgSkipTransitionPhase";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// MsgSkipTransitionPhaseResponse defines the MsgSkipTransitionPhaseResponse message.
+message MsgSkipTransitionPhaseResponse {}
+
+// MsgReportDisplayName defines the MsgReportDisplayName message.
+message MsgReportDisplayName {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string target = 2;
+  string reason = 3;
+}
+
+// MsgReportDisplayNameResponse defines the MsgReportDisplayNameResponse message.
+message MsgReportDisplayNameResponse {}
+
+// MsgAppealDisplayNameModeration defines the MsgAppealDisplayNameModeration message.
+message MsgAppealDisplayNameModeration {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string appeal_reason = 2;
+}
+
+// MsgAppealDisplayNameModerationResponse defines the MsgAppealDisplayNameModerationResponse message.
+message MsgAppealDisplayNameModerationResponse {}
+
+// ============================================================================
+// Achievement Management Messages
+// ============================================================================
+// MsgCreateAchievement creates a new achievement.
+// Authorized: Commons Council or Commons Operations Committee
+message MsgCreateAchievement {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sparkdream/x/season/MsgCreateAchievement";
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string achievement_id = 2;
+  string name = 3;
+  string description = 4;
+  uint32 rarity = 5; // Rarity enum value
+  uint64 xp_reward = 6;
+  uint32 requirement_type = 7; // RequirementType enum value
+  uint64 requirement_threshold = 8;
+}
+
+// MsgCreateAchievementResponse is the response for MsgCreateAchievement.
+message MsgCreateAchievementResponse {}
+
+// MsgUpdateAchievement updates an existing achievement.
+// Authorized: Commons Council or Commons Operations Committee
+message MsgUpdateAchievement {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sparkdream/x/season/MsgUpdateAchievement";
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string achievement_id = 2;
+  string name = 3;
+  string description = 4;
+  uint32 rarity = 5;
+  uint64 xp_reward = 6;
+  uint32 requirement_type = 7;
+  uint64 requirement_threshold = 8;
+}
+
+// MsgUpdateAchievementResponse is the response for MsgUpdateAchievement.
+message MsgUpdateAchievementResponse {}
+
+// MsgDeleteAchievement deletes an achievement.
+// Authorized: Commons Council or Commons Operations Committee
+message MsgDeleteAchievement {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sparkdream/x/season/MsgDeleteAchievement";
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string achievement_id = 2;
+}
+
+// MsgDeleteAchievementResponse is the response for MsgDeleteAchievement.
+message MsgDeleteAchievementResponse {}
+
+// ============================================================================
+// Title Management Messages
+// ============================================================================
+// MsgCreateTitle creates a new title.
+// Authorized: Commons Council or Commons Operations Committee
+message MsgCreateTitle {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sparkdream/x/season/MsgCreateTitle";
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string title_id = 2;
+  string name = 3;
+  string description = 4;
+  uint32 rarity = 5; // Rarity enum value
+  uint32 requirement_type = 6; // RequirementType enum value
+  uint64 requirement_threshold = 7;
+  uint64 requirement_season = 8; // 0 = any season
+  bool seasonal = 9; // Whether this title expires
+}
+
+// MsgCreateTitleResponse is the response for MsgCreateTitle.
+message MsgCreateTitleResponse {}
+
+// MsgUpdateTitle updates an existing title.
+// Authorized: Commons Council or Commons Operations Committee
+message MsgUpdateTitle {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sparkdream/x/season/MsgUpdateTitle";
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string title_id = 2;
+  string name = 3;
+  string description = 4;
+  uint32 rarity = 5;
+  uint32 requirement_type = 6;
+  uint64 requirement_threshold = 7;
+  uint64 requirement_season = 8;
+  bool seasonal = 9;
+}
+
+// MsgUpdateTitleResponse is the response for MsgUpdateTitle.
+message MsgUpdateTitleResponse {}
+
+// MsgDeleteTitle deletes a title.
+// Authorized: Commons Council or Commons Operations Committee
+message MsgDeleteTitle {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sparkdream/x/season/MsgDeleteTitle";
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string title_id = 2;
+}
+
+// MsgDeleteTitleResponse is the response for MsgDeleteTitle.
+message MsgDeleteTitleResponse {}
+
+// ============================================================================
+// Quest Update Message
+// ============================================================================
+// MsgUpdateQuest updates an existing quest.
+// Authorized: Commons Council or Commons Operations Committee
+message MsgUpdateQuest {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sparkdream/x/season/MsgUpdateQuest";
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string quest_id = 2;
+  string name = 3;
+  string description = 4;
+  uint64 xp_reward = 5;
+  bool repeatable = 6;
+  uint64 cooldown_epochs = 7;
+  uint64 season = 8;
+  int64 start_block = 9;
+  int64 end_block = 10;
+  uint64 min_level = 11;
+  string required_achievement = 12;
+  string prerequisite_quest = 13;
+  string quest_chain = 14;
+  bool active = 15;
+}
+
+// MsgUpdateQuestResponse is the response for MsgUpdateQuest.
+message MsgUpdateQuestResponse {}
+
+// MsgResolveDisplayNameAppeal resolves a display name appeal.
+// Authorized: Commons Council, Operations Committee, or governance authority.
+message MsgResolveDisplayNameAppeal {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sparkdream/x/season/MsgResolveDisplayNameAppeal";
+
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string member = 2;
+  bool appeal_succeeded = 3;
+}
+
+// MsgResolveDisplayNameAppealResponse defines the MsgResolveDisplayNameAppealResponse message.
+message MsgResolveDisplayNameAppealResponse {}
+
+// MsgResolveUnappealedModeration resolves a display name moderation where the appeal period
+// expired without an appeal. The report is upheld, the reporter's DREAM stake is returned,
+// and the display name stays cleared.
+// Authorized: Commons Council, Operations Committee, or governance authority.
+message MsgResolveUnappealedModeration {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sparkdream/x/season/MsgResolveUnappealedModeration";
+
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string member = 2;
+}
+
+// MsgResolveUnappealedModerationResponse defines the response for MsgResolveUnappealedModeration.
+message MsgResolveUnappealedModerationResponse {}
+
+// ============================================================================
+// Retroactive Public Goods Funding Messages
+// ============================================================================
+
+// MsgNominate creates a retroactive public goods funding nomination.
+message MsgNominate {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string content_ref = 2; // e.g. "blog/post/42"
+  string rationale = 3;
+}
+
+// MsgNominateResponse defines the response for MsgNominate.
+message MsgNominateResponse {
+  uint64 nomination_id = 1;
+}
+
+// MsgStakeNomination stakes DREAM on a nomination.
+message MsgStakeNomination {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 nomination_id = 2;
+  string amount = 3; // DREAM amount as decimal string
+}
+
+// MsgStakeNominationResponse defines the response for MsgStakeNomination.
+message MsgStakeNominationResponse {}
+
+// MsgUnstakeNomination removes a DREAM stake from a nomination.
+message MsgUnstakeNomination {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 nomination_id = 2;
+}
+
+// MsgUnstakeNominationResponse defines the response for MsgUnstakeNomination.
+message MsgUnstakeNominationResponse {}
