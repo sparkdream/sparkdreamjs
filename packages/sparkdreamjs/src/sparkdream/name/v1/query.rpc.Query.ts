@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryResolveRequest, QueryResolveResponse, QueryReverseResolveRequest, QueryReverseResolveResponse, QueryNamesRequest, QueryNamesResponse, QueryGetDisputeRequest, QueryGetDisputeResponse, QueryAllDisputeRequest, QueryAllDisputeResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryResolveRequest, QueryResolveResponse, QueryReverseResolveRequest, QueryReverseResolveResponse, QueryNamesRequest, QueryNamesResponse, QueryGetDisputeRequest, QueryGetDisputeResponse, QueryAllDisputeRequest, QueryAllDisputeResponse, QueryGetOwnerInfoRequest, QueryGetOwnerInfoResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -17,6 +17,12 @@ export interface Query {
   getDispute(request: QueryGetDisputeRequest): Promise<QueryGetDisputeResponse>;
   /** ListDispute defines the ListDispute RPC. */
   listDispute(request?: QueryAllDisputeRequest): Promise<QueryAllDisputeResponse>;
+  /**
+   * GetOwnerInfo returns the OwnerInfo (primary_name, display_name,
+   * last_active_time) for an address. Works for any address, including
+   * ones that never registered a handle.
+   */
+  getOwnerInfo(request: QueryGetOwnerInfoRequest): Promise<QueryGetOwnerInfoResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -61,6 +67,14 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.name.v1.Query", "ListDispute", data);
     return promise.then(data => QueryAllDisputeResponse.decode(new BinaryReader(data)));
   };
+  /* GetOwnerInfo returns the OwnerInfo (primary_name, display_name,
+   last_active_time) for an address. Works for any address, including
+   ones that never registered a handle. */
+  getOwnerInfo = async (request: QueryGetOwnerInfoRequest): Promise<QueryGetOwnerInfoResponse> => {
+    const data = QueryGetOwnerInfoRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.name.v1.Query", "GetOwnerInfo", data);
+    return promise.then(data => QueryGetOwnerInfoResponse.decode(new BinaryReader(data)));
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);
@@ -83,6 +97,9 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     listDispute(request?: QueryAllDisputeRequest): Promise<QueryAllDisputeResponse> {
       return queryService.listDispute(request);
+    },
+    getOwnerInfo(request: QueryGetOwnerInfoRequest): Promise<QueryGetOwnerInfoResponse> {
+      return queryService.getOwnerInfo(request);
     }
   };
 };

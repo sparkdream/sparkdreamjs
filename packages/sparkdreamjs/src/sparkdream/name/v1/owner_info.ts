@@ -11,6 +11,12 @@ export interface OwnerInfo {
   address: string;
   primaryName: string;
   lastActiveTime: bigint;
+  /**
+   * Free-form display name. Bytes-validated only: NFC, no control or
+   * zero-width chars, no newlines, 1-32 codepoints. Not unique. Not
+   * required to own a primary_name.
+   */
+  displayName: string;
 }
 export interface OwnerInfoProtoMsg {
   typeUrl: "/sparkdream.name.v1.OwnerInfo";
@@ -26,6 +32,12 @@ export interface OwnerInfoAmino {
   address?: string;
   primary_name?: string;
   last_active_time?: string;
+  /**
+   * Free-form display name. Bytes-validated only: NFC, no control or
+   * zero-width chars, no newlines, 1-32 codepoints. Not unique. Not
+   * required to own a primary_name.
+   */
+  display_name?: string;
 }
 export interface OwnerInfoAminoMsg {
   type: "/sparkdream.name.v1.OwnerInfo";
@@ -35,7 +47,8 @@ function createBaseOwnerInfo(): OwnerInfo {
   return {
     address: "",
     primaryName: "",
-    lastActiveTime: BigInt(0)
+    lastActiveTime: BigInt(0),
+    displayName: ""
   };
 }
 /**
@@ -56,6 +69,9 @@ export const OwnerInfo = {
     if (message.lastActiveTime !== BigInt(0)) {
       writer.uint32(24).int64(message.lastActiveTime);
     }
+    if (message.displayName !== "") {
+      writer.uint32(34).string(message.displayName);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): OwnerInfo {
@@ -74,6 +90,9 @@ export const OwnerInfo = {
         case 3:
           message.lastActiveTime = reader.int64();
           break;
+        case 4:
+          message.displayName = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -86,6 +105,7 @@ export const OwnerInfo = {
     message.address = object.address ?? "";
     message.primaryName = object.primaryName ?? "";
     message.lastActiveTime = object.lastActiveTime !== undefined && object.lastActiveTime !== null ? BigInt(object.lastActiveTime.toString()) : BigInt(0);
+    message.displayName = object.displayName ?? "";
     return message;
   },
   fromAmino(object: OwnerInfoAmino): OwnerInfo {
@@ -99,6 +119,9 @@ export const OwnerInfo = {
     if (object.last_active_time !== undefined && object.last_active_time !== null) {
       message.lastActiveTime = BigInt(object.last_active_time);
     }
+    if (object.display_name !== undefined && object.display_name !== null) {
+      message.displayName = object.display_name;
+    }
     return message;
   },
   toAmino(message: OwnerInfo): OwnerInfoAmino {
@@ -106,6 +129,7 @@ export const OwnerInfo = {
     obj.address = message.address === "" ? undefined : message.address;
     obj.primary_name = message.primaryName === "" ? undefined : message.primaryName;
     obj.last_active_time = message.lastActiveTime !== BigInt(0) ? message.lastActiveTime?.toString() : undefined;
+    obj.display_name = message.displayName === "" ? undefined : message.displayName;
     return obj;
   },
   fromAminoMsg(object: OwnerInfoAminoMsg): OwnerInfo {

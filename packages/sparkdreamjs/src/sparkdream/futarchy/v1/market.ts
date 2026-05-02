@@ -39,6 +39,13 @@ export interface Market {
    */
   initialLiquidity: string;
   liquidityWithdrawn: string;
+  /**
+   * Settlement price for CANCELLED and RESOLVED_INVALID markets that have
+   * outstanding shares. p_yes = exp(q_yes/b) / (exp(q_yes/b) + exp(q_no/b)).
+   * Holders redeem 1 YES share for p_yes spark and 1 NO share for (1 - p_yes)
+   * spark. Empty for ACTIVE or RESOLVED_YES/NO markets.
+   */
+  settlementPriceYes: string;
 }
 export interface MarketProtoMsg {
   typeUrl: "/sparkdream.futarchy.v1.Market";
@@ -81,6 +88,13 @@ export interface MarketAmino {
    */
   initial_liquidity?: string;
   liquidity_withdrawn?: string;
+  /**
+   * Settlement price for CANCELLED and RESOLVED_INVALID markets that have
+   * outstanding shares. p_yes = exp(q_yes/b) / (exp(q_yes/b) + exp(q_no/b)).
+   * Holders redeem 1 YES share for p_yes spark and 1 NO share for (1 - p_yes)
+   * spark. Empty for ACTIVE or RESOLVED_YES/NO markets.
+   */
+  settlement_price_yes?: string;
 }
 export interface MarketAminoMsg {
   type: "/sparkdream.futarchy.v1.Market";
@@ -102,7 +116,8 @@ function createBaseMarket(): Market {
     poolYes: "",
     poolNo: "",
     initialLiquidity: "",
-    liquidityWithdrawn: ""
+    liquidityWithdrawn: "",
+    settlementPriceYes: ""
   };
 }
 /**
@@ -159,6 +174,9 @@ export const Market = {
     if (message.liquidityWithdrawn !== "") {
       writer.uint32(122).string(message.liquidityWithdrawn);
     }
+    if (message.settlementPriceYes !== "") {
+      writer.uint32(130).string(Decimal.fromUserInput(message.settlementPriceYes, 18).atomics);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Market {
@@ -213,6 +231,9 @@ export const Market = {
         case 15:
           message.liquidityWithdrawn = reader.string();
           break;
+        case 16:
+          message.settlementPriceYes = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -237,6 +258,7 @@ export const Market = {
     message.poolNo = object.poolNo ?? "";
     message.initialLiquidity = object.initialLiquidity ?? "";
     message.liquidityWithdrawn = object.liquidityWithdrawn ?? "";
+    message.settlementPriceYes = object.settlementPriceYes ?? "";
     return message;
   },
   fromAmino(object: MarketAmino): Market {
@@ -286,6 +308,9 @@ export const Market = {
     if (object.liquidity_withdrawn !== undefined && object.liquidity_withdrawn !== null) {
       message.liquidityWithdrawn = object.liquidity_withdrawn;
     }
+    if (object.settlement_price_yes !== undefined && object.settlement_price_yes !== null) {
+      message.settlementPriceYes = object.settlement_price_yes;
+    }
     return message;
   },
   toAmino(message: Market): MarketAmino {
@@ -305,6 +330,7 @@ export const Market = {
     obj.pool_no = message.poolNo === "" ? undefined : message.poolNo;
     obj.initial_liquidity = message.initialLiquidity === "" ? undefined : message.initialLiquidity;
     obj.liquidity_withdrawn = message.liquidityWithdrawn === "" ? undefined : message.liquidityWithdrawn;
+    obj.settlement_price_yes = message.settlementPriceYes === "" ? undefined : message.settlementPriceYes;
     return obj;
   },
   fromAminoMsg(object: MarketAminoMsg): Market {

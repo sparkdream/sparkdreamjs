@@ -1196,6 +1196,66 @@ export interface MsgAnonymousVoteProposalResponseAminoMsg {
   type: "/sparkdream.commons.v1.MsgAnonymousVoteProposalResponse";
   value: MsgAnonymousVoteProposalResponseAmino;
 }
+/**
+ * MsgCreateCategory defines the MsgCreateCategory message.
+ * @name MsgCreateCategory
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgCreateCategory
+ */
+export interface MsgCreateCategory {
+  creator: string;
+  title: string;
+  description: string;
+  membersOnlyWrite: boolean;
+  adminOnlyWrite: boolean;
+}
+export interface MsgCreateCategoryProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgCreateCategory";
+  value: Uint8Array;
+}
+/**
+ * MsgCreateCategory defines the MsgCreateCategory message.
+ * @name MsgCreateCategoryAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgCreateCategory
+ */
+export interface MsgCreateCategoryAmino {
+  creator?: string;
+  title?: string;
+  description?: string;
+  members_only_write?: boolean;
+  admin_only_write?: boolean;
+}
+export interface MsgCreateCategoryAminoMsg {
+  type: "sparkdream/x/commons/MsgCreateCategory";
+  value: MsgCreateCategoryAmino;
+}
+/**
+ * MsgCreateCategoryResponse defines the MsgCreateCategoryResponse message.
+ * @name MsgCreateCategoryResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgCreateCategoryResponse
+ */
+export interface MsgCreateCategoryResponse {
+  categoryId: bigint;
+}
+export interface MsgCreateCategoryResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgCreateCategoryResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgCreateCategoryResponse defines the MsgCreateCategoryResponse message.
+ * @name MsgCreateCategoryResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgCreateCategoryResponse
+ */
+export interface MsgCreateCategoryResponseAmino {
+  category_id?: string;
+}
+export interface MsgCreateCategoryResponseAminoMsg {
+  type: "/sparkdream.commons.v1.MsgCreateCategoryResponse";
+  value: MsgCreateCategoryResponseAmino;
+}
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
     authority: "",
@@ -4456,6 +4516,199 @@ export const MsgAnonymousVoteProposalResponse = {
     return {
       typeUrl: "/sparkdream.commons.v1.MsgAnonymousVoteProposalResponse",
       value: MsgAnonymousVoteProposalResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCreateCategory(): MsgCreateCategory {
+  return {
+    creator: "",
+    title: "",
+    description: "",
+    membersOnlyWrite: false,
+    adminOnlyWrite: false
+  };
+}
+/**
+ * MsgCreateCategory defines the MsgCreateCategory message.
+ * @name MsgCreateCategory
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgCreateCategory
+ */
+export const MsgCreateCategory = {
+  typeUrl: "/sparkdream.commons.v1.MsgCreateCategory",
+  aminoType: "sparkdream/x/commons/MsgCreateCategory",
+  encode(message: MsgCreateCategory, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.title !== "") {
+      writer.uint32(18).string(message.title);
+    }
+    if (message.description !== "") {
+      writer.uint32(26).string(message.description);
+    }
+    if (message.membersOnlyWrite === true) {
+      writer.uint32(32).bool(message.membersOnlyWrite);
+    }
+    if (message.adminOnlyWrite === true) {
+      writer.uint32(40).bool(message.adminOnlyWrite);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCreateCategory {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCreateCategory();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.title = reader.string();
+          break;
+        case 3:
+          message.description = reader.string();
+          break;
+        case 4:
+          message.membersOnlyWrite = reader.bool();
+          break;
+        case 5:
+          message.adminOnlyWrite = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCreateCategory>): MsgCreateCategory {
+    const message = createBaseMsgCreateCategory();
+    message.creator = object.creator ?? "";
+    message.title = object.title ?? "";
+    message.description = object.description ?? "";
+    message.membersOnlyWrite = object.membersOnlyWrite ?? false;
+    message.adminOnlyWrite = object.adminOnlyWrite ?? false;
+    return message;
+  },
+  fromAmino(object: MsgCreateCategoryAmino): MsgCreateCategory {
+    const message = createBaseMsgCreateCategory();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.title !== undefined && object.title !== null) {
+      message.title = object.title;
+    }
+    if (object.description !== undefined && object.description !== null) {
+      message.description = object.description;
+    }
+    if (object.members_only_write !== undefined && object.members_only_write !== null) {
+      message.membersOnlyWrite = object.members_only_write;
+    }
+    if (object.admin_only_write !== undefined && object.admin_only_write !== null) {
+      message.adminOnlyWrite = object.admin_only_write;
+    }
+    return message;
+  },
+  toAmino(message: MsgCreateCategory): MsgCreateCategoryAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.title = message.title === "" ? undefined : message.title;
+    obj.description = message.description === "" ? undefined : message.description;
+    obj.members_only_write = message.membersOnlyWrite === false ? undefined : message.membersOnlyWrite;
+    obj.admin_only_write = message.adminOnlyWrite === false ? undefined : message.adminOnlyWrite;
+    return obj;
+  },
+  fromAminoMsg(object: MsgCreateCategoryAminoMsg): MsgCreateCategory {
+    return MsgCreateCategory.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCreateCategory): MsgCreateCategoryAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgCreateCategory",
+      value: MsgCreateCategory.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgCreateCategoryProtoMsg): MsgCreateCategory {
+    return MsgCreateCategory.decode(message.value);
+  },
+  toProto(message: MsgCreateCategory): Uint8Array {
+    return MsgCreateCategory.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCreateCategory): MsgCreateCategoryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgCreateCategory",
+      value: MsgCreateCategory.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCreateCategoryResponse(): MsgCreateCategoryResponse {
+  return {
+    categoryId: BigInt(0)
+  };
+}
+/**
+ * MsgCreateCategoryResponse defines the MsgCreateCategoryResponse message.
+ * @name MsgCreateCategoryResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgCreateCategoryResponse
+ */
+export const MsgCreateCategoryResponse = {
+  typeUrl: "/sparkdream.commons.v1.MsgCreateCategoryResponse",
+  encode(message: MsgCreateCategoryResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.categoryId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.categoryId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCreateCategoryResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCreateCategoryResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.categoryId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCreateCategoryResponse>): MsgCreateCategoryResponse {
+    const message = createBaseMsgCreateCategoryResponse();
+    message.categoryId = object.categoryId !== undefined && object.categoryId !== null ? BigInt(object.categoryId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgCreateCategoryResponseAmino): MsgCreateCategoryResponse {
+    const message = createBaseMsgCreateCategoryResponse();
+    if (object.category_id !== undefined && object.category_id !== null) {
+      message.categoryId = BigInt(object.category_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgCreateCategoryResponse): MsgCreateCategoryResponseAmino {
+    const obj: any = {};
+    obj.category_id = message.categoryId !== BigInt(0) ? message.categoryId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgCreateCategoryResponseAminoMsg): MsgCreateCategoryResponse {
+    return MsgCreateCategoryResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgCreateCategoryResponseProtoMsg): MsgCreateCategoryResponse {
+    return MsgCreateCategoryResponse.decode(message.value);
+  },
+  toProto(message: MsgCreateCategoryResponse): Uint8Array {
+    return MsgCreateCategoryResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCreateCategoryResponse): MsgCreateCategoryResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgCreateCategoryResponse",
+      value: MsgCreateCategoryResponse.encode(message).finish()
     };
   }
 };

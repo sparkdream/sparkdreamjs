@@ -163,6 +163,10 @@ export interface MsgCreatePost {
    * Optional: reference an x/rep initiative (0 = none, immutable)
    */
   initiativeId: bigint;
+  /**
+   * Tags referenced against the shared x/rep tag registry
+   */
+  tags: string[];
 }
 export interface MsgCreatePostProtoMsg {
   typeUrl: "/sparkdream.blog.v1.MsgCreatePost";
@@ -191,6 +195,10 @@ export interface MsgCreatePostAmino {
    * Optional: reference an x/rep initiative (0 = none, immutable)
    */
   initiative_id?: string;
+  /**
+   * Tags referenced against the shared x/rep tag registry
+   */
+  tags?: string[];
 }
 export interface MsgCreatePostAminoMsg {
   type: "/sparkdream.blog.v1.MsgCreatePost";
@@ -239,6 +247,10 @@ export interface MsgUpdatePost {
    * Minimum trust level to reply (-1 to 4)
    */
   minReplyTrustLevel: number;
+  /**
+   * Tags referenced against the shared x/rep tag registry (replaces existing tags)
+   */
+  tags: string[];
 }
 export interface MsgUpdatePostProtoMsg {
   typeUrl: "/sparkdream.blog.v1.MsgUpdatePost";
@@ -261,6 +273,10 @@ export interface MsgUpdatePostAmino {
    * Minimum trust level to reply (-1 to 4)
    */
   min_reply_trust_level?: number;
+  /**
+   * Tags referenced against the shared x/rep tag registry (replaces existing tags)
+   */
+  tags?: string[];
 }
 export interface MsgUpdatePostAminoMsg {
   type: "/sparkdream.blog.v1.MsgUpdatePost";
@@ -1221,7 +1237,8 @@ function createBaseMsgCreatePost(): MsgCreatePost {
     contentType: 0,
     minReplyTrustLevel: 0,
     authorBond: undefined,
-    initiativeId: BigInt(0)
+    initiativeId: BigInt(0),
+    tags: []
   };
 }
 /**
@@ -1254,6 +1271,9 @@ export const MsgCreatePost = {
     if (message.initiativeId !== BigInt(0)) {
       writer.uint32(56).uint64(message.initiativeId);
     }
+    for (const v of message.tags) {
+      writer.uint32(66).string(v!);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgCreatePost {
@@ -1284,6 +1304,9 @@ export const MsgCreatePost = {
         case 7:
           message.initiativeId = reader.uint64();
           break;
+        case 8:
+          message.tags.push(reader.string());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1300,6 +1323,7 @@ export const MsgCreatePost = {
     message.minReplyTrustLevel = object.minReplyTrustLevel ?? 0;
     message.authorBond = object.authorBond ?? undefined;
     message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
+    message.tags = object.tags?.map(e => e) || [];
     return message;
   },
   fromAmino(object: MsgCreatePostAmino): MsgCreatePost {
@@ -1325,6 +1349,7 @@ export const MsgCreatePost = {
     if (object.initiative_id !== undefined && object.initiative_id !== null) {
       message.initiativeId = BigInt(object.initiative_id);
     }
+    message.tags = object.tags?.map(e => e) || [];
     return message;
   },
   toAmino(message: MsgCreatePost): MsgCreatePostAmino {
@@ -1336,6 +1361,11 @@ export const MsgCreatePost = {
     obj.min_reply_trust_level = message.minReplyTrustLevel === 0 ? undefined : message.minReplyTrustLevel;
     obj.author_bond = message.authorBond === null ? undefined : message.authorBond;
     obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
+    if (message.tags) {
+      obj.tags = message.tags.map(e => e);
+    } else {
+      obj.tags = message.tags;
+    }
     return obj;
   },
   fromAminoMsg(object: MsgCreatePostAminoMsg): MsgCreatePost {
@@ -1431,7 +1461,8 @@ function createBaseMsgUpdatePost(): MsgUpdatePost {
     id: BigInt(0),
     contentType: 0,
     repliesEnabled: false,
-    minReplyTrustLevel: 0
+    minReplyTrustLevel: 0,
+    tags: []
   };
 }
 /**
@@ -1464,6 +1495,9 @@ export const MsgUpdatePost = {
     if (message.minReplyTrustLevel !== 0) {
       writer.uint32(56).int32(message.minReplyTrustLevel);
     }
+    for (const v of message.tags) {
+      writer.uint32(66).string(v!);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgUpdatePost {
@@ -1494,6 +1528,9 @@ export const MsgUpdatePost = {
         case 7:
           message.minReplyTrustLevel = reader.int32();
           break;
+        case 8:
+          message.tags.push(reader.string());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1510,6 +1547,7 @@ export const MsgUpdatePost = {
     message.contentType = object.contentType ?? 0;
     message.repliesEnabled = object.repliesEnabled ?? false;
     message.minReplyTrustLevel = object.minReplyTrustLevel ?? 0;
+    message.tags = object.tags?.map(e => e) || [];
     return message;
   },
   fromAmino(object: MsgUpdatePostAmino): MsgUpdatePost {
@@ -1535,6 +1573,7 @@ export const MsgUpdatePost = {
     if (object.min_reply_trust_level !== undefined && object.min_reply_trust_level !== null) {
       message.minReplyTrustLevel = object.min_reply_trust_level;
     }
+    message.tags = object.tags?.map(e => e) || [];
     return message;
   },
   toAmino(message: MsgUpdatePost): MsgUpdatePostAmino {
@@ -1546,6 +1585,11 @@ export const MsgUpdatePost = {
     obj.content_type = message.contentType === 0 ? undefined : message.contentType;
     obj.replies_enabled = message.repliesEnabled === false ? undefined : message.repliesEnabled;
     obj.min_reply_trust_level = message.minReplyTrustLevel === 0 ? undefined : message.minReplyTrustLevel;
+    if (message.tags) {
+      obj.tags = message.tags.map(e => e);
+    } else {
+      obj.tags = message.tags;
+    }
     return obj;
   },
   fromAminoMsg(object: MsgUpdatePostAminoMsg): MsgUpdatePost {

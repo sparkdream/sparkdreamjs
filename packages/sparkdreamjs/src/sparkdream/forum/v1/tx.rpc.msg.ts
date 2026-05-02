@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgCreateCategory, MsgCreateCategoryResponse, MsgCreatePost, MsgCreatePostResponse, MsgEditPost, MsgEditPostResponse, MsgDeletePost, MsgDeletePostResponse, MsgFreezeThread, MsgFreezeThreadResponse, MsgUnarchiveThread, MsgUnarchiveThreadResponse, MsgPinPost, MsgPinPostResponse, MsgUnpinPost, MsgUnpinPostResponse, MsgLockThread, MsgLockThreadResponse, MsgUnlockThread, MsgUnlockThreadResponse, MsgMoveThread, MsgMoveThreadResponse, MsgFollowThread, MsgFollowThreadResponse, MsgUnfollowThread, MsgUnfollowThreadResponse, MsgUpvotePost, MsgUpvotePostResponse, MsgDownvotePost, MsgDownvotePostResponse, MsgFlagPost, MsgFlagPostResponse, MsgDismissFlags, MsgDismissFlagsResponse, MsgHidePost, MsgHidePostResponse, MsgAppealPost, MsgAppealPostResponse, MsgAppealThreadLock, MsgAppealThreadLockResponse, MsgAppealThreadMove, MsgAppealThreadMoveResponse, MsgCreateBounty, MsgCreateBountyResponse, MsgAwardBounty, MsgAwardBountyResponse, MsgIncreaseBounty, MsgIncreaseBountyResponse, MsgCancelBounty, MsgCancelBountyResponse, MsgAssignBountyToReply, MsgAssignBountyToReplyResponse, MsgCreateTagBudget, MsgCreateTagBudgetResponse, MsgAwardFromTagBudget, MsgAwardFromTagBudgetResponse, MsgTopUpTagBudget, MsgTopUpTagBudgetResponse, MsgToggleTagBudget, MsgToggleTagBudgetResponse, MsgWithdrawTagBudget, MsgWithdrawTagBudgetResponse, MsgPinReply, MsgPinReplyResponse, MsgUnpinReply, MsgUnpinReplyResponse, MsgDisputePin, MsgDisputePinResponse, MsgMarkAcceptedReply, MsgMarkAcceptedReplyResponse, MsgConfirmProposedReply, MsgConfirmProposedReplyResponse, MsgRejectProposedReply, MsgRejectProposedReplyResponse, MsgSetForumPaused, MsgSetForumPausedResponse, MsgSetModerationPaused, MsgSetModerationPausedResponse, MsgReportTag, MsgReportTagResponse, MsgResolveTagReport, MsgResolveTagReportResponse, MsgBondSentinel, MsgBondSentinelResponse, MsgUnbondSentinel, MsgUnbondSentinelResponse, MsgReportMember, MsgReportMemberResponse, MsgCosignMemberReport, MsgCosignMemberReportResponse, MsgResolveMemberReport, MsgResolveMemberReportResponse, MsgDefendMemberReport, MsgDefendMemberReportResponse, MsgAppealGovAction, MsgAppealGovActionResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgCreatePost, MsgCreatePostResponse, MsgEditPost, MsgEditPostResponse, MsgDeletePost, MsgDeletePostResponse, MsgFreezeThread, MsgFreezeThreadResponse, MsgUnarchiveThread, MsgUnarchiveThreadResponse, MsgPinPost, MsgPinPostResponse, MsgUnpinPost, MsgUnpinPostResponse, MsgLockThread, MsgLockThreadResponse, MsgUnlockThread, MsgUnlockThreadResponse, MsgMoveThread, MsgMoveThreadResponse, MsgFollowThread, MsgFollowThreadResponse, MsgUnfollowThread, MsgUnfollowThreadResponse, MsgUpvotePost, MsgUpvotePostResponse, MsgDownvotePost, MsgDownvotePostResponse, MsgFlagPost, MsgFlagPostResponse, MsgDismissFlags, MsgDismissFlagsResponse, MsgHidePost, MsgHidePostResponse, MsgAppealPost, MsgAppealPostResponse, MsgAppealThreadLock, MsgAppealThreadLockResponse, MsgAppealThreadMove, MsgAppealThreadMoveResponse, MsgCreateBounty, MsgCreateBountyResponse, MsgAwardBounty, MsgAwardBountyResponse, MsgIncreaseBounty, MsgIncreaseBountyResponse, MsgCancelBounty, MsgCancelBountyResponse, MsgAssignBountyToReply, MsgAssignBountyToReplyResponse, MsgPinReply, MsgPinReplyResponse, MsgUnpinReply, MsgUnpinReplyResponse, MsgDisputePin, MsgDisputePinResponse, MsgMarkAcceptedReply, MsgMarkAcceptedReplyResponse, MsgConfirmProposedReply, MsgConfirmProposedReplyResponse, MsgRejectProposedReply, MsgRejectProposedReplyResponse, MsgSetForumPaused, MsgSetForumPausedResponse, MsgSetModerationPaused, MsgSetModerationPausedResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
@@ -14,8 +14,6 @@ export interface Msg {
    * operational parameters. Authorized for Commons Council Operations Committee.
    */
   updateOperationalParams(request: MsgUpdateOperationalParams): Promise<MsgUpdateOperationalParamsResponse>;
-  /** CreateCategory defines the CreateCategory RPC. */
-  createCategory(request: MsgCreateCategory): Promise<MsgCreateCategoryResponse>;
   /** CreatePost defines the CreatePost RPC. */
   createPost(request: MsgCreatePost): Promise<MsgCreatePostResponse>;
   /** EditPost defines the EditPost RPC. */
@@ -66,16 +64,6 @@ export interface Msg {
   cancelBounty(request: MsgCancelBounty): Promise<MsgCancelBountyResponse>;
   /** AssignBountyToReply defines the AssignBountyToReply RPC. */
   assignBountyToReply(request: MsgAssignBountyToReply): Promise<MsgAssignBountyToReplyResponse>;
-  /** CreateTagBudget defines the CreateTagBudget RPC. */
-  createTagBudget(request: MsgCreateTagBudget): Promise<MsgCreateTagBudgetResponse>;
-  /** AwardFromTagBudget defines the AwardFromTagBudget RPC. */
-  awardFromTagBudget(request: MsgAwardFromTagBudget): Promise<MsgAwardFromTagBudgetResponse>;
-  /** TopUpTagBudget defines the TopUpTagBudget RPC. */
-  topUpTagBudget(request: MsgTopUpTagBudget): Promise<MsgTopUpTagBudgetResponse>;
-  /** ToggleTagBudget defines the ToggleTagBudget RPC. */
-  toggleTagBudget(request: MsgToggleTagBudget): Promise<MsgToggleTagBudgetResponse>;
-  /** WithdrawTagBudget defines the WithdrawTagBudget RPC. */
-  withdrawTagBudget(request: MsgWithdrawTagBudget): Promise<MsgWithdrawTagBudgetResponse>;
   /** PinReply defines the PinReply RPC. */
   pinReply(request: MsgPinReply): Promise<MsgPinReplyResponse>;
   /** UnpinReply defines the UnpinReply RPC. */
@@ -92,24 +80,6 @@ export interface Msg {
   setForumPaused(request: MsgSetForumPaused): Promise<MsgSetForumPausedResponse>;
   /** SetModerationPaused defines the SetModerationPaused RPC. */
   setModerationPaused(request: MsgSetModerationPaused): Promise<MsgSetModerationPausedResponse>;
-  /** ReportTag defines the ReportTag RPC. */
-  reportTag(request: MsgReportTag): Promise<MsgReportTagResponse>;
-  /** ResolveTagReport defines the ResolveTagReport RPC. */
-  resolveTagReport(request: MsgResolveTagReport): Promise<MsgResolveTagReportResponse>;
-  /** BondSentinel defines the BondSentinel RPC. */
-  bondSentinel(request: MsgBondSentinel): Promise<MsgBondSentinelResponse>;
-  /** UnbondSentinel defines the UnbondSentinel RPC. */
-  unbondSentinel(request: MsgUnbondSentinel): Promise<MsgUnbondSentinelResponse>;
-  /** ReportMember defines the ReportMember RPC. */
-  reportMember(request: MsgReportMember): Promise<MsgReportMemberResponse>;
-  /** CosignMemberReport defines the CosignMemberReport RPC. */
-  cosignMemberReport(request: MsgCosignMemberReport): Promise<MsgCosignMemberReportResponse>;
-  /** ResolveMemberReport defines the ResolveMemberReport RPC. */
-  resolveMemberReport(request: MsgResolveMemberReport): Promise<MsgResolveMemberReportResponse>;
-  /** DefendMemberReport defines the DefendMemberReport RPC. */
-  defendMemberReport(request: MsgDefendMemberReport): Promise<MsgDefendMemberReportResponse>;
-  /** AppealGovAction defines the AppealGovAction RPC. */
-  appealGovAction(request: MsgAppealGovAction): Promise<MsgAppealGovActionResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -129,12 +99,6 @@ export class MsgClientImpl implements Msg {
     const data = MsgUpdateOperationalParams.encode(request).finish();
     const promise = this.rpc.request("sparkdream.forum.v1.Msg", "UpdateOperationalParams", data);
     return promise.then(data => MsgUpdateOperationalParamsResponse.decode(new BinaryReader(data)));
-  };
-  /* CreateCategory defines the CreateCategory RPC. */
-  createCategory = async (request: MsgCreateCategory): Promise<MsgCreateCategoryResponse> => {
-    const data = MsgCreateCategory.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "CreateCategory", data);
-    return promise.then(data => MsgCreateCategoryResponse.decode(new BinaryReader(data)));
   };
   /* CreatePost defines the CreatePost RPC. */
   createPost = async (request: MsgCreatePost): Promise<MsgCreatePostResponse> => {
@@ -286,36 +250,6 @@ export class MsgClientImpl implements Msg {
     const promise = this.rpc.request("sparkdream.forum.v1.Msg", "AssignBountyToReply", data);
     return promise.then(data => MsgAssignBountyToReplyResponse.decode(new BinaryReader(data)));
   };
-  /* CreateTagBudget defines the CreateTagBudget RPC. */
-  createTagBudget = async (request: MsgCreateTagBudget): Promise<MsgCreateTagBudgetResponse> => {
-    const data = MsgCreateTagBudget.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "CreateTagBudget", data);
-    return promise.then(data => MsgCreateTagBudgetResponse.decode(new BinaryReader(data)));
-  };
-  /* AwardFromTagBudget defines the AwardFromTagBudget RPC. */
-  awardFromTagBudget = async (request: MsgAwardFromTagBudget): Promise<MsgAwardFromTagBudgetResponse> => {
-    const data = MsgAwardFromTagBudget.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "AwardFromTagBudget", data);
-    return promise.then(data => MsgAwardFromTagBudgetResponse.decode(new BinaryReader(data)));
-  };
-  /* TopUpTagBudget defines the TopUpTagBudget RPC. */
-  topUpTagBudget = async (request: MsgTopUpTagBudget): Promise<MsgTopUpTagBudgetResponse> => {
-    const data = MsgTopUpTagBudget.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "TopUpTagBudget", data);
-    return promise.then(data => MsgTopUpTagBudgetResponse.decode(new BinaryReader(data)));
-  };
-  /* ToggleTagBudget defines the ToggleTagBudget RPC. */
-  toggleTagBudget = async (request: MsgToggleTagBudget): Promise<MsgToggleTagBudgetResponse> => {
-    const data = MsgToggleTagBudget.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "ToggleTagBudget", data);
-    return promise.then(data => MsgToggleTagBudgetResponse.decode(new BinaryReader(data)));
-  };
-  /* WithdrawTagBudget defines the WithdrawTagBudget RPC. */
-  withdrawTagBudget = async (request: MsgWithdrawTagBudget): Promise<MsgWithdrawTagBudgetResponse> => {
-    const data = MsgWithdrawTagBudget.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "WithdrawTagBudget", data);
-    return promise.then(data => MsgWithdrawTagBudgetResponse.decode(new BinaryReader(data)));
-  };
   /* PinReply defines the PinReply RPC. */
   pinReply = async (request: MsgPinReply): Promise<MsgPinReplyResponse> => {
     const data = MsgPinReply.encode(request).finish();
@@ -363,60 +297,6 @@ export class MsgClientImpl implements Msg {
     const data = MsgSetModerationPaused.encode(request).finish();
     const promise = this.rpc.request("sparkdream.forum.v1.Msg", "SetModerationPaused", data);
     return promise.then(data => MsgSetModerationPausedResponse.decode(new BinaryReader(data)));
-  };
-  /* ReportTag defines the ReportTag RPC. */
-  reportTag = async (request: MsgReportTag): Promise<MsgReportTagResponse> => {
-    const data = MsgReportTag.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "ReportTag", data);
-    return promise.then(data => MsgReportTagResponse.decode(new BinaryReader(data)));
-  };
-  /* ResolveTagReport defines the ResolveTagReport RPC. */
-  resolveTagReport = async (request: MsgResolveTagReport): Promise<MsgResolveTagReportResponse> => {
-    const data = MsgResolveTagReport.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "ResolveTagReport", data);
-    return promise.then(data => MsgResolveTagReportResponse.decode(new BinaryReader(data)));
-  };
-  /* BondSentinel defines the BondSentinel RPC. */
-  bondSentinel = async (request: MsgBondSentinel): Promise<MsgBondSentinelResponse> => {
-    const data = MsgBondSentinel.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "BondSentinel", data);
-    return promise.then(data => MsgBondSentinelResponse.decode(new BinaryReader(data)));
-  };
-  /* UnbondSentinel defines the UnbondSentinel RPC. */
-  unbondSentinel = async (request: MsgUnbondSentinel): Promise<MsgUnbondSentinelResponse> => {
-    const data = MsgUnbondSentinel.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "UnbondSentinel", data);
-    return promise.then(data => MsgUnbondSentinelResponse.decode(new BinaryReader(data)));
-  };
-  /* ReportMember defines the ReportMember RPC. */
-  reportMember = async (request: MsgReportMember): Promise<MsgReportMemberResponse> => {
-    const data = MsgReportMember.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "ReportMember", data);
-    return promise.then(data => MsgReportMemberResponse.decode(new BinaryReader(data)));
-  };
-  /* CosignMemberReport defines the CosignMemberReport RPC. */
-  cosignMemberReport = async (request: MsgCosignMemberReport): Promise<MsgCosignMemberReportResponse> => {
-    const data = MsgCosignMemberReport.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "CosignMemberReport", data);
-    return promise.then(data => MsgCosignMemberReportResponse.decode(new BinaryReader(data)));
-  };
-  /* ResolveMemberReport defines the ResolveMemberReport RPC. */
-  resolveMemberReport = async (request: MsgResolveMemberReport): Promise<MsgResolveMemberReportResponse> => {
-    const data = MsgResolveMemberReport.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "ResolveMemberReport", data);
-    return promise.then(data => MsgResolveMemberReportResponse.decode(new BinaryReader(data)));
-  };
-  /* DefendMemberReport defines the DefendMemberReport RPC. */
-  defendMemberReport = async (request: MsgDefendMemberReport): Promise<MsgDefendMemberReportResponse> => {
-    const data = MsgDefendMemberReport.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "DefendMemberReport", data);
-    return promise.then(data => MsgDefendMemberReportResponse.decode(new BinaryReader(data)));
-  };
-  /* AppealGovAction defines the AppealGovAction RPC. */
-  appealGovAction = async (request: MsgAppealGovAction): Promise<MsgAppealGovActionResponse> => {
-    const data = MsgAppealGovAction.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "AppealGovAction", data);
-    return promise.then(data => MsgAppealGovActionResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

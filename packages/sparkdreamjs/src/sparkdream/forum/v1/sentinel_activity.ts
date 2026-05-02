@@ -1,9 +1,10 @@
 //@ts-nocheck
-import { SentinelBondStatus } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
- * SentinelActivity defines the SentinelActivity message.
+ * SentinelActivity holds forum-specific action counters and local cooldowns
+ * for a sentinel. The accountability record (bond, bond status, activity
+ * stamps) lives in sparkdream.rep.v1.SentinelActivity.
  * @name SentinelActivity
  * @package sparkdream.forum.v1
  * @see proto type: sparkdream.forum.v1.SentinelActivity
@@ -16,16 +17,10 @@ export interface SentinelActivity {
   unchallengedHides: bigint;
   epochHides: bigint;
   epochAppealsResolved: bigint;
-  lastRewardEpoch: bigint;
-  cumulativeRewards: string;
   overturnCooldownUntil: bigint;
   consecutiveOverturns: bigint;
-  bondStatus: SentinelBondStatus;
-  currentBond: string;
-  totalCommittedBond: string;
   pendingHideCount: bigint;
   consecutiveUpheld: bigint;
-  demotionCooldownUntil: bigint;
   epochAppealsFiled: bigint;
   totalLocks: bigint;
   upheldLocks: bigint;
@@ -43,15 +38,15 @@ export interface SentinelActivity {
   confirmedProposals: bigint;
   rejectedProposals: bigint;
   epochCurations: bigint;
-  lastActiveEpoch: bigint;
-  consecutiveInactiveEpochs: bigint;
 }
 export interface SentinelActivityProtoMsg {
   typeUrl: "/sparkdream.forum.v1.SentinelActivity";
   value: Uint8Array;
 }
 /**
- * SentinelActivity defines the SentinelActivity message.
+ * SentinelActivity holds forum-specific action counters and local cooldowns
+ * for a sentinel. The accountability record (bond, bond status, activity
+ * stamps) lives in sparkdream.rep.v1.SentinelActivity.
  * @name SentinelActivityAmino
  * @package sparkdream.forum.v1
  * @see proto type: sparkdream.forum.v1.SentinelActivity
@@ -64,16 +59,10 @@ export interface SentinelActivityAmino {
   unchallenged_hides?: string;
   epoch_hides?: string;
   epoch_appeals_resolved?: string;
-  last_reward_epoch?: string;
-  cumulative_rewards?: string;
   overturn_cooldown_until?: string;
   consecutive_overturns?: string;
-  bond_status?: SentinelBondStatus;
-  current_bond?: string;
-  total_committed_bond?: string;
   pending_hide_count?: string;
   consecutive_upheld?: string;
-  demotion_cooldown_until?: string;
   epoch_appeals_filed?: string;
   total_locks?: string;
   upheld_locks?: string;
@@ -91,8 +80,6 @@ export interface SentinelActivityAmino {
   confirmed_proposals?: string;
   rejected_proposals?: string;
   epoch_curations?: string;
-  last_active_epoch?: string;
-  consecutive_inactive_epochs?: string;
 }
 export interface SentinelActivityAminoMsg {
   type: "/sparkdream.forum.v1.SentinelActivity";
@@ -107,16 +94,10 @@ function createBaseSentinelActivity(): SentinelActivity {
     unchallengedHides: BigInt(0),
     epochHides: BigInt(0),
     epochAppealsResolved: BigInt(0),
-    lastRewardEpoch: BigInt(0),
-    cumulativeRewards: "",
     overturnCooldownUntil: BigInt(0),
     consecutiveOverturns: BigInt(0),
-    bondStatus: 0,
-    currentBond: "",
-    totalCommittedBond: "",
     pendingHideCount: BigInt(0),
     consecutiveUpheld: BigInt(0),
-    demotionCooldownUntil: BigInt(0),
     epochAppealsFiled: BigInt(0),
     totalLocks: BigInt(0),
     upheldLocks: BigInt(0),
@@ -133,13 +114,13 @@ function createBaseSentinelActivity(): SentinelActivity {
     totalProposals: BigInt(0),
     confirmedProposals: BigInt(0),
     rejectedProposals: BigInt(0),
-    epochCurations: BigInt(0),
-    lastActiveEpoch: BigInt(0),
-    consecutiveInactiveEpochs: BigInt(0)
+    epochCurations: BigInt(0)
   };
 }
 /**
- * SentinelActivity defines the SentinelActivity message.
+ * SentinelActivity holds forum-specific action counters and local cooldowns
+ * for a sentinel. The accountability record (bond, bond status, activity
+ * stamps) lives in sparkdream.rep.v1.SentinelActivity.
  * @name SentinelActivity
  * @package sparkdream.forum.v1
  * @see proto type: sparkdream.forum.v1.SentinelActivity
@@ -168,92 +149,68 @@ export const SentinelActivity = {
     if (message.epochAppealsResolved !== BigInt(0)) {
       writer.uint32(56).uint64(message.epochAppealsResolved);
     }
-    if (message.lastRewardEpoch !== BigInt(0)) {
-      writer.uint32(64).int64(message.lastRewardEpoch);
-    }
-    if (message.cumulativeRewards !== "") {
-      writer.uint32(74).string(message.cumulativeRewards);
-    }
     if (message.overturnCooldownUntil !== BigInt(0)) {
-      writer.uint32(80).int64(message.overturnCooldownUntil);
+      writer.uint32(64).int64(message.overturnCooldownUntil);
     }
     if (message.consecutiveOverturns !== BigInt(0)) {
-      writer.uint32(88).uint64(message.consecutiveOverturns);
-    }
-    if (message.bondStatus !== 0) {
-      writer.uint32(96).int32(message.bondStatus);
-    }
-    if (message.currentBond !== "") {
-      writer.uint32(106).string(message.currentBond);
-    }
-    if (message.totalCommittedBond !== "") {
-      writer.uint32(114).string(message.totalCommittedBond);
+      writer.uint32(72).uint64(message.consecutiveOverturns);
     }
     if (message.pendingHideCount !== BigInt(0)) {
-      writer.uint32(120).uint64(message.pendingHideCount);
+      writer.uint32(80).uint64(message.pendingHideCount);
     }
     if (message.consecutiveUpheld !== BigInt(0)) {
-      writer.uint32(128).uint64(message.consecutiveUpheld);
-    }
-    if (message.demotionCooldownUntil !== BigInt(0)) {
-      writer.uint32(136).int64(message.demotionCooldownUntil);
+      writer.uint32(88).uint64(message.consecutiveUpheld);
     }
     if (message.epochAppealsFiled !== BigInt(0)) {
-      writer.uint32(144).uint64(message.epochAppealsFiled);
+      writer.uint32(96).uint64(message.epochAppealsFiled);
     }
     if (message.totalLocks !== BigInt(0)) {
-      writer.uint32(152).uint64(message.totalLocks);
+      writer.uint32(104).uint64(message.totalLocks);
     }
     if (message.upheldLocks !== BigInt(0)) {
-      writer.uint32(160).uint64(message.upheldLocks);
+      writer.uint32(112).uint64(message.upheldLocks);
     }
     if (message.overturnedLocks !== BigInt(0)) {
-      writer.uint32(168).uint64(message.overturnedLocks);
+      writer.uint32(120).uint64(message.overturnedLocks);
     }
     if (message.epochLocks !== BigInt(0)) {
-      writer.uint32(176).uint64(message.epochLocks);
+      writer.uint32(128).uint64(message.epochLocks);
     }
     if (message.totalMoves !== BigInt(0)) {
-      writer.uint32(184).uint64(message.totalMoves);
+      writer.uint32(136).uint64(message.totalMoves);
     }
     if (message.upheldMoves !== BigInt(0)) {
-      writer.uint32(192).uint64(message.upheldMoves);
+      writer.uint32(144).uint64(message.upheldMoves);
     }
     if (message.overturnedMoves !== BigInt(0)) {
-      writer.uint32(200).uint64(message.overturnedMoves);
+      writer.uint32(152).uint64(message.overturnedMoves);
     }
     if (message.epochMoves !== BigInt(0)) {
-      writer.uint32(208).uint64(message.epochMoves);
+      writer.uint32(160).uint64(message.epochMoves);
     }
     if (message.totalPins !== BigInt(0)) {
-      writer.uint32(216).uint64(message.totalPins);
+      writer.uint32(168).uint64(message.totalPins);
     }
     if (message.upheldPins !== BigInt(0)) {
-      writer.uint32(224).uint64(message.upheldPins);
+      writer.uint32(176).uint64(message.upheldPins);
     }
     if (message.overturnedPins !== BigInt(0)) {
-      writer.uint32(232).uint64(message.overturnedPins);
+      writer.uint32(184).uint64(message.overturnedPins);
     }
     if (message.epochPins !== BigInt(0)) {
-      writer.uint32(240).uint64(message.epochPins);
+      writer.uint32(192).uint64(message.epochPins);
     }
     if (message.totalProposals !== BigInt(0)) {
-      writer.uint32(248).uint64(message.totalProposals);
+      writer.uint32(200).uint64(message.totalProposals);
     }
     if (message.confirmedProposals !== BigInt(0)) {
-      writer.uint32(256).uint64(message.confirmedProposals);
+      writer.uint32(208).uint64(message.confirmedProposals);
     }
     if (message.rejectedProposals !== BigInt(0)) {
-      writer.uint32(264).uint64(message.rejectedProposals);
+      writer.uint32(216).uint64(message.rejectedProposals);
     }
     if (message.epochCurations !== BigInt(0)) {
-      writer.uint32(272).uint64(message.epochCurations);
-    }
-    if (message.lastActiveEpoch !== BigInt(0)) {
-      writer.uint32(280).int64(message.lastActiveEpoch);
-    }
-    if (message.consecutiveInactiveEpochs !== BigInt(0)) {
-      writer.uint32(288).uint64(message.consecutiveInactiveEpochs);
+      writer.uint32(224).uint64(message.epochCurations);
     }
     return writer;
   },
@@ -286,91 +243,67 @@ export const SentinelActivity = {
           message.epochAppealsResolved = reader.uint64();
           break;
         case 8:
-          message.lastRewardEpoch = reader.int64();
-          break;
-        case 9:
-          message.cumulativeRewards = reader.string();
-          break;
-        case 10:
           message.overturnCooldownUntil = reader.int64();
           break;
-        case 11:
+        case 9:
           message.consecutiveOverturns = reader.uint64();
           break;
-        case 12:
-          message.bondStatus = reader.int32() as any;
-          break;
-        case 13:
-          message.currentBond = reader.string();
-          break;
-        case 14:
-          message.totalCommittedBond = reader.string();
-          break;
-        case 15:
+        case 10:
           message.pendingHideCount = reader.uint64();
           break;
-        case 16:
+        case 11:
           message.consecutiveUpheld = reader.uint64();
           break;
-        case 17:
-          message.demotionCooldownUntil = reader.int64();
-          break;
-        case 18:
+        case 12:
           message.epochAppealsFiled = reader.uint64();
           break;
-        case 19:
+        case 13:
           message.totalLocks = reader.uint64();
           break;
-        case 20:
+        case 14:
           message.upheldLocks = reader.uint64();
           break;
-        case 21:
+        case 15:
           message.overturnedLocks = reader.uint64();
           break;
-        case 22:
+        case 16:
           message.epochLocks = reader.uint64();
           break;
-        case 23:
+        case 17:
           message.totalMoves = reader.uint64();
           break;
-        case 24:
+        case 18:
           message.upheldMoves = reader.uint64();
           break;
-        case 25:
+        case 19:
           message.overturnedMoves = reader.uint64();
           break;
-        case 26:
+        case 20:
           message.epochMoves = reader.uint64();
           break;
-        case 27:
+        case 21:
           message.totalPins = reader.uint64();
           break;
-        case 28:
+        case 22:
           message.upheldPins = reader.uint64();
           break;
-        case 29:
+        case 23:
           message.overturnedPins = reader.uint64();
           break;
-        case 30:
+        case 24:
           message.epochPins = reader.uint64();
           break;
-        case 31:
+        case 25:
           message.totalProposals = reader.uint64();
           break;
-        case 32:
+        case 26:
           message.confirmedProposals = reader.uint64();
           break;
-        case 33:
+        case 27:
           message.rejectedProposals = reader.uint64();
           break;
-        case 34:
+        case 28:
           message.epochCurations = reader.uint64();
-          break;
-        case 35:
-          message.lastActiveEpoch = reader.int64();
-          break;
-        case 36:
-          message.consecutiveInactiveEpochs = reader.uint64();
           break;
         default:
           reader.skipType(tag & 7);
@@ -388,16 +321,10 @@ export const SentinelActivity = {
     message.unchallengedHides = object.unchallengedHides !== undefined && object.unchallengedHides !== null ? BigInt(object.unchallengedHides.toString()) : BigInt(0);
     message.epochHides = object.epochHides !== undefined && object.epochHides !== null ? BigInt(object.epochHides.toString()) : BigInt(0);
     message.epochAppealsResolved = object.epochAppealsResolved !== undefined && object.epochAppealsResolved !== null ? BigInt(object.epochAppealsResolved.toString()) : BigInt(0);
-    message.lastRewardEpoch = object.lastRewardEpoch !== undefined && object.lastRewardEpoch !== null ? BigInt(object.lastRewardEpoch.toString()) : BigInt(0);
-    message.cumulativeRewards = object.cumulativeRewards ?? "";
     message.overturnCooldownUntil = object.overturnCooldownUntil !== undefined && object.overturnCooldownUntil !== null ? BigInt(object.overturnCooldownUntil.toString()) : BigInt(0);
     message.consecutiveOverturns = object.consecutiveOverturns !== undefined && object.consecutiveOverturns !== null ? BigInt(object.consecutiveOverturns.toString()) : BigInt(0);
-    message.bondStatus = object.bondStatus ?? 0;
-    message.currentBond = object.currentBond ?? "";
-    message.totalCommittedBond = object.totalCommittedBond ?? "";
     message.pendingHideCount = object.pendingHideCount !== undefined && object.pendingHideCount !== null ? BigInt(object.pendingHideCount.toString()) : BigInt(0);
     message.consecutiveUpheld = object.consecutiveUpheld !== undefined && object.consecutiveUpheld !== null ? BigInt(object.consecutiveUpheld.toString()) : BigInt(0);
-    message.demotionCooldownUntil = object.demotionCooldownUntil !== undefined && object.demotionCooldownUntil !== null ? BigInt(object.demotionCooldownUntil.toString()) : BigInt(0);
     message.epochAppealsFiled = object.epochAppealsFiled !== undefined && object.epochAppealsFiled !== null ? BigInt(object.epochAppealsFiled.toString()) : BigInt(0);
     message.totalLocks = object.totalLocks !== undefined && object.totalLocks !== null ? BigInt(object.totalLocks.toString()) : BigInt(0);
     message.upheldLocks = object.upheldLocks !== undefined && object.upheldLocks !== null ? BigInt(object.upheldLocks.toString()) : BigInt(0);
@@ -415,8 +342,6 @@ export const SentinelActivity = {
     message.confirmedProposals = object.confirmedProposals !== undefined && object.confirmedProposals !== null ? BigInt(object.confirmedProposals.toString()) : BigInt(0);
     message.rejectedProposals = object.rejectedProposals !== undefined && object.rejectedProposals !== null ? BigInt(object.rejectedProposals.toString()) : BigInt(0);
     message.epochCurations = object.epochCurations !== undefined && object.epochCurations !== null ? BigInt(object.epochCurations.toString()) : BigInt(0);
-    message.lastActiveEpoch = object.lastActiveEpoch !== undefined && object.lastActiveEpoch !== null ? BigInt(object.lastActiveEpoch.toString()) : BigInt(0);
-    message.consecutiveInactiveEpochs = object.consecutiveInactiveEpochs !== undefined && object.consecutiveInactiveEpochs !== null ? BigInt(object.consecutiveInactiveEpochs.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: SentinelActivityAmino): SentinelActivity {
@@ -442,35 +367,17 @@ export const SentinelActivity = {
     if (object.epoch_appeals_resolved !== undefined && object.epoch_appeals_resolved !== null) {
       message.epochAppealsResolved = BigInt(object.epoch_appeals_resolved);
     }
-    if (object.last_reward_epoch !== undefined && object.last_reward_epoch !== null) {
-      message.lastRewardEpoch = BigInt(object.last_reward_epoch);
-    }
-    if (object.cumulative_rewards !== undefined && object.cumulative_rewards !== null) {
-      message.cumulativeRewards = object.cumulative_rewards;
-    }
     if (object.overturn_cooldown_until !== undefined && object.overturn_cooldown_until !== null) {
       message.overturnCooldownUntil = BigInt(object.overturn_cooldown_until);
     }
     if (object.consecutive_overturns !== undefined && object.consecutive_overturns !== null) {
       message.consecutiveOverturns = BigInt(object.consecutive_overturns);
     }
-    if (object.bond_status !== undefined && object.bond_status !== null) {
-      message.bondStatus = object.bond_status;
-    }
-    if (object.current_bond !== undefined && object.current_bond !== null) {
-      message.currentBond = object.current_bond;
-    }
-    if (object.total_committed_bond !== undefined && object.total_committed_bond !== null) {
-      message.totalCommittedBond = object.total_committed_bond;
-    }
     if (object.pending_hide_count !== undefined && object.pending_hide_count !== null) {
       message.pendingHideCount = BigInt(object.pending_hide_count);
     }
     if (object.consecutive_upheld !== undefined && object.consecutive_upheld !== null) {
       message.consecutiveUpheld = BigInt(object.consecutive_upheld);
-    }
-    if (object.demotion_cooldown_until !== undefined && object.demotion_cooldown_until !== null) {
-      message.demotionCooldownUntil = BigInt(object.demotion_cooldown_until);
     }
     if (object.epoch_appeals_filed !== undefined && object.epoch_appeals_filed !== null) {
       message.epochAppealsFiled = BigInt(object.epoch_appeals_filed);
@@ -523,12 +430,6 @@ export const SentinelActivity = {
     if (object.epoch_curations !== undefined && object.epoch_curations !== null) {
       message.epochCurations = BigInt(object.epoch_curations);
     }
-    if (object.last_active_epoch !== undefined && object.last_active_epoch !== null) {
-      message.lastActiveEpoch = BigInt(object.last_active_epoch);
-    }
-    if (object.consecutive_inactive_epochs !== undefined && object.consecutive_inactive_epochs !== null) {
-      message.consecutiveInactiveEpochs = BigInt(object.consecutive_inactive_epochs);
-    }
     return message;
   },
   toAmino(message: SentinelActivity): SentinelActivityAmino {
@@ -540,16 +441,10 @@ export const SentinelActivity = {
     obj.unchallenged_hides = message.unchallengedHides !== BigInt(0) ? message.unchallengedHides?.toString() : undefined;
     obj.epoch_hides = message.epochHides !== BigInt(0) ? message.epochHides?.toString() : undefined;
     obj.epoch_appeals_resolved = message.epochAppealsResolved !== BigInt(0) ? message.epochAppealsResolved?.toString() : undefined;
-    obj.last_reward_epoch = message.lastRewardEpoch !== BigInt(0) ? message.lastRewardEpoch?.toString() : undefined;
-    obj.cumulative_rewards = message.cumulativeRewards === "" ? undefined : message.cumulativeRewards;
     obj.overturn_cooldown_until = message.overturnCooldownUntil !== BigInt(0) ? message.overturnCooldownUntil?.toString() : undefined;
     obj.consecutive_overturns = message.consecutiveOverturns !== BigInt(0) ? message.consecutiveOverturns?.toString() : undefined;
-    obj.bond_status = message.bondStatus === 0 ? undefined : message.bondStatus;
-    obj.current_bond = message.currentBond === "" ? undefined : message.currentBond;
-    obj.total_committed_bond = message.totalCommittedBond === "" ? undefined : message.totalCommittedBond;
     obj.pending_hide_count = message.pendingHideCount !== BigInt(0) ? message.pendingHideCount?.toString() : undefined;
     obj.consecutive_upheld = message.consecutiveUpheld !== BigInt(0) ? message.consecutiveUpheld?.toString() : undefined;
-    obj.demotion_cooldown_until = message.demotionCooldownUntil !== BigInt(0) ? message.demotionCooldownUntil?.toString() : undefined;
     obj.epoch_appeals_filed = message.epochAppealsFiled !== BigInt(0) ? message.epochAppealsFiled?.toString() : undefined;
     obj.total_locks = message.totalLocks !== BigInt(0) ? message.totalLocks?.toString() : undefined;
     obj.upheld_locks = message.upheldLocks !== BigInt(0) ? message.upheldLocks?.toString() : undefined;
@@ -567,8 +462,6 @@ export const SentinelActivity = {
     obj.confirmed_proposals = message.confirmedProposals !== BigInt(0) ? message.confirmedProposals?.toString() : undefined;
     obj.rejected_proposals = message.rejectedProposals !== BigInt(0) ? message.rejectedProposals?.toString() : undefined;
     obj.epoch_curations = message.epochCurations !== BigInt(0) ? message.epochCurations?.toString() : undefined;
-    obj.last_active_epoch = message.lastActiveEpoch !== BigInt(0) ? message.lastActiveEpoch?.toString() : undefined;
-    obj.consecutive_inactive_epochs = message.consecutiveInactiveEpochs !== BigInt(0) ? message.consecutiveInactiveEpochs?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: SentinelActivityAminoMsg): SentinelActivity {

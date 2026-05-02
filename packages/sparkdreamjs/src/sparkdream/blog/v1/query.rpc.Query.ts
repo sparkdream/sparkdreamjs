@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryShowPostRequest, QueryShowPostResponse, QueryListPostRequest, QueryListPostResponse, QueryShowReplyRequest, QueryShowReplyResponse, QueryListRepliesRequest, QueryListRepliesResponse, QueryListPostsByCreatorRequest, QueryListPostsByCreatorResponse, QueryReactionCountsRequest, QueryReactionCountsResponse, QueryUserReactionRequest, QueryUserReactionResponse, QueryListReactionsRequest, QueryListReactionsResponse, QueryListReactionsByCreatorRequest, QueryListReactionsByCreatorResponse, QueryListExpiringContentRequest, QueryListExpiringContentResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryShowPostRequest, QueryShowPostResponse, QueryListPostRequest, QueryListPostResponse, QueryShowReplyRequest, QueryShowReplyResponse, QueryListRepliesRequest, QueryListRepliesResponse, QueryListPostsByCreatorRequest, QueryListPostsByCreatorResponse, QueryReactionCountsRequest, QueryReactionCountsResponse, QueryUserReactionRequest, QueryUserReactionResponse, QueryListReactionsRequest, QueryListReactionsResponse, QueryListReactionsByCreatorRequest, QueryListReactionsByCreatorResponse, QueryListExpiringContentRequest, QueryListExpiringContentResponse, QueryListPostsByTagRequest, QueryListPostsByTagResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -27,6 +27,8 @@ export interface Query {
   listReactionsByCreator(request: QueryListReactionsByCreatorRequest): Promise<QueryListReactionsByCreatorResponse>;
   /** ListExpiringContent returns paginated ephemeral content expiring before a timestamp. */
   listExpiringContent(request: QueryListExpiringContentRequest): Promise<QueryListExpiringContentResponse>;
+  /** ListPostsByTag returns paginated posts that carry a given tag. */
+  listPostsByTag(request: QueryListPostsByTagRequest): Promise<QueryListPostsByTagResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -101,6 +103,12 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.blog.v1.Query", "ListExpiringContent", data);
     return promise.then(data => QueryListExpiringContentResponse.decode(new BinaryReader(data)));
   };
+  /* ListPostsByTag returns paginated posts that carry a given tag. */
+  listPostsByTag = async (request: QueryListPostsByTagRequest): Promise<QueryListPostsByTagResponse> => {
+    const data = QueryListPostsByTagRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.blog.v1.Query", "ListPostsByTag", data);
+    return promise.then(data => QueryListPostsByTagResponse.decode(new BinaryReader(data)));
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);
@@ -138,6 +146,9 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     listExpiringContent(request: QueryListExpiringContentRequest): Promise<QueryListExpiringContentResponse> {
       return queryService.listExpiringContent(request);
+    },
+    listPostsByTag(request: QueryListPostsByTagRequest): Promise<QueryListPostsByTagResponse> {
+      return queryService.listPostsByTag(request);
     }
   };
 };

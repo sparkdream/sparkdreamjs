@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetPolicyPermissionsRequest, QueryGetPolicyPermissionsResponse, QueryAllPolicyPermissionsRequest, QueryAllPolicyPermissionsResponse, QueryGetGroupRequest, QueryGetGroupResponse, QueryAllGroupRequest, QueryAllGroupResponse, QueryGetCouncilMembersRequest, QueryGetCouncilMembersResponse, QueryGetProposalRequest, QueryGetProposalResponse, QueryListProposalsRequest, QueryListProposalsResponse, QueryGetProposalVotesRequest, QueryGetProposalVotesResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetPolicyPermissionsRequest, QueryGetPolicyPermissionsResponse, QueryAllPolicyPermissionsRequest, QueryAllPolicyPermissionsResponse, QueryGetGroupRequest, QueryGetGroupResponse, QueryAllGroupRequest, QueryAllGroupResponse, QueryGetCouncilMembersRequest, QueryGetCouncilMembersResponse, QueryGetProposalRequest, QueryGetProposalResponse, QueryListProposalsRequest, QueryListProposalsResponse, QueryGetProposalVotesRequest, QueryGetProposalVotesResponse, QueryGetCategoryRequest, QueryGetCategoryResponse, QueryAllCategoryRequest, QueryAllCategoryResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -23,6 +23,10 @@ export interface Query {
   listProposals(request: QueryListProposalsRequest): Promise<QueryListProposalsResponse>;
   /** GetProposalVotes queries votes for a specific proposal. */
   getProposalVotes(request: QueryGetProposalVotesRequest): Promise<QueryGetProposalVotesResponse>;
+  /** GetCategory queries a single shared content category by id. */
+  getCategory(request: QueryGetCategoryRequest): Promise<QueryGetCategoryResponse>;
+  /** ListCategory queries all shared content categories. */
+  listCategory(request?: QueryAllCategoryRequest): Promise<QueryAllCategoryResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -87,6 +91,20 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.commons.v1.Query", "GetProposalVotes", data);
     return promise.then(data => QueryGetProposalVotesResponse.decode(new BinaryReader(data)));
   };
+  /* GetCategory queries a single shared content category by id. */
+  getCategory = async (request: QueryGetCategoryRequest): Promise<QueryGetCategoryResponse> => {
+    const data = QueryGetCategoryRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Query", "GetCategory", data);
+    return promise.then(data => QueryGetCategoryResponse.decode(new BinaryReader(data)));
+  };
+  /* ListCategory queries all shared content categories. */
+  listCategory = async (request: QueryAllCategoryRequest = {
+    pagination: undefined
+  }): Promise<QueryAllCategoryResponse> => {
+    const data = QueryAllCategoryRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Query", "ListCategory", data);
+    return promise.then(data => QueryAllCategoryResponse.decode(new BinaryReader(data)));
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);
@@ -118,6 +136,12 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     getProposalVotes(request: QueryGetProposalVotesRequest): Promise<QueryGetProposalVotesResponse> {
       return queryService.getProposalVotes(request);
+    },
+    getCategory(request: QueryGetCategoryRequest): Promise<QueryGetCategoryResponse> {
+      return queryService.getCategory(request);
+    },
+    listCategory(request?: QueryAllCategoryRequest): Promise<QueryAllCategoryResponse> {
+      return queryService.listCategory(request);
     }
   };
 };

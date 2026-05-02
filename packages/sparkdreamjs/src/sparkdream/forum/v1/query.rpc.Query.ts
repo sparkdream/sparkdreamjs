@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetPostRequest, QueryGetPostResponse, QueryAllPostRequest, QueryAllPostResponse, QueryGetCategoryRequest, QueryGetCategoryResponse, QueryAllCategoryRequest, QueryAllCategoryResponse, QueryGetTagRequest, QueryGetTagResponse, QueryAllTagRequest, QueryAllTagResponse, QueryGetReservedTagRequest, QueryGetReservedTagResponse, QueryAllReservedTagRequest, QueryAllReservedTagResponse, QueryGetUserRateLimitRequest, QueryGetUserRateLimitResponse, QueryAllUserRateLimitRequest, QueryAllUserRateLimitResponse, QueryGetUserReactionLimitRequest, QueryGetUserReactionLimitResponse, QueryAllUserReactionLimitRequest, QueryAllUserReactionLimitResponse, QueryGetSentinelActivityRequest, QueryGetSentinelActivityResponse, QueryAllSentinelActivityRequest, QueryAllSentinelActivityResponse, QueryGetHideRecordRequest, QueryGetHideRecordResponse, QueryAllHideRecordRequest, QueryAllHideRecordResponse, QueryGetThreadLockRecordRequest, QueryGetThreadLockRecordResponse, QueryAllThreadLockRecordRequest, QueryAllThreadLockRecordResponse, QueryGetThreadMoveRecordRequest, QueryGetThreadMoveRecordResponse, QueryAllThreadMoveRecordRequest, QueryAllThreadMoveRecordResponse, QueryGetPostFlagRequest, QueryGetPostFlagResponse, QueryAllPostFlagRequest, QueryAllPostFlagResponse, QueryGetBountyRequest, QueryGetBountyResponse, QueryAllBountyRequest, QueryAllBountyResponse, QueryGetTagBudgetRequest, QueryGetTagBudgetResponse, QueryAllTagBudgetRequest, QueryAllTagBudgetResponse, QueryGetTagBudgetAwardRequest, QueryGetTagBudgetAwardResponse, QueryAllTagBudgetAwardRequest, QueryAllTagBudgetAwardResponse, QueryGetThreadMetadataRequest, QueryGetThreadMetadataResponse, QueryAllThreadMetadataRequest, QueryAllThreadMetadataResponse, QueryGetThreadFollowRequest, QueryGetThreadFollowResponse, QueryAllThreadFollowRequest, QueryAllThreadFollowResponse, QueryGetThreadFollowCountRequest, QueryGetThreadFollowCountResponse, QueryAllThreadFollowCountRequest, QueryAllThreadFollowCountResponse, QueryGetArchiveMetadataRequest, QueryGetArchiveMetadataResponse, QueryAllArchiveMetadataRequest, QueryAllArchiveMetadataResponse, QueryGetTagReportRequest, QueryGetTagReportResponse, QueryAllTagReportRequest, QueryAllTagReportResponse, QueryGetMemberSalvationStatusRequest, QueryGetMemberSalvationStatusResponse, QueryAllMemberSalvationStatusRequest, QueryAllMemberSalvationStatusResponse, QueryGetJuryParticipationRequest, QueryGetJuryParticipationResponse, QueryAllJuryParticipationRequest, QueryAllJuryParticipationResponse, QueryGetMemberReportRequest, QueryGetMemberReportResponse, QueryAllMemberReportRequest, QueryAllMemberReportResponse, QueryGetMemberWarningRequest, QueryGetMemberWarningResponse, QueryAllMemberWarningRequest, QueryAllMemberWarningResponse, QueryGetGovActionAppealRequest, QueryGetGovActionAppealResponse, QueryAllGovActionAppealRequest, QueryAllGovActionAppealResponse, QueryPostsRequest, QueryPostsResponse, QueryThreadRequest, QueryThreadResponse, QueryCategoriesRequest, QueryCategoriesResponse, QueryUserPostsRequest, QueryUserPostsResponse, QuerySentinelStatusRequest, QuerySentinelStatusResponse, QuerySentinelBondCommitmentRequest, QuerySentinelBondCommitmentResponse, QueryArchiveCooldownRequest, QueryArchiveCooldownResponse, QueryTagExistsRequest, QueryTagExistsResponse, QueryTagReportsRequest, QueryTagReportsResponse, QueryForumStatusRequest, QueryForumStatusResponse, QueryAppealCooldownRequest, QueryAppealCooldownResponse, QueryMemberReportsRequest, QueryMemberReportsResponse, QueryMemberWarningsRequest, QueryMemberWarningsResponse, QueryMemberStandingRequest, QueryMemberStandingResponse, QueryPinnedPostsRequest, QueryPinnedPostsResponse, QueryLockedThreadsRequest, QueryLockedThreadsResponse, QueryThreadLockStatusRequest, QueryThreadLockStatusResponse, QueryTopPostsRequest, QueryTopPostsResponse, QueryThreadFollowersRequest, QueryThreadFollowersResponse, QueryUserFollowedThreadsRequest, QueryUserFollowedThreadsResponse, QueryIsFollowingThreadRequest, QueryIsFollowingThreadResponse, QueryBountyByThreadRequest, QueryBountyByThreadResponse, QueryActiveBountiesRequest, QueryActiveBountiesResponse, QueryUserBountiesRequest, QueryUserBountiesResponse, QueryBountyExpiringSoonRequest, QueryBountyExpiringSoonResponse, QueryTagBudgetByTagRequest, QueryTagBudgetByTagResponse, QueryTagBudgetsRequest, QueryTagBudgetsResponse, QueryTagBudgetAwardsRequest, QueryTagBudgetAwardsResponse, QueryPostFlagsRequest, QueryPostFlagsResponse, QueryFlagReviewQueueRequest, QueryFlagReviewQueueResponse, QueryGovActionAppealsRequest, QueryGovActionAppealsResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetPostRequest, QueryGetPostResponse, QueryAllPostRequest, QueryAllPostResponse, QueryGetUserRateLimitRequest, QueryGetUserRateLimitResponse, QueryAllUserRateLimitRequest, QueryAllUserRateLimitResponse, QueryGetUserReactionLimitRequest, QueryGetUserReactionLimitResponse, QueryAllUserReactionLimitRequest, QueryAllUserReactionLimitResponse, QueryGetSentinelActivityRequest, QueryGetSentinelActivityResponse, QueryAllSentinelActivityRequest, QueryAllSentinelActivityResponse, QueryGetHideRecordRequest, QueryGetHideRecordResponse, QueryAllHideRecordRequest, QueryAllHideRecordResponse, QueryGetThreadLockRecordRequest, QueryGetThreadLockRecordResponse, QueryAllThreadLockRecordRequest, QueryAllThreadLockRecordResponse, QueryGetThreadMoveRecordRequest, QueryGetThreadMoveRecordResponse, QueryAllThreadMoveRecordRequest, QueryAllThreadMoveRecordResponse, QueryGetPostFlagRequest, QueryGetPostFlagResponse, QueryAllPostFlagRequest, QueryAllPostFlagResponse, QueryGetBountyRequest, QueryGetBountyResponse, QueryAllBountyRequest, QueryAllBountyResponse, QueryGetThreadMetadataRequest, QueryGetThreadMetadataResponse, QueryAllThreadMetadataRequest, QueryAllThreadMetadataResponse, QueryGetThreadFollowRequest, QueryGetThreadFollowResponse, QueryAllThreadFollowRequest, QueryAllThreadFollowResponse, QueryGetThreadFollowCountRequest, QueryGetThreadFollowCountResponse, QueryAllThreadFollowCountRequest, QueryAllThreadFollowCountResponse, QueryGetArchiveMetadataRequest, QueryGetArchiveMetadataResponse, QueryAllArchiveMetadataRequest, QueryAllArchiveMetadataResponse, QueryPostsRequest, QueryPostsResponse, QueryThreadRequest, QueryThreadResponse, QueryUserPostsRequest, QueryUserPostsResponse, QueryArchiveCooldownRequest, QueryArchiveCooldownResponse, QueryForumStatusRequest, QueryForumStatusResponse, QueryAppealCooldownRequest, QueryAppealCooldownResponse, QueryPinnedPostsRequest, QueryPinnedPostsResponse, QueryLockedThreadsRequest, QueryLockedThreadsResponse, QueryThreadLockStatusRequest, QueryThreadLockStatusResponse, QueryTopPostsRequest, QueryTopPostsResponse, QueryThreadFollowersRequest, QueryThreadFollowersResponse, QueryUserFollowedThreadsRequest, QueryUserFollowedThreadsResponse, QueryIsFollowingThreadRequest, QueryIsFollowingThreadResponse, QueryBountyByThreadRequest, QueryBountyByThreadResponse, QueryActiveBountiesRequest, QueryActiveBountiesResponse, QueryUserBountiesRequest, QueryUserBountiesResponse, QueryBountyExpiringSoonRequest, QueryBountyExpiringSoonResponse, QueryPostFlagsRequest, QueryPostFlagsResponse, QueryFlagReviewQueueRequest, QueryFlagReviewQueueResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -11,18 +11,6 @@ export interface Query {
   getPost(request: QueryGetPostRequest): Promise<QueryGetPostResponse>;
   /** ListPost defines the ListPost RPC. */
   listPost(request?: QueryAllPostRequest): Promise<QueryAllPostResponse>;
-  /** ListCategory Queries a list of Category items. */
-  getCategory(request: QueryGetCategoryRequest): Promise<QueryGetCategoryResponse>;
-  /** ListCategory defines the ListCategory RPC. */
-  listCategory(request?: QueryAllCategoryRequest): Promise<QueryAllCategoryResponse>;
-  /** ListTag Queries a list of Tag items. */
-  getTag(request: QueryGetTagRequest): Promise<QueryGetTagResponse>;
-  /** ListTag defines the ListTag RPC. */
-  listTag(request?: QueryAllTagRequest): Promise<QueryAllTagResponse>;
-  /** ListReservedTag Queries a list of ReservedTag items. */
-  getReservedTag(request: QueryGetReservedTagRequest): Promise<QueryGetReservedTagResponse>;
-  /** ListReservedTag defines the ListReservedTag RPC. */
-  listReservedTag(request?: QueryAllReservedTagRequest): Promise<QueryAllReservedTagResponse>;
   /** ListUserRateLimit Queries a list of UserRateLimit items. */
   getUserRateLimit(request: QueryGetUserRateLimitRequest): Promise<QueryGetUserRateLimitResponse>;
   /** ListUserRateLimit defines the ListUserRateLimit RPC. */
@@ -55,14 +43,6 @@ export interface Query {
   getBounty(request: QueryGetBountyRequest): Promise<QueryGetBountyResponse>;
   /** ListBounty defines the ListBounty RPC. */
   listBounty(request?: QueryAllBountyRequest): Promise<QueryAllBountyResponse>;
-  /** ListTagBudget Queries a list of TagBudget items. */
-  getTagBudget(request: QueryGetTagBudgetRequest): Promise<QueryGetTagBudgetResponse>;
-  /** ListTagBudget defines the ListTagBudget RPC. */
-  listTagBudget(request?: QueryAllTagBudgetRequest): Promise<QueryAllTagBudgetResponse>;
-  /** ListTagBudgetAward Queries a list of TagBudgetAward items. */
-  getTagBudgetAward(request: QueryGetTagBudgetAwardRequest): Promise<QueryGetTagBudgetAwardResponse>;
-  /** ListTagBudgetAward defines the ListTagBudgetAward RPC. */
-  listTagBudgetAward(request?: QueryAllTagBudgetAwardRequest): Promise<QueryAllTagBudgetAwardResponse>;
   /** ListThreadMetadata Queries a list of ThreadMetadata items. */
   getThreadMetadata(request: QueryGetThreadMetadataRequest): Promise<QueryGetThreadMetadataResponse>;
   /** ListThreadMetadata defines the ListThreadMetadata RPC. */
@@ -79,58 +59,18 @@ export interface Query {
   getArchiveMetadata(request: QueryGetArchiveMetadataRequest): Promise<QueryGetArchiveMetadataResponse>;
   /** ListArchiveMetadata defines the ListArchiveMetadata RPC. */
   listArchiveMetadata(request?: QueryAllArchiveMetadataRequest): Promise<QueryAllArchiveMetadataResponse>;
-  /** ListTagReport Queries a list of TagReport items. */
-  getTagReport(request: QueryGetTagReportRequest): Promise<QueryGetTagReportResponse>;
-  /** ListTagReport defines the ListTagReport RPC. */
-  listTagReport(request?: QueryAllTagReportRequest): Promise<QueryAllTagReportResponse>;
-  /** ListMemberSalvationStatus Queries a list of MemberSalvationStatus items. */
-  getMemberSalvationStatus(request: QueryGetMemberSalvationStatusRequest): Promise<QueryGetMemberSalvationStatusResponse>;
-  /** ListMemberSalvationStatus defines the ListMemberSalvationStatus RPC. */
-  listMemberSalvationStatus(request?: QueryAllMemberSalvationStatusRequest): Promise<QueryAllMemberSalvationStatusResponse>;
-  /** ListJuryParticipation Queries a list of JuryParticipation items. */
-  getJuryParticipation(request: QueryGetJuryParticipationRequest): Promise<QueryGetJuryParticipationResponse>;
-  /** ListJuryParticipation defines the ListJuryParticipation RPC. */
-  listJuryParticipation(request?: QueryAllJuryParticipationRequest): Promise<QueryAllJuryParticipationResponse>;
-  /** ListMemberReport Queries a list of MemberReport items. */
-  getMemberReport(request: QueryGetMemberReportRequest): Promise<QueryGetMemberReportResponse>;
-  /** ListMemberReport defines the ListMemberReport RPC. */
-  listMemberReport(request?: QueryAllMemberReportRequest): Promise<QueryAllMemberReportResponse>;
-  /** ListMemberWarning Queries a list of MemberWarning items. */
-  getMemberWarning(request: QueryGetMemberWarningRequest): Promise<QueryGetMemberWarningResponse>;
-  /** ListMemberWarning defines the ListMemberWarning RPC. */
-  listMemberWarning(request?: QueryAllMemberWarningRequest): Promise<QueryAllMemberWarningResponse>;
-  /** ListGovActionAppeal Queries a list of GovActionAppeal items. */
-  getGovActionAppeal(request: QueryGetGovActionAppealRequest): Promise<QueryGetGovActionAppealResponse>;
-  /** ListGovActionAppeal defines the ListGovActionAppeal RPC. */
-  listGovActionAppeal(request?: QueryAllGovActionAppealRequest): Promise<QueryAllGovActionAppealResponse>;
   /** Posts Queries a list of Posts items. */
   posts(request: QueryPostsRequest): Promise<QueryPostsResponse>;
   /** Thread Queries a list of Thread items. */
   thread(request: QueryThreadRequest): Promise<QueryThreadResponse>;
-  /** Categories Queries a list of Categories items. */
-  categories(request?: QueryCategoriesRequest): Promise<QueryCategoriesResponse>;
   /** UserPosts Queries a list of UserPosts items. */
   userPosts(request: QueryUserPostsRequest): Promise<QueryUserPostsResponse>;
-  /** SentinelStatus Queries a list of SentinelStatus items. */
-  sentinelStatus(request: QuerySentinelStatusRequest): Promise<QuerySentinelStatusResponse>;
-  /** SentinelBondCommitment Queries a list of SentinelBondCommitment items. */
-  sentinelBondCommitment(request: QuerySentinelBondCommitmentRequest): Promise<QuerySentinelBondCommitmentResponse>;
   /** ArchiveCooldown Queries a list of ArchiveCooldown items. */
   archiveCooldown(request: QueryArchiveCooldownRequest): Promise<QueryArchiveCooldownResponse>;
-  /** TagExists Queries a list of TagExists items. */
-  tagExists(request: QueryTagExistsRequest): Promise<QueryTagExistsResponse>;
-  /** TagReports Queries a list of TagReports items. */
-  tagReports(request?: QueryTagReportsRequest): Promise<QueryTagReportsResponse>;
   /** ForumStatus Queries a list of ForumStatus items. */
   forumStatus(request?: QueryForumStatusRequest): Promise<QueryForumStatusResponse>;
   /** AppealCooldown Queries a list of AppealCooldown items. */
   appealCooldown(request: QueryAppealCooldownRequest): Promise<QueryAppealCooldownResponse>;
-  /** MemberReports Queries a list of MemberReports items. */
-  memberReports(request?: QueryMemberReportsRequest): Promise<QueryMemberReportsResponse>;
-  /** MemberWarnings Queries a list of MemberWarnings items. */
-  memberWarnings(request: QueryMemberWarningsRequest): Promise<QueryMemberWarningsResponse>;
-  /** MemberStanding Queries a list of MemberStanding items. */
-  memberStanding(request: QueryMemberStandingRequest): Promise<QueryMemberStandingResponse>;
   /** PinnedPosts Queries a list of PinnedPosts items. */
   pinnedPosts(request: QueryPinnedPostsRequest): Promise<QueryPinnedPostsResponse>;
   /** LockedThreads Queries a list of LockedThreads items. */
@@ -153,18 +93,10 @@ export interface Query {
   userBounties(request: QueryUserBountiesRequest): Promise<QueryUserBountiesResponse>;
   /** BountyExpiringSoon Queries a list of BountyExpiringSoon items. */
   bountyExpiringSoon(request: QueryBountyExpiringSoonRequest): Promise<QueryBountyExpiringSoonResponse>;
-  /** TagBudgetByTag Queries a list of TagBudgetByTag items. */
-  tagBudgetByTag(request: QueryTagBudgetByTagRequest): Promise<QueryTagBudgetByTagResponse>;
-  /** TagBudgets Queries a list of TagBudgets items. */
-  tagBudgets(request?: QueryTagBudgetsRequest): Promise<QueryTagBudgetsResponse>;
-  /** TagBudgetAwards Queries a list of TagBudgetAwards items. */
-  tagBudgetAwards(request: QueryTagBudgetAwardsRequest): Promise<QueryTagBudgetAwardsResponse>;
   /** PostFlags Queries a list of PostFlags items. */
   postFlags(request: QueryPostFlagsRequest): Promise<QueryPostFlagsResponse>;
   /** FlagReviewQueue Queries a list of FlagReviewQueue items. */
   flagReviewQueue(request?: QueryFlagReviewQueueRequest): Promise<QueryFlagReviewQueueResponse>;
-  /** GovActionAppeals Queries a list of GovActionAppeals items. */
-  govActionAppeals(request?: QueryGovActionAppealsRequest): Promise<QueryGovActionAppealsResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -190,48 +122,6 @@ export class QueryClientImpl implements Query {
     const data = QueryAllPostRequest.encode(request).finish();
     const promise = this.rpc.request("sparkdream.forum.v1.Query", "ListPost", data);
     return promise.then(data => QueryAllPostResponse.decode(new BinaryReader(data)));
-  };
-  /* ListCategory Queries a list of Category items. */
-  getCategory = async (request: QueryGetCategoryRequest): Promise<QueryGetCategoryResponse> => {
-    const data = QueryGetCategoryRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "GetCategory", data);
-    return promise.then(data => QueryGetCategoryResponse.decode(new BinaryReader(data)));
-  };
-  /* ListCategory defines the ListCategory RPC. */
-  listCategory = async (request: QueryAllCategoryRequest = {
-    pagination: undefined
-  }): Promise<QueryAllCategoryResponse> => {
-    const data = QueryAllCategoryRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "ListCategory", data);
-    return promise.then(data => QueryAllCategoryResponse.decode(new BinaryReader(data)));
-  };
-  /* ListTag Queries a list of Tag items. */
-  getTag = async (request: QueryGetTagRequest): Promise<QueryGetTagResponse> => {
-    const data = QueryGetTagRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "GetTag", data);
-    return promise.then(data => QueryGetTagResponse.decode(new BinaryReader(data)));
-  };
-  /* ListTag defines the ListTag RPC. */
-  listTag = async (request: QueryAllTagRequest = {
-    pagination: undefined
-  }): Promise<QueryAllTagResponse> => {
-    const data = QueryAllTagRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "ListTag", data);
-    return promise.then(data => QueryAllTagResponse.decode(new BinaryReader(data)));
-  };
-  /* ListReservedTag Queries a list of ReservedTag items. */
-  getReservedTag = async (request: QueryGetReservedTagRequest): Promise<QueryGetReservedTagResponse> => {
-    const data = QueryGetReservedTagRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "GetReservedTag", data);
-    return promise.then(data => QueryGetReservedTagResponse.decode(new BinaryReader(data)));
-  };
-  /* ListReservedTag defines the ListReservedTag RPC. */
-  listReservedTag = async (request: QueryAllReservedTagRequest = {
-    pagination: undefined
-  }): Promise<QueryAllReservedTagResponse> => {
-    const data = QueryAllReservedTagRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "ListReservedTag", data);
-    return promise.then(data => QueryAllReservedTagResponse.decode(new BinaryReader(data)));
   };
   /* ListUserRateLimit Queries a list of UserRateLimit items. */
   getUserRateLimit = async (request: QueryGetUserRateLimitRequest): Promise<QueryGetUserRateLimitResponse> => {
@@ -345,34 +235,6 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.forum.v1.Query", "ListBounty", data);
     return promise.then(data => QueryAllBountyResponse.decode(new BinaryReader(data)));
   };
-  /* ListTagBudget Queries a list of TagBudget items. */
-  getTagBudget = async (request: QueryGetTagBudgetRequest): Promise<QueryGetTagBudgetResponse> => {
-    const data = QueryGetTagBudgetRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "GetTagBudget", data);
-    return promise.then(data => QueryGetTagBudgetResponse.decode(new BinaryReader(data)));
-  };
-  /* ListTagBudget defines the ListTagBudget RPC. */
-  listTagBudget = async (request: QueryAllTagBudgetRequest = {
-    pagination: undefined
-  }): Promise<QueryAllTagBudgetResponse> => {
-    const data = QueryAllTagBudgetRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "ListTagBudget", data);
-    return promise.then(data => QueryAllTagBudgetResponse.decode(new BinaryReader(data)));
-  };
-  /* ListTagBudgetAward Queries a list of TagBudgetAward items. */
-  getTagBudgetAward = async (request: QueryGetTagBudgetAwardRequest): Promise<QueryGetTagBudgetAwardResponse> => {
-    const data = QueryGetTagBudgetAwardRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "GetTagBudgetAward", data);
-    return promise.then(data => QueryGetTagBudgetAwardResponse.decode(new BinaryReader(data)));
-  };
-  /* ListTagBudgetAward defines the ListTagBudgetAward RPC. */
-  listTagBudgetAward = async (request: QueryAllTagBudgetAwardRequest = {
-    pagination: undefined
-  }): Promise<QueryAllTagBudgetAwardResponse> => {
-    const data = QueryAllTagBudgetAwardRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "ListTagBudgetAward", data);
-    return promise.then(data => QueryAllTagBudgetAwardResponse.decode(new BinaryReader(data)));
-  };
   /* ListThreadMetadata Queries a list of ThreadMetadata items. */
   getThreadMetadata = async (request: QueryGetThreadMetadataRequest): Promise<QueryGetThreadMetadataResponse> => {
     const data = QueryGetThreadMetadataRequest.encode(request).finish();
@@ -429,90 +291,6 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.forum.v1.Query", "ListArchiveMetadata", data);
     return promise.then(data => QueryAllArchiveMetadataResponse.decode(new BinaryReader(data)));
   };
-  /* ListTagReport Queries a list of TagReport items. */
-  getTagReport = async (request: QueryGetTagReportRequest): Promise<QueryGetTagReportResponse> => {
-    const data = QueryGetTagReportRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "GetTagReport", data);
-    return promise.then(data => QueryGetTagReportResponse.decode(new BinaryReader(data)));
-  };
-  /* ListTagReport defines the ListTagReport RPC. */
-  listTagReport = async (request: QueryAllTagReportRequest = {
-    pagination: undefined
-  }): Promise<QueryAllTagReportResponse> => {
-    const data = QueryAllTagReportRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "ListTagReport", data);
-    return promise.then(data => QueryAllTagReportResponse.decode(new BinaryReader(data)));
-  };
-  /* ListMemberSalvationStatus Queries a list of MemberSalvationStatus items. */
-  getMemberSalvationStatus = async (request: QueryGetMemberSalvationStatusRequest): Promise<QueryGetMemberSalvationStatusResponse> => {
-    const data = QueryGetMemberSalvationStatusRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "GetMemberSalvationStatus", data);
-    return promise.then(data => QueryGetMemberSalvationStatusResponse.decode(new BinaryReader(data)));
-  };
-  /* ListMemberSalvationStatus defines the ListMemberSalvationStatus RPC. */
-  listMemberSalvationStatus = async (request: QueryAllMemberSalvationStatusRequest = {
-    pagination: undefined
-  }): Promise<QueryAllMemberSalvationStatusResponse> => {
-    const data = QueryAllMemberSalvationStatusRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "ListMemberSalvationStatus", data);
-    return promise.then(data => QueryAllMemberSalvationStatusResponse.decode(new BinaryReader(data)));
-  };
-  /* ListJuryParticipation Queries a list of JuryParticipation items. */
-  getJuryParticipation = async (request: QueryGetJuryParticipationRequest): Promise<QueryGetJuryParticipationResponse> => {
-    const data = QueryGetJuryParticipationRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "GetJuryParticipation", data);
-    return promise.then(data => QueryGetJuryParticipationResponse.decode(new BinaryReader(data)));
-  };
-  /* ListJuryParticipation defines the ListJuryParticipation RPC. */
-  listJuryParticipation = async (request: QueryAllJuryParticipationRequest = {
-    pagination: undefined
-  }): Promise<QueryAllJuryParticipationResponse> => {
-    const data = QueryAllJuryParticipationRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "ListJuryParticipation", data);
-    return promise.then(data => QueryAllJuryParticipationResponse.decode(new BinaryReader(data)));
-  };
-  /* ListMemberReport Queries a list of MemberReport items. */
-  getMemberReport = async (request: QueryGetMemberReportRequest): Promise<QueryGetMemberReportResponse> => {
-    const data = QueryGetMemberReportRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "GetMemberReport", data);
-    return promise.then(data => QueryGetMemberReportResponse.decode(new BinaryReader(data)));
-  };
-  /* ListMemberReport defines the ListMemberReport RPC. */
-  listMemberReport = async (request: QueryAllMemberReportRequest = {
-    pagination: undefined
-  }): Promise<QueryAllMemberReportResponse> => {
-    const data = QueryAllMemberReportRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "ListMemberReport", data);
-    return promise.then(data => QueryAllMemberReportResponse.decode(new BinaryReader(data)));
-  };
-  /* ListMemberWarning Queries a list of MemberWarning items. */
-  getMemberWarning = async (request: QueryGetMemberWarningRequest): Promise<QueryGetMemberWarningResponse> => {
-    const data = QueryGetMemberWarningRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "GetMemberWarning", data);
-    return promise.then(data => QueryGetMemberWarningResponse.decode(new BinaryReader(data)));
-  };
-  /* ListMemberWarning defines the ListMemberWarning RPC. */
-  listMemberWarning = async (request: QueryAllMemberWarningRequest = {
-    pagination: undefined
-  }): Promise<QueryAllMemberWarningResponse> => {
-    const data = QueryAllMemberWarningRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "ListMemberWarning", data);
-    return promise.then(data => QueryAllMemberWarningResponse.decode(new BinaryReader(data)));
-  };
-  /* ListGovActionAppeal Queries a list of GovActionAppeal items. */
-  getGovActionAppeal = async (request: QueryGetGovActionAppealRequest): Promise<QueryGetGovActionAppealResponse> => {
-    const data = QueryGetGovActionAppealRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "GetGovActionAppeal", data);
-    return promise.then(data => QueryGetGovActionAppealResponse.decode(new BinaryReader(data)));
-  };
-  /* ListGovActionAppeal defines the ListGovActionAppeal RPC. */
-  listGovActionAppeal = async (request: QueryAllGovActionAppealRequest = {
-    pagination: undefined
-  }): Promise<QueryAllGovActionAppealResponse> => {
-    const data = QueryAllGovActionAppealRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "ListGovActionAppeal", data);
-    return promise.then(data => QueryAllGovActionAppealResponse.decode(new BinaryReader(data)));
-  };
   /* Posts Queries a list of Posts items. */
   posts = async (request: QueryPostsRequest): Promise<QueryPostsResponse> => {
     const data = QueryPostsRequest.encode(request).finish();
@@ -525,51 +303,17 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.forum.v1.Query", "Thread", data);
     return promise.then(data => QueryThreadResponse.decode(new BinaryReader(data)));
   };
-  /* Categories Queries a list of Categories items. */
-  categories = async (request: QueryCategoriesRequest = {
-    pagination: undefined
-  }): Promise<QueryCategoriesResponse> => {
-    const data = QueryCategoriesRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "Categories", data);
-    return promise.then(data => QueryCategoriesResponse.decode(new BinaryReader(data)));
-  };
   /* UserPosts Queries a list of UserPosts items. */
   userPosts = async (request: QueryUserPostsRequest): Promise<QueryUserPostsResponse> => {
     const data = QueryUserPostsRequest.encode(request).finish();
     const promise = this.rpc.request("sparkdream.forum.v1.Query", "UserPosts", data);
     return promise.then(data => QueryUserPostsResponse.decode(new BinaryReader(data)));
   };
-  /* SentinelStatus Queries a list of SentinelStatus items. */
-  sentinelStatus = async (request: QuerySentinelStatusRequest): Promise<QuerySentinelStatusResponse> => {
-    const data = QuerySentinelStatusRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "SentinelStatus", data);
-    return promise.then(data => QuerySentinelStatusResponse.decode(new BinaryReader(data)));
-  };
-  /* SentinelBondCommitment Queries a list of SentinelBondCommitment items. */
-  sentinelBondCommitment = async (request: QuerySentinelBondCommitmentRequest): Promise<QuerySentinelBondCommitmentResponse> => {
-    const data = QuerySentinelBondCommitmentRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "SentinelBondCommitment", data);
-    return promise.then(data => QuerySentinelBondCommitmentResponse.decode(new BinaryReader(data)));
-  };
   /* ArchiveCooldown Queries a list of ArchiveCooldown items. */
   archiveCooldown = async (request: QueryArchiveCooldownRequest): Promise<QueryArchiveCooldownResponse> => {
     const data = QueryArchiveCooldownRequest.encode(request).finish();
     const promise = this.rpc.request("sparkdream.forum.v1.Query", "ArchiveCooldown", data);
     return promise.then(data => QueryArchiveCooldownResponse.decode(new BinaryReader(data)));
-  };
-  /* TagExists Queries a list of TagExists items. */
-  tagExists = async (request: QueryTagExistsRequest): Promise<QueryTagExistsResponse> => {
-    const data = QueryTagExistsRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "TagExists", data);
-    return promise.then(data => QueryTagExistsResponse.decode(new BinaryReader(data)));
-  };
-  /* TagReports Queries a list of TagReports items. */
-  tagReports = async (request: QueryTagReportsRequest = {
-    pagination: undefined
-  }): Promise<QueryTagReportsResponse> => {
-    const data = QueryTagReportsRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "TagReports", data);
-    return promise.then(data => QueryTagReportsResponse.decode(new BinaryReader(data)));
   };
   /* ForumStatus Queries a list of ForumStatus items. */
   forumStatus = async (request: QueryForumStatusRequest = {}): Promise<QueryForumStatusResponse> => {
@@ -582,26 +326,6 @@ export class QueryClientImpl implements Query {
     const data = QueryAppealCooldownRequest.encode(request).finish();
     const promise = this.rpc.request("sparkdream.forum.v1.Query", "AppealCooldown", data);
     return promise.then(data => QueryAppealCooldownResponse.decode(new BinaryReader(data)));
-  };
-  /* MemberReports Queries a list of MemberReports items. */
-  memberReports = async (request: QueryMemberReportsRequest = {
-    pagination: undefined
-  }): Promise<QueryMemberReportsResponse> => {
-    const data = QueryMemberReportsRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "MemberReports", data);
-    return promise.then(data => QueryMemberReportsResponse.decode(new BinaryReader(data)));
-  };
-  /* MemberWarnings Queries a list of MemberWarnings items. */
-  memberWarnings = async (request: QueryMemberWarningsRequest): Promise<QueryMemberWarningsResponse> => {
-    const data = QueryMemberWarningsRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "MemberWarnings", data);
-    return promise.then(data => QueryMemberWarningsResponse.decode(new BinaryReader(data)));
-  };
-  /* MemberStanding Queries a list of MemberStanding items. */
-  memberStanding = async (request: QueryMemberStandingRequest): Promise<QueryMemberStandingResponse> => {
-    const data = QueryMemberStandingRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "MemberStanding", data);
-    return promise.then(data => QueryMemberStandingResponse.decode(new BinaryReader(data)));
   };
   /* PinnedPosts Queries a list of PinnedPosts items. */
   pinnedPosts = async (request: QueryPinnedPostsRequest): Promise<QueryPinnedPostsResponse> => {
@@ -673,26 +397,6 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.forum.v1.Query", "BountyExpiringSoon", data);
     return promise.then(data => QueryBountyExpiringSoonResponse.decode(new BinaryReader(data)));
   };
-  /* TagBudgetByTag Queries a list of TagBudgetByTag items. */
-  tagBudgetByTag = async (request: QueryTagBudgetByTagRequest): Promise<QueryTagBudgetByTagResponse> => {
-    const data = QueryTagBudgetByTagRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "TagBudgetByTag", data);
-    return promise.then(data => QueryTagBudgetByTagResponse.decode(new BinaryReader(data)));
-  };
-  /* TagBudgets Queries a list of TagBudgets items. */
-  tagBudgets = async (request: QueryTagBudgetsRequest = {
-    pagination: undefined
-  }): Promise<QueryTagBudgetsResponse> => {
-    const data = QueryTagBudgetsRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "TagBudgets", data);
-    return promise.then(data => QueryTagBudgetsResponse.decode(new BinaryReader(data)));
-  };
-  /* TagBudgetAwards Queries a list of TagBudgetAwards items. */
-  tagBudgetAwards = async (request: QueryTagBudgetAwardsRequest): Promise<QueryTagBudgetAwardsResponse> => {
-    const data = QueryTagBudgetAwardsRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "TagBudgetAwards", data);
-    return promise.then(data => QueryTagBudgetAwardsResponse.decode(new BinaryReader(data)));
-  };
   /* PostFlags Queries a list of PostFlags items. */
   postFlags = async (request: QueryPostFlagsRequest): Promise<QueryPostFlagsResponse> => {
     const data = QueryPostFlagsRequest.encode(request).finish();
@@ -707,14 +411,6 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.forum.v1.Query", "FlagReviewQueue", data);
     return promise.then(data => QueryFlagReviewQueueResponse.decode(new BinaryReader(data)));
   };
-  /* GovActionAppeals Queries a list of GovActionAppeals items. */
-  govActionAppeals = async (request: QueryGovActionAppealsRequest = {
-    pagination: undefined
-  }): Promise<QueryGovActionAppealsResponse> => {
-    const data = QueryGovActionAppealsRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.forum.v1.Query", "GovActionAppeals", data);
-    return promise.then(data => QueryGovActionAppealsResponse.decode(new BinaryReader(data)));
-  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);
@@ -728,24 +424,6 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     listPost(request?: QueryAllPostRequest): Promise<QueryAllPostResponse> {
       return queryService.listPost(request);
-    },
-    getCategory(request: QueryGetCategoryRequest): Promise<QueryGetCategoryResponse> {
-      return queryService.getCategory(request);
-    },
-    listCategory(request?: QueryAllCategoryRequest): Promise<QueryAllCategoryResponse> {
-      return queryService.listCategory(request);
-    },
-    getTag(request: QueryGetTagRequest): Promise<QueryGetTagResponse> {
-      return queryService.getTag(request);
-    },
-    listTag(request?: QueryAllTagRequest): Promise<QueryAllTagResponse> {
-      return queryService.listTag(request);
-    },
-    getReservedTag(request: QueryGetReservedTagRequest): Promise<QueryGetReservedTagResponse> {
-      return queryService.getReservedTag(request);
-    },
-    listReservedTag(request?: QueryAllReservedTagRequest): Promise<QueryAllReservedTagResponse> {
-      return queryService.listReservedTag(request);
     },
     getUserRateLimit(request: QueryGetUserRateLimitRequest): Promise<QueryGetUserRateLimitResponse> {
       return queryService.getUserRateLimit(request);
@@ -795,18 +473,6 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     listBounty(request?: QueryAllBountyRequest): Promise<QueryAllBountyResponse> {
       return queryService.listBounty(request);
     },
-    getTagBudget(request: QueryGetTagBudgetRequest): Promise<QueryGetTagBudgetResponse> {
-      return queryService.getTagBudget(request);
-    },
-    listTagBudget(request?: QueryAllTagBudgetRequest): Promise<QueryAllTagBudgetResponse> {
-      return queryService.listTagBudget(request);
-    },
-    getTagBudgetAward(request: QueryGetTagBudgetAwardRequest): Promise<QueryGetTagBudgetAwardResponse> {
-      return queryService.getTagBudgetAward(request);
-    },
-    listTagBudgetAward(request?: QueryAllTagBudgetAwardRequest): Promise<QueryAllTagBudgetAwardResponse> {
-      return queryService.listTagBudgetAward(request);
-    },
     getThreadMetadata(request: QueryGetThreadMetadataRequest): Promise<QueryGetThreadMetadataResponse> {
       return queryService.getThreadMetadata(request);
     },
@@ -831,83 +497,23 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     listArchiveMetadata(request?: QueryAllArchiveMetadataRequest): Promise<QueryAllArchiveMetadataResponse> {
       return queryService.listArchiveMetadata(request);
     },
-    getTagReport(request: QueryGetTagReportRequest): Promise<QueryGetTagReportResponse> {
-      return queryService.getTagReport(request);
-    },
-    listTagReport(request?: QueryAllTagReportRequest): Promise<QueryAllTagReportResponse> {
-      return queryService.listTagReport(request);
-    },
-    getMemberSalvationStatus(request: QueryGetMemberSalvationStatusRequest): Promise<QueryGetMemberSalvationStatusResponse> {
-      return queryService.getMemberSalvationStatus(request);
-    },
-    listMemberSalvationStatus(request?: QueryAllMemberSalvationStatusRequest): Promise<QueryAllMemberSalvationStatusResponse> {
-      return queryService.listMemberSalvationStatus(request);
-    },
-    getJuryParticipation(request: QueryGetJuryParticipationRequest): Promise<QueryGetJuryParticipationResponse> {
-      return queryService.getJuryParticipation(request);
-    },
-    listJuryParticipation(request?: QueryAllJuryParticipationRequest): Promise<QueryAllJuryParticipationResponse> {
-      return queryService.listJuryParticipation(request);
-    },
-    getMemberReport(request: QueryGetMemberReportRequest): Promise<QueryGetMemberReportResponse> {
-      return queryService.getMemberReport(request);
-    },
-    listMemberReport(request?: QueryAllMemberReportRequest): Promise<QueryAllMemberReportResponse> {
-      return queryService.listMemberReport(request);
-    },
-    getMemberWarning(request: QueryGetMemberWarningRequest): Promise<QueryGetMemberWarningResponse> {
-      return queryService.getMemberWarning(request);
-    },
-    listMemberWarning(request?: QueryAllMemberWarningRequest): Promise<QueryAllMemberWarningResponse> {
-      return queryService.listMemberWarning(request);
-    },
-    getGovActionAppeal(request: QueryGetGovActionAppealRequest): Promise<QueryGetGovActionAppealResponse> {
-      return queryService.getGovActionAppeal(request);
-    },
-    listGovActionAppeal(request?: QueryAllGovActionAppealRequest): Promise<QueryAllGovActionAppealResponse> {
-      return queryService.listGovActionAppeal(request);
-    },
     posts(request: QueryPostsRequest): Promise<QueryPostsResponse> {
       return queryService.posts(request);
     },
     thread(request: QueryThreadRequest): Promise<QueryThreadResponse> {
       return queryService.thread(request);
     },
-    categories(request?: QueryCategoriesRequest): Promise<QueryCategoriesResponse> {
-      return queryService.categories(request);
-    },
     userPosts(request: QueryUserPostsRequest): Promise<QueryUserPostsResponse> {
       return queryService.userPosts(request);
     },
-    sentinelStatus(request: QuerySentinelStatusRequest): Promise<QuerySentinelStatusResponse> {
-      return queryService.sentinelStatus(request);
-    },
-    sentinelBondCommitment(request: QuerySentinelBondCommitmentRequest): Promise<QuerySentinelBondCommitmentResponse> {
-      return queryService.sentinelBondCommitment(request);
-    },
     archiveCooldown(request: QueryArchiveCooldownRequest): Promise<QueryArchiveCooldownResponse> {
       return queryService.archiveCooldown(request);
-    },
-    tagExists(request: QueryTagExistsRequest): Promise<QueryTagExistsResponse> {
-      return queryService.tagExists(request);
-    },
-    tagReports(request?: QueryTagReportsRequest): Promise<QueryTagReportsResponse> {
-      return queryService.tagReports(request);
     },
     forumStatus(request?: QueryForumStatusRequest): Promise<QueryForumStatusResponse> {
       return queryService.forumStatus(request);
     },
     appealCooldown(request: QueryAppealCooldownRequest): Promise<QueryAppealCooldownResponse> {
       return queryService.appealCooldown(request);
-    },
-    memberReports(request?: QueryMemberReportsRequest): Promise<QueryMemberReportsResponse> {
-      return queryService.memberReports(request);
-    },
-    memberWarnings(request: QueryMemberWarningsRequest): Promise<QueryMemberWarningsResponse> {
-      return queryService.memberWarnings(request);
-    },
-    memberStanding(request: QueryMemberStandingRequest): Promise<QueryMemberStandingResponse> {
-      return queryService.memberStanding(request);
     },
     pinnedPosts(request: QueryPinnedPostsRequest): Promise<QueryPinnedPostsResponse> {
       return queryService.pinnedPosts(request);
@@ -942,23 +548,11 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     bountyExpiringSoon(request: QueryBountyExpiringSoonRequest): Promise<QueryBountyExpiringSoonResponse> {
       return queryService.bountyExpiringSoon(request);
     },
-    tagBudgetByTag(request: QueryTagBudgetByTagRequest): Promise<QueryTagBudgetByTagResponse> {
-      return queryService.tagBudgetByTag(request);
-    },
-    tagBudgets(request?: QueryTagBudgetsRequest): Promise<QueryTagBudgetsResponse> {
-      return queryService.tagBudgets(request);
-    },
-    tagBudgetAwards(request: QueryTagBudgetAwardsRequest): Promise<QueryTagBudgetAwardsResponse> {
-      return queryService.tagBudgetAwards(request);
-    },
     postFlags(request: QueryPostFlagsRequest): Promise<QueryPostFlagsResponse> {
       return queryService.postFlags(request);
     },
     flagReviewQueue(request?: QueryFlagReviewQueueRequest): Promise<QueryFlagReviewQueueResponse> {
       return queryService.flagReviewQueue(request);
-    },
-    govActionAppeals(request?: QueryGovActionAppealsRequest): Promise<QueryGovActionAppealsResponse> {
-      return queryService.govActionAppeals(request);
     }
   };
 };

@@ -4,6 +4,8 @@ import { InterimType, InterimComplexity } from "./interim";
 import { ProjectCategory } from "./project";
 import { CriteriaVote, CriteriaVoteAmino, Verdict } from "./jury_review";
 import { StakeTargetType } from "./stake";
+import { RoleType } from "./bonded_role";
+import { GovAppealStatus } from "./accountability";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 import { Decimal } from "@interchainjs/math";
@@ -1795,6 +1797,872 @@ export interface MsgRegisterZkPublicKeyResponseAmino {}
 export interface MsgRegisterZkPublicKeyResponseAminoMsg {
   type: "/sparkdream.rep.v1.MsgRegisterZkPublicKeyResponse";
   value: MsgRegisterZkPublicKeyResponseAmino;
+}
+/**
+ * MsgCreateTag defines the MsgCreateTag message. Creates a new tag in the
+ * shared tag registry. Caller must meet the minimum trust level and pay the
+ * tag-creation fee.
+ * @name MsgCreateTag
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCreateTag
+ */
+export interface MsgCreateTag {
+  creator: string;
+  name: string;
+}
+export interface MsgCreateTagProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgCreateTag";
+  value: Uint8Array;
+}
+/**
+ * MsgCreateTag defines the MsgCreateTag message. Creates a new tag in the
+ * shared tag registry. Caller must meet the minimum trust level and pay the
+ * tag-creation fee.
+ * @name MsgCreateTagAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCreateTag
+ */
+export interface MsgCreateTagAmino {
+  creator?: string;
+  name?: string;
+}
+export interface MsgCreateTagAminoMsg {
+  type: "/sparkdream.rep.v1.MsgCreateTag";
+  value: MsgCreateTagAmino;
+}
+/**
+ * MsgCreateTagResponse defines the response for CreateTag.
+ * @name MsgCreateTagResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCreateTagResponse
+ */
+export interface MsgCreateTagResponse {
+  name: string;
+}
+export interface MsgCreateTagResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgCreateTagResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgCreateTagResponse defines the response for CreateTag.
+ * @name MsgCreateTagResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCreateTagResponse
+ */
+export interface MsgCreateTagResponseAmino {
+  name?: string;
+}
+export interface MsgCreateTagResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgCreateTagResponse";
+  value: MsgCreateTagResponseAmino;
+}
+/**
+ * MsgReportTag defines the MsgReportTag message.
+ * @name MsgReportTag
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReportTag
+ */
+export interface MsgReportTag {
+  creator: string;
+  tagName: string;
+  reason: string;
+}
+export interface MsgReportTagProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgReportTag";
+  value: Uint8Array;
+}
+/**
+ * MsgReportTag defines the MsgReportTag message.
+ * @name MsgReportTagAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReportTag
+ */
+export interface MsgReportTagAmino {
+  creator?: string;
+  tag_name?: string;
+  reason?: string;
+}
+export interface MsgReportTagAminoMsg {
+  type: "/sparkdream.rep.v1.MsgReportTag";
+  value: MsgReportTagAmino;
+}
+/**
+ * MsgReportTagResponse defines the MsgReportTagResponse message.
+ * @name MsgReportTagResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReportTagResponse
+ */
+export interface MsgReportTagResponse {}
+export interface MsgReportTagResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgReportTagResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgReportTagResponse defines the MsgReportTagResponse message.
+ * @name MsgReportTagResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReportTagResponse
+ */
+export interface MsgReportTagResponseAmino {}
+export interface MsgReportTagResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgReportTagResponse";
+  value: MsgReportTagResponseAmino;
+}
+/**
+ * MsgResolveTagReport defines the MsgResolveTagReport message.
+ * @name MsgResolveTagReport
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveTagReport
+ */
+export interface MsgResolveTagReport {
+  creator: string;
+  tagName: string;
+  action: bigint;
+  reserveAuthority: string;
+  reserveMembersCanUse: boolean;
+}
+export interface MsgResolveTagReportProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgResolveTagReport";
+  value: Uint8Array;
+}
+/**
+ * MsgResolveTagReport defines the MsgResolveTagReport message.
+ * @name MsgResolveTagReportAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveTagReport
+ */
+export interface MsgResolveTagReportAmino {
+  creator?: string;
+  tag_name?: string;
+  action?: string;
+  reserve_authority?: string;
+  reserve_members_can_use?: boolean;
+}
+export interface MsgResolveTagReportAminoMsg {
+  type: "/sparkdream.rep.v1.MsgResolveTagReport";
+  value: MsgResolveTagReportAmino;
+}
+/**
+ * MsgResolveTagReportResponse defines the MsgResolveTagReportResponse message.
+ * @name MsgResolveTagReportResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveTagReportResponse
+ */
+export interface MsgResolveTagReportResponse {}
+export interface MsgResolveTagReportResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgResolveTagReportResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgResolveTagReportResponse defines the MsgResolveTagReportResponse message.
+ * @name MsgResolveTagReportResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveTagReportResponse
+ */
+export interface MsgResolveTagReportResponseAmino {}
+export interface MsgResolveTagReportResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgResolveTagReportResponse";
+  value: MsgResolveTagReportResponseAmino;
+}
+/**
+ * MsgCreateTagBudget defines the MsgCreateTagBudget message.
+ * @name MsgCreateTagBudget
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCreateTagBudget
+ */
+export interface MsgCreateTagBudget {
+  creator: string;
+  tag: string;
+  initialPool: string;
+  membersOnly: boolean;
+}
+export interface MsgCreateTagBudgetProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgCreateTagBudget";
+  value: Uint8Array;
+}
+/**
+ * MsgCreateTagBudget defines the MsgCreateTagBudget message.
+ * @name MsgCreateTagBudgetAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCreateTagBudget
+ */
+export interface MsgCreateTagBudgetAmino {
+  creator?: string;
+  tag?: string;
+  initial_pool?: string;
+  members_only?: boolean;
+}
+export interface MsgCreateTagBudgetAminoMsg {
+  type: "/sparkdream.rep.v1.MsgCreateTagBudget";
+  value: MsgCreateTagBudgetAmino;
+}
+/**
+ * MsgCreateTagBudgetResponse defines the MsgCreateTagBudgetResponse message.
+ * @name MsgCreateTagBudgetResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCreateTagBudgetResponse
+ */
+export interface MsgCreateTagBudgetResponse {}
+export interface MsgCreateTagBudgetResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgCreateTagBudgetResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgCreateTagBudgetResponse defines the MsgCreateTagBudgetResponse message.
+ * @name MsgCreateTagBudgetResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCreateTagBudgetResponse
+ */
+export interface MsgCreateTagBudgetResponseAmino {}
+export interface MsgCreateTagBudgetResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgCreateTagBudgetResponse";
+  value: MsgCreateTagBudgetResponseAmino;
+}
+/**
+ * MsgAwardFromTagBudget defines the MsgAwardFromTagBudget message.
+ * @name MsgAwardFromTagBudget
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAwardFromTagBudget
+ */
+export interface MsgAwardFromTagBudget {
+  creator: string;
+  budgetId: bigint;
+  postId: bigint;
+  amount: string;
+  reason: string;
+}
+export interface MsgAwardFromTagBudgetProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgAwardFromTagBudget";
+  value: Uint8Array;
+}
+/**
+ * MsgAwardFromTagBudget defines the MsgAwardFromTagBudget message.
+ * @name MsgAwardFromTagBudgetAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAwardFromTagBudget
+ */
+export interface MsgAwardFromTagBudgetAmino {
+  creator?: string;
+  budget_id?: string;
+  post_id?: string;
+  amount?: string;
+  reason?: string;
+}
+export interface MsgAwardFromTagBudgetAminoMsg {
+  type: "/sparkdream.rep.v1.MsgAwardFromTagBudget";
+  value: MsgAwardFromTagBudgetAmino;
+}
+/**
+ * MsgAwardFromTagBudgetResponse defines the MsgAwardFromTagBudgetResponse message.
+ * @name MsgAwardFromTagBudgetResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAwardFromTagBudgetResponse
+ */
+export interface MsgAwardFromTagBudgetResponse {}
+export interface MsgAwardFromTagBudgetResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgAwardFromTagBudgetResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgAwardFromTagBudgetResponse defines the MsgAwardFromTagBudgetResponse message.
+ * @name MsgAwardFromTagBudgetResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAwardFromTagBudgetResponse
+ */
+export interface MsgAwardFromTagBudgetResponseAmino {}
+export interface MsgAwardFromTagBudgetResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgAwardFromTagBudgetResponse";
+  value: MsgAwardFromTagBudgetResponseAmino;
+}
+/**
+ * MsgTopUpTagBudget defines the MsgTopUpTagBudget message.
+ * @name MsgTopUpTagBudget
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgTopUpTagBudget
+ */
+export interface MsgTopUpTagBudget {
+  creator: string;
+  budgetId: bigint;
+  amount: string;
+}
+export interface MsgTopUpTagBudgetProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgTopUpTagBudget";
+  value: Uint8Array;
+}
+/**
+ * MsgTopUpTagBudget defines the MsgTopUpTagBudget message.
+ * @name MsgTopUpTagBudgetAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgTopUpTagBudget
+ */
+export interface MsgTopUpTagBudgetAmino {
+  creator?: string;
+  budget_id?: string;
+  amount?: string;
+}
+export interface MsgTopUpTagBudgetAminoMsg {
+  type: "/sparkdream.rep.v1.MsgTopUpTagBudget";
+  value: MsgTopUpTagBudgetAmino;
+}
+/**
+ * MsgTopUpTagBudgetResponse defines the MsgTopUpTagBudgetResponse message.
+ * @name MsgTopUpTagBudgetResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgTopUpTagBudgetResponse
+ */
+export interface MsgTopUpTagBudgetResponse {}
+export interface MsgTopUpTagBudgetResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgTopUpTagBudgetResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgTopUpTagBudgetResponse defines the MsgTopUpTagBudgetResponse message.
+ * @name MsgTopUpTagBudgetResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgTopUpTagBudgetResponse
+ */
+export interface MsgTopUpTagBudgetResponseAmino {}
+export interface MsgTopUpTagBudgetResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgTopUpTagBudgetResponse";
+  value: MsgTopUpTagBudgetResponseAmino;
+}
+/**
+ * MsgToggleTagBudget defines the MsgToggleTagBudget message.
+ * @name MsgToggleTagBudget
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgToggleTagBudget
+ */
+export interface MsgToggleTagBudget {
+  creator: string;
+  budgetId: bigint;
+  active: boolean;
+}
+export interface MsgToggleTagBudgetProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgToggleTagBudget";
+  value: Uint8Array;
+}
+/**
+ * MsgToggleTagBudget defines the MsgToggleTagBudget message.
+ * @name MsgToggleTagBudgetAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgToggleTagBudget
+ */
+export interface MsgToggleTagBudgetAmino {
+  creator?: string;
+  budget_id?: string;
+  active?: boolean;
+}
+export interface MsgToggleTagBudgetAminoMsg {
+  type: "/sparkdream.rep.v1.MsgToggleTagBudget";
+  value: MsgToggleTagBudgetAmino;
+}
+/**
+ * MsgToggleTagBudgetResponse defines the MsgToggleTagBudgetResponse message.
+ * @name MsgToggleTagBudgetResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgToggleTagBudgetResponse
+ */
+export interface MsgToggleTagBudgetResponse {}
+export interface MsgToggleTagBudgetResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgToggleTagBudgetResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgToggleTagBudgetResponse defines the MsgToggleTagBudgetResponse message.
+ * @name MsgToggleTagBudgetResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgToggleTagBudgetResponse
+ */
+export interface MsgToggleTagBudgetResponseAmino {}
+export interface MsgToggleTagBudgetResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgToggleTagBudgetResponse";
+  value: MsgToggleTagBudgetResponseAmino;
+}
+/**
+ * MsgWithdrawTagBudget defines the MsgWithdrawTagBudget message.
+ * @name MsgWithdrawTagBudget
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgWithdrawTagBudget
+ */
+export interface MsgWithdrawTagBudget {
+  creator: string;
+  budgetId: bigint;
+}
+export interface MsgWithdrawTagBudgetProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgWithdrawTagBudget";
+  value: Uint8Array;
+}
+/**
+ * MsgWithdrawTagBudget defines the MsgWithdrawTagBudget message.
+ * @name MsgWithdrawTagBudgetAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgWithdrawTagBudget
+ */
+export interface MsgWithdrawTagBudgetAmino {
+  creator?: string;
+  budget_id?: string;
+}
+export interface MsgWithdrawTagBudgetAminoMsg {
+  type: "/sparkdream.rep.v1.MsgWithdrawTagBudget";
+  value: MsgWithdrawTagBudgetAmino;
+}
+/**
+ * MsgWithdrawTagBudgetResponse defines the MsgWithdrawTagBudgetResponse message.
+ * @name MsgWithdrawTagBudgetResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgWithdrawTagBudgetResponse
+ */
+export interface MsgWithdrawTagBudgetResponse {}
+export interface MsgWithdrawTagBudgetResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgWithdrawTagBudgetResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgWithdrawTagBudgetResponse defines the MsgWithdrawTagBudgetResponse message.
+ * @name MsgWithdrawTagBudgetResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgWithdrawTagBudgetResponse
+ */
+export interface MsgWithdrawTagBudgetResponseAmino {}
+export interface MsgWithdrawTagBudgetResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgWithdrawTagBudgetResponse";
+  value: MsgWithdrawTagBudgetResponseAmino;
+}
+/**
+ * MsgBondRole bonds DREAM against a specific role_type. The role's
+ * BondedRoleConfig controls eligibility (min_bond, min_rep_tier,
+ * min_trust_level, min_age_blocks) and demotion behaviour.
+ * @name MsgBondRole
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgBondRole
+ */
+export interface MsgBondRole {
+  creator: string;
+  roleType: RoleType;
+  amount: string;
+}
+export interface MsgBondRoleProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgBondRole";
+  value: Uint8Array;
+}
+/**
+ * MsgBondRole bonds DREAM against a specific role_type. The role's
+ * BondedRoleConfig controls eligibility (min_bond, min_rep_tier,
+ * min_trust_level, min_age_blocks) and demotion behaviour.
+ * @name MsgBondRoleAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgBondRole
+ */
+export interface MsgBondRoleAmino {
+  creator?: string;
+  role_type?: RoleType;
+  amount?: string;
+}
+export interface MsgBondRoleAminoMsg {
+  type: "/sparkdream.rep.v1.MsgBondRole";
+  value: MsgBondRoleAmino;
+}
+/**
+ * MsgBondRoleResponse defines the MsgBondRoleResponse message.
+ * @name MsgBondRoleResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgBondRoleResponse
+ */
+export interface MsgBondRoleResponse {}
+export interface MsgBondRoleResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgBondRoleResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgBondRoleResponse defines the MsgBondRoleResponse message.
+ * @name MsgBondRoleResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgBondRoleResponse
+ */
+export interface MsgBondRoleResponseAmino {}
+export interface MsgBondRoleResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgBondRoleResponse";
+  value: MsgBondRoleResponseAmino;
+}
+/**
+ * MsgUnbondRole withdraws a portion of the caller's bond for the given
+ * role_type. The committed portion (reserved against pending actions) is
+ * non-withdrawable.
+ * @name MsgUnbondRole
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgUnbondRole
+ */
+export interface MsgUnbondRole {
+  creator: string;
+  roleType: RoleType;
+  amount: string;
+}
+export interface MsgUnbondRoleProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgUnbondRole";
+  value: Uint8Array;
+}
+/**
+ * MsgUnbondRole withdraws a portion of the caller's bond for the given
+ * role_type. The committed portion (reserved against pending actions) is
+ * non-withdrawable.
+ * @name MsgUnbondRoleAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgUnbondRole
+ */
+export interface MsgUnbondRoleAmino {
+  creator?: string;
+  role_type?: RoleType;
+  amount?: string;
+}
+export interface MsgUnbondRoleAminoMsg {
+  type: "/sparkdream.rep.v1.MsgUnbondRole";
+  value: MsgUnbondRoleAmino;
+}
+/**
+ * MsgUnbondRoleResponse defines the MsgUnbondRoleResponse message.
+ * @name MsgUnbondRoleResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgUnbondRoleResponse
+ */
+export interface MsgUnbondRoleResponse {}
+export interface MsgUnbondRoleResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgUnbondRoleResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgUnbondRoleResponse defines the MsgUnbondRoleResponse message.
+ * @name MsgUnbondRoleResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgUnbondRoleResponse
+ */
+export interface MsgUnbondRoleResponseAmino {}
+export interface MsgUnbondRoleResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgUnbondRoleResponse";
+  value: MsgUnbondRoleResponseAmino;
+}
+/**
+ * MsgReportMember defines the MsgReportMember message.
+ * @name MsgReportMember
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReportMember
+ */
+export interface MsgReportMember {
+  creator: string;
+  member: string;
+  reason: string;
+  recommendedAction: bigint;
+}
+export interface MsgReportMemberProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgReportMember";
+  value: Uint8Array;
+}
+/**
+ * MsgReportMember defines the MsgReportMember message.
+ * @name MsgReportMemberAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReportMember
+ */
+export interface MsgReportMemberAmino {
+  creator?: string;
+  member?: string;
+  reason?: string;
+  recommended_action?: string;
+}
+export interface MsgReportMemberAminoMsg {
+  type: "/sparkdream.rep.v1.MsgReportMember";
+  value: MsgReportMemberAmino;
+}
+/**
+ * MsgReportMemberResponse defines the MsgReportMemberResponse message.
+ * @name MsgReportMemberResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReportMemberResponse
+ */
+export interface MsgReportMemberResponse {}
+export interface MsgReportMemberResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgReportMemberResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgReportMemberResponse defines the MsgReportMemberResponse message.
+ * @name MsgReportMemberResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReportMemberResponse
+ */
+export interface MsgReportMemberResponseAmino {}
+export interface MsgReportMemberResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgReportMemberResponse";
+  value: MsgReportMemberResponseAmino;
+}
+/**
+ * MsgCosignMemberReport defines the MsgCosignMemberReport message.
+ * @name MsgCosignMemberReport
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCosignMemberReport
+ */
+export interface MsgCosignMemberReport {
+  creator: string;
+  member: string;
+}
+export interface MsgCosignMemberReportProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgCosignMemberReport";
+  value: Uint8Array;
+}
+/**
+ * MsgCosignMemberReport defines the MsgCosignMemberReport message.
+ * @name MsgCosignMemberReportAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCosignMemberReport
+ */
+export interface MsgCosignMemberReportAmino {
+  creator?: string;
+  member?: string;
+}
+export interface MsgCosignMemberReportAminoMsg {
+  type: "/sparkdream.rep.v1.MsgCosignMemberReport";
+  value: MsgCosignMemberReportAmino;
+}
+/**
+ * MsgCosignMemberReportResponse defines the MsgCosignMemberReportResponse message.
+ * @name MsgCosignMemberReportResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCosignMemberReportResponse
+ */
+export interface MsgCosignMemberReportResponse {}
+export interface MsgCosignMemberReportResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgCosignMemberReportResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgCosignMemberReportResponse defines the MsgCosignMemberReportResponse message.
+ * @name MsgCosignMemberReportResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCosignMemberReportResponse
+ */
+export interface MsgCosignMemberReportResponseAmino {}
+export interface MsgCosignMemberReportResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgCosignMemberReportResponse";
+  value: MsgCosignMemberReportResponseAmino;
+}
+/**
+ * MsgResolveMemberReport defines the MsgResolveMemberReport message.
+ * @name MsgResolveMemberReport
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveMemberReport
+ */
+export interface MsgResolveMemberReport {
+  creator: string;
+  member: string;
+  action: bigint;
+  reason: string;
+}
+export interface MsgResolveMemberReportProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgResolveMemberReport";
+  value: Uint8Array;
+}
+/**
+ * MsgResolveMemberReport defines the MsgResolveMemberReport message.
+ * @name MsgResolveMemberReportAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveMemberReport
+ */
+export interface MsgResolveMemberReportAmino {
+  creator?: string;
+  member?: string;
+  action?: string;
+  reason?: string;
+}
+export interface MsgResolveMemberReportAminoMsg {
+  type: "/sparkdream.rep.v1.MsgResolveMemberReport";
+  value: MsgResolveMemberReportAmino;
+}
+/**
+ * MsgResolveMemberReportResponse defines the MsgResolveMemberReportResponse message.
+ * @name MsgResolveMemberReportResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveMemberReportResponse
+ */
+export interface MsgResolveMemberReportResponse {}
+export interface MsgResolveMemberReportResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgResolveMemberReportResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgResolveMemberReportResponse defines the MsgResolveMemberReportResponse message.
+ * @name MsgResolveMemberReportResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveMemberReportResponse
+ */
+export interface MsgResolveMemberReportResponseAmino {}
+export interface MsgResolveMemberReportResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgResolveMemberReportResponse";
+  value: MsgResolveMemberReportResponseAmino;
+}
+/**
+ * MsgDefendMemberReport defines the MsgDefendMemberReport message.
+ * @name MsgDefendMemberReport
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgDefendMemberReport
+ */
+export interface MsgDefendMemberReport {
+  creator: string;
+  defense: string;
+}
+export interface MsgDefendMemberReportProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgDefendMemberReport";
+  value: Uint8Array;
+}
+/**
+ * MsgDefendMemberReport defines the MsgDefendMemberReport message.
+ * @name MsgDefendMemberReportAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgDefendMemberReport
+ */
+export interface MsgDefendMemberReportAmino {
+  creator?: string;
+  defense?: string;
+}
+export interface MsgDefendMemberReportAminoMsg {
+  type: "/sparkdream.rep.v1.MsgDefendMemberReport";
+  value: MsgDefendMemberReportAmino;
+}
+/**
+ * MsgDefendMemberReportResponse defines the MsgDefendMemberReportResponse message.
+ * @name MsgDefendMemberReportResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgDefendMemberReportResponse
+ */
+export interface MsgDefendMemberReportResponse {}
+export interface MsgDefendMemberReportResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgDefendMemberReportResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgDefendMemberReportResponse defines the MsgDefendMemberReportResponse message.
+ * @name MsgDefendMemberReportResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgDefendMemberReportResponse
+ */
+export interface MsgDefendMemberReportResponseAmino {}
+export interface MsgDefendMemberReportResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgDefendMemberReportResponse";
+  value: MsgDefendMemberReportResponseAmino;
+}
+/**
+ * MsgAppealGovAction defines the MsgAppealGovAction message.
+ * @name MsgAppealGovAction
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAppealGovAction
+ */
+export interface MsgAppealGovAction {
+  creator: string;
+  actionType: bigint;
+  actionTarget: string;
+  appealReason: string;
+}
+export interface MsgAppealGovActionProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgAppealGovAction";
+  value: Uint8Array;
+}
+/**
+ * MsgAppealGovAction defines the MsgAppealGovAction message.
+ * @name MsgAppealGovActionAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAppealGovAction
+ */
+export interface MsgAppealGovActionAmino {
+  creator?: string;
+  action_type?: string;
+  action_target?: string;
+  appeal_reason?: string;
+}
+export interface MsgAppealGovActionAminoMsg {
+  type: "/sparkdream.rep.v1.MsgAppealGovAction";
+  value: MsgAppealGovActionAmino;
+}
+/**
+ * MsgAppealGovActionResponse defines the MsgAppealGovActionResponse message.
+ * @name MsgAppealGovActionResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAppealGovActionResponse
+ */
+export interface MsgAppealGovActionResponse {}
+export interface MsgAppealGovActionResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgAppealGovActionResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgAppealGovActionResponse defines the MsgAppealGovActionResponse message.
+ * @name MsgAppealGovActionResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAppealGovActionResponse
+ */
+export interface MsgAppealGovActionResponseAmino {}
+export interface MsgAppealGovActionResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgAppealGovActionResponse";
+  value: MsgAppealGovActionResponseAmino;
+}
+/**
+ * MsgResolveGovActionAppeal resolves a pending appeal via council authority.
+ * Only the Operations Committee of the commons council may resolve appeals.
+ * The verdict must be UPHELD or OVERTURNED; TIMEOUT is EndBlocker-only and
+ * UNSPECIFIED is rejected.
+ * @name MsgResolveGovActionAppeal
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveGovActionAppeal
+ */
+export interface MsgResolveGovActionAppeal {
+  resolver: string;
+  appealId: bigint;
+  verdict: GovAppealStatus;
+  reason: string;
+}
+export interface MsgResolveGovActionAppealProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgResolveGovActionAppeal";
+  value: Uint8Array;
+}
+/**
+ * MsgResolveGovActionAppeal resolves a pending appeal via council authority.
+ * Only the Operations Committee of the commons council may resolve appeals.
+ * The verdict must be UPHELD or OVERTURNED; TIMEOUT is EndBlocker-only and
+ * UNSPECIFIED is rejected.
+ * @name MsgResolveGovActionAppealAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveGovActionAppeal
+ */
+export interface MsgResolveGovActionAppealAmino {
+  resolver?: string;
+  appeal_id?: string;
+  verdict?: GovAppealStatus;
+  reason?: string;
+}
+export interface MsgResolveGovActionAppealAminoMsg {
+  type: "/sparkdream.rep.v1.MsgResolveGovActionAppeal";
+  value: MsgResolveGovActionAppealAmino;
+}
+/**
+ * MsgResolveGovActionAppealResponse defines the response for
+ * ResolveGovActionAppeal.
+ * @name MsgResolveGovActionAppealResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveGovActionAppealResponse
+ */
+export interface MsgResolveGovActionAppealResponse {}
+export interface MsgResolveGovActionAppealResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgResolveGovActionAppealResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgResolveGovActionAppealResponse defines the response for
+ * ResolveGovActionAppeal.
+ * @name MsgResolveGovActionAppealResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveGovActionAppealResponse
+ */
+export interface MsgResolveGovActionAppealResponseAmino {}
+export interface MsgResolveGovActionAppealResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgResolveGovActionAppealResponse";
+  value: MsgResolveGovActionAppealResponseAmino;
 }
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
@@ -6936,6 +7804,2473 @@ export const MsgRegisterZkPublicKeyResponse = {
     return {
       typeUrl: "/sparkdream.rep.v1.MsgRegisterZkPublicKeyResponse",
       value: MsgRegisterZkPublicKeyResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCreateTag(): MsgCreateTag {
+  return {
+    creator: "",
+    name: ""
+  };
+}
+/**
+ * MsgCreateTag defines the MsgCreateTag message. Creates a new tag in the
+ * shared tag registry. Caller must meet the minimum trust level and pay the
+ * tag-creation fee.
+ * @name MsgCreateTag
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCreateTag
+ */
+export const MsgCreateTag = {
+  typeUrl: "/sparkdream.rep.v1.MsgCreateTag",
+  encode(message: MsgCreateTag, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCreateTag {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCreateTag();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.name = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCreateTag>): MsgCreateTag {
+    const message = createBaseMsgCreateTag();
+    message.creator = object.creator ?? "";
+    message.name = object.name ?? "";
+    return message;
+  },
+  fromAmino(object: MsgCreateTagAmino): MsgCreateTag {
+    const message = createBaseMsgCreateTag();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.name !== undefined && object.name !== null) {
+      message.name = object.name;
+    }
+    return message;
+  },
+  toAmino(message: MsgCreateTag): MsgCreateTagAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.name = message.name === "" ? undefined : message.name;
+    return obj;
+  },
+  fromAminoMsg(object: MsgCreateTagAminoMsg): MsgCreateTag {
+    return MsgCreateTag.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgCreateTagProtoMsg): MsgCreateTag {
+    return MsgCreateTag.decode(message.value);
+  },
+  toProto(message: MsgCreateTag): Uint8Array {
+    return MsgCreateTag.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCreateTag): MsgCreateTagProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgCreateTag",
+      value: MsgCreateTag.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCreateTagResponse(): MsgCreateTagResponse {
+  return {
+    name: ""
+  };
+}
+/**
+ * MsgCreateTagResponse defines the response for CreateTag.
+ * @name MsgCreateTagResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCreateTagResponse
+ */
+export const MsgCreateTagResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgCreateTagResponse",
+  encode(message: MsgCreateTagResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCreateTagResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCreateTagResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.name = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCreateTagResponse>): MsgCreateTagResponse {
+    const message = createBaseMsgCreateTagResponse();
+    message.name = object.name ?? "";
+    return message;
+  },
+  fromAmino(object: MsgCreateTagResponseAmino): MsgCreateTagResponse {
+    const message = createBaseMsgCreateTagResponse();
+    if (object.name !== undefined && object.name !== null) {
+      message.name = object.name;
+    }
+    return message;
+  },
+  toAmino(message: MsgCreateTagResponse): MsgCreateTagResponseAmino {
+    const obj: any = {};
+    obj.name = message.name === "" ? undefined : message.name;
+    return obj;
+  },
+  fromAminoMsg(object: MsgCreateTagResponseAminoMsg): MsgCreateTagResponse {
+    return MsgCreateTagResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgCreateTagResponseProtoMsg): MsgCreateTagResponse {
+    return MsgCreateTagResponse.decode(message.value);
+  },
+  toProto(message: MsgCreateTagResponse): Uint8Array {
+    return MsgCreateTagResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCreateTagResponse): MsgCreateTagResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgCreateTagResponse",
+      value: MsgCreateTagResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgReportTag(): MsgReportTag {
+  return {
+    creator: "",
+    tagName: "",
+    reason: ""
+  };
+}
+/**
+ * MsgReportTag defines the MsgReportTag message.
+ * @name MsgReportTag
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReportTag
+ */
+export const MsgReportTag = {
+  typeUrl: "/sparkdream.rep.v1.MsgReportTag",
+  encode(message: MsgReportTag, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.tagName !== "") {
+      writer.uint32(18).string(message.tagName);
+    }
+    if (message.reason !== "") {
+      writer.uint32(26).string(message.reason);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgReportTag {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgReportTag();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.tagName = reader.string();
+          break;
+        case 3:
+          message.reason = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgReportTag>): MsgReportTag {
+    const message = createBaseMsgReportTag();
+    message.creator = object.creator ?? "";
+    message.tagName = object.tagName ?? "";
+    message.reason = object.reason ?? "";
+    return message;
+  },
+  fromAmino(object: MsgReportTagAmino): MsgReportTag {
+    const message = createBaseMsgReportTag();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.tag_name !== undefined && object.tag_name !== null) {
+      message.tagName = object.tag_name;
+    }
+    if (object.reason !== undefined && object.reason !== null) {
+      message.reason = object.reason;
+    }
+    return message;
+  },
+  toAmino(message: MsgReportTag): MsgReportTagAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.tag_name = message.tagName === "" ? undefined : message.tagName;
+    obj.reason = message.reason === "" ? undefined : message.reason;
+    return obj;
+  },
+  fromAminoMsg(object: MsgReportTagAminoMsg): MsgReportTag {
+    return MsgReportTag.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgReportTagProtoMsg): MsgReportTag {
+    return MsgReportTag.decode(message.value);
+  },
+  toProto(message: MsgReportTag): Uint8Array {
+    return MsgReportTag.encode(message).finish();
+  },
+  toProtoMsg(message: MsgReportTag): MsgReportTagProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgReportTag",
+      value: MsgReportTag.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgReportTagResponse(): MsgReportTagResponse {
+  return {};
+}
+/**
+ * MsgReportTagResponse defines the MsgReportTagResponse message.
+ * @name MsgReportTagResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReportTagResponse
+ */
+export const MsgReportTagResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgReportTagResponse",
+  encode(_: MsgReportTagResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgReportTagResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgReportTagResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgReportTagResponse>): MsgReportTagResponse {
+    const message = createBaseMsgReportTagResponse();
+    return message;
+  },
+  fromAmino(_: MsgReportTagResponseAmino): MsgReportTagResponse {
+    const message = createBaseMsgReportTagResponse();
+    return message;
+  },
+  toAmino(_: MsgReportTagResponse): MsgReportTagResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgReportTagResponseAminoMsg): MsgReportTagResponse {
+    return MsgReportTagResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgReportTagResponseProtoMsg): MsgReportTagResponse {
+    return MsgReportTagResponse.decode(message.value);
+  },
+  toProto(message: MsgReportTagResponse): Uint8Array {
+    return MsgReportTagResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgReportTagResponse): MsgReportTagResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgReportTagResponse",
+      value: MsgReportTagResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgResolveTagReport(): MsgResolveTagReport {
+  return {
+    creator: "",
+    tagName: "",
+    action: BigInt(0),
+    reserveAuthority: "",
+    reserveMembersCanUse: false
+  };
+}
+/**
+ * MsgResolveTagReport defines the MsgResolveTagReport message.
+ * @name MsgResolveTagReport
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveTagReport
+ */
+export const MsgResolveTagReport = {
+  typeUrl: "/sparkdream.rep.v1.MsgResolveTagReport",
+  encode(message: MsgResolveTagReport, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.tagName !== "") {
+      writer.uint32(18).string(message.tagName);
+    }
+    if (message.action !== BigInt(0)) {
+      writer.uint32(24).uint64(message.action);
+    }
+    if (message.reserveAuthority !== "") {
+      writer.uint32(34).string(message.reserveAuthority);
+    }
+    if (message.reserveMembersCanUse === true) {
+      writer.uint32(40).bool(message.reserveMembersCanUse);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgResolveTagReport {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgResolveTagReport();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.tagName = reader.string();
+          break;
+        case 3:
+          message.action = reader.uint64();
+          break;
+        case 4:
+          message.reserveAuthority = reader.string();
+          break;
+        case 5:
+          message.reserveMembersCanUse = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgResolveTagReport>): MsgResolveTagReport {
+    const message = createBaseMsgResolveTagReport();
+    message.creator = object.creator ?? "";
+    message.tagName = object.tagName ?? "";
+    message.action = object.action !== undefined && object.action !== null ? BigInt(object.action.toString()) : BigInt(0);
+    message.reserveAuthority = object.reserveAuthority ?? "";
+    message.reserveMembersCanUse = object.reserveMembersCanUse ?? false;
+    return message;
+  },
+  fromAmino(object: MsgResolveTagReportAmino): MsgResolveTagReport {
+    const message = createBaseMsgResolveTagReport();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.tag_name !== undefined && object.tag_name !== null) {
+      message.tagName = object.tag_name;
+    }
+    if (object.action !== undefined && object.action !== null) {
+      message.action = BigInt(object.action);
+    }
+    if (object.reserve_authority !== undefined && object.reserve_authority !== null) {
+      message.reserveAuthority = object.reserve_authority;
+    }
+    if (object.reserve_members_can_use !== undefined && object.reserve_members_can_use !== null) {
+      message.reserveMembersCanUse = object.reserve_members_can_use;
+    }
+    return message;
+  },
+  toAmino(message: MsgResolveTagReport): MsgResolveTagReportAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.tag_name = message.tagName === "" ? undefined : message.tagName;
+    obj.action = message.action !== BigInt(0) ? message.action?.toString() : undefined;
+    obj.reserve_authority = message.reserveAuthority === "" ? undefined : message.reserveAuthority;
+    obj.reserve_members_can_use = message.reserveMembersCanUse === false ? undefined : message.reserveMembersCanUse;
+    return obj;
+  },
+  fromAminoMsg(object: MsgResolveTagReportAminoMsg): MsgResolveTagReport {
+    return MsgResolveTagReport.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgResolveTagReportProtoMsg): MsgResolveTagReport {
+    return MsgResolveTagReport.decode(message.value);
+  },
+  toProto(message: MsgResolveTagReport): Uint8Array {
+    return MsgResolveTagReport.encode(message).finish();
+  },
+  toProtoMsg(message: MsgResolveTagReport): MsgResolveTagReportProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgResolveTagReport",
+      value: MsgResolveTagReport.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgResolveTagReportResponse(): MsgResolveTagReportResponse {
+  return {};
+}
+/**
+ * MsgResolveTagReportResponse defines the MsgResolveTagReportResponse message.
+ * @name MsgResolveTagReportResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveTagReportResponse
+ */
+export const MsgResolveTagReportResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgResolveTagReportResponse",
+  encode(_: MsgResolveTagReportResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgResolveTagReportResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgResolveTagReportResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgResolveTagReportResponse>): MsgResolveTagReportResponse {
+    const message = createBaseMsgResolveTagReportResponse();
+    return message;
+  },
+  fromAmino(_: MsgResolveTagReportResponseAmino): MsgResolveTagReportResponse {
+    const message = createBaseMsgResolveTagReportResponse();
+    return message;
+  },
+  toAmino(_: MsgResolveTagReportResponse): MsgResolveTagReportResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgResolveTagReportResponseAminoMsg): MsgResolveTagReportResponse {
+    return MsgResolveTagReportResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgResolveTagReportResponseProtoMsg): MsgResolveTagReportResponse {
+    return MsgResolveTagReportResponse.decode(message.value);
+  },
+  toProto(message: MsgResolveTagReportResponse): Uint8Array {
+    return MsgResolveTagReportResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgResolveTagReportResponse): MsgResolveTagReportResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgResolveTagReportResponse",
+      value: MsgResolveTagReportResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCreateTagBudget(): MsgCreateTagBudget {
+  return {
+    creator: "",
+    tag: "",
+    initialPool: "",
+    membersOnly: false
+  };
+}
+/**
+ * MsgCreateTagBudget defines the MsgCreateTagBudget message.
+ * @name MsgCreateTagBudget
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCreateTagBudget
+ */
+export const MsgCreateTagBudget = {
+  typeUrl: "/sparkdream.rep.v1.MsgCreateTagBudget",
+  encode(message: MsgCreateTagBudget, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.tag !== "") {
+      writer.uint32(18).string(message.tag);
+    }
+    if (message.initialPool !== "") {
+      writer.uint32(26).string(message.initialPool);
+    }
+    if (message.membersOnly === true) {
+      writer.uint32(32).bool(message.membersOnly);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCreateTagBudget {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCreateTagBudget();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.tag = reader.string();
+          break;
+        case 3:
+          message.initialPool = reader.string();
+          break;
+        case 4:
+          message.membersOnly = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCreateTagBudget>): MsgCreateTagBudget {
+    const message = createBaseMsgCreateTagBudget();
+    message.creator = object.creator ?? "";
+    message.tag = object.tag ?? "";
+    message.initialPool = object.initialPool ?? "";
+    message.membersOnly = object.membersOnly ?? false;
+    return message;
+  },
+  fromAmino(object: MsgCreateTagBudgetAmino): MsgCreateTagBudget {
+    const message = createBaseMsgCreateTagBudget();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.tag !== undefined && object.tag !== null) {
+      message.tag = object.tag;
+    }
+    if (object.initial_pool !== undefined && object.initial_pool !== null) {
+      message.initialPool = object.initial_pool;
+    }
+    if (object.members_only !== undefined && object.members_only !== null) {
+      message.membersOnly = object.members_only;
+    }
+    return message;
+  },
+  toAmino(message: MsgCreateTagBudget): MsgCreateTagBudgetAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.tag = message.tag === "" ? undefined : message.tag;
+    obj.initial_pool = message.initialPool === "" ? undefined : message.initialPool;
+    obj.members_only = message.membersOnly === false ? undefined : message.membersOnly;
+    return obj;
+  },
+  fromAminoMsg(object: MsgCreateTagBudgetAminoMsg): MsgCreateTagBudget {
+    return MsgCreateTagBudget.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgCreateTagBudgetProtoMsg): MsgCreateTagBudget {
+    return MsgCreateTagBudget.decode(message.value);
+  },
+  toProto(message: MsgCreateTagBudget): Uint8Array {
+    return MsgCreateTagBudget.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCreateTagBudget): MsgCreateTagBudgetProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgCreateTagBudget",
+      value: MsgCreateTagBudget.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCreateTagBudgetResponse(): MsgCreateTagBudgetResponse {
+  return {};
+}
+/**
+ * MsgCreateTagBudgetResponse defines the MsgCreateTagBudgetResponse message.
+ * @name MsgCreateTagBudgetResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCreateTagBudgetResponse
+ */
+export const MsgCreateTagBudgetResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgCreateTagBudgetResponse",
+  encode(_: MsgCreateTagBudgetResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCreateTagBudgetResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCreateTagBudgetResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgCreateTagBudgetResponse>): MsgCreateTagBudgetResponse {
+    const message = createBaseMsgCreateTagBudgetResponse();
+    return message;
+  },
+  fromAmino(_: MsgCreateTagBudgetResponseAmino): MsgCreateTagBudgetResponse {
+    const message = createBaseMsgCreateTagBudgetResponse();
+    return message;
+  },
+  toAmino(_: MsgCreateTagBudgetResponse): MsgCreateTagBudgetResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgCreateTagBudgetResponseAminoMsg): MsgCreateTagBudgetResponse {
+    return MsgCreateTagBudgetResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgCreateTagBudgetResponseProtoMsg): MsgCreateTagBudgetResponse {
+    return MsgCreateTagBudgetResponse.decode(message.value);
+  },
+  toProto(message: MsgCreateTagBudgetResponse): Uint8Array {
+    return MsgCreateTagBudgetResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCreateTagBudgetResponse): MsgCreateTagBudgetResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgCreateTagBudgetResponse",
+      value: MsgCreateTagBudgetResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAwardFromTagBudget(): MsgAwardFromTagBudget {
+  return {
+    creator: "",
+    budgetId: BigInt(0),
+    postId: BigInt(0),
+    amount: "",
+    reason: ""
+  };
+}
+/**
+ * MsgAwardFromTagBudget defines the MsgAwardFromTagBudget message.
+ * @name MsgAwardFromTagBudget
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAwardFromTagBudget
+ */
+export const MsgAwardFromTagBudget = {
+  typeUrl: "/sparkdream.rep.v1.MsgAwardFromTagBudget",
+  encode(message: MsgAwardFromTagBudget, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.budgetId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.budgetId);
+    }
+    if (message.postId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.postId);
+    }
+    if (message.amount !== "") {
+      writer.uint32(34).string(message.amount);
+    }
+    if (message.reason !== "") {
+      writer.uint32(42).string(message.reason);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAwardFromTagBudget {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAwardFromTagBudget();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.budgetId = reader.uint64();
+          break;
+        case 3:
+          message.postId = reader.uint64();
+          break;
+        case 4:
+          message.amount = reader.string();
+          break;
+        case 5:
+          message.reason = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgAwardFromTagBudget>): MsgAwardFromTagBudget {
+    const message = createBaseMsgAwardFromTagBudget();
+    message.creator = object.creator ?? "";
+    message.budgetId = object.budgetId !== undefined && object.budgetId !== null ? BigInt(object.budgetId.toString()) : BigInt(0);
+    message.postId = object.postId !== undefined && object.postId !== null ? BigInt(object.postId.toString()) : BigInt(0);
+    message.amount = object.amount ?? "";
+    message.reason = object.reason ?? "";
+    return message;
+  },
+  fromAmino(object: MsgAwardFromTagBudgetAmino): MsgAwardFromTagBudget {
+    const message = createBaseMsgAwardFromTagBudget();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.budget_id !== undefined && object.budget_id !== null) {
+      message.budgetId = BigInt(object.budget_id);
+    }
+    if (object.post_id !== undefined && object.post_id !== null) {
+      message.postId = BigInt(object.post_id);
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = object.amount;
+    }
+    if (object.reason !== undefined && object.reason !== null) {
+      message.reason = object.reason;
+    }
+    return message;
+  },
+  toAmino(message: MsgAwardFromTagBudget): MsgAwardFromTagBudgetAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.budget_id = message.budgetId !== BigInt(0) ? message.budgetId?.toString() : undefined;
+    obj.post_id = message.postId !== BigInt(0) ? message.postId?.toString() : undefined;
+    obj.amount = message.amount === "" ? undefined : message.amount;
+    obj.reason = message.reason === "" ? undefined : message.reason;
+    return obj;
+  },
+  fromAminoMsg(object: MsgAwardFromTagBudgetAminoMsg): MsgAwardFromTagBudget {
+    return MsgAwardFromTagBudget.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgAwardFromTagBudgetProtoMsg): MsgAwardFromTagBudget {
+    return MsgAwardFromTagBudget.decode(message.value);
+  },
+  toProto(message: MsgAwardFromTagBudget): Uint8Array {
+    return MsgAwardFromTagBudget.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAwardFromTagBudget): MsgAwardFromTagBudgetProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgAwardFromTagBudget",
+      value: MsgAwardFromTagBudget.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAwardFromTagBudgetResponse(): MsgAwardFromTagBudgetResponse {
+  return {};
+}
+/**
+ * MsgAwardFromTagBudgetResponse defines the MsgAwardFromTagBudgetResponse message.
+ * @name MsgAwardFromTagBudgetResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAwardFromTagBudgetResponse
+ */
+export const MsgAwardFromTagBudgetResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgAwardFromTagBudgetResponse",
+  encode(_: MsgAwardFromTagBudgetResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAwardFromTagBudgetResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAwardFromTagBudgetResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgAwardFromTagBudgetResponse>): MsgAwardFromTagBudgetResponse {
+    const message = createBaseMsgAwardFromTagBudgetResponse();
+    return message;
+  },
+  fromAmino(_: MsgAwardFromTagBudgetResponseAmino): MsgAwardFromTagBudgetResponse {
+    const message = createBaseMsgAwardFromTagBudgetResponse();
+    return message;
+  },
+  toAmino(_: MsgAwardFromTagBudgetResponse): MsgAwardFromTagBudgetResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgAwardFromTagBudgetResponseAminoMsg): MsgAwardFromTagBudgetResponse {
+    return MsgAwardFromTagBudgetResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgAwardFromTagBudgetResponseProtoMsg): MsgAwardFromTagBudgetResponse {
+    return MsgAwardFromTagBudgetResponse.decode(message.value);
+  },
+  toProto(message: MsgAwardFromTagBudgetResponse): Uint8Array {
+    return MsgAwardFromTagBudgetResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAwardFromTagBudgetResponse): MsgAwardFromTagBudgetResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgAwardFromTagBudgetResponse",
+      value: MsgAwardFromTagBudgetResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgTopUpTagBudget(): MsgTopUpTagBudget {
+  return {
+    creator: "",
+    budgetId: BigInt(0),
+    amount: ""
+  };
+}
+/**
+ * MsgTopUpTagBudget defines the MsgTopUpTagBudget message.
+ * @name MsgTopUpTagBudget
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgTopUpTagBudget
+ */
+export const MsgTopUpTagBudget = {
+  typeUrl: "/sparkdream.rep.v1.MsgTopUpTagBudget",
+  encode(message: MsgTopUpTagBudget, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.budgetId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.budgetId);
+    }
+    if (message.amount !== "") {
+      writer.uint32(26).string(message.amount);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgTopUpTagBudget {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgTopUpTagBudget();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.budgetId = reader.uint64();
+          break;
+        case 3:
+          message.amount = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgTopUpTagBudget>): MsgTopUpTagBudget {
+    const message = createBaseMsgTopUpTagBudget();
+    message.creator = object.creator ?? "";
+    message.budgetId = object.budgetId !== undefined && object.budgetId !== null ? BigInt(object.budgetId.toString()) : BigInt(0);
+    message.amount = object.amount ?? "";
+    return message;
+  },
+  fromAmino(object: MsgTopUpTagBudgetAmino): MsgTopUpTagBudget {
+    const message = createBaseMsgTopUpTagBudget();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.budget_id !== undefined && object.budget_id !== null) {
+      message.budgetId = BigInt(object.budget_id);
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = object.amount;
+    }
+    return message;
+  },
+  toAmino(message: MsgTopUpTagBudget): MsgTopUpTagBudgetAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.budget_id = message.budgetId !== BigInt(0) ? message.budgetId?.toString() : undefined;
+    obj.amount = message.amount === "" ? undefined : message.amount;
+    return obj;
+  },
+  fromAminoMsg(object: MsgTopUpTagBudgetAminoMsg): MsgTopUpTagBudget {
+    return MsgTopUpTagBudget.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgTopUpTagBudgetProtoMsg): MsgTopUpTagBudget {
+    return MsgTopUpTagBudget.decode(message.value);
+  },
+  toProto(message: MsgTopUpTagBudget): Uint8Array {
+    return MsgTopUpTagBudget.encode(message).finish();
+  },
+  toProtoMsg(message: MsgTopUpTagBudget): MsgTopUpTagBudgetProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgTopUpTagBudget",
+      value: MsgTopUpTagBudget.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgTopUpTagBudgetResponse(): MsgTopUpTagBudgetResponse {
+  return {};
+}
+/**
+ * MsgTopUpTagBudgetResponse defines the MsgTopUpTagBudgetResponse message.
+ * @name MsgTopUpTagBudgetResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgTopUpTagBudgetResponse
+ */
+export const MsgTopUpTagBudgetResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgTopUpTagBudgetResponse",
+  encode(_: MsgTopUpTagBudgetResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgTopUpTagBudgetResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgTopUpTagBudgetResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgTopUpTagBudgetResponse>): MsgTopUpTagBudgetResponse {
+    const message = createBaseMsgTopUpTagBudgetResponse();
+    return message;
+  },
+  fromAmino(_: MsgTopUpTagBudgetResponseAmino): MsgTopUpTagBudgetResponse {
+    const message = createBaseMsgTopUpTagBudgetResponse();
+    return message;
+  },
+  toAmino(_: MsgTopUpTagBudgetResponse): MsgTopUpTagBudgetResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgTopUpTagBudgetResponseAminoMsg): MsgTopUpTagBudgetResponse {
+    return MsgTopUpTagBudgetResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgTopUpTagBudgetResponseProtoMsg): MsgTopUpTagBudgetResponse {
+    return MsgTopUpTagBudgetResponse.decode(message.value);
+  },
+  toProto(message: MsgTopUpTagBudgetResponse): Uint8Array {
+    return MsgTopUpTagBudgetResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgTopUpTagBudgetResponse): MsgTopUpTagBudgetResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgTopUpTagBudgetResponse",
+      value: MsgTopUpTagBudgetResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgToggleTagBudget(): MsgToggleTagBudget {
+  return {
+    creator: "",
+    budgetId: BigInt(0),
+    active: false
+  };
+}
+/**
+ * MsgToggleTagBudget defines the MsgToggleTagBudget message.
+ * @name MsgToggleTagBudget
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgToggleTagBudget
+ */
+export const MsgToggleTagBudget = {
+  typeUrl: "/sparkdream.rep.v1.MsgToggleTagBudget",
+  encode(message: MsgToggleTagBudget, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.budgetId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.budgetId);
+    }
+    if (message.active === true) {
+      writer.uint32(24).bool(message.active);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgToggleTagBudget {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgToggleTagBudget();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.budgetId = reader.uint64();
+          break;
+        case 3:
+          message.active = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgToggleTagBudget>): MsgToggleTagBudget {
+    const message = createBaseMsgToggleTagBudget();
+    message.creator = object.creator ?? "";
+    message.budgetId = object.budgetId !== undefined && object.budgetId !== null ? BigInt(object.budgetId.toString()) : BigInt(0);
+    message.active = object.active ?? false;
+    return message;
+  },
+  fromAmino(object: MsgToggleTagBudgetAmino): MsgToggleTagBudget {
+    const message = createBaseMsgToggleTagBudget();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.budget_id !== undefined && object.budget_id !== null) {
+      message.budgetId = BigInt(object.budget_id);
+    }
+    if (object.active !== undefined && object.active !== null) {
+      message.active = object.active;
+    }
+    return message;
+  },
+  toAmino(message: MsgToggleTagBudget): MsgToggleTagBudgetAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.budget_id = message.budgetId !== BigInt(0) ? message.budgetId?.toString() : undefined;
+    obj.active = message.active === false ? undefined : message.active;
+    return obj;
+  },
+  fromAminoMsg(object: MsgToggleTagBudgetAminoMsg): MsgToggleTagBudget {
+    return MsgToggleTagBudget.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgToggleTagBudgetProtoMsg): MsgToggleTagBudget {
+    return MsgToggleTagBudget.decode(message.value);
+  },
+  toProto(message: MsgToggleTagBudget): Uint8Array {
+    return MsgToggleTagBudget.encode(message).finish();
+  },
+  toProtoMsg(message: MsgToggleTagBudget): MsgToggleTagBudgetProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgToggleTagBudget",
+      value: MsgToggleTagBudget.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgToggleTagBudgetResponse(): MsgToggleTagBudgetResponse {
+  return {};
+}
+/**
+ * MsgToggleTagBudgetResponse defines the MsgToggleTagBudgetResponse message.
+ * @name MsgToggleTagBudgetResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgToggleTagBudgetResponse
+ */
+export const MsgToggleTagBudgetResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgToggleTagBudgetResponse",
+  encode(_: MsgToggleTagBudgetResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgToggleTagBudgetResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgToggleTagBudgetResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgToggleTagBudgetResponse>): MsgToggleTagBudgetResponse {
+    const message = createBaseMsgToggleTagBudgetResponse();
+    return message;
+  },
+  fromAmino(_: MsgToggleTagBudgetResponseAmino): MsgToggleTagBudgetResponse {
+    const message = createBaseMsgToggleTagBudgetResponse();
+    return message;
+  },
+  toAmino(_: MsgToggleTagBudgetResponse): MsgToggleTagBudgetResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgToggleTagBudgetResponseAminoMsg): MsgToggleTagBudgetResponse {
+    return MsgToggleTagBudgetResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgToggleTagBudgetResponseProtoMsg): MsgToggleTagBudgetResponse {
+    return MsgToggleTagBudgetResponse.decode(message.value);
+  },
+  toProto(message: MsgToggleTagBudgetResponse): Uint8Array {
+    return MsgToggleTagBudgetResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgToggleTagBudgetResponse): MsgToggleTagBudgetResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgToggleTagBudgetResponse",
+      value: MsgToggleTagBudgetResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgWithdrawTagBudget(): MsgWithdrawTagBudget {
+  return {
+    creator: "",
+    budgetId: BigInt(0)
+  };
+}
+/**
+ * MsgWithdrawTagBudget defines the MsgWithdrawTagBudget message.
+ * @name MsgWithdrawTagBudget
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgWithdrawTagBudget
+ */
+export const MsgWithdrawTagBudget = {
+  typeUrl: "/sparkdream.rep.v1.MsgWithdrawTagBudget",
+  encode(message: MsgWithdrawTagBudget, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.budgetId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.budgetId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgWithdrawTagBudget {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgWithdrawTagBudget();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.budgetId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgWithdrawTagBudget>): MsgWithdrawTagBudget {
+    const message = createBaseMsgWithdrawTagBudget();
+    message.creator = object.creator ?? "";
+    message.budgetId = object.budgetId !== undefined && object.budgetId !== null ? BigInt(object.budgetId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgWithdrawTagBudgetAmino): MsgWithdrawTagBudget {
+    const message = createBaseMsgWithdrawTagBudget();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.budget_id !== undefined && object.budget_id !== null) {
+      message.budgetId = BigInt(object.budget_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgWithdrawTagBudget): MsgWithdrawTagBudgetAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.budget_id = message.budgetId !== BigInt(0) ? message.budgetId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgWithdrawTagBudgetAminoMsg): MsgWithdrawTagBudget {
+    return MsgWithdrawTagBudget.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgWithdrawTagBudgetProtoMsg): MsgWithdrawTagBudget {
+    return MsgWithdrawTagBudget.decode(message.value);
+  },
+  toProto(message: MsgWithdrawTagBudget): Uint8Array {
+    return MsgWithdrawTagBudget.encode(message).finish();
+  },
+  toProtoMsg(message: MsgWithdrawTagBudget): MsgWithdrawTagBudgetProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgWithdrawTagBudget",
+      value: MsgWithdrawTagBudget.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgWithdrawTagBudgetResponse(): MsgWithdrawTagBudgetResponse {
+  return {};
+}
+/**
+ * MsgWithdrawTagBudgetResponse defines the MsgWithdrawTagBudgetResponse message.
+ * @name MsgWithdrawTagBudgetResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgWithdrawTagBudgetResponse
+ */
+export const MsgWithdrawTagBudgetResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgWithdrawTagBudgetResponse",
+  encode(_: MsgWithdrawTagBudgetResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgWithdrawTagBudgetResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgWithdrawTagBudgetResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgWithdrawTagBudgetResponse>): MsgWithdrawTagBudgetResponse {
+    const message = createBaseMsgWithdrawTagBudgetResponse();
+    return message;
+  },
+  fromAmino(_: MsgWithdrawTagBudgetResponseAmino): MsgWithdrawTagBudgetResponse {
+    const message = createBaseMsgWithdrawTagBudgetResponse();
+    return message;
+  },
+  toAmino(_: MsgWithdrawTagBudgetResponse): MsgWithdrawTagBudgetResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgWithdrawTagBudgetResponseAminoMsg): MsgWithdrawTagBudgetResponse {
+    return MsgWithdrawTagBudgetResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgWithdrawTagBudgetResponseProtoMsg): MsgWithdrawTagBudgetResponse {
+    return MsgWithdrawTagBudgetResponse.decode(message.value);
+  },
+  toProto(message: MsgWithdrawTagBudgetResponse): Uint8Array {
+    return MsgWithdrawTagBudgetResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgWithdrawTagBudgetResponse): MsgWithdrawTagBudgetResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgWithdrawTagBudgetResponse",
+      value: MsgWithdrawTagBudgetResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgBondRole(): MsgBondRole {
+  return {
+    creator: "",
+    roleType: 0,
+    amount: ""
+  };
+}
+/**
+ * MsgBondRole bonds DREAM against a specific role_type. The role's
+ * BondedRoleConfig controls eligibility (min_bond, min_rep_tier,
+ * min_trust_level, min_age_blocks) and demotion behaviour.
+ * @name MsgBondRole
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgBondRole
+ */
+export const MsgBondRole = {
+  typeUrl: "/sparkdream.rep.v1.MsgBondRole",
+  encode(message: MsgBondRole, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.roleType !== 0) {
+      writer.uint32(16).int32(message.roleType);
+    }
+    if (message.amount !== "") {
+      writer.uint32(26).string(message.amount);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgBondRole {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgBondRole();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.roleType = reader.int32() as any;
+          break;
+        case 3:
+          message.amount = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgBondRole>): MsgBondRole {
+    const message = createBaseMsgBondRole();
+    message.creator = object.creator ?? "";
+    message.roleType = object.roleType ?? 0;
+    message.amount = object.amount ?? "";
+    return message;
+  },
+  fromAmino(object: MsgBondRoleAmino): MsgBondRole {
+    const message = createBaseMsgBondRole();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.role_type !== undefined && object.role_type !== null) {
+      message.roleType = object.role_type;
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = object.amount;
+    }
+    return message;
+  },
+  toAmino(message: MsgBondRole): MsgBondRoleAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.role_type = message.roleType === 0 ? undefined : message.roleType;
+    obj.amount = message.amount === "" ? undefined : message.amount;
+    return obj;
+  },
+  fromAminoMsg(object: MsgBondRoleAminoMsg): MsgBondRole {
+    return MsgBondRole.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgBondRoleProtoMsg): MsgBondRole {
+    return MsgBondRole.decode(message.value);
+  },
+  toProto(message: MsgBondRole): Uint8Array {
+    return MsgBondRole.encode(message).finish();
+  },
+  toProtoMsg(message: MsgBondRole): MsgBondRoleProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgBondRole",
+      value: MsgBondRole.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgBondRoleResponse(): MsgBondRoleResponse {
+  return {};
+}
+/**
+ * MsgBondRoleResponse defines the MsgBondRoleResponse message.
+ * @name MsgBondRoleResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgBondRoleResponse
+ */
+export const MsgBondRoleResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgBondRoleResponse",
+  encode(_: MsgBondRoleResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgBondRoleResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgBondRoleResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgBondRoleResponse>): MsgBondRoleResponse {
+    const message = createBaseMsgBondRoleResponse();
+    return message;
+  },
+  fromAmino(_: MsgBondRoleResponseAmino): MsgBondRoleResponse {
+    const message = createBaseMsgBondRoleResponse();
+    return message;
+  },
+  toAmino(_: MsgBondRoleResponse): MsgBondRoleResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgBondRoleResponseAminoMsg): MsgBondRoleResponse {
+    return MsgBondRoleResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgBondRoleResponseProtoMsg): MsgBondRoleResponse {
+    return MsgBondRoleResponse.decode(message.value);
+  },
+  toProto(message: MsgBondRoleResponse): Uint8Array {
+    return MsgBondRoleResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgBondRoleResponse): MsgBondRoleResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgBondRoleResponse",
+      value: MsgBondRoleResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUnbondRole(): MsgUnbondRole {
+  return {
+    creator: "",
+    roleType: 0,
+    amount: ""
+  };
+}
+/**
+ * MsgUnbondRole withdraws a portion of the caller's bond for the given
+ * role_type. The committed portion (reserved against pending actions) is
+ * non-withdrawable.
+ * @name MsgUnbondRole
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgUnbondRole
+ */
+export const MsgUnbondRole = {
+  typeUrl: "/sparkdream.rep.v1.MsgUnbondRole",
+  encode(message: MsgUnbondRole, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.roleType !== 0) {
+      writer.uint32(16).int32(message.roleType);
+    }
+    if (message.amount !== "") {
+      writer.uint32(26).string(message.amount);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUnbondRole {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUnbondRole();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.roleType = reader.int32() as any;
+          break;
+        case 3:
+          message.amount = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgUnbondRole>): MsgUnbondRole {
+    const message = createBaseMsgUnbondRole();
+    message.creator = object.creator ?? "";
+    message.roleType = object.roleType ?? 0;
+    message.amount = object.amount ?? "";
+    return message;
+  },
+  fromAmino(object: MsgUnbondRoleAmino): MsgUnbondRole {
+    const message = createBaseMsgUnbondRole();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.role_type !== undefined && object.role_type !== null) {
+      message.roleType = object.role_type;
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = object.amount;
+    }
+    return message;
+  },
+  toAmino(message: MsgUnbondRole): MsgUnbondRoleAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.role_type = message.roleType === 0 ? undefined : message.roleType;
+    obj.amount = message.amount === "" ? undefined : message.amount;
+    return obj;
+  },
+  fromAminoMsg(object: MsgUnbondRoleAminoMsg): MsgUnbondRole {
+    return MsgUnbondRole.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgUnbondRoleProtoMsg): MsgUnbondRole {
+    return MsgUnbondRole.decode(message.value);
+  },
+  toProto(message: MsgUnbondRole): Uint8Array {
+    return MsgUnbondRole.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUnbondRole): MsgUnbondRoleProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgUnbondRole",
+      value: MsgUnbondRole.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUnbondRoleResponse(): MsgUnbondRoleResponse {
+  return {};
+}
+/**
+ * MsgUnbondRoleResponse defines the MsgUnbondRoleResponse message.
+ * @name MsgUnbondRoleResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgUnbondRoleResponse
+ */
+export const MsgUnbondRoleResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgUnbondRoleResponse",
+  encode(_: MsgUnbondRoleResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUnbondRoleResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUnbondRoleResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgUnbondRoleResponse>): MsgUnbondRoleResponse {
+    const message = createBaseMsgUnbondRoleResponse();
+    return message;
+  },
+  fromAmino(_: MsgUnbondRoleResponseAmino): MsgUnbondRoleResponse {
+    const message = createBaseMsgUnbondRoleResponse();
+    return message;
+  },
+  toAmino(_: MsgUnbondRoleResponse): MsgUnbondRoleResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgUnbondRoleResponseAminoMsg): MsgUnbondRoleResponse {
+    return MsgUnbondRoleResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgUnbondRoleResponseProtoMsg): MsgUnbondRoleResponse {
+    return MsgUnbondRoleResponse.decode(message.value);
+  },
+  toProto(message: MsgUnbondRoleResponse): Uint8Array {
+    return MsgUnbondRoleResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUnbondRoleResponse): MsgUnbondRoleResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgUnbondRoleResponse",
+      value: MsgUnbondRoleResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgReportMember(): MsgReportMember {
+  return {
+    creator: "",
+    member: "",
+    reason: "",
+    recommendedAction: BigInt(0)
+  };
+}
+/**
+ * MsgReportMember defines the MsgReportMember message.
+ * @name MsgReportMember
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReportMember
+ */
+export const MsgReportMember = {
+  typeUrl: "/sparkdream.rep.v1.MsgReportMember",
+  encode(message: MsgReportMember, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.member !== "") {
+      writer.uint32(18).string(message.member);
+    }
+    if (message.reason !== "") {
+      writer.uint32(26).string(message.reason);
+    }
+    if (message.recommendedAction !== BigInt(0)) {
+      writer.uint32(32).uint64(message.recommendedAction);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgReportMember {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgReportMember();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.member = reader.string();
+          break;
+        case 3:
+          message.reason = reader.string();
+          break;
+        case 4:
+          message.recommendedAction = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgReportMember>): MsgReportMember {
+    const message = createBaseMsgReportMember();
+    message.creator = object.creator ?? "";
+    message.member = object.member ?? "";
+    message.reason = object.reason ?? "";
+    message.recommendedAction = object.recommendedAction !== undefined && object.recommendedAction !== null ? BigInt(object.recommendedAction.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgReportMemberAmino): MsgReportMember {
+    const message = createBaseMsgReportMember();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.member !== undefined && object.member !== null) {
+      message.member = object.member;
+    }
+    if (object.reason !== undefined && object.reason !== null) {
+      message.reason = object.reason;
+    }
+    if (object.recommended_action !== undefined && object.recommended_action !== null) {
+      message.recommendedAction = BigInt(object.recommended_action);
+    }
+    return message;
+  },
+  toAmino(message: MsgReportMember): MsgReportMemberAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.member = message.member === "" ? undefined : message.member;
+    obj.reason = message.reason === "" ? undefined : message.reason;
+    obj.recommended_action = message.recommendedAction !== BigInt(0) ? message.recommendedAction?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgReportMemberAminoMsg): MsgReportMember {
+    return MsgReportMember.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgReportMemberProtoMsg): MsgReportMember {
+    return MsgReportMember.decode(message.value);
+  },
+  toProto(message: MsgReportMember): Uint8Array {
+    return MsgReportMember.encode(message).finish();
+  },
+  toProtoMsg(message: MsgReportMember): MsgReportMemberProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgReportMember",
+      value: MsgReportMember.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgReportMemberResponse(): MsgReportMemberResponse {
+  return {};
+}
+/**
+ * MsgReportMemberResponse defines the MsgReportMemberResponse message.
+ * @name MsgReportMemberResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReportMemberResponse
+ */
+export const MsgReportMemberResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgReportMemberResponse",
+  encode(_: MsgReportMemberResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgReportMemberResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgReportMemberResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgReportMemberResponse>): MsgReportMemberResponse {
+    const message = createBaseMsgReportMemberResponse();
+    return message;
+  },
+  fromAmino(_: MsgReportMemberResponseAmino): MsgReportMemberResponse {
+    const message = createBaseMsgReportMemberResponse();
+    return message;
+  },
+  toAmino(_: MsgReportMemberResponse): MsgReportMemberResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgReportMemberResponseAminoMsg): MsgReportMemberResponse {
+    return MsgReportMemberResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgReportMemberResponseProtoMsg): MsgReportMemberResponse {
+    return MsgReportMemberResponse.decode(message.value);
+  },
+  toProto(message: MsgReportMemberResponse): Uint8Array {
+    return MsgReportMemberResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgReportMemberResponse): MsgReportMemberResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgReportMemberResponse",
+      value: MsgReportMemberResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCosignMemberReport(): MsgCosignMemberReport {
+  return {
+    creator: "",
+    member: ""
+  };
+}
+/**
+ * MsgCosignMemberReport defines the MsgCosignMemberReport message.
+ * @name MsgCosignMemberReport
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCosignMemberReport
+ */
+export const MsgCosignMemberReport = {
+  typeUrl: "/sparkdream.rep.v1.MsgCosignMemberReport",
+  encode(message: MsgCosignMemberReport, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.member !== "") {
+      writer.uint32(18).string(message.member);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCosignMemberReport {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCosignMemberReport();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.member = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCosignMemberReport>): MsgCosignMemberReport {
+    const message = createBaseMsgCosignMemberReport();
+    message.creator = object.creator ?? "";
+    message.member = object.member ?? "";
+    return message;
+  },
+  fromAmino(object: MsgCosignMemberReportAmino): MsgCosignMemberReport {
+    const message = createBaseMsgCosignMemberReport();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.member !== undefined && object.member !== null) {
+      message.member = object.member;
+    }
+    return message;
+  },
+  toAmino(message: MsgCosignMemberReport): MsgCosignMemberReportAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.member = message.member === "" ? undefined : message.member;
+    return obj;
+  },
+  fromAminoMsg(object: MsgCosignMemberReportAminoMsg): MsgCosignMemberReport {
+    return MsgCosignMemberReport.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgCosignMemberReportProtoMsg): MsgCosignMemberReport {
+    return MsgCosignMemberReport.decode(message.value);
+  },
+  toProto(message: MsgCosignMemberReport): Uint8Array {
+    return MsgCosignMemberReport.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCosignMemberReport): MsgCosignMemberReportProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgCosignMemberReport",
+      value: MsgCosignMemberReport.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCosignMemberReportResponse(): MsgCosignMemberReportResponse {
+  return {};
+}
+/**
+ * MsgCosignMemberReportResponse defines the MsgCosignMemberReportResponse message.
+ * @name MsgCosignMemberReportResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCosignMemberReportResponse
+ */
+export const MsgCosignMemberReportResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgCosignMemberReportResponse",
+  encode(_: MsgCosignMemberReportResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCosignMemberReportResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCosignMemberReportResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgCosignMemberReportResponse>): MsgCosignMemberReportResponse {
+    const message = createBaseMsgCosignMemberReportResponse();
+    return message;
+  },
+  fromAmino(_: MsgCosignMemberReportResponseAmino): MsgCosignMemberReportResponse {
+    const message = createBaseMsgCosignMemberReportResponse();
+    return message;
+  },
+  toAmino(_: MsgCosignMemberReportResponse): MsgCosignMemberReportResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgCosignMemberReportResponseAminoMsg): MsgCosignMemberReportResponse {
+    return MsgCosignMemberReportResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgCosignMemberReportResponseProtoMsg): MsgCosignMemberReportResponse {
+    return MsgCosignMemberReportResponse.decode(message.value);
+  },
+  toProto(message: MsgCosignMemberReportResponse): Uint8Array {
+    return MsgCosignMemberReportResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCosignMemberReportResponse): MsgCosignMemberReportResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgCosignMemberReportResponse",
+      value: MsgCosignMemberReportResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgResolveMemberReport(): MsgResolveMemberReport {
+  return {
+    creator: "",
+    member: "",
+    action: BigInt(0),
+    reason: ""
+  };
+}
+/**
+ * MsgResolveMemberReport defines the MsgResolveMemberReport message.
+ * @name MsgResolveMemberReport
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveMemberReport
+ */
+export const MsgResolveMemberReport = {
+  typeUrl: "/sparkdream.rep.v1.MsgResolveMemberReport",
+  encode(message: MsgResolveMemberReport, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.member !== "") {
+      writer.uint32(18).string(message.member);
+    }
+    if (message.action !== BigInt(0)) {
+      writer.uint32(24).uint64(message.action);
+    }
+    if (message.reason !== "") {
+      writer.uint32(34).string(message.reason);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgResolveMemberReport {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgResolveMemberReport();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.member = reader.string();
+          break;
+        case 3:
+          message.action = reader.uint64();
+          break;
+        case 4:
+          message.reason = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgResolveMemberReport>): MsgResolveMemberReport {
+    const message = createBaseMsgResolveMemberReport();
+    message.creator = object.creator ?? "";
+    message.member = object.member ?? "";
+    message.action = object.action !== undefined && object.action !== null ? BigInt(object.action.toString()) : BigInt(0);
+    message.reason = object.reason ?? "";
+    return message;
+  },
+  fromAmino(object: MsgResolveMemberReportAmino): MsgResolveMemberReport {
+    const message = createBaseMsgResolveMemberReport();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.member !== undefined && object.member !== null) {
+      message.member = object.member;
+    }
+    if (object.action !== undefined && object.action !== null) {
+      message.action = BigInt(object.action);
+    }
+    if (object.reason !== undefined && object.reason !== null) {
+      message.reason = object.reason;
+    }
+    return message;
+  },
+  toAmino(message: MsgResolveMemberReport): MsgResolveMemberReportAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.member = message.member === "" ? undefined : message.member;
+    obj.action = message.action !== BigInt(0) ? message.action?.toString() : undefined;
+    obj.reason = message.reason === "" ? undefined : message.reason;
+    return obj;
+  },
+  fromAminoMsg(object: MsgResolveMemberReportAminoMsg): MsgResolveMemberReport {
+    return MsgResolveMemberReport.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgResolveMemberReportProtoMsg): MsgResolveMemberReport {
+    return MsgResolveMemberReport.decode(message.value);
+  },
+  toProto(message: MsgResolveMemberReport): Uint8Array {
+    return MsgResolveMemberReport.encode(message).finish();
+  },
+  toProtoMsg(message: MsgResolveMemberReport): MsgResolveMemberReportProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgResolveMemberReport",
+      value: MsgResolveMemberReport.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgResolveMemberReportResponse(): MsgResolveMemberReportResponse {
+  return {};
+}
+/**
+ * MsgResolveMemberReportResponse defines the MsgResolveMemberReportResponse message.
+ * @name MsgResolveMemberReportResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveMemberReportResponse
+ */
+export const MsgResolveMemberReportResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgResolveMemberReportResponse",
+  encode(_: MsgResolveMemberReportResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgResolveMemberReportResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgResolveMemberReportResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgResolveMemberReportResponse>): MsgResolveMemberReportResponse {
+    const message = createBaseMsgResolveMemberReportResponse();
+    return message;
+  },
+  fromAmino(_: MsgResolveMemberReportResponseAmino): MsgResolveMemberReportResponse {
+    const message = createBaseMsgResolveMemberReportResponse();
+    return message;
+  },
+  toAmino(_: MsgResolveMemberReportResponse): MsgResolveMemberReportResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgResolveMemberReportResponseAminoMsg): MsgResolveMemberReportResponse {
+    return MsgResolveMemberReportResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgResolveMemberReportResponseProtoMsg): MsgResolveMemberReportResponse {
+    return MsgResolveMemberReportResponse.decode(message.value);
+  },
+  toProto(message: MsgResolveMemberReportResponse): Uint8Array {
+    return MsgResolveMemberReportResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgResolveMemberReportResponse): MsgResolveMemberReportResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgResolveMemberReportResponse",
+      value: MsgResolveMemberReportResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgDefendMemberReport(): MsgDefendMemberReport {
+  return {
+    creator: "",
+    defense: ""
+  };
+}
+/**
+ * MsgDefendMemberReport defines the MsgDefendMemberReport message.
+ * @name MsgDefendMemberReport
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgDefendMemberReport
+ */
+export const MsgDefendMemberReport = {
+  typeUrl: "/sparkdream.rep.v1.MsgDefendMemberReport",
+  encode(message: MsgDefendMemberReport, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.defense !== "") {
+      writer.uint32(18).string(message.defense);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgDefendMemberReport {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgDefendMemberReport();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.defense = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgDefendMemberReport>): MsgDefendMemberReport {
+    const message = createBaseMsgDefendMemberReport();
+    message.creator = object.creator ?? "";
+    message.defense = object.defense ?? "";
+    return message;
+  },
+  fromAmino(object: MsgDefendMemberReportAmino): MsgDefendMemberReport {
+    const message = createBaseMsgDefendMemberReport();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.defense !== undefined && object.defense !== null) {
+      message.defense = object.defense;
+    }
+    return message;
+  },
+  toAmino(message: MsgDefendMemberReport): MsgDefendMemberReportAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.defense = message.defense === "" ? undefined : message.defense;
+    return obj;
+  },
+  fromAminoMsg(object: MsgDefendMemberReportAminoMsg): MsgDefendMemberReport {
+    return MsgDefendMemberReport.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgDefendMemberReportProtoMsg): MsgDefendMemberReport {
+    return MsgDefendMemberReport.decode(message.value);
+  },
+  toProto(message: MsgDefendMemberReport): Uint8Array {
+    return MsgDefendMemberReport.encode(message).finish();
+  },
+  toProtoMsg(message: MsgDefendMemberReport): MsgDefendMemberReportProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgDefendMemberReport",
+      value: MsgDefendMemberReport.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgDefendMemberReportResponse(): MsgDefendMemberReportResponse {
+  return {};
+}
+/**
+ * MsgDefendMemberReportResponse defines the MsgDefendMemberReportResponse message.
+ * @name MsgDefendMemberReportResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgDefendMemberReportResponse
+ */
+export const MsgDefendMemberReportResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgDefendMemberReportResponse",
+  encode(_: MsgDefendMemberReportResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgDefendMemberReportResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgDefendMemberReportResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgDefendMemberReportResponse>): MsgDefendMemberReportResponse {
+    const message = createBaseMsgDefendMemberReportResponse();
+    return message;
+  },
+  fromAmino(_: MsgDefendMemberReportResponseAmino): MsgDefendMemberReportResponse {
+    const message = createBaseMsgDefendMemberReportResponse();
+    return message;
+  },
+  toAmino(_: MsgDefendMemberReportResponse): MsgDefendMemberReportResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgDefendMemberReportResponseAminoMsg): MsgDefendMemberReportResponse {
+    return MsgDefendMemberReportResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgDefendMemberReportResponseProtoMsg): MsgDefendMemberReportResponse {
+    return MsgDefendMemberReportResponse.decode(message.value);
+  },
+  toProto(message: MsgDefendMemberReportResponse): Uint8Array {
+    return MsgDefendMemberReportResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgDefendMemberReportResponse): MsgDefendMemberReportResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgDefendMemberReportResponse",
+      value: MsgDefendMemberReportResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAppealGovAction(): MsgAppealGovAction {
+  return {
+    creator: "",
+    actionType: BigInt(0),
+    actionTarget: "",
+    appealReason: ""
+  };
+}
+/**
+ * MsgAppealGovAction defines the MsgAppealGovAction message.
+ * @name MsgAppealGovAction
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAppealGovAction
+ */
+export const MsgAppealGovAction = {
+  typeUrl: "/sparkdream.rep.v1.MsgAppealGovAction",
+  encode(message: MsgAppealGovAction, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.actionType !== BigInt(0)) {
+      writer.uint32(16).uint64(message.actionType);
+    }
+    if (message.actionTarget !== "") {
+      writer.uint32(26).string(message.actionTarget);
+    }
+    if (message.appealReason !== "") {
+      writer.uint32(34).string(message.appealReason);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAppealGovAction {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAppealGovAction();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.actionType = reader.uint64();
+          break;
+        case 3:
+          message.actionTarget = reader.string();
+          break;
+        case 4:
+          message.appealReason = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgAppealGovAction>): MsgAppealGovAction {
+    const message = createBaseMsgAppealGovAction();
+    message.creator = object.creator ?? "";
+    message.actionType = object.actionType !== undefined && object.actionType !== null ? BigInt(object.actionType.toString()) : BigInt(0);
+    message.actionTarget = object.actionTarget ?? "";
+    message.appealReason = object.appealReason ?? "";
+    return message;
+  },
+  fromAmino(object: MsgAppealGovActionAmino): MsgAppealGovAction {
+    const message = createBaseMsgAppealGovAction();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.action_type !== undefined && object.action_type !== null) {
+      message.actionType = BigInt(object.action_type);
+    }
+    if (object.action_target !== undefined && object.action_target !== null) {
+      message.actionTarget = object.action_target;
+    }
+    if (object.appeal_reason !== undefined && object.appeal_reason !== null) {
+      message.appealReason = object.appeal_reason;
+    }
+    return message;
+  },
+  toAmino(message: MsgAppealGovAction): MsgAppealGovActionAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.action_type = message.actionType !== BigInt(0) ? message.actionType?.toString() : undefined;
+    obj.action_target = message.actionTarget === "" ? undefined : message.actionTarget;
+    obj.appeal_reason = message.appealReason === "" ? undefined : message.appealReason;
+    return obj;
+  },
+  fromAminoMsg(object: MsgAppealGovActionAminoMsg): MsgAppealGovAction {
+    return MsgAppealGovAction.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgAppealGovActionProtoMsg): MsgAppealGovAction {
+    return MsgAppealGovAction.decode(message.value);
+  },
+  toProto(message: MsgAppealGovAction): Uint8Array {
+    return MsgAppealGovAction.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAppealGovAction): MsgAppealGovActionProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgAppealGovAction",
+      value: MsgAppealGovAction.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAppealGovActionResponse(): MsgAppealGovActionResponse {
+  return {};
+}
+/**
+ * MsgAppealGovActionResponse defines the MsgAppealGovActionResponse message.
+ * @name MsgAppealGovActionResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAppealGovActionResponse
+ */
+export const MsgAppealGovActionResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgAppealGovActionResponse",
+  encode(_: MsgAppealGovActionResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAppealGovActionResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAppealGovActionResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgAppealGovActionResponse>): MsgAppealGovActionResponse {
+    const message = createBaseMsgAppealGovActionResponse();
+    return message;
+  },
+  fromAmino(_: MsgAppealGovActionResponseAmino): MsgAppealGovActionResponse {
+    const message = createBaseMsgAppealGovActionResponse();
+    return message;
+  },
+  toAmino(_: MsgAppealGovActionResponse): MsgAppealGovActionResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgAppealGovActionResponseAminoMsg): MsgAppealGovActionResponse {
+    return MsgAppealGovActionResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgAppealGovActionResponseProtoMsg): MsgAppealGovActionResponse {
+    return MsgAppealGovActionResponse.decode(message.value);
+  },
+  toProto(message: MsgAppealGovActionResponse): Uint8Array {
+    return MsgAppealGovActionResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAppealGovActionResponse): MsgAppealGovActionResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgAppealGovActionResponse",
+      value: MsgAppealGovActionResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgResolveGovActionAppeal(): MsgResolveGovActionAppeal {
+  return {
+    resolver: "",
+    appealId: BigInt(0),
+    verdict: 0,
+    reason: ""
+  };
+}
+/**
+ * MsgResolveGovActionAppeal resolves a pending appeal via council authority.
+ * Only the Operations Committee of the commons council may resolve appeals.
+ * The verdict must be UPHELD or OVERTURNED; TIMEOUT is EndBlocker-only and
+ * UNSPECIFIED is rejected.
+ * @name MsgResolveGovActionAppeal
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveGovActionAppeal
+ */
+export const MsgResolveGovActionAppeal = {
+  typeUrl: "/sparkdream.rep.v1.MsgResolveGovActionAppeal",
+  encode(message: MsgResolveGovActionAppeal, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.resolver !== "") {
+      writer.uint32(10).string(message.resolver);
+    }
+    if (message.appealId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.appealId);
+    }
+    if (message.verdict !== 0) {
+      writer.uint32(24).int32(message.verdict);
+    }
+    if (message.reason !== "") {
+      writer.uint32(34).string(message.reason);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgResolveGovActionAppeal {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgResolveGovActionAppeal();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.resolver = reader.string();
+          break;
+        case 2:
+          message.appealId = reader.uint64();
+          break;
+        case 3:
+          message.verdict = reader.int32() as any;
+          break;
+        case 4:
+          message.reason = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgResolveGovActionAppeal>): MsgResolveGovActionAppeal {
+    const message = createBaseMsgResolveGovActionAppeal();
+    message.resolver = object.resolver ?? "";
+    message.appealId = object.appealId !== undefined && object.appealId !== null ? BigInt(object.appealId.toString()) : BigInt(0);
+    message.verdict = object.verdict ?? 0;
+    message.reason = object.reason ?? "";
+    return message;
+  },
+  fromAmino(object: MsgResolveGovActionAppealAmino): MsgResolveGovActionAppeal {
+    const message = createBaseMsgResolveGovActionAppeal();
+    if (object.resolver !== undefined && object.resolver !== null) {
+      message.resolver = object.resolver;
+    }
+    if (object.appeal_id !== undefined && object.appeal_id !== null) {
+      message.appealId = BigInt(object.appeal_id);
+    }
+    if (object.verdict !== undefined && object.verdict !== null) {
+      message.verdict = object.verdict;
+    }
+    if (object.reason !== undefined && object.reason !== null) {
+      message.reason = object.reason;
+    }
+    return message;
+  },
+  toAmino(message: MsgResolveGovActionAppeal): MsgResolveGovActionAppealAmino {
+    const obj: any = {};
+    obj.resolver = message.resolver === "" ? undefined : message.resolver;
+    obj.appeal_id = message.appealId !== BigInt(0) ? message.appealId?.toString() : undefined;
+    obj.verdict = message.verdict === 0 ? undefined : message.verdict;
+    obj.reason = message.reason === "" ? undefined : message.reason;
+    return obj;
+  },
+  fromAminoMsg(object: MsgResolveGovActionAppealAminoMsg): MsgResolveGovActionAppeal {
+    return MsgResolveGovActionAppeal.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgResolveGovActionAppealProtoMsg): MsgResolveGovActionAppeal {
+    return MsgResolveGovActionAppeal.decode(message.value);
+  },
+  toProto(message: MsgResolveGovActionAppeal): Uint8Array {
+    return MsgResolveGovActionAppeal.encode(message).finish();
+  },
+  toProtoMsg(message: MsgResolveGovActionAppeal): MsgResolveGovActionAppealProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgResolveGovActionAppeal",
+      value: MsgResolveGovActionAppeal.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgResolveGovActionAppealResponse(): MsgResolveGovActionAppealResponse {
+  return {};
+}
+/**
+ * MsgResolveGovActionAppealResponse defines the response for
+ * ResolveGovActionAppeal.
+ * @name MsgResolveGovActionAppealResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveGovActionAppealResponse
+ */
+export const MsgResolveGovActionAppealResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgResolveGovActionAppealResponse",
+  encode(_: MsgResolveGovActionAppealResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgResolveGovActionAppealResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgResolveGovActionAppealResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgResolveGovActionAppealResponse>): MsgResolveGovActionAppealResponse {
+    const message = createBaseMsgResolveGovActionAppealResponse();
+    return message;
+  },
+  fromAmino(_: MsgResolveGovActionAppealResponseAmino): MsgResolveGovActionAppealResponse {
+    const message = createBaseMsgResolveGovActionAppealResponse();
+    return message;
+  },
+  toAmino(_: MsgResolveGovActionAppealResponse): MsgResolveGovActionAppealResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgResolveGovActionAppealResponseAminoMsg): MsgResolveGovActionAppealResponse {
+    return MsgResolveGovActionAppealResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgResolveGovActionAppealResponseProtoMsg): MsgResolveGovActionAppealResponse {
+    return MsgResolveGovActionAppealResponse.decode(message.value);
+  },
+  toProto(message: MsgResolveGovActionAppealResponse): Uint8Array {
+    return MsgResolveGovActionAppealResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgResolveGovActionAppealResponse): MsgResolveGovActionAppealResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgResolveGovActionAppealResponse",
+      value: MsgResolveGovActionAppealResponse.encode(message).finish()
     };
   }
 };

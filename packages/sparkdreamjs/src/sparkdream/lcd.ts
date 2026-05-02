@@ -122,6 +122,11 @@ export const createLCDClient = async ({
           requestClient
         })
       },
+      federation: {
+        v1: new (await import("./federation/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
       forum: {
         v1: new (await import("./forum/v1/query.lcd")).LCDQueryClient({
           requestClient

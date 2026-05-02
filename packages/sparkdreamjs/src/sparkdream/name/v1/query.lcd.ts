@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponse, QueryResolveRequest, QueryResolveResponse, QueryReverseResolveRequest, QueryReverseResolveResponse, QueryNamesRequest, QueryNamesResponse, QueryGetDisputeRequest, QueryGetDisputeResponse, QueryAllDisputeRequest, QueryAllDisputeResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryResolveRequest, QueryResolveResponse, QueryReverseResolveRequest, QueryReverseResolveResponse, QueryNamesRequest, QueryNamesResponse, QueryGetDisputeRequest, QueryGetDisputeResponse, QueryAllDisputeRequest, QueryAllDisputeResponse, QueryGetOwnerInfoRequest, QueryGetOwnerInfoResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -54,5 +54,12 @@ export class LCDQueryClient {
     }
     const endpoint = `sparkdream/name/v1/dispute`;
     return await this.req.get<QueryAllDisputeResponse>(endpoint, options);
+  };
+  /* GetOwnerInfo returns the OwnerInfo (primary_name, display_name,
+   last_active_time) for an address. Works for any address, including
+   ones that never registered a handle. */
+  getOwnerInfo = async (params: QueryGetOwnerInfoRequest): Promise<QueryGetOwnerInfoResponse> => {
+    const endpoint = `sparkdream/name/v1/owner_info/${params.address}`;
+    return await this.req.get<QueryGetOwnerInfoResponse>(endpoint);
   };
 }

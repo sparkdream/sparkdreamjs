@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetMemberRequest, QueryGetMemberResponse, QueryAllMemberRequest, QueryAllMemberResponse, QueryGetInvitationRequest, QueryGetInvitationResponse, QueryAllInvitationRequest, QueryAllInvitationResponse, QueryGetProjectRequest, QueryGetProjectResponse, QueryAllProjectRequest, QueryAllProjectResponse, QueryGetInitiativeRequest, QueryGetInitiativeResponse, QueryAllInitiativeRequest, QueryAllInitiativeResponse, QueryGetStakeRequest, QueryGetStakeResponse, QueryAllStakeRequest, QueryAllStakeResponse, QueryGetChallengeRequest, QueryGetChallengeResponse, QueryAllChallengeRequest, QueryAllChallengeResponse, QueryGetJuryReviewRequest, QueryGetJuryReviewResponse, QueryAllJuryReviewRequest, QueryAllJuryReviewResponse, QueryGetInterimRequest, QueryGetInterimResponse, QueryAllInterimRequest, QueryAllInterimResponse, QueryGetInterimTemplateRequest, QueryGetInterimTemplateResponse, QueryAllInterimTemplateRequest, QueryAllInterimTemplateResponse, QueryMembersByTrustLevelRequest, QueryMembersByTrustLevelResponse, QueryInvitationsByInviterRequest, QueryInvitationsByInviterResponse, QueryInterimsByAssigneeRequest, QueryInterimsByAssigneeResponse, QueryInterimsByTypeRequest, QueryInterimsByTypeResponse, QueryInterimsByReferenceRequest, QueryInterimsByReferenceResponse, QueryProjectsByCouncilRequest, QueryProjectsByCouncilResponse, QueryInitiativesByProjectRequest, QueryInitiativesByProjectResponse, QueryInitiativesByAssigneeRequest, QueryInitiativesByAssigneeResponse, QueryAvailableInitiativesRequest, QueryAvailableInitiativesResponse, QueryStakesByStakerRequest, QueryStakesByStakerResponse, QueryStakesByTargetRequest, QueryStakesByTargetResponse, QueryInitiativeConvictionRequest, QueryInitiativeConvictionResponse, QueryChallengesByInitiativeRequest, QueryChallengesByInitiativeResponse, QueryReputationRequest, QueryReputationResponse, QueryPendingStakeRewardsRequest, QueryPendingStakeRewardsResponse, QueryGetMemberStakePoolRequest, QueryGetMemberStakePoolResponse, QueryGetTagStakePoolRequest, QueryGetTagStakePoolResponse, QueryGetProjectStakeInfoRequest, QueryGetProjectStakeInfoResponse, QueryContentConvictionRequest, QueryContentConvictionResponse, QueryAuthorBondRequest, QueryAuthorBondResponse, QueryGetContentChallengeRequest, QueryGetContentChallengeResponse, QueryAllContentChallengeRequest, QueryAllContentChallengeResponse, QueryContentChallengesByTargetRequest, QueryContentChallengesByTargetResponse, QueryContentByInitiativeRequest, QueryContentByInitiativeResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetMemberRequest, QueryGetMemberResponse, QueryAllMemberRequest, QueryAllMemberResponse, QueryGetInvitationRequest, QueryGetInvitationResponse, QueryAllInvitationRequest, QueryAllInvitationResponse, QueryGetProjectRequest, QueryGetProjectResponse, QueryAllProjectRequest, QueryAllProjectResponse, QueryGetInitiativeRequest, QueryGetInitiativeResponse, QueryAllInitiativeRequest, QueryAllInitiativeResponse, QueryGetStakeRequest, QueryGetStakeResponse, QueryAllStakeRequest, QueryAllStakeResponse, QueryGetChallengeRequest, QueryGetChallengeResponse, QueryAllChallengeRequest, QueryAllChallengeResponse, QueryGetJuryReviewRequest, QueryGetJuryReviewResponse, QueryAllJuryReviewRequest, QueryAllJuryReviewResponse, QueryGetInterimRequest, QueryGetInterimResponse, QueryAllInterimRequest, QueryAllInterimResponse, QueryGetInterimTemplateRequest, QueryGetInterimTemplateResponse, QueryAllInterimTemplateRequest, QueryAllInterimTemplateResponse, QueryMembersByTrustLevelRequest, QueryMembersByTrustLevelResponse, QueryInvitationsByInviterRequest, QueryInvitationsByInviterResponse, QueryInterimsByAssigneeRequest, QueryInterimsByAssigneeResponse, QueryInterimsByTypeRequest, QueryInterimsByTypeResponse, QueryInterimsByReferenceRequest, QueryInterimsByReferenceResponse, QueryProjectsByCouncilRequest, QueryProjectsByCouncilResponse, QueryInitiativesByProjectRequest, QueryInitiativesByProjectResponse, QueryInitiativesByAssigneeRequest, QueryInitiativesByAssigneeResponse, QueryAvailableInitiativesRequest, QueryAvailableInitiativesResponse, QueryStakesByStakerRequest, QueryStakesByStakerResponse, QueryStakesByTargetRequest, QueryStakesByTargetResponse, QueryInitiativeConvictionRequest, QueryInitiativeConvictionResponse, QueryChallengesByInitiativeRequest, QueryChallengesByInitiativeResponse, QueryReputationRequest, QueryReputationResponse, QueryPendingStakeRewardsRequest, QueryPendingStakeRewardsResponse, QueryGetMemberStakePoolRequest, QueryGetMemberStakePoolResponse, QueryGetTagStakePoolRequest, QueryGetTagStakePoolResponse, QueryListTagStakePoolsRequest, QueryListTagStakePoolsResponse, QueryGetProjectStakeInfoRequest, QueryGetProjectStakeInfoResponse, QueryContentConvictionRequest, QueryContentConvictionResponse, QueryAuthorBondRequest, QueryAuthorBondResponse, QueryGetContentChallengeRequest, QueryGetContentChallengeResponse, QueryAllContentChallengeRequest, QueryAllContentChallengeResponse, QueryContentChallengesByTargetRequest, QueryContentChallengesByTargetResponse, QueryContentByInitiativeRequest, QueryContentByInitiativeResponse, QueryDreamSupplyStatsRequest, QueryDreamSupplyStatsResponse, QueryMintBurnRatioRequest, QueryMintBurnRatioResponse, QueryEffectiveApyRequest, QueryEffectiveApyResponse, QueryTreasuryStatusRequest, QueryTreasuryStatusResponse, QueryGetTagRequest, QueryGetTagResponse, QueryAllTagRequest, QueryAllTagResponse, QueryGetReservedTagRequest, QueryGetReservedTagResponse, QueryAllReservedTagRequest, QueryAllReservedTagResponse, QueryTagExistsRequest, QueryTagExistsResponse, QueryGetTagReportRequest, QueryGetTagReportResponse, QueryAllTagReportRequest, QueryAllTagReportResponse, QueryTagReportsRequest, QueryTagReportsResponse, QueryGetTagBudgetRequest, QueryGetTagBudgetResponse, QueryAllTagBudgetRequest, QueryAllTagBudgetResponse, QueryGetTagBudgetAwardRequest, QueryGetTagBudgetAwardResponse, QueryAllTagBudgetAwardRequest, QueryAllTagBudgetAwardResponse, QueryTagBudgetByTagRequest, QueryTagBudgetByTagResponse, QueryTagBudgetsRequest, QueryTagBudgetsResponse, QueryTagBudgetAwardsRequest, QueryTagBudgetAwardsResponse, QueryBondedRoleRequest, QueryBondedRoleResponse, QueryBondedRolesByTypeRequest, QueryBondedRolesByTypeResponse, QueryBondedRoleConfigRequest, QueryBondedRoleConfigResponse, QueryGetMemberReportRequest, QueryGetMemberReportResponse, QueryAllMemberReportRequest, QueryAllMemberReportResponse, QueryGetMemberWarningRequest, QueryGetMemberWarningResponse, QueryAllMemberWarningRequest, QueryAllMemberWarningResponse, QueryGetGovActionAppealRequest, QueryGetGovActionAppealResponse, QueryAllGovActionAppealRequest, QueryAllGovActionAppealResponse, QueryGetJuryParticipationRequest, QueryGetJuryParticipationResponse, QueryAllJuryParticipationRequest, QueryAllJuryParticipationResponse, QueryMemberReportsRequest, QueryMemberReportsResponse, QueryMemberWarningsRequest, QueryMemberWarningsResponse, QueryMemberStandingRequest, QueryMemberStandingResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -77,6 +77,8 @@ export interface Query {
   getMemberStakePool(request: QueryGetMemberStakePoolRequest): Promise<QueryGetMemberStakePoolResponse>;
   /** GetTagStakePool queries a tag's stake pool info */
   getTagStakePool(request: QueryGetTagStakePoolRequest): Promise<QueryGetTagStakePoolResponse>;
+  /** ListTagStakePools queries all tag stake pools with pagination. */
+  listTagStakePools(request?: QueryListTagStakePoolsRequest): Promise<QueryListTagStakePoolsResponse>;
   /** GetProjectStakeInfo queries a project's stake info */
   getProjectStakeInfo(request: QueryGetProjectStakeInfoRequest): Promise<QueryGetProjectStakeInfoResponse>;
   /** ContentConviction queries the total conviction score for a content item */
@@ -91,6 +93,75 @@ export interface Query {
   contentChallengesByTarget(request: QueryContentChallengesByTargetRequest): Promise<QueryContentChallengesByTargetResponse>;
   /** ContentByInitiative queries content items linked to an initiative for conviction propagation */
   contentByInitiative(request: QueryContentByInitiativeRequest): Promise<QueryContentByInitiativeResponse>;
+  /** DreamSupplyStats queries aggregate DREAM supply statistics */
+  dreamSupplyStats(request?: QueryDreamSupplyStatsRequest): Promise<QueryDreamSupplyStatsResponse>;
+  /** MintBurnRatio queries the current season's mint/burn ratio */
+  mintBurnRatio(request?: QueryMintBurnRatioRequest): Promise<QueryMintBurnRatioResponse>;
+  /** EffectiveApy queries the effective staking APY from the seasonal pool */
+  effectiveApy(request?: QueryEffectiveApyRequest): Promise<QueryEffectiveApyResponse>;
+  /** TreasuryStatus queries the treasury balance and flows */
+  treasuryStatus(request?: QueryTreasuryStatusRequest): Promise<QueryTreasuryStatusResponse>;
+  /** GetTag queries a specific tag by name. */
+  getTag(request: QueryGetTagRequest): Promise<QueryGetTagResponse>;
+  /** ListTag queries all tags with pagination. */
+  listTag(request?: QueryAllTagRequest): Promise<QueryAllTagResponse>;
+  /** GetReservedTag queries a specific reserved tag by name. */
+  getReservedTag(request: QueryGetReservedTagRequest): Promise<QueryGetReservedTagResponse>;
+  /** ListReservedTag queries all reserved tags with pagination. */
+  listReservedTag(request?: QueryAllReservedTagRequest): Promise<QueryAllReservedTagResponse>;
+  /** TagExists checks whether a tag exists and returns its expiration time. */
+  tagExists(request: QueryTagExistsRequest): Promise<QueryTagExistsResponse>;
+  /** GetTagReport queries a single tag report by tag name. */
+  getTagReport(request: QueryGetTagReportRequest): Promise<QueryGetTagReportResponse>;
+  /** ListTagReport queries all tag reports with pagination. */
+  listTagReport(request?: QueryAllTagReportRequest): Promise<QueryAllTagReportResponse>;
+  /** TagReports returns the first tag report (summary query). */
+  tagReports(request?: QueryTagReportsRequest): Promise<QueryTagReportsResponse>;
+  /** GetTagBudget Queries a TagBudget by id. */
+  getTagBudget(request: QueryGetTagBudgetRequest): Promise<QueryGetTagBudgetResponse>;
+  /** ListTagBudget defines the ListTagBudget RPC. */
+  listTagBudget(request?: QueryAllTagBudgetRequest): Promise<QueryAllTagBudgetResponse>;
+  /** GetTagBudgetAward Queries a TagBudgetAward by id. */
+  getTagBudgetAward(request: QueryGetTagBudgetAwardRequest): Promise<QueryGetTagBudgetAwardResponse>;
+  /** ListTagBudgetAward defines the ListTagBudgetAward RPC. */
+  listTagBudgetAward(request?: QueryAllTagBudgetAwardRequest): Promise<QueryAllTagBudgetAwardResponse>;
+  /** TagBudgetByTag Queries a TagBudget by tag name. */
+  tagBudgetByTag(request: QueryTagBudgetByTagRequest): Promise<QueryTagBudgetByTagResponse>;
+  /** TagBudgets returns the first tag budget (summary query). */
+  tagBudgets(request?: QueryTagBudgetsRequest): Promise<QueryTagBudgetsResponse>;
+  /** TagBudgetAwards returns the first award for a budget (summary query). */
+  tagBudgetAwards(request: QueryTagBudgetAwardsRequest): Promise<QueryTagBudgetAwardsResponse>;
+  /** BondedRole queries a single BondedRole record by (role_type, address). */
+  bondedRole(request: QueryBondedRoleRequest): Promise<QueryBondedRoleResponse>;
+  /** BondedRolesByType lists all BondedRole records for a given role_type. */
+  bondedRolesByType(request: QueryBondedRolesByTypeRequest): Promise<QueryBondedRolesByTypeResponse>;
+  /**
+   * BondedRoleConfig queries the per-role policy config seeded at genesis and
+   * kept in sync by the owning module's operational-params handler.
+   */
+  bondedRoleConfig(request: QueryBondedRoleConfigRequest): Promise<QueryBondedRoleConfigResponse>;
+  /** ListMemberReport Queries a list of MemberReport items. */
+  getMemberReport(request: QueryGetMemberReportRequest): Promise<QueryGetMemberReportResponse>;
+  /** ListMemberReport defines the ListMemberReport RPC. */
+  listMemberReport(request?: QueryAllMemberReportRequest): Promise<QueryAllMemberReportResponse>;
+  /** ListMemberWarning Queries a list of MemberWarning items. */
+  getMemberWarning(request: QueryGetMemberWarningRequest): Promise<QueryGetMemberWarningResponse>;
+  /** ListMemberWarning defines the ListMemberWarning RPC. */
+  listMemberWarning(request?: QueryAllMemberWarningRequest): Promise<QueryAllMemberWarningResponse>;
+  /** ListGovActionAppeal Queries a list of GovActionAppeal items. */
+  getGovActionAppeal(request: QueryGetGovActionAppealRequest): Promise<QueryGetGovActionAppealResponse>;
+  /** ListGovActionAppeal defines the ListGovActionAppeal RPC. */
+  listGovActionAppeal(request?: QueryAllGovActionAppealRequest): Promise<QueryAllGovActionAppealResponse>;
+  /** ListJuryParticipation Queries a list of JuryParticipation items. */
+  getJuryParticipation(request: QueryGetJuryParticipationRequest): Promise<QueryGetJuryParticipationResponse>;
+  /** ListJuryParticipation defines the ListJuryParticipation RPC. */
+  listJuryParticipation(request?: QueryAllJuryParticipationRequest): Promise<QueryAllJuryParticipationResponse>;
+  /** MemberReports Queries the first member report (summary). */
+  memberReports(request?: QueryMemberReportsRequest): Promise<QueryMemberReportsResponse>;
+  /** MemberWarnings Queries the first warning for a member (summary). */
+  memberWarnings(request: QueryMemberWarningsRequest): Promise<QueryMemberWarningsResponse>;
+  /** MemberStanding Queries a member's current standing (warnings, active reports, trust tier). */
+  memberStanding(request: QueryMemberStandingRequest): Promise<QueryMemberStandingResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -333,6 +404,14 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.rep.v1.Query", "GetTagStakePool", data);
     return promise.then(data => QueryGetTagStakePoolResponse.decode(new BinaryReader(data)));
   };
+  /* ListTagStakePools queries all tag stake pools with pagination. */
+  listTagStakePools = async (request: QueryListTagStakePoolsRequest = {
+    pagination: undefined
+  }): Promise<QueryListTagStakePoolsResponse> => {
+    const data = QueryListTagStakePoolsRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "ListTagStakePools", data);
+    return promise.then(data => QueryListTagStakePoolsResponse.decode(new BinaryReader(data)));
+  };
   /* GetProjectStakeInfo queries a project's stake info */
   getProjectStakeInfo = async (request: QueryGetProjectStakeInfoRequest): Promise<QueryGetProjectStakeInfoResponse> => {
     const data = QueryGetProjectStakeInfoRequest.encode(request).finish();
@@ -376,6 +455,229 @@ export class QueryClientImpl implements Query {
     const data = QueryContentByInitiativeRequest.encode(request).finish();
     const promise = this.rpc.request("sparkdream.rep.v1.Query", "ContentByInitiative", data);
     return promise.then(data => QueryContentByInitiativeResponse.decode(new BinaryReader(data)));
+  };
+  /* DreamSupplyStats queries aggregate DREAM supply statistics */
+  dreamSupplyStats = async (request: QueryDreamSupplyStatsRequest = {}): Promise<QueryDreamSupplyStatsResponse> => {
+    const data = QueryDreamSupplyStatsRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "DreamSupplyStats", data);
+    return promise.then(data => QueryDreamSupplyStatsResponse.decode(new BinaryReader(data)));
+  };
+  /* MintBurnRatio queries the current season's mint/burn ratio */
+  mintBurnRatio = async (request: QueryMintBurnRatioRequest = {}): Promise<QueryMintBurnRatioResponse> => {
+    const data = QueryMintBurnRatioRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "MintBurnRatio", data);
+    return promise.then(data => QueryMintBurnRatioResponse.decode(new BinaryReader(data)));
+  };
+  /* EffectiveApy queries the effective staking APY from the seasonal pool */
+  effectiveApy = async (request: QueryEffectiveApyRequest = {}): Promise<QueryEffectiveApyResponse> => {
+    const data = QueryEffectiveApyRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "EffectiveApy", data);
+    return promise.then(data => QueryEffectiveApyResponse.decode(new BinaryReader(data)));
+  };
+  /* TreasuryStatus queries the treasury balance and flows */
+  treasuryStatus = async (request: QueryTreasuryStatusRequest = {}): Promise<QueryTreasuryStatusResponse> => {
+    const data = QueryTreasuryStatusRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "TreasuryStatus", data);
+    return promise.then(data => QueryTreasuryStatusResponse.decode(new BinaryReader(data)));
+  };
+  /* GetTag queries a specific tag by name. */
+  getTag = async (request: QueryGetTagRequest): Promise<QueryGetTagResponse> => {
+    const data = QueryGetTagRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "GetTag", data);
+    return promise.then(data => QueryGetTagResponse.decode(new BinaryReader(data)));
+  };
+  /* ListTag queries all tags with pagination. */
+  listTag = async (request: QueryAllTagRequest = {
+    pagination: undefined
+  }): Promise<QueryAllTagResponse> => {
+    const data = QueryAllTagRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "ListTag", data);
+    return promise.then(data => QueryAllTagResponse.decode(new BinaryReader(data)));
+  };
+  /* GetReservedTag queries a specific reserved tag by name. */
+  getReservedTag = async (request: QueryGetReservedTagRequest): Promise<QueryGetReservedTagResponse> => {
+    const data = QueryGetReservedTagRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "GetReservedTag", data);
+    return promise.then(data => QueryGetReservedTagResponse.decode(new BinaryReader(data)));
+  };
+  /* ListReservedTag queries all reserved tags with pagination. */
+  listReservedTag = async (request: QueryAllReservedTagRequest = {
+    pagination: undefined
+  }): Promise<QueryAllReservedTagResponse> => {
+    const data = QueryAllReservedTagRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "ListReservedTag", data);
+    return promise.then(data => QueryAllReservedTagResponse.decode(new BinaryReader(data)));
+  };
+  /* TagExists checks whether a tag exists and returns its expiration time. */
+  tagExists = async (request: QueryTagExistsRequest): Promise<QueryTagExistsResponse> => {
+    const data = QueryTagExistsRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "TagExists", data);
+    return promise.then(data => QueryTagExistsResponse.decode(new BinaryReader(data)));
+  };
+  /* GetTagReport queries a single tag report by tag name. */
+  getTagReport = async (request: QueryGetTagReportRequest): Promise<QueryGetTagReportResponse> => {
+    const data = QueryGetTagReportRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "GetTagReport", data);
+    return promise.then(data => QueryGetTagReportResponse.decode(new BinaryReader(data)));
+  };
+  /* ListTagReport queries all tag reports with pagination. */
+  listTagReport = async (request: QueryAllTagReportRequest = {
+    pagination: undefined
+  }): Promise<QueryAllTagReportResponse> => {
+    const data = QueryAllTagReportRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "ListTagReport", data);
+    return promise.then(data => QueryAllTagReportResponse.decode(new BinaryReader(data)));
+  };
+  /* TagReports returns the first tag report (summary query). */
+  tagReports = async (request: QueryTagReportsRequest = {
+    pagination: undefined
+  }): Promise<QueryTagReportsResponse> => {
+    const data = QueryTagReportsRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "TagReports", data);
+    return promise.then(data => QueryTagReportsResponse.decode(new BinaryReader(data)));
+  };
+  /* GetTagBudget Queries a TagBudget by id. */
+  getTagBudget = async (request: QueryGetTagBudgetRequest): Promise<QueryGetTagBudgetResponse> => {
+    const data = QueryGetTagBudgetRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "GetTagBudget", data);
+    return promise.then(data => QueryGetTagBudgetResponse.decode(new BinaryReader(data)));
+  };
+  /* ListTagBudget defines the ListTagBudget RPC. */
+  listTagBudget = async (request: QueryAllTagBudgetRequest = {
+    pagination: undefined
+  }): Promise<QueryAllTagBudgetResponse> => {
+    const data = QueryAllTagBudgetRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "ListTagBudget", data);
+    return promise.then(data => QueryAllTagBudgetResponse.decode(new BinaryReader(data)));
+  };
+  /* GetTagBudgetAward Queries a TagBudgetAward by id. */
+  getTagBudgetAward = async (request: QueryGetTagBudgetAwardRequest): Promise<QueryGetTagBudgetAwardResponse> => {
+    const data = QueryGetTagBudgetAwardRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "GetTagBudgetAward", data);
+    return promise.then(data => QueryGetTagBudgetAwardResponse.decode(new BinaryReader(data)));
+  };
+  /* ListTagBudgetAward defines the ListTagBudgetAward RPC. */
+  listTagBudgetAward = async (request: QueryAllTagBudgetAwardRequest = {
+    pagination: undefined
+  }): Promise<QueryAllTagBudgetAwardResponse> => {
+    const data = QueryAllTagBudgetAwardRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "ListTagBudgetAward", data);
+    return promise.then(data => QueryAllTagBudgetAwardResponse.decode(new BinaryReader(data)));
+  };
+  /* TagBudgetByTag Queries a TagBudget by tag name. */
+  tagBudgetByTag = async (request: QueryTagBudgetByTagRequest): Promise<QueryTagBudgetByTagResponse> => {
+    const data = QueryTagBudgetByTagRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "TagBudgetByTag", data);
+    return promise.then(data => QueryTagBudgetByTagResponse.decode(new BinaryReader(data)));
+  };
+  /* TagBudgets returns the first tag budget (summary query). */
+  tagBudgets = async (request: QueryTagBudgetsRequest = {
+    pagination: undefined
+  }): Promise<QueryTagBudgetsResponse> => {
+    const data = QueryTagBudgetsRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "TagBudgets", data);
+    return promise.then(data => QueryTagBudgetsResponse.decode(new BinaryReader(data)));
+  };
+  /* TagBudgetAwards returns the first award for a budget (summary query). */
+  tagBudgetAwards = async (request: QueryTagBudgetAwardsRequest): Promise<QueryTagBudgetAwardsResponse> => {
+    const data = QueryTagBudgetAwardsRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "TagBudgetAwards", data);
+    return promise.then(data => QueryTagBudgetAwardsResponse.decode(new BinaryReader(data)));
+  };
+  /* BondedRole queries a single BondedRole record by (role_type, address). */
+  bondedRole = async (request: QueryBondedRoleRequest): Promise<QueryBondedRoleResponse> => {
+    const data = QueryBondedRoleRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "BondedRole", data);
+    return promise.then(data => QueryBondedRoleResponse.decode(new BinaryReader(data)));
+  };
+  /* BondedRolesByType lists all BondedRole records for a given role_type. */
+  bondedRolesByType = async (request: QueryBondedRolesByTypeRequest): Promise<QueryBondedRolesByTypeResponse> => {
+    const data = QueryBondedRolesByTypeRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "BondedRolesByType", data);
+    return promise.then(data => QueryBondedRolesByTypeResponse.decode(new BinaryReader(data)));
+  };
+  /* BondedRoleConfig queries the per-role policy config seeded at genesis and
+   kept in sync by the owning module's operational-params handler. */
+  bondedRoleConfig = async (request: QueryBondedRoleConfigRequest): Promise<QueryBondedRoleConfigResponse> => {
+    const data = QueryBondedRoleConfigRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "BondedRoleConfig", data);
+    return promise.then(data => QueryBondedRoleConfigResponse.decode(new BinaryReader(data)));
+  };
+  /* ListMemberReport Queries a list of MemberReport items. */
+  getMemberReport = async (request: QueryGetMemberReportRequest): Promise<QueryGetMemberReportResponse> => {
+    const data = QueryGetMemberReportRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "GetMemberReport", data);
+    return promise.then(data => QueryGetMemberReportResponse.decode(new BinaryReader(data)));
+  };
+  /* ListMemberReport defines the ListMemberReport RPC. */
+  listMemberReport = async (request: QueryAllMemberReportRequest = {
+    pagination: undefined
+  }): Promise<QueryAllMemberReportResponse> => {
+    const data = QueryAllMemberReportRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "ListMemberReport", data);
+    return promise.then(data => QueryAllMemberReportResponse.decode(new BinaryReader(data)));
+  };
+  /* ListMemberWarning Queries a list of MemberWarning items. */
+  getMemberWarning = async (request: QueryGetMemberWarningRequest): Promise<QueryGetMemberWarningResponse> => {
+    const data = QueryGetMemberWarningRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "GetMemberWarning", data);
+    return promise.then(data => QueryGetMemberWarningResponse.decode(new BinaryReader(data)));
+  };
+  /* ListMemberWarning defines the ListMemberWarning RPC. */
+  listMemberWarning = async (request: QueryAllMemberWarningRequest = {
+    pagination: undefined
+  }): Promise<QueryAllMemberWarningResponse> => {
+    const data = QueryAllMemberWarningRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "ListMemberWarning", data);
+    return promise.then(data => QueryAllMemberWarningResponse.decode(new BinaryReader(data)));
+  };
+  /* ListGovActionAppeal Queries a list of GovActionAppeal items. */
+  getGovActionAppeal = async (request: QueryGetGovActionAppealRequest): Promise<QueryGetGovActionAppealResponse> => {
+    const data = QueryGetGovActionAppealRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "GetGovActionAppeal", data);
+    return promise.then(data => QueryGetGovActionAppealResponse.decode(new BinaryReader(data)));
+  };
+  /* ListGovActionAppeal defines the ListGovActionAppeal RPC. */
+  listGovActionAppeal = async (request: QueryAllGovActionAppealRequest = {
+    pagination: undefined
+  }): Promise<QueryAllGovActionAppealResponse> => {
+    const data = QueryAllGovActionAppealRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "ListGovActionAppeal", data);
+    return promise.then(data => QueryAllGovActionAppealResponse.decode(new BinaryReader(data)));
+  };
+  /* ListJuryParticipation Queries a list of JuryParticipation items. */
+  getJuryParticipation = async (request: QueryGetJuryParticipationRequest): Promise<QueryGetJuryParticipationResponse> => {
+    const data = QueryGetJuryParticipationRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "GetJuryParticipation", data);
+    return promise.then(data => QueryGetJuryParticipationResponse.decode(new BinaryReader(data)));
+  };
+  /* ListJuryParticipation defines the ListJuryParticipation RPC. */
+  listJuryParticipation = async (request: QueryAllJuryParticipationRequest = {
+    pagination: undefined
+  }): Promise<QueryAllJuryParticipationResponse> => {
+    const data = QueryAllJuryParticipationRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "ListJuryParticipation", data);
+    return promise.then(data => QueryAllJuryParticipationResponse.decode(new BinaryReader(data)));
+  };
+  /* MemberReports Queries the first member report (summary). */
+  memberReports = async (request: QueryMemberReportsRequest = {
+    pagination: undefined
+  }): Promise<QueryMemberReportsResponse> => {
+    const data = QueryMemberReportsRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "MemberReports", data);
+    return promise.then(data => QueryMemberReportsResponse.decode(new BinaryReader(data)));
+  };
+  /* MemberWarnings Queries the first warning for a member (summary). */
+  memberWarnings = async (request: QueryMemberWarningsRequest): Promise<QueryMemberWarningsResponse> => {
+    const data = QueryMemberWarningsRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "MemberWarnings", data);
+    return promise.then(data => QueryMemberWarningsResponse.decode(new BinaryReader(data)));
+  };
+  /* MemberStanding Queries a member's current standing (warnings, active reports, trust tier). */
+  memberStanding = async (request: QueryMemberStandingRequest): Promise<QueryMemberStandingResponse> => {
+    const data = QueryMemberStandingRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "MemberStanding", data);
+    return promise.then(data => QueryMemberStandingResponse.decode(new BinaryReader(data)));
   };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
@@ -490,6 +792,9 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     getTagStakePool(request: QueryGetTagStakePoolRequest): Promise<QueryGetTagStakePoolResponse> {
       return queryService.getTagStakePool(request);
     },
+    listTagStakePools(request?: QueryListTagStakePoolsRequest): Promise<QueryListTagStakePoolsResponse> {
+      return queryService.listTagStakePools(request);
+    },
     getProjectStakeInfo(request: QueryGetProjectStakeInfoRequest): Promise<QueryGetProjectStakeInfoResponse> {
       return queryService.getProjectStakeInfo(request);
     },
@@ -510,6 +815,105 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     contentByInitiative(request: QueryContentByInitiativeRequest): Promise<QueryContentByInitiativeResponse> {
       return queryService.contentByInitiative(request);
+    },
+    dreamSupplyStats(request?: QueryDreamSupplyStatsRequest): Promise<QueryDreamSupplyStatsResponse> {
+      return queryService.dreamSupplyStats(request);
+    },
+    mintBurnRatio(request?: QueryMintBurnRatioRequest): Promise<QueryMintBurnRatioResponse> {
+      return queryService.mintBurnRatio(request);
+    },
+    effectiveApy(request?: QueryEffectiveApyRequest): Promise<QueryEffectiveApyResponse> {
+      return queryService.effectiveApy(request);
+    },
+    treasuryStatus(request?: QueryTreasuryStatusRequest): Promise<QueryTreasuryStatusResponse> {
+      return queryService.treasuryStatus(request);
+    },
+    getTag(request: QueryGetTagRequest): Promise<QueryGetTagResponse> {
+      return queryService.getTag(request);
+    },
+    listTag(request?: QueryAllTagRequest): Promise<QueryAllTagResponse> {
+      return queryService.listTag(request);
+    },
+    getReservedTag(request: QueryGetReservedTagRequest): Promise<QueryGetReservedTagResponse> {
+      return queryService.getReservedTag(request);
+    },
+    listReservedTag(request?: QueryAllReservedTagRequest): Promise<QueryAllReservedTagResponse> {
+      return queryService.listReservedTag(request);
+    },
+    tagExists(request: QueryTagExistsRequest): Promise<QueryTagExistsResponse> {
+      return queryService.tagExists(request);
+    },
+    getTagReport(request: QueryGetTagReportRequest): Promise<QueryGetTagReportResponse> {
+      return queryService.getTagReport(request);
+    },
+    listTagReport(request?: QueryAllTagReportRequest): Promise<QueryAllTagReportResponse> {
+      return queryService.listTagReport(request);
+    },
+    tagReports(request?: QueryTagReportsRequest): Promise<QueryTagReportsResponse> {
+      return queryService.tagReports(request);
+    },
+    getTagBudget(request: QueryGetTagBudgetRequest): Promise<QueryGetTagBudgetResponse> {
+      return queryService.getTagBudget(request);
+    },
+    listTagBudget(request?: QueryAllTagBudgetRequest): Promise<QueryAllTagBudgetResponse> {
+      return queryService.listTagBudget(request);
+    },
+    getTagBudgetAward(request: QueryGetTagBudgetAwardRequest): Promise<QueryGetTagBudgetAwardResponse> {
+      return queryService.getTagBudgetAward(request);
+    },
+    listTagBudgetAward(request?: QueryAllTagBudgetAwardRequest): Promise<QueryAllTagBudgetAwardResponse> {
+      return queryService.listTagBudgetAward(request);
+    },
+    tagBudgetByTag(request: QueryTagBudgetByTagRequest): Promise<QueryTagBudgetByTagResponse> {
+      return queryService.tagBudgetByTag(request);
+    },
+    tagBudgets(request?: QueryTagBudgetsRequest): Promise<QueryTagBudgetsResponse> {
+      return queryService.tagBudgets(request);
+    },
+    tagBudgetAwards(request: QueryTagBudgetAwardsRequest): Promise<QueryTagBudgetAwardsResponse> {
+      return queryService.tagBudgetAwards(request);
+    },
+    bondedRole(request: QueryBondedRoleRequest): Promise<QueryBondedRoleResponse> {
+      return queryService.bondedRole(request);
+    },
+    bondedRolesByType(request: QueryBondedRolesByTypeRequest): Promise<QueryBondedRolesByTypeResponse> {
+      return queryService.bondedRolesByType(request);
+    },
+    bondedRoleConfig(request: QueryBondedRoleConfigRequest): Promise<QueryBondedRoleConfigResponse> {
+      return queryService.bondedRoleConfig(request);
+    },
+    getMemberReport(request: QueryGetMemberReportRequest): Promise<QueryGetMemberReportResponse> {
+      return queryService.getMemberReport(request);
+    },
+    listMemberReport(request?: QueryAllMemberReportRequest): Promise<QueryAllMemberReportResponse> {
+      return queryService.listMemberReport(request);
+    },
+    getMemberWarning(request: QueryGetMemberWarningRequest): Promise<QueryGetMemberWarningResponse> {
+      return queryService.getMemberWarning(request);
+    },
+    listMemberWarning(request?: QueryAllMemberWarningRequest): Promise<QueryAllMemberWarningResponse> {
+      return queryService.listMemberWarning(request);
+    },
+    getGovActionAppeal(request: QueryGetGovActionAppealRequest): Promise<QueryGetGovActionAppealResponse> {
+      return queryService.getGovActionAppeal(request);
+    },
+    listGovActionAppeal(request?: QueryAllGovActionAppealRequest): Promise<QueryAllGovActionAppealResponse> {
+      return queryService.listGovActionAppeal(request);
+    },
+    getJuryParticipation(request: QueryGetJuryParticipationRequest): Promise<QueryGetJuryParticipationResponse> {
+      return queryService.getJuryParticipation(request);
+    },
+    listJuryParticipation(request?: QueryAllJuryParticipationRequest): Promise<QueryAllJuryParticipationResponse> {
+      return queryService.listJuryParticipation(request);
+    },
+    memberReports(request?: QueryMemberReportsRequest): Promise<QueryMemberReportsResponse> {
+      return queryService.memberReports(request);
+    },
+    memberWarnings(request: QueryMemberWarningsRequest): Promise<QueryMemberWarningsResponse> {
+      return queryService.memberWarnings(request);
+    },
+    memberStanding(request: QueryMemberStandingRequest): Promise<QueryMemberStandingResponse> {
+      return queryService.memberStanding(request);
     }
   };
 };

@@ -490,6 +490,68 @@ export interface MsgUpdateNameResponseAminoMsg {
   type: "/sparkdream.name.v1.MsgUpdateNameResponse";
   value: MsgUpdateNameResponseAmino;
 }
+/**
+ * MsgSetDisplayName sets (or clears) the free-form display name on the
+ * signer's OwnerInfo. Empty display_name clears the field. Aesthetic
+ * policing (impersonation similarity, profanity) is a frontend concern;
+ * chain-level validation is bytes-only.
+ * @name MsgSetDisplayName
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgSetDisplayName
+ */
+export interface MsgSetDisplayName {
+  authority: string;
+  /**
+   * display_name is the new value. Empty string clears the field.
+   */
+  displayName: string;
+}
+export interface MsgSetDisplayNameProtoMsg {
+  typeUrl: "/sparkdream.name.v1.MsgSetDisplayName";
+  value: Uint8Array;
+}
+/**
+ * MsgSetDisplayName sets (or clears) the free-form display name on the
+ * signer's OwnerInfo. Empty display_name clears the field. Aesthetic
+ * policing (impersonation similarity, profanity) is a frontend concern;
+ * chain-level validation is bytes-only.
+ * @name MsgSetDisplayNameAmino
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgSetDisplayName
+ */
+export interface MsgSetDisplayNameAmino {
+  authority?: string;
+  /**
+   * display_name is the new value. Empty string clears the field.
+   */
+  display_name?: string;
+}
+export interface MsgSetDisplayNameAminoMsg {
+  type: "sparkdream/x/name/MsgSetDisplayName";
+  value: MsgSetDisplayNameAmino;
+}
+/**
+ * MsgSetDisplayNameResponse defines the response for MsgSetDisplayName.
+ * @name MsgSetDisplayNameResponse
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgSetDisplayNameResponse
+ */
+export interface MsgSetDisplayNameResponse {}
+export interface MsgSetDisplayNameResponseProtoMsg {
+  typeUrl: "/sparkdream.name.v1.MsgSetDisplayNameResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgSetDisplayNameResponse defines the response for MsgSetDisplayName.
+ * @name MsgSetDisplayNameResponseAmino
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgSetDisplayNameResponse
+ */
+export interface MsgSetDisplayNameResponseAmino {}
+export interface MsgSetDisplayNameResponseAminoMsg {
+  type: "/sparkdream.name.v1.MsgSetDisplayNameResponse";
+  value: MsgSetDisplayNameResponseAmino;
+}
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
     authority: "",
@@ -1706,6 +1768,153 @@ export const MsgUpdateNameResponse = {
     return {
       typeUrl: "/sparkdream.name.v1.MsgUpdateNameResponse",
       value: MsgUpdateNameResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSetDisplayName(): MsgSetDisplayName {
+  return {
+    authority: "",
+    displayName: ""
+  };
+}
+/**
+ * MsgSetDisplayName sets (or clears) the free-form display name on the
+ * signer's OwnerInfo. Empty display_name clears the field. Aesthetic
+ * policing (impersonation similarity, profanity) is a frontend concern;
+ * chain-level validation is bytes-only.
+ * @name MsgSetDisplayName
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgSetDisplayName
+ */
+export const MsgSetDisplayName = {
+  typeUrl: "/sparkdream.name.v1.MsgSetDisplayName",
+  aminoType: "sparkdream/x/name/MsgSetDisplayName",
+  encode(message: MsgSetDisplayName, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.displayName !== "") {
+      writer.uint32(18).string(message.displayName);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSetDisplayName {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSetDisplayName();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+        case 2:
+          message.displayName = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgSetDisplayName>): MsgSetDisplayName {
+    const message = createBaseMsgSetDisplayName();
+    message.authority = object.authority ?? "";
+    message.displayName = object.displayName ?? "";
+    return message;
+  },
+  fromAmino(object: MsgSetDisplayNameAmino): MsgSetDisplayName {
+    const message = createBaseMsgSetDisplayName();
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
+    if (object.display_name !== undefined && object.display_name !== null) {
+      message.displayName = object.display_name;
+    }
+    return message;
+  },
+  toAmino(message: MsgSetDisplayName): MsgSetDisplayNameAmino {
+    const obj: any = {};
+    obj.authority = message.authority === "" ? undefined : message.authority;
+    obj.display_name = message.displayName === "" ? undefined : message.displayName;
+    return obj;
+  },
+  fromAminoMsg(object: MsgSetDisplayNameAminoMsg): MsgSetDisplayName {
+    return MsgSetDisplayName.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSetDisplayName): MsgSetDisplayNameAminoMsg {
+    return {
+      type: "sparkdream/x/name/MsgSetDisplayName",
+      value: MsgSetDisplayName.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgSetDisplayNameProtoMsg): MsgSetDisplayName {
+    return MsgSetDisplayName.decode(message.value);
+  },
+  toProto(message: MsgSetDisplayName): Uint8Array {
+    return MsgSetDisplayName.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSetDisplayName): MsgSetDisplayNameProtoMsg {
+    return {
+      typeUrl: "/sparkdream.name.v1.MsgSetDisplayName",
+      value: MsgSetDisplayName.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSetDisplayNameResponse(): MsgSetDisplayNameResponse {
+  return {};
+}
+/**
+ * MsgSetDisplayNameResponse defines the response for MsgSetDisplayName.
+ * @name MsgSetDisplayNameResponse
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgSetDisplayNameResponse
+ */
+export const MsgSetDisplayNameResponse = {
+  typeUrl: "/sparkdream.name.v1.MsgSetDisplayNameResponse",
+  encode(_: MsgSetDisplayNameResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSetDisplayNameResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSetDisplayNameResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgSetDisplayNameResponse>): MsgSetDisplayNameResponse {
+    const message = createBaseMsgSetDisplayNameResponse();
+    return message;
+  },
+  fromAmino(_: MsgSetDisplayNameResponseAmino): MsgSetDisplayNameResponse {
+    const message = createBaseMsgSetDisplayNameResponse();
+    return message;
+  },
+  toAmino(_: MsgSetDisplayNameResponse): MsgSetDisplayNameResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgSetDisplayNameResponseAminoMsg): MsgSetDisplayNameResponse {
+    return MsgSetDisplayNameResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgSetDisplayNameResponseProtoMsg): MsgSetDisplayNameResponse {
+    return MsgSetDisplayNameResponse.decode(message.value);
+  },
+  toProto(message: MsgSetDisplayNameResponse): Uint8Array {
+    return MsgSetDisplayNameResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSetDisplayNameResponse): MsgSetDisplayNameResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.name.v1.MsgSetDisplayNameResponse",
+      value: MsgSetDisplayNameResponse.encode(message).finish()
     };
   }
 };

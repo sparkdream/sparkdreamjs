@@ -3,6 +3,7 @@ import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "
 import { Params, ParamsAmino } from "./params";
 import { NameRecord, NameRecordAmino } from "./name_record";
 import { Dispute, DisputeAmino } from "./dispute";
+import { OwnerInfo, OwnerInfoAmino } from "./owner_info";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -324,6 +325,62 @@ export interface QueryAllDisputeResponseAmino {
 export interface QueryAllDisputeResponseAminoMsg {
   type: "/sparkdream.name.v1.QueryAllDisputeResponse";
   value: QueryAllDisputeResponseAmino;
+}
+/**
+ * QueryGetOwnerInfoRequest defines the request type for the GetOwnerInfo RPC.
+ * @name QueryGetOwnerInfoRequest
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.QueryGetOwnerInfoRequest
+ */
+export interface QueryGetOwnerInfoRequest {
+  address: string;
+}
+export interface QueryGetOwnerInfoRequestProtoMsg {
+  typeUrl: "/sparkdream.name.v1.QueryGetOwnerInfoRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryGetOwnerInfoRequest defines the request type for the GetOwnerInfo RPC.
+ * @name QueryGetOwnerInfoRequestAmino
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.QueryGetOwnerInfoRequest
+ */
+export interface QueryGetOwnerInfoRequestAmino {
+  address?: string;
+}
+export interface QueryGetOwnerInfoRequestAminoMsg {
+  type: "/sparkdream.name.v1.QueryGetOwnerInfoRequest";
+  value: QueryGetOwnerInfoRequestAmino;
+}
+/**
+ * QueryGetOwnerInfoResponse defines the response type for the GetOwnerInfo RPC.
+ * owner_info is always populated; for addresses with no record it is returned
+ * with the address echoed and all other fields empty/zero.
+ * @name QueryGetOwnerInfoResponse
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.QueryGetOwnerInfoResponse
+ */
+export interface QueryGetOwnerInfoResponse {
+  ownerInfo: OwnerInfo;
+}
+export interface QueryGetOwnerInfoResponseProtoMsg {
+  typeUrl: "/sparkdream.name.v1.QueryGetOwnerInfoResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryGetOwnerInfoResponse defines the response type for the GetOwnerInfo RPC.
+ * owner_info is always populated; for addresses with no record it is returned
+ * with the address echoed and all other fields empty/zero.
+ * @name QueryGetOwnerInfoResponseAmino
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.QueryGetOwnerInfoResponse
+ */
+export interface QueryGetOwnerInfoResponseAmino {
+  owner_info?: OwnerInfoAmino;
+}
+export interface QueryGetOwnerInfoResponseAminoMsg {
+  type: "/sparkdream.name.v1.QueryGetOwnerInfoResponse";
+  value: QueryGetOwnerInfoResponseAmino;
 }
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
@@ -1177,6 +1234,146 @@ export const QueryAllDisputeResponse = {
     return {
       typeUrl: "/sparkdream.name.v1.QueryAllDisputeResponse",
       value: QueryAllDisputeResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetOwnerInfoRequest(): QueryGetOwnerInfoRequest {
+  return {
+    address: ""
+  };
+}
+/**
+ * QueryGetOwnerInfoRequest defines the request type for the GetOwnerInfo RPC.
+ * @name QueryGetOwnerInfoRequest
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.QueryGetOwnerInfoRequest
+ */
+export const QueryGetOwnerInfoRequest = {
+  typeUrl: "/sparkdream.name.v1.QueryGetOwnerInfoRequest",
+  encode(message: QueryGetOwnerInfoRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.address !== "") {
+      writer.uint32(10).string(message.address);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetOwnerInfoRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetOwnerInfoRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.address = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetOwnerInfoRequest>): QueryGetOwnerInfoRequest {
+    const message = createBaseQueryGetOwnerInfoRequest();
+    message.address = object.address ?? "";
+    return message;
+  },
+  fromAmino(object: QueryGetOwnerInfoRequestAmino): QueryGetOwnerInfoRequest {
+    const message = createBaseQueryGetOwnerInfoRequest();
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    }
+    return message;
+  },
+  toAmino(message: QueryGetOwnerInfoRequest): QueryGetOwnerInfoRequestAmino {
+    const obj: any = {};
+    obj.address = message.address === "" ? undefined : message.address;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetOwnerInfoRequestAminoMsg): QueryGetOwnerInfoRequest {
+    return QueryGetOwnerInfoRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetOwnerInfoRequestProtoMsg): QueryGetOwnerInfoRequest {
+    return QueryGetOwnerInfoRequest.decode(message.value);
+  },
+  toProto(message: QueryGetOwnerInfoRequest): Uint8Array {
+    return QueryGetOwnerInfoRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetOwnerInfoRequest): QueryGetOwnerInfoRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.name.v1.QueryGetOwnerInfoRequest",
+      value: QueryGetOwnerInfoRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetOwnerInfoResponse(): QueryGetOwnerInfoResponse {
+  return {
+    ownerInfo: OwnerInfo.fromPartial({})
+  };
+}
+/**
+ * QueryGetOwnerInfoResponse defines the response type for the GetOwnerInfo RPC.
+ * owner_info is always populated; for addresses with no record it is returned
+ * with the address echoed and all other fields empty/zero.
+ * @name QueryGetOwnerInfoResponse
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.QueryGetOwnerInfoResponse
+ */
+export const QueryGetOwnerInfoResponse = {
+  typeUrl: "/sparkdream.name.v1.QueryGetOwnerInfoResponse",
+  encode(message: QueryGetOwnerInfoResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.ownerInfo !== undefined) {
+      OwnerInfo.encode(message.ownerInfo, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetOwnerInfoResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetOwnerInfoResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.ownerInfo = OwnerInfo.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetOwnerInfoResponse>): QueryGetOwnerInfoResponse {
+    const message = createBaseQueryGetOwnerInfoResponse();
+    message.ownerInfo = object.ownerInfo !== undefined && object.ownerInfo !== null ? OwnerInfo.fromPartial(object.ownerInfo) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetOwnerInfoResponseAmino): QueryGetOwnerInfoResponse {
+    const message = createBaseQueryGetOwnerInfoResponse();
+    if (object.owner_info !== undefined && object.owner_info !== null) {
+      message.ownerInfo = OwnerInfo.fromAmino(object.owner_info);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetOwnerInfoResponse): QueryGetOwnerInfoResponseAmino {
+    const obj: any = {};
+    obj.owner_info = message.ownerInfo ? OwnerInfo.toAmino(message.ownerInfo) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetOwnerInfoResponseAminoMsg): QueryGetOwnerInfoResponse {
+    return QueryGetOwnerInfoResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetOwnerInfoResponseProtoMsg): QueryGetOwnerInfoResponse {
+    return QueryGetOwnerInfoResponse.decode(message.value);
+  },
+  toProto(message: QueryGetOwnerInfoResponse): Uint8Array {
+    return QueryGetOwnerInfoResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetOwnerInfoResponse): QueryGetOwnerInfoResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.name.v1.QueryGetOwnerInfoResponse",
+      value: QueryGetOwnerInfoResponse.encode(message).finish()
     };
   }
 };

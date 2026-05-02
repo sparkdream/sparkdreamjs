@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { MsgUpdateParams, MsgCreateCollection, MsgUpdateCollection, MsgDeleteCollection, MsgAddItem, MsgAddItems, MsgUpdateItem, MsgRemoveItem, MsgRemoveItems, MsgReorderItem, MsgAddCollaborator, MsgRemoveCollaborator, MsgUpdateCollaboratorRole, MsgRegisterCurator, MsgUnregisterCurator, MsgRateCollection, MsgChallengeReview, MsgRequestSponsorship, MsgCancelSponsorshipRequest, MsgSponsorCollection, MsgUpdateOperationalParams, MsgUpvoteContent, MsgDownvoteContent, MsgFlagContent, MsgHideContent, MsgAppealHide, MsgEndorseCollection, MsgSetSeekingEndorsement, MsgPinCollection } from "./tx";
+import { MsgUpdateParams, MsgCreateCollection, MsgUpdateCollection, MsgDeleteCollection, MsgAddItem, MsgAddItems, MsgUpdateItem, MsgRemoveItem, MsgRemoveItems, MsgReorderItem, MsgAddCollaborator, MsgRemoveCollaborator, MsgUpdateCollaboratorRole, MsgRateCollection, MsgChallengeReview, MsgRequestSponsorship, MsgCancelSponsorshipRequest, MsgSponsorCollection, MsgUpdateOperationalParams, MsgUpvoteContent, MsgDownvoteContent, MsgFlagContent, MsgHideContent, MsgAppealHide, MsgEndorseCollection, MsgSetSeekingEndorsement, MsgPinCollection } from "./tx";
 export const AminoConverter = {
   "/sparkdream.collect.v1.MsgUpdateParams": {
     aminoType: "sparkdream/x/collect/MsgUpdateParams",
@@ -65,16 +65,6 @@ export const AminoConverter = {
     aminoType: "/sparkdream.collect.v1.MsgUpdateCollaboratorRole",
     toAmino: MsgUpdateCollaboratorRole.toAmino,
     fromAmino: MsgUpdateCollaboratorRole.fromAmino
-  },
-  "/sparkdream.collect.v1.MsgRegisterCurator": {
-    aminoType: "/sparkdream.collect.v1.MsgRegisterCurator",
-    toAmino: MsgRegisterCurator.toAmino,
-    fromAmino: MsgRegisterCurator.fromAmino
-  },
-  "/sparkdream.collect.v1.MsgUnregisterCurator": {
-    aminoType: "/sparkdream.collect.v1.MsgUnregisterCurator",
-    toAmino: MsgUnregisterCurator.toAmino,
-    fromAmino: MsgUnregisterCurator.fromAmino
   },
   "/sparkdream.collect.v1.MsgRateCollection": {
     aminoType: "/sparkdream.collect.v1.MsgRateCollection",

@@ -627,6 +627,62 @@ export interface QueryListExpiringContentResponseAminoMsg {
   type: "/sparkdream.blog.v1.QueryListExpiringContentResponse";
   value: QueryListExpiringContentResponseAmino;
 }
+/**
+ * QueryListPostsByTagRequest defines the QueryListPostsByTagRequest message.
+ * @name QueryListPostsByTagRequest
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryListPostsByTagRequest
+ */
+export interface QueryListPostsByTagRequest {
+  tag: string;
+  pagination?: PageRequest;
+}
+export interface QueryListPostsByTagRequestProtoMsg {
+  typeUrl: "/sparkdream.blog.v1.QueryListPostsByTagRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryListPostsByTagRequest defines the QueryListPostsByTagRequest message.
+ * @name QueryListPostsByTagRequestAmino
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryListPostsByTagRequest
+ */
+export interface QueryListPostsByTagRequestAmino {
+  tag?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryListPostsByTagRequestAminoMsg {
+  type: "/sparkdream.blog.v1.QueryListPostsByTagRequest";
+  value: QueryListPostsByTagRequestAmino;
+}
+/**
+ * QueryListPostsByTagResponse defines the QueryListPostsByTagResponse message.
+ * @name QueryListPostsByTagResponse
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryListPostsByTagResponse
+ */
+export interface QueryListPostsByTagResponse {
+  posts: Post[];
+  pagination?: PageResponse;
+}
+export interface QueryListPostsByTagResponseProtoMsg {
+  typeUrl: "/sparkdream.blog.v1.QueryListPostsByTagResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryListPostsByTagResponse defines the QueryListPostsByTagResponse message.
+ * @name QueryListPostsByTagResponseAmino
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryListPostsByTagResponse
+ */
+export interface QueryListPostsByTagResponseAmino {
+  posts?: PostAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryListPostsByTagResponseAminoMsg {
+  type: "/sparkdream.blog.v1.QueryListPostsByTagResponse";
+  value: QueryListPostsByTagResponseAmino;
+}
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
 }
@@ -2395,6 +2451,170 @@ export const QueryListExpiringContentResponse = {
     return {
       typeUrl: "/sparkdream.blog.v1.QueryListExpiringContentResponse",
       value: QueryListExpiringContentResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryListPostsByTagRequest(): QueryListPostsByTagRequest {
+  return {
+    tag: "",
+    pagination: undefined
+  };
+}
+/**
+ * QueryListPostsByTagRequest defines the QueryListPostsByTagRequest message.
+ * @name QueryListPostsByTagRequest
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryListPostsByTagRequest
+ */
+export const QueryListPostsByTagRequest = {
+  typeUrl: "/sparkdream.blog.v1.QueryListPostsByTagRequest",
+  encode(message: QueryListPostsByTagRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.tag !== "") {
+      writer.uint32(10).string(message.tag);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryListPostsByTagRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryListPostsByTagRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tag = reader.string();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryListPostsByTagRequest>): QueryListPostsByTagRequest {
+    const message = createBaseQueryListPostsByTagRequest();
+    message.tag = object.tag ?? "";
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryListPostsByTagRequestAmino): QueryListPostsByTagRequest {
+    const message = createBaseQueryListPostsByTagRequest();
+    if (object.tag !== undefined && object.tag !== null) {
+      message.tag = object.tag;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryListPostsByTagRequest): QueryListPostsByTagRequestAmino {
+    const obj: any = {};
+    obj.tag = message.tag === "" ? undefined : message.tag;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryListPostsByTagRequestAminoMsg): QueryListPostsByTagRequest {
+    return QueryListPostsByTagRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryListPostsByTagRequestProtoMsg): QueryListPostsByTagRequest {
+    return QueryListPostsByTagRequest.decode(message.value);
+  },
+  toProto(message: QueryListPostsByTagRequest): Uint8Array {
+    return QueryListPostsByTagRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryListPostsByTagRequest): QueryListPostsByTagRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.blog.v1.QueryListPostsByTagRequest",
+      value: QueryListPostsByTagRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryListPostsByTagResponse(): QueryListPostsByTagResponse {
+  return {
+    posts: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryListPostsByTagResponse defines the QueryListPostsByTagResponse message.
+ * @name QueryListPostsByTagResponse
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryListPostsByTagResponse
+ */
+export const QueryListPostsByTagResponse = {
+  typeUrl: "/sparkdream.blog.v1.QueryListPostsByTagResponse",
+  encode(message: QueryListPostsByTagResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.posts) {
+      Post.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryListPostsByTagResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryListPostsByTagResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.posts.push(Post.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryListPostsByTagResponse>): QueryListPostsByTagResponse {
+    const message = createBaseQueryListPostsByTagResponse();
+    message.posts = object.posts?.map(e => Post.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryListPostsByTagResponseAmino): QueryListPostsByTagResponse {
+    const message = createBaseQueryListPostsByTagResponse();
+    message.posts = object.posts?.map(e => Post.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryListPostsByTagResponse): QueryListPostsByTagResponseAmino {
+    const obj: any = {};
+    if (message.posts) {
+      obj.posts = message.posts.map(e => e ? Post.toAmino(e) : undefined);
+    } else {
+      obj.posts = message.posts;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryListPostsByTagResponseAminoMsg): QueryListPostsByTagResponse {
+    return QueryListPostsByTagResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryListPostsByTagResponseProtoMsg): QueryListPostsByTagResponse {
+    return QueryListPostsByTagResponse.decode(message.value);
+  },
+  toProto(message: QueryListPostsByTagResponse): Uint8Array {
+    return QueryListPostsByTagResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryListPostsByTagResponse): QueryListPostsByTagResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.blog.v1.QueryListPostsByTagResponse",
+      value: QueryListPostsByTagResponse.encode(message).finish()
     };
   }
 };

@@ -69,6 +69,9 @@ export const createRPCMsgClient = async ({
     ecosystem: {
       v1: new (await import("./ecosystem/v1/tx.rpc.msg")).MsgClientImpl(rpc)
     },
+    federation: {
+      v1: new (await import("./federation/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    },
     forum: {
       v1: new (await import("./forum/v1/tx.rpc.msg")).MsgClientImpl(rpc)
     },

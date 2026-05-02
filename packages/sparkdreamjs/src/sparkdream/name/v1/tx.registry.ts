@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { TelescopeGeneratedType } from "../../../types";
 import { Registry } from "@cosmjs/proto-signing";
-import { MsgUpdateParams, MsgUpdateOperationalParams, MsgRegisterName, MsgSetPrimary, MsgFileDispute, MsgContestDispute, MsgResolveDispute, MsgUpdateName } from "./tx";
-export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.name.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.name.v1.MsgUpdateOperationalParams", MsgUpdateOperationalParams], ["/sparkdream.name.v1.MsgRegisterName", MsgRegisterName], ["/sparkdream.name.v1.MsgSetPrimary", MsgSetPrimary], ["/sparkdream.name.v1.MsgFileDispute", MsgFileDispute], ["/sparkdream.name.v1.MsgContestDispute", MsgContestDispute], ["/sparkdream.name.v1.MsgResolveDispute", MsgResolveDispute], ["/sparkdream.name.v1.MsgUpdateName", MsgUpdateName]];
+import { MsgUpdateParams, MsgUpdateOperationalParams, MsgRegisterName, MsgSetPrimary, MsgFileDispute, MsgContestDispute, MsgResolveDispute, MsgUpdateName, MsgSetDisplayName } from "./tx";
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.name.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.name.v1.MsgUpdateOperationalParams", MsgUpdateOperationalParams], ["/sparkdream.name.v1.MsgRegisterName", MsgRegisterName], ["/sparkdream.name.v1.MsgSetPrimary", MsgSetPrimary], ["/sparkdream.name.v1.MsgFileDispute", MsgFileDispute], ["/sparkdream.name.v1.MsgContestDispute", MsgContestDispute], ["/sparkdream.name.v1.MsgResolveDispute", MsgResolveDispute], ["/sparkdream.name.v1.MsgUpdateName", MsgUpdateName], ["/sparkdream.name.v1.MsgSetDisplayName", MsgSetDisplayName]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -57,6 +57,12 @@ export const MessageComposer = {
         typeUrl: "/sparkdream.name.v1.MsgUpdateName",
         value: MsgUpdateName.encode(value).finish()
       };
+    },
+    setDisplayName(value: MsgSetDisplayName) {
+      return {
+        typeUrl: "/sparkdream.name.v1.MsgSetDisplayName",
+        value: MsgSetDisplayName.encode(value).finish()
+      };
     }
   },
   withTypeUrl: {
@@ -105,6 +111,12 @@ export const MessageComposer = {
     updateName(value: MsgUpdateName) {
       return {
         typeUrl: "/sparkdream.name.v1.MsgUpdateName",
+        value
+      };
+    },
+    setDisplayName(value: MsgSetDisplayName) {
+      return {
+        typeUrl: "/sparkdream.name.v1.MsgSetDisplayName",
         value
       };
     }
@@ -156,6 +168,12 @@ export const MessageComposer = {
       return {
         typeUrl: "/sparkdream.name.v1.MsgUpdateName",
         value: MsgUpdateName.fromPartial(value)
+      };
+    },
+    setDisplayName(value: MsgSetDisplayName) {
+      return {
+        typeUrl: "/sparkdream.name.v1.MsgSetDisplayName",
+        value: MsgSetDisplayName.fromPartial(value)
       };
     }
   }

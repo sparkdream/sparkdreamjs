@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { MsgUpdateParams, MsgUpdateOperationalParams, MsgRegisterName, MsgSetPrimary, MsgFileDispute, MsgContestDispute, MsgResolveDispute, MsgUpdateName } from "./tx";
+import { MsgUpdateParams, MsgUpdateOperationalParams, MsgRegisterName, MsgSetPrimary, MsgFileDispute, MsgContestDispute, MsgResolveDispute, MsgUpdateName, MsgSetDisplayName } from "./tx";
 export const AminoConverter = {
   "/sparkdream.name.v1.MsgUpdateParams": {
     aminoType: "sparkdream/x/name/MsgUpdateParams",
@@ -40,5 +40,10 @@ export const AminoConverter = {
     aminoType: "/sparkdream.name.v1.MsgUpdateName",
     toAmino: MsgUpdateName.toAmino,
     fromAmino: MsgUpdateName.fromAmino
+  },
+  "/sparkdream.name.v1.MsgSetDisplayName": {
+    aminoType: "sparkdream/x/name/MsgSetDisplayName",
+    toAmino: MsgSetDisplayName.toAmino,
+    fromAmino: MsgSetDisplayName.fromAmino
   }
 };

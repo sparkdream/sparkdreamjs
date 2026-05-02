@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponse, QueryCollectionRequest, QueryCollectionResponse, QueryCollectionsByOwnerRequest, QueryCollectionsByOwnerResponse, QueryPublicCollectionsRequest, QueryPublicCollectionsResponse, QueryPublicCollectionsByTypeRequest, QueryPublicCollectionsByTypeResponse, QueryCollectionsByCollaboratorRequest, QueryCollectionsByCollaboratorResponse, QueryItemRequest, QueryItemResponse, QueryItemsRequest, QueryItemsResponse, QueryItemsByOwnerRequest, QueryItemsByOwnerResponse, QueryCollaboratorsRequest, QueryCollaboratorsResponse, QueryCuratorRequest, QueryCuratorResponse, QueryActiveCuratorsRequest, QueryActiveCuratorsResponse, QueryCurationSummaryRequest, QueryCurationSummaryResponse, QueryCurationReviewsRequest, QueryCurationReviewsResponse, QueryCurationReviewsByCuratorRequest, QueryCurationReviewsByCuratorResponse, QuerySponsorshipRequestRequest, QuerySponsorshipRequestResponse, QuerySponsorshipRequestsRequest, QuerySponsorshipRequestsResponse, QueryContentFlagRequest, QueryContentFlagResponse, QueryFlaggedContentRequest, QueryFlaggedContentResponse, QueryHideRecordRequest, QueryHideRecordResponse, QueryHideRecordsByTargetRequest, QueryHideRecordsByTargetResponse, QueryPendingCollectionsRequest, QueryPendingCollectionsResponse, QueryEndorsementRequest, QueryEndorsementResponse, QueryCollectionsByContentRequest, QueryCollectionsByContentResponse, QueryCollectionConvictionRequest, QueryCollectionConvictionResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryCollectionRequest, QueryCollectionResponse, QueryCollectionsByOwnerRequest, QueryCollectionsByOwnerResponse, QueryPublicCollectionsRequest, QueryPublicCollectionsResponse, QueryPublicCollectionsByTypeRequest, QueryPublicCollectionsByTypeResponse, QueryCollectionsByCollaboratorRequest, QueryCollectionsByCollaboratorResponse, QueryItemRequest, QueryItemResponse, QueryItemsRequest, QueryItemsResponse, QueryItemsByOwnerRequest, QueryItemsByOwnerResponse, QueryCollaboratorsRequest, QueryCollaboratorsResponse, QueryCuratorActivityRequest, QueryCuratorActivityResponse, QueryCurationSummaryRequest, QueryCurationSummaryResponse, QueryCurationReviewsRequest, QueryCurationReviewsResponse, QueryCurationReviewsByCuratorRequest, QueryCurationReviewsByCuratorResponse, QuerySponsorshipRequestRequest, QuerySponsorshipRequestResponse, QuerySponsorshipRequestsRequest, QuerySponsorshipRequestsResponse, QueryContentFlagRequest, QueryContentFlagResponse, QueryFlaggedContentRequest, QueryFlaggedContentResponse, QueryHideRecordRequest, QueryHideRecordResponse, QueryHideRecordsByTargetRequest, QueryHideRecordsByTargetResponse, QueryPendingCollectionsRequest, QueryPendingCollectionsResponse, QueryEndorsementRequest, QueryEndorsementResponse, QueryCollectionsByContentRequest, QueryCollectionsByContentResponse, QueryCollectionConvictionRequest, QueryCollectionConvictionResponse, QueryListCollectionsByTagRequest, QueryListCollectionsByTagResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -99,23 +99,12 @@ export class LCDQueryClient {
     const endpoint = `sparkdream/collect/v1/collaborators/${params.collectionId}`;
     return await this.req.get<QueryCollaboratorsResponse>(endpoint);
   };
-  /* Curator */
-  curator = async (params: QueryCuratorRequest): Promise<QueryCuratorResponse> => {
-    const endpoint = `sparkdream/collect/v1/curator/${params.address}`;
-    return await this.req.get<QueryCuratorResponse>(endpoint);
-  };
-  /* ActiveCurators */
-  activeCurators = async (params: QueryActiveCuratorsRequest = {
-    pagination: undefined
-  }): Promise<QueryActiveCuratorsResponse> => {
-    const options: any = {
-      params: {}
-    };
-    if (typeof params?.pagination !== "undefined") {
-      setPaginationParams(options, params.pagination);
-    }
-    const endpoint = `sparkdream/collect/v1/active_curators`;
-    return await this.req.get<QueryActiveCuratorsResponse>(endpoint, options);
+  /* CuratorActivity returns collect-specific per-curator counters (reviews,
+   challenged, upheld, overturned). The generic bond/status record lives in
+   x/rep under BondedRole(ROLE_TYPE_COLLECT_CURATOR, addr). */
+  curatorActivity = async (params: QueryCuratorActivityRequest): Promise<QueryCuratorActivityResponse> => {
+    const endpoint = `sparkdream/collect/v1/curator_activity/${params.address}`;
+    return await this.req.get<QueryCuratorActivityResponse>(endpoint);
   };
   /* CurationSummary */
   curationSummary = async (params: QueryCurationSummaryRequest): Promise<QueryCurationSummaryResponse> => {
@@ -225,5 +214,16 @@ export class LCDQueryClient {
   collectionConviction = async (params: QueryCollectionConvictionRequest): Promise<QueryCollectionConvictionResponse> => {
     const endpoint = `sparkdream/collect/v1/collection_conviction/${params.collectionId}`;
     return await this.req.get<QueryCollectionConvictionResponse>(endpoint);
+  };
+  /* ListCollectionsByTag returns paginated collections that carry a given tag. */
+  listCollectionsByTag = async (params: QueryListCollectionsByTagRequest): Promise<QueryListCollectionsByTagResponse> => {
+    const options: any = {
+      params: {}
+    };
+    if (typeof params?.pagination !== "undefined") {
+      setPaginationParams(options, params.pagination);
+    }
+    const endpoint = `sparkdream/collect/v1/list_collections_by_tag/${params.tag}`;
+    return await this.req.get<QueryListCollectionsByTagResponse>(endpoint, options);
   };
 }

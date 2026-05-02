@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgRegisterName, MsgRegisterNameResponse, MsgSetPrimary, MsgSetPrimaryResponse, MsgFileDispute, MsgFileDisputeResponse, MsgContestDispute, MsgContestDisputeResponse, MsgResolveDispute, MsgResolveDisputeResponse, MsgUpdateName, MsgUpdateNameResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgRegisterName, MsgRegisterNameResponse, MsgSetPrimary, MsgSetPrimaryResponse, MsgFileDispute, MsgFileDisputeResponse, MsgContestDispute, MsgContestDisputeResponse, MsgResolveDispute, MsgResolveDisputeResponse, MsgUpdateName, MsgUpdateNameResponse, MsgSetDisplayName, MsgSetDisplayNameResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
@@ -29,6 +29,11 @@ export interface Msg {
   resolveDispute(request: MsgResolveDispute): Promise<MsgResolveDisputeResponse>;
   /** UpdateName defines the UpdateName RPC. */
   updateName(request: MsgUpdateName): Promise<MsgUpdateNameResponse>;
+  /**
+   * SetDisplayName sets (or clears) the free-form display name on the
+   * signer's OwnerInfo. Empty display_name clears the field.
+   */
+  setDisplayName(request: MsgSetDisplayName): Promise<MsgSetDisplayNameResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -85,6 +90,13 @@ export class MsgClientImpl implements Msg {
     const data = MsgUpdateName.encode(request).finish();
     const promise = this.rpc.request("sparkdream.name.v1.Msg", "UpdateName", data);
     return promise.then(data => MsgUpdateNameResponse.decode(new BinaryReader(data)));
+  };
+  /* SetDisplayName sets (or clears) the free-form display name on the
+   signer's OwnerInfo. Empty display_name clears the field. */
+  setDisplayName = async (request: MsgSetDisplayName): Promise<MsgSetDisplayNameResponse> => {
+    const data = MsgSetDisplayName.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.name.v1.Msg", "SetDisplayName", data);
+    return promise.then(data => MsgSetDisplayNameResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

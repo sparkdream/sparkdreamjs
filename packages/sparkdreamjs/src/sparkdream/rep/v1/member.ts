@@ -254,6 +254,14 @@ export interface Member {
    * to build leaves as MiMC(zk_public_key, trust_level).
    */
   zkPublicKey: Uint8Array;
+  /**
+   * Salvation counters.
+   * epoch_salvations: count of salvations performed in the current epoch.
+   * last_salvation_epoch: Unix timestamp marking the start of the current
+   * salvation epoch window.
+   */
+  epochSalvations: number;
+  lastSalvationEpoch: bigint;
 }
 export interface MemberProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Member";
@@ -348,6 +356,14 @@ export interface MemberAmino {
    * to build leaves as MiMC(zk_public_key, trust_level).
    */
   zk_public_key?: string;
+  /**
+   * Salvation counters.
+   * epoch_salvations: count of salvations performed in the current epoch.
+   * last_salvation_epoch: Unix timestamp marking the start of the current
+   * salvation epoch window.
+   */
+  epoch_salvations?: number;
+  last_salvation_epoch?: string;
 }
 export interface MemberAminoMsg {
   type: "/sparkdream.rep.v1.Member";
@@ -639,7 +655,9 @@ function createBaseMember(): Member {
     lastCreditResetSeason: BigInt(0),
     reputationGainedThisEpoch: {},
     lastRepGainEpoch: BigInt(0),
-    zkPublicKey: new Uint8Array()
+    zkPublicKey: new Uint8Array(),
+    epochSalvations: 0,
+    lastSalvationEpoch: BigInt(0)
   };
 }
 /**
@@ -744,6 +762,12 @@ export const Member = {
     if (message.zkPublicKey.length !== 0) {
       writer.uint32(226).bytes(message.zkPublicKey);
     }
+    if (message.epochSalvations !== 0) {
+      writer.uint32(232).uint32(message.epochSalvations);
+    }
+    if (message.lastSalvationEpoch !== BigInt(0)) {
+      writer.uint32(240).int64(message.lastSalvationEpoch);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Member {
@@ -846,6 +870,12 @@ export const Member = {
         case 28:
           message.zkPublicKey = reader.bytes();
           break;
+        case 29:
+          message.epochSalvations = reader.uint32();
+          break;
+        case 30:
+          message.lastSalvationEpoch = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -904,6 +934,8 @@ export const Member = {
     }, {});
     message.lastRepGainEpoch = object.lastRepGainEpoch !== undefined && object.lastRepGainEpoch !== null ? BigInt(object.lastRepGainEpoch.toString()) : BigInt(0);
     message.zkPublicKey = object.zkPublicKey ?? new Uint8Array();
+    message.epochSalvations = object.epochSalvations ?? 0;
+    message.lastSalvationEpoch = object.lastSalvationEpoch !== undefined && object.lastSalvationEpoch !== null ? BigInt(object.lastSalvationEpoch.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: MemberAmino): Member {
@@ -1005,6 +1037,12 @@ export const Member = {
     if (object.zk_public_key !== undefined && object.zk_public_key !== null) {
       message.zkPublicKey = bytesFromBase64(object.zk_public_key);
     }
+    if (object.epoch_salvations !== undefined && object.epoch_salvations !== null) {
+      message.epochSalvations = object.epoch_salvations;
+    }
+    if (object.last_salvation_epoch !== undefined && object.last_salvation_epoch !== null) {
+      message.lastSalvationEpoch = BigInt(object.last_salvation_epoch);
+    }
     return message;
   },
   toAmino(message: Member): MemberAmino {
@@ -1056,6 +1094,8 @@ export const Member = {
     }
     obj.last_rep_gain_epoch = message.lastRepGainEpoch !== BigInt(0) ? message.lastRepGainEpoch?.toString() : undefined;
     obj.zk_public_key = message.zkPublicKey ? base64FromBytes(message.zkPublicKey) : undefined;
+    obj.epoch_salvations = message.epochSalvations === 0 ? undefined : message.epochSalvations;
+    obj.last_salvation_epoch = message.lastSalvationEpoch !== BigInt(0) ? message.lastSalvationEpoch?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: MemberAminoMsg): Member {

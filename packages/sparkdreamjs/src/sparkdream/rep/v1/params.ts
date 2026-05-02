@@ -107,7 +107,6 @@ export interface Params {
   /**
    * DREAM economics
    */
-  stakingApy: string;
   unstakedDecayRate: string;
   transferTaxRate: string;
   maxTipAmount: string;
@@ -182,7 +181,6 @@ export interface Params {
   /**
    * Extended staking
    */
-  projectStakingApy: string;
   projectCompletionBonusRate: string;
   memberStakeRevenueShare: string;
   tagStakeRevenueShare: string;
@@ -246,6 +244,113 @@ export interface Params {
    * Max reputation any member can earn per tag per epoch (default 50)
    */
   maxReputationGainPerEpoch: string;
+  /**
+   * Seasonal staking reward pool
+   */
+  maxStakingRewardsPerSeason: string;
+  /**
+   * Per-epoch decay on staked DREAM (default 0.05% = 0.0005)
+   */
+  stakedDecayRate: string;
+  /**
+   * Epochs new members are exempt from decay (default 30 ~1 month)
+   */
+  newMemberDecayGraceEpochs: bigint;
+  /**
+   * Treasury management
+   */
+  maxTreasuryBalance: string;
+  /**
+   * Pay interims from treasury first, mint only if empty (default true)
+   */
+  treasuryFundsInterims: boolean;
+  /**
+   * Pay retro PGF from treasury first, mint remainder (default true)
+   */
+  treasuryFundsRetroPgf: boolean;
+  /**
+   * Anti-whale staking cap: max DREAM one member can stake on a single initiative (default 50,000 DREAM)
+   * Prevents reward pool extraction — conviction is already capped by max_conviction_share_per_member,
+   * but without this cap, a whale can stake disproportionately and extract most seasonal staking rewards.
+   */
+  maxInitiativeStakePerMember: string;
+  /**
+   * Per-season cap on total DREAM minted via initiative completion rewards (default 100,000 DREAM).
+   * Bounds total extraction even if colluding members rubber-stamp initiatives.
+   */
+  maxInitiativeRewardsPerSeason: string;
+  /**
+   * Projects with approved budget above this threshold require council proposal approval
+   * instead of single Operations Committee member approval (default 10,000 DREAM).
+   */
+  largeProjectBudgetThreshold: string;
+  /**
+   * Permissionless creation fees (burned on creation — anti-spam + deflationary)
+   */
+  projectCreationFee: string;
+  /**
+   * DREAM burned for apprentice initiative under permissionless project (default 1 DREAM)
+   */
+  initiativeCreationFeeApprentice: string;
+  /**
+   * DREAM burned for standard initiative under permissionless project (default 3 DREAM)
+   */
+  initiativeCreationFeeStandard: string;
+  /**
+   * Permissionless access control (governance-only — not in RepOperationalParams)
+   */
+  permissionlessMinTrustLevel: number;
+  /**
+   * Highest initiative tier allowed in permissionless projects (default 1 = STANDARD)
+   */
+  permissionlessMaxTier: number;
+  /**
+   * DREAM burned when creating a member-registered tag (default 100 micro-DREAM)
+   */
+  tagCreationFee: string;
+  /**
+   * Sentinel SPARK reward pool (x/rep holds SPARK fed by spam taxes;
+   * drained each epoch to sentinels according to accuracy/activity gates).
+   */
+  maxSentinelRewardPool: string;
+  /**
+   * Fraction of overflow burned per epoch (default 0.5).
+   */
+  sentinelRewardPoolOverflowBurnRatio: string;
+  /**
+   * Cadence of sentinel reward distribution (default 14400 ~= 1 day).
+   */
+  sentinelRewardEpochBlocks: bigint;
+  /**
+   * Minimum accuracy to qualify for a reward (default 0.70).
+   */
+  minSentinelAccuracy: string;
+  /**
+   * Minimum appeal sample size before accuracy is meaningful (default 10).
+   */
+  minAppealsForAccuracy: bigint;
+  /**
+   * Minimum moderation actions in an epoch to qualify for a reward (default 1).
+   */
+  minEpochActivityForReward: bigint;
+  /**
+   * Minimum appeal rate (appeals / actions) to qualify for a reward (default 0.05).
+   */
+  minAppealRate: string;
+  /**
+   * Per-member active work caps (anti-monopolization). 0 = unbounded.
+   */
+  maxActiveInitiativesPerMember: number;
+  /**
+   * Max in-flight interims (PENDING/IN_PROGRESS) where the member is an assignee (default 10)
+   */
+  maxActiveInterimsPerMember: number;
+  /**
+   * Global per-epoch ceiling on DREAM minted across every path (initiative rewards,
+   * referral rewards, interim compensation, retro PGF, jury rewards, etc.). Counter
+   * resets at the first MintDREAM of each new epoch. 0 = unbounded.
+   */
+  maxDreamMintPerEpoch: string;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Params";
@@ -266,7 +371,6 @@ export interface ParamsAmino {
   /**
    * DREAM economics
    */
-  staking_apy?: string;
   unstaked_decay_rate?: string;
   transfer_tax_rate?: string;
   max_tip_amount?: string;
@@ -341,7 +445,6 @@ export interface ParamsAmino {
   /**
    * Extended staking
    */
-  project_staking_apy?: string;
   project_completion_bonus_rate?: string;
   member_stake_revenue_share?: string;
   tag_stake_revenue_share?: string;
@@ -405,6 +508,113 @@ export interface ParamsAmino {
    * Max reputation any member can earn per tag per epoch (default 50)
    */
   max_reputation_gain_per_epoch?: string;
+  /**
+   * Seasonal staking reward pool
+   */
+  max_staking_rewards_per_season?: string;
+  /**
+   * Per-epoch decay on staked DREAM (default 0.05% = 0.0005)
+   */
+  staked_decay_rate?: string;
+  /**
+   * Epochs new members are exempt from decay (default 30 ~1 month)
+   */
+  new_member_decay_grace_epochs?: string;
+  /**
+   * Treasury management
+   */
+  max_treasury_balance?: string;
+  /**
+   * Pay interims from treasury first, mint only if empty (default true)
+   */
+  treasury_funds_interims?: boolean;
+  /**
+   * Pay retro PGF from treasury first, mint remainder (default true)
+   */
+  treasury_funds_retro_pgf?: boolean;
+  /**
+   * Anti-whale staking cap: max DREAM one member can stake on a single initiative (default 50,000 DREAM)
+   * Prevents reward pool extraction — conviction is already capped by max_conviction_share_per_member,
+   * but without this cap, a whale can stake disproportionately and extract most seasonal staking rewards.
+   */
+  max_initiative_stake_per_member?: string;
+  /**
+   * Per-season cap on total DREAM minted via initiative completion rewards (default 100,000 DREAM).
+   * Bounds total extraction even if colluding members rubber-stamp initiatives.
+   */
+  max_initiative_rewards_per_season?: string;
+  /**
+   * Projects with approved budget above this threshold require council proposal approval
+   * instead of single Operations Committee member approval (default 10,000 DREAM).
+   */
+  large_project_budget_threshold?: string;
+  /**
+   * Permissionless creation fees (burned on creation — anti-spam + deflationary)
+   */
+  project_creation_fee?: string;
+  /**
+   * DREAM burned for apprentice initiative under permissionless project (default 1 DREAM)
+   */
+  initiative_creation_fee_apprentice?: string;
+  /**
+   * DREAM burned for standard initiative under permissionless project (default 3 DREAM)
+   */
+  initiative_creation_fee_standard?: string;
+  /**
+   * Permissionless access control (governance-only — not in RepOperationalParams)
+   */
+  permissionless_min_trust_level?: number;
+  /**
+   * Highest initiative tier allowed in permissionless projects (default 1 = STANDARD)
+   */
+  permissionless_max_tier?: number;
+  /**
+   * DREAM burned when creating a member-registered tag (default 100 micro-DREAM)
+   */
+  tag_creation_fee?: string;
+  /**
+   * Sentinel SPARK reward pool (x/rep holds SPARK fed by spam taxes;
+   * drained each epoch to sentinels according to accuracy/activity gates).
+   */
+  max_sentinel_reward_pool?: string;
+  /**
+   * Fraction of overflow burned per epoch (default 0.5).
+   */
+  sentinel_reward_pool_overflow_burn_ratio?: string;
+  /**
+   * Cadence of sentinel reward distribution (default 14400 ~= 1 day).
+   */
+  sentinel_reward_epoch_blocks?: string;
+  /**
+   * Minimum accuracy to qualify for a reward (default 0.70).
+   */
+  min_sentinel_accuracy?: string;
+  /**
+   * Minimum appeal sample size before accuracy is meaningful (default 10).
+   */
+  min_appeals_for_accuracy?: string;
+  /**
+   * Minimum moderation actions in an epoch to qualify for a reward (default 1).
+   */
+  min_epoch_activity_for_reward?: string;
+  /**
+   * Minimum appeal rate (appeals / actions) to qualify for a reward (default 0.05).
+   */
+  min_appeal_rate?: string;
+  /**
+   * Per-member active work caps (anti-monopolization). 0 = unbounded.
+   */
+  max_active_initiatives_per_member?: number;
+  /**
+   * Max in-flight interims (PENDING/IN_PROGRESS) where the member is an assignee (default 10)
+   */
+  max_active_interims_per_member?: number;
+  /**
+   * Global per-epoch ceiling on DREAM minted across every path (initiative rewards,
+   * referral rewards, interim compensation, retro PGF, jury rewards, etc.). Counter
+   * resets at the first MintDREAM of each new epoch. 0 = unbounded.
+   */
+  max_dream_mint_per_epoch?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/rep/Params";
@@ -427,7 +637,6 @@ export interface RepOperationalParams {
   /**
    * DREAM economics
    */
-  stakingApy: string;
   unstakedDecayRate: string;
   transferTaxRate: string;
   maxTipAmount: string;
@@ -476,7 +685,6 @@ export interface RepOperationalParams {
   /**
    * Extended staking
    */
-  projectStakingApy: string;
   projectCompletionBonusRate: string;
   memberStakeRevenueShare: string;
   tagStakeRevenueShare: string;
@@ -526,6 +734,75 @@ export interface RepOperationalParams {
    * Max reputation any member can earn per tag per epoch (default 50)
    */
   maxReputationGainPerEpoch: string;
+  /**
+   * Seasonal staking reward pool
+   */
+  maxStakingRewardsPerSeason: string;
+  stakedDecayRate: string;
+  newMemberDecayGraceEpochs: bigint;
+  /**
+   * Treasury management
+   */
+  maxTreasuryBalance: string;
+  treasuryFundsInterims: boolean;
+  treasuryFundsRetroPgf: boolean;
+  /**
+   * Anti-whale staking cap (mirrors Params.max_initiative_stake_per_member)
+   */
+  maxInitiativeStakePerMember: string;
+  /**
+   * Per-season initiative reward minting cap (mirrors Params.max_initiative_rewards_per_season)
+   */
+  maxInitiativeRewardsPerSeason: string;
+  /**
+   * Large project budget threshold for council approval (mirrors Params.large_project_budget_threshold)
+   */
+  largeProjectBudgetThreshold: string;
+  /**
+   * Permissionless creation fees (council-tunable)
+   */
+  projectCreationFee: string;
+  initiativeCreationFeeApprentice: string;
+  initiativeCreationFeeStandard: string;
+  tagCreationFee: string;
+  /**
+   * Sentinel SPARK reward pool (x/rep holds SPARK fed by spam taxes;
+   * drained each epoch to sentinels according to accuracy/activity gates).
+   */
+  maxSentinelRewardPool: string;
+  /**
+   * Fraction of overflow burned per epoch (default 0.5).
+   */
+  sentinelRewardPoolOverflowBurnRatio: string;
+  /**
+   * Cadence of sentinel reward distribution (default 14400 ~= 1 day).
+   */
+  sentinelRewardEpochBlocks: bigint;
+  /**
+   * Minimum accuracy to qualify for a reward (default 0.70).
+   */
+  minSentinelAccuracy: string;
+  /**
+   * Minimum appeal sample size before accuracy is meaningful (default 10).
+   */
+  minAppealsForAccuracy: bigint;
+  /**
+   * Minimum moderation actions in an epoch to qualify for a reward (default 1).
+   */
+  minEpochActivityForReward: bigint;
+  /**
+   * Minimum appeal rate (appeals / actions) to qualify for a reward (default 0.05).
+   */
+  minAppealRate: string;
+  /**
+   * Per-member active work caps (mirrors Params.max_active_{initiatives,interims}_per_member). 0 = unbounded.
+   */
+  maxActiveInitiativesPerMember: number;
+  maxActiveInterimsPerMember: number;
+  /**
+   * Global per-epoch DREAM minting cap (mirrors Params.max_dream_mint_per_epoch). 0 = unbounded.
+   */
+  maxDreamMintPerEpoch: string;
 }
 export interface RepOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.rep.v1.RepOperationalParams";
@@ -548,7 +825,6 @@ export interface RepOperationalParamsAmino {
   /**
    * DREAM economics
    */
-  staking_apy?: string;
   unstaked_decay_rate?: string;
   transfer_tax_rate?: string;
   max_tip_amount?: string;
@@ -597,7 +873,6 @@ export interface RepOperationalParamsAmino {
   /**
    * Extended staking
    */
-  project_staking_apy?: string;
   project_completion_bonus_rate?: string;
   member_stake_revenue_share?: string;
   tag_stake_revenue_share?: string;
@@ -647,6 +922,75 @@ export interface RepOperationalParamsAmino {
    * Max reputation any member can earn per tag per epoch (default 50)
    */
   max_reputation_gain_per_epoch?: string;
+  /**
+   * Seasonal staking reward pool
+   */
+  max_staking_rewards_per_season?: string;
+  staked_decay_rate?: string;
+  new_member_decay_grace_epochs?: string;
+  /**
+   * Treasury management
+   */
+  max_treasury_balance?: string;
+  treasury_funds_interims?: boolean;
+  treasury_funds_retro_pgf?: boolean;
+  /**
+   * Anti-whale staking cap (mirrors Params.max_initiative_stake_per_member)
+   */
+  max_initiative_stake_per_member?: string;
+  /**
+   * Per-season initiative reward minting cap (mirrors Params.max_initiative_rewards_per_season)
+   */
+  max_initiative_rewards_per_season?: string;
+  /**
+   * Large project budget threshold for council approval (mirrors Params.large_project_budget_threshold)
+   */
+  large_project_budget_threshold?: string;
+  /**
+   * Permissionless creation fees (council-tunable)
+   */
+  project_creation_fee?: string;
+  initiative_creation_fee_apprentice?: string;
+  initiative_creation_fee_standard?: string;
+  tag_creation_fee?: string;
+  /**
+   * Sentinel SPARK reward pool (x/rep holds SPARK fed by spam taxes;
+   * drained each epoch to sentinels according to accuracy/activity gates).
+   */
+  max_sentinel_reward_pool?: string;
+  /**
+   * Fraction of overflow burned per epoch (default 0.5).
+   */
+  sentinel_reward_pool_overflow_burn_ratio?: string;
+  /**
+   * Cadence of sentinel reward distribution (default 14400 ~= 1 day).
+   */
+  sentinel_reward_epoch_blocks?: string;
+  /**
+   * Minimum accuracy to qualify for a reward (default 0.70).
+   */
+  min_sentinel_accuracy?: string;
+  /**
+   * Minimum appeal sample size before accuracy is meaningful (default 10).
+   */
+  min_appeals_for_accuracy?: string;
+  /**
+   * Minimum moderation actions in an epoch to qualify for a reward (default 1).
+   */
+  min_epoch_activity_for_reward?: string;
+  /**
+   * Minimum appeal rate (appeals / actions) to qualify for a reward (default 0.05).
+   */
+  min_appeal_rate?: string;
+  /**
+   * Per-member active work caps (mirrors Params.max_active_{initiatives,interims}_per_member). 0 = unbounded.
+   */
+  max_active_initiatives_per_member?: number;
+  max_active_interims_per_member?: number;
+  /**
+   * Global per-epoch DREAM minting cap (mirrors Params.max_dream_mint_per_epoch). 0 = unbounded.
+   */
+  max_dream_mint_per_epoch?: string;
 }
 export interface RepOperationalParamsAminoMsg {
   type: "sparkdream/x/rep/RepOperationalParams";
@@ -974,7 +1318,6 @@ function createBaseParams(): Params {
   return {
     epochBlocks: BigInt(0),
     seasonDurationEpochs: BigInt(0),
-    stakingApy: "",
     unstakedDecayRate: "",
     transferTaxRate: "",
     maxTipAmount: "",
@@ -1016,7 +1359,6 @@ function createBaseParams(): Params {
     moderateSlashPenalty: "",
     severeSlashPenalty: "",
     zeroingSlashPenalty: "",
-    projectStakingApy: "",
     projectCompletionBonusRate: "",
     memberStakeRevenueShare: "",
     tagStakeRevenueShare: "",
@@ -1035,7 +1377,32 @@ function createBaseParams(): Params {
     reputationDecayRate: "",
     maxConvictionSharePerMember: "",
     invitationStakeBurnRate: "",
-    maxReputationGainPerEpoch: ""
+    maxReputationGainPerEpoch: "",
+    maxStakingRewardsPerSeason: "",
+    stakedDecayRate: "",
+    newMemberDecayGraceEpochs: BigInt(0),
+    maxTreasuryBalance: "",
+    treasuryFundsInterims: false,
+    treasuryFundsRetroPgf: false,
+    maxInitiativeStakePerMember: "",
+    maxInitiativeRewardsPerSeason: "",
+    largeProjectBudgetThreshold: "",
+    projectCreationFee: "",
+    initiativeCreationFeeApprentice: "",
+    initiativeCreationFeeStandard: "",
+    permissionlessMinTrustLevel: 0,
+    permissionlessMaxTier: 0,
+    tagCreationFee: "",
+    maxSentinelRewardPool: "",
+    sentinelRewardPoolOverflowBurnRatio: "",
+    sentinelRewardEpochBlocks: BigInt(0),
+    minSentinelAccuracy: "",
+    minAppealsForAccuracy: BigInt(0),
+    minEpochActivityForReward: BigInt(0),
+    minAppealRate: "",
+    maxActiveInitiativesPerMember: 0,
+    maxActiveInterimsPerMember: 0,
+    maxDreamMintPerEpoch: ""
   };
 }
 /**
@@ -1054,191 +1421,260 @@ export const Params = {
     if (message.seasonDurationEpochs !== BigInt(0)) {
       writer.uint32(16).int64(message.seasonDurationEpochs);
     }
-    if (message.stakingApy !== "") {
-      writer.uint32(26).string(Decimal.fromUserInput(message.stakingApy, 18).atomics);
-    }
     if (message.unstakedDecayRate !== "") {
-      writer.uint32(34).string(Decimal.fromUserInput(message.unstakedDecayRate, 18).atomics);
+      writer.uint32(26).string(Decimal.fromUserInput(message.unstakedDecayRate, 18).atomics);
     }
     if (message.transferTaxRate !== "") {
-      writer.uint32(42).string(Decimal.fromUserInput(message.transferTaxRate, 18).atomics);
+      writer.uint32(34).string(Decimal.fromUserInput(message.transferTaxRate, 18).atomics);
     }
     if (message.maxTipAmount !== "") {
-      writer.uint32(50).string(message.maxTipAmount);
+      writer.uint32(42).string(message.maxTipAmount);
     }
     if (message.maxTipsPerEpoch !== 0) {
-      writer.uint32(56).uint32(message.maxTipsPerEpoch);
+      writer.uint32(48).uint32(message.maxTipsPerEpoch);
     }
     if (message.maxGiftAmount !== "") {
-      writer.uint32(66).string(message.maxGiftAmount);
+      writer.uint32(58).string(message.maxGiftAmount);
     }
     if (message.giftOnlyToInvitees === true) {
-      writer.uint32(72).bool(message.giftOnlyToInvitees);
+      writer.uint32(64).bool(message.giftOnlyToInvitees);
     }
     if (message.completerShare !== "") {
-      writer.uint32(82).string(Decimal.fromUserInput(message.completerShare, 18).atomics);
+      writer.uint32(74).string(Decimal.fromUserInput(message.completerShare, 18).atomics);
     }
     if (message.treasuryShare !== "") {
-      writer.uint32(90).string(Decimal.fromUserInput(message.treasuryShare, 18).atomics);
+      writer.uint32(82).string(Decimal.fromUserInput(message.treasuryShare, 18).atomics);
     }
     if (message.minReputationMultiplier !== "") {
-      writer.uint32(98).string(Decimal.fromUserInput(message.minReputationMultiplier, 18).atomics);
+      writer.uint32(90).string(Decimal.fromUserInput(message.minReputationMultiplier, 18).atomics);
     }
     if (message.apprenticeTier !== undefined) {
-      TierConfig.encode(message.apprenticeTier, writer.uint32(106).fork()).ldelim();
+      TierConfig.encode(message.apprenticeTier, writer.uint32(98).fork()).ldelim();
     }
     if (message.standardTier !== undefined) {
-      TierConfig.encode(message.standardTier, writer.uint32(114).fork()).ldelim();
+      TierConfig.encode(message.standardTier, writer.uint32(106).fork()).ldelim();
     }
     if (message.expertTier !== undefined) {
-      TierConfig.encode(message.expertTier, writer.uint32(122).fork()).ldelim();
+      TierConfig.encode(message.expertTier, writer.uint32(114).fork()).ldelim();
     }
     if (message.epicTier !== undefined) {
-      TierConfig.encode(message.epicTier, writer.uint32(130).fork()).ldelim();
+      TierConfig.encode(message.epicTier, writer.uint32(122).fork()).ldelim();
     }
     if (message.convictionHalfLifeEpochs !== BigInt(0)) {
-      writer.uint32(136).int64(message.convictionHalfLifeEpochs);
+      writer.uint32(128).int64(message.convictionHalfLifeEpochs);
     }
     if (message.externalConvictionRatio !== "") {
-      writer.uint32(146).string(Decimal.fromUserInput(message.externalConvictionRatio, 18).atomics);
+      writer.uint32(138).string(Decimal.fromUserInput(message.externalConvictionRatio, 18).atomics);
     }
     if (message.convictionPerDream !== "") {
-      writer.uint32(154).string(Decimal.fromUserInput(message.convictionPerDream, 18).atomics);
+      writer.uint32(146).string(Decimal.fromUserInput(message.convictionPerDream, 18).atomics);
     }
     if (message.defaultReviewPeriodEpochs !== BigInt(0)) {
-      writer.uint32(160).int64(message.defaultReviewPeriodEpochs);
+      writer.uint32(152).int64(message.defaultReviewPeriodEpochs);
     }
     if (message.defaultChallengePeriodEpochs !== BigInt(0)) {
-      writer.uint32(168).int64(message.defaultChallengePeriodEpochs);
+      writer.uint32(160).int64(message.defaultChallengePeriodEpochs);
     }
     if (message.minInvitationStake !== "") {
-      writer.uint32(178).string(message.minInvitationStake);
+      writer.uint32(170).string(message.minInvitationStake);
     }
     if (message.invitationAccountabilityEpochs !== BigInt(0)) {
-      writer.uint32(184).int64(message.invitationAccountabilityEpochs);
+      writer.uint32(176).int64(message.invitationAccountabilityEpochs);
     }
     if (message.referralRewardRate !== "") {
-      writer.uint32(194).string(Decimal.fromUserInput(message.referralRewardRate, 18).atomics);
+      writer.uint32(186).string(Decimal.fromUserInput(message.referralRewardRate, 18).atomics);
     }
     if (message.invitationCostMultiplier !== "") {
-      writer.uint32(202).string(Decimal.fromUserInput(message.invitationCostMultiplier, 18).atomics);
+      writer.uint32(194).string(Decimal.fromUserInput(message.invitationCostMultiplier, 18).atomics);
     }
     if (message.trustLevelConfig !== undefined) {
-      TrustLevelConfig.encode(message.trustLevelConfig, writer.uint32(210).fork()).ldelim();
+      TrustLevelConfig.encode(message.trustLevelConfig, writer.uint32(202).fork()).ldelim();
     }
     if (message.minChallengeStake !== "") {
-      writer.uint32(218).string(message.minChallengeStake);
+      writer.uint32(210).string(message.minChallengeStake);
     }
     if (message.challengerRewardRate !== "") {
-      writer.uint32(226).string(Decimal.fromUserInput(message.challengerRewardRate, 18).atomics);
+      writer.uint32(218).string(Decimal.fromUserInput(message.challengerRewardRate, 18).atomics);
     }
     if (message.jurySize !== 0) {
-      writer.uint32(232).uint32(message.jurySize);
+      writer.uint32(224).uint32(message.jurySize);
     }
     if (message.jurySuperMajority !== "") {
-      writer.uint32(242).string(Decimal.fromUserInput(message.jurySuperMajority, 18).atomics);
+      writer.uint32(234).string(Decimal.fromUserInput(message.jurySuperMajority, 18).atomics);
     }
     if (message.minJurorReputation !== "") {
-      writer.uint32(250).string(Decimal.fromUserInput(message.minJurorReputation, 18).atomics);
+      writer.uint32(242).string(Decimal.fromUserInput(message.minJurorReputation, 18).atomics);
     }
     if (message.simpleComplexityBudget !== "") {
-      writer.uint32(258).string(message.simpleComplexityBudget);
+      writer.uint32(250).string(message.simpleComplexityBudget);
     }
     if (message.standardComplexityBudget !== "") {
-      writer.uint32(266).string(message.standardComplexityBudget);
+      writer.uint32(258).string(message.standardComplexityBudget);
     }
     if (message.complexComplexityBudget !== "") {
-      writer.uint32(274).string(message.complexComplexityBudget);
+      writer.uint32(266).string(message.complexComplexityBudget);
     }
     if (message.expertComplexityBudget !== "") {
-      writer.uint32(282).string(message.expertComplexityBudget);
+      writer.uint32(274).string(message.expertComplexityBudget);
     }
     if (message.soloExpertBonusRate !== "") {
-      writer.uint32(290).string(Decimal.fromUserInput(message.soloExpertBonusRate, 18).atomics);
+      writer.uint32(282).string(Decimal.fromUserInput(message.soloExpertBonusRate, 18).atomics);
     }
     if (message.interimDeadlineEpochs !== BigInt(0)) {
-      writer.uint32(296).int64(message.interimDeadlineEpochs);
+      writer.uint32(288).int64(message.interimDeadlineEpochs);
     }
     if (message.maxActiveChallengesPerCommittee !== 0) {
-      writer.uint32(304).uint32(message.maxActiveChallengesPerCommittee);
+      writer.uint32(296).uint32(message.maxActiveChallengesPerCommittee);
     }
     if (message.maxNewChallengesPerEpoch !== 0) {
-      writer.uint32(312).uint32(message.maxNewChallengesPerEpoch);
+      writer.uint32(304).uint32(message.maxNewChallengesPerEpoch);
     }
     if (message.challengeQueueMaxSize !== 0) {
-      writer.uint32(320).uint32(message.challengeQueueMaxSize);
+      writer.uint32(312).uint32(message.challengeQueueMaxSize);
     }
     if (message.minorSlashPenalty !== "") {
-      writer.uint32(330).string(Decimal.fromUserInput(message.minorSlashPenalty, 18).atomics);
+      writer.uint32(322).string(Decimal.fromUserInput(message.minorSlashPenalty, 18).atomics);
     }
     if (message.moderateSlashPenalty !== "") {
-      writer.uint32(338).string(Decimal.fromUserInput(message.moderateSlashPenalty, 18).atomics);
+      writer.uint32(330).string(Decimal.fromUserInput(message.moderateSlashPenalty, 18).atomics);
     }
     if (message.severeSlashPenalty !== "") {
-      writer.uint32(346).string(Decimal.fromUserInput(message.severeSlashPenalty, 18).atomics);
+      writer.uint32(338).string(Decimal.fromUserInput(message.severeSlashPenalty, 18).atomics);
     }
     if (message.zeroingSlashPenalty !== "") {
-      writer.uint32(354).string(Decimal.fromUserInput(message.zeroingSlashPenalty, 18).atomics);
-    }
-    if (message.projectStakingApy !== "") {
-      writer.uint32(362).string(Decimal.fromUserInput(message.projectStakingApy, 18).atomics);
+      writer.uint32(346).string(Decimal.fromUserInput(message.zeroingSlashPenalty, 18).atomics);
     }
     if (message.projectCompletionBonusRate !== "") {
-      writer.uint32(370).string(Decimal.fromUserInput(message.projectCompletionBonusRate, 18).atomics);
+      writer.uint32(354).string(Decimal.fromUserInput(message.projectCompletionBonusRate, 18).atomics);
     }
     if (message.memberStakeRevenueShare !== "") {
-      writer.uint32(378).string(Decimal.fromUserInput(message.memberStakeRevenueShare, 18).atomics);
+      writer.uint32(362).string(Decimal.fromUserInput(message.memberStakeRevenueShare, 18).atomics);
     }
     if (message.tagStakeRevenueShare !== "") {
-      writer.uint32(386).string(Decimal.fromUserInput(message.tagStakeRevenueShare, 18).atomics);
+      writer.uint32(370).string(Decimal.fromUserInput(message.tagStakeRevenueShare, 18).atomics);
     }
     if (message.minStakeDurationSeconds !== BigInt(0)) {
-      writer.uint32(392).int64(message.minStakeDurationSeconds);
+      writer.uint32(376).int64(message.minStakeDurationSeconds);
     }
     if (message.allowSelfMemberStake === true) {
-      writer.uint32(400).bool(message.allowSelfMemberStake);
+      writer.uint32(384).bool(message.allowSelfMemberStake);
     }
     if (message.challengeResponseDeadlineEpochs !== BigInt(0)) {
-      writer.uint32(408).int64(message.challengeResponseDeadlineEpochs);
+      writer.uint32(392).int64(message.challengeResponseDeadlineEpochs);
     }
     if (message.giftCooldownBlocks !== BigInt(0)) {
-      writer.uint32(416).int64(message.giftCooldownBlocks);
+      writer.uint32(400).int64(message.giftCooldownBlocks);
     }
     if (message.maxGiftsPerSenderEpoch !== "") {
-      writer.uint32(426).string(message.maxGiftsPerSenderEpoch);
+      writer.uint32(410).string(message.maxGiftsPerSenderEpoch);
     }
     if (message.contentConvictionHalfLifeEpochs !== BigInt(0)) {
-      writer.uint32(432).int64(message.contentConvictionHalfLifeEpochs);
+      writer.uint32(416).int64(message.contentConvictionHalfLifeEpochs);
     }
     if (message.maxContentStakePerMember !== "") {
-      writer.uint32(442).string(message.maxContentStakePerMember);
+      writer.uint32(426).string(message.maxContentStakePerMember);
     }
     if (message.maxAuthorBondPerContent !== "") {
-      writer.uint32(450).string(message.maxAuthorBondPerContent);
+      writer.uint32(434).string(message.maxAuthorBondPerContent);
     }
     if (message.authorBondSlashOnModeration === true) {
-      writer.uint32(456).bool(message.authorBondSlashOnModeration);
+      writer.uint32(440).bool(message.authorBondSlashOnModeration);
     }
     if (message.contentChallengeRewardShare !== "") {
-      writer.uint32(466).string(Decimal.fromUserInput(message.contentChallengeRewardShare, 18).atomics);
+      writer.uint32(450).string(Decimal.fromUserInput(message.contentChallengeRewardShare, 18).atomics);
     }
     if (message.convictionPropagationRatio !== "") {
-      writer.uint32(474).string(Decimal.fromUserInput(message.convictionPropagationRatio, 18).atomics);
+      writer.uint32(458).string(Decimal.fromUserInput(message.convictionPropagationRatio, 18).atomics);
     }
     if (message.maxTagsPerInitiative !== 0) {
-      writer.uint32(480).uint32(message.maxTagsPerInitiative);
+      writer.uint32(464).uint32(message.maxTagsPerInitiative);
     }
     if (message.reputationDecayRate !== "") {
-      writer.uint32(490).string(Decimal.fromUserInput(message.reputationDecayRate, 18).atomics);
+      writer.uint32(474).string(Decimal.fromUserInput(message.reputationDecayRate, 18).atomics);
     }
     if (message.maxConvictionSharePerMember !== "") {
-      writer.uint32(498).string(Decimal.fromUserInput(message.maxConvictionSharePerMember, 18).atomics);
+      writer.uint32(482).string(Decimal.fromUserInput(message.maxConvictionSharePerMember, 18).atomics);
     }
     if (message.invitationStakeBurnRate !== "") {
-      writer.uint32(506).string(Decimal.fromUserInput(message.invitationStakeBurnRate, 18).atomics);
+      writer.uint32(490).string(Decimal.fromUserInput(message.invitationStakeBurnRate, 18).atomics);
     }
     if (message.maxReputationGainPerEpoch !== "") {
-      writer.uint32(514).string(Decimal.fromUserInput(message.maxReputationGainPerEpoch, 18).atomics);
+      writer.uint32(498).string(Decimal.fromUserInput(message.maxReputationGainPerEpoch, 18).atomics);
+    }
+    if (message.maxStakingRewardsPerSeason !== "") {
+      writer.uint32(506).string(message.maxStakingRewardsPerSeason);
+    }
+    if (message.stakedDecayRate !== "") {
+      writer.uint32(514).string(Decimal.fromUserInput(message.stakedDecayRate, 18).atomics);
+    }
+    if (message.newMemberDecayGraceEpochs !== BigInt(0)) {
+      writer.uint32(520).int64(message.newMemberDecayGraceEpochs);
+    }
+    if (message.maxTreasuryBalance !== "") {
+      writer.uint32(530).string(message.maxTreasuryBalance);
+    }
+    if (message.treasuryFundsInterims === true) {
+      writer.uint32(536).bool(message.treasuryFundsInterims);
+    }
+    if (message.treasuryFundsRetroPgf === true) {
+      writer.uint32(544).bool(message.treasuryFundsRetroPgf);
+    }
+    if (message.maxInitiativeStakePerMember !== "") {
+      writer.uint32(554).string(message.maxInitiativeStakePerMember);
+    }
+    if (message.maxInitiativeRewardsPerSeason !== "") {
+      writer.uint32(562).string(message.maxInitiativeRewardsPerSeason);
+    }
+    if (message.largeProjectBudgetThreshold !== "") {
+      writer.uint32(570).string(message.largeProjectBudgetThreshold);
+    }
+    if (message.projectCreationFee !== "") {
+      writer.uint32(578).string(message.projectCreationFee);
+    }
+    if (message.initiativeCreationFeeApprentice !== "") {
+      writer.uint32(586).string(message.initiativeCreationFeeApprentice);
+    }
+    if (message.initiativeCreationFeeStandard !== "") {
+      writer.uint32(594).string(message.initiativeCreationFeeStandard);
+    }
+    if (message.permissionlessMinTrustLevel !== 0) {
+      writer.uint32(600).uint32(message.permissionlessMinTrustLevel);
+    }
+    if (message.permissionlessMaxTier !== 0) {
+      writer.uint32(608).uint32(message.permissionlessMaxTier);
+    }
+    if (message.tagCreationFee !== "") {
+      writer.uint32(618).string(message.tagCreationFee);
+    }
+    if (message.maxSentinelRewardPool !== "") {
+      writer.uint32(626).string(message.maxSentinelRewardPool);
+    }
+    if (message.sentinelRewardPoolOverflowBurnRatio !== "") {
+      writer.uint32(634).string(Decimal.fromUserInput(message.sentinelRewardPoolOverflowBurnRatio, 18).atomics);
+    }
+    if (message.sentinelRewardEpochBlocks !== BigInt(0)) {
+      writer.uint32(640).uint64(message.sentinelRewardEpochBlocks);
+    }
+    if (message.minSentinelAccuracy !== "") {
+      writer.uint32(650).string(Decimal.fromUserInput(message.minSentinelAccuracy, 18).atomics);
+    }
+    if (message.minAppealsForAccuracy !== BigInt(0)) {
+      writer.uint32(656).uint64(message.minAppealsForAccuracy);
+    }
+    if (message.minEpochActivityForReward !== BigInt(0)) {
+      writer.uint32(664).uint64(message.minEpochActivityForReward);
+    }
+    if (message.minAppealRate !== "") {
+      writer.uint32(674).string(Decimal.fromUserInput(message.minAppealRate, 18).atomics);
+    }
+    if (message.maxActiveInitiativesPerMember !== 0) {
+      writer.uint32(680).uint32(message.maxActiveInitiativesPerMember);
+    }
+    if (message.maxActiveInterimsPerMember !== 0) {
+      writer.uint32(688).uint32(message.maxActiveInterimsPerMember);
+    }
+    if (message.maxDreamMintPerEpoch !== "") {
+      writer.uint32(698).string(message.maxDreamMintPerEpoch);
     }
     return writer;
   },
@@ -1256,190 +1692,259 @@ export const Params = {
           message.seasonDurationEpochs = reader.int64();
           break;
         case 3:
-          message.stakingApy = Decimal.fromAtomics(reader.string(), 18).toString();
-          break;
-        case 4:
           message.unstakedDecayRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 5:
+        case 4:
           message.transferTaxRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 6:
+        case 5:
           message.maxTipAmount = reader.string();
           break;
-        case 7:
+        case 6:
           message.maxTipsPerEpoch = reader.uint32();
           break;
-        case 8:
+        case 7:
           message.maxGiftAmount = reader.string();
           break;
-        case 9:
+        case 8:
           message.giftOnlyToInvitees = reader.bool();
           break;
-        case 10:
+        case 9:
           message.completerShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 11:
+        case 10:
           message.treasuryShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 12:
+        case 11:
           message.minReputationMultiplier = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 13:
+        case 12:
           message.apprenticeTier = TierConfig.decode(reader, reader.uint32());
           break;
-        case 14:
+        case 13:
           message.standardTier = TierConfig.decode(reader, reader.uint32());
           break;
-        case 15:
+        case 14:
           message.expertTier = TierConfig.decode(reader, reader.uint32());
           break;
-        case 16:
+        case 15:
           message.epicTier = TierConfig.decode(reader, reader.uint32());
           break;
-        case 17:
+        case 16:
           message.convictionHalfLifeEpochs = reader.int64();
           break;
-        case 18:
+        case 17:
           message.externalConvictionRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 19:
+        case 18:
           message.convictionPerDream = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 20:
+        case 19:
           message.defaultReviewPeriodEpochs = reader.int64();
           break;
-        case 21:
+        case 20:
           message.defaultChallengePeriodEpochs = reader.int64();
           break;
-        case 22:
+        case 21:
           message.minInvitationStake = reader.string();
           break;
-        case 23:
+        case 22:
           message.invitationAccountabilityEpochs = reader.int64();
           break;
-        case 24:
+        case 23:
           message.referralRewardRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 25:
+        case 24:
           message.invitationCostMultiplier = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 26:
+        case 25:
           message.trustLevelConfig = TrustLevelConfig.decode(reader, reader.uint32());
           break;
-        case 27:
+        case 26:
           message.minChallengeStake = reader.string();
           break;
-        case 28:
+        case 27:
           message.challengerRewardRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 29:
+        case 28:
           message.jurySize = reader.uint32();
           break;
-        case 30:
+        case 29:
           message.jurySuperMajority = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 31:
+        case 30:
           message.minJurorReputation = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 32:
+        case 31:
           message.simpleComplexityBudget = reader.string();
           break;
-        case 33:
+        case 32:
           message.standardComplexityBudget = reader.string();
           break;
-        case 34:
+        case 33:
           message.complexComplexityBudget = reader.string();
           break;
-        case 35:
+        case 34:
           message.expertComplexityBudget = reader.string();
           break;
-        case 36:
+        case 35:
           message.soloExpertBonusRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 37:
+        case 36:
           message.interimDeadlineEpochs = reader.int64();
           break;
-        case 38:
+        case 37:
           message.maxActiveChallengesPerCommittee = reader.uint32();
           break;
-        case 39:
+        case 38:
           message.maxNewChallengesPerEpoch = reader.uint32();
           break;
-        case 40:
+        case 39:
           message.challengeQueueMaxSize = reader.uint32();
           break;
-        case 41:
+        case 40:
           message.minorSlashPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 42:
+        case 41:
           message.moderateSlashPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 43:
+        case 42:
           message.severeSlashPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 44:
+        case 43:
           message.zeroingSlashPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 45:
-          message.projectStakingApy = Decimal.fromAtomics(reader.string(), 18).toString();
-          break;
-        case 46:
+        case 44:
           message.projectCompletionBonusRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 47:
+        case 45:
           message.memberStakeRevenueShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 48:
+        case 46:
           message.tagStakeRevenueShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 49:
+        case 47:
           message.minStakeDurationSeconds = reader.int64();
           break;
-        case 50:
+        case 48:
           message.allowSelfMemberStake = reader.bool();
           break;
-        case 51:
+        case 49:
           message.challengeResponseDeadlineEpochs = reader.int64();
           break;
-        case 52:
+        case 50:
           message.giftCooldownBlocks = reader.int64();
           break;
-        case 53:
+        case 51:
           message.maxGiftsPerSenderEpoch = reader.string();
           break;
-        case 54:
+        case 52:
           message.contentConvictionHalfLifeEpochs = reader.int64();
           break;
-        case 55:
+        case 53:
           message.maxContentStakePerMember = reader.string();
           break;
-        case 56:
+        case 54:
           message.maxAuthorBondPerContent = reader.string();
           break;
-        case 57:
+        case 55:
           message.authorBondSlashOnModeration = reader.bool();
           break;
-        case 58:
+        case 56:
           message.contentChallengeRewardShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 59:
+        case 57:
           message.convictionPropagationRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 60:
+        case 58:
           message.maxTagsPerInitiative = reader.uint32();
           break;
-        case 61:
+        case 59:
           message.reputationDecayRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 62:
+        case 60:
           message.maxConvictionSharePerMember = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 63:
+        case 61:
           message.invitationStakeBurnRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 64:
+        case 62:
           message.maxReputationGainPerEpoch = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 63:
+          message.maxStakingRewardsPerSeason = reader.string();
+          break;
+        case 64:
+          message.stakedDecayRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 65:
+          message.newMemberDecayGraceEpochs = reader.int64();
+          break;
+        case 66:
+          message.maxTreasuryBalance = reader.string();
+          break;
+        case 67:
+          message.treasuryFundsInterims = reader.bool();
+          break;
+        case 68:
+          message.treasuryFundsRetroPgf = reader.bool();
+          break;
+        case 69:
+          message.maxInitiativeStakePerMember = reader.string();
+          break;
+        case 70:
+          message.maxInitiativeRewardsPerSeason = reader.string();
+          break;
+        case 71:
+          message.largeProjectBudgetThreshold = reader.string();
+          break;
+        case 72:
+          message.projectCreationFee = reader.string();
+          break;
+        case 73:
+          message.initiativeCreationFeeApprentice = reader.string();
+          break;
+        case 74:
+          message.initiativeCreationFeeStandard = reader.string();
+          break;
+        case 75:
+          message.permissionlessMinTrustLevel = reader.uint32();
+          break;
+        case 76:
+          message.permissionlessMaxTier = reader.uint32();
+          break;
+        case 77:
+          message.tagCreationFee = reader.string();
+          break;
+        case 78:
+          message.maxSentinelRewardPool = reader.string();
+          break;
+        case 79:
+          message.sentinelRewardPoolOverflowBurnRatio = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 80:
+          message.sentinelRewardEpochBlocks = reader.uint64();
+          break;
+        case 81:
+          message.minSentinelAccuracy = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 82:
+          message.minAppealsForAccuracy = reader.uint64();
+          break;
+        case 83:
+          message.minEpochActivityForReward = reader.uint64();
+          break;
+        case 84:
+          message.minAppealRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 85:
+          message.maxActiveInitiativesPerMember = reader.uint32();
+          break;
+        case 86:
+          message.maxActiveInterimsPerMember = reader.uint32();
+          break;
+        case 87:
+          message.maxDreamMintPerEpoch = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1452,7 +1957,6 @@ export const Params = {
     const message = createBaseParams();
     message.epochBlocks = object.epochBlocks !== undefined && object.epochBlocks !== null ? BigInt(object.epochBlocks.toString()) : BigInt(0);
     message.seasonDurationEpochs = object.seasonDurationEpochs !== undefined && object.seasonDurationEpochs !== null ? BigInt(object.seasonDurationEpochs.toString()) : BigInt(0);
-    message.stakingApy = object.stakingApy ?? "";
     message.unstakedDecayRate = object.unstakedDecayRate ?? "";
     message.transferTaxRate = object.transferTaxRate ?? "";
     message.maxTipAmount = object.maxTipAmount ?? "";
@@ -1494,7 +1998,6 @@ export const Params = {
     message.moderateSlashPenalty = object.moderateSlashPenalty ?? "";
     message.severeSlashPenalty = object.severeSlashPenalty ?? "";
     message.zeroingSlashPenalty = object.zeroingSlashPenalty ?? "";
-    message.projectStakingApy = object.projectStakingApy ?? "";
     message.projectCompletionBonusRate = object.projectCompletionBonusRate ?? "";
     message.memberStakeRevenueShare = object.memberStakeRevenueShare ?? "";
     message.tagStakeRevenueShare = object.tagStakeRevenueShare ?? "";
@@ -1514,6 +2017,31 @@ export const Params = {
     message.maxConvictionSharePerMember = object.maxConvictionSharePerMember ?? "";
     message.invitationStakeBurnRate = object.invitationStakeBurnRate ?? "";
     message.maxReputationGainPerEpoch = object.maxReputationGainPerEpoch ?? "";
+    message.maxStakingRewardsPerSeason = object.maxStakingRewardsPerSeason ?? "";
+    message.stakedDecayRate = object.stakedDecayRate ?? "";
+    message.newMemberDecayGraceEpochs = object.newMemberDecayGraceEpochs !== undefined && object.newMemberDecayGraceEpochs !== null ? BigInt(object.newMemberDecayGraceEpochs.toString()) : BigInt(0);
+    message.maxTreasuryBalance = object.maxTreasuryBalance ?? "";
+    message.treasuryFundsInterims = object.treasuryFundsInterims ?? false;
+    message.treasuryFundsRetroPgf = object.treasuryFundsRetroPgf ?? false;
+    message.maxInitiativeStakePerMember = object.maxInitiativeStakePerMember ?? "";
+    message.maxInitiativeRewardsPerSeason = object.maxInitiativeRewardsPerSeason ?? "";
+    message.largeProjectBudgetThreshold = object.largeProjectBudgetThreshold ?? "";
+    message.projectCreationFee = object.projectCreationFee ?? "";
+    message.initiativeCreationFeeApprentice = object.initiativeCreationFeeApprentice ?? "";
+    message.initiativeCreationFeeStandard = object.initiativeCreationFeeStandard ?? "";
+    message.permissionlessMinTrustLevel = object.permissionlessMinTrustLevel ?? 0;
+    message.permissionlessMaxTier = object.permissionlessMaxTier ?? 0;
+    message.tagCreationFee = object.tagCreationFee ?? "";
+    message.maxSentinelRewardPool = object.maxSentinelRewardPool ?? "";
+    message.sentinelRewardPoolOverflowBurnRatio = object.sentinelRewardPoolOverflowBurnRatio ?? "";
+    message.sentinelRewardEpochBlocks = object.sentinelRewardEpochBlocks !== undefined && object.sentinelRewardEpochBlocks !== null ? BigInt(object.sentinelRewardEpochBlocks.toString()) : BigInt(0);
+    message.minSentinelAccuracy = object.minSentinelAccuracy ?? "";
+    message.minAppealsForAccuracy = object.minAppealsForAccuracy !== undefined && object.minAppealsForAccuracy !== null ? BigInt(object.minAppealsForAccuracy.toString()) : BigInt(0);
+    message.minEpochActivityForReward = object.minEpochActivityForReward !== undefined && object.minEpochActivityForReward !== null ? BigInt(object.minEpochActivityForReward.toString()) : BigInt(0);
+    message.minAppealRate = object.minAppealRate ?? "";
+    message.maxActiveInitiativesPerMember = object.maxActiveInitiativesPerMember ?? 0;
+    message.maxActiveInterimsPerMember = object.maxActiveInterimsPerMember ?? 0;
+    message.maxDreamMintPerEpoch = object.maxDreamMintPerEpoch ?? "";
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -1523,9 +2051,6 @@ export const Params = {
     }
     if (object.season_duration_epochs !== undefined && object.season_duration_epochs !== null) {
       message.seasonDurationEpochs = BigInt(object.season_duration_epochs);
-    }
-    if (object.staking_apy !== undefined && object.staking_apy !== null) {
-      message.stakingApy = object.staking_apy;
     }
     if (object.unstaked_decay_rate !== undefined && object.unstaked_decay_rate !== null) {
       message.unstakedDecayRate = object.unstaked_decay_rate;
@@ -1650,9 +2175,6 @@ export const Params = {
     if (object.zeroing_slash_penalty !== undefined && object.zeroing_slash_penalty !== null) {
       message.zeroingSlashPenalty = object.zeroing_slash_penalty;
     }
-    if (object.project_staking_apy !== undefined && object.project_staking_apy !== null) {
-      message.projectStakingApy = object.project_staking_apy;
-    }
     if (object.project_completion_bonus_rate !== undefined && object.project_completion_bonus_rate !== null) {
       message.projectCompletionBonusRate = object.project_completion_bonus_rate;
     }
@@ -1710,13 +2232,87 @@ export const Params = {
     if (object.max_reputation_gain_per_epoch !== undefined && object.max_reputation_gain_per_epoch !== null) {
       message.maxReputationGainPerEpoch = object.max_reputation_gain_per_epoch;
     }
+    if (object.max_staking_rewards_per_season !== undefined && object.max_staking_rewards_per_season !== null) {
+      message.maxStakingRewardsPerSeason = object.max_staking_rewards_per_season;
+    }
+    if (object.staked_decay_rate !== undefined && object.staked_decay_rate !== null) {
+      message.stakedDecayRate = object.staked_decay_rate;
+    }
+    if (object.new_member_decay_grace_epochs !== undefined && object.new_member_decay_grace_epochs !== null) {
+      message.newMemberDecayGraceEpochs = BigInt(object.new_member_decay_grace_epochs);
+    }
+    if (object.max_treasury_balance !== undefined && object.max_treasury_balance !== null) {
+      message.maxTreasuryBalance = object.max_treasury_balance;
+    }
+    if (object.treasury_funds_interims !== undefined && object.treasury_funds_interims !== null) {
+      message.treasuryFundsInterims = object.treasury_funds_interims;
+    }
+    if (object.treasury_funds_retro_pgf !== undefined && object.treasury_funds_retro_pgf !== null) {
+      message.treasuryFundsRetroPgf = object.treasury_funds_retro_pgf;
+    }
+    if (object.max_initiative_stake_per_member !== undefined && object.max_initiative_stake_per_member !== null) {
+      message.maxInitiativeStakePerMember = object.max_initiative_stake_per_member;
+    }
+    if (object.max_initiative_rewards_per_season !== undefined && object.max_initiative_rewards_per_season !== null) {
+      message.maxInitiativeRewardsPerSeason = object.max_initiative_rewards_per_season;
+    }
+    if (object.large_project_budget_threshold !== undefined && object.large_project_budget_threshold !== null) {
+      message.largeProjectBudgetThreshold = object.large_project_budget_threshold;
+    }
+    if (object.project_creation_fee !== undefined && object.project_creation_fee !== null) {
+      message.projectCreationFee = object.project_creation_fee;
+    }
+    if (object.initiative_creation_fee_apprentice !== undefined && object.initiative_creation_fee_apprentice !== null) {
+      message.initiativeCreationFeeApprentice = object.initiative_creation_fee_apprentice;
+    }
+    if (object.initiative_creation_fee_standard !== undefined && object.initiative_creation_fee_standard !== null) {
+      message.initiativeCreationFeeStandard = object.initiative_creation_fee_standard;
+    }
+    if (object.permissionless_min_trust_level !== undefined && object.permissionless_min_trust_level !== null) {
+      message.permissionlessMinTrustLevel = object.permissionless_min_trust_level;
+    }
+    if (object.permissionless_max_tier !== undefined && object.permissionless_max_tier !== null) {
+      message.permissionlessMaxTier = object.permissionless_max_tier;
+    }
+    if (object.tag_creation_fee !== undefined && object.tag_creation_fee !== null) {
+      message.tagCreationFee = object.tag_creation_fee;
+    }
+    if (object.max_sentinel_reward_pool !== undefined && object.max_sentinel_reward_pool !== null) {
+      message.maxSentinelRewardPool = object.max_sentinel_reward_pool;
+    }
+    if (object.sentinel_reward_pool_overflow_burn_ratio !== undefined && object.sentinel_reward_pool_overflow_burn_ratio !== null) {
+      message.sentinelRewardPoolOverflowBurnRatio = object.sentinel_reward_pool_overflow_burn_ratio;
+    }
+    if (object.sentinel_reward_epoch_blocks !== undefined && object.sentinel_reward_epoch_blocks !== null) {
+      message.sentinelRewardEpochBlocks = BigInt(object.sentinel_reward_epoch_blocks);
+    }
+    if (object.min_sentinel_accuracy !== undefined && object.min_sentinel_accuracy !== null) {
+      message.minSentinelAccuracy = object.min_sentinel_accuracy;
+    }
+    if (object.min_appeals_for_accuracy !== undefined && object.min_appeals_for_accuracy !== null) {
+      message.minAppealsForAccuracy = BigInt(object.min_appeals_for_accuracy);
+    }
+    if (object.min_epoch_activity_for_reward !== undefined && object.min_epoch_activity_for_reward !== null) {
+      message.minEpochActivityForReward = BigInt(object.min_epoch_activity_for_reward);
+    }
+    if (object.min_appeal_rate !== undefined && object.min_appeal_rate !== null) {
+      message.minAppealRate = object.min_appeal_rate;
+    }
+    if (object.max_active_initiatives_per_member !== undefined && object.max_active_initiatives_per_member !== null) {
+      message.maxActiveInitiativesPerMember = object.max_active_initiatives_per_member;
+    }
+    if (object.max_active_interims_per_member !== undefined && object.max_active_interims_per_member !== null) {
+      message.maxActiveInterimsPerMember = object.max_active_interims_per_member;
+    }
+    if (object.max_dream_mint_per_epoch !== undefined && object.max_dream_mint_per_epoch !== null) {
+      message.maxDreamMintPerEpoch = object.max_dream_mint_per_epoch;
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
     const obj: any = {};
     obj.epoch_blocks = message.epochBlocks !== BigInt(0) ? message.epochBlocks?.toString() : undefined;
     obj.season_duration_epochs = message.seasonDurationEpochs !== BigInt(0) ? message.seasonDurationEpochs?.toString() : undefined;
-    obj.staking_apy = message.stakingApy === "" ? undefined : message.stakingApy;
     obj.unstaked_decay_rate = message.unstakedDecayRate === "" ? undefined : message.unstakedDecayRate;
     obj.transfer_tax_rate = message.transferTaxRate === "" ? undefined : message.transferTaxRate;
     obj.max_tip_amount = message.maxTipAmount === "" ? undefined : message.maxTipAmount;
@@ -1758,7 +2354,6 @@ export const Params = {
     obj.moderate_slash_penalty = message.moderateSlashPenalty === "" ? undefined : message.moderateSlashPenalty;
     obj.severe_slash_penalty = message.severeSlashPenalty === "" ? undefined : message.severeSlashPenalty;
     obj.zeroing_slash_penalty = message.zeroingSlashPenalty === "" ? undefined : message.zeroingSlashPenalty;
-    obj.project_staking_apy = message.projectStakingApy === "" ? undefined : message.projectStakingApy;
     obj.project_completion_bonus_rate = message.projectCompletionBonusRate === "" ? undefined : message.projectCompletionBonusRate;
     obj.member_stake_revenue_share = message.memberStakeRevenueShare === "" ? undefined : message.memberStakeRevenueShare;
     obj.tag_stake_revenue_share = message.tagStakeRevenueShare === "" ? undefined : message.tagStakeRevenueShare;
@@ -1778,6 +2373,31 @@ export const Params = {
     obj.max_conviction_share_per_member = message.maxConvictionSharePerMember === "" ? undefined : message.maxConvictionSharePerMember;
     obj.invitation_stake_burn_rate = message.invitationStakeBurnRate === "" ? undefined : message.invitationStakeBurnRate;
     obj.max_reputation_gain_per_epoch = message.maxReputationGainPerEpoch === "" ? undefined : message.maxReputationGainPerEpoch;
+    obj.max_staking_rewards_per_season = message.maxStakingRewardsPerSeason === "" ? undefined : message.maxStakingRewardsPerSeason;
+    obj.staked_decay_rate = message.stakedDecayRate === "" ? undefined : message.stakedDecayRate;
+    obj.new_member_decay_grace_epochs = message.newMemberDecayGraceEpochs !== BigInt(0) ? message.newMemberDecayGraceEpochs?.toString() : undefined;
+    obj.max_treasury_balance = message.maxTreasuryBalance === "" ? undefined : message.maxTreasuryBalance;
+    obj.treasury_funds_interims = message.treasuryFundsInterims === false ? undefined : message.treasuryFundsInterims;
+    obj.treasury_funds_retro_pgf = message.treasuryFundsRetroPgf === false ? undefined : message.treasuryFundsRetroPgf;
+    obj.max_initiative_stake_per_member = message.maxInitiativeStakePerMember === "" ? undefined : message.maxInitiativeStakePerMember;
+    obj.max_initiative_rewards_per_season = message.maxInitiativeRewardsPerSeason === "" ? undefined : message.maxInitiativeRewardsPerSeason;
+    obj.large_project_budget_threshold = message.largeProjectBudgetThreshold === "" ? undefined : message.largeProjectBudgetThreshold;
+    obj.project_creation_fee = message.projectCreationFee === "" ? undefined : message.projectCreationFee;
+    obj.initiative_creation_fee_apprentice = message.initiativeCreationFeeApprentice === "" ? undefined : message.initiativeCreationFeeApprentice;
+    obj.initiative_creation_fee_standard = message.initiativeCreationFeeStandard === "" ? undefined : message.initiativeCreationFeeStandard;
+    obj.permissionless_min_trust_level = message.permissionlessMinTrustLevel === 0 ? undefined : message.permissionlessMinTrustLevel;
+    obj.permissionless_max_tier = message.permissionlessMaxTier === 0 ? undefined : message.permissionlessMaxTier;
+    obj.tag_creation_fee = message.tagCreationFee === "" ? undefined : message.tagCreationFee;
+    obj.max_sentinel_reward_pool = message.maxSentinelRewardPool === "" ? undefined : message.maxSentinelRewardPool;
+    obj.sentinel_reward_pool_overflow_burn_ratio = message.sentinelRewardPoolOverflowBurnRatio === "" ? undefined : message.sentinelRewardPoolOverflowBurnRatio;
+    obj.sentinel_reward_epoch_blocks = message.sentinelRewardEpochBlocks !== BigInt(0) ? message.sentinelRewardEpochBlocks?.toString() : undefined;
+    obj.min_sentinel_accuracy = message.minSentinelAccuracy === "" ? undefined : message.minSentinelAccuracy;
+    obj.min_appeals_for_accuracy = message.minAppealsForAccuracy !== BigInt(0) ? message.minAppealsForAccuracy?.toString() : undefined;
+    obj.min_epoch_activity_for_reward = message.minEpochActivityForReward !== BigInt(0) ? message.minEpochActivityForReward?.toString() : undefined;
+    obj.min_appeal_rate = message.minAppealRate === "" ? undefined : message.minAppealRate;
+    obj.max_active_initiatives_per_member = message.maxActiveInitiativesPerMember === 0 ? undefined : message.maxActiveInitiativesPerMember;
+    obj.max_active_interims_per_member = message.maxActiveInterimsPerMember === 0 ? undefined : message.maxActiveInterimsPerMember;
+    obj.max_dream_mint_per_epoch = message.maxDreamMintPerEpoch === "" ? undefined : message.maxDreamMintPerEpoch;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {
@@ -1806,7 +2426,6 @@ function createBaseRepOperationalParams(): RepOperationalParams {
   return {
     epochBlocks: BigInt(0),
     seasonDurationEpochs: BigInt(0),
-    stakingApy: "",
     unstakedDecayRate: "",
     transferTaxRate: "",
     maxTipAmount: "",
@@ -1834,7 +2453,6 @@ function createBaseRepOperationalParams(): RepOperationalParams {
     maxActiveChallengesPerCommittee: 0,
     maxNewChallengesPerEpoch: 0,
     challengeQueueMaxSize: 0,
-    projectStakingApy: "",
     projectCompletionBonusRate: "",
     memberStakeRevenueShare: "",
     tagStakeRevenueShare: "",
@@ -1853,7 +2471,30 @@ function createBaseRepOperationalParams(): RepOperationalParams {
     reputationDecayRate: "",
     maxConvictionSharePerMember: "",
     invitationStakeBurnRate: "",
-    maxReputationGainPerEpoch: ""
+    maxReputationGainPerEpoch: "",
+    maxStakingRewardsPerSeason: "",
+    stakedDecayRate: "",
+    newMemberDecayGraceEpochs: BigInt(0),
+    maxTreasuryBalance: "",
+    treasuryFundsInterims: false,
+    treasuryFundsRetroPgf: false,
+    maxInitiativeStakePerMember: "",
+    maxInitiativeRewardsPerSeason: "",
+    largeProjectBudgetThreshold: "",
+    projectCreationFee: "",
+    initiativeCreationFeeApprentice: "",
+    initiativeCreationFeeStandard: "",
+    tagCreationFee: "",
+    maxSentinelRewardPool: "",
+    sentinelRewardPoolOverflowBurnRatio: "",
+    sentinelRewardEpochBlocks: BigInt(0),
+    minSentinelAccuracy: "",
+    minAppealsForAccuracy: BigInt(0),
+    minEpochActivityForReward: BigInt(0),
+    minAppealRate: "",
+    maxActiveInitiativesPerMember: 0,
+    maxActiveInterimsPerMember: 0,
+    maxDreamMintPerEpoch: ""
   };
 }
 /**
@@ -1874,149 +2515,212 @@ export const RepOperationalParams = {
     if (message.seasonDurationEpochs !== BigInt(0)) {
       writer.uint32(16).int64(message.seasonDurationEpochs);
     }
-    if (message.stakingApy !== "") {
-      writer.uint32(26).string(Decimal.fromUserInput(message.stakingApy, 18).atomics);
-    }
     if (message.unstakedDecayRate !== "") {
-      writer.uint32(34).string(Decimal.fromUserInput(message.unstakedDecayRate, 18).atomics);
+      writer.uint32(26).string(Decimal.fromUserInput(message.unstakedDecayRate, 18).atomics);
     }
     if (message.transferTaxRate !== "") {
-      writer.uint32(42).string(Decimal.fromUserInput(message.transferTaxRate, 18).atomics);
+      writer.uint32(34).string(Decimal.fromUserInput(message.transferTaxRate, 18).atomics);
     }
     if (message.maxTipAmount !== "") {
-      writer.uint32(50).string(message.maxTipAmount);
+      writer.uint32(42).string(message.maxTipAmount);
     }
     if (message.maxTipsPerEpoch !== 0) {
-      writer.uint32(56).uint32(message.maxTipsPerEpoch);
+      writer.uint32(48).uint32(message.maxTipsPerEpoch);
     }
     if (message.maxGiftAmount !== "") {
-      writer.uint32(66).string(message.maxGiftAmount);
+      writer.uint32(58).string(message.maxGiftAmount);
     }
     if (message.giftOnlyToInvitees === true) {
-      writer.uint32(72).bool(message.giftOnlyToInvitees);
+      writer.uint32(64).bool(message.giftOnlyToInvitees);
     }
     if (message.minReputationMultiplier !== "") {
-      writer.uint32(82).string(Decimal.fromUserInput(message.minReputationMultiplier, 18).atomics);
+      writer.uint32(74).string(Decimal.fromUserInput(message.minReputationMultiplier, 18).atomics);
     }
     if (message.defaultReviewPeriodEpochs !== BigInt(0)) {
-      writer.uint32(88).int64(message.defaultReviewPeriodEpochs);
+      writer.uint32(80).int64(message.defaultReviewPeriodEpochs);
     }
     if (message.defaultChallengePeriodEpochs !== BigInt(0)) {
-      writer.uint32(96).int64(message.defaultChallengePeriodEpochs);
+      writer.uint32(88).int64(message.defaultChallengePeriodEpochs);
     }
     if (message.minInvitationStake !== "") {
-      writer.uint32(106).string(message.minInvitationStake);
+      writer.uint32(98).string(message.minInvitationStake);
     }
     if (message.invitationAccountabilityEpochs !== BigInt(0)) {
-      writer.uint32(112).int64(message.invitationAccountabilityEpochs);
+      writer.uint32(104).int64(message.invitationAccountabilityEpochs);
     }
     if (message.referralRewardRate !== "") {
-      writer.uint32(122).string(Decimal.fromUserInput(message.referralRewardRate, 18).atomics);
+      writer.uint32(114).string(Decimal.fromUserInput(message.referralRewardRate, 18).atomics);
     }
     if (message.invitationCostMultiplier !== "") {
-      writer.uint32(130).string(Decimal.fromUserInput(message.invitationCostMultiplier, 18).atomics);
+      writer.uint32(122).string(Decimal.fromUserInput(message.invitationCostMultiplier, 18).atomics);
     }
     if (message.minChallengeStake !== "") {
-      writer.uint32(138).string(message.minChallengeStake);
+      writer.uint32(130).string(message.minChallengeStake);
     }
     if (message.challengerRewardRate !== "") {
-      writer.uint32(146).string(Decimal.fromUserInput(message.challengerRewardRate, 18).atomics);
+      writer.uint32(138).string(Decimal.fromUserInput(message.challengerRewardRate, 18).atomics);
     }
     if (message.jurySize !== 0) {
-      writer.uint32(152).uint32(message.jurySize);
+      writer.uint32(144).uint32(message.jurySize);
     }
     if (message.jurySuperMajority !== "") {
-      writer.uint32(162).string(Decimal.fromUserInput(message.jurySuperMajority, 18).atomics);
+      writer.uint32(154).string(Decimal.fromUserInput(message.jurySuperMajority, 18).atomics);
     }
     if (message.minJurorReputation !== "") {
-      writer.uint32(170).string(Decimal.fromUserInput(message.minJurorReputation, 18).atomics);
+      writer.uint32(162).string(Decimal.fromUserInput(message.minJurorReputation, 18).atomics);
     }
     if (message.simpleComplexityBudget !== "") {
-      writer.uint32(178).string(message.simpleComplexityBudget);
+      writer.uint32(170).string(message.simpleComplexityBudget);
     }
     if (message.standardComplexityBudget !== "") {
-      writer.uint32(186).string(message.standardComplexityBudget);
+      writer.uint32(178).string(message.standardComplexityBudget);
     }
     if (message.complexComplexityBudget !== "") {
-      writer.uint32(194).string(message.complexComplexityBudget);
+      writer.uint32(186).string(message.complexComplexityBudget);
     }
     if (message.expertComplexityBudget !== "") {
-      writer.uint32(202).string(message.expertComplexityBudget);
+      writer.uint32(194).string(message.expertComplexityBudget);
     }
     if (message.soloExpertBonusRate !== "") {
-      writer.uint32(210).string(Decimal.fromUserInput(message.soloExpertBonusRate, 18).atomics);
+      writer.uint32(202).string(Decimal.fromUserInput(message.soloExpertBonusRate, 18).atomics);
     }
     if (message.interimDeadlineEpochs !== BigInt(0)) {
-      writer.uint32(216).int64(message.interimDeadlineEpochs);
+      writer.uint32(208).int64(message.interimDeadlineEpochs);
     }
     if (message.maxActiveChallengesPerCommittee !== 0) {
-      writer.uint32(224).uint32(message.maxActiveChallengesPerCommittee);
+      writer.uint32(216).uint32(message.maxActiveChallengesPerCommittee);
     }
     if (message.maxNewChallengesPerEpoch !== 0) {
-      writer.uint32(232).uint32(message.maxNewChallengesPerEpoch);
+      writer.uint32(224).uint32(message.maxNewChallengesPerEpoch);
     }
     if (message.challengeQueueMaxSize !== 0) {
-      writer.uint32(240).uint32(message.challengeQueueMaxSize);
-    }
-    if (message.projectStakingApy !== "") {
-      writer.uint32(250).string(Decimal.fromUserInput(message.projectStakingApy, 18).atomics);
+      writer.uint32(232).uint32(message.challengeQueueMaxSize);
     }
     if (message.projectCompletionBonusRate !== "") {
-      writer.uint32(258).string(Decimal.fromUserInput(message.projectCompletionBonusRate, 18).atomics);
+      writer.uint32(242).string(Decimal.fromUserInput(message.projectCompletionBonusRate, 18).atomics);
     }
     if (message.memberStakeRevenueShare !== "") {
-      writer.uint32(266).string(Decimal.fromUserInput(message.memberStakeRevenueShare, 18).atomics);
+      writer.uint32(250).string(Decimal.fromUserInput(message.memberStakeRevenueShare, 18).atomics);
     }
     if (message.tagStakeRevenueShare !== "") {
-      writer.uint32(274).string(Decimal.fromUserInput(message.tagStakeRevenueShare, 18).atomics);
+      writer.uint32(258).string(Decimal.fromUserInput(message.tagStakeRevenueShare, 18).atomics);
     }
     if (message.minStakeDurationSeconds !== BigInt(0)) {
-      writer.uint32(280).int64(message.minStakeDurationSeconds);
+      writer.uint32(264).int64(message.minStakeDurationSeconds);
     }
     if (message.allowSelfMemberStake === true) {
-      writer.uint32(288).bool(message.allowSelfMemberStake);
+      writer.uint32(272).bool(message.allowSelfMemberStake);
     }
     if (message.challengeResponseDeadlineEpochs !== BigInt(0)) {
-      writer.uint32(296).int64(message.challengeResponseDeadlineEpochs);
+      writer.uint32(280).int64(message.challengeResponseDeadlineEpochs);
     }
     if (message.giftCooldownBlocks !== BigInt(0)) {
-      writer.uint32(304).int64(message.giftCooldownBlocks);
+      writer.uint32(288).int64(message.giftCooldownBlocks);
     }
     if (message.maxGiftsPerSenderEpoch !== "") {
-      writer.uint32(314).string(message.maxGiftsPerSenderEpoch);
+      writer.uint32(298).string(message.maxGiftsPerSenderEpoch);
     }
     if (message.contentConvictionHalfLifeEpochs !== BigInt(0)) {
-      writer.uint32(320).int64(message.contentConvictionHalfLifeEpochs);
+      writer.uint32(304).int64(message.contentConvictionHalfLifeEpochs);
     }
     if (message.maxContentStakePerMember !== "") {
-      writer.uint32(330).string(message.maxContentStakePerMember);
+      writer.uint32(314).string(message.maxContentStakePerMember);
     }
     if (message.maxAuthorBondPerContent !== "") {
-      writer.uint32(338).string(message.maxAuthorBondPerContent);
+      writer.uint32(322).string(message.maxAuthorBondPerContent);
     }
     if (message.authorBondSlashOnModeration === true) {
-      writer.uint32(344).bool(message.authorBondSlashOnModeration);
+      writer.uint32(328).bool(message.authorBondSlashOnModeration);
     }
     if (message.contentChallengeRewardShare !== "") {
-      writer.uint32(354).string(Decimal.fromUserInput(message.contentChallengeRewardShare, 18).atomics);
+      writer.uint32(338).string(Decimal.fromUserInput(message.contentChallengeRewardShare, 18).atomics);
     }
     if (message.convictionPropagationRatio !== "") {
-      writer.uint32(362).string(Decimal.fromUserInput(message.convictionPropagationRatio, 18).atomics);
+      writer.uint32(346).string(Decimal.fromUserInput(message.convictionPropagationRatio, 18).atomics);
     }
     if (message.maxTagsPerInitiative !== 0) {
-      writer.uint32(368).uint32(message.maxTagsPerInitiative);
+      writer.uint32(352).uint32(message.maxTagsPerInitiative);
     }
     if (message.reputationDecayRate !== "") {
-      writer.uint32(378).string(Decimal.fromUserInput(message.reputationDecayRate, 18).atomics);
+      writer.uint32(362).string(Decimal.fromUserInput(message.reputationDecayRate, 18).atomics);
     }
     if (message.maxConvictionSharePerMember !== "") {
-      writer.uint32(386).string(Decimal.fromUserInput(message.maxConvictionSharePerMember, 18).atomics);
+      writer.uint32(370).string(Decimal.fromUserInput(message.maxConvictionSharePerMember, 18).atomics);
     }
     if (message.invitationStakeBurnRate !== "") {
-      writer.uint32(394).string(Decimal.fromUserInput(message.invitationStakeBurnRate, 18).atomics);
+      writer.uint32(378).string(Decimal.fromUserInput(message.invitationStakeBurnRate, 18).atomics);
     }
     if (message.maxReputationGainPerEpoch !== "") {
-      writer.uint32(402).string(Decimal.fromUserInput(message.maxReputationGainPerEpoch, 18).atomics);
+      writer.uint32(386).string(Decimal.fromUserInput(message.maxReputationGainPerEpoch, 18).atomics);
+    }
+    if (message.maxStakingRewardsPerSeason !== "") {
+      writer.uint32(394).string(message.maxStakingRewardsPerSeason);
+    }
+    if (message.stakedDecayRate !== "") {
+      writer.uint32(402).string(Decimal.fromUserInput(message.stakedDecayRate, 18).atomics);
+    }
+    if (message.newMemberDecayGraceEpochs !== BigInt(0)) {
+      writer.uint32(408).int64(message.newMemberDecayGraceEpochs);
+    }
+    if (message.maxTreasuryBalance !== "") {
+      writer.uint32(418).string(message.maxTreasuryBalance);
+    }
+    if (message.treasuryFundsInterims === true) {
+      writer.uint32(424).bool(message.treasuryFundsInterims);
+    }
+    if (message.treasuryFundsRetroPgf === true) {
+      writer.uint32(432).bool(message.treasuryFundsRetroPgf);
+    }
+    if (message.maxInitiativeStakePerMember !== "") {
+      writer.uint32(442).string(message.maxInitiativeStakePerMember);
+    }
+    if (message.maxInitiativeRewardsPerSeason !== "") {
+      writer.uint32(450).string(message.maxInitiativeRewardsPerSeason);
+    }
+    if (message.largeProjectBudgetThreshold !== "") {
+      writer.uint32(458).string(message.largeProjectBudgetThreshold);
+    }
+    if (message.projectCreationFee !== "") {
+      writer.uint32(466).string(message.projectCreationFee);
+    }
+    if (message.initiativeCreationFeeApprentice !== "") {
+      writer.uint32(474).string(message.initiativeCreationFeeApprentice);
+    }
+    if (message.initiativeCreationFeeStandard !== "") {
+      writer.uint32(482).string(message.initiativeCreationFeeStandard);
+    }
+    if (message.tagCreationFee !== "") {
+      writer.uint32(490).string(message.tagCreationFee);
+    }
+    if (message.maxSentinelRewardPool !== "") {
+      writer.uint32(498).string(message.maxSentinelRewardPool);
+    }
+    if (message.sentinelRewardPoolOverflowBurnRatio !== "") {
+      writer.uint32(506).string(Decimal.fromUserInput(message.sentinelRewardPoolOverflowBurnRatio, 18).atomics);
+    }
+    if (message.sentinelRewardEpochBlocks !== BigInt(0)) {
+      writer.uint32(512).uint64(message.sentinelRewardEpochBlocks);
+    }
+    if (message.minSentinelAccuracy !== "") {
+      writer.uint32(522).string(Decimal.fromUserInput(message.minSentinelAccuracy, 18).atomics);
+    }
+    if (message.minAppealsForAccuracy !== BigInt(0)) {
+      writer.uint32(528).uint64(message.minAppealsForAccuracy);
+    }
+    if (message.minEpochActivityForReward !== BigInt(0)) {
+      writer.uint32(536).uint64(message.minEpochActivityForReward);
+    }
+    if (message.minAppealRate !== "") {
+      writer.uint32(546).string(Decimal.fromUserInput(message.minAppealRate, 18).atomics);
+    }
+    if (message.maxActiveInitiativesPerMember !== 0) {
+      writer.uint32(552).uint32(message.maxActiveInitiativesPerMember);
+    }
+    if (message.maxActiveInterimsPerMember !== 0) {
+      writer.uint32(560).uint32(message.maxActiveInterimsPerMember);
+    }
+    if (message.maxDreamMintPerEpoch !== "") {
+      writer.uint32(570).string(message.maxDreamMintPerEpoch);
     }
     return writer;
   },
@@ -2034,148 +2738,211 @@ export const RepOperationalParams = {
           message.seasonDurationEpochs = reader.int64();
           break;
         case 3:
-          message.stakingApy = Decimal.fromAtomics(reader.string(), 18).toString();
-          break;
-        case 4:
           message.unstakedDecayRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 5:
+        case 4:
           message.transferTaxRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 6:
+        case 5:
           message.maxTipAmount = reader.string();
           break;
-        case 7:
+        case 6:
           message.maxTipsPerEpoch = reader.uint32();
           break;
-        case 8:
+        case 7:
           message.maxGiftAmount = reader.string();
           break;
-        case 9:
+        case 8:
           message.giftOnlyToInvitees = reader.bool();
           break;
-        case 10:
+        case 9:
           message.minReputationMultiplier = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 11:
+        case 10:
           message.defaultReviewPeriodEpochs = reader.int64();
           break;
-        case 12:
+        case 11:
           message.defaultChallengePeriodEpochs = reader.int64();
           break;
-        case 13:
+        case 12:
           message.minInvitationStake = reader.string();
           break;
-        case 14:
+        case 13:
           message.invitationAccountabilityEpochs = reader.int64();
           break;
-        case 15:
+        case 14:
           message.referralRewardRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 16:
+        case 15:
           message.invitationCostMultiplier = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 17:
+        case 16:
           message.minChallengeStake = reader.string();
           break;
-        case 18:
+        case 17:
           message.challengerRewardRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 19:
+        case 18:
           message.jurySize = reader.uint32();
           break;
-        case 20:
+        case 19:
           message.jurySuperMajority = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 21:
+        case 20:
           message.minJurorReputation = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 22:
+        case 21:
           message.simpleComplexityBudget = reader.string();
           break;
-        case 23:
+        case 22:
           message.standardComplexityBudget = reader.string();
           break;
-        case 24:
+        case 23:
           message.complexComplexityBudget = reader.string();
           break;
-        case 25:
+        case 24:
           message.expertComplexityBudget = reader.string();
           break;
-        case 26:
+        case 25:
           message.soloExpertBonusRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 27:
+        case 26:
           message.interimDeadlineEpochs = reader.int64();
           break;
-        case 28:
+        case 27:
           message.maxActiveChallengesPerCommittee = reader.uint32();
           break;
-        case 29:
+        case 28:
           message.maxNewChallengesPerEpoch = reader.uint32();
           break;
-        case 30:
+        case 29:
           message.challengeQueueMaxSize = reader.uint32();
           break;
-        case 31:
-          message.projectStakingApy = Decimal.fromAtomics(reader.string(), 18).toString();
-          break;
-        case 32:
+        case 30:
           message.projectCompletionBonusRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 33:
+        case 31:
           message.memberStakeRevenueShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 34:
+        case 32:
           message.tagStakeRevenueShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 35:
+        case 33:
           message.minStakeDurationSeconds = reader.int64();
           break;
-        case 36:
+        case 34:
           message.allowSelfMemberStake = reader.bool();
           break;
-        case 37:
+        case 35:
           message.challengeResponseDeadlineEpochs = reader.int64();
           break;
-        case 38:
+        case 36:
           message.giftCooldownBlocks = reader.int64();
           break;
-        case 39:
+        case 37:
           message.maxGiftsPerSenderEpoch = reader.string();
           break;
-        case 40:
+        case 38:
           message.contentConvictionHalfLifeEpochs = reader.int64();
           break;
-        case 41:
+        case 39:
           message.maxContentStakePerMember = reader.string();
           break;
-        case 42:
+        case 40:
           message.maxAuthorBondPerContent = reader.string();
           break;
-        case 43:
+        case 41:
           message.authorBondSlashOnModeration = reader.bool();
           break;
-        case 44:
+        case 42:
           message.contentChallengeRewardShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 45:
+        case 43:
           message.convictionPropagationRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 46:
+        case 44:
           message.maxTagsPerInitiative = reader.uint32();
           break;
-        case 47:
+        case 45:
           message.reputationDecayRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 48:
+        case 46:
           message.maxConvictionSharePerMember = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 49:
+        case 47:
           message.invitationStakeBurnRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 50:
+        case 48:
           message.maxReputationGainPerEpoch = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 49:
+          message.maxStakingRewardsPerSeason = reader.string();
+          break;
+        case 50:
+          message.stakedDecayRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 51:
+          message.newMemberDecayGraceEpochs = reader.int64();
+          break;
+        case 52:
+          message.maxTreasuryBalance = reader.string();
+          break;
+        case 53:
+          message.treasuryFundsInterims = reader.bool();
+          break;
+        case 54:
+          message.treasuryFundsRetroPgf = reader.bool();
+          break;
+        case 55:
+          message.maxInitiativeStakePerMember = reader.string();
+          break;
+        case 56:
+          message.maxInitiativeRewardsPerSeason = reader.string();
+          break;
+        case 57:
+          message.largeProjectBudgetThreshold = reader.string();
+          break;
+        case 58:
+          message.projectCreationFee = reader.string();
+          break;
+        case 59:
+          message.initiativeCreationFeeApprentice = reader.string();
+          break;
+        case 60:
+          message.initiativeCreationFeeStandard = reader.string();
+          break;
+        case 61:
+          message.tagCreationFee = reader.string();
+          break;
+        case 62:
+          message.maxSentinelRewardPool = reader.string();
+          break;
+        case 63:
+          message.sentinelRewardPoolOverflowBurnRatio = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 64:
+          message.sentinelRewardEpochBlocks = reader.uint64();
+          break;
+        case 65:
+          message.minSentinelAccuracy = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 66:
+          message.minAppealsForAccuracy = reader.uint64();
+          break;
+        case 67:
+          message.minEpochActivityForReward = reader.uint64();
+          break;
+        case 68:
+          message.minAppealRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 69:
+          message.maxActiveInitiativesPerMember = reader.uint32();
+          break;
+        case 70:
+          message.maxActiveInterimsPerMember = reader.uint32();
+          break;
+        case 71:
+          message.maxDreamMintPerEpoch = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -2188,7 +2955,6 @@ export const RepOperationalParams = {
     const message = createBaseRepOperationalParams();
     message.epochBlocks = object.epochBlocks !== undefined && object.epochBlocks !== null ? BigInt(object.epochBlocks.toString()) : BigInt(0);
     message.seasonDurationEpochs = object.seasonDurationEpochs !== undefined && object.seasonDurationEpochs !== null ? BigInt(object.seasonDurationEpochs.toString()) : BigInt(0);
-    message.stakingApy = object.stakingApy ?? "";
     message.unstakedDecayRate = object.unstakedDecayRate ?? "";
     message.transferTaxRate = object.transferTaxRate ?? "";
     message.maxTipAmount = object.maxTipAmount ?? "";
@@ -2216,7 +2982,6 @@ export const RepOperationalParams = {
     message.maxActiveChallengesPerCommittee = object.maxActiveChallengesPerCommittee ?? 0;
     message.maxNewChallengesPerEpoch = object.maxNewChallengesPerEpoch ?? 0;
     message.challengeQueueMaxSize = object.challengeQueueMaxSize ?? 0;
-    message.projectStakingApy = object.projectStakingApy ?? "";
     message.projectCompletionBonusRate = object.projectCompletionBonusRate ?? "";
     message.memberStakeRevenueShare = object.memberStakeRevenueShare ?? "";
     message.tagStakeRevenueShare = object.tagStakeRevenueShare ?? "";
@@ -2236,6 +3001,29 @@ export const RepOperationalParams = {
     message.maxConvictionSharePerMember = object.maxConvictionSharePerMember ?? "";
     message.invitationStakeBurnRate = object.invitationStakeBurnRate ?? "";
     message.maxReputationGainPerEpoch = object.maxReputationGainPerEpoch ?? "";
+    message.maxStakingRewardsPerSeason = object.maxStakingRewardsPerSeason ?? "";
+    message.stakedDecayRate = object.stakedDecayRate ?? "";
+    message.newMemberDecayGraceEpochs = object.newMemberDecayGraceEpochs !== undefined && object.newMemberDecayGraceEpochs !== null ? BigInt(object.newMemberDecayGraceEpochs.toString()) : BigInt(0);
+    message.maxTreasuryBalance = object.maxTreasuryBalance ?? "";
+    message.treasuryFundsInterims = object.treasuryFundsInterims ?? false;
+    message.treasuryFundsRetroPgf = object.treasuryFundsRetroPgf ?? false;
+    message.maxInitiativeStakePerMember = object.maxInitiativeStakePerMember ?? "";
+    message.maxInitiativeRewardsPerSeason = object.maxInitiativeRewardsPerSeason ?? "";
+    message.largeProjectBudgetThreshold = object.largeProjectBudgetThreshold ?? "";
+    message.projectCreationFee = object.projectCreationFee ?? "";
+    message.initiativeCreationFeeApprentice = object.initiativeCreationFeeApprentice ?? "";
+    message.initiativeCreationFeeStandard = object.initiativeCreationFeeStandard ?? "";
+    message.tagCreationFee = object.tagCreationFee ?? "";
+    message.maxSentinelRewardPool = object.maxSentinelRewardPool ?? "";
+    message.sentinelRewardPoolOverflowBurnRatio = object.sentinelRewardPoolOverflowBurnRatio ?? "";
+    message.sentinelRewardEpochBlocks = object.sentinelRewardEpochBlocks !== undefined && object.sentinelRewardEpochBlocks !== null ? BigInt(object.sentinelRewardEpochBlocks.toString()) : BigInt(0);
+    message.minSentinelAccuracy = object.minSentinelAccuracy ?? "";
+    message.minAppealsForAccuracy = object.minAppealsForAccuracy !== undefined && object.minAppealsForAccuracy !== null ? BigInt(object.minAppealsForAccuracy.toString()) : BigInt(0);
+    message.minEpochActivityForReward = object.minEpochActivityForReward !== undefined && object.minEpochActivityForReward !== null ? BigInt(object.minEpochActivityForReward.toString()) : BigInt(0);
+    message.minAppealRate = object.minAppealRate ?? "";
+    message.maxActiveInitiativesPerMember = object.maxActiveInitiativesPerMember ?? 0;
+    message.maxActiveInterimsPerMember = object.maxActiveInterimsPerMember ?? 0;
+    message.maxDreamMintPerEpoch = object.maxDreamMintPerEpoch ?? "";
     return message;
   },
   fromAmino(object: RepOperationalParamsAmino): RepOperationalParams {
@@ -2245,9 +3033,6 @@ export const RepOperationalParams = {
     }
     if (object.season_duration_epochs !== undefined && object.season_duration_epochs !== null) {
       message.seasonDurationEpochs = BigInt(object.season_duration_epochs);
-    }
-    if (object.staking_apy !== undefined && object.staking_apy !== null) {
-      message.stakingApy = object.staking_apy;
     }
     if (object.unstaked_decay_rate !== undefined && object.unstaked_decay_rate !== null) {
       message.unstakedDecayRate = object.unstaked_decay_rate;
@@ -2330,9 +3115,6 @@ export const RepOperationalParams = {
     if (object.challenge_queue_max_size !== undefined && object.challenge_queue_max_size !== null) {
       message.challengeQueueMaxSize = object.challenge_queue_max_size;
     }
-    if (object.project_staking_apy !== undefined && object.project_staking_apy !== null) {
-      message.projectStakingApy = object.project_staking_apy;
-    }
     if (object.project_completion_bonus_rate !== undefined && object.project_completion_bonus_rate !== null) {
       message.projectCompletionBonusRate = object.project_completion_bonus_rate;
     }
@@ -2390,13 +3172,81 @@ export const RepOperationalParams = {
     if (object.max_reputation_gain_per_epoch !== undefined && object.max_reputation_gain_per_epoch !== null) {
       message.maxReputationGainPerEpoch = object.max_reputation_gain_per_epoch;
     }
+    if (object.max_staking_rewards_per_season !== undefined && object.max_staking_rewards_per_season !== null) {
+      message.maxStakingRewardsPerSeason = object.max_staking_rewards_per_season;
+    }
+    if (object.staked_decay_rate !== undefined && object.staked_decay_rate !== null) {
+      message.stakedDecayRate = object.staked_decay_rate;
+    }
+    if (object.new_member_decay_grace_epochs !== undefined && object.new_member_decay_grace_epochs !== null) {
+      message.newMemberDecayGraceEpochs = BigInt(object.new_member_decay_grace_epochs);
+    }
+    if (object.max_treasury_balance !== undefined && object.max_treasury_balance !== null) {
+      message.maxTreasuryBalance = object.max_treasury_balance;
+    }
+    if (object.treasury_funds_interims !== undefined && object.treasury_funds_interims !== null) {
+      message.treasuryFundsInterims = object.treasury_funds_interims;
+    }
+    if (object.treasury_funds_retro_pgf !== undefined && object.treasury_funds_retro_pgf !== null) {
+      message.treasuryFundsRetroPgf = object.treasury_funds_retro_pgf;
+    }
+    if (object.max_initiative_stake_per_member !== undefined && object.max_initiative_stake_per_member !== null) {
+      message.maxInitiativeStakePerMember = object.max_initiative_stake_per_member;
+    }
+    if (object.max_initiative_rewards_per_season !== undefined && object.max_initiative_rewards_per_season !== null) {
+      message.maxInitiativeRewardsPerSeason = object.max_initiative_rewards_per_season;
+    }
+    if (object.large_project_budget_threshold !== undefined && object.large_project_budget_threshold !== null) {
+      message.largeProjectBudgetThreshold = object.large_project_budget_threshold;
+    }
+    if (object.project_creation_fee !== undefined && object.project_creation_fee !== null) {
+      message.projectCreationFee = object.project_creation_fee;
+    }
+    if (object.initiative_creation_fee_apprentice !== undefined && object.initiative_creation_fee_apprentice !== null) {
+      message.initiativeCreationFeeApprentice = object.initiative_creation_fee_apprentice;
+    }
+    if (object.initiative_creation_fee_standard !== undefined && object.initiative_creation_fee_standard !== null) {
+      message.initiativeCreationFeeStandard = object.initiative_creation_fee_standard;
+    }
+    if (object.tag_creation_fee !== undefined && object.tag_creation_fee !== null) {
+      message.tagCreationFee = object.tag_creation_fee;
+    }
+    if (object.max_sentinel_reward_pool !== undefined && object.max_sentinel_reward_pool !== null) {
+      message.maxSentinelRewardPool = object.max_sentinel_reward_pool;
+    }
+    if (object.sentinel_reward_pool_overflow_burn_ratio !== undefined && object.sentinel_reward_pool_overflow_burn_ratio !== null) {
+      message.sentinelRewardPoolOverflowBurnRatio = object.sentinel_reward_pool_overflow_burn_ratio;
+    }
+    if (object.sentinel_reward_epoch_blocks !== undefined && object.sentinel_reward_epoch_blocks !== null) {
+      message.sentinelRewardEpochBlocks = BigInt(object.sentinel_reward_epoch_blocks);
+    }
+    if (object.min_sentinel_accuracy !== undefined && object.min_sentinel_accuracy !== null) {
+      message.minSentinelAccuracy = object.min_sentinel_accuracy;
+    }
+    if (object.min_appeals_for_accuracy !== undefined && object.min_appeals_for_accuracy !== null) {
+      message.minAppealsForAccuracy = BigInt(object.min_appeals_for_accuracy);
+    }
+    if (object.min_epoch_activity_for_reward !== undefined && object.min_epoch_activity_for_reward !== null) {
+      message.minEpochActivityForReward = BigInt(object.min_epoch_activity_for_reward);
+    }
+    if (object.min_appeal_rate !== undefined && object.min_appeal_rate !== null) {
+      message.minAppealRate = object.min_appeal_rate;
+    }
+    if (object.max_active_initiatives_per_member !== undefined && object.max_active_initiatives_per_member !== null) {
+      message.maxActiveInitiativesPerMember = object.max_active_initiatives_per_member;
+    }
+    if (object.max_active_interims_per_member !== undefined && object.max_active_interims_per_member !== null) {
+      message.maxActiveInterimsPerMember = object.max_active_interims_per_member;
+    }
+    if (object.max_dream_mint_per_epoch !== undefined && object.max_dream_mint_per_epoch !== null) {
+      message.maxDreamMintPerEpoch = object.max_dream_mint_per_epoch;
+    }
     return message;
   },
   toAmino(message: RepOperationalParams): RepOperationalParamsAmino {
     const obj: any = {};
     obj.epoch_blocks = message.epochBlocks !== BigInt(0) ? message.epochBlocks?.toString() : undefined;
     obj.season_duration_epochs = message.seasonDurationEpochs !== BigInt(0) ? message.seasonDurationEpochs?.toString() : undefined;
-    obj.staking_apy = message.stakingApy === "" ? undefined : message.stakingApy;
     obj.unstaked_decay_rate = message.unstakedDecayRate === "" ? undefined : message.unstakedDecayRate;
     obj.transfer_tax_rate = message.transferTaxRate === "" ? undefined : message.transferTaxRate;
     obj.max_tip_amount = message.maxTipAmount === "" ? undefined : message.maxTipAmount;
@@ -2424,7 +3274,6 @@ export const RepOperationalParams = {
     obj.max_active_challenges_per_committee = message.maxActiveChallengesPerCommittee === 0 ? undefined : message.maxActiveChallengesPerCommittee;
     obj.max_new_challenges_per_epoch = message.maxNewChallengesPerEpoch === 0 ? undefined : message.maxNewChallengesPerEpoch;
     obj.challenge_queue_max_size = message.challengeQueueMaxSize === 0 ? undefined : message.challengeQueueMaxSize;
-    obj.project_staking_apy = message.projectStakingApy === "" ? undefined : message.projectStakingApy;
     obj.project_completion_bonus_rate = message.projectCompletionBonusRate === "" ? undefined : message.projectCompletionBonusRate;
     obj.member_stake_revenue_share = message.memberStakeRevenueShare === "" ? undefined : message.memberStakeRevenueShare;
     obj.tag_stake_revenue_share = message.tagStakeRevenueShare === "" ? undefined : message.tagStakeRevenueShare;
@@ -2444,6 +3293,29 @@ export const RepOperationalParams = {
     obj.max_conviction_share_per_member = message.maxConvictionSharePerMember === "" ? undefined : message.maxConvictionSharePerMember;
     obj.invitation_stake_burn_rate = message.invitationStakeBurnRate === "" ? undefined : message.invitationStakeBurnRate;
     obj.max_reputation_gain_per_epoch = message.maxReputationGainPerEpoch === "" ? undefined : message.maxReputationGainPerEpoch;
+    obj.max_staking_rewards_per_season = message.maxStakingRewardsPerSeason === "" ? undefined : message.maxStakingRewardsPerSeason;
+    obj.staked_decay_rate = message.stakedDecayRate === "" ? undefined : message.stakedDecayRate;
+    obj.new_member_decay_grace_epochs = message.newMemberDecayGraceEpochs !== BigInt(0) ? message.newMemberDecayGraceEpochs?.toString() : undefined;
+    obj.max_treasury_balance = message.maxTreasuryBalance === "" ? undefined : message.maxTreasuryBalance;
+    obj.treasury_funds_interims = message.treasuryFundsInterims === false ? undefined : message.treasuryFundsInterims;
+    obj.treasury_funds_retro_pgf = message.treasuryFundsRetroPgf === false ? undefined : message.treasuryFundsRetroPgf;
+    obj.max_initiative_stake_per_member = message.maxInitiativeStakePerMember === "" ? undefined : message.maxInitiativeStakePerMember;
+    obj.max_initiative_rewards_per_season = message.maxInitiativeRewardsPerSeason === "" ? undefined : message.maxInitiativeRewardsPerSeason;
+    obj.large_project_budget_threshold = message.largeProjectBudgetThreshold === "" ? undefined : message.largeProjectBudgetThreshold;
+    obj.project_creation_fee = message.projectCreationFee === "" ? undefined : message.projectCreationFee;
+    obj.initiative_creation_fee_apprentice = message.initiativeCreationFeeApprentice === "" ? undefined : message.initiativeCreationFeeApprentice;
+    obj.initiative_creation_fee_standard = message.initiativeCreationFeeStandard === "" ? undefined : message.initiativeCreationFeeStandard;
+    obj.tag_creation_fee = message.tagCreationFee === "" ? undefined : message.tagCreationFee;
+    obj.max_sentinel_reward_pool = message.maxSentinelRewardPool === "" ? undefined : message.maxSentinelRewardPool;
+    obj.sentinel_reward_pool_overflow_burn_ratio = message.sentinelRewardPoolOverflowBurnRatio === "" ? undefined : message.sentinelRewardPoolOverflowBurnRatio;
+    obj.sentinel_reward_epoch_blocks = message.sentinelRewardEpochBlocks !== BigInt(0) ? message.sentinelRewardEpochBlocks?.toString() : undefined;
+    obj.min_sentinel_accuracy = message.minSentinelAccuracy === "" ? undefined : message.minSentinelAccuracy;
+    obj.min_appeals_for_accuracy = message.minAppealsForAccuracy !== BigInt(0) ? message.minAppealsForAccuracy?.toString() : undefined;
+    obj.min_epoch_activity_for_reward = message.minEpochActivityForReward !== BigInt(0) ? message.minEpochActivityForReward?.toString() : undefined;
+    obj.min_appeal_rate = message.minAppealRate === "" ? undefined : message.minAppealRate;
+    obj.max_active_initiatives_per_member = message.maxActiveInitiativesPerMember === 0 ? undefined : message.maxActiveInitiativesPerMember;
+    obj.max_active_interims_per_member = message.maxActiveInterimsPerMember === 0 ? undefined : message.maxActiveInterimsPerMember;
+    obj.max_dream_mint_per_epoch = message.maxDreamMintPerEpoch === "" ? undefined : message.maxDreamMintPerEpoch;
     return obj;
   },
   fromAminoMsg(object: RepOperationalParamsAminoMsg): RepOperationalParams {

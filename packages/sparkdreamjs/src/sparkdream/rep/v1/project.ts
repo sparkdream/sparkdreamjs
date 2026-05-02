@@ -161,6 +161,11 @@ export interface Project {
   approvedBy: string;
   approvedAt: bigint;
   completedAt: bigint;
+  /**
+   * Permissionless projects skip committee approval.
+   * Zero budget, APPRENTICE/STANDARD initiatives only, rewards minted on completion.
+   */
+  permissionless: boolean;
 }
 export interface ProjectProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Project";
@@ -190,6 +195,11 @@ export interface ProjectAmino {
   approved_by?: string;
   approved_at?: string;
   completed_at?: string;
+  /**
+   * Permissionless projects skip committee approval.
+   * Zero budget, APPRENTICE/STANDARD initiatives only, rewards minted on completion.
+   */
+  permissionless?: boolean;
 }
 export interface ProjectAminoMsg {
   type: "/sparkdream.rep.v1.Project";
@@ -249,7 +259,8 @@ function createBaseProject(): Project {
     status: 0,
     approvedBy: "",
     approvedAt: BigInt(0),
-    completedAt: BigInt(0)
+    completedAt: BigInt(0),
+    permissionless: false
   };
 }
 /**
@@ -312,6 +323,9 @@ export const Project = {
     if (message.completedAt !== BigInt(0)) {
       writer.uint32(136).int64(message.completedAt);
     }
+    if (message.permissionless === true) {
+      writer.uint32(144).bool(message.permissionless);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Project {
@@ -372,6 +386,9 @@ export const Project = {
         case 17:
           message.completedAt = reader.int64();
           break;
+        case 18:
+          message.permissionless = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -398,6 +415,7 @@ export const Project = {
     message.approvedBy = object.approvedBy ?? "";
     message.approvedAt = object.approvedAt !== undefined && object.approvedAt !== null ? BigInt(object.approvedAt.toString()) : BigInt(0);
     message.completedAt = object.completedAt !== undefined && object.completedAt !== null ? BigInt(object.completedAt.toString()) : BigInt(0);
+    message.permissionless = object.permissionless ?? false;
     return message;
   },
   fromAmino(object: ProjectAmino): Project {
@@ -451,6 +469,9 @@ export const Project = {
     if (object.completed_at !== undefined && object.completed_at !== null) {
       message.completedAt = BigInt(object.completed_at);
     }
+    if (object.permissionless !== undefined && object.permissionless !== null) {
+      message.permissionless = object.permissionless;
+    }
     return message;
   },
   toAmino(message: Project): ProjectAmino {
@@ -476,6 +497,7 @@ export const Project = {
     obj.approved_by = message.approvedBy === "" ? undefined : message.approvedBy;
     obj.approved_at = message.approvedAt !== BigInt(0) ? message.approvedAt?.toString() : undefined;
     obj.completed_at = message.completedAt !== BigInt(0) ? message.completedAt?.toString() : undefined;
+    obj.permissionless = message.permissionless === false ? undefined : message.permissionless;
     return obj;
   },
   fromAminoMsg(object: ProjectAminoMsg): Project {

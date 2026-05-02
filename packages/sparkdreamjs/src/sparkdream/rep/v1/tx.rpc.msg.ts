@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgInviteMember, MsgInviteMemberResponse, MsgAcceptInvitation, MsgAcceptInvitationResponse, MsgTransferDream, MsgTransferDreamResponse, MsgCreateInterim, MsgCreateInterimResponse, MsgAssignInterim, MsgAssignInterimResponse, MsgSubmitInterimWork, MsgSubmitInterimWorkResponse, MsgApproveInterim, MsgApproveInterimResponse, MsgAbandonInterim, MsgAbandonInterimResponse, MsgCompleteInterim, MsgCompleteInterimResponse, MsgProposeProject, MsgProposeProjectResponse, MsgApproveProjectBudget, MsgApproveProjectBudgetResponse, MsgCancelProject, MsgCancelProjectResponse, MsgCreateInitiative, MsgCreateInitiativeResponse, MsgAssignInitiative, MsgAssignInitiativeResponse, MsgSubmitInitiativeWork, MsgSubmitInitiativeWorkResponse, MsgApproveInitiative, MsgApproveInitiativeResponse, MsgAbandonInitiative, MsgAbandonInitiativeResponse, MsgCompleteInitiative, MsgCompleteInitiativeResponse, MsgStake, MsgStakeResponse, MsgUnstake, MsgUnstakeResponse, MsgClaimStakingRewards, MsgClaimStakingRewardsResponse, MsgCompoundStakingRewards, MsgCompoundStakingRewardsResponse, MsgCreateChallenge, MsgCreateChallengeResponse, MsgRespondToChallenge, MsgRespondToChallengeResponse, MsgSubmitJurorVote, MsgSubmitJurorVoteResponse, MsgSubmitExpertTestimony, MsgSubmitExpertTestimonyResponse, MsgChallengeContent, MsgChallengeContentResponse, MsgRespondToContentChallenge, MsgRespondToContentChallengeResponse, MsgRegisterZkPublicKey, MsgRegisterZkPublicKeyResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgInviteMember, MsgInviteMemberResponse, MsgAcceptInvitation, MsgAcceptInvitationResponse, MsgTransferDream, MsgTransferDreamResponse, MsgCreateInterim, MsgCreateInterimResponse, MsgAssignInterim, MsgAssignInterimResponse, MsgSubmitInterimWork, MsgSubmitInterimWorkResponse, MsgApproveInterim, MsgApproveInterimResponse, MsgAbandonInterim, MsgAbandonInterimResponse, MsgCompleteInterim, MsgCompleteInterimResponse, MsgProposeProject, MsgProposeProjectResponse, MsgApproveProjectBudget, MsgApproveProjectBudgetResponse, MsgCancelProject, MsgCancelProjectResponse, MsgCreateInitiative, MsgCreateInitiativeResponse, MsgAssignInitiative, MsgAssignInitiativeResponse, MsgSubmitInitiativeWork, MsgSubmitInitiativeWorkResponse, MsgApproveInitiative, MsgApproveInitiativeResponse, MsgAbandonInitiative, MsgAbandonInitiativeResponse, MsgCompleteInitiative, MsgCompleteInitiativeResponse, MsgStake, MsgStakeResponse, MsgUnstake, MsgUnstakeResponse, MsgClaimStakingRewards, MsgClaimStakingRewardsResponse, MsgCompoundStakingRewards, MsgCompoundStakingRewardsResponse, MsgCreateChallenge, MsgCreateChallengeResponse, MsgRespondToChallenge, MsgRespondToChallengeResponse, MsgSubmitJurorVote, MsgSubmitJurorVoteResponse, MsgSubmitExpertTestimony, MsgSubmitExpertTestimonyResponse, MsgChallengeContent, MsgChallengeContentResponse, MsgRespondToContentChallenge, MsgRespondToContentChallengeResponse, MsgRegisterZkPublicKey, MsgRegisterZkPublicKeyResponse, MsgCreateTag, MsgCreateTagResponse, MsgReportTag, MsgReportTagResponse, MsgResolveTagReport, MsgResolveTagReportResponse, MsgCreateTagBudget, MsgCreateTagBudgetResponse, MsgAwardFromTagBudget, MsgAwardFromTagBudgetResponse, MsgTopUpTagBudget, MsgTopUpTagBudgetResponse, MsgToggleTagBudget, MsgToggleTagBudgetResponse, MsgWithdrawTagBudget, MsgWithdrawTagBudgetResponse, MsgBondRole, MsgBondRoleResponse, MsgUnbondRole, MsgUnbondRoleResponse, MsgReportMember, MsgReportMemberResponse, MsgCosignMemberReport, MsgCosignMemberReportResponse, MsgResolveMemberReport, MsgResolveMemberReportResponse, MsgDefendMemberReport, MsgDefendMemberReportResponse, MsgAppealGovAction, MsgAppealGovActionResponse, MsgResolveGovActionAppeal, MsgResolveGovActionAppealResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
@@ -72,6 +72,53 @@ export interface Msg {
   respondToContentChallenge(request: MsgRespondToContentChallenge): Promise<MsgRespondToContentChallengeResponse>;
   /** RegisterZkPublicKey defines the RegisterZkPublicKey RPC. */
   registerZkPublicKey(request: MsgRegisterZkPublicKey): Promise<MsgRegisterZkPublicKeyResponse>;
+  /**
+   * CreateTag defines the CreateTag RPC. Permissionless tag registry creation
+   * for members meeting the minimum trust level. Deducts the tag-creation fee
+   * from the creator (split between burn and community pool).
+   */
+  createTag(request: MsgCreateTag): Promise<MsgCreateTagResponse>;
+  /** ReportTag defines the ReportTag RPC. */
+  reportTag(request: MsgReportTag): Promise<MsgReportTagResponse>;
+  /** ResolveTagReport defines the ResolveTagReport RPC. */
+  resolveTagReport(request: MsgResolveTagReport): Promise<MsgResolveTagReportResponse>;
+  /** CreateTagBudget defines the CreateTagBudget RPC. */
+  createTagBudget(request: MsgCreateTagBudget): Promise<MsgCreateTagBudgetResponse>;
+  /** AwardFromTagBudget defines the AwardFromTagBudget RPC. */
+  awardFromTagBudget(request: MsgAwardFromTagBudget): Promise<MsgAwardFromTagBudgetResponse>;
+  /** TopUpTagBudget defines the TopUpTagBudget RPC. */
+  topUpTagBudget(request: MsgTopUpTagBudget): Promise<MsgTopUpTagBudgetResponse>;
+  /** ToggleTagBudget defines the ToggleTagBudget RPC. */
+  toggleTagBudget(request: MsgToggleTagBudget): Promise<MsgToggleTagBudgetResponse>;
+  /** WithdrawTagBudget defines the WithdrawTagBudget RPC. */
+  withdrawTagBudget(request: MsgWithdrawTagBudget): Promise<MsgWithdrawTagBudgetResponse>;
+  /**
+   * BondRole locks DREAM against (role_type, creator) and creates or updates
+   * the BondedRole record. Used to register as a forum sentinel, collect
+   * curator, federation verifier, etc. — role-specific eligibility comes from
+   * the role's BondedRoleConfig.
+   */
+  bondRole(request: MsgBondRole): Promise<MsgBondRoleResponse>;
+  /**
+   * UnbondRole withdraws a portion of the caller's bond for the given
+   * role_type (subject to committed-bond constraints).
+   */
+  unbondRole(request: MsgUnbondRole): Promise<MsgUnbondRoleResponse>;
+  /** ReportMember defines the ReportMember RPC. */
+  reportMember(request: MsgReportMember): Promise<MsgReportMemberResponse>;
+  /** CosignMemberReport defines the CosignMemberReport RPC. */
+  cosignMemberReport(request: MsgCosignMemberReport): Promise<MsgCosignMemberReportResponse>;
+  /** ResolveMemberReport defines the ResolveMemberReport RPC. */
+  resolveMemberReport(request: MsgResolveMemberReport): Promise<MsgResolveMemberReportResponse>;
+  /** DefendMemberReport defines the DefendMemberReport RPC. */
+  defendMemberReport(request: MsgDefendMemberReport): Promise<MsgDefendMemberReportResponse>;
+  /** AppealGovAction defines the AppealGovAction RPC. */
+  appealGovAction(request: MsgAppealGovAction): Promise<MsgAppealGovActionResponse>;
+  /**
+   * ResolveGovActionAppeal defines the ResolveGovActionAppeal RPC. Resolves
+   * a pending gov action appeal via council authority (UPHELD or OVERTURNED).
+   */
+  resolveGovActionAppeal(request: MsgResolveGovActionAppeal): Promise<MsgResolveGovActionAppealResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -265,6 +312,109 @@ export class MsgClientImpl implements Msg {
     const data = MsgRegisterZkPublicKey.encode(request).finish();
     const promise = this.rpc.request("sparkdream.rep.v1.Msg", "RegisterZkPublicKey", data);
     return promise.then(data => MsgRegisterZkPublicKeyResponse.decode(new BinaryReader(data)));
+  };
+  /* CreateTag defines the CreateTag RPC. Permissionless tag registry creation
+   for members meeting the minimum trust level. Deducts the tag-creation fee
+   from the creator (split between burn and community pool). */
+  createTag = async (request: MsgCreateTag): Promise<MsgCreateTagResponse> => {
+    const data = MsgCreateTag.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "CreateTag", data);
+    return promise.then(data => MsgCreateTagResponse.decode(new BinaryReader(data)));
+  };
+  /* ReportTag defines the ReportTag RPC. */
+  reportTag = async (request: MsgReportTag): Promise<MsgReportTagResponse> => {
+    const data = MsgReportTag.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "ReportTag", data);
+    return promise.then(data => MsgReportTagResponse.decode(new BinaryReader(data)));
+  };
+  /* ResolveTagReport defines the ResolveTagReport RPC. */
+  resolveTagReport = async (request: MsgResolveTagReport): Promise<MsgResolveTagReportResponse> => {
+    const data = MsgResolveTagReport.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "ResolveTagReport", data);
+    return promise.then(data => MsgResolveTagReportResponse.decode(new BinaryReader(data)));
+  };
+  /* CreateTagBudget defines the CreateTagBudget RPC. */
+  createTagBudget = async (request: MsgCreateTagBudget): Promise<MsgCreateTagBudgetResponse> => {
+    const data = MsgCreateTagBudget.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "CreateTagBudget", data);
+    return promise.then(data => MsgCreateTagBudgetResponse.decode(new BinaryReader(data)));
+  };
+  /* AwardFromTagBudget defines the AwardFromTagBudget RPC. */
+  awardFromTagBudget = async (request: MsgAwardFromTagBudget): Promise<MsgAwardFromTagBudgetResponse> => {
+    const data = MsgAwardFromTagBudget.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "AwardFromTagBudget", data);
+    return promise.then(data => MsgAwardFromTagBudgetResponse.decode(new BinaryReader(data)));
+  };
+  /* TopUpTagBudget defines the TopUpTagBudget RPC. */
+  topUpTagBudget = async (request: MsgTopUpTagBudget): Promise<MsgTopUpTagBudgetResponse> => {
+    const data = MsgTopUpTagBudget.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "TopUpTagBudget", data);
+    return promise.then(data => MsgTopUpTagBudgetResponse.decode(new BinaryReader(data)));
+  };
+  /* ToggleTagBudget defines the ToggleTagBudget RPC. */
+  toggleTagBudget = async (request: MsgToggleTagBudget): Promise<MsgToggleTagBudgetResponse> => {
+    const data = MsgToggleTagBudget.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "ToggleTagBudget", data);
+    return promise.then(data => MsgToggleTagBudgetResponse.decode(new BinaryReader(data)));
+  };
+  /* WithdrawTagBudget defines the WithdrawTagBudget RPC. */
+  withdrawTagBudget = async (request: MsgWithdrawTagBudget): Promise<MsgWithdrawTagBudgetResponse> => {
+    const data = MsgWithdrawTagBudget.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "WithdrawTagBudget", data);
+    return promise.then(data => MsgWithdrawTagBudgetResponse.decode(new BinaryReader(data)));
+  };
+  /* BondRole locks DREAM against (role_type, creator) and creates or updates
+   the BondedRole record. Used to register as a forum sentinel, collect
+   curator, federation verifier, etc. — role-specific eligibility comes from
+   the role's BondedRoleConfig. */
+  bondRole = async (request: MsgBondRole): Promise<MsgBondRoleResponse> => {
+    const data = MsgBondRole.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "BondRole", data);
+    return promise.then(data => MsgBondRoleResponse.decode(new BinaryReader(data)));
+  };
+  /* UnbondRole withdraws a portion of the caller's bond for the given
+   role_type (subject to committed-bond constraints). */
+  unbondRole = async (request: MsgUnbondRole): Promise<MsgUnbondRoleResponse> => {
+    const data = MsgUnbondRole.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "UnbondRole", data);
+    return promise.then(data => MsgUnbondRoleResponse.decode(new BinaryReader(data)));
+  };
+  /* ReportMember defines the ReportMember RPC. */
+  reportMember = async (request: MsgReportMember): Promise<MsgReportMemberResponse> => {
+    const data = MsgReportMember.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "ReportMember", data);
+    return promise.then(data => MsgReportMemberResponse.decode(new BinaryReader(data)));
+  };
+  /* CosignMemberReport defines the CosignMemberReport RPC. */
+  cosignMemberReport = async (request: MsgCosignMemberReport): Promise<MsgCosignMemberReportResponse> => {
+    const data = MsgCosignMemberReport.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "CosignMemberReport", data);
+    return promise.then(data => MsgCosignMemberReportResponse.decode(new BinaryReader(data)));
+  };
+  /* ResolveMemberReport defines the ResolveMemberReport RPC. */
+  resolveMemberReport = async (request: MsgResolveMemberReport): Promise<MsgResolveMemberReportResponse> => {
+    const data = MsgResolveMemberReport.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "ResolveMemberReport", data);
+    return promise.then(data => MsgResolveMemberReportResponse.decode(new BinaryReader(data)));
+  };
+  /* DefendMemberReport defines the DefendMemberReport RPC. */
+  defendMemberReport = async (request: MsgDefendMemberReport): Promise<MsgDefendMemberReportResponse> => {
+    const data = MsgDefendMemberReport.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "DefendMemberReport", data);
+    return promise.then(data => MsgDefendMemberReportResponse.decode(new BinaryReader(data)));
+  };
+  /* AppealGovAction defines the AppealGovAction RPC. */
+  appealGovAction = async (request: MsgAppealGovAction): Promise<MsgAppealGovActionResponse> => {
+    const data = MsgAppealGovAction.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "AppealGovAction", data);
+    return promise.then(data => MsgAppealGovActionResponse.decode(new BinaryReader(data)));
+  };
+  /* ResolveGovActionAppeal defines the ResolveGovActionAppeal RPC. Resolves
+   a pending gov action appeal via council authority (UPHELD or OVERTURNED). */
+  resolveGovActionAppeal = async (request: MsgResolveGovActionAppeal): Promise<MsgResolveGovActionAppealResponse> => {
+    const data = MsgResolveGovActionAppeal.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "ResolveGovActionAppeal", data);
+    return promise.then(data => MsgResolveGovActionAppealResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

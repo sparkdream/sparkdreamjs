@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryCollectionRequest, QueryCollectionResponse, QueryCollectionsByOwnerRequest, QueryCollectionsByOwnerResponse, QueryPublicCollectionsRequest, QueryPublicCollectionsResponse, QueryPublicCollectionsByTypeRequest, QueryPublicCollectionsByTypeResponse, QueryCollectionsByCollaboratorRequest, QueryCollectionsByCollaboratorResponse, QueryItemRequest, QueryItemResponse, QueryItemsRequest, QueryItemsResponse, QueryItemsByOwnerRequest, QueryItemsByOwnerResponse, QueryCollaboratorsRequest, QueryCollaboratorsResponse, QueryCuratorRequest, QueryCuratorResponse, QueryActiveCuratorsRequest, QueryActiveCuratorsResponse, QueryCurationSummaryRequest, QueryCurationSummaryResponse, QueryCurationReviewsRequest, QueryCurationReviewsResponse, QueryCurationReviewsByCuratorRequest, QueryCurationReviewsByCuratorResponse, QuerySponsorshipRequestRequest, QuerySponsorshipRequestResponse, QuerySponsorshipRequestsRequest, QuerySponsorshipRequestsResponse, QueryContentFlagRequest, QueryContentFlagResponse, QueryFlaggedContentRequest, QueryFlaggedContentResponse, QueryHideRecordRequest, QueryHideRecordResponse, QueryHideRecordsByTargetRequest, QueryHideRecordsByTargetResponse, QueryPendingCollectionsRequest, QueryPendingCollectionsResponse, QueryEndorsementRequest, QueryEndorsementResponse, QueryCollectionsByContentRequest, QueryCollectionsByContentResponse, QueryCollectionConvictionRequest, QueryCollectionConvictionResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryCollectionRequest, QueryCollectionResponse, QueryCollectionsByOwnerRequest, QueryCollectionsByOwnerResponse, QueryPublicCollectionsRequest, QueryPublicCollectionsResponse, QueryPublicCollectionsByTypeRequest, QueryPublicCollectionsByTypeResponse, QueryCollectionsByCollaboratorRequest, QueryCollectionsByCollaboratorResponse, QueryItemRequest, QueryItemResponse, QueryItemsRequest, QueryItemsResponse, QueryItemsByOwnerRequest, QueryItemsByOwnerResponse, QueryCollaboratorsRequest, QueryCollaboratorsResponse, QueryCuratorActivityRequest, QueryCuratorActivityResponse, QueryCurationSummaryRequest, QueryCurationSummaryResponse, QueryCurationReviewsRequest, QueryCurationReviewsResponse, QueryCurationReviewsByCuratorRequest, QueryCurationReviewsByCuratorResponse, QuerySponsorshipRequestRequest, QuerySponsorshipRequestResponse, QuerySponsorshipRequestsRequest, QuerySponsorshipRequestsResponse, QueryContentFlagRequest, QueryContentFlagResponse, QueryFlaggedContentRequest, QueryFlaggedContentResponse, QueryHideRecordRequest, QueryHideRecordResponse, QueryHideRecordsByTargetRequest, QueryHideRecordsByTargetResponse, QueryPendingCollectionsRequest, QueryPendingCollectionsResponse, QueryEndorsementRequest, QueryEndorsementResponse, QueryCollectionsByContentRequest, QueryCollectionsByContentResponse, QueryCollectionConvictionRequest, QueryCollectionConvictionResponse, QueryListCollectionsByTagRequest, QueryListCollectionsByTagResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   params(request?: QueryParamsRequest): Promise<QueryParamsResponse>;
@@ -15,8 +15,12 @@ export interface Query {
   items(request: QueryItemsRequest): Promise<QueryItemsResponse>;
   itemsByOwner(request: QueryItemsByOwnerRequest): Promise<QueryItemsByOwnerResponse>;
   collaborators(request: QueryCollaboratorsRequest): Promise<QueryCollaboratorsResponse>;
-  curator(request: QueryCuratorRequest): Promise<QueryCuratorResponse>;
-  activeCurators(request?: QueryActiveCuratorsRequest): Promise<QueryActiveCuratorsResponse>;
+  /**
+   * CuratorActivity returns collect-specific per-curator counters (reviews,
+   * challenged, upheld, overturned). The generic bond/status record lives in
+   * x/rep under BondedRole(ROLE_TYPE_COLLECT_CURATOR, addr).
+   */
+  curatorActivity(request: QueryCuratorActivityRequest): Promise<QueryCuratorActivityResponse>;
   curationSummary(request: QueryCurationSummaryRequest): Promise<QueryCurationSummaryResponse>;
   curationReviews(request: QueryCurationReviewsRequest): Promise<QueryCurationReviewsResponse>;
   curationReviewsByCurator(request: QueryCurationReviewsByCuratorRequest): Promise<QueryCurationReviewsByCuratorResponse>;
@@ -44,6 +48,8 @@ export interface Query {
    * and author bond for a collection (delegates to x/rep).
    */
   collectionConviction(request: QueryCollectionConvictionRequest): Promise<QueryCollectionConvictionResponse>;
+  /** ListCollectionsByTag returns paginated collections that carry a given tag. */
+  listCollectionsByTag(request: QueryListCollectionsByTagRequest): Promise<QueryListCollectionsByTagResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -112,19 +118,13 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.collect.v1.Query", "Collaborators", data);
     return promise.then(data => QueryCollaboratorsResponse.decode(new BinaryReader(data)));
   };
-  /* Curator */
-  curator = async (request: QueryCuratorRequest): Promise<QueryCuratorResponse> => {
-    const data = QueryCuratorRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.collect.v1.Query", "Curator", data);
-    return promise.then(data => QueryCuratorResponse.decode(new BinaryReader(data)));
-  };
-  /* ActiveCurators */
-  activeCurators = async (request: QueryActiveCuratorsRequest = {
-    pagination: undefined
-  }): Promise<QueryActiveCuratorsResponse> => {
-    const data = QueryActiveCuratorsRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.collect.v1.Query", "ActiveCurators", data);
-    return promise.then(data => QueryActiveCuratorsResponse.decode(new BinaryReader(data)));
+  /* CuratorActivity returns collect-specific per-curator counters (reviews,
+   challenged, upheld, overturned). The generic bond/status record lives in
+   x/rep under BondedRole(ROLE_TYPE_COLLECT_CURATOR, addr). */
+  curatorActivity = async (request: QueryCuratorActivityRequest): Promise<QueryCuratorActivityResponse> => {
+    const data = QueryCuratorActivityRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.collect.v1.Query", "CuratorActivity", data);
+    return promise.then(data => QueryCuratorActivityResponse.decode(new BinaryReader(data)));
   };
   /* CurationSummary */
   curationSummary = async (request: QueryCurationSummaryRequest): Promise<QueryCurationSummaryResponse> => {
@@ -212,6 +212,12 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.collect.v1.Query", "CollectionConviction", data);
     return promise.then(data => QueryCollectionConvictionResponse.decode(new BinaryReader(data)));
   };
+  /* ListCollectionsByTag returns paginated collections that carry a given tag. */
+  listCollectionsByTag = async (request: QueryListCollectionsByTagRequest): Promise<QueryListCollectionsByTagResponse> => {
+    const data = QueryListCollectionsByTagRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.collect.v1.Query", "ListCollectionsByTag", data);
+    return promise.then(data => QueryListCollectionsByTagResponse.decode(new BinaryReader(data)));
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);
@@ -247,11 +253,8 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     collaborators(request: QueryCollaboratorsRequest): Promise<QueryCollaboratorsResponse> {
       return queryService.collaborators(request);
     },
-    curator(request: QueryCuratorRequest): Promise<QueryCuratorResponse> {
-      return queryService.curator(request);
-    },
-    activeCurators(request?: QueryActiveCuratorsRequest): Promise<QueryActiveCuratorsResponse> {
-      return queryService.activeCurators(request);
+    curatorActivity(request: QueryCuratorActivityRequest): Promise<QueryCuratorActivityResponse> {
+      return queryService.curatorActivity(request);
     },
     curationSummary(request: QueryCurationSummaryRequest): Promise<QueryCurationSummaryResponse> {
       return queryService.curationSummary(request);
@@ -291,6 +294,9 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     collectionConviction(request: QueryCollectionConvictionRequest): Promise<QueryCollectionConvictionResponse> {
       return queryService.collectionConviction(request);
+    },
+    listCollectionsByTag(request: QueryListCollectionsByTagRequest): Promise<QueryListCollectionsByTagResponse> {
+      return queryService.listCollectionsByTag(request);
     }
   };
 };

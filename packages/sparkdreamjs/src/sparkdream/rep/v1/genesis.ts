@@ -10,6 +10,16 @@ import { JuryReview, JuryReviewAmino } from "./jury_review";
 import { Interim, InterimAmino } from "./interim";
 import { InterimTemplate, InterimTemplateAmino } from "./interim_template";
 import { ContentChallenge, ContentChallengeAmino } from "./content_challenge";
+import { Tag, TagAmino } from "./tag";
+import { ReservedTag, ReservedTagAmino } from "./reserved_tag";
+import { TagReport, TagReportAmino } from "./tag_report";
+import { TagBudget, TagBudgetAmino } from "./tag_budget";
+import { TagBudgetAward, TagBudgetAwardAmino } from "./tag_budget_award";
+import { JuryParticipation, JuryParticipationAmino } from "./jury_participation";
+import { MemberReport, MemberReportAmino } from "./member_report";
+import { MemberWarning, MemberWarningAmino } from "./member_warning";
+import { GovActionAppeal, GovActionAppealAmino } from "./gov_action_appeal";
+import { BondedRole, BondedRoleAmino, BondedRoleConfig, BondedRoleConfigAmino } from "./bonded_role";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -54,6 +64,36 @@ export interface GenesisState {
    * Content initiative links for conviction propagation
    */
   contentInitiativeLinks: ContentInitiativeLink[];
+  /**
+   * Tag registry
+   */
+  tagMap: Tag[];
+  reservedTagMap: ReservedTag[];
+  /**
+   * Tag moderation
+   */
+  tagReportMap: TagReport[];
+  /**
+   * Tag budgets
+   */
+  tagBudgetList: TagBudget[];
+  tagBudgetCount: bigint;
+  tagBudgetAwardList: TagBudgetAward[];
+  tagBudgetAwardCount: bigint;
+  /**
+   * Accountability state
+   */
+  juryParticipationMap: JuryParticipation[];
+  memberReportMap: MemberReport[];
+  memberWarningList: MemberWarning[];
+  memberWarningCount: bigint;
+  govActionAppealList: GovActionAppeal[];
+  govActionAppealCount: bigint;
+  /**
+   * Bonded-role primitive (Phase 1 of bonded-role generalization).
+   */
+  bondedRoleList: BondedRole[];
+  bondedRoleConfigList: BondedRoleConfig[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.rep.v1.GenesisState";
@@ -101,6 +141,36 @@ export interface GenesisStateAmino {
    * Content initiative links for conviction propagation
    */
   content_initiative_links?: ContentInitiativeLinkAmino[];
+  /**
+   * Tag registry
+   */
+  tag_map?: TagAmino[];
+  reserved_tag_map?: ReservedTagAmino[];
+  /**
+   * Tag moderation
+   */
+  tag_report_map?: TagReportAmino[];
+  /**
+   * Tag budgets
+   */
+  tag_budget_list?: TagBudgetAmino[];
+  tag_budget_count?: string;
+  tag_budget_award_list?: TagBudgetAwardAmino[];
+  tag_budget_award_count?: string;
+  /**
+   * Accountability state
+   */
+  jury_participation_map?: JuryParticipationAmino[];
+  member_report_map?: MemberReportAmino[];
+  member_warning_list?: MemberWarningAmino[];
+  member_warning_count?: string;
+  gov_action_appeal_list?: GovActionAppealAmino[];
+  gov_action_appeal_count?: string;
+  /**
+   * Bonded-role primitive (Phase 1 of bonded-role generalization).
+   */
+  bonded_role_list?: BondedRoleAmino[];
+  bonded_role_config_list?: BondedRoleConfigAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.rep.v1.GenesisState";
@@ -172,7 +242,22 @@ function createBaseGenesisState(): GenesisState {
     projectStakeInfoList: [],
     contentChallengeList: [],
     contentChallengeCount: BigInt(0),
-    contentInitiativeLinks: []
+    contentInitiativeLinks: [],
+    tagMap: [],
+    reservedTagMap: [],
+    tagReportMap: [],
+    tagBudgetList: [],
+    tagBudgetCount: BigInt(0),
+    tagBudgetAwardList: [],
+    tagBudgetAwardCount: BigInt(0),
+    juryParticipationMap: [],
+    memberReportMap: [],
+    memberWarningList: [],
+    memberWarningCount: BigInt(0),
+    govActionAppealList: [],
+    govActionAppealCount: BigInt(0),
+    bondedRoleList: [],
+    bondedRoleConfigList: []
   };
 }
 /**
@@ -253,6 +338,51 @@ export const GenesisState = {
     for (const v of message.contentInitiativeLinks) {
       ContentInitiativeLink.encode(v!, writer.uint32(186).fork()).ldelim();
     }
+    for (const v of message.tagMap) {
+      Tag.encode(v!, writer.uint32(194).fork()).ldelim();
+    }
+    for (const v of message.reservedTagMap) {
+      ReservedTag.encode(v!, writer.uint32(202).fork()).ldelim();
+    }
+    for (const v of message.tagReportMap) {
+      TagReport.encode(v!, writer.uint32(210).fork()).ldelim();
+    }
+    for (const v of message.tagBudgetList) {
+      TagBudget.encode(v!, writer.uint32(218).fork()).ldelim();
+    }
+    if (message.tagBudgetCount !== BigInt(0)) {
+      writer.uint32(224).uint64(message.tagBudgetCount);
+    }
+    for (const v of message.tagBudgetAwardList) {
+      TagBudgetAward.encode(v!, writer.uint32(234).fork()).ldelim();
+    }
+    if (message.tagBudgetAwardCount !== BigInt(0)) {
+      writer.uint32(240).uint64(message.tagBudgetAwardCount);
+    }
+    for (const v of message.juryParticipationMap) {
+      JuryParticipation.encode(v!, writer.uint32(258).fork()).ldelim();
+    }
+    for (const v of message.memberReportMap) {
+      MemberReport.encode(v!, writer.uint32(266).fork()).ldelim();
+    }
+    for (const v of message.memberWarningList) {
+      MemberWarning.encode(v!, writer.uint32(274).fork()).ldelim();
+    }
+    if (message.memberWarningCount !== BigInt(0)) {
+      writer.uint32(280).uint64(message.memberWarningCount);
+    }
+    for (const v of message.govActionAppealList) {
+      GovActionAppeal.encode(v!, writer.uint32(290).fork()).ldelim();
+    }
+    if (message.govActionAppealCount !== BigInt(0)) {
+      writer.uint32(296).uint64(message.govActionAppealCount);
+    }
+    for (const v of message.bondedRoleList) {
+      BondedRole.encode(v!, writer.uint32(306).fork()).ldelim();
+    }
+    for (const v of message.bondedRoleConfigList) {
+      BondedRoleConfig.encode(v!, writer.uint32(314).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -331,6 +461,51 @@ export const GenesisState = {
         case 23:
           message.contentInitiativeLinks.push(ContentInitiativeLink.decode(reader, reader.uint32()));
           break;
+        case 24:
+          message.tagMap.push(Tag.decode(reader, reader.uint32()));
+          break;
+        case 25:
+          message.reservedTagMap.push(ReservedTag.decode(reader, reader.uint32()));
+          break;
+        case 26:
+          message.tagReportMap.push(TagReport.decode(reader, reader.uint32()));
+          break;
+        case 27:
+          message.tagBudgetList.push(TagBudget.decode(reader, reader.uint32()));
+          break;
+        case 28:
+          message.tagBudgetCount = reader.uint64();
+          break;
+        case 29:
+          message.tagBudgetAwardList.push(TagBudgetAward.decode(reader, reader.uint32()));
+          break;
+        case 30:
+          message.tagBudgetAwardCount = reader.uint64();
+          break;
+        case 32:
+          message.juryParticipationMap.push(JuryParticipation.decode(reader, reader.uint32()));
+          break;
+        case 33:
+          message.memberReportMap.push(MemberReport.decode(reader, reader.uint32()));
+          break;
+        case 34:
+          message.memberWarningList.push(MemberWarning.decode(reader, reader.uint32()));
+          break;
+        case 35:
+          message.memberWarningCount = reader.uint64();
+          break;
+        case 36:
+          message.govActionAppealList.push(GovActionAppeal.decode(reader, reader.uint32()));
+          break;
+        case 37:
+          message.govActionAppealCount = reader.uint64();
+          break;
+        case 38:
+          message.bondedRoleList.push(BondedRole.decode(reader, reader.uint32()));
+          break;
+        case 39:
+          message.bondedRoleConfigList.push(BondedRoleConfig.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -363,6 +538,21 @@ export const GenesisState = {
     message.contentChallengeList = object.contentChallengeList?.map(e => ContentChallenge.fromPartial(e)) || [];
     message.contentChallengeCount = object.contentChallengeCount !== undefined && object.contentChallengeCount !== null ? BigInt(object.contentChallengeCount.toString()) : BigInt(0);
     message.contentInitiativeLinks = object.contentInitiativeLinks?.map(e => ContentInitiativeLink.fromPartial(e)) || [];
+    message.tagMap = object.tagMap?.map(e => Tag.fromPartial(e)) || [];
+    message.reservedTagMap = object.reservedTagMap?.map(e => ReservedTag.fromPartial(e)) || [];
+    message.tagReportMap = object.tagReportMap?.map(e => TagReport.fromPartial(e)) || [];
+    message.tagBudgetList = object.tagBudgetList?.map(e => TagBudget.fromPartial(e)) || [];
+    message.tagBudgetCount = object.tagBudgetCount !== undefined && object.tagBudgetCount !== null ? BigInt(object.tagBudgetCount.toString()) : BigInt(0);
+    message.tagBudgetAwardList = object.tagBudgetAwardList?.map(e => TagBudgetAward.fromPartial(e)) || [];
+    message.tagBudgetAwardCount = object.tagBudgetAwardCount !== undefined && object.tagBudgetAwardCount !== null ? BigInt(object.tagBudgetAwardCount.toString()) : BigInt(0);
+    message.juryParticipationMap = object.juryParticipationMap?.map(e => JuryParticipation.fromPartial(e)) || [];
+    message.memberReportMap = object.memberReportMap?.map(e => MemberReport.fromPartial(e)) || [];
+    message.memberWarningList = object.memberWarningList?.map(e => MemberWarning.fromPartial(e)) || [];
+    message.memberWarningCount = object.memberWarningCount !== undefined && object.memberWarningCount !== null ? BigInt(object.memberWarningCount.toString()) : BigInt(0);
+    message.govActionAppealList = object.govActionAppealList?.map(e => GovActionAppeal.fromPartial(e)) || [];
+    message.govActionAppealCount = object.govActionAppealCount !== undefined && object.govActionAppealCount !== null ? BigInt(object.govActionAppealCount.toString()) : BigInt(0);
+    message.bondedRoleList = object.bondedRoleList?.map(e => BondedRole.fromPartial(e)) || [];
+    message.bondedRoleConfigList = object.bondedRoleConfigList?.map(e => BondedRoleConfig.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -408,6 +598,29 @@ export const GenesisState = {
       message.contentChallengeCount = BigInt(object.content_challenge_count);
     }
     message.contentInitiativeLinks = object.content_initiative_links?.map(e => ContentInitiativeLink.fromAmino(e)) || [];
+    message.tagMap = object.tag_map?.map(e => Tag.fromAmino(e)) || [];
+    message.reservedTagMap = object.reserved_tag_map?.map(e => ReservedTag.fromAmino(e)) || [];
+    message.tagReportMap = object.tag_report_map?.map(e => TagReport.fromAmino(e)) || [];
+    message.tagBudgetList = object.tag_budget_list?.map(e => TagBudget.fromAmino(e)) || [];
+    if (object.tag_budget_count !== undefined && object.tag_budget_count !== null) {
+      message.tagBudgetCount = BigInt(object.tag_budget_count);
+    }
+    message.tagBudgetAwardList = object.tag_budget_award_list?.map(e => TagBudgetAward.fromAmino(e)) || [];
+    if (object.tag_budget_award_count !== undefined && object.tag_budget_award_count !== null) {
+      message.tagBudgetAwardCount = BigInt(object.tag_budget_award_count);
+    }
+    message.juryParticipationMap = object.jury_participation_map?.map(e => JuryParticipation.fromAmino(e)) || [];
+    message.memberReportMap = object.member_report_map?.map(e => MemberReport.fromAmino(e)) || [];
+    message.memberWarningList = object.member_warning_list?.map(e => MemberWarning.fromAmino(e)) || [];
+    if (object.member_warning_count !== undefined && object.member_warning_count !== null) {
+      message.memberWarningCount = BigInt(object.member_warning_count);
+    }
+    message.govActionAppealList = object.gov_action_appeal_list?.map(e => GovActionAppeal.fromAmino(e)) || [];
+    if (object.gov_action_appeal_count !== undefined && object.gov_action_appeal_count !== null) {
+      message.govActionAppealCount = BigInt(object.gov_action_appeal_count);
+    }
+    message.bondedRoleList = object.bonded_role_list?.map(e => BondedRole.fromAmino(e)) || [];
+    message.bondedRoleConfigList = object.bonded_role_config_list?.map(e => BondedRoleConfig.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -490,6 +703,65 @@ export const GenesisState = {
       obj.content_initiative_links = message.contentInitiativeLinks.map(e => e ? ContentInitiativeLink.toAmino(e) : undefined);
     } else {
       obj.content_initiative_links = message.contentInitiativeLinks;
+    }
+    if (message.tagMap) {
+      obj.tag_map = message.tagMap.map(e => e ? Tag.toAmino(e) : undefined);
+    } else {
+      obj.tag_map = message.tagMap;
+    }
+    if (message.reservedTagMap) {
+      obj.reserved_tag_map = message.reservedTagMap.map(e => e ? ReservedTag.toAmino(e) : undefined);
+    } else {
+      obj.reserved_tag_map = message.reservedTagMap;
+    }
+    if (message.tagReportMap) {
+      obj.tag_report_map = message.tagReportMap.map(e => e ? TagReport.toAmino(e) : undefined);
+    } else {
+      obj.tag_report_map = message.tagReportMap;
+    }
+    if (message.tagBudgetList) {
+      obj.tag_budget_list = message.tagBudgetList.map(e => e ? TagBudget.toAmino(e) : undefined);
+    } else {
+      obj.tag_budget_list = message.tagBudgetList;
+    }
+    obj.tag_budget_count = message.tagBudgetCount !== BigInt(0) ? message.tagBudgetCount?.toString() : undefined;
+    if (message.tagBudgetAwardList) {
+      obj.tag_budget_award_list = message.tagBudgetAwardList.map(e => e ? TagBudgetAward.toAmino(e) : undefined);
+    } else {
+      obj.tag_budget_award_list = message.tagBudgetAwardList;
+    }
+    obj.tag_budget_award_count = message.tagBudgetAwardCount !== BigInt(0) ? message.tagBudgetAwardCount?.toString() : undefined;
+    if (message.juryParticipationMap) {
+      obj.jury_participation_map = message.juryParticipationMap.map(e => e ? JuryParticipation.toAmino(e) : undefined);
+    } else {
+      obj.jury_participation_map = message.juryParticipationMap;
+    }
+    if (message.memberReportMap) {
+      obj.member_report_map = message.memberReportMap.map(e => e ? MemberReport.toAmino(e) : undefined);
+    } else {
+      obj.member_report_map = message.memberReportMap;
+    }
+    if (message.memberWarningList) {
+      obj.member_warning_list = message.memberWarningList.map(e => e ? MemberWarning.toAmino(e) : undefined);
+    } else {
+      obj.member_warning_list = message.memberWarningList;
+    }
+    obj.member_warning_count = message.memberWarningCount !== BigInt(0) ? message.memberWarningCount?.toString() : undefined;
+    if (message.govActionAppealList) {
+      obj.gov_action_appeal_list = message.govActionAppealList.map(e => e ? GovActionAppeal.toAmino(e) : undefined);
+    } else {
+      obj.gov_action_appeal_list = message.govActionAppealList;
+    }
+    obj.gov_action_appeal_count = message.govActionAppealCount !== BigInt(0) ? message.govActionAppealCount?.toString() : undefined;
+    if (message.bondedRoleList) {
+      obj.bonded_role_list = message.bondedRoleList.map(e => e ? BondedRole.toAmino(e) : undefined);
+    } else {
+      obj.bonded_role_list = message.bondedRoleList;
+    }
+    if (message.bondedRoleConfigList) {
+      obj.bonded_role_config_list = message.bondedRoleConfigList.map(e => e ? BondedRoleConfig.toAmino(e) : undefined);
+    } else {
+      obj.bonded_role_config_list = message.bondedRoleConfigList;
     }
     return obj;
   },

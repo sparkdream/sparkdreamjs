@@ -671,44 +671,6 @@ export interface CollaboratorAminoMsg {
   value: CollaboratorAmino;
 }
 /**
- * Curator represents a registered curation reviewer with a bonded stake.
- * @name Curator
- * @package sparkdream.collect.v1
- * @see proto type: sparkdream.collect.v1.Curator
- */
-export interface Curator {
-  address: string;
-  bondAmount: string;
-  registeredAt: bigint;
-  totalReviews: bigint;
-  challengedReviews: bigint;
-  active: boolean;
-  pendingChallenges: number;
-}
-export interface CuratorProtoMsg {
-  typeUrl: "/sparkdream.collect.v1.Curator";
-  value: Uint8Array;
-}
-/**
- * Curator represents a registered curation reviewer with a bonded stake.
- * @name CuratorAmino
- * @package sparkdream.collect.v1
- * @see proto type: sparkdream.collect.v1.Curator
- */
-export interface CuratorAmino {
-  address?: string;
-  bond_amount?: string;
-  registered_at?: string;
-  total_reviews?: string;
-  challenged_reviews?: string;
-  active?: boolean;
-  pending_challenges?: number;
-}
-export interface CuratorAminoMsg {
-  type: "/sparkdream.collect.v1.Curator";
-  value: CuratorAmino;
-}
-/**
  * CurationReview records a curator's verdict on a collection.
  * @name CurationReview
  * @package sparkdream.collect.v1
@@ -725,6 +687,13 @@ export interface CurationReview {
   challenged: boolean;
   overturned: boolean;
   challenger: string;
+  /**
+   * committed_slash is the DREAM amount reserved against the curator's bonded
+   * role (ROLE_TYPE_COLLECT_CURATOR) when the review was challenged. Set at
+   * MsgChallengeReview time and consumed at resolution (SlashBond on uphold,
+   * ReleaseBond on reject). Zero / empty when the review is not challenged.
+   */
+  committedSlash: string;
 }
 export interface CurationReviewProtoMsg {
   typeUrl: "/sparkdream.collect.v1.CurationReview";
@@ -747,6 +716,13 @@ export interface CurationReviewAmino {
   challenged?: boolean;
   overturned?: boolean;
   challenger?: string;
+  /**
+   * committed_slash is the DREAM amount reserved against the curator's bonded
+   * role (ROLE_TYPE_COLLECT_CURATOR) when the review was challenged. Set at
+   * MsgChallengeReview time and consumed at resolution (SlashBond on uphold,
+   * ReleaseBond on reject). Zero / empty when the review is not challenged.
+   */
+  committed_slash?: string;
 }
 export interface CurationReviewAminoMsg {
   type: "/sparkdream.collect.v1.CurationReview";
@@ -947,6 +923,12 @@ export interface CollectOperationalParams {
    */
   pinMinTrustLevel: number;
   maxPinsPerDay: number;
+  /**
+   * --- Curator bonded-role config (flattened) — see Params for rationale ---
+   */
+  curatorDemotionCooldown: bigint;
+  curatorDemotionThreshold: string;
+  curatorOverturnDemotionStreak: bigint;
 }
 export interface CollectOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.collect.v1.CollectOperationalParams";
@@ -1005,6 +987,12 @@ export interface CollectOperationalParamsAmino {
    */
   pin_min_trust_level?: number;
   max_pins_per_day?: number;
+  /**
+   * --- Curator bonded-role config (flattened) — see Params for rationale ---
+   */
+  curator_demotion_cooldown?: string;
+  curator_demotion_threshold?: string;
+  curator_overturn_demotion_streak?: string;
 }
 export interface CollectOperationalParamsAminoMsg {
   type: "/sparkdream.collect.v1.CollectOperationalParams";
@@ -2384,147 +2372,6 @@ export const Collaborator = {
     };
   }
 };
-function createBaseCurator(): Curator {
-  return {
-    address: "",
-    bondAmount: "",
-    registeredAt: BigInt(0),
-    totalReviews: BigInt(0),
-    challengedReviews: BigInt(0),
-    active: false,
-    pendingChallenges: 0
-  };
-}
-/**
- * Curator represents a registered curation reviewer with a bonded stake.
- * @name Curator
- * @package sparkdream.collect.v1
- * @see proto type: sparkdream.collect.v1.Curator
- */
-export const Curator = {
-  typeUrl: "/sparkdream.collect.v1.Curator",
-  encode(message: Curator, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.address !== "") {
-      writer.uint32(10).string(message.address);
-    }
-    if (message.bondAmount !== "") {
-      writer.uint32(18).string(message.bondAmount);
-    }
-    if (message.registeredAt !== BigInt(0)) {
-      writer.uint32(24).int64(message.registeredAt);
-    }
-    if (message.totalReviews !== BigInt(0)) {
-      writer.uint32(32).uint64(message.totalReviews);
-    }
-    if (message.challengedReviews !== BigInt(0)) {
-      writer.uint32(40).uint64(message.challengedReviews);
-    }
-    if (message.active === true) {
-      writer.uint32(48).bool(message.active);
-    }
-    if (message.pendingChallenges !== 0) {
-      writer.uint32(56).uint32(message.pendingChallenges);
-    }
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): Curator {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCurator();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.address = reader.string();
-          break;
-        case 2:
-          message.bondAmount = reader.string();
-          break;
-        case 3:
-          message.registeredAt = reader.int64();
-          break;
-        case 4:
-          message.totalReviews = reader.uint64();
-          break;
-        case 5:
-          message.challengedReviews = reader.uint64();
-          break;
-        case 6:
-          message.active = reader.bool();
-          break;
-        case 7:
-          message.pendingChallenges = reader.uint32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial(object: DeepPartial<Curator>): Curator {
-    const message = createBaseCurator();
-    message.address = object.address ?? "";
-    message.bondAmount = object.bondAmount ?? "";
-    message.registeredAt = object.registeredAt !== undefined && object.registeredAt !== null ? BigInt(object.registeredAt.toString()) : BigInt(0);
-    message.totalReviews = object.totalReviews !== undefined && object.totalReviews !== null ? BigInt(object.totalReviews.toString()) : BigInt(0);
-    message.challengedReviews = object.challengedReviews !== undefined && object.challengedReviews !== null ? BigInt(object.challengedReviews.toString()) : BigInt(0);
-    message.active = object.active ?? false;
-    message.pendingChallenges = object.pendingChallenges ?? 0;
-    return message;
-  },
-  fromAmino(object: CuratorAmino): Curator {
-    const message = createBaseCurator();
-    if (object.address !== undefined && object.address !== null) {
-      message.address = object.address;
-    }
-    if (object.bond_amount !== undefined && object.bond_amount !== null) {
-      message.bondAmount = object.bond_amount;
-    }
-    if (object.registered_at !== undefined && object.registered_at !== null) {
-      message.registeredAt = BigInt(object.registered_at);
-    }
-    if (object.total_reviews !== undefined && object.total_reviews !== null) {
-      message.totalReviews = BigInt(object.total_reviews);
-    }
-    if (object.challenged_reviews !== undefined && object.challenged_reviews !== null) {
-      message.challengedReviews = BigInt(object.challenged_reviews);
-    }
-    if (object.active !== undefined && object.active !== null) {
-      message.active = object.active;
-    }
-    if (object.pending_challenges !== undefined && object.pending_challenges !== null) {
-      message.pendingChallenges = object.pending_challenges;
-    }
-    return message;
-  },
-  toAmino(message: Curator): CuratorAmino {
-    const obj: any = {};
-    obj.address = message.address === "" ? undefined : message.address;
-    obj.bond_amount = message.bondAmount === "" ? undefined : message.bondAmount;
-    obj.registered_at = message.registeredAt !== BigInt(0) ? message.registeredAt?.toString() : undefined;
-    obj.total_reviews = message.totalReviews !== BigInt(0) ? message.totalReviews?.toString() : undefined;
-    obj.challenged_reviews = message.challengedReviews !== BigInt(0) ? message.challengedReviews?.toString() : undefined;
-    obj.active = message.active === false ? undefined : message.active;
-    obj.pending_challenges = message.pendingChallenges === 0 ? undefined : message.pendingChallenges;
-    return obj;
-  },
-  fromAminoMsg(object: CuratorAminoMsg): Curator {
-    return Curator.fromAmino(object.value);
-  },
-  fromProtoMsg(message: CuratorProtoMsg): Curator {
-    return Curator.decode(message.value);
-  },
-  toProto(message: Curator): Uint8Array {
-    return Curator.encode(message).finish();
-  },
-  toProtoMsg(message: Curator): CuratorProtoMsg {
-    return {
-      typeUrl: "/sparkdream.collect.v1.Curator",
-      value: Curator.encode(message).finish()
-    };
-  }
-};
 function createBaseCurationReview(): CurationReview {
   return {
     id: BigInt(0),
@@ -2536,7 +2383,8 @@ function createBaseCurationReview(): CurationReview {
     createdAt: BigInt(0),
     challenged: false,
     overturned: false,
-    challenger: ""
+    challenger: "",
+    committedSlash: ""
   };
 }
 /**
@@ -2578,6 +2426,9 @@ export const CurationReview = {
     if (message.challenger !== "") {
       writer.uint32(82).string(message.challenger);
     }
+    if (message.committedSlash !== "") {
+      writer.uint32(90).string(message.committedSlash);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): CurationReview {
@@ -2617,6 +2468,9 @@ export const CurationReview = {
         case 10:
           message.challenger = reader.string();
           break;
+        case 11:
+          message.committedSlash = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2636,6 +2490,7 @@ export const CurationReview = {
     message.challenged = object.challenged ?? false;
     message.overturned = object.overturned ?? false;
     message.challenger = object.challenger ?? "";
+    message.committedSlash = object.committedSlash ?? "";
     return message;
   },
   fromAmino(object: CurationReviewAmino): CurationReview {
@@ -2668,6 +2523,9 @@ export const CurationReview = {
     if (object.challenger !== undefined && object.challenger !== null) {
       message.challenger = object.challenger;
     }
+    if (object.committed_slash !== undefined && object.committed_slash !== null) {
+      message.committedSlash = object.committed_slash;
+    }
     return message;
   },
   toAmino(message: CurationReview): CurationReviewAmino {
@@ -2686,6 +2544,7 @@ export const CurationReview = {
     obj.challenged = message.challenged === false ? undefined : message.challenged;
     obj.overturned = message.overturned === false ? undefined : message.overturned;
     obj.challenger = message.challenger === "" ? undefined : message.challenger;
+    obj.committed_slash = message.committedSlash === "" ? undefined : message.committedSlash;
     return obj;
   },
   fromAminoMsg(object: CurationReviewAminoMsg): CurationReview {
@@ -3253,7 +3112,10 @@ function createBaseCollectOperationalParams(): CollectOperationalParams {
     convictionRenewalThreshold: "",
     convictionRenewalPeriod: BigInt(0),
     pinMinTrustLevel: 0,
-    maxPinsPerDay: 0
+    maxPinsPerDay: 0,
+    curatorDemotionCooldown: BigInt(0),
+    curatorDemotionThreshold: "",
+    curatorOverturnDemotionStreak: BigInt(0)
   };
 }
 /**
@@ -3385,6 +3247,15 @@ export const CollectOperationalParams = {
     if (message.maxPinsPerDay !== 0) {
       writer.uint32(352).uint32(message.maxPinsPerDay);
     }
+    if (message.curatorDemotionCooldown !== BigInt(0)) {
+      writer.uint32(360).int64(message.curatorDemotionCooldown);
+    }
+    if (message.curatorDemotionThreshold !== "") {
+      writer.uint32(370).string(message.curatorDemotionThreshold);
+    }
+    if (message.curatorOverturnDemotionStreak !== BigInt(0)) {
+      writer.uint32(376).uint64(message.curatorOverturnDemotionStreak);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): CollectOperationalParams {
@@ -3514,6 +3385,15 @@ export const CollectOperationalParams = {
         case 44:
           message.maxPinsPerDay = reader.uint32();
           break;
+        case 45:
+          message.curatorDemotionCooldown = reader.int64();
+          break;
+        case 46:
+          message.curatorDemotionThreshold = reader.string();
+          break;
+        case 47:
+          message.curatorOverturnDemotionStreak = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3563,6 +3443,9 @@ export const CollectOperationalParams = {
     message.convictionRenewalPeriod = object.convictionRenewalPeriod !== undefined && object.convictionRenewalPeriod !== null ? BigInt(object.convictionRenewalPeriod.toString()) : BigInt(0);
     message.pinMinTrustLevel = object.pinMinTrustLevel ?? 0;
     message.maxPinsPerDay = object.maxPinsPerDay ?? 0;
+    message.curatorDemotionCooldown = object.curatorDemotionCooldown !== undefined && object.curatorDemotionCooldown !== null ? BigInt(object.curatorDemotionCooldown.toString()) : BigInt(0);
+    message.curatorDemotionThreshold = object.curatorDemotionThreshold ?? "";
+    message.curatorOverturnDemotionStreak = object.curatorOverturnDemotionStreak !== undefined && object.curatorOverturnDemotionStreak !== null ? BigInt(object.curatorOverturnDemotionStreak.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: CollectOperationalParamsAmino): CollectOperationalParams {
@@ -3687,6 +3570,15 @@ export const CollectOperationalParams = {
     if (object.max_pins_per_day !== undefined && object.max_pins_per_day !== null) {
       message.maxPinsPerDay = object.max_pins_per_day;
     }
+    if (object.curator_demotion_cooldown !== undefined && object.curator_demotion_cooldown !== null) {
+      message.curatorDemotionCooldown = BigInt(object.curator_demotion_cooldown);
+    }
+    if (object.curator_demotion_threshold !== undefined && object.curator_demotion_threshold !== null) {
+      message.curatorDemotionThreshold = object.curator_demotion_threshold;
+    }
+    if (object.curator_overturn_demotion_streak !== undefined && object.curator_overturn_demotion_streak !== null) {
+      message.curatorOverturnDemotionStreak = BigInt(object.curator_overturn_demotion_streak);
+    }
     return message;
   },
   toAmino(message: CollectOperationalParams): CollectOperationalParamsAmino {
@@ -3731,6 +3623,9 @@ export const CollectOperationalParams = {
     obj.conviction_renewal_period = message.convictionRenewalPeriod !== BigInt(0) ? message.convictionRenewalPeriod?.toString() : undefined;
     obj.pin_min_trust_level = message.pinMinTrustLevel === 0 ? undefined : message.pinMinTrustLevel;
     obj.max_pins_per_day = message.maxPinsPerDay === 0 ? undefined : message.maxPinsPerDay;
+    obj.curator_demotion_cooldown = message.curatorDemotionCooldown !== BigInt(0) ? message.curatorDemotionCooldown?.toString() : undefined;
+    obj.curator_demotion_threshold = message.curatorDemotionThreshold === "" ? undefined : message.curatorDemotionThreshold;
+    obj.curator_overturn_demotion_streak = message.curatorOverturnDemotionStreak !== BigInt(0) ? message.curatorOverturnDemotionStreak?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: CollectOperationalParamsAminoMsg): CollectOperationalParams {

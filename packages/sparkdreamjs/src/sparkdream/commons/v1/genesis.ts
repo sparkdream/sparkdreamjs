@@ -2,6 +2,7 @@
 import { Params, ParamsAmino } from "./params";
 import { PolicyPermissions, PolicyPermissionsAmino } from "./policy_permissions";
 import { Group, GroupAmino, Proposal, ProposalAmino, Member, MemberAmino, DecisionPolicy, DecisionPolicyAmino, Vote, VoteAmino } from "./group";
+import { Category, CategoryAmino } from "./category";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -45,6 +46,14 @@ export interface GenesisState {
    * votes stores all active votes
    */
   proposalVotes: ProposalVotes[];
+  /**
+   * category_map stores all shared content categories
+   */
+  categoryMap: Category[];
+  /**
+   * next_category_id is the next auto-increment category ID
+   */
+  nextCategoryId: bigint;
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.commons.v1.GenesisState";
@@ -91,6 +100,14 @@ export interface GenesisStateAmino {
    * votes stores all active votes
    */
   proposal_votes?: ProposalVotesAmino[];
+  /**
+   * category_map stores all shared content categories
+   */
+  category_map?: CategoryAmino[];
+  /**
+   * next_category_id is the next auto-increment category ID
+   */
+  next_category_id?: string;
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.commons.v1.GenesisState";
@@ -219,7 +236,9 @@ function createBaseGenesisState(): GenesisState {
     nextProposalId: BigInt(0),
     nextCouncilId: BigInt(0),
     policyVersions: [],
-    proposalVotes: []
+    proposalVotes: [],
+    categoryMap: [],
+    nextCategoryId: BigInt(0)
   };
 }
 /**
@@ -261,6 +280,12 @@ export const GenesisState = {
     for (const v of message.proposalVotes) {
       ProposalVotes.encode(v!, writer.uint32(82).fork()).ldelim();
     }
+    for (const v of message.categoryMap) {
+      Category.encode(v!, writer.uint32(90).fork()).ldelim();
+    }
+    if (message.nextCategoryId !== BigInt(0)) {
+      writer.uint32(96).uint64(message.nextCategoryId);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -300,6 +325,12 @@ export const GenesisState = {
         case 10:
           message.proposalVotes.push(ProposalVotes.decode(reader, reader.uint32()));
           break;
+        case 11:
+          message.categoryMap.push(Category.decode(reader, reader.uint32()));
+          break;
+        case 12:
+          message.nextCategoryId = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -319,6 +350,8 @@ export const GenesisState = {
     message.nextCouncilId = object.nextCouncilId !== undefined && object.nextCouncilId !== null ? BigInt(object.nextCouncilId.toString()) : BigInt(0);
     message.policyVersions = object.policyVersions?.map(e => PolicyVersionEntry.fromPartial(e)) || [];
     message.proposalVotes = object.proposalVotes?.map(e => ProposalVotes.fromPartial(e)) || [];
+    message.categoryMap = object.categoryMap?.map(e => Category.fromPartial(e)) || [];
+    message.nextCategoryId = object.nextCategoryId !== undefined && object.nextCategoryId !== null ? BigInt(object.nextCategoryId.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -339,6 +372,10 @@ export const GenesisState = {
     }
     message.policyVersions = object.policy_versions?.map(e => PolicyVersionEntry.fromAmino(e)) || [];
     message.proposalVotes = object.proposal_votes?.map(e => ProposalVotes.fromAmino(e)) || [];
+    message.categoryMap = object.category_map?.map(e => Category.fromAmino(e)) || [];
+    if (object.next_category_id !== undefined && object.next_category_id !== null) {
+      message.nextCategoryId = BigInt(object.next_category_id);
+    }
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -381,6 +418,12 @@ export const GenesisState = {
     } else {
       obj.proposal_votes = message.proposalVotes;
     }
+    if (message.categoryMap) {
+      obj.category_map = message.categoryMap.map(e => e ? Category.toAmino(e) : undefined);
+    } else {
+      obj.category_map = message.categoryMap;
+    }
+    obj.next_category_id = message.nextCategoryId !== BigInt(0) ? message.nextCategoryId?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {

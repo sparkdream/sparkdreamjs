@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "../../../cosmos/base/query/v1beta1/pagination";
+import { RoleType, BondedRole, BondedRoleAmino, BondedRoleConfig, BondedRoleConfigAmino } from "./bonded_role";
 import { Params, ParamsAmino } from "./params";
 import { Member, MemberAmino } from "./member";
 import { Invitation, InvitationAmino } from "./invitation";
@@ -11,6 +12,15 @@ import { JuryReview, JuryReviewAmino } from "./jury_review";
 import { Interim, InterimAmino } from "./interim";
 import { InterimTemplate, InterimTemplateAmino } from "./interim_template";
 import { ContentChallenge, ContentChallengeAmino } from "./content_challenge";
+import { Tag, TagAmino } from "./tag";
+import { ReservedTag, ReservedTagAmino } from "./reserved_tag";
+import { TagReport, TagReportAmino } from "./tag_report";
+import { TagBudget, TagBudgetAmino } from "./tag_budget";
+import { TagBudgetAward, TagBudgetAwardAmino } from "./tag_budget_award";
+import { MemberReport, MemberReportAmino } from "./member_report";
+import { MemberWarning, MemberWarningAmino } from "./member_warning";
+import { GovActionAppeal, GovActionAppealAmino } from "./gov_action_appeal";
+import { JuryParticipation, JuryParticipationAmino } from "./jury_participation";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 import { Decimal } from "@interchainjs/math";
@@ -2015,6 +2025,60 @@ export interface QueryGetTagStakePoolResponseAminoMsg {
   value: QueryGetTagStakePoolResponseAmino;
 }
 /**
+ * QueryListTagStakePoolsRequest defines the request for listing tag stake pools.
+ * @name QueryListTagStakePoolsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryListTagStakePoolsRequest
+ */
+export interface QueryListTagStakePoolsRequest {
+  pagination?: PageRequest;
+}
+export interface QueryListTagStakePoolsRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryListTagStakePoolsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryListTagStakePoolsRequest defines the request for listing tag stake pools.
+ * @name QueryListTagStakePoolsRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryListTagStakePoolsRequest
+ */
+export interface QueryListTagStakePoolsRequestAmino {
+  pagination?: PageRequestAmino;
+}
+export interface QueryListTagStakePoolsRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryListTagStakePoolsRequest";
+  value: QueryListTagStakePoolsRequestAmino;
+}
+/**
+ * QueryListTagStakePoolsResponse defines the response for listing tag stake pools.
+ * @name QueryListTagStakePoolsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryListTagStakePoolsResponse
+ */
+export interface QueryListTagStakePoolsResponse {
+  pool: TagStakePool[];
+  pagination?: PageResponse;
+}
+export interface QueryListTagStakePoolsResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryListTagStakePoolsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryListTagStakePoolsResponse defines the response for listing tag stake pools.
+ * @name QueryListTagStakePoolsResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryListTagStakePoolsResponse
+ */
+export interface QueryListTagStakePoolsResponseAmino {
+  pool?: TagStakePoolAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryListTagStakePoolsResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryListTagStakePoolsResponse";
+  value: QueryListTagStakePoolsResponseAmino;
+}
+/**
  * QueryGetProjectStakeInfoRequest defines the request for project stake info
  * @name QueryGetProjectStakeInfoRequest
  * @package sparkdream.rep.v1
@@ -2461,6 +2525,1784 @@ export interface QueryContentByInitiativeResponseAmino {
 export interface QueryContentByInitiativeResponseAminoMsg {
   type: "/sparkdream.rep.v1.QueryContentByInitiativeResponse";
   value: QueryContentByInitiativeResponseAmino;
+}
+/**
+ * @name QueryDreamSupplyStatsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryDreamSupplyStatsRequest
+ */
+export interface QueryDreamSupplyStatsRequest {}
+export interface QueryDreamSupplyStatsRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryDreamSupplyStatsRequest";
+  value: Uint8Array;
+}
+/**
+ * @name QueryDreamSupplyStatsRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryDreamSupplyStatsRequest
+ */
+export interface QueryDreamSupplyStatsRequestAmino {}
+export interface QueryDreamSupplyStatsRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryDreamSupplyStatsRequest";
+  value: QueryDreamSupplyStatsRequestAmino;
+}
+/**
+ * @name QueryDreamSupplyStatsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryDreamSupplyStatsResponse
+ */
+export interface QueryDreamSupplyStatsResponse {
+  totalMinted: string;
+  totalBurned: string;
+  circulating: string;
+  totalStaked: string;
+  treasuryBalance: string;
+  stakedRatio: string;
+}
+export interface QueryDreamSupplyStatsResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryDreamSupplyStatsResponse";
+  value: Uint8Array;
+}
+/**
+ * @name QueryDreamSupplyStatsResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryDreamSupplyStatsResponse
+ */
+export interface QueryDreamSupplyStatsResponseAmino {
+  total_minted?: string;
+  total_burned?: string;
+  circulating?: string;
+  total_staked?: string;
+  treasury_balance?: string;
+  staked_ratio?: string;
+}
+export interface QueryDreamSupplyStatsResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryDreamSupplyStatsResponse";
+  value: QueryDreamSupplyStatsResponseAmino;
+}
+/**
+ * @name QueryMintBurnRatioRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMintBurnRatioRequest
+ */
+export interface QueryMintBurnRatioRequest {}
+export interface QueryMintBurnRatioRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryMintBurnRatioRequest";
+  value: Uint8Array;
+}
+/**
+ * @name QueryMintBurnRatioRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMintBurnRatioRequest
+ */
+export interface QueryMintBurnRatioRequestAmino {}
+export interface QueryMintBurnRatioRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryMintBurnRatioRequest";
+  value: QueryMintBurnRatioRequestAmino;
+}
+/**
+ * @name QueryMintBurnRatioResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMintBurnRatioResponse
+ */
+export interface QueryMintBurnRatioResponse {
+  seasonMinted: string;
+  seasonBurned: string;
+  ratio: string;
+  season: number;
+}
+export interface QueryMintBurnRatioResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryMintBurnRatioResponse";
+  value: Uint8Array;
+}
+/**
+ * @name QueryMintBurnRatioResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMintBurnRatioResponse
+ */
+export interface QueryMintBurnRatioResponseAmino {
+  season_minted?: string;
+  season_burned?: string;
+  ratio?: string;
+  season?: number;
+}
+export interface QueryMintBurnRatioResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryMintBurnRatioResponse";
+  value: QueryMintBurnRatioResponseAmino;
+}
+/**
+ * @name QueryEffectiveApyRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryEffectiveApyRequest
+ */
+export interface QueryEffectiveApyRequest {}
+export interface QueryEffectiveApyRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryEffectiveApyRequest";
+  value: Uint8Array;
+}
+/**
+ * @name QueryEffectiveApyRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryEffectiveApyRequest
+ */
+export interface QueryEffectiveApyRequestAmino {}
+export interface QueryEffectiveApyRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryEffectiveApyRequest";
+  value: QueryEffectiveApyRequestAmino;
+}
+/**
+ * @name QueryEffectiveApyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryEffectiveApyResponse
+ */
+export interface QueryEffectiveApyResponse {
+  seasonalPoolTotal: string;
+  seasonalPoolRemaining: string;
+  totalStaked: string;
+  effectiveApy: string;
+}
+export interface QueryEffectiveApyResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryEffectiveApyResponse";
+  value: Uint8Array;
+}
+/**
+ * @name QueryEffectiveApyResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryEffectiveApyResponse
+ */
+export interface QueryEffectiveApyResponseAmino {
+  seasonal_pool_total?: string;
+  seasonal_pool_remaining?: string;
+  total_staked?: string;
+  effective_apy?: string;
+}
+export interface QueryEffectiveApyResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryEffectiveApyResponse";
+  value: QueryEffectiveApyResponseAmino;
+}
+/**
+ * @name QueryTreasuryStatusRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTreasuryStatusRequest
+ */
+export interface QueryTreasuryStatusRequest {}
+export interface QueryTreasuryStatusRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryTreasuryStatusRequest";
+  value: Uint8Array;
+}
+/**
+ * @name QueryTreasuryStatusRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTreasuryStatusRequest
+ */
+export interface QueryTreasuryStatusRequestAmino {}
+export interface QueryTreasuryStatusRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryTreasuryStatusRequest";
+  value: QueryTreasuryStatusRequestAmino;
+}
+/**
+ * @name QueryTreasuryStatusResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTreasuryStatusResponse
+ */
+export interface QueryTreasuryStatusResponse {
+  balance: string;
+  maxBalance: string;
+  seasonInflow: string;
+  seasonOutflow: string;
+  seasonBurned: string;
+}
+export interface QueryTreasuryStatusResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryTreasuryStatusResponse";
+  value: Uint8Array;
+}
+/**
+ * @name QueryTreasuryStatusResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTreasuryStatusResponse
+ */
+export interface QueryTreasuryStatusResponseAmino {
+  balance?: string;
+  max_balance?: string;
+  season_inflow?: string;
+  season_outflow?: string;
+  season_burned?: string;
+}
+export interface QueryTreasuryStatusResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryTreasuryStatusResponse";
+  value: QueryTreasuryStatusResponseAmino;
+}
+/**
+ * QueryGetTagRequest is request type for the Query/GetTag RPC method.
+ * @name QueryGetTagRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagRequest
+ */
+export interface QueryGetTagRequest {
+  name: string;
+}
+export interface QueryGetTagRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryGetTagRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryGetTagRequest is request type for the Query/GetTag RPC method.
+ * @name QueryGetTagRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagRequest
+ */
+export interface QueryGetTagRequestAmino {
+  name?: string;
+}
+export interface QueryGetTagRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryGetTagRequest";
+  value: QueryGetTagRequestAmino;
+}
+/**
+ * QueryGetTagResponse is response type for the Query/GetTag RPC method.
+ * @name QueryGetTagResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagResponse
+ */
+export interface QueryGetTagResponse {
+  tag: Tag;
+}
+export interface QueryGetTagResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryGetTagResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryGetTagResponse is response type for the Query/GetTag RPC method.
+ * @name QueryGetTagResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagResponse
+ */
+export interface QueryGetTagResponseAmino {
+  tag?: TagAmino;
+}
+export interface QueryGetTagResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryGetTagResponse";
+  value: QueryGetTagResponseAmino;
+}
+/**
+ * QueryAllTagRequest is request type for the Query/ListTag RPC method.
+ * @name QueryAllTagRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagRequest
+ */
+export interface QueryAllTagRequest {
+  pagination?: PageRequest;
+}
+export interface QueryAllTagRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAllTagRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryAllTagRequest is request type for the Query/ListTag RPC method.
+ * @name QueryAllTagRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagRequest
+ */
+export interface QueryAllTagRequestAmino {
+  pagination?: PageRequestAmino;
+}
+export interface QueryAllTagRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAllTagRequest";
+  value: QueryAllTagRequestAmino;
+}
+/**
+ * QueryAllTagResponse is response type for the Query/ListTag RPC method.
+ * @name QueryAllTagResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagResponse
+ */
+export interface QueryAllTagResponse {
+  tag: Tag[];
+  pagination?: PageResponse;
+}
+export interface QueryAllTagResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAllTagResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryAllTagResponse is response type for the Query/ListTag RPC method.
+ * @name QueryAllTagResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagResponse
+ */
+export interface QueryAllTagResponseAmino {
+  tag?: TagAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryAllTagResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAllTagResponse";
+  value: QueryAllTagResponseAmino;
+}
+/**
+ * QueryGetReservedTagRequest is request type for the Query/GetReservedTag RPC method.
+ * @name QueryGetReservedTagRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetReservedTagRequest
+ */
+export interface QueryGetReservedTagRequest {
+  name: string;
+}
+export interface QueryGetReservedTagRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryGetReservedTagRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryGetReservedTagRequest is request type for the Query/GetReservedTag RPC method.
+ * @name QueryGetReservedTagRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetReservedTagRequest
+ */
+export interface QueryGetReservedTagRequestAmino {
+  name?: string;
+}
+export interface QueryGetReservedTagRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryGetReservedTagRequest";
+  value: QueryGetReservedTagRequestAmino;
+}
+/**
+ * QueryGetReservedTagResponse is response type for the Query/GetReservedTag RPC method.
+ * @name QueryGetReservedTagResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetReservedTagResponse
+ */
+export interface QueryGetReservedTagResponse {
+  reservedTag: ReservedTag;
+}
+export interface QueryGetReservedTagResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryGetReservedTagResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryGetReservedTagResponse is response type for the Query/GetReservedTag RPC method.
+ * @name QueryGetReservedTagResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetReservedTagResponse
+ */
+export interface QueryGetReservedTagResponseAmino {
+  reserved_tag?: ReservedTagAmino;
+}
+export interface QueryGetReservedTagResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryGetReservedTagResponse";
+  value: QueryGetReservedTagResponseAmino;
+}
+/**
+ * QueryAllReservedTagRequest is request type for the Query/ListReservedTag RPC method.
+ * @name QueryAllReservedTagRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllReservedTagRequest
+ */
+export interface QueryAllReservedTagRequest {
+  pagination?: PageRequest;
+}
+export interface QueryAllReservedTagRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAllReservedTagRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryAllReservedTagRequest is request type for the Query/ListReservedTag RPC method.
+ * @name QueryAllReservedTagRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllReservedTagRequest
+ */
+export interface QueryAllReservedTagRequestAmino {
+  pagination?: PageRequestAmino;
+}
+export interface QueryAllReservedTagRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAllReservedTagRequest";
+  value: QueryAllReservedTagRequestAmino;
+}
+/**
+ * QueryAllReservedTagResponse is response type for the Query/ListReservedTag RPC method.
+ * @name QueryAllReservedTagResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllReservedTagResponse
+ */
+export interface QueryAllReservedTagResponse {
+  reservedTag: ReservedTag[];
+  pagination?: PageResponse;
+}
+export interface QueryAllReservedTagResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAllReservedTagResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryAllReservedTagResponse is response type for the Query/ListReservedTag RPC method.
+ * @name QueryAllReservedTagResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllReservedTagResponse
+ */
+export interface QueryAllReservedTagResponseAmino {
+  reserved_tag?: ReservedTagAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryAllReservedTagResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAllReservedTagResponse";
+  value: QueryAllReservedTagResponseAmino;
+}
+/**
+ * QueryTagExistsRequest is request type for the Query/TagExists RPC method.
+ * @name QueryTagExistsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagExistsRequest
+ */
+export interface QueryTagExistsRequest {
+  tagName: string;
+}
+export interface QueryTagExistsRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryTagExistsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryTagExistsRequest is request type for the Query/TagExists RPC method.
+ * @name QueryTagExistsRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagExistsRequest
+ */
+export interface QueryTagExistsRequestAmino {
+  tag_name?: string;
+}
+export interface QueryTagExistsRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryTagExistsRequest";
+  value: QueryTagExistsRequestAmino;
+}
+/**
+ * QueryTagExistsResponse is response type for the Query/TagExists RPC method.
+ * @name QueryTagExistsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagExistsResponse
+ */
+export interface QueryTagExistsResponse {
+  exists: boolean;
+  expirationTime: bigint;
+}
+export interface QueryTagExistsResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryTagExistsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryTagExistsResponse is response type for the Query/TagExists RPC method.
+ * @name QueryTagExistsResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagExistsResponse
+ */
+export interface QueryTagExistsResponseAmino {
+  exists?: boolean;
+  expiration_time?: string;
+}
+export interface QueryTagExistsResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryTagExistsResponse";
+  value: QueryTagExistsResponseAmino;
+}
+/**
+ * QueryGetTagReportRequest defines the QueryGetTagReportRequest message.
+ * @name QueryGetTagReportRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagReportRequest
+ */
+export interface QueryGetTagReportRequest {
+  tagName: string;
+}
+export interface QueryGetTagReportRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryGetTagReportRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryGetTagReportRequest defines the QueryGetTagReportRequest message.
+ * @name QueryGetTagReportRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagReportRequest
+ */
+export interface QueryGetTagReportRequestAmino {
+  tag_name?: string;
+}
+export interface QueryGetTagReportRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryGetTagReportRequest";
+  value: QueryGetTagReportRequestAmino;
+}
+/**
+ * QueryGetTagReportResponse defines the QueryGetTagReportResponse message.
+ * @name QueryGetTagReportResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagReportResponse
+ */
+export interface QueryGetTagReportResponse {
+  tagReport: TagReport;
+}
+export interface QueryGetTagReportResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryGetTagReportResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryGetTagReportResponse defines the QueryGetTagReportResponse message.
+ * @name QueryGetTagReportResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagReportResponse
+ */
+export interface QueryGetTagReportResponseAmino {
+  tag_report?: TagReportAmino;
+}
+export interface QueryGetTagReportResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryGetTagReportResponse";
+  value: QueryGetTagReportResponseAmino;
+}
+/**
+ * QueryAllTagReportRequest defines the QueryAllTagReportRequest message.
+ * @name QueryAllTagReportRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagReportRequest
+ */
+export interface QueryAllTagReportRequest {
+  pagination?: PageRequest;
+}
+export interface QueryAllTagReportRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAllTagReportRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryAllTagReportRequest defines the QueryAllTagReportRequest message.
+ * @name QueryAllTagReportRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagReportRequest
+ */
+export interface QueryAllTagReportRequestAmino {
+  pagination?: PageRequestAmino;
+}
+export interface QueryAllTagReportRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAllTagReportRequest";
+  value: QueryAllTagReportRequestAmino;
+}
+/**
+ * QueryAllTagReportResponse defines the QueryAllTagReportResponse message.
+ * @name QueryAllTagReportResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagReportResponse
+ */
+export interface QueryAllTagReportResponse {
+  tagReport: TagReport[];
+  pagination?: PageResponse;
+}
+export interface QueryAllTagReportResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAllTagReportResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryAllTagReportResponse defines the QueryAllTagReportResponse message.
+ * @name QueryAllTagReportResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagReportResponse
+ */
+export interface QueryAllTagReportResponseAmino {
+  tag_report?: TagReportAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryAllTagReportResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAllTagReportResponse";
+  value: QueryAllTagReportResponseAmino;
+}
+/**
+ * QueryTagReportsRequest defines the QueryTagReportsRequest message.
+ * @name QueryTagReportsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagReportsRequest
+ */
+export interface QueryTagReportsRequest {
+  pagination?: PageRequest;
+}
+export interface QueryTagReportsRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryTagReportsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryTagReportsRequest defines the QueryTagReportsRequest message.
+ * @name QueryTagReportsRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagReportsRequest
+ */
+export interface QueryTagReportsRequestAmino {
+  pagination?: PageRequestAmino;
+}
+export interface QueryTagReportsRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryTagReportsRequest";
+  value: QueryTagReportsRequestAmino;
+}
+/**
+ * QueryTagReportsResponse defines the QueryTagReportsResponse message.
+ * @name QueryTagReportsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagReportsResponse
+ */
+export interface QueryTagReportsResponse {
+  tagName: string;
+  underReview: boolean;
+  pagination?: PageResponse;
+}
+export interface QueryTagReportsResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryTagReportsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryTagReportsResponse defines the QueryTagReportsResponse message.
+ * @name QueryTagReportsResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagReportsResponse
+ */
+export interface QueryTagReportsResponseAmino {
+  tag_name?: string;
+  under_review?: boolean;
+  pagination?: PageResponseAmino;
+}
+export interface QueryTagReportsResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryTagReportsResponse";
+  value: QueryTagReportsResponseAmino;
+}
+/**
+ * QueryGetTagBudgetRequest defines the QueryGetTagBudgetRequest message.
+ * @name QueryGetTagBudgetRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagBudgetRequest
+ */
+export interface QueryGetTagBudgetRequest {
+  id: bigint;
+}
+export interface QueryGetTagBudgetRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryGetTagBudgetRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryGetTagBudgetRequest defines the QueryGetTagBudgetRequest message.
+ * @name QueryGetTagBudgetRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagBudgetRequest
+ */
+export interface QueryGetTagBudgetRequestAmino {
+  id?: string;
+}
+export interface QueryGetTagBudgetRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryGetTagBudgetRequest";
+  value: QueryGetTagBudgetRequestAmino;
+}
+/**
+ * QueryGetTagBudgetResponse defines the QueryGetTagBudgetResponse message.
+ * @name QueryGetTagBudgetResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagBudgetResponse
+ */
+export interface QueryGetTagBudgetResponse {
+  tagBudget: TagBudget;
+}
+export interface QueryGetTagBudgetResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryGetTagBudgetResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryGetTagBudgetResponse defines the QueryGetTagBudgetResponse message.
+ * @name QueryGetTagBudgetResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagBudgetResponse
+ */
+export interface QueryGetTagBudgetResponseAmino {
+  tag_budget?: TagBudgetAmino;
+}
+export interface QueryGetTagBudgetResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryGetTagBudgetResponse";
+  value: QueryGetTagBudgetResponseAmino;
+}
+/**
+ * QueryAllTagBudgetRequest defines the QueryAllTagBudgetRequest message.
+ * @name QueryAllTagBudgetRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagBudgetRequest
+ */
+export interface QueryAllTagBudgetRequest {
+  pagination?: PageRequest;
+}
+export interface QueryAllTagBudgetRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAllTagBudgetRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryAllTagBudgetRequest defines the QueryAllTagBudgetRequest message.
+ * @name QueryAllTagBudgetRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagBudgetRequest
+ */
+export interface QueryAllTagBudgetRequestAmino {
+  pagination?: PageRequestAmino;
+}
+export interface QueryAllTagBudgetRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAllTagBudgetRequest";
+  value: QueryAllTagBudgetRequestAmino;
+}
+/**
+ * QueryAllTagBudgetResponse defines the QueryAllTagBudgetResponse message.
+ * @name QueryAllTagBudgetResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagBudgetResponse
+ */
+export interface QueryAllTagBudgetResponse {
+  tagBudget: TagBudget[];
+  pagination?: PageResponse;
+}
+export interface QueryAllTagBudgetResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAllTagBudgetResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryAllTagBudgetResponse defines the QueryAllTagBudgetResponse message.
+ * @name QueryAllTagBudgetResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagBudgetResponse
+ */
+export interface QueryAllTagBudgetResponseAmino {
+  tag_budget?: TagBudgetAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryAllTagBudgetResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAllTagBudgetResponse";
+  value: QueryAllTagBudgetResponseAmino;
+}
+/**
+ * QueryGetTagBudgetAwardRequest defines the QueryGetTagBudgetAwardRequest message.
+ * @name QueryGetTagBudgetAwardRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagBudgetAwardRequest
+ */
+export interface QueryGetTagBudgetAwardRequest {
+  id: bigint;
+}
+export interface QueryGetTagBudgetAwardRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryGetTagBudgetAwardRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryGetTagBudgetAwardRequest defines the QueryGetTagBudgetAwardRequest message.
+ * @name QueryGetTagBudgetAwardRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagBudgetAwardRequest
+ */
+export interface QueryGetTagBudgetAwardRequestAmino {
+  id?: string;
+}
+export interface QueryGetTagBudgetAwardRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryGetTagBudgetAwardRequest";
+  value: QueryGetTagBudgetAwardRequestAmino;
+}
+/**
+ * QueryGetTagBudgetAwardResponse defines the QueryGetTagBudgetAwardResponse message.
+ * @name QueryGetTagBudgetAwardResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagBudgetAwardResponse
+ */
+export interface QueryGetTagBudgetAwardResponse {
+  tagBudgetAward: TagBudgetAward;
+}
+export interface QueryGetTagBudgetAwardResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryGetTagBudgetAwardResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryGetTagBudgetAwardResponse defines the QueryGetTagBudgetAwardResponse message.
+ * @name QueryGetTagBudgetAwardResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagBudgetAwardResponse
+ */
+export interface QueryGetTagBudgetAwardResponseAmino {
+  tag_budget_award?: TagBudgetAwardAmino;
+}
+export interface QueryGetTagBudgetAwardResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryGetTagBudgetAwardResponse";
+  value: QueryGetTagBudgetAwardResponseAmino;
+}
+/**
+ * QueryAllTagBudgetAwardRequest defines the QueryAllTagBudgetAwardRequest message.
+ * @name QueryAllTagBudgetAwardRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagBudgetAwardRequest
+ */
+export interface QueryAllTagBudgetAwardRequest {
+  pagination?: PageRequest;
+}
+export interface QueryAllTagBudgetAwardRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAllTagBudgetAwardRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryAllTagBudgetAwardRequest defines the QueryAllTagBudgetAwardRequest message.
+ * @name QueryAllTagBudgetAwardRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagBudgetAwardRequest
+ */
+export interface QueryAllTagBudgetAwardRequestAmino {
+  pagination?: PageRequestAmino;
+}
+export interface QueryAllTagBudgetAwardRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAllTagBudgetAwardRequest";
+  value: QueryAllTagBudgetAwardRequestAmino;
+}
+/**
+ * QueryAllTagBudgetAwardResponse defines the QueryAllTagBudgetAwardResponse message.
+ * @name QueryAllTagBudgetAwardResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagBudgetAwardResponse
+ */
+export interface QueryAllTagBudgetAwardResponse {
+  tagBudgetAward: TagBudgetAward[];
+  pagination?: PageResponse;
+}
+export interface QueryAllTagBudgetAwardResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAllTagBudgetAwardResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryAllTagBudgetAwardResponse defines the QueryAllTagBudgetAwardResponse message.
+ * @name QueryAllTagBudgetAwardResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagBudgetAwardResponse
+ */
+export interface QueryAllTagBudgetAwardResponseAmino {
+  tag_budget_award?: TagBudgetAwardAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryAllTagBudgetAwardResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAllTagBudgetAwardResponse";
+  value: QueryAllTagBudgetAwardResponseAmino;
+}
+/**
+ * QueryTagBudgetByTagRequest defines the QueryTagBudgetByTagRequest message.
+ * @name QueryTagBudgetByTagRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagBudgetByTagRequest
+ */
+export interface QueryTagBudgetByTagRequest {
+  tag: string;
+}
+export interface QueryTagBudgetByTagRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryTagBudgetByTagRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryTagBudgetByTagRequest defines the QueryTagBudgetByTagRequest message.
+ * @name QueryTagBudgetByTagRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagBudgetByTagRequest
+ */
+export interface QueryTagBudgetByTagRequestAmino {
+  tag?: string;
+}
+export interface QueryTagBudgetByTagRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryTagBudgetByTagRequest";
+  value: QueryTagBudgetByTagRequestAmino;
+}
+/**
+ * QueryTagBudgetByTagResponse defines the QueryTagBudgetByTagResponse message.
+ * @name QueryTagBudgetByTagResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagBudgetByTagResponse
+ */
+export interface QueryTagBudgetByTagResponse {
+  budgetId: bigint;
+  poolBalance: string;
+  active: boolean;
+}
+export interface QueryTagBudgetByTagResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryTagBudgetByTagResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryTagBudgetByTagResponse defines the QueryTagBudgetByTagResponse message.
+ * @name QueryTagBudgetByTagResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagBudgetByTagResponse
+ */
+export interface QueryTagBudgetByTagResponseAmino {
+  budget_id?: string;
+  pool_balance?: string;
+  active?: boolean;
+}
+export interface QueryTagBudgetByTagResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryTagBudgetByTagResponse";
+  value: QueryTagBudgetByTagResponseAmino;
+}
+/**
+ * QueryTagBudgetsRequest defines the QueryTagBudgetsRequest message.
+ * @name QueryTagBudgetsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagBudgetsRequest
+ */
+export interface QueryTagBudgetsRequest {
+  pagination?: PageRequest;
+}
+export interface QueryTagBudgetsRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryTagBudgetsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryTagBudgetsRequest defines the QueryTagBudgetsRequest message.
+ * @name QueryTagBudgetsRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagBudgetsRequest
+ */
+export interface QueryTagBudgetsRequestAmino {
+  pagination?: PageRequestAmino;
+}
+export interface QueryTagBudgetsRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryTagBudgetsRequest";
+  value: QueryTagBudgetsRequestAmino;
+}
+/**
+ * QueryTagBudgetsResponse defines the QueryTagBudgetsResponse message.
+ * @name QueryTagBudgetsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagBudgetsResponse
+ */
+export interface QueryTagBudgetsResponse {
+  budgetId: bigint;
+  tag: string;
+  poolBalance: string;
+  pagination?: PageResponse;
+}
+export interface QueryTagBudgetsResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryTagBudgetsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryTagBudgetsResponse defines the QueryTagBudgetsResponse message.
+ * @name QueryTagBudgetsResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagBudgetsResponse
+ */
+export interface QueryTagBudgetsResponseAmino {
+  budget_id?: string;
+  tag?: string;
+  pool_balance?: string;
+  pagination?: PageResponseAmino;
+}
+export interface QueryTagBudgetsResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryTagBudgetsResponse";
+  value: QueryTagBudgetsResponseAmino;
+}
+/**
+ * QueryTagBudgetAwardsRequest defines the QueryTagBudgetAwardsRequest message.
+ * @name QueryTagBudgetAwardsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagBudgetAwardsRequest
+ */
+export interface QueryTagBudgetAwardsRequest {
+  budgetId: bigint;
+  pagination?: PageRequest;
+}
+export interface QueryTagBudgetAwardsRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryTagBudgetAwardsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryTagBudgetAwardsRequest defines the QueryTagBudgetAwardsRequest message.
+ * @name QueryTagBudgetAwardsRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagBudgetAwardsRequest
+ */
+export interface QueryTagBudgetAwardsRequestAmino {
+  budget_id?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryTagBudgetAwardsRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryTagBudgetAwardsRequest";
+  value: QueryTagBudgetAwardsRequestAmino;
+}
+/**
+ * QueryTagBudgetAwardsResponse defines the QueryTagBudgetAwardsResponse message.
+ * @name QueryTagBudgetAwardsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagBudgetAwardsResponse
+ */
+export interface QueryTagBudgetAwardsResponse {
+  postId: bigint;
+  recipient: string;
+  amount: string;
+  pagination?: PageResponse;
+}
+export interface QueryTagBudgetAwardsResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryTagBudgetAwardsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryTagBudgetAwardsResponse defines the QueryTagBudgetAwardsResponse message.
+ * @name QueryTagBudgetAwardsResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagBudgetAwardsResponse
+ */
+export interface QueryTagBudgetAwardsResponseAmino {
+  post_id?: string;
+  recipient?: string;
+  amount?: string;
+  pagination?: PageResponseAmino;
+}
+export interface QueryTagBudgetAwardsResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryTagBudgetAwardsResponse";
+  value: QueryTagBudgetAwardsResponseAmino;
+}
+/**
+ * QueryBondedRoleRequest fetches a single BondedRole record.
+ * @name QueryBondedRoleRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryBondedRoleRequest
+ */
+export interface QueryBondedRoleRequest {
+  roleType: RoleType;
+  address: string;
+}
+export interface QueryBondedRoleRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryBondedRoleRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryBondedRoleRequest fetches a single BondedRole record.
+ * @name QueryBondedRoleRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryBondedRoleRequest
+ */
+export interface QueryBondedRoleRequestAmino {
+  role_type?: RoleType;
+  address?: string;
+}
+export interface QueryBondedRoleRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryBondedRoleRequest";
+  value: QueryBondedRoleRequestAmino;
+}
+/**
+ * QueryBondedRoleResponse holds the fetched BondedRole record.
+ * @name QueryBondedRoleResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryBondedRoleResponse
+ */
+export interface QueryBondedRoleResponse {
+  bondedRole: BondedRole;
+}
+export interface QueryBondedRoleResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryBondedRoleResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryBondedRoleResponse holds the fetched BondedRole record.
+ * @name QueryBondedRoleResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryBondedRoleResponse
+ */
+export interface QueryBondedRoleResponseAmino {
+  bonded_role?: BondedRoleAmino;
+}
+export interface QueryBondedRoleResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryBondedRoleResponse";
+  value: QueryBondedRoleResponseAmino;
+}
+/**
+ * QueryBondedRolesByTypeRequest lists all BondedRole records for role_type.
+ * @name QueryBondedRolesByTypeRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryBondedRolesByTypeRequest
+ */
+export interface QueryBondedRolesByTypeRequest {
+  roleType: RoleType;
+  pagination?: PageRequest;
+}
+export interface QueryBondedRolesByTypeRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryBondedRolesByTypeRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryBondedRolesByTypeRequest lists all BondedRole records for role_type.
+ * @name QueryBondedRolesByTypeRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryBondedRolesByTypeRequest
+ */
+export interface QueryBondedRolesByTypeRequestAmino {
+  role_type?: RoleType;
+  pagination?: PageRequestAmino;
+}
+export interface QueryBondedRolesByTypeRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryBondedRolesByTypeRequest";
+  value: QueryBondedRolesByTypeRequestAmino;
+}
+/**
+ * QueryBondedRolesByTypeResponse holds the paginated list of BondedRole records.
+ * @name QueryBondedRolesByTypeResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryBondedRolesByTypeResponse
+ */
+export interface QueryBondedRolesByTypeResponse {
+  bondedRoles: BondedRole[];
+  pagination?: PageResponse;
+}
+export interface QueryBondedRolesByTypeResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryBondedRolesByTypeResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryBondedRolesByTypeResponse holds the paginated list of BondedRole records.
+ * @name QueryBondedRolesByTypeResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryBondedRolesByTypeResponse
+ */
+export interface QueryBondedRolesByTypeResponseAmino {
+  bonded_roles?: BondedRoleAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryBondedRolesByTypeResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryBondedRolesByTypeResponse";
+  value: QueryBondedRolesByTypeResponseAmino;
+}
+/**
+ * QueryBondedRoleConfigRequest fetches the policy config for a role_type.
+ * @name QueryBondedRoleConfigRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryBondedRoleConfigRequest
+ */
+export interface QueryBondedRoleConfigRequest {
+  roleType: RoleType;
+}
+export interface QueryBondedRoleConfigRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryBondedRoleConfigRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryBondedRoleConfigRequest fetches the policy config for a role_type.
+ * @name QueryBondedRoleConfigRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryBondedRoleConfigRequest
+ */
+export interface QueryBondedRoleConfigRequestAmino {
+  role_type?: RoleType;
+}
+export interface QueryBondedRoleConfigRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryBondedRoleConfigRequest";
+  value: QueryBondedRoleConfigRequestAmino;
+}
+/**
+ * QueryBondedRoleConfigResponse holds the fetched BondedRoleConfig.
+ * @name QueryBondedRoleConfigResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryBondedRoleConfigResponse
+ */
+export interface QueryBondedRoleConfigResponse {
+  bondedRoleConfig: BondedRoleConfig;
+}
+export interface QueryBondedRoleConfigResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryBondedRoleConfigResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryBondedRoleConfigResponse holds the fetched BondedRoleConfig.
+ * @name QueryBondedRoleConfigResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryBondedRoleConfigResponse
+ */
+export interface QueryBondedRoleConfigResponseAmino {
+  bonded_role_config?: BondedRoleConfigAmino;
+}
+export interface QueryBondedRoleConfigResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryBondedRoleConfigResponse";
+  value: QueryBondedRoleConfigResponseAmino;
+}
+/**
+ * QueryGetMemberReportRequest defines the QueryGetMemberReportRequest message.
+ * @name QueryGetMemberReportRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetMemberReportRequest
+ */
+export interface QueryGetMemberReportRequest {
+  member: string;
+}
+export interface QueryGetMemberReportRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryGetMemberReportRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryGetMemberReportRequest defines the QueryGetMemberReportRequest message.
+ * @name QueryGetMemberReportRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetMemberReportRequest
+ */
+export interface QueryGetMemberReportRequestAmino {
+  member?: string;
+}
+export interface QueryGetMemberReportRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryGetMemberReportRequest";
+  value: QueryGetMemberReportRequestAmino;
+}
+/**
+ * QueryGetMemberReportResponse defines the QueryGetMemberReportResponse message.
+ * @name QueryGetMemberReportResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetMemberReportResponse
+ */
+export interface QueryGetMemberReportResponse {
+  memberReport: MemberReport;
+}
+export interface QueryGetMemberReportResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryGetMemberReportResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryGetMemberReportResponse defines the QueryGetMemberReportResponse message.
+ * @name QueryGetMemberReportResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetMemberReportResponse
+ */
+export interface QueryGetMemberReportResponseAmino {
+  member_report?: MemberReportAmino;
+}
+export interface QueryGetMemberReportResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryGetMemberReportResponse";
+  value: QueryGetMemberReportResponseAmino;
+}
+/**
+ * QueryAllMemberReportRequest defines the QueryAllMemberReportRequest message.
+ * @name QueryAllMemberReportRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllMemberReportRequest
+ */
+export interface QueryAllMemberReportRequest {
+  pagination?: PageRequest;
+}
+export interface QueryAllMemberReportRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAllMemberReportRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryAllMemberReportRequest defines the QueryAllMemberReportRequest message.
+ * @name QueryAllMemberReportRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllMemberReportRequest
+ */
+export interface QueryAllMemberReportRequestAmino {
+  pagination?: PageRequestAmino;
+}
+export interface QueryAllMemberReportRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAllMemberReportRequest";
+  value: QueryAllMemberReportRequestAmino;
+}
+/**
+ * QueryAllMemberReportResponse defines the QueryAllMemberReportResponse message.
+ * @name QueryAllMemberReportResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllMemberReportResponse
+ */
+export interface QueryAllMemberReportResponse {
+  memberReport: MemberReport[];
+  pagination?: PageResponse;
+}
+export interface QueryAllMemberReportResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAllMemberReportResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryAllMemberReportResponse defines the QueryAllMemberReportResponse message.
+ * @name QueryAllMemberReportResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllMemberReportResponse
+ */
+export interface QueryAllMemberReportResponseAmino {
+  member_report?: MemberReportAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryAllMemberReportResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAllMemberReportResponse";
+  value: QueryAllMemberReportResponseAmino;
+}
+/**
+ * QueryGetMemberWarningRequest defines the QueryGetMemberWarningRequest message.
+ * @name QueryGetMemberWarningRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetMemberWarningRequest
+ */
+export interface QueryGetMemberWarningRequest {
+  id: bigint;
+}
+export interface QueryGetMemberWarningRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryGetMemberWarningRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryGetMemberWarningRequest defines the QueryGetMemberWarningRequest message.
+ * @name QueryGetMemberWarningRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetMemberWarningRequest
+ */
+export interface QueryGetMemberWarningRequestAmino {
+  id?: string;
+}
+export interface QueryGetMemberWarningRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryGetMemberWarningRequest";
+  value: QueryGetMemberWarningRequestAmino;
+}
+/**
+ * QueryGetMemberWarningResponse defines the QueryGetMemberWarningResponse message.
+ * @name QueryGetMemberWarningResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetMemberWarningResponse
+ */
+export interface QueryGetMemberWarningResponse {
+  memberWarning: MemberWarning;
+}
+export interface QueryGetMemberWarningResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryGetMemberWarningResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryGetMemberWarningResponse defines the QueryGetMemberWarningResponse message.
+ * @name QueryGetMemberWarningResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetMemberWarningResponse
+ */
+export interface QueryGetMemberWarningResponseAmino {
+  member_warning?: MemberWarningAmino;
+}
+export interface QueryGetMemberWarningResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryGetMemberWarningResponse";
+  value: QueryGetMemberWarningResponseAmino;
+}
+/**
+ * QueryAllMemberWarningRequest defines the QueryAllMemberWarningRequest message.
+ * @name QueryAllMemberWarningRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllMemberWarningRequest
+ */
+export interface QueryAllMemberWarningRequest {
+  pagination?: PageRequest;
+}
+export interface QueryAllMemberWarningRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAllMemberWarningRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryAllMemberWarningRequest defines the QueryAllMemberWarningRequest message.
+ * @name QueryAllMemberWarningRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllMemberWarningRequest
+ */
+export interface QueryAllMemberWarningRequestAmino {
+  pagination?: PageRequestAmino;
+}
+export interface QueryAllMemberWarningRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAllMemberWarningRequest";
+  value: QueryAllMemberWarningRequestAmino;
+}
+/**
+ * QueryAllMemberWarningResponse defines the QueryAllMemberWarningResponse message.
+ * @name QueryAllMemberWarningResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllMemberWarningResponse
+ */
+export interface QueryAllMemberWarningResponse {
+  memberWarning: MemberWarning[];
+  pagination?: PageResponse;
+}
+export interface QueryAllMemberWarningResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAllMemberWarningResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryAllMemberWarningResponse defines the QueryAllMemberWarningResponse message.
+ * @name QueryAllMemberWarningResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllMemberWarningResponse
+ */
+export interface QueryAllMemberWarningResponseAmino {
+  member_warning?: MemberWarningAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryAllMemberWarningResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAllMemberWarningResponse";
+  value: QueryAllMemberWarningResponseAmino;
+}
+/**
+ * QueryGetGovActionAppealRequest defines the QueryGetGovActionAppealRequest message.
+ * @name QueryGetGovActionAppealRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetGovActionAppealRequest
+ */
+export interface QueryGetGovActionAppealRequest {
+  id: bigint;
+}
+export interface QueryGetGovActionAppealRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryGetGovActionAppealRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryGetGovActionAppealRequest defines the QueryGetGovActionAppealRequest message.
+ * @name QueryGetGovActionAppealRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetGovActionAppealRequest
+ */
+export interface QueryGetGovActionAppealRequestAmino {
+  id?: string;
+}
+export interface QueryGetGovActionAppealRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryGetGovActionAppealRequest";
+  value: QueryGetGovActionAppealRequestAmino;
+}
+/**
+ * QueryGetGovActionAppealResponse defines the QueryGetGovActionAppealResponse message.
+ * @name QueryGetGovActionAppealResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetGovActionAppealResponse
+ */
+export interface QueryGetGovActionAppealResponse {
+  govActionAppeal: GovActionAppeal;
+}
+export interface QueryGetGovActionAppealResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryGetGovActionAppealResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryGetGovActionAppealResponse defines the QueryGetGovActionAppealResponse message.
+ * @name QueryGetGovActionAppealResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetGovActionAppealResponse
+ */
+export interface QueryGetGovActionAppealResponseAmino {
+  gov_action_appeal?: GovActionAppealAmino;
+}
+export interface QueryGetGovActionAppealResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryGetGovActionAppealResponse";
+  value: QueryGetGovActionAppealResponseAmino;
+}
+/**
+ * QueryAllGovActionAppealRequest defines the QueryAllGovActionAppealRequest message.
+ * @name QueryAllGovActionAppealRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllGovActionAppealRequest
+ */
+export interface QueryAllGovActionAppealRequest {
+  pagination?: PageRequest;
+}
+export interface QueryAllGovActionAppealRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAllGovActionAppealRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryAllGovActionAppealRequest defines the QueryAllGovActionAppealRequest message.
+ * @name QueryAllGovActionAppealRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllGovActionAppealRequest
+ */
+export interface QueryAllGovActionAppealRequestAmino {
+  pagination?: PageRequestAmino;
+}
+export interface QueryAllGovActionAppealRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAllGovActionAppealRequest";
+  value: QueryAllGovActionAppealRequestAmino;
+}
+/**
+ * QueryAllGovActionAppealResponse defines the QueryAllGovActionAppealResponse message.
+ * @name QueryAllGovActionAppealResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllGovActionAppealResponse
+ */
+export interface QueryAllGovActionAppealResponse {
+  govActionAppeal: GovActionAppeal[];
+  pagination?: PageResponse;
+}
+export interface QueryAllGovActionAppealResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAllGovActionAppealResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryAllGovActionAppealResponse defines the QueryAllGovActionAppealResponse message.
+ * @name QueryAllGovActionAppealResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllGovActionAppealResponse
+ */
+export interface QueryAllGovActionAppealResponseAmino {
+  gov_action_appeal?: GovActionAppealAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryAllGovActionAppealResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAllGovActionAppealResponse";
+  value: QueryAllGovActionAppealResponseAmino;
+}
+/**
+ * QueryGetJuryParticipationRequest defines the QueryGetJuryParticipationRequest message.
+ * @name QueryGetJuryParticipationRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetJuryParticipationRequest
+ */
+export interface QueryGetJuryParticipationRequest {
+  juror: string;
+}
+export interface QueryGetJuryParticipationRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryGetJuryParticipationRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryGetJuryParticipationRequest defines the QueryGetJuryParticipationRequest message.
+ * @name QueryGetJuryParticipationRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetJuryParticipationRequest
+ */
+export interface QueryGetJuryParticipationRequestAmino {
+  juror?: string;
+}
+export interface QueryGetJuryParticipationRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryGetJuryParticipationRequest";
+  value: QueryGetJuryParticipationRequestAmino;
+}
+/**
+ * QueryGetJuryParticipationResponse defines the QueryGetJuryParticipationResponse message.
+ * @name QueryGetJuryParticipationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetJuryParticipationResponse
+ */
+export interface QueryGetJuryParticipationResponse {
+  juryParticipation: JuryParticipation;
+}
+export interface QueryGetJuryParticipationResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryGetJuryParticipationResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryGetJuryParticipationResponse defines the QueryGetJuryParticipationResponse message.
+ * @name QueryGetJuryParticipationResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetJuryParticipationResponse
+ */
+export interface QueryGetJuryParticipationResponseAmino {
+  jury_participation?: JuryParticipationAmino;
+}
+export interface QueryGetJuryParticipationResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryGetJuryParticipationResponse";
+  value: QueryGetJuryParticipationResponseAmino;
+}
+/**
+ * QueryAllJuryParticipationRequest defines the QueryAllJuryParticipationRequest message.
+ * @name QueryAllJuryParticipationRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllJuryParticipationRequest
+ */
+export interface QueryAllJuryParticipationRequest {
+  pagination?: PageRequest;
+}
+export interface QueryAllJuryParticipationRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAllJuryParticipationRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryAllJuryParticipationRequest defines the QueryAllJuryParticipationRequest message.
+ * @name QueryAllJuryParticipationRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllJuryParticipationRequest
+ */
+export interface QueryAllJuryParticipationRequestAmino {
+  pagination?: PageRequestAmino;
+}
+export interface QueryAllJuryParticipationRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAllJuryParticipationRequest";
+  value: QueryAllJuryParticipationRequestAmino;
+}
+/**
+ * QueryAllJuryParticipationResponse defines the QueryAllJuryParticipationResponse message.
+ * @name QueryAllJuryParticipationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllJuryParticipationResponse
+ */
+export interface QueryAllJuryParticipationResponse {
+  juryParticipation: JuryParticipation[];
+  pagination?: PageResponse;
+}
+export interface QueryAllJuryParticipationResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAllJuryParticipationResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryAllJuryParticipationResponse defines the QueryAllJuryParticipationResponse message.
+ * @name QueryAllJuryParticipationResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllJuryParticipationResponse
+ */
+export interface QueryAllJuryParticipationResponseAmino {
+  jury_participation?: JuryParticipationAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryAllJuryParticipationResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAllJuryParticipationResponse";
+  value: QueryAllJuryParticipationResponseAmino;
+}
+/**
+ * QueryMemberReportsRequest defines the QueryMemberReportsRequest message.
+ * @name QueryMemberReportsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberReportsRequest
+ */
+export interface QueryMemberReportsRequest {
+  pagination?: PageRequest;
+}
+export interface QueryMemberReportsRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberReportsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryMemberReportsRequest defines the QueryMemberReportsRequest message.
+ * @name QueryMemberReportsRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberReportsRequest
+ */
+export interface QueryMemberReportsRequestAmino {
+  pagination?: PageRequestAmino;
+}
+export interface QueryMemberReportsRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryMemberReportsRequest";
+  value: QueryMemberReportsRequestAmino;
+}
+/**
+ * QueryMemberReportsResponse defines the QueryMemberReportsResponse message.
+ * @name QueryMemberReportsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberReportsResponse
+ */
+export interface QueryMemberReportsResponse {
+  member: string;
+  status: bigint;
+  pagination?: PageResponse;
+}
+export interface QueryMemberReportsResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberReportsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryMemberReportsResponse defines the QueryMemberReportsResponse message.
+ * @name QueryMemberReportsResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberReportsResponse
+ */
+export interface QueryMemberReportsResponseAmino {
+  member?: string;
+  status?: string;
+  pagination?: PageResponseAmino;
+}
+export interface QueryMemberReportsResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryMemberReportsResponse";
+  value: QueryMemberReportsResponseAmino;
+}
+/**
+ * QueryMemberWarningsRequest defines the QueryMemberWarningsRequest message.
+ * @name QueryMemberWarningsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberWarningsRequest
+ */
+export interface QueryMemberWarningsRequest {
+  member: string;
+  pagination?: PageRequest;
+}
+export interface QueryMemberWarningsRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberWarningsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryMemberWarningsRequest defines the QueryMemberWarningsRequest message.
+ * @name QueryMemberWarningsRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberWarningsRequest
+ */
+export interface QueryMemberWarningsRequestAmino {
+  member?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryMemberWarningsRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryMemberWarningsRequest";
+  value: QueryMemberWarningsRequestAmino;
+}
+/**
+ * QueryMemberWarningsResponse defines the QueryMemberWarningsResponse message.
+ * @name QueryMemberWarningsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberWarningsResponse
+ */
+export interface QueryMemberWarningsResponse {
+  warningNumber: bigint;
+  reason: string;
+  issuedAt: bigint;
+  pagination?: PageResponse;
+}
+export interface QueryMemberWarningsResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberWarningsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryMemberWarningsResponse defines the QueryMemberWarningsResponse message.
+ * @name QueryMemberWarningsResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberWarningsResponse
+ */
+export interface QueryMemberWarningsResponseAmino {
+  warning_number?: string;
+  reason?: string;
+  issued_at?: string;
+  pagination?: PageResponseAmino;
+}
+export interface QueryMemberWarningsResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryMemberWarningsResponse";
+  value: QueryMemberWarningsResponseAmino;
+}
+/**
+ * QueryMemberStandingRequest defines the QueryMemberStandingRequest message.
+ * @name QueryMemberStandingRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberStandingRequest
+ */
+export interface QueryMemberStandingRequest {
+  member: string;
+}
+export interface QueryMemberStandingRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberStandingRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryMemberStandingRequest defines the QueryMemberStandingRequest message.
+ * @name QueryMemberStandingRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberStandingRequest
+ */
+export interface QueryMemberStandingRequestAmino {
+  member?: string;
+}
+export interface QueryMemberStandingRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryMemberStandingRequest";
+  value: QueryMemberStandingRequestAmino;
+}
+/**
+ * QueryMemberStandingResponse defines the QueryMemberStandingResponse message.
+ * @name QueryMemberStandingResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberStandingResponse
+ */
+export interface QueryMemberStandingResponse {
+  warningCount: bigint;
+  activeReport: boolean;
+  trustTier: bigint;
+}
+export interface QueryMemberStandingResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberStandingResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryMemberStandingResponse defines the QueryMemberStandingResponse message.
+ * @name QueryMemberStandingResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberStandingResponse
+ */
+export interface QueryMemberStandingResponseAmino {
+  warning_count?: string;
+  active_report?: boolean;
+  trust_tier?: string;
+}
+export interface QueryMemberStandingResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryMemberStandingResponse";
+  value: QueryMemberStandingResponseAmino;
 }
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
@@ -8159,6 +10001,158 @@ export const QueryGetTagStakePoolResponse = {
     };
   }
 };
+function createBaseQueryListTagStakePoolsRequest(): QueryListTagStakePoolsRequest {
+  return {
+    pagination: undefined
+  };
+}
+/**
+ * QueryListTagStakePoolsRequest defines the request for listing tag stake pools.
+ * @name QueryListTagStakePoolsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryListTagStakePoolsRequest
+ */
+export const QueryListTagStakePoolsRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryListTagStakePoolsRequest",
+  encode(message: QueryListTagStakePoolsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryListTagStakePoolsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryListTagStakePoolsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryListTagStakePoolsRequest>): QueryListTagStakePoolsRequest {
+    const message = createBaseQueryListTagStakePoolsRequest();
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryListTagStakePoolsRequestAmino): QueryListTagStakePoolsRequest {
+    const message = createBaseQueryListTagStakePoolsRequest();
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryListTagStakePoolsRequest): QueryListTagStakePoolsRequestAmino {
+    const obj: any = {};
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryListTagStakePoolsRequestAminoMsg): QueryListTagStakePoolsRequest {
+    return QueryListTagStakePoolsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryListTagStakePoolsRequestProtoMsg): QueryListTagStakePoolsRequest {
+    return QueryListTagStakePoolsRequest.decode(message.value);
+  },
+  toProto(message: QueryListTagStakePoolsRequest): Uint8Array {
+    return QueryListTagStakePoolsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryListTagStakePoolsRequest): QueryListTagStakePoolsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryListTagStakePoolsRequest",
+      value: QueryListTagStakePoolsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryListTagStakePoolsResponse(): QueryListTagStakePoolsResponse {
+  return {
+    pool: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryListTagStakePoolsResponse defines the response for listing tag stake pools.
+ * @name QueryListTagStakePoolsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryListTagStakePoolsResponse
+ */
+export const QueryListTagStakePoolsResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryListTagStakePoolsResponse",
+  encode(message: QueryListTagStakePoolsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.pool) {
+      TagStakePool.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryListTagStakePoolsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryListTagStakePoolsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pool.push(TagStakePool.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryListTagStakePoolsResponse>): QueryListTagStakePoolsResponse {
+    const message = createBaseQueryListTagStakePoolsResponse();
+    message.pool = object.pool?.map(e => TagStakePool.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryListTagStakePoolsResponseAmino): QueryListTagStakePoolsResponse {
+    const message = createBaseQueryListTagStakePoolsResponse();
+    message.pool = object.pool?.map(e => TagStakePool.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryListTagStakePoolsResponse): QueryListTagStakePoolsResponseAmino {
+    const obj: any = {};
+    if (message.pool) {
+      obj.pool = message.pool.map(e => e ? TagStakePool.toAmino(e) : undefined);
+    } else {
+      obj.pool = message.pool;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryListTagStakePoolsResponseAminoMsg): QueryListTagStakePoolsResponse {
+    return QueryListTagStakePoolsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryListTagStakePoolsResponseProtoMsg): QueryListTagStakePoolsResponse {
+    return QueryListTagStakePoolsResponse.decode(message.value);
+  },
+  toProto(message: QueryListTagStakePoolsResponse): Uint8Array {
+    return QueryListTagStakePoolsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryListTagStakePoolsResponse): QueryListTagStakePoolsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryListTagStakePoolsResponse",
+      value: QueryListTagStakePoolsResponse.encode(message).finish()
+    };
+  }
+};
 function createBaseQueryGetProjectStakeInfoRequest(): QueryGetProjectStakeInfoRequest {
   return {
     projectId: BigInt(0)
@@ -9327,6 +11321,5084 @@ export const QueryContentByInitiativeResponse = {
     return {
       typeUrl: "/sparkdream.rep.v1.QueryContentByInitiativeResponse",
       value: QueryContentByInitiativeResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryDreamSupplyStatsRequest(): QueryDreamSupplyStatsRequest {
+  return {};
+}
+/**
+ * @name QueryDreamSupplyStatsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryDreamSupplyStatsRequest
+ */
+export const QueryDreamSupplyStatsRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryDreamSupplyStatsRequest",
+  encode(_: QueryDreamSupplyStatsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryDreamSupplyStatsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryDreamSupplyStatsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<QueryDreamSupplyStatsRequest>): QueryDreamSupplyStatsRequest {
+    const message = createBaseQueryDreamSupplyStatsRequest();
+    return message;
+  },
+  fromAmino(_: QueryDreamSupplyStatsRequestAmino): QueryDreamSupplyStatsRequest {
+    const message = createBaseQueryDreamSupplyStatsRequest();
+    return message;
+  },
+  toAmino(_: QueryDreamSupplyStatsRequest): QueryDreamSupplyStatsRequestAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: QueryDreamSupplyStatsRequestAminoMsg): QueryDreamSupplyStatsRequest {
+    return QueryDreamSupplyStatsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryDreamSupplyStatsRequestProtoMsg): QueryDreamSupplyStatsRequest {
+    return QueryDreamSupplyStatsRequest.decode(message.value);
+  },
+  toProto(message: QueryDreamSupplyStatsRequest): Uint8Array {
+    return QueryDreamSupplyStatsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryDreamSupplyStatsRequest): QueryDreamSupplyStatsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryDreamSupplyStatsRequest",
+      value: QueryDreamSupplyStatsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryDreamSupplyStatsResponse(): QueryDreamSupplyStatsResponse {
+  return {
+    totalMinted: "",
+    totalBurned: "",
+    circulating: "",
+    totalStaked: "",
+    treasuryBalance: "",
+    stakedRatio: ""
+  };
+}
+/**
+ * @name QueryDreamSupplyStatsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryDreamSupplyStatsResponse
+ */
+export const QueryDreamSupplyStatsResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryDreamSupplyStatsResponse",
+  encode(message: QueryDreamSupplyStatsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.totalMinted !== "") {
+      writer.uint32(10).string(message.totalMinted);
+    }
+    if (message.totalBurned !== "") {
+      writer.uint32(18).string(message.totalBurned);
+    }
+    if (message.circulating !== "") {
+      writer.uint32(26).string(message.circulating);
+    }
+    if (message.totalStaked !== "") {
+      writer.uint32(34).string(message.totalStaked);
+    }
+    if (message.treasuryBalance !== "") {
+      writer.uint32(42).string(message.treasuryBalance);
+    }
+    if (message.stakedRatio !== "") {
+      writer.uint32(50).string(Decimal.fromUserInput(message.stakedRatio, 18).atomics);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryDreamSupplyStatsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryDreamSupplyStatsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.totalMinted = reader.string();
+          break;
+        case 2:
+          message.totalBurned = reader.string();
+          break;
+        case 3:
+          message.circulating = reader.string();
+          break;
+        case 4:
+          message.totalStaked = reader.string();
+          break;
+        case 5:
+          message.treasuryBalance = reader.string();
+          break;
+        case 6:
+          message.stakedRatio = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryDreamSupplyStatsResponse>): QueryDreamSupplyStatsResponse {
+    const message = createBaseQueryDreamSupplyStatsResponse();
+    message.totalMinted = object.totalMinted ?? "";
+    message.totalBurned = object.totalBurned ?? "";
+    message.circulating = object.circulating ?? "";
+    message.totalStaked = object.totalStaked ?? "";
+    message.treasuryBalance = object.treasuryBalance ?? "";
+    message.stakedRatio = object.stakedRatio ?? "";
+    return message;
+  },
+  fromAmino(object: QueryDreamSupplyStatsResponseAmino): QueryDreamSupplyStatsResponse {
+    const message = createBaseQueryDreamSupplyStatsResponse();
+    if (object.total_minted !== undefined && object.total_minted !== null) {
+      message.totalMinted = object.total_minted;
+    }
+    if (object.total_burned !== undefined && object.total_burned !== null) {
+      message.totalBurned = object.total_burned;
+    }
+    if (object.circulating !== undefined && object.circulating !== null) {
+      message.circulating = object.circulating;
+    }
+    if (object.total_staked !== undefined && object.total_staked !== null) {
+      message.totalStaked = object.total_staked;
+    }
+    if (object.treasury_balance !== undefined && object.treasury_balance !== null) {
+      message.treasuryBalance = object.treasury_balance;
+    }
+    if (object.staked_ratio !== undefined && object.staked_ratio !== null) {
+      message.stakedRatio = object.staked_ratio;
+    }
+    return message;
+  },
+  toAmino(message: QueryDreamSupplyStatsResponse): QueryDreamSupplyStatsResponseAmino {
+    const obj: any = {};
+    obj.total_minted = message.totalMinted === "" ? undefined : message.totalMinted;
+    obj.total_burned = message.totalBurned === "" ? undefined : message.totalBurned;
+    obj.circulating = message.circulating === "" ? undefined : message.circulating;
+    obj.total_staked = message.totalStaked === "" ? undefined : message.totalStaked;
+    obj.treasury_balance = message.treasuryBalance === "" ? undefined : message.treasuryBalance;
+    obj.staked_ratio = message.stakedRatio === "" ? undefined : message.stakedRatio;
+    return obj;
+  },
+  fromAminoMsg(object: QueryDreamSupplyStatsResponseAminoMsg): QueryDreamSupplyStatsResponse {
+    return QueryDreamSupplyStatsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryDreamSupplyStatsResponseProtoMsg): QueryDreamSupplyStatsResponse {
+    return QueryDreamSupplyStatsResponse.decode(message.value);
+  },
+  toProto(message: QueryDreamSupplyStatsResponse): Uint8Array {
+    return QueryDreamSupplyStatsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryDreamSupplyStatsResponse): QueryDreamSupplyStatsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryDreamSupplyStatsResponse",
+      value: QueryDreamSupplyStatsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryMintBurnRatioRequest(): QueryMintBurnRatioRequest {
+  return {};
+}
+/**
+ * @name QueryMintBurnRatioRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMintBurnRatioRequest
+ */
+export const QueryMintBurnRatioRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryMintBurnRatioRequest",
+  encode(_: QueryMintBurnRatioRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryMintBurnRatioRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryMintBurnRatioRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<QueryMintBurnRatioRequest>): QueryMintBurnRatioRequest {
+    const message = createBaseQueryMintBurnRatioRequest();
+    return message;
+  },
+  fromAmino(_: QueryMintBurnRatioRequestAmino): QueryMintBurnRatioRequest {
+    const message = createBaseQueryMintBurnRatioRequest();
+    return message;
+  },
+  toAmino(_: QueryMintBurnRatioRequest): QueryMintBurnRatioRequestAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: QueryMintBurnRatioRequestAminoMsg): QueryMintBurnRatioRequest {
+    return QueryMintBurnRatioRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryMintBurnRatioRequestProtoMsg): QueryMintBurnRatioRequest {
+    return QueryMintBurnRatioRequest.decode(message.value);
+  },
+  toProto(message: QueryMintBurnRatioRequest): Uint8Array {
+    return QueryMintBurnRatioRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryMintBurnRatioRequest): QueryMintBurnRatioRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryMintBurnRatioRequest",
+      value: QueryMintBurnRatioRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryMintBurnRatioResponse(): QueryMintBurnRatioResponse {
+  return {
+    seasonMinted: "",
+    seasonBurned: "",
+    ratio: "",
+    season: 0
+  };
+}
+/**
+ * @name QueryMintBurnRatioResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMintBurnRatioResponse
+ */
+export const QueryMintBurnRatioResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryMintBurnRatioResponse",
+  encode(message: QueryMintBurnRatioResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.seasonMinted !== "") {
+      writer.uint32(10).string(message.seasonMinted);
+    }
+    if (message.seasonBurned !== "") {
+      writer.uint32(18).string(message.seasonBurned);
+    }
+    if (message.ratio !== "") {
+      writer.uint32(26).string(Decimal.fromUserInput(message.ratio, 18).atomics);
+    }
+    if (message.season !== 0) {
+      writer.uint32(32).uint32(message.season);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryMintBurnRatioResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryMintBurnRatioResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.seasonMinted = reader.string();
+          break;
+        case 2:
+          message.seasonBurned = reader.string();
+          break;
+        case 3:
+          message.ratio = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 4:
+          message.season = reader.uint32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryMintBurnRatioResponse>): QueryMintBurnRatioResponse {
+    const message = createBaseQueryMintBurnRatioResponse();
+    message.seasonMinted = object.seasonMinted ?? "";
+    message.seasonBurned = object.seasonBurned ?? "";
+    message.ratio = object.ratio ?? "";
+    message.season = object.season ?? 0;
+    return message;
+  },
+  fromAmino(object: QueryMintBurnRatioResponseAmino): QueryMintBurnRatioResponse {
+    const message = createBaseQueryMintBurnRatioResponse();
+    if (object.season_minted !== undefined && object.season_minted !== null) {
+      message.seasonMinted = object.season_minted;
+    }
+    if (object.season_burned !== undefined && object.season_burned !== null) {
+      message.seasonBurned = object.season_burned;
+    }
+    if (object.ratio !== undefined && object.ratio !== null) {
+      message.ratio = object.ratio;
+    }
+    if (object.season !== undefined && object.season !== null) {
+      message.season = object.season;
+    }
+    return message;
+  },
+  toAmino(message: QueryMintBurnRatioResponse): QueryMintBurnRatioResponseAmino {
+    const obj: any = {};
+    obj.season_minted = message.seasonMinted === "" ? undefined : message.seasonMinted;
+    obj.season_burned = message.seasonBurned === "" ? undefined : message.seasonBurned;
+    obj.ratio = message.ratio === "" ? undefined : message.ratio;
+    obj.season = message.season === 0 ? undefined : message.season;
+    return obj;
+  },
+  fromAminoMsg(object: QueryMintBurnRatioResponseAminoMsg): QueryMintBurnRatioResponse {
+    return QueryMintBurnRatioResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryMintBurnRatioResponseProtoMsg): QueryMintBurnRatioResponse {
+    return QueryMintBurnRatioResponse.decode(message.value);
+  },
+  toProto(message: QueryMintBurnRatioResponse): Uint8Array {
+    return QueryMintBurnRatioResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryMintBurnRatioResponse): QueryMintBurnRatioResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryMintBurnRatioResponse",
+      value: QueryMintBurnRatioResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryEffectiveApyRequest(): QueryEffectiveApyRequest {
+  return {};
+}
+/**
+ * @name QueryEffectiveApyRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryEffectiveApyRequest
+ */
+export const QueryEffectiveApyRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryEffectiveApyRequest",
+  encode(_: QueryEffectiveApyRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryEffectiveApyRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryEffectiveApyRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<QueryEffectiveApyRequest>): QueryEffectiveApyRequest {
+    const message = createBaseQueryEffectiveApyRequest();
+    return message;
+  },
+  fromAmino(_: QueryEffectiveApyRequestAmino): QueryEffectiveApyRequest {
+    const message = createBaseQueryEffectiveApyRequest();
+    return message;
+  },
+  toAmino(_: QueryEffectiveApyRequest): QueryEffectiveApyRequestAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: QueryEffectiveApyRequestAminoMsg): QueryEffectiveApyRequest {
+    return QueryEffectiveApyRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryEffectiveApyRequestProtoMsg): QueryEffectiveApyRequest {
+    return QueryEffectiveApyRequest.decode(message.value);
+  },
+  toProto(message: QueryEffectiveApyRequest): Uint8Array {
+    return QueryEffectiveApyRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryEffectiveApyRequest): QueryEffectiveApyRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryEffectiveApyRequest",
+      value: QueryEffectiveApyRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryEffectiveApyResponse(): QueryEffectiveApyResponse {
+  return {
+    seasonalPoolTotal: "",
+    seasonalPoolRemaining: "",
+    totalStaked: "",
+    effectiveApy: ""
+  };
+}
+/**
+ * @name QueryEffectiveApyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryEffectiveApyResponse
+ */
+export const QueryEffectiveApyResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryEffectiveApyResponse",
+  encode(message: QueryEffectiveApyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.seasonalPoolTotal !== "") {
+      writer.uint32(10).string(message.seasonalPoolTotal);
+    }
+    if (message.seasonalPoolRemaining !== "") {
+      writer.uint32(18).string(message.seasonalPoolRemaining);
+    }
+    if (message.totalStaked !== "") {
+      writer.uint32(26).string(message.totalStaked);
+    }
+    if (message.effectiveApy !== "") {
+      writer.uint32(34).string(Decimal.fromUserInput(message.effectiveApy, 18).atomics);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryEffectiveApyResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryEffectiveApyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.seasonalPoolTotal = reader.string();
+          break;
+        case 2:
+          message.seasonalPoolRemaining = reader.string();
+          break;
+        case 3:
+          message.totalStaked = reader.string();
+          break;
+        case 4:
+          message.effectiveApy = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryEffectiveApyResponse>): QueryEffectiveApyResponse {
+    const message = createBaseQueryEffectiveApyResponse();
+    message.seasonalPoolTotal = object.seasonalPoolTotal ?? "";
+    message.seasonalPoolRemaining = object.seasonalPoolRemaining ?? "";
+    message.totalStaked = object.totalStaked ?? "";
+    message.effectiveApy = object.effectiveApy ?? "";
+    return message;
+  },
+  fromAmino(object: QueryEffectiveApyResponseAmino): QueryEffectiveApyResponse {
+    const message = createBaseQueryEffectiveApyResponse();
+    if (object.seasonal_pool_total !== undefined && object.seasonal_pool_total !== null) {
+      message.seasonalPoolTotal = object.seasonal_pool_total;
+    }
+    if (object.seasonal_pool_remaining !== undefined && object.seasonal_pool_remaining !== null) {
+      message.seasonalPoolRemaining = object.seasonal_pool_remaining;
+    }
+    if (object.total_staked !== undefined && object.total_staked !== null) {
+      message.totalStaked = object.total_staked;
+    }
+    if (object.effective_apy !== undefined && object.effective_apy !== null) {
+      message.effectiveApy = object.effective_apy;
+    }
+    return message;
+  },
+  toAmino(message: QueryEffectiveApyResponse): QueryEffectiveApyResponseAmino {
+    const obj: any = {};
+    obj.seasonal_pool_total = message.seasonalPoolTotal === "" ? undefined : message.seasonalPoolTotal;
+    obj.seasonal_pool_remaining = message.seasonalPoolRemaining === "" ? undefined : message.seasonalPoolRemaining;
+    obj.total_staked = message.totalStaked === "" ? undefined : message.totalStaked;
+    obj.effective_apy = message.effectiveApy === "" ? undefined : message.effectiveApy;
+    return obj;
+  },
+  fromAminoMsg(object: QueryEffectiveApyResponseAminoMsg): QueryEffectiveApyResponse {
+    return QueryEffectiveApyResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryEffectiveApyResponseProtoMsg): QueryEffectiveApyResponse {
+    return QueryEffectiveApyResponse.decode(message.value);
+  },
+  toProto(message: QueryEffectiveApyResponse): Uint8Array {
+    return QueryEffectiveApyResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryEffectiveApyResponse): QueryEffectiveApyResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryEffectiveApyResponse",
+      value: QueryEffectiveApyResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryTreasuryStatusRequest(): QueryTreasuryStatusRequest {
+  return {};
+}
+/**
+ * @name QueryTreasuryStatusRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTreasuryStatusRequest
+ */
+export const QueryTreasuryStatusRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryTreasuryStatusRequest",
+  encode(_: QueryTreasuryStatusRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryTreasuryStatusRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryTreasuryStatusRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<QueryTreasuryStatusRequest>): QueryTreasuryStatusRequest {
+    const message = createBaseQueryTreasuryStatusRequest();
+    return message;
+  },
+  fromAmino(_: QueryTreasuryStatusRequestAmino): QueryTreasuryStatusRequest {
+    const message = createBaseQueryTreasuryStatusRequest();
+    return message;
+  },
+  toAmino(_: QueryTreasuryStatusRequest): QueryTreasuryStatusRequestAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: QueryTreasuryStatusRequestAminoMsg): QueryTreasuryStatusRequest {
+    return QueryTreasuryStatusRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryTreasuryStatusRequestProtoMsg): QueryTreasuryStatusRequest {
+    return QueryTreasuryStatusRequest.decode(message.value);
+  },
+  toProto(message: QueryTreasuryStatusRequest): Uint8Array {
+    return QueryTreasuryStatusRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryTreasuryStatusRequest): QueryTreasuryStatusRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryTreasuryStatusRequest",
+      value: QueryTreasuryStatusRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryTreasuryStatusResponse(): QueryTreasuryStatusResponse {
+  return {
+    balance: "",
+    maxBalance: "",
+    seasonInflow: "",
+    seasonOutflow: "",
+    seasonBurned: ""
+  };
+}
+/**
+ * @name QueryTreasuryStatusResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTreasuryStatusResponse
+ */
+export const QueryTreasuryStatusResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryTreasuryStatusResponse",
+  encode(message: QueryTreasuryStatusResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.balance !== "") {
+      writer.uint32(10).string(message.balance);
+    }
+    if (message.maxBalance !== "") {
+      writer.uint32(18).string(message.maxBalance);
+    }
+    if (message.seasonInflow !== "") {
+      writer.uint32(26).string(message.seasonInflow);
+    }
+    if (message.seasonOutflow !== "") {
+      writer.uint32(34).string(message.seasonOutflow);
+    }
+    if (message.seasonBurned !== "") {
+      writer.uint32(42).string(message.seasonBurned);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryTreasuryStatusResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryTreasuryStatusResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.balance = reader.string();
+          break;
+        case 2:
+          message.maxBalance = reader.string();
+          break;
+        case 3:
+          message.seasonInflow = reader.string();
+          break;
+        case 4:
+          message.seasonOutflow = reader.string();
+          break;
+        case 5:
+          message.seasonBurned = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryTreasuryStatusResponse>): QueryTreasuryStatusResponse {
+    const message = createBaseQueryTreasuryStatusResponse();
+    message.balance = object.balance ?? "";
+    message.maxBalance = object.maxBalance ?? "";
+    message.seasonInflow = object.seasonInflow ?? "";
+    message.seasonOutflow = object.seasonOutflow ?? "";
+    message.seasonBurned = object.seasonBurned ?? "";
+    return message;
+  },
+  fromAmino(object: QueryTreasuryStatusResponseAmino): QueryTreasuryStatusResponse {
+    const message = createBaseQueryTreasuryStatusResponse();
+    if (object.balance !== undefined && object.balance !== null) {
+      message.balance = object.balance;
+    }
+    if (object.max_balance !== undefined && object.max_balance !== null) {
+      message.maxBalance = object.max_balance;
+    }
+    if (object.season_inflow !== undefined && object.season_inflow !== null) {
+      message.seasonInflow = object.season_inflow;
+    }
+    if (object.season_outflow !== undefined && object.season_outflow !== null) {
+      message.seasonOutflow = object.season_outflow;
+    }
+    if (object.season_burned !== undefined && object.season_burned !== null) {
+      message.seasonBurned = object.season_burned;
+    }
+    return message;
+  },
+  toAmino(message: QueryTreasuryStatusResponse): QueryTreasuryStatusResponseAmino {
+    const obj: any = {};
+    obj.balance = message.balance === "" ? undefined : message.balance;
+    obj.max_balance = message.maxBalance === "" ? undefined : message.maxBalance;
+    obj.season_inflow = message.seasonInflow === "" ? undefined : message.seasonInflow;
+    obj.season_outflow = message.seasonOutflow === "" ? undefined : message.seasonOutflow;
+    obj.season_burned = message.seasonBurned === "" ? undefined : message.seasonBurned;
+    return obj;
+  },
+  fromAminoMsg(object: QueryTreasuryStatusResponseAminoMsg): QueryTreasuryStatusResponse {
+    return QueryTreasuryStatusResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryTreasuryStatusResponseProtoMsg): QueryTreasuryStatusResponse {
+    return QueryTreasuryStatusResponse.decode(message.value);
+  },
+  toProto(message: QueryTreasuryStatusResponse): Uint8Array {
+    return QueryTreasuryStatusResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryTreasuryStatusResponse): QueryTreasuryStatusResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryTreasuryStatusResponse",
+      value: QueryTreasuryStatusResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetTagRequest(): QueryGetTagRequest {
+  return {
+    name: ""
+  };
+}
+/**
+ * QueryGetTagRequest is request type for the Query/GetTag RPC method.
+ * @name QueryGetTagRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagRequest
+ */
+export const QueryGetTagRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryGetTagRequest",
+  encode(message: QueryGetTagRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetTagRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetTagRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.name = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetTagRequest>): QueryGetTagRequest {
+    const message = createBaseQueryGetTagRequest();
+    message.name = object.name ?? "";
+    return message;
+  },
+  fromAmino(object: QueryGetTagRequestAmino): QueryGetTagRequest {
+    const message = createBaseQueryGetTagRequest();
+    if (object.name !== undefined && object.name !== null) {
+      message.name = object.name;
+    }
+    return message;
+  },
+  toAmino(message: QueryGetTagRequest): QueryGetTagRequestAmino {
+    const obj: any = {};
+    obj.name = message.name === "" ? undefined : message.name;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetTagRequestAminoMsg): QueryGetTagRequest {
+    return QueryGetTagRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetTagRequestProtoMsg): QueryGetTagRequest {
+    return QueryGetTagRequest.decode(message.value);
+  },
+  toProto(message: QueryGetTagRequest): Uint8Array {
+    return QueryGetTagRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetTagRequest): QueryGetTagRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryGetTagRequest",
+      value: QueryGetTagRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetTagResponse(): QueryGetTagResponse {
+  return {
+    tag: Tag.fromPartial({})
+  };
+}
+/**
+ * QueryGetTagResponse is response type for the Query/GetTag RPC method.
+ * @name QueryGetTagResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagResponse
+ */
+export const QueryGetTagResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryGetTagResponse",
+  encode(message: QueryGetTagResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.tag !== undefined) {
+      Tag.encode(message.tag, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetTagResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetTagResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tag = Tag.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetTagResponse>): QueryGetTagResponse {
+    const message = createBaseQueryGetTagResponse();
+    message.tag = object.tag !== undefined && object.tag !== null ? Tag.fromPartial(object.tag) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetTagResponseAmino): QueryGetTagResponse {
+    const message = createBaseQueryGetTagResponse();
+    if (object.tag !== undefined && object.tag !== null) {
+      message.tag = Tag.fromAmino(object.tag);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetTagResponse): QueryGetTagResponseAmino {
+    const obj: any = {};
+    obj.tag = message.tag ? Tag.toAmino(message.tag) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetTagResponseAminoMsg): QueryGetTagResponse {
+    return QueryGetTagResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetTagResponseProtoMsg): QueryGetTagResponse {
+    return QueryGetTagResponse.decode(message.value);
+  },
+  toProto(message: QueryGetTagResponse): Uint8Array {
+    return QueryGetTagResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetTagResponse): QueryGetTagResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryGetTagResponse",
+      value: QueryGetTagResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllTagRequest(): QueryAllTagRequest {
+  return {
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllTagRequest is request type for the Query/ListTag RPC method.
+ * @name QueryAllTagRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagRequest
+ */
+export const QueryAllTagRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryAllTagRequest",
+  encode(message: QueryAllTagRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllTagRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllTagRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllTagRequest>): QueryAllTagRequest {
+    const message = createBaseQueryAllTagRequest();
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllTagRequestAmino): QueryAllTagRequest {
+    const message = createBaseQueryAllTagRequest();
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllTagRequest): QueryAllTagRequestAmino {
+    const obj: any = {};
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllTagRequestAminoMsg): QueryAllTagRequest {
+    return QueryAllTagRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllTagRequestProtoMsg): QueryAllTagRequest {
+    return QueryAllTagRequest.decode(message.value);
+  },
+  toProto(message: QueryAllTagRequest): Uint8Array {
+    return QueryAllTagRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllTagRequest): QueryAllTagRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAllTagRequest",
+      value: QueryAllTagRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllTagResponse(): QueryAllTagResponse {
+  return {
+    tag: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllTagResponse is response type for the Query/ListTag RPC method.
+ * @name QueryAllTagResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagResponse
+ */
+export const QueryAllTagResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryAllTagResponse",
+  encode(message: QueryAllTagResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.tag) {
+      Tag.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllTagResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllTagResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tag.push(Tag.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllTagResponse>): QueryAllTagResponse {
+    const message = createBaseQueryAllTagResponse();
+    message.tag = object.tag?.map(e => Tag.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllTagResponseAmino): QueryAllTagResponse {
+    const message = createBaseQueryAllTagResponse();
+    message.tag = object.tag?.map(e => Tag.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllTagResponse): QueryAllTagResponseAmino {
+    const obj: any = {};
+    if (message.tag) {
+      obj.tag = message.tag.map(e => e ? Tag.toAmino(e) : undefined);
+    } else {
+      obj.tag = message.tag;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllTagResponseAminoMsg): QueryAllTagResponse {
+    return QueryAllTagResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllTagResponseProtoMsg): QueryAllTagResponse {
+    return QueryAllTagResponse.decode(message.value);
+  },
+  toProto(message: QueryAllTagResponse): Uint8Array {
+    return QueryAllTagResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllTagResponse): QueryAllTagResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAllTagResponse",
+      value: QueryAllTagResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetReservedTagRequest(): QueryGetReservedTagRequest {
+  return {
+    name: ""
+  };
+}
+/**
+ * QueryGetReservedTagRequest is request type for the Query/GetReservedTag RPC method.
+ * @name QueryGetReservedTagRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetReservedTagRequest
+ */
+export const QueryGetReservedTagRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryGetReservedTagRequest",
+  encode(message: QueryGetReservedTagRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.name !== "") {
+      writer.uint32(10).string(message.name);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetReservedTagRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetReservedTagRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.name = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetReservedTagRequest>): QueryGetReservedTagRequest {
+    const message = createBaseQueryGetReservedTagRequest();
+    message.name = object.name ?? "";
+    return message;
+  },
+  fromAmino(object: QueryGetReservedTagRequestAmino): QueryGetReservedTagRequest {
+    const message = createBaseQueryGetReservedTagRequest();
+    if (object.name !== undefined && object.name !== null) {
+      message.name = object.name;
+    }
+    return message;
+  },
+  toAmino(message: QueryGetReservedTagRequest): QueryGetReservedTagRequestAmino {
+    const obj: any = {};
+    obj.name = message.name === "" ? undefined : message.name;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetReservedTagRequestAminoMsg): QueryGetReservedTagRequest {
+    return QueryGetReservedTagRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetReservedTagRequestProtoMsg): QueryGetReservedTagRequest {
+    return QueryGetReservedTagRequest.decode(message.value);
+  },
+  toProto(message: QueryGetReservedTagRequest): Uint8Array {
+    return QueryGetReservedTagRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetReservedTagRequest): QueryGetReservedTagRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryGetReservedTagRequest",
+      value: QueryGetReservedTagRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetReservedTagResponse(): QueryGetReservedTagResponse {
+  return {
+    reservedTag: ReservedTag.fromPartial({})
+  };
+}
+/**
+ * QueryGetReservedTagResponse is response type for the Query/GetReservedTag RPC method.
+ * @name QueryGetReservedTagResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetReservedTagResponse
+ */
+export const QueryGetReservedTagResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryGetReservedTagResponse",
+  encode(message: QueryGetReservedTagResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.reservedTag !== undefined) {
+      ReservedTag.encode(message.reservedTag, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetReservedTagResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetReservedTagResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.reservedTag = ReservedTag.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetReservedTagResponse>): QueryGetReservedTagResponse {
+    const message = createBaseQueryGetReservedTagResponse();
+    message.reservedTag = object.reservedTag !== undefined && object.reservedTag !== null ? ReservedTag.fromPartial(object.reservedTag) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetReservedTagResponseAmino): QueryGetReservedTagResponse {
+    const message = createBaseQueryGetReservedTagResponse();
+    if (object.reserved_tag !== undefined && object.reserved_tag !== null) {
+      message.reservedTag = ReservedTag.fromAmino(object.reserved_tag);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetReservedTagResponse): QueryGetReservedTagResponseAmino {
+    const obj: any = {};
+    obj.reserved_tag = message.reservedTag ? ReservedTag.toAmino(message.reservedTag) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetReservedTagResponseAminoMsg): QueryGetReservedTagResponse {
+    return QueryGetReservedTagResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetReservedTagResponseProtoMsg): QueryGetReservedTagResponse {
+    return QueryGetReservedTagResponse.decode(message.value);
+  },
+  toProto(message: QueryGetReservedTagResponse): Uint8Array {
+    return QueryGetReservedTagResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetReservedTagResponse): QueryGetReservedTagResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryGetReservedTagResponse",
+      value: QueryGetReservedTagResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllReservedTagRequest(): QueryAllReservedTagRequest {
+  return {
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllReservedTagRequest is request type for the Query/ListReservedTag RPC method.
+ * @name QueryAllReservedTagRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllReservedTagRequest
+ */
+export const QueryAllReservedTagRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryAllReservedTagRequest",
+  encode(message: QueryAllReservedTagRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllReservedTagRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllReservedTagRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllReservedTagRequest>): QueryAllReservedTagRequest {
+    const message = createBaseQueryAllReservedTagRequest();
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllReservedTagRequestAmino): QueryAllReservedTagRequest {
+    const message = createBaseQueryAllReservedTagRequest();
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllReservedTagRequest): QueryAllReservedTagRequestAmino {
+    const obj: any = {};
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllReservedTagRequestAminoMsg): QueryAllReservedTagRequest {
+    return QueryAllReservedTagRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllReservedTagRequestProtoMsg): QueryAllReservedTagRequest {
+    return QueryAllReservedTagRequest.decode(message.value);
+  },
+  toProto(message: QueryAllReservedTagRequest): Uint8Array {
+    return QueryAllReservedTagRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllReservedTagRequest): QueryAllReservedTagRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAllReservedTagRequest",
+      value: QueryAllReservedTagRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllReservedTagResponse(): QueryAllReservedTagResponse {
+  return {
+    reservedTag: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllReservedTagResponse is response type for the Query/ListReservedTag RPC method.
+ * @name QueryAllReservedTagResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllReservedTagResponse
+ */
+export const QueryAllReservedTagResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryAllReservedTagResponse",
+  encode(message: QueryAllReservedTagResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.reservedTag) {
+      ReservedTag.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllReservedTagResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllReservedTagResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.reservedTag.push(ReservedTag.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllReservedTagResponse>): QueryAllReservedTagResponse {
+    const message = createBaseQueryAllReservedTagResponse();
+    message.reservedTag = object.reservedTag?.map(e => ReservedTag.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllReservedTagResponseAmino): QueryAllReservedTagResponse {
+    const message = createBaseQueryAllReservedTagResponse();
+    message.reservedTag = object.reserved_tag?.map(e => ReservedTag.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllReservedTagResponse): QueryAllReservedTagResponseAmino {
+    const obj: any = {};
+    if (message.reservedTag) {
+      obj.reserved_tag = message.reservedTag.map(e => e ? ReservedTag.toAmino(e) : undefined);
+    } else {
+      obj.reserved_tag = message.reservedTag;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllReservedTagResponseAminoMsg): QueryAllReservedTagResponse {
+    return QueryAllReservedTagResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllReservedTagResponseProtoMsg): QueryAllReservedTagResponse {
+    return QueryAllReservedTagResponse.decode(message.value);
+  },
+  toProto(message: QueryAllReservedTagResponse): Uint8Array {
+    return QueryAllReservedTagResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllReservedTagResponse): QueryAllReservedTagResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAllReservedTagResponse",
+      value: QueryAllReservedTagResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryTagExistsRequest(): QueryTagExistsRequest {
+  return {
+    tagName: ""
+  };
+}
+/**
+ * QueryTagExistsRequest is request type for the Query/TagExists RPC method.
+ * @name QueryTagExistsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagExistsRequest
+ */
+export const QueryTagExistsRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryTagExistsRequest",
+  encode(message: QueryTagExistsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.tagName !== "") {
+      writer.uint32(10).string(message.tagName);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryTagExistsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryTagExistsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tagName = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryTagExistsRequest>): QueryTagExistsRequest {
+    const message = createBaseQueryTagExistsRequest();
+    message.tagName = object.tagName ?? "";
+    return message;
+  },
+  fromAmino(object: QueryTagExistsRequestAmino): QueryTagExistsRequest {
+    const message = createBaseQueryTagExistsRequest();
+    if (object.tag_name !== undefined && object.tag_name !== null) {
+      message.tagName = object.tag_name;
+    }
+    return message;
+  },
+  toAmino(message: QueryTagExistsRequest): QueryTagExistsRequestAmino {
+    const obj: any = {};
+    obj.tag_name = message.tagName === "" ? undefined : message.tagName;
+    return obj;
+  },
+  fromAminoMsg(object: QueryTagExistsRequestAminoMsg): QueryTagExistsRequest {
+    return QueryTagExistsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryTagExistsRequestProtoMsg): QueryTagExistsRequest {
+    return QueryTagExistsRequest.decode(message.value);
+  },
+  toProto(message: QueryTagExistsRequest): Uint8Array {
+    return QueryTagExistsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryTagExistsRequest): QueryTagExistsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryTagExistsRequest",
+      value: QueryTagExistsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryTagExistsResponse(): QueryTagExistsResponse {
+  return {
+    exists: false,
+    expirationTime: BigInt(0)
+  };
+}
+/**
+ * QueryTagExistsResponse is response type for the Query/TagExists RPC method.
+ * @name QueryTagExistsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagExistsResponse
+ */
+export const QueryTagExistsResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryTagExistsResponse",
+  encode(message: QueryTagExistsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.exists === true) {
+      writer.uint32(8).bool(message.exists);
+    }
+    if (message.expirationTime !== BigInt(0)) {
+      writer.uint32(16).int64(message.expirationTime);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryTagExistsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryTagExistsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.exists = reader.bool();
+          break;
+        case 2:
+          message.expirationTime = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryTagExistsResponse>): QueryTagExistsResponse {
+    const message = createBaseQueryTagExistsResponse();
+    message.exists = object.exists ?? false;
+    message.expirationTime = object.expirationTime !== undefined && object.expirationTime !== null ? BigInt(object.expirationTime.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryTagExistsResponseAmino): QueryTagExistsResponse {
+    const message = createBaseQueryTagExistsResponse();
+    if (object.exists !== undefined && object.exists !== null) {
+      message.exists = object.exists;
+    }
+    if (object.expiration_time !== undefined && object.expiration_time !== null) {
+      message.expirationTime = BigInt(object.expiration_time);
+    }
+    return message;
+  },
+  toAmino(message: QueryTagExistsResponse): QueryTagExistsResponseAmino {
+    const obj: any = {};
+    obj.exists = message.exists === false ? undefined : message.exists;
+    obj.expiration_time = message.expirationTime !== BigInt(0) ? message.expirationTime?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryTagExistsResponseAminoMsg): QueryTagExistsResponse {
+    return QueryTagExistsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryTagExistsResponseProtoMsg): QueryTagExistsResponse {
+    return QueryTagExistsResponse.decode(message.value);
+  },
+  toProto(message: QueryTagExistsResponse): Uint8Array {
+    return QueryTagExistsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryTagExistsResponse): QueryTagExistsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryTagExistsResponse",
+      value: QueryTagExistsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetTagReportRequest(): QueryGetTagReportRequest {
+  return {
+    tagName: ""
+  };
+}
+/**
+ * QueryGetTagReportRequest defines the QueryGetTagReportRequest message.
+ * @name QueryGetTagReportRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagReportRequest
+ */
+export const QueryGetTagReportRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryGetTagReportRequest",
+  encode(message: QueryGetTagReportRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.tagName !== "") {
+      writer.uint32(10).string(message.tagName);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetTagReportRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetTagReportRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tagName = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetTagReportRequest>): QueryGetTagReportRequest {
+    const message = createBaseQueryGetTagReportRequest();
+    message.tagName = object.tagName ?? "";
+    return message;
+  },
+  fromAmino(object: QueryGetTagReportRequestAmino): QueryGetTagReportRequest {
+    const message = createBaseQueryGetTagReportRequest();
+    if (object.tag_name !== undefined && object.tag_name !== null) {
+      message.tagName = object.tag_name;
+    }
+    return message;
+  },
+  toAmino(message: QueryGetTagReportRequest): QueryGetTagReportRequestAmino {
+    const obj: any = {};
+    obj.tag_name = message.tagName === "" ? undefined : message.tagName;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetTagReportRequestAminoMsg): QueryGetTagReportRequest {
+    return QueryGetTagReportRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetTagReportRequestProtoMsg): QueryGetTagReportRequest {
+    return QueryGetTagReportRequest.decode(message.value);
+  },
+  toProto(message: QueryGetTagReportRequest): Uint8Array {
+    return QueryGetTagReportRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetTagReportRequest): QueryGetTagReportRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryGetTagReportRequest",
+      value: QueryGetTagReportRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetTagReportResponse(): QueryGetTagReportResponse {
+  return {
+    tagReport: TagReport.fromPartial({})
+  };
+}
+/**
+ * QueryGetTagReportResponse defines the QueryGetTagReportResponse message.
+ * @name QueryGetTagReportResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagReportResponse
+ */
+export const QueryGetTagReportResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryGetTagReportResponse",
+  encode(message: QueryGetTagReportResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.tagReport !== undefined) {
+      TagReport.encode(message.tagReport, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetTagReportResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetTagReportResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tagReport = TagReport.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetTagReportResponse>): QueryGetTagReportResponse {
+    const message = createBaseQueryGetTagReportResponse();
+    message.tagReport = object.tagReport !== undefined && object.tagReport !== null ? TagReport.fromPartial(object.tagReport) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetTagReportResponseAmino): QueryGetTagReportResponse {
+    const message = createBaseQueryGetTagReportResponse();
+    if (object.tag_report !== undefined && object.tag_report !== null) {
+      message.tagReport = TagReport.fromAmino(object.tag_report);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetTagReportResponse): QueryGetTagReportResponseAmino {
+    const obj: any = {};
+    obj.tag_report = message.tagReport ? TagReport.toAmino(message.tagReport) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetTagReportResponseAminoMsg): QueryGetTagReportResponse {
+    return QueryGetTagReportResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetTagReportResponseProtoMsg): QueryGetTagReportResponse {
+    return QueryGetTagReportResponse.decode(message.value);
+  },
+  toProto(message: QueryGetTagReportResponse): Uint8Array {
+    return QueryGetTagReportResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetTagReportResponse): QueryGetTagReportResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryGetTagReportResponse",
+      value: QueryGetTagReportResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllTagReportRequest(): QueryAllTagReportRequest {
+  return {
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllTagReportRequest defines the QueryAllTagReportRequest message.
+ * @name QueryAllTagReportRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagReportRequest
+ */
+export const QueryAllTagReportRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryAllTagReportRequest",
+  encode(message: QueryAllTagReportRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllTagReportRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllTagReportRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllTagReportRequest>): QueryAllTagReportRequest {
+    const message = createBaseQueryAllTagReportRequest();
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllTagReportRequestAmino): QueryAllTagReportRequest {
+    const message = createBaseQueryAllTagReportRequest();
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllTagReportRequest): QueryAllTagReportRequestAmino {
+    const obj: any = {};
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllTagReportRequestAminoMsg): QueryAllTagReportRequest {
+    return QueryAllTagReportRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllTagReportRequestProtoMsg): QueryAllTagReportRequest {
+    return QueryAllTagReportRequest.decode(message.value);
+  },
+  toProto(message: QueryAllTagReportRequest): Uint8Array {
+    return QueryAllTagReportRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllTagReportRequest): QueryAllTagReportRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAllTagReportRequest",
+      value: QueryAllTagReportRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllTagReportResponse(): QueryAllTagReportResponse {
+  return {
+    tagReport: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllTagReportResponse defines the QueryAllTagReportResponse message.
+ * @name QueryAllTagReportResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagReportResponse
+ */
+export const QueryAllTagReportResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryAllTagReportResponse",
+  encode(message: QueryAllTagReportResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.tagReport) {
+      TagReport.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllTagReportResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllTagReportResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tagReport.push(TagReport.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllTagReportResponse>): QueryAllTagReportResponse {
+    const message = createBaseQueryAllTagReportResponse();
+    message.tagReport = object.tagReport?.map(e => TagReport.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllTagReportResponseAmino): QueryAllTagReportResponse {
+    const message = createBaseQueryAllTagReportResponse();
+    message.tagReport = object.tag_report?.map(e => TagReport.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllTagReportResponse): QueryAllTagReportResponseAmino {
+    const obj: any = {};
+    if (message.tagReport) {
+      obj.tag_report = message.tagReport.map(e => e ? TagReport.toAmino(e) : undefined);
+    } else {
+      obj.tag_report = message.tagReport;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllTagReportResponseAminoMsg): QueryAllTagReportResponse {
+    return QueryAllTagReportResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllTagReportResponseProtoMsg): QueryAllTagReportResponse {
+    return QueryAllTagReportResponse.decode(message.value);
+  },
+  toProto(message: QueryAllTagReportResponse): Uint8Array {
+    return QueryAllTagReportResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllTagReportResponse): QueryAllTagReportResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAllTagReportResponse",
+      value: QueryAllTagReportResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryTagReportsRequest(): QueryTagReportsRequest {
+  return {
+    pagination: undefined
+  };
+}
+/**
+ * QueryTagReportsRequest defines the QueryTagReportsRequest message.
+ * @name QueryTagReportsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagReportsRequest
+ */
+export const QueryTagReportsRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryTagReportsRequest",
+  encode(message: QueryTagReportsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryTagReportsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryTagReportsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryTagReportsRequest>): QueryTagReportsRequest {
+    const message = createBaseQueryTagReportsRequest();
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryTagReportsRequestAmino): QueryTagReportsRequest {
+    const message = createBaseQueryTagReportsRequest();
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryTagReportsRequest): QueryTagReportsRequestAmino {
+    const obj: any = {};
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryTagReportsRequestAminoMsg): QueryTagReportsRequest {
+    return QueryTagReportsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryTagReportsRequestProtoMsg): QueryTagReportsRequest {
+    return QueryTagReportsRequest.decode(message.value);
+  },
+  toProto(message: QueryTagReportsRequest): Uint8Array {
+    return QueryTagReportsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryTagReportsRequest): QueryTagReportsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryTagReportsRequest",
+      value: QueryTagReportsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryTagReportsResponse(): QueryTagReportsResponse {
+  return {
+    tagName: "",
+    underReview: false,
+    pagination: undefined
+  };
+}
+/**
+ * QueryTagReportsResponse defines the QueryTagReportsResponse message.
+ * @name QueryTagReportsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagReportsResponse
+ */
+export const QueryTagReportsResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryTagReportsResponse",
+  encode(message: QueryTagReportsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.tagName !== "") {
+      writer.uint32(10).string(message.tagName);
+    }
+    if (message.underReview === true) {
+      writer.uint32(16).bool(message.underReview);
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryTagReportsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryTagReportsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tagName = reader.string();
+          break;
+        case 2:
+          message.underReview = reader.bool();
+          break;
+        case 3:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryTagReportsResponse>): QueryTagReportsResponse {
+    const message = createBaseQueryTagReportsResponse();
+    message.tagName = object.tagName ?? "";
+    message.underReview = object.underReview ?? false;
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryTagReportsResponseAmino): QueryTagReportsResponse {
+    const message = createBaseQueryTagReportsResponse();
+    if (object.tag_name !== undefined && object.tag_name !== null) {
+      message.tagName = object.tag_name;
+    }
+    if (object.under_review !== undefined && object.under_review !== null) {
+      message.underReview = object.under_review;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryTagReportsResponse): QueryTagReportsResponseAmino {
+    const obj: any = {};
+    obj.tag_name = message.tagName === "" ? undefined : message.tagName;
+    obj.under_review = message.underReview === false ? undefined : message.underReview;
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryTagReportsResponseAminoMsg): QueryTagReportsResponse {
+    return QueryTagReportsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryTagReportsResponseProtoMsg): QueryTagReportsResponse {
+    return QueryTagReportsResponse.decode(message.value);
+  },
+  toProto(message: QueryTagReportsResponse): Uint8Array {
+    return QueryTagReportsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryTagReportsResponse): QueryTagReportsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryTagReportsResponse",
+      value: QueryTagReportsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetTagBudgetRequest(): QueryGetTagBudgetRequest {
+  return {
+    id: BigInt(0)
+  };
+}
+/**
+ * QueryGetTagBudgetRequest defines the QueryGetTagBudgetRequest message.
+ * @name QueryGetTagBudgetRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagBudgetRequest
+ */
+export const QueryGetTagBudgetRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryGetTagBudgetRequest",
+  encode(message: QueryGetTagBudgetRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.id !== BigInt(0)) {
+      writer.uint32(8).uint64(message.id);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetTagBudgetRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetTagBudgetRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetTagBudgetRequest>): QueryGetTagBudgetRequest {
+    const message = createBaseQueryGetTagBudgetRequest();
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryGetTagBudgetRequestAmino): QueryGetTagBudgetRequest {
+    const message = createBaseQueryGetTagBudgetRequest();
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetTagBudgetRequest): QueryGetTagBudgetRequestAmino {
+    const obj: any = {};
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetTagBudgetRequestAminoMsg): QueryGetTagBudgetRequest {
+    return QueryGetTagBudgetRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetTagBudgetRequestProtoMsg): QueryGetTagBudgetRequest {
+    return QueryGetTagBudgetRequest.decode(message.value);
+  },
+  toProto(message: QueryGetTagBudgetRequest): Uint8Array {
+    return QueryGetTagBudgetRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetTagBudgetRequest): QueryGetTagBudgetRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryGetTagBudgetRequest",
+      value: QueryGetTagBudgetRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetTagBudgetResponse(): QueryGetTagBudgetResponse {
+  return {
+    tagBudget: TagBudget.fromPartial({})
+  };
+}
+/**
+ * QueryGetTagBudgetResponse defines the QueryGetTagBudgetResponse message.
+ * @name QueryGetTagBudgetResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagBudgetResponse
+ */
+export const QueryGetTagBudgetResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryGetTagBudgetResponse",
+  encode(message: QueryGetTagBudgetResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.tagBudget !== undefined) {
+      TagBudget.encode(message.tagBudget, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetTagBudgetResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetTagBudgetResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tagBudget = TagBudget.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetTagBudgetResponse>): QueryGetTagBudgetResponse {
+    const message = createBaseQueryGetTagBudgetResponse();
+    message.tagBudget = object.tagBudget !== undefined && object.tagBudget !== null ? TagBudget.fromPartial(object.tagBudget) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetTagBudgetResponseAmino): QueryGetTagBudgetResponse {
+    const message = createBaseQueryGetTagBudgetResponse();
+    if (object.tag_budget !== undefined && object.tag_budget !== null) {
+      message.tagBudget = TagBudget.fromAmino(object.tag_budget);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetTagBudgetResponse): QueryGetTagBudgetResponseAmino {
+    const obj: any = {};
+    obj.tag_budget = message.tagBudget ? TagBudget.toAmino(message.tagBudget) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetTagBudgetResponseAminoMsg): QueryGetTagBudgetResponse {
+    return QueryGetTagBudgetResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetTagBudgetResponseProtoMsg): QueryGetTagBudgetResponse {
+    return QueryGetTagBudgetResponse.decode(message.value);
+  },
+  toProto(message: QueryGetTagBudgetResponse): Uint8Array {
+    return QueryGetTagBudgetResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetTagBudgetResponse): QueryGetTagBudgetResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryGetTagBudgetResponse",
+      value: QueryGetTagBudgetResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllTagBudgetRequest(): QueryAllTagBudgetRequest {
+  return {
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllTagBudgetRequest defines the QueryAllTagBudgetRequest message.
+ * @name QueryAllTagBudgetRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagBudgetRequest
+ */
+export const QueryAllTagBudgetRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryAllTagBudgetRequest",
+  encode(message: QueryAllTagBudgetRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllTagBudgetRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllTagBudgetRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllTagBudgetRequest>): QueryAllTagBudgetRequest {
+    const message = createBaseQueryAllTagBudgetRequest();
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllTagBudgetRequestAmino): QueryAllTagBudgetRequest {
+    const message = createBaseQueryAllTagBudgetRequest();
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllTagBudgetRequest): QueryAllTagBudgetRequestAmino {
+    const obj: any = {};
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllTagBudgetRequestAminoMsg): QueryAllTagBudgetRequest {
+    return QueryAllTagBudgetRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllTagBudgetRequestProtoMsg): QueryAllTagBudgetRequest {
+    return QueryAllTagBudgetRequest.decode(message.value);
+  },
+  toProto(message: QueryAllTagBudgetRequest): Uint8Array {
+    return QueryAllTagBudgetRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllTagBudgetRequest): QueryAllTagBudgetRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAllTagBudgetRequest",
+      value: QueryAllTagBudgetRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllTagBudgetResponse(): QueryAllTagBudgetResponse {
+  return {
+    tagBudget: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllTagBudgetResponse defines the QueryAllTagBudgetResponse message.
+ * @name QueryAllTagBudgetResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagBudgetResponse
+ */
+export const QueryAllTagBudgetResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryAllTagBudgetResponse",
+  encode(message: QueryAllTagBudgetResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.tagBudget) {
+      TagBudget.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllTagBudgetResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllTagBudgetResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tagBudget.push(TagBudget.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllTagBudgetResponse>): QueryAllTagBudgetResponse {
+    const message = createBaseQueryAllTagBudgetResponse();
+    message.tagBudget = object.tagBudget?.map(e => TagBudget.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllTagBudgetResponseAmino): QueryAllTagBudgetResponse {
+    const message = createBaseQueryAllTagBudgetResponse();
+    message.tagBudget = object.tag_budget?.map(e => TagBudget.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllTagBudgetResponse): QueryAllTagBudgetResponseAmino {
+    const obj: any = {};
+    if (message.tagBudget) {
+      obj.tag_budget = message.tagBudget.map(e => e ? TagBudget.toAmino(e) : undefined);
+    } else {
+      obj.tag_budget = message.tagBudget;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllTagBudgetResponseAminoMsg): QueryAllTagBudgetResponse {
+    return QueryAllTagBudgetResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllTagBudgetResponseProtoMsg): QueryAllTagBudgetResponse {
+    return QueryAllTagBudgetResponse.decode(message.value);
+  },
+  toProto(message: QueryAllTagBudgetResponse): Uint8Array {
+    return QueryAllTagBudgetResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllTagBudgetResponse): QueryAllTagBudgetResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAllTagBudgetResponse",
+      value: QueryAllTagBudgetResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetTagBudgetAwardRequest(): QueryGetTagBudgetAwardRequest {
+  return {
+    id: BigInt(0)
+  };
+}
+/**
+ * QueryGetTagBudgetAwardRequest defines the QueryGetTagBudgetAwardRequest message.
+ * @name QueryGetTagBudgetAwardRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagBudgetAwardRequest
+ */
+export const QueryGetTagBudgetAwardRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryGetTagBudgetAwardRequest",
+  encode(message: QueryGetTagBudgetAwardRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.id !== BigInt(0)) {
+      writer.uint32(8).uint64(message.id);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetTagBudgetAwardRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetTagBudgetAwardRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetTagBudgetAwardRequest>): QueryGetTagBudgetAwardRequest {
+    const message = createBaseQueryGetTagBudgetAwardRequest();
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryGetTagBudgetAwardRequestAmino): QueryGetTagBudgetAwardRequest {
+    const message = createBaseQueryGetTagBudgetAwardRequest();
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetTagBudgetAwardRequest): QueryGetTagBudgetAwardRequestAmino {
+    const obj: any = {};
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetTagBudgetAwardRequestAminoMsg): QueryGetTagBudgetAwardRequest {
+    return QueryGetTagBudgetAwardRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetTagBudgetAwardRequestProtoMsg): QueryGetTagBudgetAwardRequest {
+    return QueryGetTagBudgetAwardRequest.decode(message.value);
+  },
+  toProto(message: QueryGetTagBudgetAwardRequest): Uint8Array {
+    return QueryGetTagBudgetAwardRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetTagBudgetAwardRequest): QueryGetTagBudgetAwardRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryGetTagBudgetAwardRequest",
+      value: QueryGetTagBudgetAwardRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetTagBudgetAwardResponse(): QueryGetTagBudgetAwardResponse {
+  return {
+    tagBudgetAward: TagBudgetAward.fromPartial({})
+  };
+}
+/**
+ * QueryGetTagBudgetAwardResponse defines the QueryGetTagBudgetAwardResponse message.
+ * @name QueryGetTagBudgetAwardResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetTagBudgetAwardResponse
+ */
+export const QueryGetTagBudgetAwardResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryGetTagBudgetAwardResponse",
+  encode(message: QueryGetTagBudgetAwardResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.tagBudgetAward !== undefined) {
+      TagBudgetAward.encode(message.tagBudgetAward, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetTagBudgetAwardResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetTagBudgetAwardResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tagBudgetAward = TagBudgetAward.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetTagBudgetAwardResponse>): QueryGetTagBudgetAwardResponse {
+    const message = createBaseQueryGetTagBudgetAwardResponse();
+    message.tagBudgetAward = object.tagBudgetAward !== undefined && object.tagBudgetAward !== null ? TagBudgetAward.fromPartial(object.tagBudgetAward) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetTagBudgetAwardResponseAmino): QueryGetTagBudgetAwardResponse {
+    const message = createBaseQueryGetTagBudgetAwardResponse();
+    if (object.tag_budget_award !== undefined && object.tag_budget_award !== null) {
+      message.tagBudgetAward = TagBudgetAward.fromAmino(object.tag_budget_award);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetTagBudgetAwardResponse): QueryGetTagBudgetAwardResponseAmino {
+    const obj: any = {};
+    obj.tag_budget_award = message.tagBudgetAward ? TagBudgetAward.toAmino(message.tagBudgetAward) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetTagBudgetAwardResponseAminoMsg): QueryGetTagBudgetAwardResponse {
+    return QueryGetTagBudgetAwardResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetTagBudgetAwardResponseProtoMsg): QueryGetTagBudgetAwardResponse {
+    return QueryGetTagBudgetAwardResponse.decode(message.value);
+  },
+  toProto(message: QueryGetTagBudgetAwardResponse): Uint8Array {
+    return QueryGetTagBudgetAwardResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetTagBudgetAwardResponse): QueryGetTagBudgetAwardResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryGetTagBudgetAwardResponse",
+      value: QueryGetTagBudgetAwardResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllTagBudgetAwardRequest(): QueryAllTagBudgetAwardRequest {
+  return {
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllTagBudgetAwardRequest defines the QueryAllTagBudgetAwardRequest message.
+ * @name QueryAllTagBudgetAwardRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagBudgetAwardRequest
+ */
+export const QueryAllTagBudgetAwardRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryAllTagBudgetAwardRequest",
+  encode(message: QueryAllTagBudgetAwardRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllTagBudgetAwardRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllTagBudgetAwardRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllTagBudgetAwardRequest>): QueryAllTagBudgetAwardRequest {
+    const message = createBaseQueryAllTagBudgetAwardRequest();
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllTagBudgetAwardRequestAmino): QueryAllTagBudgetAwardRequest {
+    const message = createBaseQueryAllTagBudgetAwardRequest();
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllTagBudgetAwardRequest): QueryAllTagBudgetAwardRequestAmino {
+    const obj: any = {};
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllTagBudgetAwardRequestAminoMsg): QueryAllTagBudgetAwardRequest {
+    return QueryAllTagBudgetAwardRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllTagBudgetAwardRequestProtoMsg): QueryAllTagBudgetAwardRequest {
+    return QueryAllTagBudgetAwardRequest.decode(message.value);
+  },
+  toProto(message: QueryAllTagBudgetAwardRequest): Uint8Array {
+    return QueryAllTagBudgetAwardRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllTagBudgetAwardRequest): QueryAllTagBudgetAwardRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAllTagBudgetAwardRequest",
+      value: QueryAllTagBudgetAwardRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllTagBudgetAwardResponse(): QueryAllTagBudgetAwardResponse {
+  return {
+    tagBudgetAward: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllTagBudgetAwardResponse defines the QueryAllTagBudgetAwardResponse message.
+ * @name QueryAllTagBudgetAwardResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllTagBudgetAwardResponse
+ */
+export const QueryAllTagBudgetAwardResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryAllTagBudgetAwardResponse",
+  encode(message: QueryAllTagBudgetAwardResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.tagBudgetAward) {
+      TagBudgetAward.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllTagBudgetAwardResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllTagBudgetAwardResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tagBudgetAward.push(TagBudgetAward.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllTagBudgetAwardResponse>): QueryAllTagBudgetAwardResponse {
+    const message = createBaseQueryAllTagBudgetAwardResponse();
+    message.tagBudgetAward = object.tagBudgetAward?.map(e => TagBudgetAward.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllTagBudgetAwardResponseAmino): QueryAllTagBudgetAwardResponse {
+    const message = createBaseQueryAllTagBudgetAwardResponse();
+    message.tagBudgetAward = object.tag_budget_award?.map(e => TagBudgetAward.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllTagBudgetAwardResponse): QueryAllTagBudgetAwardResponseAmino {
+    const obj: any = {};
+    if (message.tagBudgetAward) {
+      obj.tag_budget_award = message.tagBudgetAward.map(e => e ? TagBudgetAward.toAmino(e) : undefined);
+    } else {
+      obj.tag_budget_award = message.tagBudgetAward;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllTagBudgetAwardResponseAminoMsg): QueryAllTagBudgetAwardResponse {
+    return QueryAllTagBudgetAwardResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllTagBudgetAwardResponseProtoMsg): QueryAllTagBudgetAwardResponse {
+    return QueryAllTagBudgetAwardResponse.decode(message.value);
+  },
+  toProto(message: QueryAllTagBudgetAwardResponse): Uint8Array {
+    return QueryAllTagBudgetAwardResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllTagBudgetAwardResponse): QueryAllTagBudgetAwardResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAllTagBudgetAwardResponse",
+      value: QueryAllTagBudgetAwardResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryTagBudgetByTagRequest(): QueryTagBudgetByTagRequest {
+  return {
+    tag: ""
+  };
+}
+/**
+ * QueryTagBudgetByTagRequest defines the QueryTagBudgetByTagRequest message.
+ * @name QueryTagBudgetByTagRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagBudgetByTagRequest
+ */
+export const QueryTagBudgetByTagRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryTagBudgetByTagRequest",
+  encode(message: QueryTagBudgetByTagRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.tag !== "") {
+      writer.uint32(10).string(message.tag);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryTagBudgetByTagRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryTagBudgetByTagRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tag = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryTagBudgetByTagRequest>): QueryTagBudgetByTagRequest {
+    const message = createBaseQueryTagBudgetByTagRequest();
+    message.tag = object.tag ?? "";
+    return message;
+  },
+  fromAmino(object: QueryTagBudgetByTagRequestAmino): QueryTagBudgetByTagRequest {
+    const message = createBaseQueryTagBudgetByTagRequest();
+    if (object.tag !== undefined && object.tag !== null) {
+      message.tag = object.tag;
+    }
+    return message;
+  },
+  toAmino(message: QueryTagBudgetByTagRequest): QueryTagBudgetByTagRequestAmino {
+    const obj: any = {};
+    obj.tag = message.tag === "" ? undefined : message.tag;
+    return obj;
+  },
+  fromAminoMsg(object: QueryTagBudgetByTagRequestAminoMsg): QueryTagBudgetByTagRequest {
+    return QueryTagBudgetByTagRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryTagBudgetByTagRequestProtoMsg): QueryTagBudgetByTagRequest {
+    return QueryTagBudgetByTagRequest.decode(message.value);
+  },
+  toProto(message: QueryTagBudgetByTagRequest): Uint8Array {
+    return QueryTagBudgetByTagRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryTagBudgetByTagRequest): QueryTagBudgetByTagRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryTagBudgetByTagRequest",
+      value: QueryTagBudgetByTagRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryTagBudgetByTagResponse(): QueryTagBudgetByTagResponse {
+  return {
+    budgetId: BigInt(0),
+    poolBalance: "",
+    active: false
+  };
+}
+/**
+ * QueryTagBudgetByTagResponse defines the QueryTagBudgetByTagResponse message.
+ * @name QueryTagBudgetByTagResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagBudgetByTagResponse
+ */
+export const QueryTagBudgetByTagResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryTagBudgetByTagResponse",
+  encode(message: QueryTagBudgetByTagResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.budgetId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.budgetId);
+    }
+    if (message.poolBalance !== "") {
+      writer.uint32(18).string(message.poolBalance);
+    }
+    if (message.active === true) {
+      writer.uint32(24).bool(message.active);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryTagBudgetByTagResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryTagBudgetByTagResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.budgetId = reader.uint64();
+          break;
+        case 2:
+          message.poolBalance = reader.string();
+          break;
+        case 3:
+          message.active = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryTagBudgetByTagResponse>): QueryTagBudgetByTagResponse {
+    const message = createBaseQueryTagBudgetByTagResponse();
+    message.budgetId = object.budgetId !== undefined && object.budgetId !== null ? BigInt(object.budgetId.toString()) : BigInt(0);
+    message.poolBalance = object.poolBalance ?? "";
+    message.active = object.active ?? false;
+    return message;
+  },
+  fromAmino(object: QueryTagBudgetByTagResponseAmino): QueryTagBudgetByTagResponse {
+    const message = createBaseQueryTagBudgetByTagResponse();
+    if (object.budget_id !== undefined && object.budget_id !== null) {
+      message.budgetId = BigInt(object.budget_id);
+    }
+    if (object.pool_balance !== undefined && object.pool_balance !== null) {
+      message.poolBalance = object.pool_balance;
+    }
+    if (object.active !== undefined && object.active !== null) {
+      message.active = object.active;
+    }
+    return message;
+  },
+  toAmino(message: QueryTagBudgetByTagResponse): QueryTagBudgetByTagResponseAmino {
+    const obj: any = {};
+    obj.budget_id = message.budgetId !== BigInt(0) ? message.budgetId?.toString() : undefined;
+    obj.pool_balance = message.poolBalance === "" ? undefined : message.poolBalance;
+    obj.active = message.active === false ? undefined : message.active;
+    return obj;
+  },
+  fromAminoMsg(object: QueryTagBudgetByTagResponseAminoMsg): QueryTagBudgetByTagResponse {
+    return QueryTagBudgetByTagResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryTagBudgetByTagResponseProtoMsg): QueryTagBudgetByTagResponse {
+    return QueryTagBudgetByTagResponse.decode(message.value);
+  },
+  toProto(message: QueryTagBudgetByTagResponse): Uint8Array {
+    return QueryTagBudgetByTagResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryTagBudgetByTagResponse): QueryTagBudgetByTagResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryTagBudgetByTagResponse",
+      value: QueryTagBudgetByTagResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryTagBudgetsRequest(): QueryTagBudgetsRequest {
+  return {
+    pagination: undefined
+  };
+}
+/**
+ * QueryTagBudgetsRequest defines the QueryTagBudgetsRequest message.
+ * @name QueryTagBudgetsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagBudgetsRequest
+ */
+export const QueryTagBudgetsRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryTagBudgetsRequest",
+  encode(message: QueryTagBudgetsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryTagBudgetsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryTagBudgetsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryTagBudgetsRequest>): QueryTagBudgetsRequest {
+    const message = createBaseQueryTagBudgetsRequest();
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryTagBudgetsRequestAmino): QueryTagBudgetsRequest {
+    const message = createBaseQueryTagBudgetsRequest();
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryTagBudgetsRequest): QueryTagBudgetsRequestAmino {
+    const obj: any = {};
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryTagBudgetsRequestAminoMsg): QueryTagBudgetsRequest {
+    return QueryTagBudgetsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryTagBudgetsRequestProtoMsg): QueryTagBudgetsRequest {
+    return QueryTagBudgetsRequest.decode(message.value);
+  },
+  toProto(message: QueryTagBudgetsRequest): Uint8Array {
+    return QueryTagBudgetsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryTagBudgetsRequest): QueryTagBudgetsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryTagBudgetsRequest",
+      value: QueryTagBudgetsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryTagBudgetsResponse(): QueryTagBudgetsResponse {
+  return {
+    budgetId: BigInt(0),
+    tag: "",
+    poolBalance: "",
+    pagination: undefined
+  };
+}
+/**
+ * QueryTagBudgetsResponse defines the QueryTagBudgetsResponse message.
+ * @name QueryTagBudgetsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagBudgetsResponse
+ */
+export const QueryTagBudgetsResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryTagBudgetsResponse",
+  encode(message: QueryTagBudgetsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.budgetId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.budgetId);
+    }
+    if (message.tag !== "") {
+      writer.uint32(18).string(message.tag);
+    }
+    if (message.poolBalance !== "") {
+      writer.uint32(26).string(message.poolBalance);
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryTagBudgetsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryTagBudgetsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.budgetId = reader.uint64();
+          break;
+        case 2:
+          message.tag = reader.string();
+          break;
+        case 3:
+          message.poolBalance = reader.string();
+          break;
+        case 4:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryTagBudgetsResponse>): QueryTagBudgetsResponse {
+    const message = createBaseQueryTagBudgetsResponse();
+    message.budgetId = object.budgetId !== undefined && object.budgetId !== null ? BigInt(object.budgetId.toString()) : BigInt(0);
+    message.tag = object.tag ?? "";
+    message.poolBalance = object.poolBalance ?? "";
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryTagBudgetsResponseAmino): QueryTagBudgetsResponse {
+    const message = createBaseQueryTagBudgetsResponse();
+    if (object.budget_id !== undefined && object.budget_id !== null) {
+      message.budgetId = BigInt(object.budget_id);
+    }
+    if (object.tag !== undefined && object.tag !== null) {
+      message.tag = object.tag;
+    }
+    if (object.pool_balance !== undefined && object.pool_balance !== null) {
+      message.poolBalance = object.pool_balance;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryTagBudgetsResponse): QueryTagBudgetsResponseAmino {
+    const obj: any = {};
+    obj.budget_id = message.budgetId !== BigInt(0) ? message.budgetId?.toString() : undefined;
+    obj.tag = message.tag === "" ? undefined : message.tag;
+    obj.pool_balance = message.poolBalance === "" ? undefined : message.poolBalance;
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryTagBudgetsResponseAminoMsg): QueryTagBudgetsResponse {
+    return QueryTagBudgetsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryTagBudgetsResponseProtoMsg): QueryTagBudgetsResponse {
+    return QueryTagBudgetsResponse.decode(message.value);
+  },
+  toProto(message: QueryTagBudgetsResponse): Uint8Array {
+    return QueryTagBudgetsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryTagBudgetsResponse): QueryTagBudgetsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryTagBudgetsResponse",
+      value: QueryTagBudgetsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryTagBudgetAwardsRequest(): QueryTagBudgetAwardsRequest {
+  return {
+    budgetId: BigInt(0),
+    pagination: undefined
+  };
+}
+/**
+ * QueryTagBudgetAwardsRequest defines the QueryTagBudgetAwardsRequest message.
+ * @name QueryTagBudgetAwardsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagBudgetAwardsRequest
+ */
+export const QueryTagBudgetAwardsRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryTagBudgetAwardsRequest",
+  encode(message: QueryTagBudgetAwardsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.budgetId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.budgetId);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryTagBudgetAwardsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryTagBudgetAwardsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.budgetId = reader.uint64();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryTagBudgetAwardsRequest>): QueryTagBudgetAwardsRequest {
+    const message = createBaseQueryTagBudgetAwardsRequest();
+    message.budgetId = object.budgetId !== undefined && object.budgetId !== null ? BigInt(object.budgetId.toString()) : BigInt(0);
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryTagBudgetAwardsRequestAmino): QueryTagBudgetAwardsRequest {
+    const message = createBaseQueryTagBudgetAwardsRequest();
+    if (object.budget_id !== undefined && object.budget_id !== null) {
+      message.budgetId = BigInt(object.budget_id);
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryTagBudgetAwardsRequest): QueryTagBudgetAwardsRequestAmino {
+    const obj: any = {};
+    obj.budget_id = message.budgetId !== BigInt(0) ? message.budgetId?.toString() : undefined;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryTagBudgetAwardsRequestAminoMsg): QueryTagBudgetAwardsRequest {
+    return QueryTagBudgetAwardsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryTagBudgetAwardsRequestProtoMsg): QueryTagBudgetAwardsRequest {
+    return QueryTagBudgetAwardsRequest.decode(message.value);
+  },
+  toProto(message: QueryTagBudgetAwardsRequest): Uint8Array {
+    return QueryTagBudgetAwardsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryTagBudgetAwardsRequest): QueryTagBudgetAwardsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryTagBudgetAwardsRequest",
+      value: QueryTagBudgetAwardsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryTagBudgetAwardsResponse(): QueryTagBudgetAwardsResponse {
+  return {
+    postId: BigInt(0),
+    recipient: "",
+    amount: "",
+    pagination: undefined
+  };
+}
+/**
+ * QueryTagBudgetAwardsResponse defines the QueryTagBudgetAwardsResponse message.
+ * @name QueryTagBudgetAwardsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTagBudgetAwardsResponse
+ */
+export const QueryTagBudgetAwardsResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryTagBudgetAwardsResponse",
+  encode(message: QueryTagBudgetAwardsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.postId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.postId);
+    }
+    if (message.recipient !== "") {
+      writer.uint32(18).string(message.recipient);
+    }
+    if (message.amount !== "") {
+      writer.uint32(26).string(message.amount);
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryTagBudgetAwardsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryTagBudgetAwardsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.postId = reader.uint64();
+          break;
+        case 2:
+          message.recipient = reader.string();
+          break;
+        case 3:
+          message.amount = reader.string();
+          break;
+        case 4:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryTagBudgetAwardsResponse>): QueryTagBudgetAwardsResponse {
+    const message = createBaseQueryTagBudgetAwardsResponse();
+    message.postId = object.postId !== undefined && object.postId !== null ? BigInt(object.postId.toString()) : BigInt(0);
+    message.recipient = object.recipient ?? "";
+    message.amount = object.amount ?? "";
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryTagBudgetAwardsResponseAmino): QueryTagBudgetAwardsResponse {
+    const message = createBaseQueryTagBudgetAwardsResponse();
+    if (object.post_id !== undefined && object.post_id !== null) {
+      message.postId = BigInt(object.post_id);
+    }
+    if (object.recipient !== undefined && object.recipient !== null) {
+      message.recipient = object.recipient;
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = object.amount;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryTagBudgetAwardsResponse): QueryTagBudgetAwardsResponseAmino {
+    const obj: any = {};
+    obj.post_id = message.postId !== BigInt(0) ? message.postId?.toString() : undefined;
+    obj.recipient = message.recipient === "" ? undefined : message.recipient;
+    obj.amount = message.amount === "" ? undefined : message.amount;
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryTagBudgetAwardsResponseAminoMsg): QueryTagBudgetAwardsResponse {
+    return QueryTagBudgetAwardsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryTagBudgetAwardsResponseProtoMsg): QueryTagBudgetAwardsResponse {
+    return QueryTagBudgetAwardsResponse.decode(message.value);
+  },
+  toProto(message: QueryTagBudgetAwardsResponse): Uint8Array {
+    return QueryTagBudgetAwardsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryTagBudgetAwardsResponse): QueryTagBudgetAwardsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryTagBudgetAwardsResponse",
+      value: QueryTagBudgetAwardsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryBondedRoleRequest(): QueryBondedRoleRequest {
+  return {
+    roleType: 0,
+    address: ""
+  };
+}
+/**
+ * QueryBondedRoleRequest fetches a single BondedRole record.
+ * @name QueryBondedRoleRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryBondedRoleRequest
+ */
+export const QueryBondedRoleRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryBondedRoleRequest",
+  encode(message: QueryBondedRoleRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.roleType !== 0) {
+      writer.uint32(8).int32(message.roleType);
+    }
+    if (message.address !== "") {
+      writer.uint32(18).string(message.address);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryBondedRoleRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryBondedRoleRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.roleType = reader.int32() as any;
+          break;
+        case 2:
+          message.address = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryBondedRoleRequest>): QueryBondedRoleRequest {
+    const message = createBaseQueryBondedRoleRequest();
+    message.roleType = object.roleType ?? 0;
+    message.address = object.address ?? "";
+    return message;
+  },
+  fromAmino(object: QueryBondedRoleRequestAmino): QueryBondedRoleRequest {
+    const message = createBaseQueryBondedRoleRequest();
+    if (object.role_type !== undefined && object.role_type !== null) {
+      message.roleType = object.role_type;
+    }
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    }
+    return message;
+  },
+  toAmino(message: QueryBondedRoleRequest): QueryBondedRoleRequestAmino {
+    const obj: any = {};
+    obj.role_type = message.roleType === 0 ? undefined : message.roleType;
+    obj.address = message.address === "" ? undefined : message.address;
+    return obj;
+  },
+  fromAminoMsg(object: QueryBondedRoleRequestAminoMsg): QueryBondedRoleRequest {
+    return QueryBondedRoleRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryBondedRoleRequestProtoMsg): QueryBondedRoleRequest {
+    return QueryBondedRoleRequest.decode(message.value);
+  },
+  toProto(message: QueryBondedRoleRequest): Uint8Array {
+    return QueryBondedRoleRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryBondedRoleRequest): QueryBondedRoleRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryBondedRoleRequest",
+      value: QueryBondedRoleRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryBondedRoleResponse(): QueryBondedRoleResponse {
+  return {
+    bondedRole: BondedRole.fromPartial({})
+  };
+}
+/**
+ * QueryBondedRoleResponse holds the fetched BondedRole record.
+ * @name QueryBondedRoleResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryBondedRoleResponse
+ */
+export const QueryBondedRoleResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryBondedRoleResponse",
+  encode(message: QueryBondedRoleResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.bondedRole !== undefined) {
+      BondedRole.encode(message.bondedRole, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryBondedRoleResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryBondedRoleResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.bondedRole = BondedRole.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryBondedRoleResponse>): QueryBondedRoleResponse {
+    const message = createBaseQueryBondedRoleResponse();
+    message.bondedRole = object.bondedRole !== undefined && object.bondedRole !== null ? BondedRole.fromPartial(object.bondedRole) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryBondedRoleResponseAmino): QueryBondedRoleResponse {
+    const message = createBaseQueryBondedRoleResponse();
+    if (object.bonded_role !== undefined && object.bonded_role !== null) {
+      message.bondedRole = BondedRole.fromAmino(object.bonded_role);
+    }
+    return message;
+  },
+  toAmino(message: QueryBondedRoleResponse): QueryBondedRoleResponseAmino {
+    const obj: any = {};
+    obj.bonded_role = message.bondedRole ? BondedRole.toAmino(message.bondedRole) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryBondedRoleResponseAminoMsg): QueryBondedRoleResponse {
+    return QueryBondedRoleResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryBondedRoleResponseProtoMsg): QueryBondedRoleResponse {
+    return QueryBondedRoleResponse.decode(message.value);
+  },
+  toProto(message: QueryBondedRoleResponse): Uint8Array {
+    return QueryBondedRoleResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryBondedRoleResponse): QueryBondedRoleResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryBondedRoleResponse",
+      value: QueryBondedRoleResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryBondedRolesByTypeRequest(): QueryBondedRolesByTypeRequest {
+  return {
+    roleType: 0,
+    pagination: undefined
+  };
+}
+/**
+ * QueryBondedRolesByTypeRequest lists all BondedRole records for role_type.
+ * @name QueryBondedRolesByTypeRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryBondedRolesByTypeRequest
+ */
+export const QueryBondedRolesByTypeRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryBondedRolesByTypeRequest",
+  encode(message: QueryBondedRolesByTypeRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.roleType !== 0) {
+      writer.uint32(8).int32(message.roleType);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryBondedRolesByTypeRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryBondedRolesByTypeRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.roleType = reader.int32() as any;
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryBondedRolesByTypeRequest>): QueryBondedRolesByTypeRequest {
+    const message = createBaseQueryBondedRolesByTypeRequest();
+    message.roleType = object.roleType ?? 0;
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryBondedRolesByTypeRequestAmino): QueryBondedRolesByTypeRequest {
+    const message = createBaseQueryBondedRolesByTypeRequest();
+    if (object.role_type !== undefined && object.role_type !== null) {
+      message.roleType = object.role_type;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryBondedRolesByTypeRequest): QueryBondedRolesByTypeRequestAmino {
+    const obj: any = {};
+    obj.role_type = message.roleType === 0 ? undefined : message.roleType;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryBondedRolesByTypeRequestAminoMsg): QueryBondedRolesByTypeRequest {
+    return QueryBondedRolesByTypeRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryBondedRolesByTypeRequestProtoMsg): QueryBondedRolesByTypeRequest {
+    return QueryBondedRolesByTypeRequest.decode(message.value);
+  },
+  toProto(message: QueryBondedRolesByTypeRequest): Uint8Array {
+    return QueryBondedRolesByTypeRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryBondedRolesByTypeRequest): QueryBondedRolesByTypeRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryBondedRolesByTypeRequest",
+      value: QueryBondedRolesByTypeRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryBondedRolesByTypeResponse(): QueryBondedRolesByTypeResponse {
+  return {
+    bondedRoles: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryBondedRolesByTypeResponse holds the paginated list of BondedRole records.
+ * @name QueryBondedRolesByTypeResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryBondedRolesByTypeResponse
+ */
+export const QueryBondedRolesByTypeResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryBondedRolesByTypeResponse",
+  encode(message: QueryBondedRolesByTypeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.bondedRoles) {
+      BondedRole.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryBondedRolesByTypeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryBondedRolesByTypeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.bondedRoles.push(BondedRole.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryBondedRolesByTypeResponse>): QueryBondedRolesByTypeResponse {
+    const message = createBaseQueryBondedRolesByTypeResponse();
+    message.bondedRoles = object.bondedRoles?.map(e => BondedRole.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryBondedRolesByTypeResponseAmino): QueryBondedRolesByTypeResponse {
+    const message = createBaseQueryBondedRolesByTypeResponse();
+    message.bondedRoles = object.bonded_roles?.map(e => BondedRole.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryBondedRolesByTypeResponse): QueryBondedRolesByTypeResponseAmino {
+    const obj: any = {};
+    if (message.bondedRoles) {
+      obj.bonded_roles = message.bondedRoles.map(e => e ? BondedRole.toAmino(e) : undefined);
+    } else {
+      obj.bonded_roles = message.bondedRoles;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryBondedRolesByTypeResponseAminoMsg): QueryBondedRolesByTypeResponse {
+    return QueryBondedRolesByTypeResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryBondedRolesByTypeResponseProtoMsg): QueryBondedRolesByTypeResponse {
+    return QueryBondedRolesByTypeResponse.decode(message.value);
+  },
+  toProto(message: QueryBondedRolesByTypeResponse): Uint8Array {
+    return QueryBondedRolesByTypeResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryBondedRolesByTypeResponse): QueryBondedRolesByTypeResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryBondedRolesByTypeResponse",
+      value: QueryBondedRolesByTypeResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryBondedRoleConfigRequest(): QueryBondedRoleConfigRequest {
+  return {
+    roleType: 0
+  };
+}
+/**
+ * QueryBondedRoleConfigRequest fetches the policy config for a role_type.
+ * @name QueryBondedRoleConfigRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryBondedRoleConfigRequest
+ */
+export const QueryBondedRoleConfigRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryBondedRoleConfigRequest",
+  encode(message: QueryBondedRoleConfigRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.roleType !== 0) {
+      writer.uint32(8).int32(message.roleType);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryBondedRoleConfigRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryBondedRoleConfigRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.roleType = reader.int32() as any;
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryBondedRoleConfigRequest>): QueryBondedRoleConfigRequest {
+    const message = createBaseQueryBondedRoleConfigRequest();
+    message.roleType = object.roleType ?? 0;
+    return message;
+  },
+  fromAmino(object: QueryBondedRoleConfigRequestAmino): QueryBondedRoleConfigRequest {
+    const message = createBaseQueryBondedRoleConfigRequest();
+    if (object.role_type !== undefined && object.role_type !== null) {
+      message.roleType = object.role_type;
+    }
+    return message;
+  },
+  toAmino(message: QueryBondedRoleConfigRequest): QueryBondedRoleConfigRequestAmino {
+    const obj: any = {};
+    obj.role_type = message.roleType === 0 ? undefined : message.roleType;
+    return obj;
+  },
+  fromAminoMsg(object: QueryBondedRoleConfigRequestAminoMsg): QueryBondedRoleConfigRequest {
+    return QueryBondedRoleConfigRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryBondedRoleConfigRequestProtoMsg): QueryBondedRoleConfigRequest {
+    return QueryBondedRoleConfigRequest.decode(message.value);
+  },
+  toProto(message: QueryBondedRoleConfigRequest): Uint8Array {
+    return QueryBondedRoleConfigRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryBondedRoleConfigRequest): QueryBondedRoleConfigRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryBondedRoleConfigRequest",
+      value: QueryBondedRoleConfigRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryBondedRoleConfigResponse(): QueryBondedRoleConfigResponse {
+  return {
+    bondedRoleConfig: BondedRoleConfig.fromPartial({})
+  };
+}
+/**
+ * QueryBondedRoleConfigResponse holds the fetched BondedRoleConfig.
+ * @name QueryBondedRoleConfigResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryBondedRoleConfigResponse
+ */
+export const QueryBondedRoleConfigResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryBondedRoleConfigResponse",
+  encode(message: QueryBondedRoleConfigResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.bondedRoleConfig !== undefined) {
+      BondedRoleConfig.encode(message.bondedRoleConfig, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryBondedRoleConfigResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryBondedRoleConfigResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.bondedRoleConfig = BondedRoleConfig.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryBondedRoleConfigResponse>): QueryBondedRoleConfigResponse {
+    const message = createBaseQueryBondedRoleConfigResponse();
+    message.bondedRoleConfig = object.bondedRoleConfig !== undefined && object.bondedRoleConfig !== null ? BondedRoleConfig.fromPartial(object.bondedRoleConfig) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryBondedRoleConfigResponseAmino): QueryBondedRoleConfigResponse {
+    const message = createBaseQueryBondedRoleConfigResponse();
+    if (object.bonded_role_config !== undefined && object.bonded_role_config !== null) {
+      message.bondedRoleConfig = BondedRoleConfig.fromAmino(object.bonded_role_config);
+    }
+    return message;
+  },
+  toAmino(message: QueryBondedRoleConfigResponse): QueryBondedRoleConfigResponseAmino {
+    const obj: any = {};
+    obj.bonded_role_config = message.bondedRoleConfig ? BondedRoleConfig.toAmino(message.bondedRoleConfig) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryBondedRoleConfigResponseAminoMsg): QueryBondedRoleConfigResponse {
+    return QueryBondedRoleConfigResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryBondedRoleConfigResponseProtoMsg): QueryBondedRoleConfigResponse {
+    return QueryBondedRoleConfigResponse.decode(message.value);
+  },
+  toProto(message: QueryBondedRoleConfigResponse): Uint8Array {
+    return QueryBondedRoleConfigResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryBondedRoleConfigResponse): QueryBondedRoleConfigResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryBondedRoleConfigResponse",
+      value: QueryBondedRoleConfigResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetMemberReportRequest(): QueryGetMemberReportRequest {
+  return {
+    member: ""
+  };
+}
+/**
+ * QueryGetMemberReportRequest defines the QueryGetMemberReportRequest message.
+ * @name QueryGetMemberReportRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetMemberReportRequest
+ */
+export const QueryGetMemberReportRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryGetMemberReportRequest",
+  encode(message: QueryGetMemberReportRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.member !== "") {
+      writer.uint32(10).string(message.member);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetMemberReportRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetMemberReportRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.member = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetMemberReportRequest>): QueryGetMemberReportRequest {
+    const message = createBaseQueryGetMemberReportRequest();
+    message.member = object.member ?? "";
+    return message;
+  },
+  fromAmino(object: QueryGetMemberReportRequestAmino): QueryGetMemberReportRequest {
+    const message = createBaseQueryGetMemberReportRequest();
+    if (object.member !== undefined && object.member !== null) {
+      message.member = object.member;
+    }
+    return message;
+  },
+  toAmino(message: QueryGetMemberReportRequest): QueryGetMemberReportRequestAmino {
+    const obj: any = {};
+    obj.member = message.member === "" ? undefined : message.member;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetMemberReportRequestAminoMsg): QueryGetMemberReportRequest {
+    return QueryGetMemberReportRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetMemberReportRequestProtoMsg): QueryGetMemberReportRequest {
+    return QueryGetMemberReportRequest.decode(message.value);
+  },
+  toProto(message: QueryGetMemberReportRequest): Uint8Array {
+    return QueryGetMemberReportRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetMemberReportRequest): QueryGetMemberReportRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryGetMemberReportRequest",
+      value: QueryGetMemberReportRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetMemberReportResponse(): QueryGetMemberReportResponse {
+  return {
+    memberReport: MemberReport.fromPartial({})
+  };
+}
+/**
+ * QueryGetMemberReportResponse defines the QueryGetMemberReportResponse message.
+ * @name QueryGetMemberReportResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetMemberReportResponse
+ */
+export const QueryGetMemberReportResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryGetMemberReportResponse",
+  encode(message: QueryGetMemberReportResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.memberReport !== undefined) {
+      MemberReport.encode(message.memberReport, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetMemberReportResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetMemberReportResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.memberReport = MemberReport.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetMemberReportResponse>): QueryGetMemberReportResponse {
+    const message = createBaseQueryGetMemberReportResponse();
+    message.memberReport = object.memberReport !== undefined && object.memberReport !== null ? MemberReport.fromPartial(object.memberReport) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetMemberReportResponseAmino): QueryGetMemberReportResponse {
+    const message = createBaseQueryGetMemberReportResponse();
+    if (object.member_report !== undefined && object.member_report !== null) {
+      message.memberReport = MemberReport.fromAmino(object.member_report);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetMemberReportResponse): QueryGetMemberReportResponseAmino {
+    const obj: any = {};
+    obj.member_report = message.memberReport ? MemberReport.toAmino(message.memberReport) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetMemberReportResponseAminoMsg): QueryGetMemberReportResponse {
+    return QueryGetMemberReportResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetMemberReportResponseProtoMsg): QueryGetMemberReportResponse {
+    return QueryGetMemberReportResponse.decode(message.value);
+  },
+  toProto(message: QueryGetMemberReportResponse): Uint8Array {
+    return QueryGetMemberReportResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetMemberReportResponse): QueryGetMemberReportResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryGetMemberReportResponse",
+      value: QueryGetMemberReportResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllMemberReportRequest(): QueryAllMemberReportRequest {
+  return {
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllMemberReportRequest defines the QueryAllMemberReportRequest message.
+ * @name QueryAllMemberReportRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllMemberReportRequest
+ */
+export const QueryAllMemberReportRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryAllMemberReportRequest",
+  encode(message: QueryAllMemberReportRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllMemberReportRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllMemberReportRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllMemberReportRequest>): QueryAllMemberReportRequest {
+    const message = createBaseQueryAllMemberReportRequest();
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllMemberReportRequestAmino): QueryAllMemberReportRequest {
+    const message = createBaseQueryAllMemberReportRequest();
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllMemberReportRequest): QueryAllMemberReportRequestAmino {
+    const obj: any = {};
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllMemberReportRequestAminoMsg): QueryAllMemberReportRequest {
+    return QueryAllMemberReportRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllMemberReportRequestProtoMsg): QueryAllMemberReportRequest {
+    return QueryAllMemberReportRequest.decode(message.value);
+  },
+  toProto(message: QueryAllMemberReportRequest): Uint8Array {
+    return QueryAllMemberReportRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllMemberReportRequest): QueryAllMemberReportRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAllMemberReportRequest",
+      value: QueryAllMemberReportRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllMemberReportResponse(): QueryAllMemberReportResponse {
+  return {
+    memberReport: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllMemberReportResponse defines the QueryAllMemberReportResponse message.
+ * @name QueryAllMemberReportResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllMemberReportResponse
+ */
+export const QueryAllMemberReportResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryAllMemberReportResponse",
+  encode(message: QueryAllMemberReportResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.memberReport) {
+      MemberReport.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllMemberReportResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllMemberReportResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.memberReport.push(MemberReport.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllMemberReportResponse>): QueryAllMemberReportResponse {
+    const message = createBaseQueryAllMemberReportResponse();
+    message.memberReport = object.memberReport?.map(e => MemberReport.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllMemberReportResponseAmino): QueryAllMemberReportResponse {
+    const message = createBaseQueryAllMemberReportResponse();
+    message.memberReport = object.member_report?.map(e => MemberReport.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllMemberReportResponse): QueryAllMemberReportResponseAmino {
+    const obj: any = {};
+    if (message.memberReport) {
+      obj.member_report = message.memberReport.map(e => e ? MemberReport.toAmino(e) : undefined);
+    } else {
+      obj.member_report = message.memberReport;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllMemberReportResponseAminoMsg): QueryAllMemberReportResponse {
+    return QueryAllMemberReportResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllMemberReportResponseProtoMsg): QueryAllMemberReportResponse {
+    return QueryAllMemberReportResponse.decode(message.value);
+  },
+  toProto(message: QueryAllMemberReportResponse): Uint8Array {
+    return QueryAllMemberReportResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllMemberReportResponse): QueryAllMemberReportResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAllMemberReportResponse",
+      value: QueryAllMemberReportResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetMemberWarningRequest(): QueryGetMemberWarningRequest {
+  return {
+    id: BigInt(0)
+  };
+}
+/**
+ * QueryGetMemberWarningRequest defines the QueryGetMemberWarningRequest message.
+ * @name QueryGetMemberWarningRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetMemberWarningRequest
+ */
+export const QueryGetMemberWarningRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryGetMemberWarningRequest",
+  encode(message: QueryGetMemberWarningRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.id !== BigInt(0)) {
+      writer.uint32(8).uint64(message.id);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetMemberWarningRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetMemberWarningRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetMemberWarningRequest>): QueryGetMemberWarningRequest {
+    const message = createBaseQueryGetMemberWarningRequest();
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryGetMemberWarningRequestAmino): QueryGetMemberWarningRequest {
+    const message = createBaseQueryGetMemberWarningRequest();
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetMemberWarningRequest): QueryGetMemberWarningRequestAmino {
+    const obj: any = {};
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetMemberWarningRequestAminoMsg): QueryGetMemberWarningRequest {
+    return QueryGetMemberWarningRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetMemberWarningRequestProtoMsg): QueryGetMemberWarningRequest {
+    return QueryGetMemberWarningRequest.decode(message.value);
+  },
+  toProto(message: QueryGetMemberWarningRequest): Uint8Array {
+    return QueryGetMemberWarningRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetMemberWarningRequest): QueryGetMemberWarningRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryGetMemberWarningRequest",
+      value: QueryGetMemberWarningRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetMemberWarningResponse(): QueryGetMemberWarningResponse {
+  return {
+    memberWarning: MemberWarning.fromPartial({})
+  };
+}
+/**
+ * QueryGetMemberWarningResponse defines the QueryGetMemberWarningResponse message.
+ * @name QueryGetMemberWarningResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetMemberWarningResponse
+ */
+export const QueryGetMemberWarningResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryGetMemberWarningResponse",
+  encode(message: QueryGetMemberWarningResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.memberWarning !== undefined) {
+      MemberWarning.encode(message.memberWarning, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetMemberWarningResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetMemberWarningResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.memberWarning = MemberWarning.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetMemberWarningResponse>): QueryGetMemberWarningResponse {
+    const message = createBaseQueryGetMemberWarningResponse();
+    message.memberWarning = object.memberWarning !== undefined && object.memberWarning !== null ? MemberWarning.fromPartial(object.memberWarning) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetMemberWarningResponseAmino): QueryGetMemberWarningResponse {
+    const message = createBaseQueryGetMemberWarningResponse();
+    if (object.member_warning !== undefined && object.member_warning !== null) {
+      message.memberWarning = MemberWarning.fromAmino(object.member_warning);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetMemberWarningResponse): QueryGetMemberWarningResponseAmino {
+    const obj: any = {};
+    obj.member_warning = message.memberWarning ? MemberWarning.toAmino(message.memberWarning) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetMemberWarningResponseAminoMsg): QueryGetMemberWarningResponse {
+    return QueryGetMemberWarningResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetMemberWarningResponseProtoMsg): QueryGetMemberWarningResponse {
+    return QueryGetMemberWarningResponse.decode(message.value);
+  },
+  toProto(message: QueryGetMemberWarningResponse): Uint8Array {
+    return QueryGetMemberWarningResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetMemberWarningResponse): QueryGetMemberWarningResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryGetMemberWarningResponse",
+      value: QueryGetMemberWarningResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllMemberWarningRequest(): QueryAllMemberWarningRequest {
+  return {
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllMemberWarningRequest defines the QueryAllMemberWarningRequest message.
+ * @name QueryAllMemberWarningRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllMemberWarningRequest
+ */
+export const QueryAllMemberWarningRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryAllMemberWarningRequest",
+  encode(message: QueryAllMemberWarningRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllMemberWarningRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllMemberWarningRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllMemberWarningRequest>): QueryAllMemberWarningRequest {
+    const message = createBaseQueryAllMemberWarningRequest();
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllMemberWarningRequestAmino): QueryAllMemberWarningRequest {
+    const message = createBaseQueryAllMemberWarningRequest();
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllMemberWarningRequest): QueryAllMemberWarningRequestAmino {
+    const obj: any = {};
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllMemberWarningRequestAminoMsg): QueryAllMemberWarningRequest {
+    return QueryAllMemberWarningRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllMemberWarningRequestProtoMsg): QueryAllMemberWarningRequest {
+    return QueryAllMemberWarningRequest.decode(message.value);
+  },
+  toProto(message: QueryAllMemberWarningRequest): Uint8Array {
+    return QueryAllMemberWarningRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllMemberWarningRequest): QueryAllMemberWarningRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAllMemberWarningRequest",
+      value: QueryAllMemberWarningRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllMemberWarningResponse(): QueryAllMemberWarningResponse {
+  return {
+    memberWarning: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllMemberWarningResponse defines the QueryAllMemberWarningResponse message.
+ * @name QueryAllMemberWarningResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllMemberWarningResponse
+ */
+export const QueryAllMemberWarningResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryAllMemberWarningResponse",
+  encode(message: QueryAllMemberWarningResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.memberWarning) {
+      MemberWarning.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllMemberWarningResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllMemberWarningResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.memberWarning.push(MemberWarning.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllMemberWarningResponse>): QueryAllMemberWarningResponse {
+    const message = createBaseQueryAllMemberWarningResponse();
+    message.memberWarning = object.memberWarning?.map(e => MemberWarning.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllMemberWarningResponseAmino): QueryAllMemberWarningResponse {
+    const message = createBaseQueryAllMemberWarningResponse();
+    message.memberWarning = object.member_warning?.map(e => MemberWarning.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllMemberWarningResponse): QueryAllMemberWarningResponseAmino {
+    const obj: any = {};
+    if (message.memberWarning) {
+      obj.member_warning = message.memberWarning.map(e => e ? MemberWarning.toAmino(e) : undefined);
+    } else {
+      obj.member_warning = message.memberWarning;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllMemberWarningResponseAminoMsg): QueryAllMemberWarningResponse {
+    return QueryAllMemberWarningResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllMemberWarningResponseProtoMsg): QueryAllMemberWarningResponse {
+    return QueryAllMemberWarningResponse.decode(message.value);
+  },
+  toProto(message: QueryAllMemberWarningResponse): Uint8Array {
+    return QueryAllMemberWarningResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllMemberWarningResponse): QueryAllMemberWarningResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAllMemberWarningResponse",
+      value: QueryAllMemberWarningResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetGovActionAppealRequest(): QueryGetGovActionAppealRequest {
+  return {
+    id: BigInt(0)
+  };
+}
+/**
+ * QueryGetGovActionAppealRequest defines the QueryGetGovActionAppealRequest message.
+ * @name QueryGetGovActionAppealRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetGovActionAppealRequest
+ */
+export const QueryGetGovActionAppealRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryGetGovActionAppealRequest",
+  encode(message: QueryGetGovActionAppealRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.id !== BigInt(0)) {
+      writer.uint32(8).uint64(message.id);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetGovActionAppealRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetGovActionAppealRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetGovActionAppealRequest>): QueryGetGovActionAppealRequest {
+    const message = createBaseQueryGetGovActionAppealRequest();
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryGetGovActionAppealRequestAmino): QueryGetGovActionAppealRequest {
+    const message = createBaseQueryGetGovActionAppealRequest();
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetGovActionAppealRequest): QueryGetGovActionAppealRequestAmino {
+    const obj: any = {};
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetGovActionAppealRequestAminoMsg): QueryGetGovActionAppealRequest {
+    return QueryGetGovActionAppealRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetGovActionAppealRequestProtoMsg): QueryGetGovActionAppealRequest {
+    return QueryGetGovActionAppealRequest.decode(message.value);
+  },
+  toProto(message: QueryGetGovActionAppealRequest): Uint8Array {
+    return QueryGetGovActionAppealRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetGovActionAppealRequest): QueryGetGovActionAppealRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryGetGovActionAppealRequest",
+      value: QueryGetGovActionAppealRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetGovActionAppealResponse(): QueryGetGovActionAppealResponse {
+  return {
+    govActionAppeal: GovActionAppeal.fromPartial({})
+  };
+}
+/**
+ * QueryGetGovActionAppealResponse defines the QueryGetGovActionAppealResponse message.
+ * @name QueryGetGovActionAppealResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetGovActionAppealResponse
+ */
+export const QueryGetGovActionAppealResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryGetGovActionAppealResponse",
+  encode(message: QueryGetGovActionAppealResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.govActionAppeal !== undefined) {
+      GovActionAppeal.encode(message.govActionAppeal, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetGovActionAppealResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetGovActionAppealResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.govActionAppeal = GovActionAppeal.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetGovActionAppealResponse>): QueryGetGovActionAppealResponse {
+    const message = createBaseQueryGetGovActionAppealResponse();
+    message.govActionAppeal = object.govActionAppeal !== undefined && object.govActionAppeal !== null ? GovActionAppeal.fromPartial(object.govActionAppeal) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetGovActionAppealResponseAmino): QueryGetGovActionAppealResponse {
+    const message = createBaseQueryGetGovActionAppealResponse();
+    if (object.gov_action_appeal !== undefined && object.gov_action_appeal !== null) {
+      message.govActionAppeal = GovActionAppeal.fromAmino(object.gov_action_appeal);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetGovActionAppealResponse): QueryGetGovActionAppealResponseAmino {
+    const obj: any = {};
+    obj.gov_action_appeal = message.govActionAppeal ? GovActionAppeal.toAmino(message.govActionAppeal) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetGovActionAppealResponseAminoMsg): QueryGetGovActionAppealResponse {
+    return QueryGetGovActionAppealResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetGovActionAppealResponseProtoMsg): QueryGetGovActionAppealResponse {
+    return QueryGetGovActionAppealResponse.decode(message.value);
+  },
+  toProto(message: QueryGetGovActionAppealResponse): Uint8Array {
+    return QueryGetGovActionAppealResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetGovActionAppealResponse): QueryGetGovActionAppealResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryGetGovActionAppealResponse",
+      value: QueryGetGovActionAppealResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllGovActionAppealRequest(): QueryAllGovActionAppealRequest {
+  return {
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllGovActionAppealRequest defines the QueryAllGovActionAppealRequest message.
+ * @name QueryAllGovActionAppealRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllGovActionAppealRequest
+ */
+export const QueryAllGovActionAppealRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryAllGovActionAppealRequest",
+  encode(message: QueryAllGovActionAppealRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllGovActionAppealRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllGovActionAppealRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllGovActionAppealRequest>): QueryAllGovActionAppealRequest {
+    const message = createBaseQueryAllGovActionAppealRequest();
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllGovActionAppealRequestAmino): QueryAllGovActionAppealRequest {
+    const message = createBaseQueryAllGovActionAppealRequest();
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllGovActionAppealRequest): QueryAllGovActionAppealRequestAmino {
+    const obj: any = {};
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllGovActionAppealRequestAminoMsg): QueryAllGovActionAppealRequest {
+    return QueryAllGovActionAppealRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllGovActionAppealRequestProtoMsg): QueryAllGovActionAppealRequest {
+    return QueryAllGovActionAppealRequest.decode(message.value);
+  },
+  toProto(message: QueryAllGovActionAppealRequest): Uint8Array {
+    return QueryAllGovActionAppealRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllGovActionAppealRequest): QueryAllGovActionAppealRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAllGovActionAppealRequest",
+      value: QueryAllGovActionAppealRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllGovActionAppealResponse(): QueryAllGovActionAppealResponse {
+  return {
+    govActionAppeal: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllGovActionAppealResponse defines the QueryAllGovActionAppealResponse message.
+ * @name QueryAllGovActionAppealResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllGovActionAppealResponse
+ */
+export const QueryAllGovActionAppealResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryAllGovActionAppealResponse",
+  encode(message: QueryAllGovActionAppealResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.govActionAppeal) {
+      GovActionAppeal.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllGovActionAppealResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllGovActionAppealResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.govActionAppeal.push(GovActionAppeal.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllGovActionAppealResponse>): QueryAllGovActionAppealResponse {
+    const message = createBaseQueryAllGovActionAppealResponse();
+    message.govActionAppeal = object.govActionAppeal?.map(e => GovActionAppeal.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllGovActionAppealResponseAmino): QueryAllGovActionAppealResponse {
+    const message = createBaseQueryAllGovActionAppealResponse();
+    message.govActionAppeal = object.gov_action_appeal?.map(e => GovActionAppeal.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllGovActionAppealResponse): QueryAllGovActionAppealResponseAmino {
+    const obj: any = {};
+    if (message.govActionAppeal) {
+      obj.gov_action_appeal = message.govActionAppeal.map(e => e ? GovActionAppeal.toAmino(e) : undefined);
+    } else {
+      obj.gov_action_appeal = message.govActionAppeal;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllGovActionAppealResponseAminoMsg): QueryAllGovActionAppealResponse {
+    return QueryAllGovActionAppealResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllGovActionAppealResponseProtoMsg): QueryAllGovActionAppealResponse {
+    return QueryAllGovActionAppealResponse.decode(message.value);
+  },
+  toProto(message: QueryAllGovActionAppealResponse): Uint8Array {
+    return QueryAllGovActionAppealResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllGovActionAppealResponse): QueryAllGovActionAppealResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAllGovActionAppealResponse",
+      value: QueryAllGovActionAppealResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetJuryParticipationRequest(): QueryGetJuryParticipationRequest {
+  return {
+    juror: ""
+  };
+}
+/**
+ * QueryGetJuryParticipationRequest defines the QueryGetJuryParticipationRequest message.
+ * @name QueryGetJuryParticipationRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetJuryParticipationRequest
+ */
+export const QueryGetJuryParticipationRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryGetJuryParticipationRequest",
+  encode(message: QueryGetJuryParticipationRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.juror !== "") {
+      writer.uint32(10).string(message.juror);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetJuryParticipationRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetJuryParticipationRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.juror = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetJuryParticipationRequest>): QueryGetJuryParticipationRequest {
+    const message = createBaseQueryGetJuryParticipationRequest();
+    message.juror = object.juror ?? "";
+    return message;
+  },
+  fromAmino(object: QueryGetJuryParticipationRequestAmino): QueryGetJuryParticipationRequest {
+    const message = createBaseQueryGetJuryParticipationRequest();
+    if (object.juror !== undefined && object.juror !== null) {
+      message.juror = object.juror;
+    }
+    return message;
+  },
+  toAmino(message: QueryGetJuryParticipationRequest): QueryGetJuryParticipationRequestAmino {
+    const obj: any = {};
+    obj.juror = message.juror === "" ? undefined : message.juror;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetJuryParticipationRequestAminoMsg): QueryGetJuryParticipationRequest {
+    return QueryGetJuryParticipationRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetJuryParticipationRequestProtoMsg): QueryGetJuryParticipationRequest {
+    return QueryGetJuryParticipationRequest.decode(message.value);
+  },
+  toProto(message: QueryGetJuryParticipationRequest): Uint8Array {
+    return QueryGetJuryParticipationRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetJuryParticipationRequest): QueryGetJuryParticipationRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryGetJuryParticipationRequest",
+      value: QueryGetJuryParticipationRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetJuryParticipationResponse(): QueryGetJuryParticipationResponse {
+  return {
+    juryParticipation: JuryParticipation.fromPartial({})
+  };
+}
+/**
+ * QueryGetJuryParticipationResponse defines the QueryGetJuryParticipationResponse message.
+ * @name QueryGetJuryParticipationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryGetJuryParticipationResponse
+ */
+export const QueryGetJuryParticipationResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryGetJuryParticipationResponse",
+  encode(message: QueryGetJuryParticipationResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.juryParticipation !== undefined) {
+      JuryParticipation.encode(message.juryParticipation, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetJuryParticipationResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetJuryParticipationResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.juryParticipation = JuryParticipation.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetJuryParticipationResponse>): QueryGetJuryParticipationResponse {
+    const message = createBaseQueryGetJuryParticipationResponse();
+    message.juryParticipation = object.juryParticipation !== undefined && object.juryParticipation !== null ? JuryParticipation.fromPartial(object.juryParticipation) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetJuryParticipationResponseAmino): QueryGetJuryParticipationResponse {
+    const message = createBaseQueryGetJuryParticipationResponse();
+    if (object.jury_participation !== undefined && object.jury_participation !== null) {
+      message.juryParticipation = JuryParticipation.fromAmino(object.jury_participation);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetJuryParticipationResponse): QueryGetJuryParticipationResponseAmino {
+    const obj: any = {};
+    obj.jury_participation = message.juryParticipation ? JuryParticipation.toAmino(message.juryParticipation) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetJuryParticipationResponseAminoMsg): QueryGetJuryParticipationResponse {
+    return QueryGetJuryParticipationResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetJuryParticipationResponseProtoMsg): QueryGetJuryParticipationResponse {
+    return QueryGetJuryParticipationResponse.decode(message.value);
+  },
+  toProto(message: QueryGetJuryParticipationResponse): Uint8Array {
+    return QueryGetJuryParticipationResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetJuryParticipationResponse): QueryGetJuryParticipationResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryGetJuryParticipationResponse",
+      value: QueryGetJuryParticipationResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllJuryParticipationRequest(): QueryAllJuryParticipationRequest {
+  return {
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllJuryParticipationRequest defines the QueryAllJuryParticipationRequest message.
+ * @name QueryAllJuryParticipationRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllJuryParticipationRequest
+ */
+export const QueryAllJuryParticipationRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryAllJuryParticipationRequest",
+  encode(message: QueryAllJuryParticipationRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllJuryParticipationRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllJuryParticipationRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllJuryParticipationRequest>): QueryAllJuryParticipationRequest {
+    const message = createBaseQueryAllJuryParticipationRequest();
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllJuryParticipationRequestAmino): QueryAllJuryParticipationRequest {
+    const message = createBaseQueryAllJuryParticipationRequest();
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllJuryParticipationRequest): QueryAllJuryParticipationRequestAmino {
+    const obj: any = {};
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllJuryParticipationRequestAminoMsg): QueryAllJuryParticipationRequest {
+    return QueryAllJuryParticipationRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllJuryParticipationRequestProtoMsg): QueryAllJuryParticipationRequest {
+    return QueryAllJuryParticipationRequest.decode(message.value);
+  },
+  toProto(message: QueryAllJuryParticipationRequest): Uint8Array {
+    return QueryAllJuryParticipationRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllJuryParticipationRequest): QueryAllJuryParticipationRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAllJuryParticipationRequest",
+      value: QueryAllJuryParticipationRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllJuryParticipationResponse(): QueryAllJuryParticipationResponse {
+  return {
+    juryParticipation: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllJuryParticipationResponse defines the QueryAllJuryParticipationResponse message.
+ * @name QueryAllJuryParticipationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAllJuryParticipationResponse
+ */
+export const QueryAllJuryParticipationResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryAllJuryParticipationResponse",
+  encode(message: QueryAllJuryParticipationResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.juryParticipation) {
+      JuryParticipation.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllJuryParticipationResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllJuryParticipationResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.juryParticipation.push(JuryParticipation.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllJuryParticipationResponse>): QueryAllJuryParticipationResponse {
+    const message = createBaseQueryAllJuryParticipationResponse();
+    message.juryParticipation = object.juryParticipation?.map(e => JuryParticipation.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllJuryParticipationResponseAmino): QueryAllJuryParticipationResponse {
+    const message = createBaseQueryAllJuryParticipationResponse();
+    message.juryParticipation = object.jury_participation?.map(e => JuryParticipation.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllJuryParticipationResponse): QueryAllJuryParticipationResponseAmino {
+    const obj: any = {};
+    if (message.juryParticipation) {
+      obj.jury_participation = message.juryParticipation.map(e => e ? JuryParticipation.toAmino(e) : undefined);
+    } else {
+      obj.jury_participation = message.juryParticipation;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllJuryParticipationResponseAminoMsg): QueryAllJuryParticipationResponse {
+    return QueryAllJuryParticipationResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllJuryParticipationResponseProtoMsg): QueryAllJuryParticipationResponse {
+    return QueryAllJuryParticipationResponse.decode(message.value);
+  },
+  toProto(message: QueryAllJuryParticipationResponse): Uint8Array {
+    return QueryAllJuryParticipationResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllJuryParticipationResponse): QueryAllJuryParticipationResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAllJuryParticipationResponse",
+      value: QueryAllJuryParticipationResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryMemberReportsRequest(): QueryMemberReportsRequest {
+  return {
+    pagination: undefined
+  };
+}
+/**
+ * QueryMemberReportsRequest defines the QueryMemberReportsRequest message.
+ * @name QueryMemberReportsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberReportsRequest
+ */
+export const QueryMemberReportsRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberReportsRequest",
+  encode(message: QueryMemberReportsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryMemberReportsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryMemberReportsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryMemberReportsRequest>): QueryMemberReportsRequest {
+    const message = createBaseQueryMemberReportsRequest();
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryMemberReportsRequestAmino): QueryMemberReportsRequest {
+    const message = createBaseQueryMemberReportsRequest();
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryMemberReportsRequest): QueryMemberReportsRequestAmino {
+    const obj: any = {};
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryMemberReportsRequestAminoMsg): QueryMemberReportsRequest {
+    return QueryMemberReportsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryMemberReportsRequestProtoMsg): QueryMemberReportsRequest {
+    return QueryMemberReportsRequest.decode(message.value);
+  },
+  toProto(message: QueryMemberReportsRequest): Uint8Array {
+    return QueryMemberReportsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryMemberReportsRequest): QueryMemberReportsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryMemberReportsRequest",
+      value: QueryMemberReportsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryMemberReportsResponse(): QueryMemberReportsResponse {
+  return {
+    member: "",
+    status: BigInt(0),
+    pagination: undefined
+  };
+}
+/**
+ * QueryMemberReportsResponse defines the QueryMemberReportsResponse message.
+ * @name QueryMemberReportsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberReportsResponse
+ */
+export const QueryMemberReportsResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberReportsResponse",
+  encode(message: QueryMemberReportsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.member !== "") {
+      writer.uint32(10).string(message.member);
+    }
+    if (message.status !== BigInt(0)) {
+      writer.uint32(16).uint64(message.status);
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryMemberReportsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryMemberReportsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.member = reader.string();
+          break;
+        case 2:
+          message.status = reader.uint64();
+          break;
+        case 3:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryMemberReportsResponse>): QueryMemberReportsResponse {
+    const message = createBaseQueryMemberReportsResponse();
+    message.member = object.member ?? "";
+    message.status = object.status !== undefined && object.status !== null ? BigInt(object.status.toString()) : BigInt(0);
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryMemberReportsResponseAmino): QueryMemberReportsResponse {
+    const message = createBaseQueryMemberReportsResponse();
+    if (object.member !== undefined && object.member !== null) {
+      message.member = object.member;
+    }
+    if (object.status !== undefined && object.status !== null) {
+      message.status = BigInt(object.status);
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryMemberReportsResponse): QueryMemberReportsResponseAmino {
+    const obj: any = {};
+    obj.member = message.member === "" ? undefined : message.member;
+    obj.status = message.status !== BigInt(0) ? message.status?.toString() : undefined;
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryMemberReportsResponseAminoMsg): QueryMemberReportsResponse {
+    return QueryMemberReportsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryMemberReportsResponseProtoMsg): QueryMemberReportsResponse {
+    return QueryMemberReportsResponse.decode(message.value);
+  },
+  toProto(message: QueryMemberReportsResponse): Uint8Array {
+    return QueryMemberReportsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryMemberReportsResponse): QueryMemberReportsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryMemberReportsResponse",
+      value: QueryMemberReportsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryMemberWarningsRequest(): QueryMemberWarningsRequest {
+  return {
+    member: "",
+    pagination: undefined
+  };
+}
+/**
+ * QueryMemberWarningsRequest defines the QueryMemberWarningsRequest message.
+ * @name QueryMemberWarningsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberWarningsRequest
+ */
+export const QueryMemberWarningsRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberWarningsRequest",
+  encode(message: QueryMemberWarningsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.member !== "") {
+      writer.uint32(10).string(message.member);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryMemberWarningsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryMemberWarningsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.member = reader.string();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryMemberWarningsRequest>): QueryMemberWarningsRequest {
+    const message = createBaseQueryMemberWarningsRequest();
+    message.member = object.member ?? "";
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryMemberWarningsRequestAmino): QueryMemberWarningsRequest {
+    const message = createBaseQueryMemberWarningsRequest();
+    if (object.member !== undefined && object.member !== null) {
+      message.member = object.member;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryMemberWarningsRequest): QueryMemberWarningsRequestAmino {
+    const obj: any = {};
+    obj.member = message.member === "" ? undefined : message.member;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryMemberWarningsRequestAminoMsg): QueryMemberWarningsRequest {
+    return QueryMemberWarningsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryMemberWarningsRequestProtoMsg): QueryMemberWarningsRequest {
+    return QueryMemberWarningsRequest.decode(message.value);
+  },
+  toProto(message: QueryMemberWarningsRequest): Uint8Array {
+    return QueryMemberWarningsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryMemberWarningsRequest): QueryMemberWarningsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryMemberWarningsRequest",
+      value: QueryMemberWarningsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryMemberWarningsResponse(): QueryMemberWarningsResponse {
+  return {
+    warningNumber: BigInt(0),
+    reason: "",
+    issuedAt: BigInt(0),
+    pagination: undefined
+  };
+}
+/**
+ * QueryMemberWarningsResponse defines the QueryMemberWarningsResponse message.
+ * @name QueryMemberWarningsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberWarningsResponse
+ */
+export const QueryMemberWarningsResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberWarningsResponse",
+  encode(message: QueryMemberWarningsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.warningNumber !== BigInt(0)) {
+      writer.uint32(8).uint64(message.warningNumber);
+    }
+    if (message.reason !== "") {
+      writer.uint32(18).string(message.reason);
+    }
+    if (message.issuedAt !== BigInt(0)) {
+      writer.uint32(24).int64(message.issuedAt);
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryMemberWarningsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryMemberWarningsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.warningNumber = reader.uint64();
+          break;
+        case 2:
+          message.reason = reader.string();
+          break;
+        case 3:
+          message.issuedAt = reader.int64();
+          break;
+        case 4:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryMemberWarningsResponse>): QueryMemberWarningsResponse {
+    const message = createBaseQueryMemberWarningsResponse();
+    message.warningNumber = object.warningNumber !== undefined && object.warningNumber !== null ? BigInt(object.warningNumber.toString()) : BigInt(0);
+    message.reason = object.reason ?? "";
+    message.issuedAt = object.issuedAt !== undefined && object.issuedAt !== null ? BigInt(object.issuedAt.toString()) : BigInt(0);
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryMemberWarningsResponseAmino): QueryMemberWarningsResponse {
+    const message = createBaseQueryMemberWarningsResponse();
+    if (object.warning_number !== undefined && object.warning_number !== null) {
+      message.warningNumber = BigInt(object.warning_number);
+    }
+    if (object.reason !== undefined && object.reason !== null) {
+      message.reason = object.reason;
+    }
+    if (object.issued_at !== undefined && object.issued_at !== null) {
+      message.issuedAt = BigInt(object.issued_at);
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryMemberWarningsResponse): QueryMemberWarningsResponseAmino {
+    const obj: any = {};
+    obj.warning_number = message.warningNumber !== BigInt(0) ? message.warningNumber?.toString() : undefined;
+    obj.reason = message.reason === "" ? undefined : message.reason;
+    obj.issued_at = message.issuedAt !== BigInt(0) ? message.issuedAt?.toString() : undefined;
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryMemberWarningsResponseAminoMsg): QueryMemberWarningsResponse {
+    return QueryMemberWarningsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryMemberWarningsResponseProtoMsg): QueryMemberWarningsResponse {
+    return QueryMemberWarningsResponse.decode(message.value);
+  },
+  toProto(message: QueryMemberWarningsResponse): Uint8Array {
+    return QueryMemberWarningsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryMemberWarningsResponse): QueryMemberWarningsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryMemberWarningsResponse",
+      value: QueryMemberWarningsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryMemberStandingRequest(): QueryMemberStandingRequest {
+  return {
+    member: ""
+  };
+}
+/**
+ * QueryMemberStandingRequest defines the QueryMemberStandingRequest message.
+ * @name QueryMemberStandingRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberStandingRequest
+ */
+export const QueryMemberStandingRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberStandingRequest",
+  encode(message: QueryMemberStandingRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.member !== "") {
+      writer.uint32(10).string(message.member);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryMemberStandingRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryMemberStandingRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.member = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryMemberStandingRequest>): QueryMemberStandingRequest {
+    const message = createBaseQueryMemberStandingRequest();
+    message.member = object.member ?? "";
+    return message;
+  },
+  fromAmino(object: QueryMemberStandingRequestAmino): QueryMemberStandingRequest {
+    const message = createBaseQueryMemberStandingRequest();
+    if (object.member !== undefined && object.member !== null) {
+      message.member = object.member;
+    }
+    return message;
+  },
+  toAmino(message: QueryMemberStandingRequest): QueryMemberStandingRequestAmino {
+    const obj: any = {};
+    obj.member = message.member === "" ? undefined : message.member;
+    return obj;
+  },
+  fromAminoMsg(object: QueryMemberStandingRequestAminoMsg): QueryMemberStandingRequest {
+    return QueryMemberStandingRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryMemberStandingRequestProtoMsg): QueryMemberStandingRequest {
+    return QueryMemberStandingRequest.decode(message.value);
+  },
+  toProto(message: QueryMemberStandingRequest): Uint8Array {
+    return QueryMemberStandingRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryMemberStandingRequest): QueryMemberStandingRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryMemberStandingRequest",
+      value: QueryMemberStandingRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryMemberStandingResponse(): QueryMemberStandingResponse {
+  return {
+    warningCount: BigInt(0),
+    activeReport: false,
+    trustTier: BigInt(0)
+  };
+}
+/**
+ * QueryMemberStandingResponse defines the QueryMemberStandingResponse message.
+ * @name QueryMemberStandingResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberStandingResponse
+ */
+export const QueryMemberStandingResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberStandingResponse",
+  encode(message: QueryMemberStandingResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.warningCount !== BigInt(0)) {
+      writer.uint32(8).uint64(message.warningCount);
+    }
+    if (message.activeReport === true) {
+      writer.uint32(16).bool(message.activeReport);
+    }
+    if (message.trustTier !== BigInt(0)) {
+      writer.uint32(24).uint64(message.trustTier);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryMemberStandingResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryMemberStandingResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.warningCount = reader.uint64();
+          break;
+        case 2:
+          message.activeReport = reader.bool();
+          break;
+        case 3:
+          message.trustTier = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryMemberStandingResponse>): QueryMemberStandingResponse {
+    const message = createBaseQueryMemberStandingResponse();
+    message.warningCount = object.warningCount !== undefined && object.warningCount !== null ? BigInt(object.warningCount.toString()) : BigInt(0);
+    message.activeReport = object.activeReport ?? false;
+    message.trustTier = object.trustTier !== undefined && object.trustTier !== null ? BigInt(object.trustTier.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryMemberStandingResponseAmino): QueryMemberStandingResponse {
+    const message = createBaseQueryMemberStandingResponse();
+    if (object.warning_count !== undefined && object.warning_count !== null) {
+      message.warningCount = BigInt(object.warning_count);
+    }
+    if (object.active_report !== undefined && object.active_report !== null) {
+      message.activeReport = object.active_report;
+    }
+    if (object.trust_tier !== undefined && object.trust_tier !== null) {
+      message.trustTier = BigInt(object.trust_tier);
+    }
+    return message;
+  },
+  toAmino(message: QueryMemberStandingResponse): QueryMemberStandingResponseAmino {
+    const obj: any = {};
+    obj.warning_count = message.warningCount !== BigInt(0) ? message.warningCount?.toString() : undefined;
+    obj.active_report = message.activeReport === false ? undefined : message.activeReport;
+    obj.trust_tier = message.trustTier !== BigInt(0) ? message.trustTier?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryMemberStandingResponseAminoMsg): QueryMemberStandingResponse {
+    return QueryMemberStandingResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryMemberStandingResponseProtoMsg): QueryMemberStandingResponse {
+    return QueryMemberStandingResponse.decode(message.value);
+  },
+  toProto(message: QueryMemberStandingResponse): Uint8Array {
+    return QueryMemberStandingResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryMemberStandingResponse): QueryMemberStandingResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryMemberStandingResponse",
+      value: QueryMemberStandingResponse.encode(message).finish()
     };
   }
 };

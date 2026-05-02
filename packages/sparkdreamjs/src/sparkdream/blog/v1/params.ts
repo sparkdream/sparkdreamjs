@@ -86,6 +86,14 @@ export interface Params {
    * Duration in seconds to extend TTL by when conviction-renewed (default: 604800 = 7 days)
    */
   convictionRenewalPeriod: bigint;
+  /**
+   * Maximum number of tags that may be attached to a post (default: 5)
+   */
+  maxTagsPerPost: number;
+  /**
+   * Maximum length in bytes of any single tag name (default: 32)
+   */
+  maxTagLength: number;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.blog.v1.Params";
@@ -174,6 +182,14 @@ export interface ParamsAmino {
    * Duration in seconds to extend TTL by when conviction-renewed (default: 604800 = 7 days)
    */
   conviction_renewal_period?: string;
+  /**
+   * Maximum number of tags that may be attached to a post (default: 5)
+   */
+  max_tags_per_post?: number;
+  /**
+   * Maximum length in bytes of any single tag name (default: 32)
+   */
+  max_tag_length?: number;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/blog/Params";
@@ -313,7 +329,9 @@ function createBaseParams(): Params {
     maxCostPerByte: Coin.fromPartial({}),
     maxReactionFee: Coin.fromPartial({}),
     convictionRenewalThreshold: "",
-    convictionRenewalPeriod: BigInt(0)
+    convictionRenewalPeriod: BigInt(0),
+    maxTagsPerPost: 0,
+    maxTagLength: 0
   };
 }
 /**
@@ -383,6 +401,12 @@ export const Params = {
     if (message.convictionRenewalPeriod !== BigInt(0)) {
       writer.uint32(192).int64(message.convictionRenewalPeriod);
     }
+    if (message.maxTagsPerPost !== 0) {
+      writer.uint32(200).uint32(message.maxTagsPerPost);
+    }
+    if (message.maxTagLength !== 0) {
+      writer.uint32(208).uint32(message.maxTagLength);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -449,6 +473,12 @@ export const Params = {
         case 24:
           message.convictionRenewalPeriod = reader.int64();
           break;
+        case 25:
+          message.maxTagsPerPost = reader.uint32();
+          break;
+        case 26:
+          message.maxTagLength = reader.uint32();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -477,6 +507,8 @@ export const Params = {
     message.maxReactionFee = object.maxReactionFee !== undefined && object.maxReactionFee !== null ? Coin.fromPartial(object.maxReactionFee) : undefined;
     message.convictionRenewalThreshold = object.convictionRenewalThreshold ?? "";
     message.convictionRenewalPeriod = object.convictionRenewalPeriod !== undefined && object.convictionRenewalPeriod !== null ? BigInt(object.convictionRenewalPeriod.toString()) : BigInt(0);
+    message.maxTagsPerPost = object.maxTagsPerPost ?? 0;
+    message.maxTagLength = object.maxTagLength ?? 0;
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -538,6 +570,12 @@ export const Params = {
     if (object.conviction_renewal_period !== undefined && object.conviction_renewal_period !== null) {
       message.convictionRenewalPeriod = BigInt(object.conviction_renewal_period);
     }
+    if (object.max_tags_per_post !== undefined && object.max_tags_per_post !== null) {
+      message.maxTagsPerPost = object.max_tags_per_post;
+    }
+    if (object.max_tag_length !== undefined && object.max_tag_length !== null) {
+      message.maxTagLength = object.max_tag_length;
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -561,6 +599,8 @@ export const Params = {
     obj.max_reaction_fee = message.maxReactionFee ? Coin.toAmino(message.maxReactionFee) : undefined;
     obj.conviction_renewal_threshold = message.convictionRenewalThreshold === "" ? undefined : message.convictionRenewalThreshold;
     obj.conviction_renewal_period = message.convictionRenewalPeriod !== BigInt(0) ? message.convictionRenewalPeriod?.toString() : undefined;
+    obj.max_tags_per_post = message.maxTagsPerPost === 0 ? undefined : message.maxTagsPerPost;
+    obj.max_tag_length = message.maxTagLength === 0 ? undefined : message.maxTagLength;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {

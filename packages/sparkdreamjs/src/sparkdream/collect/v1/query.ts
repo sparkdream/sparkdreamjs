@@ -1,7 +1,8 @@
 //@ts-nocheck
 import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "../../../cosmos/base/query/v1beta1/pagination";
-import { FlagTargetType, Collection, CollectionAmino, Item, ItemAmino, Collaborator, CollaboratorAmino, Curator, CuratorAmino, CurationSummary, CurationSummaryAmino, CurationReview, CurationReviewAmino, SponsorshipRequest, SponsorshipRequestAmino, CollectionFlag, CollectionFlagAmino, HideRecord, HideRecordAmino, Endorsement, EndorsementAmino } from "./types";
+import { FlagTargetType, Collection, CollectionAmino, Item, ItemAmino, Collaborator, CollaboratorAmino, CurationSummary, CurationSummaryAmino, CurationReview, CurationReviewAmino, SponsorshipRequest, SponsorshipRequestAmino, CollectionFlag, CollectionFlagAmino, HideRecord, HideRecordAmino, Endorsement, EndorsementAmino } from "./types";
 import { Params, ParamsAmino } from "./params";
+import { CuratorActivity, CuratorActivityAmino } from "./curator_activity";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 import { Decimal } from "@interchainjs/math";
@@ -504,102 +505,52 @@ export interface QueryCollaboratorsResponseAminoMsg {
   value: QueryCollaboratorsResponseAmino;
 }
 /**
- * @name QueryCuratorRequest
+ * @name QueryCuratorActivityRequest
  * @package sparkdream.collect.v1
- * @see proto type: sparkdream.collect.v1.QueryCuratorRequest
+ * @see proto type: sparkdream.collect.v1.QueryCuratorActivityRequest
  */
-export interface QueryCuratorRequest {
+export interface QueryCuratorActivityRequest {
   address: string;
 }
-export interface QueryCuratorRequestProtoMsg {
-  typeUrl: "/sparkdream.collect.v1.QueryCuratorRequest";
+export interface QueryCuratorActivityRequestProtoMsg {
+  typeUrl: "/sparkdream.collect.v1.QueryCuratorActivityRequest";
   value: Uint8Array;
 }
 /**
- * @name QueryCuratorRequestAmino
+ * @name QueryCuratorActivityRequestAmino
  * @package sparkdream.collect.v1
- * @see proto type: sparkdream.collect.v1.QueryCuratorRequest
+ * @see proto type: sparkdream.collect.v1.QueryCuratorActivityRequest
  */
-export interface QueryCuratorRequestAmino {
+export interface QueryCuratorActivityRequestAmino {
   address?: string;
 }
-export interface QueryCuratorRequestAminoMsg {
-  type: "/sparkdream.collect.v1.QueryCuratorRequest";
-  value: QueryCuratorRequestAmino;
+export interface QueryCuratorActivityRequestAminoMsg {
+  type: "/sparkdream.collect.v1.QueryCuratorActivityRequest";
+  value: QueryCuratorActivityRequestAmino;
 }
 /**
- * @name QueryCuratorResponse
+ * @name QueryCuratorActivityResponse
  * @package sparkdream.collect.v1
- * @see proto type: sparkdream.collect.v1.QueryCuratorResponse
+ * @see proto type: sparkdream.collect.v1.QueryCuratorActivityResponse
  */
-export interface QueryCuratorResponse {
-  curator: Curator;
+export interface QueryCuratorActivityResponse {
+  activity: CuratorActivity;
 }
-export interface QueryCuratorResponseProtoMsg {
-  typeUrl: "/sparkdream.collect.v1.QueryCuratorResponse";
+export interface QueryCuratorActivityResponseProtoMsg {
+  typeUrl: "/sparkdream.collect.v1.QueryCuratorActivityResponse";
   value: Uint8Array;
 }
 /**
- * @name QueryCuratorResponseAmino
+ * @name QueryCuratorActivityResponseAmino
  * @package sparkdream.collect.v1
- * @see proto type: sparkdream.collect.v1.QueryCuratorResponse
+ * @see proto type: sparkdream.collect.v1.QueryCuratorActivityResponse
  */
-export interface QueryCuratorResponseAmino {
-  curator?: CuratorAmino;
+export interface QueryCuratorActivityResponseAmino {
+  activity?: CuratorActivityAmino;
 }
-export interface QueryCuratorResponseAminoMsg {
-  type: "/sparkdream.collect.v1.QueryCuratorResponse";
-  value: QueryCuratorResponseAmino;
-}
-/**
- * @name QueryActiveCuratorsRequest
- * @package sparkdream.collect.v1
- * @see proto type: sparkdream.collect.v1.QueryActiveCuratorsRequest
- */
-export interface QueryActiveCuratorsRequest {
-  pagination?: PageRequest;
-}
-export interface QueryActiveCuratorsRequestProtoMsg {
-  typeUrl: "/sparkdream.collect.v1.QueryActiveCuratorsRequest";
-  value: Uint8Array;
-}
-/**
- * @name QueryActiveCuratorsRequestAmino
- * @package sparkdream.collect.v1
- * @see proto type: sparkdream.collect.v1.QueryActiveCuratorsRequest
- */
-export interface QueryActiveCuratorsRequestAmino {
-  pagination?: PageRequestAmino;
-}
-export interface QueryActiveCuratorsRequestAminoMsg {
-  type: "/sparkdream.collect.v1.QueryActiveCuratorsRequest";
-  value: QueryActiveCuratorsRequestAmino;
-}
-/**
- * @name QueryActiveCuratorsResponse
- * @package sparkdream.collect.v1
- * @see proto type: sparkdream.collect.v1.QueryActiveCuratorsResponse
- */
-export interface QueryActiveCuratorsResponse {
-  curators: Curator[];
-  pagination?: PageResponse;
-}
-export interface QueryActiveCuratorsResponseProtoMsg {
-  typeUrl: "/sparkdream.collect.v1.QueryActiveCuratorsResponse";
-  value: Uint8Array;
-}
-/**
- * @name QueryActiveCuratorsResponseAmino
- * @package sparkdream.collect.v1
- * @see proto type: sparkdream.collect.v1.QueryActiveCuratorsResponse
- */
-export interface QueryActiveCuratorsResponseAmino {
-  curators?: CuratorAmino[];
-  pagination?: PageResponseAmino;
-}
-export interface QueryActiveCuratorsResponseAminoMsg {
-  type: "/sparkdream.collect.v1.QueryActiveCuratorsResponse";
-  value: QueryActiveCuratorsResponseAmino;
+export interface QueryCuratorActivityResponseAminoMsg {
+  type: "/sparkdream.collect.v1.QueryCuratorActivityResponse";
+  value: QueryCuratorActivityResponseAmino;
 }
 /**
  * @name QueryCurationSummaryRequest
@@ -1288,6 +1239,62 @@ export interface QueryCollectionConvictionResponseAmino {
 export interface QueryCollectionConvictionResponseAminoMsg {
   type: "/sparkdream.collect.v1.QueryCollectionConvictionResponse";
   value: QueryCollectionConvictionResponseAmino;
+}
+/**
+ * QueryListCollectionsByTagRequest defines the QueryListCollectionsByTag request.
+ * @name QueryListCollectionsByTagRequest
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.QueryListCollectionsByTagRequest
+ */
+export interface QueryListCollectionsByTagRequest {
+  tag: string;
+  pagination?: PageRequest;
+}
+export interface QueryListCollectionsByTagRequestProtoMsg {
+  typeUrl: "/sparkdream.collect.v1.QueryListCollectionsByTagRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryListCollectionsByTagRequest defines the QueryListCollectionsByTag request.
+ * @name QueryListCollectionsByTagRequestAmino
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.QueryListCollectionsByTagRequest
+ */
+export interface QueryListCollectionsByTagRequestAmino {
+  tag?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryListCollectionsByTagRequestAminoMsg {
+  type: "/sparkdream.collect.v1.QueryListCollectionsByTagRequest";
+  value: QueryListCollectionsByTagRequestAmino;
+}
+/**
+ * QueryListCollectionsByTagResponse defines the QueryListCollectionsByTag response.
+ * @name QueryListCollectionsByTagResponse
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.QueryListCollectionsByTagResponse
+ */
+export interface QueryListCollectionsByTagResponse {
+  collections: Collection[];
+  pagination?: PageResponse;
+}
+export interface QueryListCollectionsByTagResponseProtoMsg {
+  typeUrl: "/sparkdream.collect.v1.QueryListCollectionsByTagResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryListCollectionsByTagResponse defines the QueryListCollectionsByTag response.
+ * @name QueryListCollectionsByTagResponseAmino
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.QueryListCollectionsByTagResponse
+ */
+export interface QueryListCollectionsByTagResponseAmino {
+  collections?: CollectionAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryListCollectionsByTagResponseAminoMsg {
+  type: "/sparkdream.collect.v1.QueryListCollectionsByTagResponse";
+  value: QueryListCollectionsByTagResponseAmino;
 }
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
@@ -2782,28 +2789,28 @@ export const QueryCollaboratorsResponse = {
     };
   }
 };
-function createBaseQueryCuratorRequest(): QueryCuratorRequest {
+function createBaseQueryCuratorActivityRequest(): QueryCuratorActivityRequest {
   return {
     address: ""
   };
 }
 /**
- * @name QueryCuratorRequest
+ * @name QueryCuratorActivityRequest
  * @package sparkdream.collect.v1
- * @see proto type: sparkdream.collect.v1.QueryCuratorRequest
+ * @see proto type: sparkdream.collect.v1.QueryCuratorActivityRequest
  */
-export const QueryCuratorRequest = {
-  typeUrl: "/sparkdream.collect.v1.QueryCuratorRequest",
-  encode(message: QueryCuratorRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+export const QueryCuratorActivityRequest = {
+  typeUrl: "/sparkdream.collect.v1.QueryCuratorActivityRequest",
+  encode(message: QueryCuratorActivityRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
     }
     return writer;
   },
-  decode(input: BinaryReader | Uint8Array, length?: number): QueryCuratorRequest {
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryCuratorActivityRequest {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryCuratorRequest();
+    const message = createBaseQueryCuratorActivityRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2817,66 +2824,66 @@ export const QueryCuratorRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryCuratorRequest>): QueryCuratorRequest {
-    const message = createBaseQueryCuratorRequest();
+  fromPartial(object: DeepPartial<QueryCuratorActivityRequest>): QueryCuratorActivityRequest {
+    const message = createBaseQueryCuratorActivityRequest();
     message.address = object.address ?? "";
     return message;
   },
-  fromAmino(object: QueryCuratorRequestAmino): QueryCuratorRequest {
-    const message = createBaseQueryCuratorRequest();
+  fromAmino(object: QueryCuratorActivityRequestAmino): QueryCuratorActivityRequest {
+    const message = createBaseQueryCuratorActivityRequest();
     if (object.address !== undefined && object.address !== null) {
       message.address = object.address;
     }
     return message;
   },
-  toAmino(message: QueryCuratorRequest): QueryCuratorRequestAmino {
+  toAmino(message: QueryCuratorActivityRequest): QueryCuratorActivityRequestAmino {
     const obj: any = {};
     obj.address = message.address === "" ? undefined : message.address;
     return obj;
   },
-  fromAminoMsg(object: QueryCuratorRequestAminoMsg): QueryCuratorRequest {
-    return QueryCuratorRequest.fromAmino(object.value);
+  fromAminoMsg(object: QueryCuratorActivityRequestAminoMsg): QueryCuratorActivityRequest {
+    return QueryCuratorActivityRequest.fromAmino(object.value);
   },
-  fromProtoMsg(message: QueryCuratorRequestProtoMsg): QueryCuratorRequest {
-    return QueryCuratorRequest.decode(message.value);
+  fromProtoMsg(message: QueryCuratorActivityRequestProtoMsg): QueryCuratorActivityRequest {
+    return QueryCuratorActivityRequest.decode(message.value);
   },
-  toProto(message: QueryCuratorRequest): Uint8Array {
-    return QueryCuratorRequest.encode(message).finish();
+  toProto(message: QueryCuratorActivityRequest): Uint8Array {
+    return QueryCuratorActivityRequest.encode(message).finish();
   },
-  toProtoMsg(message: QueryCuratorRequest): QueryCuratorRequestProtoMsg {
+  toProtoMsg(message: QueryCuratorActivityRequest): QueryCuratorActivityRequestProtoMsg {
     return {
-      typeUrl: "/sparkdream.collect.v1.QueryCuratorRequest",
-      value: QueryCuratorRequest.encode(message).finish()
+      typeUrl: "/sparkdream.collect.v1.QueryCuratorActivityRequest",
+      value: QueryCuratorActivityRequest.encode(message).finish()
     };
   }
 };
-function createBaseQueryCuratorResponse(): QueryCuratorResponse {
+function createBaseQueryCuratorActivityResponse(): QueryCuratorActivityResponse {
   return {
-    curator: Curator.fromPartial({})
+    activity: CuratorActivity.fromPartial({})
   };
 }
 /**
- * @name QueryCuratorResponse
+ * @name QueryCuratorActivityResponse
  * @package sparkdream.collect.v1
- * @see proto type: sparkdream.collect.v1.QueryCuratorResponse
+ * @see proto type: sparkdream.collect.v1.QueryCuratorActivityResponse
  */
-export const QueryCuratorResponse = {
-  typeUrl: "/sparkdream.collect.v1.QueryCuratorResponse",
-  encode(message: QueryCuratorResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.curator !== undefined) {
-      Curator.encode(message.curator, writer.uint32(10).fork()).ldelim();
+export const QueryCuratorActivityResponse = {
+  typeUrl: "/sparkdream.collect.v1.QueryCuratorActivityResponse",
+  encode(message: QueryCuratorActivityResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.activity !== undefined) {
+      CuratorActivity.encode(message.activity, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
-  decode(input: BinaryReader | Uint8Array, length?: number): QueryCuratorResponse {
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryCuratorActivityResponse {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryCuratorResponse();
+    const message = createBaseQueryCuratorActivityResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.curator = Curator.decode(reader, reader.uint32());
+          message.activity = CuratorActivity.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -2885,186 +2892,36 @@ export const QueryCuratorResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryCuratorResponse>): QueryCuratorResponse {
-    const message = createBaseQueryCuratorResponse();
-    message.curator = object.curator !== undefined && object.curator !== null ? Curator.fromPartial(object.curator) : undefined;
+  fromPartial(object: DeepPartial<QueryCuratorActivityResponse>): QueryCuratorActivityResponse {
+    const message = createBaseQueryCuratorActivityResponse();
+    message.activity = object.activity !== undefined && object.activity !== null ? CuratorActivity.fromPartial(object.activity) : undefined;
     return message;
   },
-  fromAmino(object: QueryCuratorResponseAmino): QueryCuratorResponse {
-    const message = createBaseQueryCuratorResponse();
-    if (object.curator !== undefined && object.curator !== null) {
-      message.curator = Curator.fromAmino(object.curator);
+  fromAmino(object: QueryCuratorActivityResponseAmino): QueryCuratorActivityResponse {
+    const message = createBaseQueryCuratorActivityResponse();
+    if (object.activity !== undefined && object.activity !== null) {
+      message.activity = CuratorActivity.fromAmino(object.activity);
     }
     return message;
   },
-  toAmino(message: QueryCuratorResponse): QueryCuratorResponseAmino {
+  toAmino(message: QueryCuratorActivityResponse): QueryCuratorActivityResponseAmino {
     const obj: any = {};
-    obj.curator = message.curator ? Curator.toAmino(message.curator) : undefined;
+    obj.activity = message.activity ? CuratorActivity.toAmino(message.activity) : undefined;
     return obj;
   },
-  fromAminoMsg(object: QueryCuratorResponseAminoMsg): QueryCuratorResponse {
-    return QueryCuratorResponse.fromAmino(object.value);
+  fromAminoMsg(object: QueryCuratorActivityResponseAminoMsg): QueryCuratorActivityResponse {
+    return QueryCuratorActivityResponse.fromAmino(object.value);
   },
-  fromProtoMsg(message: QueryCuratorResponseProtoMsg): QueryCuratorResponse {
-    return QueryCuratorResponse.decode(message.value);
+  fromProtoMsg(message: QueryCuratorActivityResponseProtoMsg): QueryCuratorActivityResponse {
+    return QueryCuratorActivityResponse.decode(message.value);
   },
-  toProto(message: QueryCuratorResponse): Uint8Array {
-    return QueryCuratorResponse.encode(message).finish();
+  toProto(message: QueryCuratorActivityResponse): Uint8Array {
+    return QueryCuratorActivityResponse.encode(message).finish();
   },
-  toProtoMsg(message: QueryCuratorResponse): QueryCuratorResponseProtoMsg {
+  toProtoMsg(message: QueryCuratorActivityResponse): QueryCuratorActivityResponseProtoMsg {
     return {
-      typeUrl: "/sparkdream.collect.v1.QueryCuratorResponse",
-      value: QueryCuratorResponse.encode(message).finish()
-    };
-  }
-};
-function createBaseQueryActiveCuratorsRequest(): QueryActiveCuratorsRequest {
-  return {
-    pagination: undefined
-  };
-}
-/**
- * @name QueryActiveCuratorsRequest
- * @package sparkdream.collect.v1
- * @see proto type: sparkdream.collect.v1.QueryActiveCuratorsRequest
- */
-export const QueryActiveCuratorsRequest = {
-  typeUrl: "/sparkdream.collect.v1.QueryActiveCuratorsRequest",
-  encode(message: QueryActiveCuratorsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.pagination !== undefined) {
-      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): QueryActiveCuratorsRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryActiveCuratorsRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.pagination = PageRequest.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial(object: DeepPartial<QueryActiveCuratorsRequest>): QueryActiveCuratorsRequest {
-    const message = createBaseQueryActiveCuratorsRequest();
-    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
-    return message;
-  },
-  fromAmino(object: QueryActiveCuratorsRequestAmino): QueryActiveCuratorsRequest {
-    const message = createBaseQueryActiveCuratorsRequest();
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromAmino(object.pagination);
-    }
-    return message;
-  },
-  toAmino(message: QueryActiveCuratorsRequest): QueryActiveCuratorsRequestAmino {
-    const obj: any = {};
-    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
-    return obj;
-  },
-  fromAminoMsg(object: QueryActiveCuratorsRequestAminoMsg): QueryActiveCuratorsRequest {
-    return QueryActiveCuratorsRequest.fromAmino(object.value);
-  },
-  fromProtoMsg(message: QueryActiveCuratorsRequestProtoMsg): QueryActiveCuratorsRequest {
-    return QueryActiveCuratorsRequest.decode(message.value);
-  },
-  toProto(message: QueryActiveCuratorsRequest): Uint8Array {
-    return QueryActiveCuratorsRequest.encode(message).finish();
-  },
-  toProtoMsg(message: QueryActiveCuratorsRequest): QueryActiveCuratorsRequestProtoMsg {
-    return {
-      typeUrl: "/sparkdream.collect.v1.QueryActiveCuratorsRequest",
-      value: QueryActiveCuratorsRequest.encode(message).finish()
-    };
-  }
-};
-function createBaseQueryActiveCuratorsResponse(): QueryActiveCuratorsResponse {
-  return {
-    curators: [],
-    pagination: undefined
-  };
-}
-/**
- * @name QueryActiveCuratorsResponse
- * @package sparkdream.collect.v1
- * @see proto type: sparkdream.collect.v1.QueryActiveCuratorsResponse
- */
-export const QueryActiveCuratorsResponse = {
-  typeUrl: "/sparkdream.collect.v1.QueryActiveCuratorsResponse",
-  encode(message: QueryActiveCuratorsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    for (const v of message.curators) {
-      Curator.encode(v!, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.pagination !== undefined) {
-      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): QueryActiveCuratorsResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryActiveCuratorsResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.curators.push(Curator.decode(reader, reader.uint32()));
-          break;
-        case 2:
-          message.pagination = PageResponse.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial(object: DeepPartial<QueryActiveCuratorsResponse>): QueryActiveCuratorsResponse {
-    const message = createBaseQueryActiveCuratorsResponse();
-    message.curators = object.curators?.map(e => Curator.fromPartial(e)) || [];
-    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
-    return message;
-  },
-  fromAmino(object: QueryActiveCuratorsResponseAmino): QueryActiveCuratorsResponse {
-    const message = createBaseQueryActiveCuratorsResponse();
-    message.curators = object.curators?.map(e => Curator.fromAmino(e)) || [];
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromAmino(object.pagination);
-    }
-    return message;
-  },
-  toAmino(message: QueryActiveCuratorsResponse): QueryActiveCuratorsResponseAmino {
-    const obj: any = {};
-    if (message.curators) {
-      obj.curators = message.curators.map(e => e ? Curator.toAmino(e) : undefined);
-    } else {
-      obj.curators = message.curators;
-    }
-    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
-    return obj;
-  },
-  fromAminoMsg(object: QueryActiveCuratorsResponseAminoMsg): QueryActiveCuratorsResponse {
-    return QueryActiveCuratorsResponse.fromAmino(object.value);
-  },
-  fromProtoMsg(message: QueryActiveCuratorsResponseProtoMsg): QueryActiveCuratorsResponse {
-    return QueryActiveCuratorsResponse.decode(message.value);
-  },
-  toProto(message: QueryActiveCuratorsResponse): Uint8Array {
-    return QueryActiveCuratorsResponse.encode(message).finish();
-  },
-  toProtoMsg(message: QueryActiveCuratorsResponse): QueryActiveCuratorsResponseProtoMsg {
-    return {
-      typeUrl: "/sparkdream.collect.v1.QueryActiveCuratorsResponse",
-      value: QueryActiveCuratorsResponse.encode(message).finish()
+      typeUrl: "/sparkdream.collect.v1.QueryCuratorActivityResponse",
+      value: QueryCuratorActivityResponse.encode(message).finish()
     };
   }
 };
@@ -5055,6 +4912,170 @@ export const QueryCollectionConvictionResponse = {
     return {
       typeUrl: "/sparkdream.collect.v1.QueryCollectionConvictionResponse",
       value: QueryCollectionConvictionResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryListCollectionsByTagRequest(): QueryListCollectionsByTagRequest {
+  return {
+    tag: "",
+    pagination: undefined
+  };
+}
+/**
+ * QueryListCollectionsByTagRequest defines the QueryListCollectionsByTag request.
+ * @name QueryListCollectionsByTagRequest
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.QueryListCollectionsByTagRequest
+ */
+export const QueryListCollectionsByTagRequest = {
+  typeUrl: "/sparkdream.collect.v1.QueryListCollectionsByTagRequest",
+  encode(message: QueryListCollectionsByTagRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.tag !== "") {
+      writer.uint32(10).string(message.tag);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryListCollectionsByTagRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryListCollectionsByTagRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tag = reader.string();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryListCollectionsByTagRequest>): QueryListCollectionsByTagRequest {
+    const message = createBaseQueryListCollectionsByTagRequest();
+    message.tag = object.tag ?? "";
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryListCollectionsByTagRequestAmino): QueryListCollectionsByTagRequest {
+    const message = createBaseQueryListCollectionsByTagRequest();
+    if (object.tag !== undefined && object.tag !== null) {
+      message.tag = object.tag;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryListCollectionsByTagRequest): QueryListCollectionsByTagRequestAmino {
+    const obj: any = {};
+    obj.tag = message.tag === "" ? undefined : message.tag;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryListCollectionsByTagRequestAminoMsg): QueryListCollectionsByTagRequest {
+    return QueryListCollectionsByTagRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryListCollectionsByTagRequestProtoMsg): QueryListCollectionsByTagRequest {
+    return QueryListCollectionsByTagRequest.decode(message.value);
+  },
+  toProto(message: QueryListCollectionsByTagRequest): Uint8Array {
+    return QueryListCollectionsByTagRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryListCollectionsByTagRequest): QueryListCollectionsByTagRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.collect.v1.QueryListCollectionsByTagRequest",
+      value: QueryListCollectionsByTagRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryListCollectionsByTagResponse(): QueryListCollectionsByTagResponse {
+  return {
+    collections: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryListCollectionsByTagResponse defines the QueryListCollectionsByTag response.
+ * @name QueryListCollectionsByTagResponse
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.QueryListCollectionsByTagResponse
+ */
+export const QueryListCollectionsByTagResponse = {
+  typeUrl: "/sparkdream.collect.v1.QueryListCollectionsByTagResponse",
+  encode(message: QueryListCollectionsByTagResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.collections) {
+      Collection.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryListCollectionsByTagResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryListCollectionsByTagResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.collections.push(Collection.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryListCollectionsByTagResponse>): QueryListCollectionsByTagResponse {
+    const message = createBaseQueryListCollectionsByTagResponse();
+    message.collections = object.collections?.map(e => Collection.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryListCollectionsByTagResponseAmino): QueryListCollectionsByTagResponse {
+    const message = createBaseQueryListCollectionsByTagResponse();
+    message.collections = object.collections?.map(e => Collection.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryListCollectionsByTagResponse): QueryListCollectionsByTagResponseAmino {
+    const obj: any = {};
+    if (message.collections) {
+      obj.collections = message.collections.map(e => e ? Collection.toAmino(e) : undefined);
+    } else {
+      obj.collections = message.collections;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryListCollectionsByTagResponseAminoMsg): QueryListCollectionsByTagResponse {
+    return QueryListCollectionsByTagResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryListCollectionsByTagResponseProtoMsg): QueryListCollectionsByTagResponse {
+    return QueryListCollectionsByTagResponse.decode(message.value);
+  },
+  toProto(message: QueryListCollectionsByTagResponse): Uint8Array {
+    return QueryListCollectionsByTagResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryListCollectionsByTagResponse): QueryListCollectionsByTagResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.collect.v1.QueryListCollectionsByTagResponse",
+      value: QueryListCollectionsByTagResponse.encode(message).finish()
     };
   }
 };

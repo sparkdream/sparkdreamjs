@@ -142,13 +142,24 @@ export interface Params {
   nominationWindowEpochs: bigint;
   maxNominationsPerMember: bigint;
   retroRewardMaxRecipients: bigint;
-  retroRewardBudgetPerSeason: string;
   retroRewardMinConviction: string;
   nominationConvictionHalfLifeEpochs: bigint;
   nominationRationaleMaxLength: number;
   nominationMinTrustLevel: number;
   nominationStakeMinTrustLevel: number;
   nominationMinStake: string;
+  /**
+   * Activity-based retro PGF budget (replaces fixed budget)
+   */
+  retroRewardBudgetRatio: string;
+  /**
+   * Floor for retro PGF budget in micro-DREAM (default 10,000 DREAM)
+   */
+  retroRewardBudgetMin: string;
+  /**
+   * Ceiling for retro PGF budget in micro-DREAM (default 75,000 DREAM)
+   */
+  retroRewardBudgetMax: string;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.season.v1.Params";
@@ -294,13 +305,24 @@ export interface ParamsAmino {
   nomination_window_epochs?: string;
   max_nominations_per_member?: string;
   retro_reward_max_recipients?: string;
-  retro_reward_budget_per_season?: string;
   retro_reward_min_conviction?: string;
   nomination_conviction_half_life_epochs?: string;
   nomination_rationale_max_length?: number;
   nomination_min_trust_level?: number;
   nomination_stake_min_trust_level?: number;
   nomination_min_stake?: string;
+  /**
+   * Activity-based retro PGF budget (replaces fixed budget)
+   */
+  retro_reward_budget_ratio?: string;
+  /**
+   * Floor for retro PGF budget in micro-DREAM (default 10,000 DREAM)
+   */
+  retro_reward_budget_min?: string;
+  /**
+   * Ceiling for retro PGF budget in micro-DREAM (default 75,000 DREAM)
+   */
+  retro_reward_budget_max?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/season/Params";
@@ -426,13 +448,18 @@ export interface SeasonOperationalParams {
   nominationWindowEpochs: bigint;
   maxNominationsPerMember: bigint;
   retroRewardMaxRecipients: bigint;
-  retroRewardBudgetPerSeason: string;
   retroRewardMinConviction: string;
   nominationConvictionHalfLifeEpochs: bigint;
   nominationRationaleMaxLength: number;
   nominationMinTrustLevel: number;
   nominationStakeMinTrustLevel: number;
   nominationMinStake: string;
+  /**
+   * Activity-based retro PGF budget
+   */
+  retroRewardBudgetRatio: string;
+  retroRewardBudgetMin: string;
+  retroRewardBudgetMax: string;
 }
 export interface SeasonOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.season.v1.SeasonOperationalParams";
@@ -558,13 +585,18 @@ export interface SeasonOperationalParamsAmino {
   nomination_window_epochs?: string;
   max_nominations_per_member?: string;
   retro_reward_max_recipients?: string;
-  retro_reward_budget_per_season?: string;
   retro_reward_min_conviction?: string;
   nomination_conviction_half_life_epochs?: string;
   nomination_rationale_max_length?: number;
   nomination_min_trust_level?: number;
   nomination_stake_min_trust_level?: number;
   nomination_min_stake?: string;
+  /**
+   * Activity-based retro PGF budget
+   */
+  retro_reward_budget_ratio?: string;
+  retro_reward_budget_min?: string;
+  retro_reward_budget_max?: string;
 }
 export interface SeasonOperationalParamsAminoMsg {
   type: "sparkdream/x/season/SeasonOperationalParams";
@@ -630,13 +662,15 @@ function createBaseParams(): Params {
     nominationWindowEpochs: BigInt(0),
     maxNominationsPerMember: BigInt(0),
     retroRewardMaxRecipients: BigInt(0),
-    retroRewardBudgetPerSeason: "",
     retroRewardMinConviction: "",
     nominationConvictionHalfLifeEpochs: BigInt(0),
     nominationRationaleMaxLength: 0,
     nominationMinTrustLevel: 0,
     nominationStakeMinTrustLevel: 0,
-    nominationMinStake: ""
+    nominationMinStake: "",
+    retroRewardBudgetRatio: "",
+    retroRewardBudgetMin: "",
+    retroRewardBudgetMax: ""
   };
 }
 /**
@@ -825,26 +859,32 @@ export const Params = {
     if (message.retroRewardMaxRecipients !== BigInt(0)) {
       writer.uint32(464).uint64(message.retroRewardMaxRecipients);
     }
-    if (message.retroRewardBudgetPerSeason !== "") {
-      writer.uint32(474).string(Decimal.fromUserInput(message.retroRewardBudgetPerSeason, 18).atomics);
-    }
     if (message.retroRewardMinConviction !== "") {
-      writer.uint32(482).string(Decimal.fromUserInput(message.retroRewardMinConviction, 18).atomics);
+      writer.uint32(474).string(Decimal.fromUserInput(message.retroRewardMinConviction, 18).atomics);
     }
     if (message.nominationConvictionHalfLifeEpochs !== BigInt(0)) {
-      writer.uint32(488).uint64(message.nominationConvictionHalfLifeEpochs);
+      writer.uint32(480).uint64(message.nominationConvictionHalfLifeEpochs);
     }
     if (message.nominationRationaleMaxLength !== 0) {
-      writer.uint32(496).uint32(message.nominationRationaleMaxLength);
+      writer.uint32(488).uint32(message.nominationRationaleMaxLength);
     }
     if (message.nominationMinTrustLevel !== 0) {
-      writer.uint32(504).uint32(message.nominationMinTrustLevel);
+      writer.uint32(496).uint32(message.nominationMinTrustLevel);
     }
     if (message.nominationStakeMinTrustLevel !== 0) {
-      writer.uint32(512).uint32(message.nominationStakeMinTrustLevel);
+      writer.uint32(504).uint32(message.nominationStakeMinTrustLevel);
     }
     if (message.nominationMinStake !== "") {
-      writer.uint32(522).string(Decimal.fromUserInput(message.nominationMinStake, 18).atomics);
+      writer.uint32(514).string(Decimal.fromUserInput(message.nominationMinStake, 18).atomics);
+    }
+    if (message.retroRewardBudgetRatio !== "") {
+      writer.uint32(522).string(Decimal.fromUserInput(message.retroRewardBudgetRatio, 18).atomics);
+    }
+    if (message.retroRewardBudgetMin !== "") {
+      writer.uint32(530).string(message.retroRewardBudgetMin);
+    }
+    if (message.retroRewardBudgetMax !== "") {
+      writer.uint32(538).string(message.retroRewardBudgetMax);
     }
     return writer;
   },
@@ -1037,25 +1077,31 @@ export const Params = {
           message.retroRewardMaxRecipients = reader.uint64();
           break;
         case 59:
-          message.retroRewardBudgetPerSeason = Decimal.fromAtomics(reader.string(), 18).toString();
-          break;
-        case 60:
           message.retroRewardMinConviction = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 61:
+        case 60:
           message.nominationConvictionHalfLifeEpochs = reader.uint64();
           break;
-        case 62:
+        case 61:
           message.nominationRationaleMaxLength = reader.uint32();
           break;
-        case 63:
+        case 62:
           message.nominationMinTrustLevel = reader.uint32();
           break;
-        case 64:
+        case 63:
           message.nominationStakeMinTrustLevel = reader.uint32();
           break;
-        case 65:
+        case 64:
           message.nominationMinStake = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 65:
+          message.retroRewardBudgetRatio = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 66:
+          message.retroRewardBudgetMin = reader.string();
+          break;
+        case 67:
+          message.retroRewardBudgetMax = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1124,13 +1170,15 @@ export const Params = {
     message.nominationWindowEpochs = object.nominationWindowEpochs !== undefined && object.nominationWindowEpochs !== null ? BigInt(object.nominationWindowEpochs.toString()) : BigInt(0);
     message.maxNominationsPerMember = object.maxNominationsPerMember !== undefined && object.maxNominationsPerMember !== null ? BigInt(object.maxNominationsPerMember.toString()) : BigInt(0);
     message.retroRewardMaxRecipients = object.retroRewardMaxRecipients !== undefined && object.retroRewardMaxRecipients !== null ? BigInt(object.retroRewardMaxRecipients.toString()) : BigInt(0);
-    message.retroRewardBudgetPerSeason = object.retroRewardBudgetPerSeason ?? "";
     message.retroRewardMinConviction = object.retroRewardMinConviction ?? "";
     message.nominationConvictionHalfLifeEpochs = object.nominationConvictionHalfLifeEpochs !== undefined && object.nominationConvictionHalfLifeEpochs !== null ? BigInt(object.nominationConvictionHalfLifeEpochs.toString()) : BigInt(0);
     message.nominationRationaleMaxLength = object.nominationRationaleMaxLength ?? 0;
     message.nominationMinTrustLevel = object.nominationMinTrustLevel ?? 0;
     message.nominationStakeMinTrustLevel = object.nominationStakeMinTrustLevel ?? 0;
     message.nominationMinStake = object.nominationMinStake ?? "";
+    message.retroRewardBudgetRatio = object.retroRewardBudgetRatio ?? "";
+    message.retroRewardBudgetMin = object.retroRewardBudgetMin ?? "";
+    message.retroRewardBudgetMax = object.retroRewardBudgetMax ?? "";
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -1307,9 +1355,6 @@ export const Params = {
     if (object.retro_reward_max_recipients !== undefined && object.retro_reward_max_recipients !== null) {
       message.retroRewardMaxRecipients = BigInt(object.retro_reward_max_recipients);
     }
-    if (object.retro_reward_budget_per_season !== undefined && object.retro_reward_budget_per_season !== null) {
-      message.retroRewardBudgetPerSeason = object.retro_reward_budget_per_season;
-    }
     if (object.retro_reward_min_conviction !== undefined && object.retro_reward_min_conviction !== null) {
       message.retroRewardMinConviction = object.retro_reward_min_conviction;
     }
@@ -1327,6 +1372,15 @@ export const Params = {
     }
     if (object.nomination_min_stake !== undefined && object.nomination_min_stake !== null) {
       message.nominationMinStake = object.nomination_min_stake;
+    }
+    if (object.retro_reward_budget_ratio !== undefined && object.retro_reward_budget_ratio !== null) {
+      message.retroRewardBudgetRatio = object.retro_reward_budget_ratio;
+    }
+    if (object.retro_reward_budget_min !== undefined && object.retro_reward_budget_min !== null) {
+      message.retroRewardBudgetMin = object.retro_reward_budget_min;
+    }
+    if (object.retro_reward_budget_max !== undefined && object.retro_reward_budget_max !== null) {
+      message.retroRewardBudgetMax = object.retro_reward_budget_max;
     }
     return message;
   },
@@ -1394,13 +1448,15 @@ export const Params = {
     obj.nomination_window_epochs = message.nominationWindowEpochs !== BigInt(0) ? message.nominationWindowEpochs?.toString() : undefined;
     obj.max_nominations_per_member = message.maxNominationsPerMember !== BigInt(0) ? message.maxNominationsPerMember?.toString() : undefined;
     obj.retro_reward_max_recipients = message.retroRewardMaxRecipients !== BigInt(0) ? message.retroRewardMaxRecipients?.toString() : undefined;
-    obj.retro_reward_budget_per_season = message.retroRewardBudgetPerSeason === "" ? undefined : message.retroRewardBudgetPerSeason;
     obj.retro_reward_min_conviction = message.retroRewardMinConviction === "" ? undefined : message.retroRewardMinConviction;
     obj.nomination_conviction_half_life_epochs = message.nominationConvictionHalfLifeEpochs !== BigInt(0) ? message.nominationConvictionHalfLifeEpochs?.toString() : undefined;
     obj.nomination_rationale_max_length = message.nominationRationaleMaxLength === 0 ? undefined : message.nominationRationaleMaxLength;
     obj.nomination_min_trust_level = message.nominationMinTrustLevel === 0 ? undefined : message.nominationMinTrustLevel;
     obj.nomination_stake_min_trust_level = message.nominationStakeMinTrustLevel === 0 ? undefined : message.nominationStakeMinTrustLevel;
     obj.nomination_min_stake = message.nominationMinStake === "" ? undefined : message.nominationMinStake;
+    obj.retro_reward_budget_ratio = message.retroRewardBudgetRatio === "" ? undefined : message.retroRewardBudgetRatio;
+    obj.retro_reward_budget_min = message.retroRewardBudgetMin === "" ? undefined : message.retroRewardBudgetMin;
+    obj.retro_reward_budget_max = message.retroRewardBudgetMax === "" ? undefined : message.retroRewardBudgetMax;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {
@@ -1476,13 +1532,15 @@ function createBaseSeasonOperationalParams(): SeasonOperationalParams {
     nominationWindowEpochs: BigInt(0),
     maxNominationsPerMember: BigInt(0),
     retroRewardMaxRecipients: BigInt(0),
-    retroRewardBudgetPerSeason: "",
     retroRewardMinConviction: "",
     nominationConvictionHalfLifeEpochs: BigInt(0),
     nominationRationaleMaxLength: 0,
     nominationMinTrustLevel: 0,
     nominationStakeMinTrustLevel: 0,
-    nominationMinStake: ""
+    nominationMinStake: "",
+    retroRewardBudgetRatio: "",
+    retroRewardBudgetMin: "",
+    retroRewardBudgetMax: ""
   };
 }
 /**
@@ -1643,26 +1701,32 @@ export const SeasonOperationalParams = {
     if (message.retroRewardMaxRecipients !== BigInt(0)) {
       writer.uint32(392).uint64(message.retroRewardMaxRecipients);
     }
-    if (message.retroRewardBudgetPerSeason !== "") {
-      writer.uint32(402).string(Decimal.fromUserInput(message.retroRewardBudgetPerSeason, 18).atomics);
-    }
     if (message.retroRewardMinConviction !== "") {
-      writer.uint32(410).string(Decimal.fromUserInput(message.retroRewardMinConviction, 18).atomics);
+      writer.uint32(402).string(Decimal.fromUserInput(message.retroRewardMinConviction, 18).atomics);
     }
     if (message.nominationConvictionHalfLifeEpochs !== BigInt(0)) {
-      writer.uint32(416).uint64(message.nominationConvictionHalfLifeEpochs);
+      writer.uint32(408).uint64(message.nominationConvictionHalfLifeEpochs);
     }
     if (message.nominationRationaleMaxLength !== 0) {
-      writer.uint32(424).uint32(message.nominationRationaleMaxLength);
+      writer.uint32(416).uint32(message.nominationRationaleMaxLength);
     }
     if (message.nominationMinTrustLevel !== 0) {
-      writer.uint32(432).uint32(message.nominationMinTrustLevel);
+      writer.uint32(424).uint32(message.nominationMinTrustLevel);
     }
     if (message.nominationStakeMinTrustLevel !== 0) {
-      writer.uint32(440).uint32(message.nominationStakeMinTrustLevel);
+      writer.uint32(432).uint32(message.nominationStakeMinTrustLevel);
     }
     if (message.nominationMinStake !== "") {
-      writer.uint32(450).string(Decimal.fromUserInput(message.nominationMinStake, 18).atomics);
+      writer.uint32(442).string(Decimal.fromUserInput(message.nominationMinStake, 18).atomics);
+    }
+    if (message.retroRewardBudgetRatio !== "") {
+      writer.uint32(450).string(Decimal.fromUserInput(message.retroRewardBudgetRatio, 18).atomics);
+    }
+    if (message.retroRewardBudgetMin !== "") {
+      writer.uint32(458).string(message.retroRewardBudgetMin);
+    }
+    if (message.retroRewardBudgetMax !== "") {
+      writer.uint32(466).string(message.retroRewardBudgetMax);
     }
     return writer;
   },
@@ -1821,25 +1885,31 @@ export const SeasonOperationalParams = {
           message.retroRewardMaxRecipients = reader.uint64();
           break;
         case 50:
-          message.retroRewardBudgetPerSeason = Decimal.fromAtomics(reader.string(), 18).toString();
-          break;
-        case 51:
           message.retroRewardMinConviction = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 52:
+        case 51:
           message.nominationConvictionHalfLifeEpochs = reader.uint64();
           break;
-        case 53:
+        case 52:
           message.nominationRationaleMaxLength = reader.uint32();
           break;
-        case 54:
+        case 53:
           message.nominationMinTrustLevel = reader.uint32();
           break;
-        case 55:
+        case 54:
           message.nominationStakeMinTrustLevel = reader.uint32();
           break;
-        case 56:
+        case 55:
           message.nominationMinStake = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 56:
+          message.retroRewardBudgetRatio = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 57:
+          message.retroRewardBudgetMin = reader.string();
+          break;
+        case 58:
+          message.retroRewardBudgetMax = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1899,13 +1969,15 @@ export const SeasonOperationalParams = {
     message.nominationWindowEpochs = object.nominationWindowEpochs !== undefined && object.nominationWindowEpochs !== null ? BigInt(object.nominationWindowEpochs.toString()) : BigInt(0);
     message.maxNominationsPerMember = object.maxNominationsPerMember !== undefined && object.maxNominationsPerMember !== null ? BigInt(object.maxNominationsPerMember.toString()) : BigInt(0);
     message.retroRewardMaxRecipients = object.retroRewardMaxRecipients !== undefined && object.retroRewardMaxRecipients !== null ? BigInt(object.retroRewardMaxRecipients.toString()) : BigInt(0);
-    message.retroRewardBudgetPerSeason = object.retroRewardBudgetPerSeason ?? "";
     message.retroRewardMinConviction = object.retroRewardMinConviction ?? "";
     message.nominationConvictionHalfLifeEpochs = object.nominationConvictionHalfLifeEpochs !== undefined && object.nominationConvictionHalfLifeEpochs !== null ? BigInt(object.nominationConvictionHalfLifeEpochs.toString()) : BigInt(0);
     message.nominationRationaleMaxLength = object.nominationRationaleMaxLength ?? 0;
     message.nominationMinTrustLevel = object.nominationMinTrustLevel ?? 0;
     message.nominationStakeMinTrustLevel = object.nominationStakeMinTrustLevel ?? 0;
     message.nominationMinStake = object.nominationMinStake ?? "";
+    message.retroRewardBudgetRatio = object.retroRewardBudgetRatio ?? "";
+    message.retroRewardBudgetMin = object.retroRewardBudgetMin ?? "";
+    message.retroRewardBudgetMax = object.retroRewardBudgetMax ?? "";
     return message;
   },
   fromAmino(object: SeasonOperationalParamsAmino): SeasonOperationalParams {
@@ -2057,9 +2129,6 @@ export const SeasonOperationalParams = {
     if (object.retro_reward_max_recipients !== undefined && object.retro_reward_max_recipients !== null) {
       message.retroRewardMaxRecipients = BigInt(object.retro_reward_max_recipients);
     }
-    if (object.retro_reward_budget_per_season !== undefined && object.retro_reward_budget_per_season !== null) {
-      message.retroRewardBudgetPerSeason = object.retro_reward_budget_per_season;
-    }
     if (object.retro_reward_min_conviction !== undefined && object.retro_reward_min_conviction !== null) {
       message.retroRewardMinConviction = object.retro_reward_min_conviction;
     }
@@ -2077,6 +2146,15 @@ export const SeasonOperationalParams = {
     }
     if (object.nomination_min_stake !== undefined && object.nomination_min_stake !== null) {
       message.nominationMinStake = object.nomination_min_stake;
+    }
+    if (object.retro_reward_budget_ratio !== undefined && object.retro_reward_budget_ratio !== null) {
+      message.retroRewardBudgetRatio = object.retro_reward_budget_ratio;
+    }
+    if (object.retro_reward_budget_min !== undefined && object.retro_reward_budget_min !== null) {
+      message.retroRewardBudgetMin = object.retro_reward_budget_min;
+    }
+    if (object.retro_reward_budget_max !== undefined && object.retro_reward_budget_max !== null) {
+      message.retroRewardBudgetMax = object.retro_reward_budget_max;
     }
     return message;
   },
@@ -2131,13 +2209,15 @@ export const SeasonOperationalParams = {
     obj.nomination_window_epochs = message.nominationWindowEpochs !== BigInt(0) ? message.nominationWindowEpochs?.toString() : undefined;
     obj.max_nominations_per_member = message.maxNominationsPerMember !== BigInt(0) ? message.maxNominationsPerMember?.toString() : undefined;
     obj.retro_reward_max_recipients = message.retroRewardMaxRecipients !== BigInt(0) ? message.retroRewardMaxRecipients?.toString() : undefined;
-    obj.retro_reward_budget_per_season = message.retroRewardBudgetPerSeason === "" ? undefined : message.retroRewardBudgetPerSeason;
     obj.retro_reward_min_conviction = message.retroRewardMinConviction === "" ? undefined : message.retroRewardMinConviction;
     obj.nomination_conviction_half_life_epochs = message.nominationConvictionHalfLifeEpochs !== BigInt(0) ? message.nominationConvictionHalfLifeEpochs?.toString() : undefined;
     obj.nomination_rationale_max_length = message.nominationRationaleMaxLength === 0 ? undefined : message.nominationRationaleMaxLength;
     obj.nomination_min_trust_level = message.nominationMinTrustLevel === 0 ? undefined : message.nominationMinTrustLevel;
     obj.nomination_stake_min_trust_level = message.nominationStakeMinTrustLevel === 0 ? undefined : message.nominationStakeMinTrustLevel;
     obj.nomination_min_stake = message.nominationMinStake === "" ? undefined : message.nominationMinStake;
+    obj.retro_reward_budget_ratio = message.retroRewardBudgetRatio === "" ? undefined : message.retroRewardBudgetRatio;
+    obj.retro_reward_budget_min = message.retroRewardBudgetMin === "" ? undefined : message.retroRewardBudgetMin;
+    obj.retro_reward_budget_max = message.retroRewardBudgetMax === "" ? undefined : message.retroRewardBudgetMax;
     return obj;
   },
   fromAminoMsg(object: SeasonOperationalParamsAminoMsg): SeasonOperationalParams {

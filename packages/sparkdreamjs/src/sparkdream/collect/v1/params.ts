@@ -106,6 +106,22 @@ export interface Params {
    * Max pins per address per day (default: 10)
    */
   maxPinsPerDay: number;
+  /**
+   * curator_demotion_cooldown is the number of seconds a DEMOTED curator
+   * must wait before re-bonding.
+   */
+  curatorDemotionCooldown: bigint;
+  /**
+   * curator_demotion_threshold is the bond floor (DREAM) below which a
+   * curator transitions from RECOVERY to DEMOTED.
+   */
+  curatorDemotionThreshold: string;
+  /**
+   * curator_overturn_demotion_streak is the number of consecutive overturned
+   * challenge outcomes against a curator before they are demoted. Zero = no
+   * streak-based demotion.
+   */
+  curatorOverturnDemotionStreak: bigint;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.collect.v1.Params";
@@ -215,6 +231,22 @@ export interface ParamsAmino {
    * Max pins per address per day (default: 10)
    */
   max_pins_per_day?: number;
+  /**
+   * curator_demotion_cooldown is the number of seconds a DEMOTED curator
+   * must wait before re-bonding.
+   */
+  curator_demotion_cooldown?: string;
+  /**
+   * curator_demotion_threshold is the bond floor (DREAM) below which a
+   * curator transitions from RECOVERY to DEMOTED.
+   */
+  curator_demotion_threshold?: string;
+  /**
+   * curator_overturn_demotion_streak is the number of consecutive overturned
+   * challenge outcomes against a curator before they are demoted. Zero = no
+   * streak-based demotion.
+   */
+  curator_overturn_demotion_streak?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/collect/Params";
@@ -279,7 +311,10 @@ function createBaseParams(): Params {
     convictionRenewalThreshold: "",
     convictionRenewalPeriod: BigInt(0),
     pinMinTrustLevel: 0,
-    maxPinsPerDay: 0
+    maxPinsPerDay: 0,
+    curatorDemotionCooldown: BigInt(0),
+    curatorDemotionThreshold: "",
+    curatorOverturnDemotionStreak: BigInt(0)
   };
 }
 /**
@@ -466,6 +501,15 @@ export const Params = {
     if (message.maxPinsPerDay !== 0) {
       writer.uint32(496).uint32(message.maxPinsPerDay);
     }
+    if (message.curatorDemotionCooldown !== BigInt(0)) {
+      writer.uint32(504).int64(message.curatorDemotionCooldown);
+    }
+    if (message.curatorDemotionThreshold !== "") {
+      writer.uint32(514).string(message.curatorDemotionThreshold);
+    }
+    if (message.curatorOverturnDemotionStreak !== BigInt(0)) {
+      writer.uint32(520).uint64(message.curatorOverturnDemotionStreak);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -649,6 +693,15 @@ export const Params = {
         case 62:
           message.maxPinsPerDay = reader.uint32();
           break;
+        case 63:
+          message.curatorDemotionCooldown = reader.int64();
+          break;
+        case 64:
+          message.curatorDemotionThreshold = reader.string();
+          break;
+        case 65:
+          message.curatorOverturnDemotionStreak = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -716,6 +769,9 @@ export const Params = {
     message.convictionRenewalPeriod = object.convictionRenewalPeriod !== undefined && object.convictionRenewalPeriod !== null ? BigInt(object.convictionRenewalPeriod.toString()) : BigInt(0);
     message.pinMinTrustLevel = object.pinMinTrustLevel ?? 0;
     message.maxPinsPerDay = object.maxPinsPerDay ?? 0;
+    message.curatorDemotionCooldown = object.curatorDemotionCooldown !== undefined && object.curatorDemotionCooldown !== null ? BigInt(object.curatorDemotionCooldown.toString()) : BigInt(0);
+    message.curatorDemotionThreshold = object.curatorDemotionThreshold ?? "";
+    message.curatorOverturnDemotionStreak = object.curatorOverturnDemotionStreak !== undefined && object.curatorOverturnDemotionStreak !== null ? BigInt(object.curatorOverturnDemotionStreak.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -894,6 +950,15 @@ export const Params = {
     if (object.max_pins_per_day !== undefined && object.max_pins_per_day !== null) {
       message.maxPinsPerDay = object.max_pins_per_day;
     }
+    if (object.curator_demotion_cooldown !== undefined && object.curator_demotion_cooldown !== null) {
+      message.curatorDemotionCooldown = BigInt(object.curator_demotion_cooldown);
+    }
+    if (object.curator_demotion_threshold !== undefined && object.curator_demotion_threshold !== null) {
+      message.curatorDemotionThreshold = object.curator_demotion_threshold;
+    }
+    if (object.curator_overturn_demotion_streak !== undefined && object.curator_overturn_demotion_streak !== null) {
+      message.curatorOverturnDemotionStreak = BigInt(object.curator_overturn_demotion_streak);
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -956,6 +1021,9 @@ export const Params = {
     obj.conviction_renewal_period = message.convictionRenewalPeriod !== BigInt(0) ? message.convictionRenewalPeriod?.toString() : undefined;
     obj.pin_min_trust_level = message.pinMinTrustLevel === 0 ? undefined : message.pinMinTrustLevel;
     obj.max_pins_per_day = message.maxPinsPerDay === 0 ? undefined : message.maxPinsPerDay;
+    obj.curator_demotion_cooldown = message.curatorDemotionCooldown !== BigInt(0) ? message.curatorDemotionCooldown?.toString() : undefined;
+    obj.curator_demotion_threshold = message.curatorDemotionThreshold === "" ? undefined : message.curatorDemotionThreshold;
+    obj.curator_overturn_demotion_streak = message.curatorOverturnDemotionStreak !== BigInt(0) ? message.curatorOverturnDemotionStreak?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {

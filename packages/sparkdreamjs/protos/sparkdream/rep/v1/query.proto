@@ -6,17 +6,27 @@ import "amino/amino.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
+import "sparkdream/rep/v1/bonded_role.proto";
 import "sparkdream/rep/v1/challenge.proto";
 import "sparkdream/rep/v1/content_challenge.proto";
+import "sparkdream/rep/v1/gov_action_appeal.proto";
 import "sparkdream/rep/v1/initiative.proto";
 import "sparkdream/rep/v1/interim.proto";
 import "sparkdream/rep/v1/interim_template.proto";
 import "sparkdream/rep/v1/invitation.proto";
+import "sparkdream/rep/v1/jury_participation.proto";
 import "sparkdream/rep/v1/jury_review.proto";
 import "sparkdream/rep/v1/member.proto";
+import "sparkdream/rep/v1/member_report.proto";
+import "sparkdream/rep/v1/member_warning.proto";
 import "sparkdream/rep/v1/params.proto";
 import "sparkdream/rep/v1/project.proto";
+import "sparkdream/rep/v1/reserved_tag.proto";
 import "sparkdream/rep/v1/stake.proto";
+import "sparkdream/rep/v1/tag.proto";
+import "sparkdream/rep/v1/tag_budget.proto";
+import "sparkdream/rep/v1/tag_budget_award.proto";
+import "sparkdream/rep/v1/tag_report.proto";
 
 option go_package = "sparkdream/x/rep/types";
 
@@ -202,6 +212,11 @@ service Query {
     option (google.api.http).get = "/sparkdream/rep/v1/tag_stake_pool/{tag}";
   }
 
+  // ListTagStakePools queries all tag stake pools with pagination.
+  rpc ListTagStakePools(QueryListTagStakePoolsRequest) returns (QueryListTagStakePoolsResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/tag_stake_pool";
+  }
+
   // GetProjectStakeInfo queries a project's stake info
   rpc GetProjectStakeInfo(QueryGetProjectStakeInfoRequest) returns (QueryGetProjectStakeInfoResponse) {
     option (google.api.http).get = "/sparkdream/rep/v1/project_stake_info/{project_id}";
@@ -235,6 +250,172 @@ service Query {
   // ContentByInitiative queries content items linked to an initiative for conviction propagation
   rpc ContentByInitiative(QueryContentByInitiativeRequest) returns (QueryContentByInitiativeResponse) {
     option (google.api.http).get = "/sparkdream/rep/v1/content_by_initiative/{initiative_id}";
+  }
+
+  // DreamSupplyStats queries aggregate DREAM supply statistics
+  rpc DreamSupplyStats(QueryDreamSupplyStatsRequest) returns (QueryDreamSupplyStatsResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/dream_supply_stats";
+  }
+
+  // MintBurnRatio queries the current season's mint/burn ratio
+  rpc MintBurnRatio(QueryMintBurnRatioRequest) returns (QueryMintBurnRatioResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/mint_burn_ratio";
+  }
+
+  // EffectiveApy queries the effective staking APY from the seasonal pool
+  rpc EffectiveApy(QueryEffectiveApyRequest) returns (QueryEffectiveApyResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/effective_apy";
+  }
+
+  // TreasuryStatus queries the treasury balance and flows
+  rpc TreasuryStatus(QueryTreasuryStatusRequest) returns (QueryTreasuryStatusResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/treasury_status";
+  }
+
+  // GetTag queries a specific tag by name.
+  rpc GetTag(QueryGetTagRequest) returns (QueryGetTagResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/tag/{name}";
+  }
+
+  // ListTag queries all tags with pagination.
+  rpc ListTag(QueryAllTagRequest) returns (QueryAllTagResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/tag";
+  }
+
+  // GetReservedTag queries a specific reserved tag by name.
+  rpc GetReservedTag(QueryGetReservedTagRequest) returns (QueryGetReservedTagResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/reserved_tag/{name}";
+  }
+
+  // ListReservedTag queries all reserved tags with pagination.
+  rpc ListReservedTag(QueryAllReservedTagRequest) returns (QueryAllReservedTagResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/reserved_tag";
+  }
+
+  // TagExists checks whether a tag exists and returns its expiration time.
+  rpc TagExists(QueryTagExistsRequest) returns (QueryTagExistsResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/tag_exists/{tag_name}";
+  }
+
+  // GetTagReport queries a single tag report by tag name.
+  rpc GetTagReport(QueryGetTagReportRequest) returns (QueryGetTagReportResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/tag_report/{tag_name}";
+  }
+
+  // ListTagReport queries all tag reports with pagination.
+  rpc ListTagReport(QueryAllTagReportRequest) returns (QueryAllTagReportResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/tag_report";
+  }
+
+  // TagReports returns the first tag report (summary query).
+  rpc TagReports(QueryTagReportsRequest) returns (QueryTagReportsResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/tag_reports";
+  }
+
+  // GetTagBudget Queries a TagBudget by id.
+  rpc GetTagBudget(QueryGetTagBudgetRequest) returns (QueryGetTagBudgetResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/tag_budget/{id}";
+  }
+
+  // ListTagBudget defines the ListTagBudget RPC.
+  rpc ListTagBudget(QueryAllTagBudgetRequest) returns (QueryAllTagBudgetResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/tag_budget";
+  }
+
+  // GetTagBudgetAward Queries a TagBudgetAward by id.
+  rpc GetTagBudgetAward(QueryGetTagBudgetAwardRequest) returns (QueryGetTagBudgetAwardResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/tag_budget_award/{id}";
+  }
+
+  // ListTagBudgetAward defines the ListTagBudgetAward RPC.
+  rpc ListTagBudgetAward(QueryAllTagBudgetAwardRequest) returns (QueryAllTagBudgetAwardResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/tag_budget_award";
+  }
+
+  // TagBudgetByTag Queries a TagBudget by tag name.
+  rpc TagBudgetByTag(QueryTagBudgetByTagRequest) returns (QueryTagBudgetByTagResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/tag_budget_by_tag/{tag}";
+  }
+
+  // TagBudgets returns the first tag budget (summary query).
+  rpc TagBudgets(QueryTagBudgetsRequest) returns (QueryTagBudgetsResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/tag_budgets";
+  }
+
+  // TagBudgetAwards returns the first award for a budget (summary query).
+  rpc TagBudgetAwards(QueryTagBudgetAwardsRequest) returns (QueryTagBudgetAwardsResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/tag_budget_awards/{budget_id}";
+  }
+
+  // BondedRole queries a single BondedRole record by (role_type, address).
+  rpc BondedRole(QueryBondedRoleRequest) returns (QueryBondedRoleResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/bonded_role/{role_type}/{address}";
+  }
+
+  // BondedRolesByType lists all BondedRole records for a given role_type.
+  rpc BondedRolesByType(QueryBondedRolesByTypeRequest) returns (QueryBondedRolesByTypeResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/bonded_roles_by_type/{role_type}";
+  }
+
+  // BondedRoleConfig queries the per-role policy config seeded at genesis and
+  // kept in sync by the owning module's operational-params handler.
+  rpc BondedRoleConfig(QueryBondedRoleConfigRequest) returns (QueryBondedRoleConfigResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/bonded_role_config/{role_type}";
+  }
+
+  // ListMemberReport Queries a list of MemberReport items.
+  rpc GetMemberReport(QueryGetMemberReportRequest) returns (QueryGetMemberReportResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/member_report/{member}";
+  }
+
+  // ListMemberReport defines the ListMemberReport RPC.
+  rpc ListMemberReport(QueryAllMemberReportRequest) returns (QueryAllMemberReportResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/member_report";
+  }
+
+  // ListMemberWarning Queries a list of MemberWarning items.
+  rpc GetMemberWarning(QueryGetMemberWarningRequest) returns (QueryGetMemberWarningResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/member_warning/{id}";
+  }
+
+  // ListMemberWarning defines the ListMemberWarning RPC.
+  rpc ListMemberWarning(QueryAllMemberWarningRequest) returns (QueryAllMemberWarningResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/member_warning";
+  }
+
+  // ListGovActionAppeal Queries a list of GovActionAppeal items.
+  rpc GetGovActionAppeal(QueryGetGovActionAppealRequest) returns (QueryGetGovActionAppealResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/gov_action_appeal/{id}";
+  }
+
+  // ListGovActionAppeal defines the ListGovActionAppeal RPC.
+  rpc ListGovActionAppeal(QueryAllGovActionAppealRequest) returns (QueryAllGovActionAppealResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/gov_action_appeal";
+  }
+
+  // ListJuryParticipation Queries a list of JuryParticipation items.
+  rpc GetJuryParticipation(QueryGetJuryParticipationRequest) returns (QueryGetJuryParticipationResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/jury_participation/{juror}";
+  }
+
+  // ListJuryParticipation defines the ListJuryParticipation RPC.
+  rpc ListJuryParticipation(QueryAllJuryParticipationRequest) returns (QueryAllJuryParticipationResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/jury_participation";
+  }
+
+  // MemberReports Queries the first member report (summary).
+  rpc MemberReports(QueryMemberReportsRequest) returns (QueryMemberReportsResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/member_reports";
+  }
+
+  // MemberWarnings Queries the first warning for a member (summary).
+  rpc MemberWarnings(QueryMemberWarningsRequest) returns (QueryMemberWarningsResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/member_warnings/{member}";
+  }
+
+  // MemberStanding Queries a member's current standing (warnings, active reports, trust tier).
+  rpc MemberStanding(QueryMemberStandingRequest) returns (QueryMemberStandingResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/member_standing/{member}";
   }
 }
 
@@ -666,6 +847,17 @@ message QueryGetTagStakePoolResponse {
   TagStakePool pool = 1 [(gogoproto.nullable) = false];
 }
 
+// QueryListTagStakePoolsRequest defines the request for listing tag stake pools.
+message QueryListTagStakePoolsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryListTagStakePoolsResponse defines the response for listing tag stake pools.
+message QueryListTagStakePoolsResponse {
+  repeated TagStakePool pool = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
 // QueryGetProjectStakeInfoRequest defines the request for project stake info
 message QueryGetProjectStakeInfoRequest {
   uint64 project_id = 1;
@@ -765,4 +957,417 @@ message QueryContentByInitiativeResponse {
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];
+}
+
+// Economic health queries
+
+message QueryDreamSupplyStatsRequest {}
+message QueryDreamSupplyStatsResponse {
+  string total_minted = 1 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+  string total_burned = 2 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+  string circulating = 3 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+  string total_staked = 4 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+  string treasury_balance = 5 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+  string staked_ratio = 6 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message QueryMintBurnRatioRequest {}
+message QueryMintBurnRatioResponse {
+  string season_minted = 1 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+  string season_burned = 2 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+  string ratio = 3 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+  uint32 season = 4;
+}
+
+message QueryEffectiveApyRequest {}
+message QueryEffectiveApyResponse {
+  string seasonal_pool_total = 1 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+  string seasonal_pool_remaining = 2 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+  string total_staked = 3 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+  string effective_apy = 4 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message QueryTreasuryStatusRequest {}
+message QueryTreasuryStatusResponse {
+  string balance = 1 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+  string max_balance = 2 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+  string season_inflow = 3 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+  string season_outflow = 4 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+  string season_burned = 5 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// QueryGetTagRequest is request type for the Query/GetTag RPC method.
+message QueryGetTagRequest {
+  string name = 1;
+}
+
+// QueryGetTagResponse is response type for the Query/GetTag RPC method.
+message QueryGetTagResponse {
+  Tag tag = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryAllTagRequest is request type for the Query/ListTag RPC method.
+message QueryAllTagRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryAllTagResponse is response type for the Query/ListTag RPC method.
+message QueryAllTagResponse {
+  repeated Tag tag = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryGetReservedTagRequest is request type for the Query/GetReservedTag RPC method.
+message QueryGetReservedTagRequest {
+  string name = 1;
+}
+
+// QueryGetReservedTagResponse is response type for the Query/GetReservedTag RPC method.
+message QueryGetReservedTagResponse {
+  ReservedTag reserved_tag = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryAllReservedTagRequest is request type for the Query/ListReservedTag RPC method.
+message QueryAllReservedTagRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryAllReservedTagResponse is response type for the Query/ListReservedTag RPC method.
+message QueryAllReservedTagResponse {
+  repeated ReservedTag reserved_tag = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryTagExistsRequest is request type for the Query/TagExists RPC method.
+message QueryTagExistsRequest {
+  string tag_name = 1;
+}
+
+// QueryTagExistsResponse is response type for the Query/TagExists RPC method.
+message QueryTagExistsResponse {
+  bool exists = 1;
+  int64 expiration_time = 2;
+}
+
+// QueryGetTagReportRequest defines the QueryGetTagReportRequest message.
+message QueryGetTagReportRequest {
+  string tag_name = 1;
+}
+
+// QueryGetTagReportResponse defines the QueryGetTagReportResponse message.
+message QueryGetTagReportResponse {
+  TagReport tag_report = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryAllTagReportRequest defines the QueryAllTagReportRequest message.
+message QueryAllTagReportRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryAllTagReportResponse defines the QueryAllTagReportResponse message.
+message QueryAllTagReportResponse {
+  repeated TagReport tag_report = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryTagReportsRequest defines the QueryTagReportsRequest message.
+message QueryTagReportsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryTagReportsResponse defines the QueryTagReportsResponse message.
+message QueryTagReportsResponse {
+  string tag_name = 1;
+  bool under_review = 2;
+  cosmos.base.query.v1beta1.PageResponse pagination = 3;
+}
+
+// QueryGetTagBudgetRequest defines the QueryGetTagBudgetRequest message.
+message QueryGetTagBudgetRequest {
+  uint64 id = 1;
+}
+
+// QueryGetTagBudgetResponse defines the QueryGetTagBudgetResponse message.
+message QueryGetTagBudgetResponse {
+  TagBudget tag_budget = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryAllTagBudgetRequest defines the QueryAllTagBudgetRequest message.
+message QueryAllTagBudgetRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryAllTagBudgetResponse defines the QueryAllTagBudgetResponse message.
+message QueryAllTagBudgetResponse {
+  repeated TagBudget tag_budget = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryGetTagBudgetAwardRequest defines the QueryGetTagBudgetAwardRequest message.
+message QueryGetTagBudgetAwardRequest {
+  uint64 id = 1;
+}
+
+// QueryGetTagBudgetAwardResponse defines the QueryGetTagBudgetAwardResponse message.
+message QueryGetTagBudgetAwardResponse {
+  TagBudgetAward tag_budget_award = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryAllTagBudgetAwardRequest defines the QueryAllTagBudgetAwardRequest message.
+message QueryAllTagBudgetAwardRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryAllTagBudgetAwardResponse defines the QueryAllTagBudgetAwardResponse message.
+message QueryAllTagBudgetAwardResponse {
+  repeated TagBudgetAward tag_budget_award = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryTagBudgetByTagRequest defines the QueryTagBudgetByTagRequest message.
+message QueryTagBudgetByTagRequest {
+  string tag = 1;
+}
+
+// QueryTagBudgetByTagResponse defines the QueryTagBudgetByTagResponse message.
+message QueryTagBudgetByTagResponse {
+  uint64 budget_id = 1;
+  string pool_balance = 2;
+  bool active = 3;
+}
+
+// QueryTagBudgetsRequest defines the QueryTagBudgetsRequest message.
+message QueryTagBudgetsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryTagBudgetsResponse defines the QueryTagBudgetsResponse message.
+message QueryTagBudgetsResponse {
+  uint64 budget_id = 1;
+  string tag = 2;
+  string pool_balance = 3;
+  cosmos.base.query.v1beta1.PageResponse pagination = 4;
+}
+
+// QueryTagBudgetAwardsRequest defines the QueryTagBudgetAwardsRequest message.
+message QueryTagBudgetAwardsRequest {
+  uint64 budget_id = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// QueryTagBudgetAwardsResponse defines the QueryTagBudgetAwardsResponse message.
+message QueryTagBudgetAwardsResponse {
+  uint64 post_id = 1;
+  string recipient = 2;
+  string amount = 3;
+  cosmos.base.query.v1beta1.PageResponse pagination = 4;
+}
+
+// QueryBondedRoleRequest fetches a single BondedRole record.
+message QueryBondedRoleRequest {
+  RoleType role_type = 1;
+  string address = 2;
+}
+
+// QueryBondedRoleResponse holds the fetched BondedRole record.
+message QueryBondedRoleResponse {
+  BondedRole bonded_role = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryBondedRolesByTypeRequest lists all BondedRole records for role_type.
+message QueryBondedRolesByTypeRequest {
+  RoleType role_type = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// QueryBondedRolesByTypeResponse holds the paginated list of BondedRole records.
+message QueryBondedRolesByTypeResponse {
+  repeated BondedRole bonded_roles = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryBondedRoleConfigRequest fetches the policy config for a role_type.
+message QueryBondedRoleConfigRequest {
+  RoleType role_type = 1;
+}
+
+// QueryBondedRoleConfigResponse holds the fetched BondedRoleConfig.
+message QueryBondedRoleConfigResponse {
+  BondedRoleConfig bonded_role_config = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryGetMemberReportRequest defines the QueryGetMemberReportRequest message.
+message QueryGetMemberReportRequest {
+  string member = 1;
+}
+
+// QueryGetMemberReportResponse defines the QueryGetMemberReportResponse message.
+message QueryGetMemberReportResponse {
+  MemberReport member_report = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryAllMemberReportRequest defines the QueryAllMemberReportRequest message.
+message QueryAllMemberReportRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryAllMemberReportResponse defines the QueryAllMemberReportResponse message.
+message QueryAllMemberReportResponse {
+  repeated MemberReport member_report = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryGetMemberWarningRequest defines the QueryGetMemberWarningRequest message.
+message QueryGetMemberWarningRequest {
+  uint64 id = 1;
+}
+
+// QueryGetMemberWarningResponse defines the QueryGetMemberWarningResponse message.
+message QueryGetMemberWarningResponse {
+  MemberWarning member_warning = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryAllMemberWarningRequest defines the QueryAllMemberWarningRequest message.
+message QueryAllMemberWarningRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryAllMemberWarningResponse defines the QueryAllMemberWarningResponse message.
+message QueryAllMemberWarningResponse {
+  repeated MemberWarning member_warning = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryGetGovActionAppealRequest defines the QueryGetGovActionAppealRequest message.
+message QueryGetGovActionAppealRequest {
+  uint64 id = 1;
+}
+
+// QueryGetGovActionAppealResponse defines the QueryGetGovActionAppealResponse message.
+message QueryGetGovActionAppealResponse {
+  GovActionAppeal gov_action_appeal = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryAllGovActionAppealRequest defines the QueryAllGovActionAppealRequest message.
+message QueryAllGovActionAppealRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryAllGovActionAppealResponse defines the QueryAllGovActionAppealResponse message.
+message QueryAllGovActionAppealResponse {
+  repeated GovActionAppeal gov_action_appeal = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryGetJuryParticipationRequest defines the QueryGetJuryParticipationRequest message.
+message QueryGetJuryParticipationRequest {
+  string juror = 1;
+}
+
+// QueryGetJuryParticipationResponse defines the QueryGetJuryParticipationResponse message.
+message QueryGetJuryParticipationResponse {
+  JuryParticipation jury_participation = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryAllJuryParticipationRequest defines the QueryAllJuryParticipationRequest message.
+message QueryAllJuryParticipationRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryAllJuryParticipationResponse defines the QueryAllJuryParticipationResponse message.
+message QueryAllJuryParticipationResponse {
+  repeated JuryParticipation jury_participation = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryMemberReportsRequest defines the QueryMemberReportsRequest message.
+message QueryMemberReportsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryMemberReportsResponse defines the QueryMemberReportsResponse message.
+message QueryMemberReportsResponse {
+  string member = 1;
+  uint64 status = 2;
+  cosmos.base.query.v1beta1.PageResponse pagination = 3;
+}
+
+// QueryMemberWarningsRequest defines the QueryMemberWarningsRequest message.
+message QueryMemberWarningsRequest {
+  string member = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// QueryMemberWarningsResponse defines the QueryMemberWarningsResponse message.
+message QueryMemberWarningsResponse {
+  uint64 warning_number = 1;
+  string reason = 2;
+  int64 issued_at = 3;
+  cosmos.base.query.v1beta1.PageResponse pagination = 4;
+}
+
+// QueryMemberStandingRequest defines the QueryMemberStandingRequest message.
+message QueryMemberStandingRequest {
+  string member = 1;
+}
+
+// QueryMemberStandingResponse defines the QueryMemberStandingResponse message.
+message QueryMemberStandingResponse {
+  uint64 warning_count = 1;
+  bool active_report = 2;
+  uint64 trust_tier = 3;
 }

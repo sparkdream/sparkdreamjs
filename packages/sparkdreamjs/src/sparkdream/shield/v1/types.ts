@@ -567,6 +567,10 @@ export interface TLEValidatorPublicShare {
    * Shamir share index
    */
   shareIndex: number;
+  /**
+   * BN256 G2 point (for pairing-based decryption share verification)
+   */
+  publicShareG2: Uint8Array;
 }
 export interface TLEValidatorPublicShareProtoMsg {
   typeUrl: "/sparkdream.shield.v1.TLEValidatorPublicShare";
@@ -588,6 +592,10 @@ export interface TLEValidatorPublicShareAmino {
    * Shamir share index
    */
   share_index?: number;
+  /**
+   * BN256 G2 point (for pairing-based decryption share verification)
+   */
+  public_share_g2?: string;
 }
 export interface TLEValidatorPublicShareAminoMsg {
   type: "/sparkdream.shield.v1.TLEValidatorPublicShare";
@@ -714,6 +722,12 @@ export interface DKGContribution {
    * Proves knowledge of the constant term (the validator's secret contribution).
    */
   proofOfPossession: Uint8Array;
+  /**
+   * G2 Feldman commitments: [a₀*G2, a₁*G2, ..., a_{t-1}*G2]
+   * Dual representation for pairing-based decryption share verification.
+   * Must have the same length as feldman_commitments and encode the same scalars.
+   */
+  feldmanCommitmentsG2: Uint8Array[];
 }
 export interface DKGContributionProtoMsg {
   typeUrl: "/sparkdream.shield.v1.DKGContribution";
@@ -750,6 +764,12 @@ export interface DKGContributionAmino {
    * Proves knowledge of the constant term (the validator's secret contribution).
    */
   proof_of_possession?: string;
+  /**
+   * G2 Feldman commitments: [a₀*G2, a₁*G2, ..., a_{t-1}*G2]
+   * Dual representation for pairing-based decryption share verification.
+   * Must have the same length as feldman_commitments and encode the same scalars.
+   */
+  feldman_commitments_g2?: string[];
 }
 export interface DKGContributionAminoMsg {
   type: "/sparkdream.shield.v1.DKGContribution";
@@ -862,6 +882,10 @@ export interface DKGVoteExtension {
    */
   contributionPop: Uint8Array;
   /**
+   * G2 Feldman commitments (mirrors feldman_commitments on G2 for pairing checks)
+   */
+  feldmanCommitmentsG2: Uint8Array[];
+  /**
    * --- Decryption share data (ACTIVE phase, when pending ops need decryption) ---
    * The epoch for which this decryption share was computed
    */
@@ -913,6 +937,10 @@ export interface DKGVoteExtensionAmino {
    * Schnorr proof of possession over validator address using a₀
    */
   contribution_pop?: string;
+  /**
+   * G2 Feldman commitments (mirrors feldman_commitments on G2 for pairing checks)
+   */
+  feldman_commitments_g2?: string[];
   /**
    * --- Decryption share data (ACTIVE phase, when pending ops need decryption) ---
    * The epoch for which this decryption share was computed
@@ -2087,7 +2115,8 @@ function createBaseTLEValidatorPublicShare(): TLEValidatorPublicShare {
   return {
     validatorAddress: "",
     publicShare: new Uint8Array(),
-    shareIndex: 0
+    shareIndex: 0,
+    publicShareG2: new Uint8Array()
   };
 }
 /**
@@ -2108,6 +2137,9 @@ export const TLEValidatorPublicShare = {
     if (message.shareIndex !== 0) {
       writer.uint32(24).uint32(message.shareIndex);
     }
+    if (message.publicShareG2.length !== 0) {
+      writer.uint32(34).bytes(message.publicShareG2);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): TLEValidatorPublicShare {
@@ -2126,6 +2158,9 @@ export const TLEValidatorPublicShare = {
         case 3:
           message.shareIndex = reader.uint32();
           break;
+        case 4:
+          message.publicShareG2 = reader.bytes();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2138,6 +2173,7 @@ export const TLEValidatorPublicShare = {
     message.validatorAddress = object.validatorAddress ?? "";
     message.publicShare = object.publicShare ?? new Uint8Array();
     message.shareIndex = object.shareIndex ?? 0;
+    message.publicShareG2 = object.publicShareG2 ?? new Uint8Array();
     return message;
   },
   fromAmino(object: TLEValidatorPublicShareAmino): TLEValidatorPublicShare {
@@ -2151,6 +2187,9 @@ export const TLEValidatorPublicShare = {
     if (object.share_index !== undefined && object.share_index !== null) {
       message.shareIndex = object.share_index;
     }
+    if (object.public_share_g2 !== undefined && object.public_share_g2 !== null) {
+      message.publicShareG2 = bytesFromBase64(object.public_share_g2);
+    }
     return message;
   },
   toAmino(message: TLEValidatorPublicShare): TLEValidatorPublicShareAmino {
@@ -2158,6 +2197,7 @@ export const TLEValidatorPublicShare = {
     obj.validator_address = message.validatorAddress === "" ? undefined : message.validatorAddress;
     obj.public_share = message.publicShare ? base64FromBytes(message.publicShare) : undefined;
     obj.share_index = message.shareIndex === 0 ? undefined : message.shareIndex;
+    obj.public_share_g2 = message.publicShareG2 ? base64FromBytes(message.publicShareG2) : undefined;
     return obj;
   },
   fromAminoMsg(object: TLEValidatorPublicShareAminoMsg): TLEValidatorPublicShare {
@@ -2349,7 +2389,8 @@ function createBaseDKGContribution(): DKGContribution {
     round: BigInt(0),
     feldmanCommitments: [],
     encryptedEvaluations: [],
-    proofOfPossession: new Uint8Array()
+    proofOfPossession: new Uint8Array(),
+    feldmanCommitmentsG2: []
   };
 }
 /**
@@ -2376,6 +2417,9 @@ export const DKGContribution = {
     if (message.proofOfPossession.length !== 0) {
       writer.uint32(42).bytes(message.proofOfPossession);
     }
+    for (const v of message.feldmanCommitmentsG2) {
+      writer.uint32(50).bytes(v!);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): DKGContribution {
@@ -2400,6 +2444,9 @@ export const DKGContribution = {
         case 5:
           message.proofOfPossession = reader.bytes();
           break;
+        case 6:
+          message.feldmanCommitmentsG2.push(reader.bytes());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2414,6 +2461,7 @@ export const DKGContribution = {
     message.feldmanCommitments = object.feldmanCommitments?.map(e => e) || [];
     message.encryptedEvaluations = object.encryptedEvaluations?.map(e => EncryptedEvaluation.fromPartial(e)) || [];
     message.proofOfPossession = object.proofOfPossession ?? new Uint8Array();
+    message.feldmanCommitmentsG2 = object.feldmanCommitmentsG2?.map(e => e) || [];
     return message;
   },
   fromAmino(object: DKGContributionAmino): DKGContribution {
@@ -2429,6 +2477,7 @@ export const DKGContribution = {
     if (object.proof_of_possession !== undefined && object.proof_of_possession !== null) {
       message.proofOfPossession = bytesFromBase64(object.proof_of_possession);
     }
+    message.feldmanCommitmentsG2 = object.feldman_commitments_g2?.map(e => bytesFromBase64(e)) || [];
     return message;
   },
   toAmino(message: DKGContribution): DKGContributionAmino {
@@ -2446,6 +2495,11 @@ export const DKGContribution = {
       obj.encrypted_evaluations = message.encryptedEvaluations;
     }
     obj.proof_of_possession = message.proofOfPossession ? base64FromBytes(message.proofOfPossession) : undefined;
+    if (message.feldmanCommitmentsG2) {
+      obj.feldman_commitments_g2 = message.feldmanCommitmentsG2.map(e => base64FromBytes(e));
+    } else {
+      obj.feldman_commitments_g2 = message.feldmanCommitmentsG2;
+    }
     return obj;
   },
   fromAminoMsg(object: DKGContributionAminoMsg): DKGContribution {
@@ -2635,6 +2689,7 @@ function createBaseDKGVoteExtension(): DKGVoteExtension {
     feldmanCommitments: [],
     encryptedEvaluations: [],
     contributionPop: new Uint8Array(),
+    feldmanCommitmentsG2: [],
     decryptionEpoch: BigInt(0),
     decryptionShare: new Uint8Array()
   };
@@ -2670,11 +2725,14 @@ export const DKGVoteExtension = {
     if (message.contributionPop.length !== 0) {
       writer.uint32(58).bytes(message.contributionPop);
     }
+    for (const v of message.feldmanCommitmentsG2) {
+      writer.uint32(66).bytes(v!);
+    }
     if (message.decryptionEpoch !== BigInt(0)) {
-      writer.uint32(64).uint64(message.decryptionEpoch);
+      writer.uint32(72).uint64(message.decryptionEpoch);
     }
     if (message.decryptionShare.length !== 0) {
-      writer.uint32(74).bytes(message.decryptionShare);
+      writer.uint32(82).bytes(message.decryptionShare);
     }
     return writer;
   },
@@ -2707,9 +2765,12 @@ export const DKGVoteExtension = {
           message.contributionPop = reader.bytes();
           break;
         case 8:
-          message.decryptionEpoch = reader.uint64();
+          message.feldmanCommitmentsG2.push(reader.bytes());
           break;
         case 9:
+          message.decryptionEpoch = reader.uint64();
+          break;
+        case 10:
           message.decryptionShare = reader.bytes();
           break;
         default:
@@ -2728,6 +2789,7 @@ export const DKGVoteExtension = {
     message.feldmanCommitments = object.feldmanCommitments?.map(e => e) || [];
     message.encryptedEvaluations = object.encryptedEvaluations?.map(e => EncryptedEvaluation.fromPartial(e)) || [];
     message.contributionPop = object.contributionPop ?? new Uint8Array();
+    message.feldmanCommitmentsG2 = object.feldmanCommitmentsG2?.map(e => e) || [];
     message.decryptionEpoch = object.decryptionEpoch !== undefined && object.decryptionEpoch !== null ? BigInt(object.decryptionEpoch.toString()) : BigInt(0);
     message.decryptionShare = object.decryptionShare ?? new Uint8Array();
     return message;
@@ -2751,6 +2813,7 @@ export const DKGVoteExtension = {
     if (object.contribution_pop !== undefined && object.contribution_pop !== null) {
       message.contributionPop = bytesFromBase64(object.contribution_pop);
     }
+    message.feldmanCommitmentsG2 = object.feldman_commitments_g2?.map(e => bytesFromBase64(e)) || [];
     if (object.decryption_epoch !== undefined && object.decryption_epoch !== null) {
       message.decryptionEpoch = BigInt(object.decryption_epoch);
     }
@@ -2776,6 +2839,11 @@ export const DKGVoteExtension = {
       obj.encrypted_evaluations = message.encryptedEvaluations;
     }
     obj.contribution_pop = message.contributionPop ? base64FromBytes(message.contributionPop) : undefined;
+    if (message.feldmanCommitmentsG2) {
+      obj.feldman_commitments_g2 = message.feldmanCommitmentsG2.map(e => base64FromBytes(e));
+    } else {
+      obj.feldman_commitments_g2 = message.feldmanCommitmentsG2;
+    }
     obj.decryption_epoch = message.decryptionEpoch !== BigInt(0) ? message.decryptionEpoch?.toString() : undefined;
     obj.decryption_share = message.decryptionShare ? base64FromBytes(message.decryptionShare) : undefined;
     return obj;

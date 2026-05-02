@@ -94,6 +94,10 @@ export interface Post {
    * True if anonymous content has entered conviction-sustained state (TTL extended by community conviction)
    */
   convictionSustained: boolean;
+  /**
+   * Tags referenced against the shared x/rep tag registry
+   */
+  tags: string[];
 }
 export interface PostProtoMsg {
   typeUrl: "/sparkdream.blog.v1.Post";
@@ -190,6 +194,10 @@ export interface PostAmino {
    * True if anonymous content has entered conviction-sustained state (TTL extended by community conviction)
    */
   conviction_sustained?: boolean;
+  /**
+   * Tags referenced against the shared x/rep tag registry
+   */
+  tags?: string[];
 }
 export interface PostAminoMsg {
   type: "/sparkdream.blog.v1.Post";
@@ -217,7 +225,8 @@ function createBasePost(): Post {
     edited: false,
     editedAt: BigInt(0),
     initiativeId: BigInt(0),
-    convictionSustained: false
+    convictionSustained: false,
+    tags: []
   };
 }
 /**
@@ -292,6 +301,9 @@ export const Post = {
     if (message.convictionSustained === true) {
       writer.uint32(168).bool(message.convictionSustained);
     }
+    for (const v of message.tags) {
+      writer.uint32(178).string(v!);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Post {
@@ -364,6 +376,9 @@ export const Post = {
         case 21:
           message.convictionSustained = reader.bool();
           break;
+        case 22:
+          message.tags.push(reader.string());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -394,6 +409,7 @@ export const Post = {
     message.editedAt = object.editedAt !== undefined && object.editedAt !== null ? BigInt(object.editedAt.toString()) : BigInt(0);
     message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
     message.convictionSustained = object.convictionSustained ?? false;
+    message.tags = object.tags?.map(e => e) || [];
     return message;
   },
   fromAmino(object: PostAmino): Post {
@@ -461,6 +477,7 @@ export const Post = {
     if (object.conviction_sustained !== undefined && object.conviction_sustained !== null) {
       message.convictionSustained = object.conviction_sustained;
     }
+    message.tags = object.tags?.map(e => e) || [];
     return message;
   },
   toAmino(message: Post): PostAmino {
@@ -486,6 +503,11 @@ export const Post = {
     obj.edited_at = message.editedAt !== BigInt(0) ? message.editedAt?.toString() : undefined;
     obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
     obj.conviction_sustained = message.convictionSustained === false ? undefined : message.convictionSustained;
+    if (message.tags) {
+      obj.tags = message.tags.map(e => e);
+    } else {
+      obj.tags = message.tags;
+    }
     return obj;
   },
   fromAminoMsg(object: PostAminoMsg): Post {

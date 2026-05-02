@@ -1,6 +1,7 @@
 //@ts-nocheck
 import { Params, ParamsAmino } from "./params";
-import { Collection, CollectionAmino, Item, ItemAmino, Collaborator, CollaboratorAmino, Curator, CuratorAmino, CurationReview, CurationReviewAmino, CurationSummary, CurationSummaryAmino, SponsorshipRequest, SponsorshipRequestAmino, CollectionFlag, CollectionFlagAmino, HideRecord, HideRecordAmino, Endorsement, EndorsementAmino } from "./types";
+import { Collection, CollectionAmino, Item, ItemAmino, Collaborator, CollaboratorAmino, CurationReview, CurationReviewAmino, CurationSummary, CurationSummaryAmino, SponsorshipRequest, SponsorshipRequestAmino, CollectionFlag, CollectionFlagAmino, HideRecord, HideRecordAmino, Endorsement, EndorsementAmino } from "./types";
+import { CuratorActivity, CuratorActivityAmino } from "./curator_activity";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -19,7 +20,7 @@ export interface GenesisState {
   items: Item[];
   itemCount: bigint;
   collaborators: Collaborator[];
-  curators: Curator[];
+  curatorActivities: CuratorActivity[];
   curationReviews: CurationReview[];
   curationReviewCount: bigint;
   curationSummaries: CurationSummary[];
@@ -49,7 +50,7 @@ export interface GenesisStateAmino {
   items?: ItemAmino[];
   item_count?: string;
   collaborators?: CollaboratorAmino[];
-  curators?: CuratorAmino[];
+  curator_activities?: CuratorActivityAmino[];
   curation_reviews?: CurationReviewAmino[];
   curation_review_count?: string;
   curation_summaries?: CurationSummaryAmino[];
@@ -71,7 +72,7 @@ function createBaseGenesisState(): GenesisState {
     items: [],
     itemCount: BigInt(0),
     collaborators: [],
-    curators: [],
+    curatorActivities: [],
     curationReviews: [],
     curationReviewCount: BigInt(0),
     curationSummaries: [],
@@ -109,8 +110,8 @@ export const GenesisState = {
     for (const v of message.collaborators) {
       Collaborator.encode(v!, writer.uint32(50).fork()).ldelim();
     }
-    for (const v of message.curators) {
-      Curator.encode(v!, writer.uint32(58).fork()).ldelim();
+    for (const v of message.curatorActivities) {
+      CuratorActivity.encode(v!, writer.uint32(130).fork()).ldelim();
     }
     for (const v of message.curationReviews) {
       CurationReview.encode(v!, writer.uint32(66).fork()).ldelim();
@@ -163,8 +164,8 @@ export const GenesisState = {
         case 6:
           message.collaborators.push(Collaborator.decode(reader, reader.uint32()));
           break;
-        case 7:
-          message.curators.push(Curator.decode(reader, reader.uint32()));
+        case 16:
+          message.curatorActivities.push(CuratorActivity.decode(reader, reader.uint32()));
           break;
         case 8:
           message.curationReviews.push(CurationReview.decode(reader, reader.uint32()));
@@ -205,7 +206,7 @@ export const GenesisState = {
     message.items = object.items?.map(e => Item.fromPartial(e)) || [];
     message.itemCount = object.itemCount !== undefined && object.itemCount !== null ? BigInt(object.itemCount.toString()) : BigInt(0);
     message.collaborators = object.collaborators?.map(e => Collaborator.fromPartial(e)) || [];
-    message.curators = object.curators?.map(e => Curator.fromPartial(e)) || [];
+    message.curatorActivities = object.curatorActivities?.map(e => CuratorActivity.fromPartial(e)) || [];
     message.curationReviews = object.curationReviews?.map(e => CurationReview.fromPartial(e)) || [];
     message.curationReviewCount = object.curationReviewCount !== undefined && object.curationReviewCount !== null ? BigInt(object.curationReviewCount.toString()) : BigInt(0);
     message.curationSummaries = object.curationSummaries?.map(e => CurationSummary.fromPartial(e)) || [];
@@ -230,7 +231,7 @@ export const GenesisState = {
       message.itemCount = BigInt(object.item_count);
     }
     message.collaborators = object.collaborators?.map(e => Collaborator.fromAmino(e)) || [];
-    message.curators = object.curators?.map(e => Curator.fromAmino(e)) || [];
+    message.curatorActivities = object.curator_activities?.map(e => CuratorActivity.fromAmino(e)) || [];
     message.curationReviews = object.curation_reviews?.map(e => CurationReview.fromAmino(e)) || [];
     if (object.curation_review_count !== undefined && object.curation_review_count !== null) {
       message.curationReviewCount = BigInt(object.curation_review_count);
@@ -265,10 +266,10 @@ export const GenesisState = {
     } else {
       obj.collaborators = message.collaborators;
     }
-    if (message.curators) {
-      obj.curators = message.curators.map(e => e ? Curator.toAmino(e) : undefined);
+    if (message.curatorActivities) {
+      obj.curator_activities = message.curatorActivities.map(e => e ? CuratorActivity.toAmino(e) : undefined);
     } else {
-      obj.curators = message.curators;
+      obj.curator_activities = message.curatorActivities;
     }
     if (message.curationReviews) {
       obj.curation_reviews = message.curationReviews.map(e => e ? CurationReview.toAmino(e) : undefined);

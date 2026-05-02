@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgCreateCollection, MsgCreateCollectionResponse, MsgUpdateCollection, MsgUpdateCollectionResponse, MsgDeleteCollection, MsgDeleteCollectionResponse, MsgAddItem, MsgAddItemResponse, MsgAddItems, MsgAddItemsResponse, MsgUpdateItem, MsgUpdateItemResponse, MsgRemoveItem, MsgRemoveItemResponse, MsgRemoveItems, MsgRemoveItemsResponse, MsgReorderItem, MsgReorderItemResponse, MsgAddCollaborator, MsgAddCollaboratorResponse, MsgRemoveCollaborator, MsgRemoveCollaboratorResponse, MsgUpdateCollaboratorRole, MsgUpdateCollaboratorRoleResponse, MsgRegisterCurator, MsgRegisterCuratorResponse, MsgUnregisterCurator, MsgUnregisterCuratorResponse, MsgRateCollection, MsgRateCollectionResponse, MsgChallengeReview, MsgChallengeReviewResponse, MsgRequestSponsorship, MsgRequestSponsorshipResponse, MsgCancelSponsorshipRequest, MsgCancelSponsorshipRequestResponse, MsgSponsorCollection, MsgSponsorCollectionResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgUpvoteContent, MsgUpvoteContentResponse, MsgDownvoteContent, MsgDownvoteContentResponse, MsgFlagContent, MsgFlagContentResponse, MsgHideContent, MsgHideContentResponse, MsgAppealHide, MsgAppealHideResponse, MsgEndorseCollection, MsgEndorseCollectionResponse, MsgSetSeekingEndorsement, MsgSetSeekingEndorsementResponse, MsgPinCollection, MsgPinCollectionResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgCreateCollection, MsgCreateCollectionResponse, MsgUpdateCollection, MsgUpdateCollectionResponse, MsgDeleteCollection, MsgDeleteCollectionResponse, MsgAddItem, MsgAddItemResponse, MsgAddItems, MsgAddItemsResponse, MsgUpdateItem, MsgUpdateItemResponse, MsgRemoveItem, MsgRemoveItemResponse, MsgRemoveItems, MsgRemoveItemsResponse, MsgReorderItem, MsgReorderItemResponse, MsgAddCollaborator, MsgAddCollaboratorResponse, MsgRemoveCollaborator, MsgRemoveCollaboratorResponse, MsgUpdateCollaboratorRole, MsgUpdateCollaboratorRoleResponse, MsgRateCollection, MsgRateCollectionResponse, MsgChallengeReview, MsgChallengeReviewResponse, MsgRequestSponsorship, MsgRequestSponsorshipResponse, MsgCancelSponsorshipRequest, MsgCancelSponsorshipRequestResponse, MsgSponsorCollection, MsgSponsorCollectionResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgUpvoteContent, MsgUpvoteContentResponse, MsgDownvoteContent, MsgDownvoteContentResponse, MsgFlagContent, MsgFlagContentResponse, MsgHideContent, MsgHideContentResponse, MsgAppealHide, MsgAppealHideResponse, MsgEndorseCollection, MsgEndorseCollectionResponse, MsgSetSeekingEndorsement, MsgSetSeekingEndorsementResponse, MsgPinCollection, MsgPinCollectionResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   updateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
@@ -17,8 +17,10 @@ export interface Msg {
   addCollaborator(request: MsgAddCollaborator): Promise<MsgAddCollaboratorResponse>;
   removeCollaborator(request: MsgRemoveCollaborator): Promise<MsgRemoveCollaboratorResponse>;
   updateCollaboratorRole(request: MsgUpdateCollaboratorRole): Promise<MsgUpdateCollaboratorRoleResponse>;
-  registerCurator(request: MsgRegisterCurator): Promise<MsgRegisterCuratorResponse>;
-  unregisterCurator(request: MsgUnregisterCurator): Promise<MsgUnregisterCuratorResponse>;
+  /**
+   * RateCollection submits a curation review. The creator must hold a bonded
+   * ROLE_TYPE_COLLECT_CURATOR in x/rep (created via MsgBondRole there).
+   */
   rateCollection(request: MsgRateCollection): Promise<MsgRateCollectionResponse>;
   challengeReview(request: MsgChallengeReview): Promise<MsgChallengeReviewResponse>;
   requestSponsorship(request: MsgRequestSponsorship): Promise<MsgRequestSponsorshipResponse>;
@@ -125,19 +127,8 @@ export class MsgClientImpl implements Msg {
     const promise = this.rpc.request("sparkdream.collect.v1.Msg", "UpdateCollaboratorRole", data);
     return promise.then(data => MsgUpdateCollaboratorRoleResponse.decode(new BinaryReader(data)));
   };
-  /* RegisterCurator */
-  registerCurator = async (request: MsgRegisterCurator): Promise<MsgRegisterCuratorResponse> => {
-    const data = MsgRegisterCurator.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.collect.v1.Msg", "RegisterCurator", data);
-    return promise.then(data => MsgRegisterCuratorResponse.decode(new BinaryReader(data)));
-  };
-  /* UnregisterCurator */
-  unregisterCurator = async (request: MsgUnregisterCurator): Promise<MsgUnregisterCuratorResponse> => {
-    const data = MsgUnregisterCurator.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.collect.v1.Msg", "UnregisterCurator", data);
-    return promise.then(data => MsgUnregisterCuratorResponse.decode(new BinaryReader(data)));
-  };
-  /* RateCollection */
+  /* RateCollection submits a curation review. The creator must hold a bonded
+   ROLE_TYPE_COLLECT_CURATOR in x/rep (created via MsgBondRole there). */
   rateCollection = async (request: MsgRateCollection): Promise<MsgRateCollectionResponse> => {
     const data = MsgRateCollection.encode(request).finish();
     const promise = this.rpc.request("sparkdream.collect.v1.Msg", "RateCollection", data);

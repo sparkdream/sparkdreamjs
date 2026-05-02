@@ -131,6 +131,11 @@ export enum RequirementType {
   REQUIREMENT_TYPE_TOP_XP = 9,
   REQUIREMENT_TYPE_MIN_LEVEL = 10,
   REQUIREMENT_TYPE_ACHIEVEMENT_COUNT = 11,
+  /**
+   * REQUIREMENT_TYPE_GENESIS - Marker for achievements that can only be held via genesis seeding.
+   * No runtime path awards these; absence of a corresponding evaluator is the enforcement.
+   */
+  REQUIREMENT_TYPE_GENESIS = 12,
   UNRECOGNIZED = -1,
 }
 export const RequirementTypeAmino = RequirementType;
@@ -172,6 +177,9 @@ export function requirementTypeFromJSON(object: any): RequirementType {
     case 11:
     case "REQUIREMENT_TYPE_ACHIEVEMENT_COUNT":
       return RequirementType.REQUIREMENT_TYPE_ACHIEVEMENT_COUNT;
+    case 12:
+    case "REQUIREMENT_TYPE_GENESIS":
+      return RequirementType.REQUIREMENT_TYPE_GENESIS;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -204,6 +212,8 @@ export function requirementTypeToJSON(object: RequirementType): string {
       return "REQUIREMENT_TYPE_MIN_LEVEL";
     case RequirementType.REQUIREMENT_TYPE_ACHIEVEMENT_COUNT:
       return "REQUIREMENT_TYPE_ACHIEVEMENT_COUNT";
+    case RequirementType.REQUIREMENT_TYPE_GENESIS:
+      return "REQUIREMENT_TYPE_GENESIS";
     case RequirementType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";

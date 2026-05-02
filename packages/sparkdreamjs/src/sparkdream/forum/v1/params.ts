@@ -138,6 +138,30 @@ export interface Params {
    * conviction_renewal_period is the TTL extension in seconds when conviction threshold is met
    */
   convictionRenewalPeriod: bigint;
+  /**
+   * min_sentinel_bond — see ForumOperationalParams.min_sentinel_bond.
+   */
+  minSentinelBond: string;
+  /**
+   * min_sentinel_rep_tier — see ForumOperationalParams.min_sentinel_rep_tier.
+   */
+  minSentinelRepTier: bigint;
+  /**
+   * min_sentinel_trust_level — see ForumOperationalParams.min_sentinel_trust_level.
+   */
+  minSentinelTrustLevel: string;
+  /**
+   * min_sentinel_age_blocks — see ForumOperationalParams.min_sentinel_age_blocks.
+   */
+  minSentinelAgeBlocks: bigint;
+  /**
+   * sentinel_demotion_cooldown — see ForumOperationalParams.sentinel_demotion_cooldown.
+   */
+  sentinelDemotionCooldown: bigint;
+  /**
+   * sentinel_demotion_threshold — see ForumOperationalParams.sentinel_demotion_threshold.
+   */
+  sentinelDemotionThreshold: string;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.forum.v1.Params";
@@ -278,6 +302,30 @@ export interface ParamsAmino {
    * conviction_renewal_period is the TTL extension in seconds when conviction threshold is met
    */
   conviction_renewal_period?: string;
+  /**
+   * min_sentinel_bond — see ForumOperationalParams.min_sentinel_bond.
+   */
+  min_sentinel_bond?: string;
+  /**
+   * min_sentinel_rep_tier — see ForumOperationalParams.min_sentinel_rep_tier.
+   */
+  min_sentinel_rep_tier?: string;
+  /**
+   * min_sentinel_trust_level — see ForumOperationalParams.min_sentinel_trust_level.
+   */
+  min_sentinel_trust_level?: string;
+  /**
+   * min_sentinel_age_blocks — see ForumOperationalParams.min_sentinel_age_blocks.
+   */
+  min_sentinel_age_blocks?: string;
+  /**
+   * sentinel_demotion_cooldown — see ForumOperationalParams.sentinel_demotion_cooldown.
+   */
+  sentinel_demotion_cooldown?: string;
+  /**
+   * sentinel_demotion_threshold — see ForumOperationalParams.sentinel_demotion_threshold.
+   */
+  sentinel_demotion_threshold?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/forum/Params";
@@ -340,6 +388,38 @@ export interface ForumOperationalParams {
    * conviction_renewal_period is the TTL extension in seconds when conviction threshold is met
    */
   convictionRenewalPeriod: bigint;
+  /**
+   * min_sentinel_bond is the minimum DREAM required to bond as a sentinel
+   * (math.Int string, e.g. "1000").
+   */
+  minSentinelBond: string;
+  /**
+   * min_sentinel_rep_tier is the minimum reputation tier required to bond as
+   * a sentinel. 0 = no rep-tier gate.
+   */
+  minSentinelRepTier: bigint;
+  /**
+   * min_sentinel_trust_level is the minimum trust level required to bond as a
+   * sentinel, as an enum name (e.g. "TRUST_LEVEL_ESTABLISHED"). Empty = no
+   * trust-level gate.
+   */
+  minSentinelTrustLevel: string;
+  /**
+   * min_sentinel_age_blocks is enforced by forum at action time (the sentinel
+   * must have been bonded for this many blocks before taking an action). Zero
+   * = no age gate.
+   */
+  minSentinelAgeBlocks: bigint;
+  /**
+   * sentinel_demotion_cooldown is the number of seconds a DEMOTED sentinel
+   * must wait before re-bonding.
+   */
+  sentinelDemotionCooldown: bigint;
+  /**
+   * sentinel_demotion_threshold is the bond floor below which the sentinel
+   * transitions from RECOVERY to DEMOTED (math.Int string).
+   */
+  sentinelDemotionThreshold: string;
 }
 export interface ForumOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.forum.v1.ForumOperationalParams";
@@ -402,6 +482,38 @@ export interface ForumOperationalParamsAmino {
    * conviction_renewal_period is the TTL extension in seconds when conviction threshold is met
    */
   conviction_renewal_period?: string;
+  /**
+   * min_sentinel_bond is the minimum DREAM required to bond as a sentinel
+   * (math.Int string, e.g. "1000").
+   */
+  min_sentinel_bond?: string;
+  /**
+   * min_sentinel_rep_tier is the minimum reputation tier required to bond as
+   * a sentinel. 0 = no rep-tier gate.
+   */
+  min_sentinel_rep_tier?: string;
+  /**
+   * min_sentinel_trust_level is the minimum trust level required to bond as a
+   * sentinel, as an enum name (e.g. "TRUST_LEVEL_ESTABLISHED"). Empty = no
+   * trust-level gate.
+   */
+  min_sentinel_trust_level?: string;
+  /**
+   * min_sentinel_age_blocks is enforced by forum at action time (the sentinel
+   * must have been bonded for this many blocks before taking an action). Zero
+   * = no age gate.
+   */
+  min_sentinel_age_blocks?: string;
+  /**
+   * sentinel_demotion_cooldown is the number of seconds a DEMOTED sentinel
+   * must wait before re-bonding.
+   */
+  sentinel_demotion_cooldown?: string;
+  /**
+   * sentinel_demotion_threshold is the bond floor below which the sentinel
+   * transitions from RECOVERY to DEMOTED (math.Int string).
+   */
+  sentinel_demotion_threshold?: string;
 }
 export interface ForumOperationalParamsAminoMsg {
   type: "sparkdream/x/forum/ForumOperationalParams";
@@ -440,7 +552,13 @@ function createBaseParams(): Params {
     costPerByteExempt: false,
     ephemeralTtl: BigInt(0),
     convictionRenewalThreshold: "",
-    convictionRenewalPeriod: BigInt(0)
+    convictionRenewalPeriod: BigInt(0),
+    minSentinelBond: "",
+    minSentinelRepTier: BigInt(0),
+    minSentinelTrustLevel: "",
+    minSentinelAgeBlocks: BigInt(0),
+    sentinelDemotionCooldown: BigInt(0),
+    sentinelDemotionThreshold: ""
   };
 }
 /**
@@ -549,6 +667,24 @@ export const Params = {
     if (message.convictionRenewalPeriod !== BigInt(0)) {
       writer.uint32(304).int64(message.convictionRenewalPeriod);
     }
+    if (message.minSentinelBond !== "") {
+      writer.uint32(322).string(message.minSentinelBond);
+    }
+    if (message.minSentinelRepTier !== BigInt(0)) {
+      writer.uint32(328).uint64(message.minSentinelRepTier);
+    }
+    if (message.minSentinelTrustLevel !== "") {
+      writer.uint32(338).string(message.minSentinelTrustLevel);
+    }
+    if (message.minSentinelAgeBlocks !== BigInt(0)) {
+      writer.uint32(344).int64(message.minSentinelAgeBlocks);
+    }
+    if (message.sentinelDemotionCooldown !== BigInt(0)) {
+      writer.uint32(352).int64(message.sentinelDemotionCooldown);
+    }
+    if (message.sentinelDemotionThreshold !== "") {
+      writer.uint32(362).string(message.sentinelDemotionThreshold);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -654,6 +790,24 @@ export const Params = {
         case 38:
           message.convictionRenewalPeriod = reader.int64();
           break;
+        case 40:
+          message.minSentinelBond = reader.string();
+          break;
+        case 41:
+          message.minSentinelRepTier = reader.uint64();
+          break;
+        case 42:
+          message.minSentinelTrustLevel = reader.string();
+          break;
+        case 43:
+          message.minSentinelAgeBlocks = reader.int64();
+          break;
+        case 44:
+          message.sentinelDemotionCooldown = reader.int64();
+          break;
+        case 45:
+          message.sentinelDemotionThreshold = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -695,6 +849,12 @@ export const Params = {
     message.ephemeralTtl = object.ephemeralTtl !== undefined && object.ephemeralTtl !== null ? BigInt(object.ephemeralTtl.toString()) : BigInt(0);
     message.convictionRenewalThreshold = object.convictionRenewalThreshold ?? "";
     message.convictionRenewalPeriod = object.convictionRenewalPeriod !== undefined && object.convictionRenewalPeriod !== null ? BigInt(object.convictionRenewalPeriod.toString()) : BigInt(0);
+    message.minSentinelBond = object.minSentinelBond ?? "";
+    message.minSentinelRepTier = object.minSentinelRepTier !== undefined && object.minSentinelRepTier !== null ? BigInt(object.minSentinelRepTier.toString()) : BigInt(0);
+    message.minSentinelTrustLevel = object.minSentinelTrustLevel ?? "";
+    message.minSentinelAgeBlocks = object.minSentinelAgeBlocks !== undefined && object.minSentinelAgeBlocks !== null ? BigInt(object.minSentinelAgeBlocks.toString()) : BigInt(0);
+    message.sentinelDemotionCooldown = object.sentinelDemotionCooldown !== undefined && object.sentinelDemotionCooldown !== null ? BigInt(object.sentinelDemotionCooldown.toString()) : BigInt(0);
+    message.sentinelDemotionThreshold = object.sentinelDemotionThreshold ?? "";
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -795,6 +955,24 @@ export const Params = {
     if (object.conviction_renewal_period !== undefined && object.conviction_renewal_period !== null) {
       message.convictionRenewalPeriod = BigInt(object.conviction_renewal_period);
     }
+    if (object.min_sentinel_bond !== undefined && object.min_sentinel_bond !== null) {
+      message.minSentinelBond = object.min_sentinel_bond;
+    }
+    if (object.min_sentinel_rep_tier !== undefined && object.min_sentinel_rep_tier !== null) {
+      message.minSentinelRepTier = BigInt(object.min_sentinel_rep_tier);
+    }
+    if (object.min_sentinel_trust_level !== undefined && object.min_sentinel_trust_level !== null) {
+      message.minSentinelTrustLevel = object.min_sentinel_trust_level;
+    }
+    if (object.min_sentinel_age_blocks !== undefined && object.min_sentinel_age_blocks !== null) {
+      message.minSentinelAgeBlocks = BigInt(object.min_sentinel_age_blocks);
+    }
+    if (object.sentinel_demotion_cooldown !== undefined && object.sentinel_demotion_cooldown !== null) {
+      message.sentinelDemotionCooldown = BigInt(object.sentinel_demotion_cooldown);
+    }
+    if (object.sentinel_demotion_threshold !== undefined && object.sentinel_demotion_threshold !== null) {
+      message.sentinelDemotionThreshold = object.sentinel_demotion_threshold;
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -831,6 +1009,12 @@ export const Params = {
     obj.ephemeral_ttl = message.ephemeralTtl !== BigInt(0) ? message.ephemeralTtl?.toString() : undefined;
     obj.conviction_renewal_threshold = message.convictionRenewalThreshold === "" ? undefined : message.convictionRenewalThreshold;
     obj.conviction_renewal_period = message.convictionRenewalPeriod !== BigInt(0) ? message.convictionRenewalPeriod?.toString() : undefined;
+    obj.min_sentinel_bond = message.minSentinelBond === "" ? undefined : message.minSentinelBond;
+    obj.min_sentinel_rep_tier = message.minSentinelRepTier !== BigInt(0) ? message.minSentinelRepTier?.toString() : undefined;
+    obj.min_sentinel_trust_level = message.minSentinelTrustLevel === "" ? undefined : message.minSentinelTrustLevel;
+    obj.min_sentinel_age_blocks = message.minSentinelAgeBlocks !== BigInt(0) ? message.minSentinelAgeBlocks?.toString() : undefined;
+    obj.sentinel_demotion_cooldown = message.sentinelDemotionCooldown !== BigInt(0) ? message.sentinelDemotionCooldown?.toString() : undefined;
+    obj.sentinel_demotion_threshold = message.sentinelDemotionThreshold === "" ? undefined : message.sentinelDemotionThreshold;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {
@@ -885,7 +1069,13 @@ function createBaseForumOperationalParams(): ForumOperationalParams {
     moveAppealCooldown: BigInt(0),
     ephemeralTtl: BigInt(0),
     convictionRenewalThreshold: "",
-    convictionRenewalPeriod: BigInt(0)
+    convictionRenewalPeriod: BigInt(0),
+    minSentinelBond: "",
+    minSentinelRepTier: BigInt(0),
+    minSentinelTrustLevel: "",
+    minSentinelAgeBlocks: BigInt(0),
+    sentinelDemotionCooldown: BigInt(0),
+    sentinelDemotionThreshold: ""
   };
 }
 /**
@@ -988,6 +1178,24 @@ export const ForumOperationalParams = {
     if (message.convictionRenewalPeriod !== BigInt(0)) {
       writer.uint32(256).int64(message.convictionRenewalPeriod);
     }
+    if (message.minSentinelBond !== "") {
+      writer.uint32(322).string(message.minSentinelBond);
+    }
+    if (message.minSentinelRepTier !== BigInt(0)) {
+      writer.uint32(328).uint64(message.minSentinelRepTier);
+    }
+    if (message.minSentinelTrustLevel !== "") {
+      writer.uint32(338).string(message.minSentinelTrustLevel);
+    }
+    if (message.minSentinelAgeBlocks !== BigInt(0)) {
+      writer.uint32(344).int64(message.minSentinelAgeBlocks);
+    }
+    if (message.sentinelDemotionCooldown !== BigInt(0)) {
+      writer.uint32(352).int64(message.sentinelDemotionCooldown);
+    }
+    if (message.sentinelDemotionThreshold !== "") {
+      writer.uint32(362).string(message.sentinelDemotionThreshold);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): ForumOperationalParams {
@@ -1084,6 +1292,24 @@ export const ForumOperationalParams = {
         case 32:
           message.convictionRenewalPeriod = reader.int64();
           break;
+        case 40:
+          message.minSentinelBond = reader.string();
+          break;
+        case 41:
+          message.minSentinelRepTier = reader.uint64();
+          break;
+        case 42:
+          message.minSentinelTrustLevel = reader.string();
+          break;
+        case 43:
+          message.minSentinelAgeBlocks = reader.int64();
+          break;
+        case 44:
+          message.sentinelDemotionCooldown = reader.int64();
+          break;
+        case 45:
+          message.sentinelDemotionThreshold = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1122,6 +1348,12 @@ export const ForumOperationalParams = {
     message.ephemeralTtl = object.ephemeralTtl !== undefined && object.ephemeralTtl !== null ? BigInt(object.ephemeralTtl.toString()) : BigInt(0);
     message.convictionRenewalThreshold = object.convictionRenewalThreshold ?? "";
     message.convictionRenewalPeriod = object.convictionRenewalPeriod !== undefined && object.convictionRenewalPeriod !== null ? BigInt(object.convictionRenewalPeriod.toString()) : BigInt(0);
+    message.minSentinelBond = object.minSentinelBond ?? "";
+    message.minSentinelRepTier = object.minSentinelRepTier !== undefined && object.minSentinelRepTier !== null ? BigInt(object.minSentinelRepTier.toString()) : BigInt(0);
+    message.minSentinelTrustLevel = object.minSentinelTrustLevel ?? "";
+    message.minSentinelAgeBlocks = object.minSentinelAgeBlocks !== undefined && object.minSentinelAgeBlocks !== null ? BigInt(object.minSentinelAgeBlocks.toString()) : BigInt(0);
+    message.sentinelDemotionCooldown = object.sentinelDemotionCooldown !== undefined && object.sentinelDemotionCooldown !== null ? BigInt(object.sentinelDemotionCooldown.toString()) : BigInt(0);
+    message.sentinelDemotionThreshold = object.sentinelDemotionThreshold ?? "";
     return message;
   },
   fromAmino(object: ForumOperationalParamsAmino): ForumOperationalParams {
@@ -1213,6 +1445,24 @@ export const ForumOperationalParams = {
     if (object.conviction_renewal_period !== undefined && object.conviction_renewal_period !== null) {
       message.convictionRenewalPeriod = BigInt(object.conviction_renewal_period);
     }
+    if (object.min_sentinel_bond !== undefined && object.min_sentinel_bond !== null) {
+      message.minSentinelBond = object.min_sentinel_bond;
+    }
+    if (object.min_sentinel_rep_tier !== undefined && object.min_sentinel_rep_tier !== null) {
+      message.minSentinelRepTier = BigInt(object.min_sentinel_rep_tier);
+    }
+    if (object.min_sentinel_trust_level !== undefined && object.min_sentinel_trust_level !== null) {
+      message.minSentinelTrustLevel = object.min_sentinel_trust_level;
+    }
+    if (object.min_sentinel_age_blocks !== undefined && object.min_sentinel_age_blocks !== null) {
+      message.minSentinelAgeBlocks = BigInt(object.min_sentinel_age_blocks);
+    }
+    if (object.sentinel_demotion_cooldown !== undefined && object.sentinel_demotion_cooldown !== null) {
+      message.sentinelDemotionCooldown = BigInt(object.sentinel_demotion_cooldown);
+    }
+    if (object.sentinel_demotion_threshold !== undefined && object.sentinel_demotion_threshold !== null) {
+      message.sentinelDemotionThreshold = object.sentinel_demotion_threshold;
+    }
     return message;
   },
   toAmino(message: ForumOperationalParams): ForumOperationalParamsAmino {
@@ -1246,6 +1496,12 @@ export const ForumOperationalParams = {
     obj.ephemeral_ttl = message.ephemeralTtl !== BigInt(0) ? message.ephemeralTtl?.toString() : undefined;
     obj.conviction_renewal_threshold = message.convictionRenewalThreshold === "" ? undefined : message.convictionRenewalThreshold;
     obj.conviction_renewal_period = message.convictionRenewalPeriod !== BigInt(0) ? message.convictionRenewalPeriod?.toString() : undefined;
+    obj.min_sentinel_bond = message.minSentinelBond === "" ? undefined : message.minSentinelBond;
+    obj.min_sentinel_rep_tier = message.minSentinelRepTier !== BigInt(0) ? message.minSentinelRepTier?.toString() : undefined;
+    obj.min_sentinel_trust_level = message.minSentinelTrustLevel === "" ? undefined : message.minSentinelTrustLevel;
+    obj.min_sentinel_age_blocks = message.minSentinelAgeBlocks !== BigInt(0) ? message.minSentinelAgeBlocks?.toString() : undefined;
+    obj.sentinel_demotion_cooldown = message.sentinelDemotionCooldown !== BigInt(0) ? message.sentinelDemotionCooldown?.toString() : undefined;
+    obj.sentinel_demotion_threshold = message.sentinelDemotionThreshold === "" ? undefined : message.sentinelDemotionThreshold;
     return obj;
   },
   fromAminoMsg(object: ForumOperationalParamsAminoMsg): ForumOperationalParams {

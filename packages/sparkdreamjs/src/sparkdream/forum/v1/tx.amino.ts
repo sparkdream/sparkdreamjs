@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { MsgUpdateParams, MsgUpdateOperationalParams, MsgCreateCategory, MsgCreatePost, MsgEditPost, MsgDeletePost, MsgFreezeThread, MsgUnarchiveThread, MsgPinPost, MsgUnpinPost, MsgLockThread, MsgUnlockThread, MsgMoveThread, MsgFollowThread, MsgUnfollowThread, MsgUpvotePost, MsgDownvotePost, MsgFlagPost, MsgDismissFlags, MsgHidePost, MsgAppealPost, MsgAppealThreadLock, MsgAppealThreadMove, MsgCreateBounty, MsgAwardBounty, MsgIncreaseBounty, MsgCancelBounty, MsgAssignBountyToReply, MsgCreateTagBudget, MsgAwardFromTagBudget, MsgTopUpTagBudget, MsgToggleTagBudget, MsgWithdrawTagBudget, MsgPinReply, MsgUnpinReply, MsgDisputePin, MsgMarkAcceptedReply, MsgConfirmProposedReply, MsgRejectProposedReply, MsgSetForumPaused, MsgSetModerationPaused, MsgReportTag, MsgResolveTagReport, MsgBondSentinel, MsgUnbondSentinel, MsgReportMember, MsgCosignMemberReport, MsgResolveMemberReport, MsgDefendMemberReport, MsgAppealGovAction } from "./tx";
+import { MsgUpdateParams, MsgUpdateOperationalParams, MsgCreatePost, MsgEditPost, MsgDeletePost, MsgFreezeThread, MsgUnarchiveThread, MsgPinPost, MsgUnpinPost, MsgLockThread, MsgUnlockThread, MsgMoveThread, MsgFollowThread, MsgUnfollowThread, MsgUpvotePost, MsgDownvotePost, MsgFlagPost, MsgDismissFlags, MsgHidePost, MsgAppealPost, MsgAppealThreadLock, MsgAppealThreadMove, MsgCreateBounty, MsgAwardBounty, MsgIncreaseBounty, MsgCancelBounty, MsgAssignBountyToReply, MsgPinReply, MsgUnpinReply, MsgDisputePin, MsgMarkAcceptedReply, MsgConfirmProposedReply, MsgRejectProposedReply, MsgSetForumPaused, MsgSetModerationPaused } from "./tx";
 export const AminoConverter = {
   "/sparkdream.forum.v1.MsgUpdateParams": {
     aminoType: "sparkdream/x/forum/MsgUpdateParams",
@@ -10,11 +10,6 @@ export const AminoConverter = {
     aminoType: "sparkdream/x/forum/MsgUpdateOperationalParams",
     toAmino: MsgUpdateOperationalParams.toAmino,
     fromAmino: MsgUpdateOperationalParams.fromAmino
-  },
-  "/sparkdream.forum.v1.MsgCreateCategory": {
-    aminoType: "/sparkdream.forum.v1.MsgCreateCategory",
-    toAmino: MsgCreateCategory.toAmino,
-    fromAmino: MsgCreateCategory.fromAmino
   },
   "/sparkdream.forum.v1.MsgCreatePost": {
     aminoType: "/sparkdream.forum.v1.MsgCreatePost",
@@ -141,31 +136,6 @@ export const AminoConverter = {
     toAmino: MsgAssignBountyToReply.toAmino,
     fromAmino: MsgAssignBountyToReply.fromAmino
   },
-  "/sparkdream.forum.v1.MsgCreateTagBudget": {
-    aminoType: "/sparkdream.forum.v1.MsgCreateTagBudget",
-    toAmino: MsgCreateTagBudget.toAmino,
-    fromAmino: MsgCreateTagBudget.fromAmino
-  },
-  "/sparkdream.forum.v1.MsgAwardFromTagBudget": {
-    aminoType: "/sparkdream.forum.v1.MsgAwardFromTagBudget",
-    toAmino: MsgAwardFromTagBudget.toAmino,
-    fromAmino: MsgAwardFromTagBudget.fromAmino
-  },
-  "/sparkdream.forum.v1.MsgTopUpTagBudget": {
-    aminoType: "/sparkdream.forum.v1.MsgTopUpTagBudget",
-    toAmino: MsgTopUpTagBudget.toAmino,
-    fromAmino: MsgTopUpTagBudget.fromAmino
-  },
-  "/sparkdream.forum.v1.MsgToggleTagBudget": {
-    aminoType: "/sparkdream.forum.v1.MsgToggleTagBudget",
-    toAmino: MsgToggleTagBudget.toAmino,
-    fromAmino: MsgToggleTagBudget.fromAmino
-  },
-  "/sparkdream.forum.v1.MsgWithdrawTagBudget": {
-    aminoType: "/sparkdream.forum.v1.MsgWithdrawTagBudget",
-    toAmino: MsgWithdrawTagBudget.toAmino,
-    fromAmino: MsgWithdrawTagBudget.fromAmino
-  },
   "/sparkdream.forum.v1.MsgPinReply": {
     aminoType: "/sparkdream.forum.v1.MsgPinReply",
     toAmino: MsgPinReply.toAmino,
@@ -205,50 +175,5 @@ export const AminoConverter = {
     aminoType: "/sparkdream.forum.v1.MsgSetModerationPaused",
     toAmino: MsgSetModerationPaused.toAmino,
     fromAmino: MsgSetModerationPaused.fromAmino
-  },
-  "/sparkdream.forum.v1.MsgReportTag": {
-    aminoType: "/sparkdream.forum.v1.MsgReportTag",
-    toAmino: MsgReportTag.toAmino,
-    fromAmino: MsgReportTag.fromAmino
-  },
-  "/sparkdream.forum.v1.MsgResolveTagReport": {
-    aminoType: "/sparkdream.forum.v1.MsgResolveTagReport",
-    toAmino: MsgResolveTagReport.toAmino,
-    fromAmino: MsgResolveTagReport.fromAmino
-  },
-  "/sparkdream.forum.v1.MsgBondSentinel": {
-    aminoType: "/sparkdream.forum.v1.MsgBondSentinel",
-    toAmino: MsgBondSentinel.toAmino,
-    fromAmino: MsgBondSentinel.fromAmino
-  },
-  "/sparkdream.forum.v1.MsgUnbondSentinel": {
-    aminoType: "/sparkdream.forum.v1.MsgUnbondSentinel",
-    toAmino: MsgUnbondSentinel.toAmino,
-    fromAmino: MsgUnbondSentinel.fromAmino
-  },
-  "/sparkdream.forum.v1.MsgReportMember": {
-    aminoType: "/sparkdream.forum.v1.MsgReportMember",
-    toAmino: MsgReportMember.toAmino,
-    fromAmino: MsgReportMember.fromAmino
-  },
-  "/sparkdream.forum.v1.MsgCosignMemberReport": {
-    aminoType: "/sparkdream.forum.v1.MsgCosignMemberReport",
-    toAmino: MsgCosignMemberReport.toAmino,
-    fromAmino: MsgCosignMemberReport.fromAmino
-  },
-  "/sparkdream.forum.v1.MsgResolveMemberReport": {
-    aminoType: "/sparkdream.forum.v1.MsgResolveMemberReport",
-    toAmino: MsgResolveMemberReport.toAmino,
-    fromAmino: MsgResolveMemberReport.fromAmino
-  },
-  "/sparkdream.forum.v1.MsgDefendMemberReport": {
-    aminoType: "/sparkdream.forum.v1.MsgDefendMemberReport",
-    toAmino: MsgDefendMemberReport.toAmino,
-    fromAmino: MsgDefendMemberReport.fromAmino
-  },
-  "/sparkdream.forum.v1.MsgAppealGovAction": {
-    aminoType: "/sparkdream.forum.v1.MsgAppealGovAction",
-    toAmino: MsgAppealGovAction.toAmino,
-    fromAmino: MsgAppealGovAction.fromAmino
   }
 };

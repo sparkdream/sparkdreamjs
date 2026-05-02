@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { MsgUpdateParams, MsgUpdateOperationalParams, MsgInviteMember, MsgAcceptInvitation, MsgTransferDream, MsgCreateInterim, MsgAssignInterim, MsgSubmitInterimWork, MsgApproveInterim, MsgAbandonInterim, MsgCompleteInterim, MsgProposeProject, MsgApproveProjectBudget, MsgCancelProject, MsgCreateInitiative, MsgAssignInitiative, MsgSubmitInitiativeWork, MsgApproveInitiative, MsgAbandonInitiative, MsgCompleteInitiative, MsgStake, MsgUnstake, MsgClaimStakingRewards, MsgCompoundStakingRewards, MsgCreateChallenge, MsgRespondToChallenge, MsgSubmitJurorVote, MsgSubmitExpertTestimony, MsgChallengeContent, MsgRespondToContentChallenge, MsgRegisterZkPublicKey } from "./tx";
+import { MsgUpdateParams, MsgUpdateOperationalParams, MsgInviteMember, MsgAcceptInvitation, MsgTransferDream, MsgCreateInterim, MsgAssignInterim, MsgSubmitInterimWork, MsgApproveInterim, MsgAbandonInterim, MsgCompleteInterim, MsgProposeProject, MsgApproveProjectBudget, MsgCancelProject, MsgCreateInitiative, MsgAssignInitiative, MsgSubmitInitiativeWork, MsgApproveInitiative, MsgAbandonInitiative, MsgCompleteInitiative, MsgStake, MsgUnstake, MsgClaimStakingRewards, MsgCompoundStakingRewards, MsgCreateChallenge, MsgRespondToChallenge, MsgSubmitJurorVote, MsgSubmitExpertTestimony, MsgChallengeContent, MsgRespondToContentChallenge, MsgRegisterZkPublicKey, MsgCreateTag, MsgReportTag, MsgResolveTagReport, MsgCreateTagBudget, MsgAwardFromTagBudget, MsgTopUpTagBudget, MsgToggleTagBudget, MsgWithdrawTagBudget, MsgBondRole, MsgUnbondRole, MsgReportMember, MsgCosignMemberReport, MsgResolveMemberReport, MsgDefendMemberReport, MsgAppealGovAction, MsgResolveGovActionAppeal } from "./tx";
 export const AminoConverter = {
   "/sparkdream.rep.v1.MsgUpdateParams": {
     aminoType: "sparkdream/x/rep/MsgUpdateParams",
@@ -155,5 +155,85 @@ export const AminoConverter = {
     aminoType: "/sparkdream.rep.v1.MsgRegisterZkPublicKey",
     toAmino: MsgRegisterZkPublicKey.toAmino,
     fromAmino: MsgRegisterZkPublicKey.fromAmino
+  },
+  "/sparkdream.rep.v1.MsgCreateTag": {
+    aminoType: "/sparkdream.rep.v1.MsgCreateTag",
+    toAmino: MsgCreateTag.toAmino,
+    fromAmino: MsgCreateTag.fromAmino
+  },
+  "/sparkdream.rep.v1.MsgReportTag": {
+    aminoType: "/sparkdream.rep.v1.MsgReportTag",
+    toAmino: MsgReportTag.toAmino,
+    fromAmino: MsgReportTag.fromAmino
+  },
+  "/sparkdream.rep.v1.MsgResolveTagReport": {
+    aminoType: "/sparkdream.rep.v1.MsgResolveTagReport",
+    toAmino: MsgResolveTagReport.toAmino,
+    fromAmino: MsgResolveTagReport.fromAmino
+  },
+  "/sparkdream.rep.v1.MsgCreateTagBudget": {
+    aminoType: "/sparkdream.rep.v1.MsgCreateTagBudget",
+    toAmino: MsgCreateTagBudget.toAmino,
+    fromAmino: MsgCreateTagBudget.fromAmino
+  },
+  "/sparkdream.rep.v1.MsgAwardFromTagBudget": {
+    aminoType: "/sparkdream.rep.v1.MsgAwardFromTagBudget",
+    toAmino: MsgAwardFromTagBudget.toAmino,
+    fromAmino: MsgAwardFromTagBudget.fromAmino
+  },
+  "/sparkdream.rep.v1.MsgTopUpTagBudget": {
+    aminoType: "/sparkdream.rep.v1.MsgTopUpTagBudget",
+    toAmino: MsgTopUpTagBudget.toAmino,
+    fromAmino: MsgTopUpTagBudget.fromAmino
+  },
+  "/sparkdream.rep.v1.MsgToggleTagBudget": {
+    aminoType: "/sparkdream.rep.v1.MsgToggleTagBudget",
+    toAmino: MsgToggleTagBudget.toAmino,
+    fromAmino: MsgToggleTagBudget.fromAmino
+  },
+  "/sparkdream.rep.v1.MsgWithdrawTagBudget": {
+    aminoType: "/sparkdream.rep.v1.MsgWithdrawTagBudget",
+    toAmino: MsgWithdrawTagBudget.toAmino,
+    fromAmino: MsgWithdrawTagBudget.fromAmino
+  },
+  "/sparkdream.rep.v1.MsgBondRole": {
+    aminoType: "/sparkdream.rep.v1.MsgBondRole",
+    toAmino: MsgBondRole.toAmino,
+    fromAmino: MsgBondRole.fromAmino
+  },
+  "/sparkdream.rep.v1.MsgUnbondRole": {
+    aminoType: "/sparkdream.rep.v1.MsgUnbondRole",
+    toAmino: MsgUnbondRole.toAmino,
+    fromAmino: MsgUnbondRole.fromAmino
+  },
+  "/sparkdream.rep.v1.MsgReportMember": {
+    aminoType: "/sparkdream.rep.v1.MsgReportMember",
+    toAmino: MsgReportMember.toAmino,
+    fromAmino: MsgReportMember.fromAmino
+  },
+  "/sparkdream.rep.v1.MsgCosignMemberReport": {
+    aminoType: "/sparkdream.rep.v1.MsgCosignMemberReport",
+    toAmino: MsgCosignMemberReport.toAmino,
+    fromAmino: MsgCosignMemberReport.fromAmino
+  },
+  "/sparkdream.rep.v1.MsgResolveMemberReport": {
+    aminoType: "/sparkdream.rep.v1.MsgResolveMemberReport",
+    toAmino: MsgResolveMemberReport.toAmino,
+    fromAmino: MsgResolveMemberReport.fromAmino
+  },
+  "/sparkdream.rep.v1.MsgDefendMemberReport": {
+    aminoType: "/sparkdream.rep.v1.MsgDefendMemberReport",
+    toAmino: MsgDefendMemberReport.toAmino,
+    fromAmino: MsgDefendMemberReport.fromAmino
+  },
+  "/sparkdream.rep.v1.MsgAppealGovAction": {
+    aminoType: "/sparkdream.rep.v1.MsgAppealGovAction",
+    toAmino: MsgAppealGovAction.toAmino,
+    fromAmino: MsgAppealGovAction.fromAmino
+  },
+  "/sparkdream.rep.v1.MsgResolveGovActionAppeal": {
+    aminoType: "/sparkdream.rep.v1.MsgResolveGovActionAppeal",
+    toAmino: MsgResolveGovActionAppeal.toAmino,
+    fromAmino: MsgResolveGovActionAppeal.fromAmino
   }
 };

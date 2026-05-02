@@ -81,6 +81,9 @@ export const createRPCQueryClient = async ({
       ecosystem: {
         v1: (await import("./ecosystem/v1/query.rpc.Query")).createRpcQueryExtension(client)
       },
+      federation: {
+        v1: (await import("./federation/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
       forum: {
         v1: (await import("./forum/v1/query.rpc.Query")).createRpcQueryExtension(client)
       },

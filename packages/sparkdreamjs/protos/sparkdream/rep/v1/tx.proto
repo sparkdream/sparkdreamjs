@@ -6,6 +6,8 @@ import "amino/amino.proto";
 import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
+import "sparkdream/rep/v1/accountability.proto";
+import "sparkdream/rep/v1/bonded_role.proto";
 import "sparkdream/rep/v1/interim.proto";
 import "sparkdream/rep/v1/jury_review.proto";
 import "sparkdream/rep/v1/params.proto";
@@ -112,6 +114,61 @@ service Msg {
 
   // RegisterZkPublicKey defines the RegisterZkPublicKey RPC.
   rpc RegisterZkPublicKey(MsgRegisterZkPublicKey) returns (MsgRegisterZkPublicKeyResponse);
+
+  // CreateTag defines the CreateTag RPC. Permissionless tag registry creation
+  // for members meeting the minimum trust level. Deducts the tag-creation fee
+  // from the creator (split between burn and community pool).
+  rpc CreateTag(MsgCreateTag) returns (MsgCreateTagResponse);
+
+  // ReportTag defines the ReportTag RPC.
+  rpc ReportTag(MsgReportTag) returns (MsgReportTagResponse);
+
+  // ResolveTagReport defines the ResolveTagReport RPC.
+  rpc ResolveTagReport(MsgResolveTagReport) returns (MsgResolveTagReportResponse);
+
+  // CreateTagBudget defines the CreateTagBudget RPC.
+  rpc CreateTagBudget(MsgCreateTagBudget) returns (MsgCreateTagBudgetResponse);
+
+  // AwardFromTagBudget defines the AwardFromTagBudget RPC.
+  rpc AwardFromTagBudget(MsgAwardFromTagBudget) returns (MsgAwardFromTagBudgetResponse);
+
+  // TopUpTagBudget defines the TopUpTagBudget RPC.
+  rpc TopUpTagBudget(MsgTopUpTagBudget) returns (MsgTopUpTagBudgetResponse);
+
+  // ToggleTagBudget defines the ToggleTagBudget RPC.
+  rpc ToggleTagBudget(MsgToggleTagBudget) returns (MsgToggleTagBudgetResponse);
+
+  // WithdrawTagBudget defines the WithdrawTagBudget RPC.
+  rpc WithdrawTagBudget(MsgWithdrawTagBudget) returns (MsgWithdrawTagBudgetResponse);
+
+  // BondRole locks DREAM against (role_type, creator) and creates or updates
+  // the BondedRole record. Used to register as a forum sentinel, collect
+  // curator, federation verifier, etc. — role-specific eligibility comes from
+  // the role's BondedRoleConfig.
+  rpc BondRole(MsgBondRole) returns (MsgBondRoleResponse);
+
+  // UnbondRole withdraws a portion of the caller's bond for the given
+  // role_type (subject to committed-bond constraints).
+  rpc UnbondRole(MsgUnbondRole) returns (MsgUnbondRoleResponse);
+
+  // ReportMember defines the ReportMember RPC.
+  rpc ReportMember(MsgReportMember) returns (MsgReportMemberResponse);
+
+  // CosignMemberReport defines the CosignMemberReport RPC.
+  rpc CosignMemberReport(MsgCosignMemberReport) returns (MsgCosignMemberReportResponse);
+
+  // ResolveMemberReport defines the ResolveMemberReport RPC.
+  rpc ResolveMemberReport(MsgResolveMemberReport) returns (MsgResolveMemberReportResponse);
+
+  // DefendMemberReport defines the DefendMemberReport RPC.
+  rpc DefendMemberReport(MsgDefendMemberReport) returns (MsgDefendMemberReportResponse);
+
+  // AppealGovAction defines the AppealGovAction RPC.
+  rpc AppealGovAction(MsgAppealGovAction) returns (MsgAppealGovActionResponse);
+
+  // ResolveGovActionAppeal defines the ResolveGovActionAppeal RPC. Resolves
+  // a pending gov action appeal via council authority (UPHELD or OVERTURNED).
+  rpc ResolveGovActionAppeal(MsgResolveGovActionAppeal) returns (MsgResolveGovActionAppealResponse);
 }
 
 // MsgUpdateParams is the Msg/UpdateParams request type.
@@ -534,3 +591,196 @@ message MsgRegisterZkPublicKey {
 
 // MsgRegisterZkPublicKeyResponse defines the MsgRegisterZkPublicKeyResponse message.
 message MsgRegisterZkPublicKeyResponse {}
+
+// MsgCreateTag defines the MsgCreateTag message. Creates a new tag in the
+// shared tag registry. Caller must meet the minimum trust level and pay the
+// tag-creation fee.
+message MsgCreateTag {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string name = 2;
+}
+
+// MsgCreateTagResponse defines the response for CreateTag.
+message MsgCreateTagResponse {
+  string name = 1;
+}
+
+// MsgReportTag defines the MsgReportTag message.
+message MsgReportTag {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string tag_name = 2;
+  string reason = 3;
+}
+
+// MsgReportTagResponse defines the MsgReportTagResponse message.
+message MsgReportTagResponse {}
+
+// MsgResolveTagReport defines the MsgResolveTagReport message.
+message MsgResolveTagReport {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string tag_name = 2;
+  uint64 action = 3;
+  string reserve_authority = 4;
+  bool reserve_members_can_use = 5;
+}
+
+// MsgResolveTagReportResponse defines the MsgResolveTagReportResponse message.
+message MsgResolveTagReportResponse {}
+
+// MsgCreateTagBudget defines the MsgCreateTagBudget message.
+message MsgCreateTagBudget {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string tag = 2;
+  string initial_pool = 3;
+  bool members_only = 4;
+}
+
+// MsgCreateTagBudgetResponse defines the MsgCreateTagBudgetResponse message.
+message MsgCreateTagBudgetResponse {}
+
+// MsgAwardFromTagBudget defines the MsgAwardFromTagBudget message.
+message MsgAwardFromTagBudget {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 budget_id = 2;
+  uint64 post_id = 3;
+  string amount = 4;
+  string reason = 5;
+}
+
+// MsgAwardFromTagBudgetResponse defines the MsgAwardFromTagBudgetResponse message.
+message MsgAwardFromTagBudgetResponse {}
+
+// MsgTopUpTagBudget defines the MsgTopUpTagBudget message.
+message MsgTopUpTagBudget {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 budget_id = 2;
+  string amount = 3;
+}
+
+// MsgTopUpTagBudgetResponse defines the MsgTopUpTagBudgetResponse message.
+message MsgTopUpTagBudgetResponse {}
+
+// MsgToggleTagBudget defines the MsgToggleTagBudget message.
+message MsgToggleTagBudget {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 budget_id = 2;
+  bool active = 3;
+}
+
+// MsgToggleTagBudgetResponse defines the MsgToggleTagBudgetResponse message.
+message MsgToggleTagBudgetResponse {}
+
+// MsgWithdrawTagBudget defines the MsgWithdrawTagBudget message.
+message MsgWithdrawTagBudget {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 budget_id = 2;
+}
+
+// MsgWithdrawTagBudgetResponse defines the MsgWithdrawTagBudgetResponse message.
+message MsgWithdrawTagBudgetResponse {}
+
+// MsgBondRole bonds DREAM against a specific role_type. The role's
+// BondedRoleConfig controls eligibility (min_bond, min_rep_tier,
+// min_trust_level, min_age_blocks) and demotion behaviour.
+message MsgBondRole {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  RoleType role_type = 2;
+  string amount = 3;
+}
+
+// MsgBondRoleResponse defines the MsgBondRoleResponse message.
+message MsgBondRoleResponse {}
+
+// MsgUnbondRole withdraws a portion of the caller's bond for the given
+// role_type. The committed portion (reserved against pending actions) is
+// non-withdrawable.
+message MsgUnbondRole {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  RoleType role_type = 2;
+  string amount = 3;
+}
+
+// MsgUnbondRoleResponse defines the MsgUnbondRoleResponse message.
+message MsgUnbondRoleResponse {}
+
+// MsgReportMember defines the MsgReportMember message.
+message MsgReportMember {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string member = 2;
+  string reason = 3;
+  uint64 recommended_action = 4;
+}
+
+// MsgReportMemberResponse defines the MsgReportMemberResponse message.
+message MsgReportMemberResponse {}
+
+// MsgCosignMemberReport defines the MsgCosignMemberReport message.
+message MsgCosignMemberReport {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string member = 2;
+}
+
+// MsgCosignMemberReportResponse defines the MsgCosignMemberReportResponse message.
+message MsgCosignMemberReportResponse {}
+
+// MsgResolveMemberReport defines the MsgResolveMemberReport message.
+message MsgResolveMemberReport {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string member = 2;
+  uint64 action = 3;
+  string reason = 4;
+}
+
+// MsgResolveMemberReportResponse defines the MsgResolveMemberReportResponse message.
+message MsgResolveMemberReportResponse {}
+
+// MsgDefendMemberReport defines the MsgDefendMemberReport message.
+message MsgDefendMemberReport {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string defense = 2;
+}
+
+// MsgDefendMemberReportResponse defines the MsgDefendMemberReportResponse message.
+message MsgDefendMemberReportResponse {}
+
+// MsgAppealGovAction defines the MsgAppealGovAction message.
+message MsgAppealGovAction {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 action_type = 2;
+  string action_target = 3;
+  string appeal_reason = 4;
+}
+
+// MsgAppealGovActionResponse defines the MsgAppealGovActionResponse message.
+message MsgAppealGovActionResponse {}
+
+// MsgResolveGovActionAppeal resolves a pending appeal via council authority.
+// Only the Operations Committee of the commons council may resolve appeals.
+// The verdict must be UPHELD or OVERTURNED; TIMEOUT is EndBlocker-only and
+// UNSPECIFIED is rejected.
+message MsgResolveGovActionAppeal {
+  option (cosmos.msg.v1.signer) = "resolver";
+  string resolver = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 appeal_id = 2;
+  GovAppealStatus verdict = 3;
+  string reason = 4;
+}
+
+// MsgResolveGovActionAppealResponse defines the response for
+// ResolveGovActionAppeal.
+message MsgResolveGovActionAppealResponse {}

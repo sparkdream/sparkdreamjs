@@ -3,6 +3,7 @@ import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "
 import { Params, ParamsAmino } from "./params";
 import { PolicyPermissions, PolicyPermissionsAmino } from "./policy_permissions";
 import { Group, GroupAmino, Member, MemberAmino, Proposal, ProposalAmino, Vote, VoteAmino, TallyResult, TallyResultAmino } from "./group";
+import { Category, CategoryAmino } from "./category";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -494,6 +495,112 @@ export interface QueryGetProposalVotesResponseAmino {
 export interface QueryGetProposalVotesResponseAminoMsg {
   type: "/sparkdream.commons.v1.QueryGetProposalVotesResponse";
   value: QueryGetProposalVotesResponseAmino;
+}
+/**
+ * QueryGetCategoryRequest queries a single category by id.
+ * @name QueryGetCategoryRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetCategoryRequest
+ */
+export interface QueryGetCategoryRequest {
+  categoryId: bigint;
+}
+export interface QueryGetCategoryRequestProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryGetCategoryRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryGetCategoryRequest queries a single category by id.
+ * @name QueryGetCategoryRequestAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetCategoryRequest
+ */
+export interface QueryGetCategoryRequestAmino {
+  category_id?: string;
+}
+export interface QueryGetCategoryRequestAminoMsg {
+  type: "/sparkdream.commons.v1.QueryGetCategoryRequest";
+  value: QueryGetCategoryRequestAmino;
+}
+/**
+ * QueryGetCategoryResponse returns a single category.
+ * @name QueryGetCategoryResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetCategoryResponse
+ */
+export interface QueryGetCategoryResponse {
+  category: Category;
+}
+export interface QueryGetCategoryResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryGetCategoryResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryGetCategoryResponse returns a single category.
+ * @name QueryGetCategoryResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetCategoryResponse
+ */
+export interface QueryGetCategoryResponseAmino {
+  category?: CategoryAmino;
+}
+export interface QueryGetCategoryResponseAminoMsg {
+  type: "/sparkdream.commons.v1.QueryGetCategoryResponse";
+  value: QueryGetCategoryResponseAmino;
+}
+/**
+ * QueryAllCategoryRequest queries all categories with pagination.
+ * @name QueryAllCategoryRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryAllCategoryRequest
+ */
+export interface QueryAllCategoryRequest {
+  pagination?: PageRequest;
+}
+export interface QueryAllCategoryRequestProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryAllCategoryRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryAllCategoryRequest queries all categories with pagination.
+ * @name QueryAllCategoryRequestAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryAllCategoryRequest
+ */
+export interface QueryAllCategoryRequestAmino {
+  pagination?: PageRequestAmino;
+}
+export interface QueryAllCategoryRequestAminoMsg {
+  type: "/sparkdream.commons.v1.QueryAllCategoryRequest";
+  value: QueryAllCategoryRequestAmino;
+}
+/**
+ * QueryAllCategoryResponse returns all categories.
+ * @name QueryAllCategoryResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryAllCategoryResponse
+ */
+export interface QueryAllCategoryResponse {
+  category: Category[];
+  pagination?: PageResponse;
+}
+export interface QueryAllCategoryResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryAllCategoryResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryAllCategoryResponse returns all categories.
+ * @name QueryAllCategoryResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryAllCategoryResponse
+ */
+export interface QueryAllCategoryResponseAmino {
+  category?: CategoryAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryAllCategoryResponseAminoMsg {
+  type: "/sparkdream.commons.v1.QueryAllCategoryResponse";
+  value: QueryAllCategoryResponseAmino;
 }
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
@@ -1817,6 +1924,296 @@ export const QueryGetProposalVotesResponse = {
     return {
       typeUrl: "/sparkdream.commons.v1.QueryGetProposalVotesResponse",
       value: QueryGetProposalVotesResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetCategoryRequest(): QueryGetCategoryRequest {
+  return {
+    categoryId: BigInt(0)
+  };
+}
+/**
+ * QueryGetCategoryRequest queries a single category by id.
+ * @name QueryGetCategoryRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetCategoryRequest
+ */
+export const QueryGetCategoryRequest = {
+  typeUrl: "/sparkdream.commons.v1.QueryGetCategoryRequest",
+  encode(message: QueryGetCategoryRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.categoryId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.categoryId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetCategoryRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetCategoryRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.categoryId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetCategoryRequest>): QueryGetCategoryRequest {
+    const message = createBaseQueryGetCategoryRequest();
+    message.categoryId = object.categoryId !== undefined && object.categoryId !== null ? BigInt(object.categoryId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryGetCategoryRequestAmino): QueryGetCategoryRequest {
+    const message = createBaseQueryGetCategoryRequest();
+    if (object.category_id !== undefined && object.category_id !== null) {
+      message.categoryId = BigInt(object.category_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetCategoryRequest): QueryGetCategoryRequestAmino {
+    const obj: any = {};
+    obj.category_id = message.categoryId !== BigInt(0) ? message.categoryId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetCategoryRequestAminoMsg): QueryGetCategoryRequest {
+    return QueryGetCategoryRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetCategoryRequestProtoMsg): QueryGetCategoryRequest {
+    return QueryGetCategoryRequest.decode(message.value);
+  },
+  toProto(message: QueryGetCategoryRequest): Uint8Array {
+    return QueryGetCategoryRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetCategoryRequest): QueryGetCategoryRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryGetCategoryRequest",
+      value: QueryGetCategoryRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetCategoryResponse(): QueryGetCategoryResponse {
+  return {
+    category: Category.fromPartial({})
+  };
+}
+/**
+ * QueryGetCategoryResponse returns a single category.
+ * @name QueryGetCategoryResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetCategoryResponse
+ */
+export const QueryGetCategoryResponse = {
+  typeUrl: "/sparkdream.commons.v1.QueryGetCategoryResponse",
+  encode(message: QueryGetCategoryResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.category !== undefined) {
+      Category.encode(message.category, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetCategoryResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetCategoryResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.category = Category.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetCategoryResponse>): QueryGetCategoryResponse {
+    const message = createBaseQueryGetCategoryResponse();
+    message.category = object.category !== undefined && object.category !== null ? Category.fromPartial(object.category) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetCategoryResponseAmino): QueryGetCategoryResponse {
+    const message = createBaseQueryGetCategoryResponse();
+    if (object.category !== undefined && object.category !== null) {
+      message.category = Category.fromAmino(object.category);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetCategoryResponse): QueryGetCategoryResponseAmino {
+    const obj: any = {};
+    obj.category = message.category ? Category.toAmino(message.category) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetCategoryResponseAminoMsg): QueryGetCategoryResponse {
+    return QueryGetCategoryResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetCategoryResponseProtoMsg): QueryGetCategoryResponse {
+    return QueryGetCategoryResponse.decode(message.value);
+  },
+  toProto(message: QueryGetCategoryResponse): Uint8Array {
+    return QueryGetCategoryResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetCategoryResponse): QueryGetCategoryResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryGetCategoryResponse",
+      value: QueryGetCategoryResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllCategoryRequest(): QueryAllCategoryRequest {
+  return {
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllCategoryRequest queries all categories with pagination.
+ * @name QueryAllCategoryRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryAllCategoryRequest
+ */
+export const QueryAllCategoryRequest = {
+  typeUrl: "/sparkdream.commons.v1.QueryAllCategoryRequest",
+  encode(message: QueryAllCategoryRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllCategoryRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllCategoryRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllCategoryRequest>): QueryAllCategoryRequest {
+    const message = createBaseQueryAllCategoryRequest();
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllCategoryRequestAmino): QueryAllCategoryRequest {
+    const message = createBaseQueryAllCategoryRequest();
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllCategoryRequest): QueryAllCategoryRequestAmino {
+    const obj: any = {};
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllCategoryRequestAminoMsg): QueryAllCategoryRequest {
+    return QueryAllCategoryRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllCategoryRequestProtoMsg): QueryAllCategoryRequest {
+    return QueryAllCategoryRequest.decode(message.value);
+  },
+  toProto(message: QueryAllCategoryRequest): Uint8Array {
+    return QueryAllCategoryRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllCategoryRequest): QueryAllCategoryRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryAllCategoryRequest",
+      value: QueryAllCategoryRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllCategoryResponse(): QueryAllCategoryResponse {
+  return {
+    category: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllCategoryResponse returns all categories.
+ * @name QueryAllCategoryResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryAllCategoryResponse
+ */
+export const QueryAllCategoryResponse = {
+  typeUrl: "/sparkdream.commons.v1.QueryAllCategoryResponse",
+  encode(message: QueryAllCategoryResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.category) {
+      Category.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllCategoryResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllCategoryResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.category.push(Category.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllCategoryResponse>): QueryAllCategoryResponse {
+    const message = createBaseQueryAllCategoryResponse();
+    message.category = object.category?.map(e => Category.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllCategoryResponseAmino): QueryAllCategoryResponse {
+    const message = createBaseQueryAllCategoryResponse();
+    message.category = object.category?.map(e => Category.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllCategoryResponse): QueryAllCategoryResponseAmino {
+    const obj: any = {};
+    if (message.category) {
+      obj.category = message.category.map(e => e ? Category.toAmino(e) : undefined);
+    } else {
+      obj.category = message.category;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllCategoryResponseAminoMsg): QueryAllCategoryResponse {
+    return QueryAllCategoryResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllCategoryResponseProtoMsg): QueryAllCategoryResponse {
+    return QueryAllCategoryResponse.decode(message.value);
+  },
+  toProto(message: QueryAllCategoryResponse): Uint8Array {
+    return QueryAllCategoryResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllCategoryResponse): QueryAllCategoryResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryAllCategoryResponse",
+      value: QueryAllCategoryResponse.encode(message).finish()
     };
   }
 };

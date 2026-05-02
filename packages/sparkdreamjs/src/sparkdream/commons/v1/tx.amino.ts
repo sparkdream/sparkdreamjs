@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { MsgUpdateParams, MsgSpendFromCommons, MsgEmergencyCancelGovProposal, MsgCreatePolicyPermissions, MsgUpdatePolicyPermissions, MsgDeletePolicyPermissions, MsgRegisterGroup, MsgRenewGroup, MsgUpdateGroupMembers, MsgUpdateGroupConfig, MsgForceUpgrade, MsgDeleteGroup, MsgVetoGroupProposals, MsgSubmitProposal, MsgVoteProposal, MsgExecuteProposal, MsgSubmitAnonymousProposal, MsgAnonymousVoteProposal } from "./tx";
+import { MsgUpdateParams, MsgSpendFromCommons, MsgEmergencyCancelGovProposal, MsgCreatePolicyPermissions, MsgUpdatePolicyPermissions, MsgDeletePolicyPermissions, MsgRegisterGroup, MsgRenewGroup, MsgUpdateGroupMembers, MsgUpdateGroupConfig, MsgForceUpgrade, MsgDeleteGroup, MsgVetoGroupProposals, MsgSubmitProposal, MsgVoteProposal, MsgExecuteProposal, MsgSubmitAnonymousProposal, MsgAnonymousVoteProposal, MsgCreateCategory } from "./tx";
 export const AminoConverter = {
   "/sparkdream.commons.v1.MsgUpdateParams": {
     aminoType: "sparkdream/x/commons/MsgUpdateParams",
@@ -90,5 +90,10 @@ export const AminoConverter = {
     aminoType: "sparkdream/x/commons/MsgAnonymousVoteProposal",
     toAmino: MsgAnonymousVoteProposal.toAmino,
     fromAmino: MsgAnonymousVoteProposal.fromAmino
+  },
+  "/sparkdream.commons.v1.MsgCreateCategory": {
+    aminoType: "sparkdream/x/commons/MsgCreateCategory",
+    toAmino: MsgCreateCategory.toAmino,
+    fromAmino: MsgCreateCategory.fromAmino
   }
 };
