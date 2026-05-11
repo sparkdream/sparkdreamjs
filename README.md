@@ -212,6 +212,35 @@ const fee: StdFee = {
 const response = await stargateClient.signAndBroadcast(address, [msg], fee);
 ```
 
+### Amino signing of `MsgSubmitProposal` (and other Any-wrapping messages)
+
+`sparkdream.commons.v1.MsgSubmitProposal`, `MsgSubmitAnonymousProposal`, and
+`sparkdream.session.v1.MsgExecSession` each embed a `repeated google.protobuf.Any`
+field. Telescope's auto-generated amino converters can't recursively decode and
+re-encode those inner messages, so amino-signing (Ledger users hit this) fails
+with either Keplr's *"Data is invalid: JSON Dictionaries are not sorted"* or
+the chain's *"signature verification failed"*.
+
+These three converters are hand-overridden in `src-overrides/` and need a
+one-time wiring step from the consumer — after you've built your proto
+`Registry` and your stargate `AminoTypes`, register them so the patched
+converters can decode each inner `Any.value` and look up its amino form:
+
+```ts
+import { configureNestedAminoConverter } from '@sparkdreamnft/sparkdreamjs/sparkdream/commons/v1/tx.amino';
+
+const registry = new Registry(/* … all module proto types … */);
+const aminoTypes = new AminoTypes({ /* … all module amino converters … */ });
+
+configureNestedAminoConverter({ registry, aminoTypes });
+
+// now SigningStargateClient.signAndBroadcast can amino-sign proposals
+```
+
+If you forget the call, you'll get a clear error from
+`configureNestedAminoConverter() must be called before amino-signing…` the
+first time one of these messages goes through `toAmino`.
+
 ## Advanced Usage
 
 

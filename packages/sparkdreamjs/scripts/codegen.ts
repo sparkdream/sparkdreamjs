@@ -1,13 +1,37 @@
 import { TelescopeInput } from '@cosmology/telescope';
 import telescope from '@cosmology/telescope';
-import { join } from 'path';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'fs';
+import { join, relative } from 'path';
 import { rimrafSync as rimraf } from 'rimraf';
 
 import { AMINO_MAP } from './aminos';
 
 const protoDirs: string[] = [join(__dirname, '/../protos')];
 const outPath: string = join(__dirname, '../src');
+const overridesPath: string = join(__dirname, '../src-overrides');
 rimraf(outPath);
+
+// Recursively overlay every file under `src` onto `dst`, overwriting matching
+// files. Used after telescope finishes to drop hand-written overrides on top
+// of generated code (e.g. amino converters that need recursive Any handling
+// for MsgSubmitProposal / MsgSubmitAnonymousProposal / MsgExecSession — see
+// src-overrides/nested-amino.ts).
+function overlayDir(src: string, dst: string): string[] {
+  if (!existsSync(src)) return [];
+  const applied: string[] = [];
+  if (!existsSync(dst)) mkdirSync(dst, { recursive: true });
+  for (const entry of readdirSync(src)) {
+    const s = join(src, entry);
+    const d = join(dst, entry);
+    if (statSync(s).isDirectory()) {
+      applied.push(...overlayDir(s, d));
+    } else {
+      copyFileSync(s, d);
+      applied.push(relative(overridesPath, s));
+    }
+  }
+  return applied;
+}
 
 export const options: TelescopeInput = {
   protoDirs,
@@ -111,6 +135,11 @@ export const options: TelescopeInput = {
 
 telescope(options)
   .then(() => {
+    const overlaid = overlayDir(overridesPath, outPath);
+    if (overlaid.length > 0) {
+      console.log(`📦 overlaid ${overlaid.length} hand-written file(s) from src-overrides:`);
+      for (const f of overlaid) console.log(`   • ${f}`);
+    }
     console.log('✨ all done!');
   })
   .catch((e) => {
