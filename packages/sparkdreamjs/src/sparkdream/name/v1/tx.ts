@@ -165,7 +165,7 @@ export interface MsgRegisterNameAmino {
   data?: string;
 }
 export interface MsgRegisterNameAminoMsg {
-  type: "/sparkdream.name.v1.MsgRegisterName";
+  type: "sparkdream/x/name/MsgRegisterName";
   value: MsgRegisterNameAmino;
 }
 /**
@@ -215,7 +215,7 @@ export interface MsgSetPrimaryAmino {
   name?: string;
 }
 export interface MsgSetPrimaryAminoMsg {
-  type: "/sparkdream.name.v1.MsgSetPrimary";
+  type: "sparkdream/x/name/MsgSetPrimary";
   value: MsgSetPrimaryAmino;
 }
 /**
@@ -273,7 +273,7 @@ export interface MsgFileDisputeAmino {
   reason?: string;
 }
 export interface MsgFileDisputeAminoMsg {
-  type: "/sparkdream.name.v1.MsgFileDispute";
+  type: "sparkdream/x/name/MsgFileDispute";
   value: MsgFileDisputeAmino;
 }
 /**
@@ -407,7 +407,7 @@ export interface MsgResolveDisputeAmino {
   transfer_approved?: boolean;
 }
 export interface MsgResolveDisputeAminoMsg {
-  type: "/sparkdream.name.v1.MsgResolveDispute";
+  type: "sparkdream/x/name/MsgResolveDispute";
   value: MsgResolveDisputeAmino;
 }
 /**
@@ -459,7 +459,7 @@ export interface MsgUpdateNameAmino {
   data?: string;
 }
 export interface MsgUpdateNameAminoMsg {
-  type: "/sparkdream.name.v1.MsgUpdateName";
+  type: "sparkdream/x/name/MsgUpdateName";
   value: MsgUpdateNameAmino;
 }
 /**
@@ -551,6 +551,198 @@ export interface MsgSetDisplayNameResponseAmino {}
 export interface MsgSetDisplayNameResponseAminoMsg {
   type: "/sparkdream.name.v1.MsgSetDisplayNameResponse";
   value: MsgSetDisplayNameResponseAmino;
+}
+/**
+ * MsgSetTarget sets (or clears, with empty `target`) the resolver target for
+ * an owned name. Setting always resets target_accepted to false; the target
+ * must call MsgAcceptTarget to re-consent.
+ * @name MsgSetTarget
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgSetTarget
+ */
+export interface MsgSetTarget {
+  /**
+   * authority is the current owner of the name.
+   */
+  authority: string;
+  name: string;
+  /**
+   * target is the address forward resolution should return. Empty clears the
+   * override and falls back to the owner.
+   */
+  target: string;
+}
+export interface MsgSetTargetProtoMsg {
+  typeUrl: "/sparkdream.name.v1.MsgSetTarget";
+  value: Uint8Array;
+}
+/**
+ * MsgSetTarget sets (or clears, with empty `target`) the resolver target for
+ * an owned name. Setting always resets target_accepted to false; the target
+ * must call MsgAcceptTarget to re-consent.
+ * @name MsgSetTargetAmino
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgSetTarget
+ */
+export interface MsgSetTargetAmino {
+  /**
+   * authority is the current owner of the name.
+   */
+  authority?: string;
+  name?: string;
+  /**
+   * target is the address forward resolution should return. Empty clears the
+   * override and falls back to the owner.
+   */
+  target?: string;
+}
+export interface MsgSetTargetAminoMsg {
+  type: "sparkdream/x/name/MsgSetTarget";
+  value: MsgSetTargetAmino;
+}
+/**
+ * MsgSetTargetResponse defines the response for MsgSetTarget.
+ * @name MsgSetTargetResponse
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgSetTargetResponse
+ */
+export interface MsgSetTargetResponse {}
+export interface MsgSetTargetResponseProtoMsg {
+  typeUrl: "/sparkdream.name.v1.MsgSetTargetResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgSetTargetResponse defines the response for MsgSetTarget.
+ * @name MsgSetTargetResponseAmino
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgSetTargetResponse
+ */
+export interface MsgSetTargetResponseAmino {}
+export interface MsgSetTargetResponseAminoMsg {
+  type: "/sparkdream.name.v1.MsgSetTargetResponse";
+  value: MsgSetTargetResponseAmino;
+}
+/**
+ * MsgAcceptTarget consents to being the resolver target of a name. Authority
+ * must equal the name's current `target`. Sets target_accepted = true and
+ * makes the signer eligible to set this name as primary for reverse
+ * resolution.
+ * @name MsgAcceptTarget
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgAcceptTarget
+ */
+export interface MsgAcceptTarget {
+  authority: string;
+  name: string;
+}
+export interface MsgAcceptTargetProtoMsg {
+  typeUrl: "/sparkdream.name.v1.MsgAcceptTarget";
+  value: Uint8Array;
+}
+/**
+ * MsgAcceptTarget consents to being the resolver target of a name. Authority
+ * must equal the name's current `target`. Sets target_accepted = true and
+ * makes the signer eligible to set this name as primary for reverse
+ * resolution.
+ * @name MsgAcceptTargetAmino
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgAcceptTarget
+ */
+export interface MsgAcceptTargetAmino {
+  authority?: string;
+  name?: string;
+}
+export interface MsgAcceptTargetAminoMsg {
+  type: "sparkdream/x/name/MsgAcceptTarget";
+  value: MsgAcceptTargetAmino;
+}
+/**
+ * MsgAcceptTargetResponse defines the response for MsgAcceptTarget.
+ * @name MsgAcceptTargetResponse
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgAcceptTargetResponse
+ */
+export interface MsgAcceptTargetResponse {}
+export interface MsgAcceptTargetResponseProtoMsg {
+  typeUrl: "/sparkdream.name.v1.MsgAcceptTargetResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgAcceptTargetResponse defines the response for MsgAcceptTarget.
+ * @name MsgAcceptTargetResponseAmino
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgAcceptTargetResponse
+ */
+export interface MsgAcceptTargetResponseAmino {}
+export interface MsgAcceptTargetResponseAminoMsg {
+  type: "/sparkdream.name.v1.MsgAcceptTargetResponse";
+  value: MsgAcceptTargetResponseAmino;
+}
+/**
+ * MsgTransferName transfers ownership of a name. The new owner must be an
+ * active x/rep member and must not be over the per-address name cap. Rejected
+ * while the name has an active dispute (prevents dumping disputed names).
+ * Existing target / target_accepted state carries over; the new owner can
+ * revoke by calling MsgSetTarget.
+ * @name MsgTransferName
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgTransferName
+ */
+export interface MsgTransferName {
+  /**
+   * authority is the current owner of the name.
+   */
+  authority: string;
+  name: string;
+  newOwner: string;
+}
+export interface MsgTransferNameProtoMsg {
+  typeUrl: "/sparkdream.name.v1.MsgTransferName";
+  value: Uint8Array;
+}
+/**
+ * MsgTransferName transfers ownership of a name. The new owner must be an
+ * active x/rep member and must not be over the per-address name cap. Rejected
+ * while the name has an active dispute (prevents dumping disputed names).
+ * Existing target / target_accepted state carries over; the new owner can
+ * revoke by calling MsgSetTarget.
+ * @name MsgTransferNameAmino
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgTransferName
+ */
+export interface MsgTransferNameAmino {
+  /**
+   * authority is the current owner of the name.
+   */
+  authority?: string;
+  name?: string;
+  new_owner?: string;
+}
+export interface MsgTransferNameAminoMsg {
+  type: "sparkdream/x/name/MsgTransferName";
+  value: MsgTransferNameAmino;
+}
+/**
+ * MsgTransferNameResponse defines the response for MsgTransferName.
+ * @name MsgTransferNameResponse
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgTransferNameResponse
+ */
+export interface MsgTransferNameResponse {}
+export interface MsgTransferNameResponseProtoMsg {
+  typeUrl: "/sparkdream.name.v1.MsgTransferNameResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgTransferNameResponse defines the response for MsgTransferName.
+ * @name MsgTransferNameResponseAmino
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgTransferNameResponse
+ */
+export interface MsgTransferNameResponseAmino {}
+export interface MsgTransferNameResponseAminoMsg {
+  type: "/sparkdream.name.v1.MsgTransferNameResponse";
+  value: MsgTransferNameResponseAmino;
 }
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
@@ -858,6 +1050,7 @@ function createBaseMsgRegisterName(): MsgRegisterName {
  */
 export const MsgRegisterName = {
   typeUrl: "/sparkdream.name.v1.MsgRegisterName",
+  aminoType: "sparkdream/x/name/MsgRegisterName",
   encode(message: MsgRegisterName, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -922,6 +1115,12 @@ export const MsgRegisterName = {
   },
   fromAminoMsg(object: MsgRegisterNameAminoMsg): MsgRegisterName {
     return MsgRegisterName.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRegisterName): MsgRegisterNameAminoMsg {
+    return {
+      type: "sparkdream/x/name/MsgRegisterName",
+      value: MsgRegisterName.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgRegisterNameProtoMsg): MsgRegisterName {
     return MsgRegisterName.decode(message.value);
@@ -1006,6 +1205,7 @@ function createBaseMsgSetPrimary(): MsgSetPrimary {
  */
 export const MsgSetPrimary = {
   typeUrl: "/sparkdream.name.v1.MsgSetPrimary",
+  aminoType: "sparkdream/x/name/MsgSetPrimary",
   encode(message: MsgSetPrimary, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -1059,6 +1259,12 @@ export const MsgSetPrimary = {
   },
   fromAminoMsg(object: MsgSetPrimaryAminoMsg): MsgSetPrimary {
     return MsgSetPrimary.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSetPrimary): MsgSetPrimaryAminoMsg {
+    return {
+      type: "sparkdream/x/name/MsgSetPrimary",
+      value: MsgSetPrimary.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgSetPrimaryProtoMsg): MsgSetPrimary {
     return MsgSetPrimary.decode(message.value);
@@ -1144,6 +1350,7 @@ function createBaseMsgFileDispute(): MsgFileDispute {
  */
 export const MsgFileDispute = {
   typeUrl: "/sparkdream.name.v1.MsgFileDispute",
+  aminoType: "sparkdream/x/name/MsgFileDispute",
   encode(message: MsgFileDispute, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -1208,6 +1415,12 @@ export const MsgFileDispute = {
   },
   fromAminoMsg(object: MsgFileDisputeAminoMsg): MsgFileDispute {
     return MsgFileDispute.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgFileDispute): MsgFileDisputeAminoMsg {
+    return {
+      type: "sparkdream/x/name/MsgFileDispute",
+      value: MsgFileDispute.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgFileDisputeProtoMsg): MsgFileDispute {
     return MsgFileDispute.decode(message.value);
@@ -1452,6 +1665,7 @@ function createBaseMsgResolveDispute(): MsgResolveDispute {
  */
 export const MsgResolveDispute = {
   typeUrl: "/sparkdream.name.v1.MsgResolveDispute",
+  aminoType: "sparkdream/x/name/MsgResolveDispute",
   encode(message: MsgResolveDispute, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -1527,6 +1741,12 @@ export const MsgResolveDispute = {
   },
   fromAminoMsg(object: MsgResolveDisputeAminoMsg): MsgResolveDispute {
     return MsgResolveDispute.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgResolveDispute): MsgResolveDisputeAminoMsg {
+    return {
+      type: "sparkdream/x/name/MsgResolveDispute",
+      value: MsgResolveDispute.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgResolveDisputeProtoMsg): MsgResolveDispute {
     return MsgResolveDispute.decode(message.value);
@@ -1612,6 +1832,7 @@ function createBaseMsgUpdateName(): MsgUpdateName {
  */
 export const MsgUpdateName = {
   typeUrl: "/sparkdream.name.v1.MsgUpdateName",
+  aminoType: "sparkdream/x/name/MsgUpdateName",
   encode(message: MsgUpdateName, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -1676,6 +1897,12 @@ export const MsgUpdateName = {
   },
   fromAminoMsg(object: MsgUpdateNameAminoMsg): MsgUpdateName {
     return MsgUpdateName.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUpdateName): MsgUpdateNameAminoMsg {
+    return {
+      type: "sparkdream/x/name/MsgUpdateName",
+      value: MsgUpdateName.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUpdateNameProtoMsg): MsgUpdateName {
     return MsgUpdateName.decode(message.value);
@@ -1915,6 +2142,471 @@ export const MsgSetDisplayNameResponse = {
     return {
       typeUrl: "/sparkdream.name.v1.MsgSetDisplayNameResponse",
       value: MsgSetDisplayNameResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSetTarget(): MsgSetTarget {
+  return {
+    authority: "",
+    name: "",
+    target: ""
+  };
+}
+/**
+ * MsgSetTarget sets (or clears, with empty `target`) the resolver target for
+ * an owned name. Setting always resets target_accepted to false; the target
+ * must call MsgAcceptTarget to re-consent.
+ * @name MsgSetTarget
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgSetTarget
+ */
+export const MsgSetTarget = {
+  typeUrl: "/sparkdream.name.v1.MsgSetTarget",
+  aminoType: "sparkdream/x/name/MsgSetTarget",
+  encode(message: MsgSetTarget, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.target !== "") {
+      writer.uint32(26).string(message.target);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSetTarget {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSetTarget();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+        case 2:
+          message.name = reader.string();
+          break;
+        case 3:
+          message.target = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgSetTarget>): MsgSetTarget {
+    const message = createBaseMsgSetTarget();
+    message.authority = object.authority ?? "";
+    message.name = object.name ?? "";
+    message.target = object.target ?? "";
+    return message;
+  },
+  fromAmino(object: MsgSetTargetAmino): MsgSetTarget {
+    const message = createBaseMsgSetTarget();
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
+    if (object.name !== undefined && object.name !== null) {
+      message.name = object.name;
+    }
+    if (object.target !== undefined && object.target !== null) {
+      message.target = object.target;
+    }
+    return message;
+  },
+  toAmino(message: MsgSetTarget): MsgSetTargetAmino {
+    const obj: any = {};
+    obj.authority = message.authority === "" ? undefined : message.authority;
+    obj.name = message.name === "" ? undefined : message.name;
+    obj.target = message.target === "" ? undefined : message.target;
+    return obj;
+  },
+  fromAminoMsg(object: MsgSetTargetAminoMsg): MsgSetTarget {
+    return MsgSetTarget.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSetTarget): MsgSetTargetAminoMsg {
+    return {
+      type: "sparkdream/x/name/MsgSetTarget",
+      value: MsgSetTarget.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgSetTargetProtoMsg): MsgSetTarget {
+    return MsgSetTarget.decode(message.value);
+  },
+  toProto(message: MsgSetTarget): Uint8Array {
+    return MsgSetTarget.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSetTarget): MsgSetTargetProtoMsg {
+    return {
+      typeUrl: "/sparkdream.name.v1.MsgSetTarget",
+      value: MsgSetTarget.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSetTargetResponse(): MsgSetTargetResponse {
+  return {};
+}
+/**
+ * MsgSetTargetResponse defines the response for MsgSetTarget.
+ * @name MsgSetTargetResponse
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgSetTargetResponse
+ */
+export const MsgSetTargetResponse = {
+  typeUrl: "/sparkdream.name.v1.MsgSetTargetResponse",
+  encode(_: MsgSetTargetResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSetTargetResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSetTargetResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgSetTargetResponse>): MsgSetTargetResponse {
+    const message = createBaseMsgSetTargetResponse();
+    return message;
+  },
+  fromAmino(_: MsgSetTargetResponseAmino): MsgSetTargetResponse {
+    const message = createBaseMsgSetTargetResponse();
+    return message;
+  },
+  toAmino(_: MsgSetTargetResponse): MsgSetTargetResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgSetTargetResponseAminoMsg): MsgSetTargetResponse {
+    return MsgSetTargetResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgSetTargetResponseProtoMsg): MsgSetTargetResponse {
+    return MsgSetTargetResponse.decode(message.value);
+  },
+  toProto(message: MsgSetTargetResponse): Uint8Array {
+    return MsgSetTargetResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSetTargetResponse): MsgSetTargetResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.name.v1.MsgSetTargetResponse",
+      value: MsgSetTargetResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAcceptTarget(): MsgAcceptTarget {
+  return {
+    authority: "",
+    name: ""
+  };
+}
+/**
+ * MsgAcceptTarget consents to being the resolver target of a name. Authority
+ * must equal the name's current `target`. Sets target_accepted = true and
+ * makes the signer eligible to set this name as primary for reverse
+ * resolution.
+ * @name MsgAcceptTarget
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgAcceptTarget
+ */
+export const MsgAcceptTarget = {
+  typeUrl: "/sparkdream.name.v1.MsgAcceptTarget",
+  aminoType: "sparkdream/x/name/MsgAcceptTarget",
+  encode(message: MsgAcceptTarget, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAcceptTarget {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAcceptTarget();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+        case 2:
+          message.name = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgAcceptTarget>): MsgAcceptTarget {
+    const message = createBaseMsgAcceptTarget();
+    message.authority = object.authority ?? "";
+    message.name = object.name ?? "";
+    return message;
+  },
+  fromAmino(object: MsgAcceptTargetAmino): MsgAcceptTarget {
+    const message = createBaseMsgAcceptTarget();
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
+    if (object.name !== undefined && object.name !== null) {
+      message.name = object.name;
+    }
+    return message;
+  },
+  toAmino(message: MsgAcceptTarget): MsgAcceptTargetAmino {
+    const obj: any = {};
+    obj.authority = message.authority === "" ? undefined : message.authority;
+    obj.name = message.name === "" ? undefined : message.name;
+    return obj;
+  },
+  fromAminoMsg(object: MsgAcceptTargetAminoMsg): MsgAcceptTarget {
+    return MsgAcceptTarget.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAcceptTarget): MsgAcceptTargetAminoMsg {
+    return {
+      type: "sparkdream/x/name/MsgAcceptTarget",
+      value: MsgAcceptTarget.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgAcceptTargetProtoMsg): MsgAcceptTarget {
+    return MsgAcceptTarget.decode(message.value);
+  },
+  toProto(message: MsgAcceptTarget): Uint8Array {
+    return MsgAcceptTarget.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAcceptTarget): MsgAcceptTargetProtoMsg {
+    return {
+      typeUrl: "/sparkdream.name.v1.MsgAcceptTarget",
+      value: MsgAcceptTarget.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAcceptTargetResponse(): MsgAcceptTargetResponse {
+  return {};
+}
+/**
+ * MsgAcceptTargetResponse defines the response for MsgAcceptTarget.
+ * @name MsgAcceptTargetResponse
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgAcceptTargetResponse
+ */
+export const MsgAcceptTargetResponse = {
+  typeUrl: "/sparkdream.name.v1.MsgAcceptTargetResponse",
+  encode(_: MsgAcceptTargetResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAcceptTargetResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAcceptTargetResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgAcceptTargetResponse>): MsgAcceptTargetResponse {
+    const message = createBaseMsgAcceptTargetResponse();
+    return message;
+  },
+  fromAmino(_: MsgAcceptTargetResponseAmino): MsgAcceptTargetResponse {
+    const message = createBaseMsgAcceptTargetResponse();
+    return message;
+  },
+  toAmino(_: MsgAcceptTargetResponse): MsgAcceptTargetResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgAcceptTargetResponseAminoMsg): MsgAcceptTargetResponse {
+    return MsgAcceptTargetResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgAcceptTargetResponseProtoMsg): MsgAcceptTargetResponse {
+    return MsgAcceptTargetResponse.decode(message.value);
+  },
+  toProto(message: MsgAcceptTargetResponse): Uint8Array {
+    return MsgAcceptTargetResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAcceptTargetResponse): MsgAcceptTargetResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.name.v1.MsgAcceptTargetResponse",
+      value: MsgAcceptTargetResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgTransferName(): MsgTransferName {
+  return {
+    authority: "",
+    name: "",
+    newOwner: ""
+  };
+}
+/**
+ * MsgTransferName transfers ownership of a name. The new owner must be an
+ * active x/rep member and must not be over the per-address name cap. Rejected
+ * while the name has an active dispute (prevents dumping disputed names).
+ * Existing target / target_accepted state carries over; the new owner can
+ * revoke by calling MsgSetTarget.
+ * @name MsgTransferName
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgTransferName
+ */
+export const MsgTransferName = {
+  typeUrl: "/sparkdream.name.v1.MsgTransferName",
+  aminoType: "sparkdream/x/name/MsgTransferName",
+  encode(message: MsgTransferName, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.newOwner !== "") {
+      writer.uint32(26).string(message.newOwner);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgTransferName {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgTransferName();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+        case 2:
+          message.name = reader.string();
+          break;
+        case 3:
+          message.newOwner = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgTransferName>): MsgTransferName {
+    const message = createBaseMsgTransferName();
+    message.authority = object.authority ?? "";
+    message.name = object.name ?? "";
+    message.newOwner = object.newOwner ?? "";
+    return message;
+  },
+  fromAmino(object: MsgTransferNameAmino): MsgTransferName {
+    const message = createBaseMsgTransferName();
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
+    if (object.name !== undefined && object.name !== null) {
+      message.name = object.name;
+    }
+    if (object.new_owner !== undefined && object.new_owner !== null) {
+      message.newOwner = object.new_owner;
+    }
+    return message;
+  },
+  toAmino(message: MsgTransferName): MsgTransferNameAmino {
+    const obj: any = {};
+    obj.authority = message.authority === "" ? undefined : message.authority;
+    obj.name = message.name === "" ? undefined : message.name;
+    obj.new_owner = message.newOwner === "" ? undefined : message.newOwner;
+    return obj;
+  },
+  fromAminoMsg(object: MsgTransferNameAminoMsg): MsgTransferName {
+    return MsgTransferName.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgTransferName): MsgTransferNameAminoMsg {
+    return {
+      type: "sparkdream/x/name/MsgTransferName",
+      value: MsgTransferName.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgTransferNameProtoMsg): MsgTransferName {
+    return MsgTransferName.decode(message.value);
+  },
+  toProto(message: MsgTransferName): Uint8Array {
+    return MsgTransferName.encode(message).finish();
+  },
+  toProtoMsg(message: MsgTransferName): MsgTransferNameProtoMsg {
+    return {
+      typeUrl: "/sparkdream.name.v1.MsgTransferName",
+      value: MsgTransferName.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgTransferNameResponse(): MsgTransferNameResponse {
+  return {};
+}
+/**
+ * MsgTransferNameResponse defines the response for MsgTransferName.
+ * @name MsgTransferNameResponse
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.MsgTransferNameResponse
+ */
+export const MsgTransferNameResponse = {
+  typeUrl: "/sparkdream.name.v1.MsgTransferNameResponse",
+  encode(_: MsgTransferNameResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgTransferNameResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgTransferNameResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgTransferNameResponse>): MsgTransferNameResponse {
+    const message = createBaseMsgTransferNameResponse();
+    return message;
+  },
+  fromAmino(_: MsgTransferNameResponseAmino): MsgTransferNameResponse {
+    const message = createBaseMsgTransferNameResponse();
+    return message;
+  },
+  toAmino(_: MsgTransferNameResponse): MsgTransferNameResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgTransferNameResponseAminoMsg): MsgTransferNameResponse {
+    return MsgTransferNameResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgTransferNameResponseProtoMsg): MsgTransferNameResponse {
+    return MsgTransferNameResponse.decode(message.value);
+  },
+  toProto(message: MsgTransferNameResponse): Uint8Array {
+    return MsgTransferNameResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgTransferNameResponse): MsgTransferNameResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.name.v1.MsgTransferNameResponse",
+      value: MsgTransferNameResponse.encode(message).finish()
     };
   }
 };

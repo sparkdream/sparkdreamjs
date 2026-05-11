@@ -2,7 +2,7 @@
 import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "../../../cosmos/base/query/v1beta1/pagination";
 import { Params, ParamsAmino } from "./params";
 import { PolicyPermissions, PolicyPermissionsAmino } from "./policy_permissions";
-import { Group, GroupAmino, Member, MemberAmino, Proposal, ProposalAmino, Vote, VoteAmino, TallyResult, TallyResultAmino } from "./group";
+import { DecisionPolicy, DecisionPolicyAmino, Group, GroupAmino, Member, MemberAmino, Proposal, ProposalAmino, Vote, VoteAmino, TallyResult, TallyResultAmino } from "./group";
 import { Category, CategoryAmino } from "./category";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
@@ -165,6 +165,152 @@ export interface QueryAllPolicyPermissionsResponseAmino {
 export interface QueryAllPolicyPermissionsResponseAminoMsg {
   type: "/sparkdream.commons.v1.QueryAllPolicyPermissionsResponse";
   value: QueryAllPolicyPermissionsResponseAmino;
+}
+/**
+ * QueryGetDecisionPolicyRequest fetches a single DecisionPolicy by policy_address.
+ * @name QueryGetDecisionPolicyRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetDecisionPolicyRequest
+ */
+export interface QueryGetDecisionPolicyRequest {
+  policyAddress: string;
+}
+export interface QueryGetDecisionPolicyRequestProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryGetDecisionPolicyRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryGetDecisionPolicyRequest fetches a single DecisionPolicy by policy_address.
+ * @name QueryGetDecisionPolicyRequestAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetDecisionPolicyRequest
+ */
+export interface QueryGetDecisionPolicyRequestAmino {
+  policy_address?: string;
+}
+export interface QueryGetDecisionPolicyRequestAminoMsg {
+  type: "/sparkdream.commons.v1.QueryGetDecisionPolicyRequest";
+  value: QueryGetDecisionPolicyRequestAmino;
+}
+/**
+ * QueryGetDecisionPolicyResponse returns the DecisionPolicy registered for a
+ * given council policy address.
+ * @name QueryGetDecisionPolicyResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetDecisionPolicyResponse
+ */
+export interface QueryGetDecisionPolicyResponse {
+  decisionPolicy: DecisionPolicy;
+}
+export interface QueryGetDecisionPolicyResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryGetDecisionPolicyResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryGetDecisionPolicyResponse returns the DecisionPolicy registered for a
+ * given council policy address.
+ * @name QueryGetDecisionPolicyResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetDecisionPolicyResponse
+ */
+export interface QueryGetDecisionPolicyResponseAmino {
+  decision_policy?: DecisionPolicyAmino;
+}
+export interface QueryGetDecisionPolicyResponseAminoMsg {
+  type: "/sparkdream.commons.v1.QueryGetDecisionPolicyResponse";
+  value: QueryGetDecisionPolicyResponseAmino;
+}
+/**
+ * DecisionPolicyEntry pairs a policy_address with its DecisionPolicy. Used as
+ * the element type for the paginated list response — the underlying
+ * collections.Map is keyed by policy_address, and consumers of the list query
+ * need the key alongside the value to disambiguate which council each entry
+ * belongs to.
+ * @name DecisionPolicyEntry
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.DecisionPolicyEntry
+ */
+export interface DecisionPolicyEntry {
+  policyAddress: string;
+  decisionPolicy: DecisionPolicy;
+}
+export interface DecisionPolicyEntryProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.DecisionPolicyEntry";
+  value: Uint8Array;
+}
+/**
+ * DecisionPolicyEntry pairs a policy_address with its DecisionPolicy. Used as
+ * the element type for the paginated list response — the underlying
+ * collections.Map is keyed by policy_address, and consumers of the list query
+ * need the key alongside the value to disambiguate which council each entry
+ * belongs to.
+ * @name DecisionPolicyEntryAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.DecisionPolicyEntry
+ */
+export interface DecisionPolicyEntryAmino {
+  policy_address?: string;
+  decision_policy?: DecisionPolicyAmino;
+}
+export interface DecisionPolicyEntryAminoMsg {
+  type: "/sparkdream.commons.v1.DecisionPolicyEntry";
+  value: DecisionPolicyEntryAmino;
+}
+/**
+ * QueryAllDecisionPoliciesRequest paginates over every DecisionPolicy.
+ * @name QueryAllDecisionPoliciesRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryAllDecisionPoliciesRequest
+ */
+export interface QueryAllDecisionPoliciesRequest {
+  pagination?: PageRequest;
+}
+export interface QueryAllDecisionPoliciesRequestProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryAllDecisionPoliciesRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryAllDecisionPoliciesRequest paginates over every DecisionPolicy.
+ * @name QueryAllDecisionPoliciesRequestAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryAllDecisionPoliciesRequest
+ */
+export interface QueryAllDecisionPoliciesRequestAmino {
+  pagination?: PageRequestAmino;
+}
+export interface QueryAllDecisionPoliciesRequestAminoMsg {
+  type: "/sparkdream.commons.v1.QueryAllDecisionPoliciesRequest";
+  value: QueryAllDecisionPoliciesRequestAmino;
+}
+/**
+ * QueryAllDecisionPoliciesResponse returns every DecisionPolicy paired with
+ * its policy_address.
+ * @name QueryAllDecisionPoliciesResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryAllDecisionPoliciesResponse
+ */
+export interface QueryAllDecisionPoliciesResponse {
+  entries: DecisionPolicyEntry[];
+  pagination?: PageResponse;
+}
+export interface QueryAllDecisionPoliciesResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryAllDecisionPoliciesResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryAllDecisionPoliciesResponse returns every DecisionPolicy paired with
+ * its policy_address.
+ * @name QueryAllDecisionPoliciesResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryAllDecisionPoliciesResponse
+ */
+export interface QueryAllDecisionPoliciesResponseAmino {
+  entries?: DecisionPolicyEntryAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryAllDecisionPoliciesResponseAminoMsg {
+  type: "/sparkdream.commons.v1.QueryAllDecisionPoliciesResponse";
+  value: QueryAllDecisionPoliciesResponseAmino;
 }
 /**
  * QueryGetGroupRequest queries a specific group by name.
@@ -1014,6 +1160,383 @@ export const QueryAllPolicyPermissionsResponse = {
     return {
       typeUrl: "/sparkdream.commons.v1.QueryAllPolicyPermissionsResponse",
       value: QueryAllPolicyPermissionsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetDecisionPolicyRequest(): QueryGetDecisionPolicyRequest {
+  return {
+    policyAddress: ""
+  };
+}
+/**
+ * QueryGetDecisionPolicyRequest fetches a single DecisionPolicy by policy_address.
+ * @name QueryGetDecisionPolicyRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetDecisionPolicyRequest
+ */
+export const QueryGetDecisionPolicyRequest = {
+  typeUrl: "/sparkdream.commons.v1.QueryGetDecisionPolicyRequest",
+  encode(message: QueryGetDecisionPolicyRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.policyAddress !== "") {
+      writer.uint32(10).string(message.policyAddress);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetDecisionPolicyRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetDecisionPolicyRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.policyAddress = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetDecisionPolicyRequest>): QueryGetDecisionPolicyRequest {
+    const message = createBaseQueryGetDecisionPolicyRequest();
+    message.policyAddress = object.policyAddress ?? "";
+    return message;
+  },
+  fromAmino(object: QueryGetDecisionPolicyRequestAmino): QueryGetDecisionPolicyRequest {
+    const message = createBaseQueryGetDecisionPolicyRequest();
+    if (object.policy_address !== undefined && object.policy_address !== null) {
+      message.policyAddress = object.policy_address;
+    }
+    return message;
+  },
+  toAmino(message: QueryGetDecisionPolicyRequest): QueryGetDecisionPolicyRequestAmino {
+    const obj: any = {};
+    obj.policy_address = message.policyAddress === "" ? undefined : message.policyAddress;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetDecisionPolicyRequestAminoMsg): QueryGetDecisionPolicyRequest {
+    return QueryGetDecisionPolicyRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetDecisionPolicyRequestProtoMsg): QueryGetDecisionPolicyRequest {
+    return QueryGetDecisionPolicyRequest.decode(message.value);
+  },
+  toProto(message: QueryGetDecisionPolicyRequest): Uint8Array {
+    return QueryGetDecisionPolicyRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetDecisionPolicyRequest): QueryGetDecisionPolicyRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryGetDecisionPolicyRequest",
+      value: QueryGetDecisionPolicyRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetDecisionPolicyResponse(): QueryGetDecisionPolicyResponse {
+  return {
+    decisionPolicy: DecisionPolicy.fromPartial({})
+  };
+}
+/**
+ * QueryGetDecisionPolicyResponse returns the DecisionPolicy registered for a
+ * given council policy address.
+ * @name QueryGetDecisionPolicyResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetDecisionPolicyResponse
+ */
+export const QueryGetDecisionPolicyResponse = {
+  typeUrl: "/sparkdream.commons.v1.QueryGetDecisionPolicyResponse",
+  encode(message: QueryGetDecisionPolicyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.decisionPolicy !== undefined) {
+      DecisionPolicy.encode(message.decisionPolicy, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetDecisionPolicyResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetDecisionPolicyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.decisionPolicy = DecisionPolicy.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetDecisionPolicyResponse>): QueryGetDecisionPolicyResponse {
+    const message = createBaseQueryGetDecisionPolicyResponse();
+    message.decisionPolicy = object.decisionPolicy !== undefined && object.decisionPolicy !== null ? DecisionPolicy.fromPartial(object.decisionPolicy) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetDecisionPolicyResponseAmino): QueryGetDecisionPolicyResponse {
+    const message = createBaseQueryGetDecisionPolicyResponse();
+    if (object.decision_policy !== undefined && object.decision_policy !== null) {
+      message.decisionPolicy = DecisionPolicy.fromAmino(object.decision_policy);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetDecisionPolicyResponse): QueryGetDecisionPolicyResponseAmino {
+    const obj: any = {};
+    obj.decision_policy = message.decisionPolicy ? DecisionPolicy.toAmino(message.decisionPolicy) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetDecisionPolicyResponseAminoMsg): QueryGetDecisionPolicyResponse {
+    return QueryGetDecisionPolicyResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetDecisionPolicyResponseProtoMsg): QueryGetDecisionPolicyResponse {
+    return QueryGetDecisionPolicyResponse.decode(message.value);
+  },
+  toProto(message: QueryGetDecisionPolicyResponse): Uint8Array {
+    return QueryGetDecisionPolicyResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetDecisionPolicyResponse): QueryGetDecisionPolicyResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryGetDecisionPolicyResponse",
+      value: QueryGetDecisionPolicyResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseDecisionPolicyEntry(): DecisionPolicyEntry {
+  return {
+    policyAddress: "",
+    decisionPolicy: DecisionPolicy.fromPartial({})
+  };
+}
+/**
+ * DecisionPolicyEntry pairs a policy_address with its DecisionPolicy. Used as
+ * the element type for the paginated list response — the underlying
+ * collections.Map is keyed by policy_address, and consumers of the list query
+ * need the key alongside the value to disambiguate which council each entry
+ * belongs to.
+ * @name DecisionPolicyEntry
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.DecisionPolicyEntry
+ */
+export const DecisionPolicyEntry = {
+  typeUrl: "/sparkdream.commons.v1.DecisionPolicyEntry",
+  encode(message: DecisionPolicyEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.policyAddress !== "") {
+      writer.uint32(10).string(message.policyAddress);
+    }
+    if (message.decisionPolicy !== undefined) {
+      DecisionPolicy.encode(message.decisionPolicy, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): DecisionPolicyEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDecisionPolicyEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.policyAddress = reader.string();
+          break;
+        case 2:
+          message.decisionPolicy = DecisionPolicy.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<DecisionPolicyEntry>): DecisionPolicyEntry {
+    const message = createBaseDecisionPolicyEntry();
+    message.policyAddress = object.policyAddress ?? "";
+    message.decisionPolicy = object.decisionPolicy !== undefined && object.decisionPolicy !== null ? DecisionPolicy.fromPartial(object.decisionPolicy) : undefined;
+    return message;
+  },
+  fromAmino(object: DecisionPolicyEntryAmino): DecisionPolicyEntry {
+    const message = createBaseDecisionPolicyEntry();
+    if (object.policy_address !== undefined && object.policy_address !== null) {
+      message.policyAddress = object.policy_address;
+    }
+    if (object.decision_policy !== undefined && object.decision_policy !== null) {
+      message.decisionPolicy = DecisionPolicy.fromAmino(object.decision_policy);
+    }
+    return message;
+  },
+  toAmino(message: DecisionPolicyEntry): DecisionPolicyEntryAmino {
+    const obj: any = {};
+    obj.policy_address = message.policyAddress === "" ? undefined : message.policyAddress;
+    obj.decision_policy = message.decisionPolicy ? DecisionPolicy.toAmino(message.decisionPolicy) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: DecisionPolicyEntryAminoMsg): DecisionPolicyEntry {
+    return DecisionPolicyEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: DecisionPolicyEntryProtoMsg): DecisionPolicyEntry {
+    return DecisionPolicyEntry.decode(message.value);
+  },
+  toProto(message: DecisionPolicyEntry): Uint8Array {
+    return DecisionPolicyEntry.encode(message).finish();
+  },
+  toProtoMsg(message: DecisionPolicyEntry): DecisionPolicyEntryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.DecisionPolicyEntry",
+      value: DecisionPolicyEntry.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllDecisionPoliciesRequest(): QueryAllDecisionPoliciesRequest {
+  return {
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllDecisionPoliciesRequest paginates over every DecisionPolicy.
+ * @name QueryAllDecisionPoliciesRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryAllDecisionPoliciesRequest
+ */
+export const QueryAllDecisionPoliciesRequest = {
+  typeUrl: "/sparkdream.commons.v1.QueryAllDecisionPoliciesRequest",
+  encode(message: QueryAllDecisionPoliciesRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllDecisionPoliciesRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllDecisionPoliciesRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllDecisionPoliciesRequest>): QueryAllDecisionPoliciesRequest {
+    const message = createBaseQueryAllDecisionPoliciesRequest();
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllDecisionPoliciesRequestAmino): QueryAllDecisionPoliciesRequest {
+    const message = createBaseQueryAllDecisionPoliciesRequest();
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllDecisionPoliciesRequest): QueryAllDecisionPoliciesRequestAmino {
+    const obj: any = {};
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllDecisionPoliciesRequestAminoMsg): QueryAllDecisionPoliciesRequest {
+    return QueryAllDecisionPoliciesRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllDecisionPoliciesRequestProtoMsg): QueryAllDecisionPoliciesRequest {
+    return QueryAllDecisionPoliciesRequest.decode(message.value);
+  },
+  toProto(message: QueryAllDecisionPoliciesRequest): Uint8Array {
+    return QueryAllDecisionPoliciesRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllDecisionPoliciesRequest): QueryAllDecisionPoliciesRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryAllDecisionPoliciesRequest",
+      value: QueryAllDecisionPoliciesRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAllDecisionPoliciesResponse(): QueryAllDecisionPoliciesResponse {
+  return {
+    entries: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryAllDecisionPoliciesResponse returns every DecisionPolicy paired with
+ * its policy_address.
+ * @name QueryAllDecisionPoliciesResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryAllDecisionPoliciesResponse
+ */
+export const QueryAllDecisionPoliciesResponse = {
+  typeUrl: "/sparkdream.commons.v1.QueryAllDecisionPoliciesResponse",
+  encode(message: QueryAllDecisionPoliciesResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.entries) {
+      DecisionPolicyEntry.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllDecisionPoliciesResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllDecisionPoliciesResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.entries.push(DecisionPolicyEntry.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAllDecisionPoliciesResponse>): QueryAllDecisionPoliciesResponse {
+    const message = createBaseQueryAllDecisionPoliciesResponse();
+    message.entries = object.entries?.map(e => DecisionPolicyEntry.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAllDecisionPoliciesResponseAmino): QueryAllDecisionPoliciesResponse {
+    const message = createBaseQueryAllDecisionPoliciesResponse();
+    message.entries = object.entries?.map(e => DecisionPolicyEntry.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAllDecisionPoliciesResponse): QueryAllDecisionPoliciesResponseAmino {
+    const obj: any = {};
+    if (message.entries) {
+      obj.entries = message.entries.map(e => e ? DecisionPolicyEntry.toAmino(e) : undefined);
+    } else {
+      obj.entries = message.entries;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAllDecisionPoliciesResponseAminoMsg): QueryAllDecisionPoliciesResponse {
+    return QueryAllDecisionPoliciesResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAllDecisionPoliciesResponseProtoMsg): QueryAllDecisionPoliciesResponse {
+    return QueryAllDecisionPoliciesResponse.decode(message.value);
+  },
+  toProto(message: QueryAllDecisionPoliciesResponse): Uint8Array {
+    return QueryAllDecisionPoliciesResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAllDecisionPoliciesResponse): QueryAllDecisionPoliciesResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryAllDecisionPoliciesResponse",
+      value: QueryAllDecisionPoliciesResponse.encode(message).finish()
     };
   }
 };

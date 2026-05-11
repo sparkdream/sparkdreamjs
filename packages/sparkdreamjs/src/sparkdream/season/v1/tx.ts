@@ -155,7 +155,7 @@ export interface MsgSetDisplayNameAmino {
   name?: string;
 }
 export interface MsgSetDisplayNameAminoMsg {
-  type: "/sparkdream.season.v1.MsgSetDisplayName";
+  type: "sparkdream/x/season/MsgSetDisplayName";
   value: MsgSetDisplayNameAmino;
 }
 /**
@@ -205,7 +205,7 @@ export interface MsgSetUsernameAmino {
   username?: string;
 }
 export interface MsgSetUsernameAminoMsg {
-  type: "/sparkdream.season.v1.MsgSetUsername";
+  type: "sparkdream/x/season/MsgSetUsername";
   value: MsgSetUsernameAmino;
 }
 /**
@@ -255,7 +255,7 @@ export interface MsgSetDisplayTitleAmino {
   title_id?: string;
 }
 export interface MsgSetDisplayTitleAminoMsg {
-  type: "/sparkdream.season.v1.MsgSetDisplayTitle";
+  type: "sparkdream/x/season/MsgSetDisplayTitle";
   value: MsgSetDisplayTitleAmino;
 }
 /**
@@ -309,7 +309,7 @@ export interface MsgCreateGuildAmino {
   invite_only?: boolean;
 }
 export interface MsgCreateGuildAminoMsg {
-  type: "/sparkdream.season.v1.MsgCreateGuild";
+  type: "sparkdream/x/season/MsgCreateGuild";
   value: MsgCreateGuildAmino;
 }
 /**
@@ -359,7 +359,7 @@ export interface MsgJoinGuildAmino {
   guild_id?: string;
 }
 export interface MsgJoinGuildAminoMsg {
-  type: "/sparkdream.season.v1.MsgJoinGuild";
+  type: "sparkdream/x/season/MsgJoinGuild";
   value: MsgJoinGuildAmino;
 }
 /**
@@ -407,7 +407,7 @@ export interface MsgLeaveGuildAmino {
   creator?: string;
 }
 export interface MsgLeaveGuildAminoMsg {
-  type: "/sparkdream.season.v1.MsgLeaveGuild";
+  type: "sparkdream/x/season/MsgLeaveGuild";
   value: MsgLeaveGuildAmino;
 }
 /**
@@ -459,7 +459,7 @@ export interface MsgTransferGuildFounderAmino {
   new_founder?: string;
 }
 export interface MsgTransferGuildFounderAminoMsg {
-  type: "/sparkdream.season.v1.MsgTransferGuildFounder";
+  type: "sparkdream/x/season/MsgTransferGuildFounder";
   value: MsgTransferGuildFounderAmino;
 }
 /**
@@ -509,7 +509,7 @@ export interface MsgDissolveGuildAmino {
   guild_id?: string;
 }
 export interface MsgDissolveGuildAminoMsg {
-  type: "/sparkdream.season.v1.MsgDissolveGuild";
+  type: "sparkdream/x/season/MsgDissolveGuild";
   value: MsgDissolveGuildAmino;
 }
 /**
@@ -561,7 +561,7 @@ export interface MsgPromoteToOfficerAmino {
   member?: string;
 }
 export interface MsgPromoteToOfficerAminoMsg {
-  type: "/sparkdream.season.v1.MsgPromoteToOfficer";
+  type: "sparkdream/x/season/MsgPromoteToOfficer";
   value: MsgPromoteToOfficerAmino;
 }
 /**
@@ -613,7 +613,7 @@ export interface MsgDemoteOfficerAmino {
   officer?: string;
 }
 export interface MsgDemoteOfficerAminoMsg {
-  type: "/sparkdream.season.v1.MsgDemoteOfficer";
+  type: "sparkdream/x/season/MsgDemoteOfficer";
   value: MsgDemoteOfficerAmino;
 }
 /**
@@ -665,7 +665,7 @@ export interface MsgInviteToGuildAmino {
   invitee?: string;
 }
 export interface MsgInviteToGuildAminoMsg {
-  type: "/sparkdream.season.v1.MsgInviteToGuild";
+  type: "sparkdream/x/season/MsgInviteToGuild";
   value: MsgInviteToGuildAmino;
 }
 /**
@@ -715,7 +715,7 @@ export interface MsgAcceptGuildInviteAmino {
   guild_id?: string;
 }
 export interface MsgAcceptGuildInviteAminoMsg {
-  type: "/sparkdream.season.v1.MsgAcceptGuildInvite";
+  type: "sparkdream/x/season/MsgAcceptGuildInvite";
   value: MsgAcceptGuildInviteAmino;
 }
 /**
@@ -767,7 +767,7 @@ export interface MsgRevokeGuildInviteAmino {
   invitee?: string;
 }
 export interface MsgRevokeGuildInviteAminoMsg {
-  type: "/sparkdream.season.v1.MsgRevokeGuildInvite";
+  type: "sparkdream/x/season/MsgRevokeGuildInvite";
   value: MsgRevokeGuildInviteAmino;
 }
 /**
@@ -819,7 +819,7 @@ export interface MsgSetGuildInviteOnlyAmino {
   invite_only?: boolean;
 }
 export interface MsgSetGuildInviteOnlyAminoMsg {
-  type: "/sparkdream.season.v1.MsgSetGuildInviteOnly";
+  type: "sparkdream/x/season/MsgSetGuildInviteOnly";
   value: MsgSetGuildInviteOnlyAmino;
 }
 /**
@@ -871,7 +871,7 @@ export interface MsgUpdateGuildDescriptionAmino {
   description?: string;
 }
 export interface MsgUpdateGuildDescriptionAminoMsg {
-  type: "/sparkdream.season.v1.MsgUpdateGuildDescription";
+  type: "sparkdream/x/season/MsgUpdateGuildDescription";
   value: MsgUpdateGuildDescriptionAmino;
 }
 /**
@@ -925,7 +925,7 @@ export interface MsgKickFromGuildAmino {
   reason?: string;
 }
 export interface MsgKickFromGuildAminoMsg {
-  type: "/sparkdream.season.v1.MsgKickFromGuild";
+  type: "sparkdream/x/season/MsgKickFromGuild";
   value: MsgKickFromGuildAmino;
 }
 /**
@@ -975,7 +975,7 @@ export interface MsgClaimGuildFounderAmino {
   guild_id?: string;
 }
 export interface MsgClaimGuildFounderAminoMsg {
-  type: "/sparkdream.season.v1.MsgClaimGuildFounder";
+  type: "sparkdream/x/season/MsgClaimGuildFounder";
   value: MsgClaimGuildFounderAmino;
 }
 /**
@@ -1025,7 +1025,7 @@ export interface MsgStartQuestAmino {
   quest_id?: string;
 }
 export interface MsgStartQuestAminoMsg {
-  type: "/sparkdream.season.v1.MsgStartQuest";
+  type: "sparkdream/x/season/MsgStartQuest";
   value: MsgStartQuestAmino;
 }
 /**
@@ -1075,7 +1075,7 @@ export interface MsgClaimQuestRewardAmino {
   quest_id?: string;
 }
 export interface MsgClaimQuestRewardAminoMsg {
-  type: "/sparkdream.season.v1.MsgClaimQuestReward";
+  type: "sparkdream/x/season/MsgClaimQuestReward";
   value: MsgClaimQuestRewardAmino;
 }
 /**
@@ -1125,7 +1125,7 @@ export interface MsgAbandonQuestAmino {
   quest_id?: string;
 }
 export interface MsgAbandonQuestAminoMsg {
-  type: "/sparkdream.season.v1.MsgAbandonQuest";
+  type: "sparkdream/x/season/MsgAbandonQuest";
   value: MsgAbandonQuestAmino;
 }
 /**
@@ -1591,7 +1591,7 @@ export interface MsgReportDisplayNameAmino {
   reason?: string;
 }
 export interface MsgReportDisplayNameAminoMsg {
-  type: "/sparkdream.season.v1.MsgReportDisplayName";
+  type: "sparkdream/x/season/MsgReportDisplayName";
   value: MsgReportDisplayNameAmino;
 }
 /**
@@ -1641,7 +1641,7 @@ export interface MsgAppealDisplayNameModerationAmino {
   appeal_reason?: string;
 }
 export interface MsgAppealDisplayNameModerationAminoMsg {
-  type: "/sparkdream.season.v1.MsgAppealDisplayNameModeration";
+  type: "sparkdream/x/season/MsgAppealDisplayNameModeration";
   value: MsgAppealDisplayNameModerationAmino;
 }
 /**
@@ -2305,7 +2305,7 @@ export interface MsgNominateAmino {
   rationale?: string;
 }
 export interface MsgNominateAminoMsg {
-  type: "/sparkdream.season.v1.MsgNominate";
+  type: "sparkdream/x/season/MsgNominate";
   value: MsgNominateAmino;
 }
 /**
@@ -2367,7 +2367,7 @@ export interface MsgStakeNominationAmino {
   amount?: string;
 }
 export interface MsgStakeNominationAminoMsg {
-  type: "/sparkdream.season.v1.MsgStakeNomination";
+  type: "sparkdream/x/season/MsgStakeNomination";
   value: MsgStakeNominationAmino;
 }
 /**
@@ -2417,7 +2417,7 @@ export interface MsgUnstakeNominationAmino {
   nomination_id?: string;
 }
 export interface MsgUnstakeNominationAminoMsg {
-  type: "/sparkdream.season.v1.MsgUnstakeNomination";
+  type: "sparkdream/x/season/MsgUnstakeNomination";
   value: MsgUnstakeNominationAmino;
 }
 /**
@@ -2746,6 +2746,7 @@ function createBaseMsgSetDisplayName(): MsgSetDisplayName {
  */
 export const MsgSetDisplayName = {
   typeUrl: "/sparkdream.season.v1.MsgSetDisplayName",
+  aminoType: "sparkdream/x/season/MsgSetDisplayName",
   encode(message: MsgSetDisplayName, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -2799,6 +2800,12 @@ export const MsgSetDisplayName = {
   },
   fromAminoMsg(object: MsgSetDisplayNameAminoMsg): MsgSetDisplayName {
     return MsgSetDisplayName.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSetDisplayName): MsgSetDisplayNameAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgSetDisplayName",
+      value: MsgSetDisplayName.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgSetDisplayNameProtoMsg): MsgSetDisplayName {
     return MsgSetDisplayName.decode(message.value);
@@ -2883,6 +2890,7 @@ function createBaseMsgSetUsername(): MsgSetUsername {
  */
 export const MsgSetUsername = {
   typeUrl: "/sparkdream.season.v1.MsgSetUsername",
+  aminoType: "sparkdream/x/season/MsgSetUsername",
   encode(message: MsgSetUsername, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -2936,6 +2944,12 @@ export const MsgSetUsername = {
   },
   fromAminoMsg(object: MsgSetUsernameAminoMsg): MsgSetUsername {
     return MsgSetUsername.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSetUsername): MsgSetUsernameAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgSetUsername",
+      value: MsgSetUsername.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgSetUsernameProtoMsg): MsgSetUsername {
     return MsgSetUsername.decode(message.value);
@@ -3020,6 +3034,7 @@ function createBaseMsgSetDisplayTitle(): MsgSetDisplayTitle {
  */
 export const MsgSetDisplayTitle = {
   typeUrl: "/sparkdream.season.v1.MsgSetDisplayTitle",
+  aminoType: "sparkdream/x/season/MsgSetDisplayTitle",
   encode(message: MsgSetDisplayTitle, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3073,6 +3088,12 @@ export const MsgSetDisplayTitle = {
   },
   fromAminoMsg(object: MsgSetDisplayTitleAminoMsg): MsgSetDisplayTitle {
     return MsgSetDisplayTitle.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSetDisplayTitle): MsgSetDisplayTitleAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgSetDisplayTitle",
+      value: MsgSetDisplayTitle.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgSetDisplayTitleProtoMsg): MsgSetDisplayTitle {
     return MsgSetDisplayTitle.decode(message.value);
@@ -3159,6 +3180,7 @@ function createBaseMsgCreateGuild(): MsgCreateGuild {
  */
 export const MsgCreateGuild = {
   typeUrl: "/sparkdream.season.v1.MsgCreateGuild",
+  aminoType: "sparkdream/x/season/MsgCreateGuild",
   encode(message: MsgCreateGuild, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3234,6 +3256,12 @@ export const MsgCreateGuild = {
   },
   fromAminoMsg(object: MsgCreateGuildAminoMsg): MsgCreateGuild {
     return MsgCreateGuild.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCreateGuild): MsgCreateGuildAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgCreateGuild",
+      value: MsgCreateGuild.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgCreateGuildProtoMsg): MsgCreateGuild {
     return MsgCreateGuild.decode(message.value);
@@ -3318,6 +3346,7 @@ function createBaseMsgJoinGuild(): MsgJoinGuild {
  */
 export const MsgJoinGuild = {
   typeUrl: "/sparkdream.season.v1.MsgJoinGuild",
+  aminoType: "sparkdream/x/season/MsgJoinGuild",
   encode(message: MsgJoinGuild, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3371,6 +3400,12 @@ export const MsgJoinGuild = {
   },
   fromAminoMsg(object: MsgJoinGuildAminoMsg): MsgJoinGuild {
     return MsgJoinGuild.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgJoinGuild): MsgJoinGuildAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgJoinGuild",
+      value: MsgJoinGuild.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgJoinGuildProtoMsg): MsgJoinGuild {
     return MsgJoinGuild.decode(message.value);
@@ -3454,6 +3489,7 @@ function createBaseMsgLeaveGuild(): MsgLeaveGuild {
  */
 export const MsgLeaveGuild = {
   typeUrl: "/sparkdream.season.v1.MsgLeaveGuild",
+  aminoType: "sparkdream/x/season/MsgLeaveGuild",
   encode(message: MsgLeaveGuild, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3496,6 +3532,12 @@ export const MsgLeaveGuild = {
   },
   fromAminoMsg(object: MsgLeaveGuildAminoMsg): MsgLeaveGuild {
     return MsgLeaveGuild.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgLeaveGuild): MsgLeaveGuildAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgLeaveGuild",
+      value: MsgLeaveGuild.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgLeaveGuildProtoMsg): MsgLeaveGuild {
     return MsgLeaveGuild.decode(message.value);
@@ -3581,6 +3623,7 @@ function createBaseMsgTransferGuildFounder(): MsgTransferGuildFounder {
  */
 export const MsgTransferGuildFounder = {
   typeUrl: "/sparkdream.season.v1.MsgTransferGuildFounder",
+  aminoType: "sparkdream/x/season/MsgTransferGuildFounder",
   encode(message: MsgTransferGuildFounder, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3645,6 +3688,12 @@ export const MsgTransferGuildFounder = {
   },
   fromAminoMsg(object: MsgTransferGuildFounderAminoMsg): MsgTransferGuildFounder {
     return MsgTransferGuildFounder.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgTransferGuildFounder): MsgTransferGuildFounderAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgTransferGuildFounder",
+      value: MsgTransferGuildFounder.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgTransferGuildFounderProtoMsg): MsgTransferGuildFounder {
     return MsgTransferGuildFounder.decode(message.value);
@@ -3729,6 +3778,7 @@ function createBaseMsgDissolveGuild(): MsgDissolveGuild {
  */
 export const MsgDissolveGuild = {
   typeUrl: "/sparkdream.season.v1.MsgDissolveGuild",
+  aminoType: "sparkdream/x/season/MsgDissolveGuild",
   encode(message: MsgDissolveGuild, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3782,6 +3832,12 @@ export const MsgDissolveGuild = {
   },
   fromAminoMsg(object: MsgDissolveGuildAminoMsg): MsgDissolveGuild {
     return MsgDissolveGuild.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgDissolveGuild): MsgDissolveGuildAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgDissolveGuild",
+      value: MsgDissolveGuild.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgDissolveGuildProtoMsg): MsgDissolveGuild {
     return MsgDissolveGuild.decode(message.value);
@@ -3867,6 +3923,7 @@ function createBaseMsgPromoteToOfficer(): MsgPromoteToOfficer {
  */
 export const MsgPromoteToOfficer = {
   typeUrl: "/sparkdream.season.v1.MsgPromoteToOfficer",
+  aminoType: "sparkdream/x/season/MsgPromoteToOfficer",
   encode(message: MsgPromoteToOfficer, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3931,6 +3988,12 @@ export const MsgPromoteToOfficer = {
   },
   fromAminoMsg(object: MsgPromoteToOfficerAminoMsg): MsgPromoteToOfficer {
     return MsgPromoteToOfficer.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgPromoteToOfficer): MsgPromoteToOfficerAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgPromoteToOfficer",
+      value: MsgPromoteToOfficer.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgPromoteToOfficerProtoMsg): MsgPromoteToOfficer {
     return MsgPromoteToOfficer.decode(message.value);
@@ -4016,6 +4079,7 @@ function createBaseMsgDemoteOfficer(): MsgDemoteOfficer {
  */
 export const MsgDemoteOfficer = {
   typeUrl: "/sparkdream.season.v1.MsgDemoteOfficer",
+  aminoType: "sparkdream/x/season/MsgDemoteOfficer",
   encode(message: MsgDemoteOfficer, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4080,6 +4144,12 @@ export const MsgDemoteOfficer = {
   },
   fromAminoMsg(object: MsgDemoteOfficerAminoMsg): MsgDemoteOfficer {
     return MsgDemoteOfficer.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgDemoteOfficer): MsgDemoteOfficerAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgDemoteOfficer",
+      value: MsgDemoteOfficer.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgDemoteOfficerProtoMsg): MsgDemoteOfficer {
     return MsgDemoteOfficer.decode(message.value);
@@ -4165,6 +4235,7 @@ function createBaseMsgInviteToGuild(): MsgInviteToGuild {
  */
 export const MsgInviteToGuild = {
   typeUrl: "/sparkdream.season.v1.MsgInviteToGuild",
+  aminoType: "sparkdream/x/season/MsgInviteToGuild",
   encode(message: MsgInviteToGuild, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4229,6 +4300,12 @@ export const MsgInviteToGuild = {
   },
   fromAminoMsg(object: MsgInviteToGuildAminoMsg): MsgInviteToGuild {
     return MsgInviteToGuild.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgInviteToGuild): MsgInviteToGuildAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgInviteToGuild",
+      value: MsgInviteToGuild.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgInviteToGuildProtoMsg): MsgInviteToGuild {
     return MsgInviteToGuild.decode(message.value);
@@ -4313,6 +4390,7 @@ function createBaseMsgAcceptGuildInvite(): MsgAcceptGuildInvite {
  */
 export const MsgAcceptGuildInvite = {
   typeUrl: "/sparkdream.season.v1.MsgAcceptGuildInvite",
+  aminoType: "sparkdream/x/season/MsgAcceptGuildInvite",
   encode(message: MsgAcceptGuildInvite, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4366,6 +4444,12 @@ export const MsgAcceptGuildInvite = {
   },
   fromAminoMsg(object: MsgAcceptGuildInviteAminoMsg): MsgAcceptGuildInvite {
     return MsgAcceptGuildInvite.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAcceptGuildInvite): MsgAcceptGuildInviteAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgAcceptGuildInvite",
+      value: MsgAcceptGuildInvite.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgAcceptGuildInviteProtoMsg): MsgAcceptGuildInvite {
     return MsgAcceptGuildInvite.decode(message.value);
@@ -4451,6 +4535,7 @@ function createBaseMsgRevokeGuildInvite(): MsgRevokeGuildInvite {
  */
 export const MsgRevokeGuildInvite = {
   typeUrl: "/sparkdream.season.v1.MsgRevokeGuildInvite",
+  aminoType: "sparkdream/x/season/MsgRevokeGuildInvite",
   encode(message: MsgRevokeGuildInvite, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4515,6 +4600,12 @@ export const MsgRevokeGuildInvite = {
   },
   fromAminoMsg(object: MsgRevokeGuildInviteAminoMsg): MsgRevokeGuildInvite {
     return MsgRevokeGuildInvite.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRevokeGuildInvite): MsgRevokeGuildInviteAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgRevokeGuildInvite",
+      value: MsgRevokeGuildInvite.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgRevokeGuildInviteProtoMsg): MsgRevokeGuildInvite {
     return MsgRevokeGuildInvite.decode(message.value);
@@ -4600,6 +4691,7 @@ function createBaseMsgSetGuildInviteOnly(): MsgSetGuildInviteOnly {
  */
 export const MsgSetGuildInviteOnly = {
   typeUrl: "/sparkdream.season.v1.MsgSetGuildInviteOnly",
+  aminoType: "sparkdream/x/season/MsgSetGuildInviteOnly",
   encode(message: MsgSetGuildInviteOnly, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4664,6 +4756,12 @@ export const MsgSetGuildInviteOnly = {
   },
   fromAminoMsg(object: MsgSetGuildInviteOnlyAminoMsg): MsgSetGuildInviteOnly {
     return MsgSetGuildInviteOnly.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSetGuildInviteOnly): MsgSetGuildInviteOnlyAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgSetGuildInviteOnly",
+      value: MsgSetGuildInviteOnly.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgSetGuildInviteOnlyProtoMsg): MsgSetGuildInviteOnly {
     return MsgSetGuildInviteOnly.decode(message.value);
@@ -4749,6 +4847,7 @@ function createBaseMsgUpdateGuildDescription(): MsgUpdateGuildDescription {
  */
 export const MsgUpdateGuildDescription = {
   typeUrl: "/sparkdream.season.v1.MsgUpdateGuildDescription",
+  aminoType: "sparkdream/x/season/MsgUpdateGuildDescription",
   encode(message: MsgUpdateGuildDescription, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4813,6 +4912,12 @@ export const MsgUpdateGuildDescription = {
   },
   fromAminoMsg(object: MsgUpdateGuildDescriptionAminoMsg): MsgUpdateGuildDescription {
     return MsgUpdateGuildDescription.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUpdateGuildDescription): MsgUpdateGuildDescriptionAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgUpdateGuildDescription",
+      value: MsgUpdateGuildDescription.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUpdateGuildDescriptionProtoMsg): MsgUpdateGuildDescription {
     return MsgUpdateGuildDescription.decode(message.value);
@@ -4899,6 +5004,7 @@ function createBaseMsgKickFromGuild(): MsgKickFromGuild {
  */
 export const MsgKickFromGuild = {
   typeUrl: "/sparkdream.season.v1.MsgKickFromGuild",
+  aminoType: "sparkdream/x/season/MsgKickFromGuild",
   encode(message: MsgKickFromGuild, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4974,6 +5080,12 @@ export const MsgKickFromGuild = {
   },
   fromAminoMsg(object: MsgKickFromGuildAminoMsg): MsgKickFromGuild {
     return MsgKickFromGuild.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgKickFromGuild): MsgKickFromGuildAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgKickFromGuild",
+      value: MsgKickFromGuild.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgKickFromGuildProtoMsg): MsgKickFromGuild {
     return MsgKickFromGuild.decode(message.value);
@@ -5058,6 +5170,7 @@ function createBaseMsgClaimGuildFounder(): MsgClaimGuildFounder {
  */
 export const MsgClaimGuildFounder = {
   typeUrl: "/sparkdream.season.v1.MsgClaimGuildFounder",
+  aminoType: "sparkdream/x/season/MsgClaimGuildFounder",
   encode(message: MsgClaimGuildFounder, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -5111,6 +5224,12 @@ export const MsgClaimGuildFounder = {
   },
   fromAminoMsg(object: MsgClaimGuildFounderAminoMsg): MsgClaimGuildFounder {
     return MsgClaimGuildFounder.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgClaimGuildFounder): MsgClaimGuildFounderAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgClaimGuildFounder",
+      value: MsgClaimGuildFounder.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgClaimGuildFounderProtoMsg): MsgClaimGuildFounder {
     return MsgClaimGuildFounder.decode(message.value);
@@ -5195,6 +5314,7 @@ function createBaseMsgStartQuest(): MsgStartQuest {
  */
 export const MsgStartQuest = {
   typeUrl: "/sparkdream.season.v1.MsgStartQuest",
+  aminoType: "sparkdream/x/season/MsgStartQuest",
   encode(message: MsgStartQuest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -5248,6 +5368,12 @@ export const MsgStartQuest = {
   },
   fromAminoMsg(object: MsgStartQuestAminoMsg): MsgStartQuest {
     return MsgStartQuest.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgStartQuest): MsgStartQuestAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgStartQuest",
+      value: MsgStartQuest.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgStartQuestProtoMsg): MsgStartQuest {
     return MsgStartQuest.decode(message.value);
@@ -5332,6 +5458,7 @@ function createBaseMsgClaimQuestReward(): MsgClaimQuestReward {
  */
 export const MsgClaimQuestReward = {
   typeUrl: "/sparkdream.season.v1.MsgClaimQuestReward",
+  aminoType: "sparkdream/x/season/MsgClaimQuestReward",
   encode(message: MsgClaimQuestReward, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -5385,6 +5512,12 @@ export const MsgClaimQuestReward = {
   },
   fromAminoMsg(object: MsgClaimQuestRewardAminoMsg): MsgClaimQuestReward {
     return MsgClaimQuestReward.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgClaimQuestReward): MsgClaimQuestRewardAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgClaimQuestReward",
+      value: MsgClaimQuestReward.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgClaimQuestRewardProtoMsg): MsgClaimQuestReward {
     return MsgClaimQuestReward.decode(message.value);
@@ -5469,6 +5602,7 @@ function createBaseMsgAbandonQuest(): MsgAbandonQuest {
  */
 export const MsgAbandonQuest = {
   typeUrl: "/sparkdream.season.v1.MsgAbandonQuest",
+  aminoType: "sparkdream/x/season/MsgAbandonQuest",
   encode(message: MsgAbandonQuest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -5522,6 +5656,12 @@ export const MsgAbandonQuest = {
   },
   fromAminoMsg(object: MsgAbandonQuestAminoMsg): MsgAbandonQuest {
     return MsgAbandonQuest.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAbandonQuest): MsgAbandonQuestAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgAbandonQuest",
+      value: MsgAbandonQuest.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgAbandonQuestProtoMsg): MsgAbandonQuest {
     return MsgAbandonQuest.decode(message.value);
@@ -6747,6 +6887,7 @@ function createBaseMsgReportDisplayName(): MsgReportDisplayName {
  */
 export const MsgReportDisplayName = {
   typeUrl: "/sparkdream.season.v1.MsgReportDisplayName",
+  aminoType: "sparkdream/x/season/MsgReportDisplayName",
   encode(message: MsgReportDisplayName, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -6811,6 +6952,12 @@ export const MsgReportDisplayName = {
   },
   fromAminoMsg(object: MsgReportDisplayNameAminoMsg): MsgReportDisplayName {
     return MsgReportDisplayName.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgReportDisplayName): MsgReportDisplayNameAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgReportDisplayName",
+      value: MsgReportDisplayName.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgReportDisplayNameProtoMsg): MsgReportDisplayName {
     return MsgReportDisplayName.decode(message.value);
@@ -6895,6 +7042,7 @@ function createBaseMsgAppealDisplayNameModeration(): MsgAppealDisplayNameModerat
  */
 export const MsgAppealDisplayNameModeration = {
   typeUrl: "/sparkdream.season.v1.MsgAppealDisplayNameModeration",
+  aminoType: "sparkdream/x/season/MsgAppealDisplayNameModeration",
   encode(message: MsgAppealDisplayNameModeration, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -6948,6 +7096,12 @@ export const MsgAppealDisplayNameModeration = {
   },
   fromAminoMsg(object: MsgAppealDisplayNameModerationAminoMsg): MsgAppealDisplayNameModeration {
     return MsgAppealDisplayNameModeration.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAppealDisplayNameModeration): MsgAppealDisplayNameModerationAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgAppealDisplayNameModeration",
+      value: MsgAppealDisplayNameModeration.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgAppealDisplayNameModerationProtoMsg): MsgAppealDisplayNameModeration {
     return MsgAppealDisplayNameModeration.decode(message.value);
@@ -8829,6 +8983,7 @@ function createBaseMsgNominate(): MsgNominate {
  */
 export const MsgNominate = {
   typeUrl: "/sparkdream.season.v1.MsgNominate",
+  aminoType: "sparkdream/x/season/MsgNominate",
   encode(message: MsgNominate, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -8893,6 +9048,12 @@ export const MsgNominate = {
   },
   fromAminoMsg(object: MsgNominateAminoMsg): MsgNominate {
     return MsgNominate.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgNominate): MsgNominateAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgNominate",
+      value: MsgNominate.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgNominateProtoMsg): MsgNominate {
     return MsgNominate.decode(message.value);
@@ -8991,6 +9152,7 @@ function createBaseMsgStakeNomination(): MsgStakeNomination {
  */
 export const MsgStakeNomination = {
   typeUrl: "/sparkdream.season.v1.MsgStakeNomination",
+  aminoType: "sparkdream/x/season/MsgStakeNomination",
   encode(message: MsgStakeNomination, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -9055,6 +9217,12 @@ export const MsgStakeNomination = {
   },
   fromAminoMsg(object: MsgStakeNominationAminoMsg): MsgStakeNomination {
     return MsgStakeNomination.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgStakeNomination): MsgStakeNominationAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgStakeNomination",
+      value: MsgStakeNomination.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgStakeNominationProtoMsg): MsgStakeNomination {
     return MsgStakeNomination.decode(message.value);
@@ -9139,6 +9307,7 @@ function createBaseMsgUnstakeNomination(): MsgUnstakeNomination {
  */
 export const MsgUnstakeNomination = {
   typeUrl: "/sparkdream.season.v1.MsgUnstakeNomination",
+  aminoType: "sparkdream/x/season/MsgUnstakeNomination",
   encode(message: MsgUnstakeNomination, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -9192,6 +9361,12 @@ export const MsgUnstakeNomination = {
   },
   fromAminoMsg(object: MsgUnstakeNominationAminoMsg): MsgUnstakeNomination {
     return MsgUnstakeNomination.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUnstakeNomination): MsgUnstakeNominationAminoMsg {
+    return {
+      type: "sparkdream/x/season/MsgUnstakeNomination",
+      value: MsgUnstakeNomination.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUnstakeNominationProtoMsg): MsgUnstakeNomination {
     return MsgUnstakeNomination.decode(message.value);

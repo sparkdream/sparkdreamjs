@@ -199,7 +199,7 @@ export interface MsgCreatePolicyPermissionsAmino {
   allowed_messages?: string[];
 }
 export interface MsgCreatePolicyPermissionsAminoMsg {
-  type: "/sparkdream.commons.v1.MsgCreatePolicyPermissions";
+  type: "sparkdream/x/commons/MsgCreatePolicyPermissions";
   value: MsgCreatePolicyPermissionsAmino;
 }
 /**
@@ -251,7 +251,7 @@ export interface MsgUpdatePolicyPermissionsAmino {
   allowed_messages?: string[];
 }
 export interface MsgUpdatePolicyPermissionsAminoMsg {
-  type: "/sparkdream.commons.v1.MsgUpdatePolicyPermissions";
+  type: "sparkdream/x/commons/MsgUpdatePolicyPermissions";
   value: MsgUpdatePolicyPermissionsAmino;
 }
 /**
@@ -301,7 +301,7 @@ export interface MsgDeletePolicyPermissionsAmino {
   policy_address?: string;
 }
 export interface MsgDeletePolicyPermissionsAminoMsg {
-  type: "/sparkdream.commons.v1.MsgDeletePolicyPermissions";
+  type: "sparkdream/x/commons/MsgDeletePolicyPermissions";
   value: MsgDeletePolicyPermissionsAmino;
 }
 /**
@@ -387,7 +387,7 @@ export interface MsgRegisterGroupAmino {
   electoral_policy_address?: string;
 }
 export interface MsgRegisterGroupAminoMsg {
-  type: "/sparkdream.commons.v1.MsgRegisterGroup";
+  type: "sparkdream/x/commons/MsgRegisterGroup";
   value: MsgRegisterGroupAmino;
 }
 /**
@@ -441,7 +441,7 @@ export interface MsgRenewGroupAmino {
   new_member_weights?: string[];
 }
 export interface MsgRenewGroupAminoMsg {
-  type: "/sparkdream.commons.v1.MsgRenewGroup";
+  type: "sparkdream/x/commons/MsgRenewGroup";
   value: MsgRenewGroupAmino;
 }
 /**
@@ -513,7 +513,7 @@ export interface MsgUpdateGroupConfigAmino {
   electoral_policy_address?: string;
 }
 export interface MsgUpdateGroupConfigAminoMsg {
-  type: "/sparkdream.commons.v1.MsgUpdateGroupConfig";
+  type: "sparkdream/x/commons/MsgUpdateGroupConfig";
   value: MsgUpdateGroupConfigAmino;
 }
 /**
@@ -569,7 +569,7 @@ export interface MsgUpdateGroupMembersAmino {
   members_to_remove?: string[];
 }
 export interface MsgUpdateGroupMembersAminoMsg {
-  type: "/sparkdream.commons.v1.MsgUpdateGroupMembers";
+  type: "sparkdream/x/commons/MsgUpdateGroupMembers";
   value: MsgUpdateGroupMembersAmino;
 }
 /**
@@ -619,7 +619,7 @@ export interface MsgForceUpgradeAmino {
   plan?: UpgradePlanAmino;
 }
 export interface MsgForceUpgradeAminoMsg {
-  type: "/sparkdream.commons.v1.MsgForceUpgrade";
+  type: "sparkdream/x/commons/MsgForceUpgrade";
   value: MsgForceUpgradeAmino;
 }
 /**
@@ -727,7 +727,7 @@ export interface MsgDeleteGroupAmino {
   group_name?: string;
 }
 export interface MsgDeleteGroupAminoMsg {
-  type: "/sparkdream.commons.v1.MsgDeleteGroup";
+  type: "sparkdream/x/commons/MsgDeleteGroup";
   value: MsgDeleteGroupAmino;
 }
 /**
@@ -777,7 +777,7 @@ export interface MsgVetoGroupProposalsAmino {
   group_name?: string;
 }
 export interface MsgVetoGroupProposalsAminoMsg {
-  type: "/sparkdream.commons.v1.MsgVetoGroupProposals";
+  type: "sparkdream/x/commons/MsgVetoGroupProposals";
   value: MsgVetoGroupProposalsAmino;
 }
 /**
@@ -855,7 +855,7 @@ export interface MsgSubmitProposalAmino {
   metadata?: string;
 }
 export interface MsgSubmitProposalAminoMsg {
-  type: "/sparkdream.commons.v1.MsgSubmitProposal";
+  type: "sparkdream/x/commons/MsgSubmitProposal";
   value: MsgSubmitProposalAmino;
 }
 /**
@@ -937,7 +937,7 @@ export interface MsgVoteProposalAmino {
   metadata?: string;
 }
 export interface MsgVoteProposalAminoMsg {
-  type: "/sparkdream.commons.v1.MsgVoteProposal";
+  type: "sparkdream/x/commons/MsgVoteProposal";
   value: MsgVoteProposalAmino;
 }
 /**
@@ -999,7 +999,7 @@ export interface MsgExecuteProposalAmino {
   proposal_id?: string;
 }
 export interface MsgExecuteProposalAminoMsg {
-  type: "/sparkdream.commons.v1.MsgExecuteProposal";
+  type: "sparkdream/x/commons/MsgExecuteProposal";
   value: MsgExecuteProposalAmino;
 }
 /**
@@ -1718,6 +1718,7 @@ function createBaseMsgCreatePolicyPermissions(): MsgCreatePolicyPermissions {
  */
 export const MsgCreatePolicyPermissions = {
   typeUrl: "/sparkdream.commons.v1.MsgCreatePolicyPermissions",
+  aminoType: "sparkdream/x/commons/MsgCreatePolicyPermissions",
   encode(message: MsgCreatePolicyPermissions, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -1784,6 +1785,12 @@ export const MsgCreatePolicyPermissions = {
   },
   fromAminoMsg(object: MsgCreatePolicyPermissionsAminoMsg): MsgCreatePolicyPermissions {
     return MsgCreatePolicyPermissions.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCreatePolicyPermissions): MsgCreatePolicyPermissionsAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgCreatePolicyPermissions",
+      value: MsgCreatePolicyPermissions.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgCreatePolicyPermissionsProtoMsg): MsgCreatePolicyPermissions {
     return MsgCreatePolicyPermissions.decode(message.value);
@@ -1869,6 +1876,7 @@ function createBaseMsgUpdatePolicyPermissions(): MsgUpdatePolicyPermissions {
  */
 export const MsgUpdatePolicyPermissions = {
   typeUrl: "/sparkdream.commons.v1.MsgUpdatePolicyPermissions",
+  aminoType: "sparkdream/x/commons/MsgUpdatePolicyPermissions",
   encode(message: MsgUpdatePolicyPermissions, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -1935,6 +1943,12 @@ export const MsgUpdatePolicyPermissions = {
   },
   fromAminoMsg(object: MsgUpdatePolicyPermissionsAminoMsg): MsgUpdatePolicyPermissions {
     return MsgUpdatePolicyPermissions.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUpdatePolicyPermissions): MsgUpdatePolicyPermissionsAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgUpdatePolicyPermissions",
+      value: MsgUpdatePolicyPermissions.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUpdatePolicyPermissionsProtoMsg): MsgUpdatePolicyPermissions {
     return MsgUpdatePolicyPermissions.decode(message.value);
@@ -2019,6 +2033,7 @@ function createBaseMsgDeletePolicyPermissions(): MsgDeletePolicyPermissions {
  */
 export const MsgDeletePolicyPermissions = {
   typeUrl: "/sparkdream.commons.v1.MsgDeletePolicyPermissions",
+  aminoType: "sparkdream/x/commons/MsgDeletePolicyPermissions",
   encode(message: MsgDeletePolicyPermissions, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -2072,6 +2087,12 @@ export const MsgDeletePolicyPermissions = {
   },
   fromAminoMsg(object: MsgDeletePolicyPermissionsAminoMsg): MsgDeletePolicyPermissions {
     return MsgDeletePolicyPermissions.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgDeletePolicyPermissions): MsgDeletePolicyPermissionsAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgDeletePolicyPermissions",
+      value: MsgDeletePolicyPermissions.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgDeletePolicyPermissionsProtoMsg): MsgDeletePolicyPermissions {
     return MsgDeletePolicyPermissions.decode(message.value);
@@ -2174,6 +2195,7 @@ function createBaseMsgRegisterGroup(): MsgRegisterGroup {
  */
 export const MsgRegisterGroup = {
   typeUrl: "/sparkdream.commons.v1.MsgRegisterGroup",
+  aminoType: "sparkdream/x/commons/MsgRegisterGroup",
   encode(message: MsgRegisterGroup, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -2432,6 +2454,12 @@ export const MsgRegisterGroup = {
   fromAminoMsg(object: MsgRegisterGroupAminoMsg): MsgRegisterGroup {
     return MsgRegisterGroup.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgRegisterGroup): MsgRegisterGroupAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgRegisterGroup",
+      value: MsgRegisterGroup.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgRegisterGroupProtoMsg): MsgRegisterGroup {
     return MsgRegisterGroup.decode(message.value);
   },
@@ -2517,6 +2545,7 @@ function createBaseMsgRenewGroup(): MsgRenewGroup {
  */
 export const MsgRenewGroup = {
   typeUrl: "/sparkdream.commons.v1.MsgRenewGroup",
+  aminoType: "sparkdream/x/commons/MsgRenewGroup",
   encode(message: MsgRenewGroup, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -2596,6 +2625,12 @@ export const MsgRenewGroup = {
   },
   fromAminoMsg(object: MsgRenewGroupAminoMsg): MsgRenewGroup {
     return MsgRenewGroup.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRenewGroup): MsgRenewGroupAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgRenewGroup",
+      value: MsgRenewGroup.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgRenewGroupProtoMsg): MsgRenewGroup {
     return MsgRenewGroup.decode(message.value);
@@ -2691,6 +2726,7 @@ function createBaseMsgUpdateGroupConfig(): MsgUpdateGroupConfig {
  */
 export const MsgUpdateGroupConfig = {
   typeUrl: "/sparkdream.commons.v1.MsgUpdateGroupConfig",
+  aminoType: "sparkdream/x/commons/MsgUpdateGroupConfig",
   encode(message: MsgUpdateGroupConfig, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -2866,6 +2902,12 @@ export const MsgUpdateGroupConfig = {
   fromAminoMsg(object: MsgUpdateGroupConfigAminoMsg): MsgUpdateGroupConfig {
     return MsgUpdateGroupConfig.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgUpdateGroupConfig): MsgUpdateGroupConfigAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgUpdateGroupConfig",
+      value: MsgUpdateGroupConfig.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgUpdateGroupConfigProtoMsg): MsgUpdateGroupConfig {
     return MsgUpdateGroupConfig.decode(message.value);
   },
@@ -2952,6 +2994,7 @@ function createBaseMsgUpdateGroupMembers(): MsgUpdateGroupMembers {
  */
 export const MsgUpdateGroupMembers = {
   typeUrl: "/sparkdream.commons.v1.MsgUpdateGroupMembers",
+  aminoType: "sparkdream/x/commons/MsgUpdateGroupMembers",
   encode(message: MsgUpdateGroupMembers, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -3045,6 +3088,12 @@ export const MsgUpdateGroupMembers = {
   fromAminoMsg(object: MsgUpdateGroupMembersAminoMsg): MsgUpdateGroupMembers {
     return MsgUpdateGroupMembers.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgUpdateGroupMembers): MsgUpdateGroupMembersAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgUpdateGroupMembers",
+      value: MsgUpdateGroupMembers.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgUpdateGroupMembersProtoMsg): MsgUpdateGroupMembers {
     return MsgUpdateGroupMembers.decode(message.value);
   },
@@ -3128,6 +3177,7 @@ function createBaseMsgForceUpgrade(): MsgForceUpgrade {
  */
 export const MsgForceUpgrade = {
   typeUrl: "/sparkdream.commons.v1.MsgForceUpgrade",
+  aminoType: "sparkdream/x/commons/MsgForceUpgrade",
   encode(message: MsgForceUpgrade, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -3181,6 +3231,12 @@ export const MsgForceUpgrade = {
   },
   fromAminoMsg(object: MsgForceUpgradeAminoMsg): MsgForceUpgrade {
     return MsgForceUpgrade.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgForceUpgrade): MsgForceUpgradeAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgForceUpgrade",
+      value: MsgForceUpgrade.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgForceUpgradeProtoMsg): MsgForceUpgrade {
     return MsgForceUpgrade.decode(message.value);
@@ -3428,6 +3484,7 @@ function createBaseMsgDeleteGroup(): MsgDeleteGroup {
  */
 export const MsgDeleteGroup = {
   typeUrl: "/sparkdream.commons.v1.MsgDeleteGroup",
+  aminoType: "sparkdream/x/commons/MsgDeleteGroup",
   encode(message: MsgDeleteGroup, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -3481,6 +3538,12 @@ export const MsgDeleteGroup = {
   },
   fromAminoMsg(object: MsgDeleteGroupAminoMsg): MsgDeleteGroup {
     return MsgDeleteGroup.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgDeleteGroup): MsgDeleteGroupAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgDeleteGroup",
+      value: MsgDeleteGroup.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgDeleteGroupProtoMsg): MsgDeleteGroup {
     return MsgDeleteGroup.decode(message.value);
@@ -3565,6 +3628,7 @@ function createBaseMsgVetoGroupProposals(): MsgVetoGroupProposals {
  */
 export const MsgVetoGroupProposals = {
   typeUrl: "/sparkdream.commons.v1.MsgVetoGroupProposals",
+  aminoType: "sparkdream/x/commons/MsgVetoGroupProposals",
   encode(message: MsgVetoGroupProposals, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -3618,6 +3682,12 @@ export const MsgVetoGroupProposals = {
   },
   fromAminoMsg(object: MsgVetoGroupProposalsAminoMsg): MsgVetoGroupProposals {
     return MsgVetoGroupProposals.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgVetoGroupProposals): MsgVetoGroupProposalsAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgVetoGroupProposals",
+      value: MsgVetoGroupProposals.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgVetoGroupProposalsProtoMsg): MsgVetoGroupProposals {
     return MsgVetoGroupProposals.decode(message.value);
@@ -3704,6 +3774,7 @@ function createBaseMsgSubmitProposal(): MsgSubmitProposal {
  */
 export const MsgSubmitProposal = {
   typeUrl: "/sparkdream.commons.v1.MsgSubmitProposal",
+  aminoType: "sparkdream/x/commons/MsgSubmitProposal",
   encode(message: MsgSubmitProposal, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.proposer !== "") {
       writer.uint32(10).string(message.proposer);
@@ -3781,6 +3852,12 @@ export const MsgSubmitProposal = {
   },
   fromAminoMsg(object: MsgSubmitProposalAminoMsg): MsgSubmitProposal {
     return MsgSubmitProposal.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSubmitProposal): MsgSubmitProposalAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgSubmitProposal",
+      value: MsgSubmitProposal.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgSubmitProposalProtoMsg): MsgSubmitProposal {
     return MsgSubmitProposal.decode(message.value);
@@ -3880,6 +3957,7 @@ function createBaseMsgVoteProposal(): MsgVoteProposal {
  */
 export const MsgVoteProposal = {
   typeUrl: "/sparkdream.commons.v1.MsgVoteProposal",
+  aminoType: "sparkdream/x/commons/MsgVoteProposal",
   encode(message: MsgVoteProposal, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.voter !== "") {
       writer.uint32(10).string(message.voter);
@@ -3955,6 +4033,12 @@ export const MsgVoteProposal = {
   },
   fromAminoMsg(object: MsgVoteProposalAminoMsg): MsgVoteProposal {
     return MsgVoteProposal.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgVoteProposal): MsgVoteProposalAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgVoteProposal",
+      value: MsgVoteProposal.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgVoteProposalProtoMsg): MsgVoteProposal {
     return MsgVoteProposal.decode(message.value);
@@ -4039,6 +4123,7 @@ function createBaseMsgExecuteProposal(): MsgExecuteProposal {
  */
 export const MsgExecuteProposal = {
   typeUrl: "/sparkdream.commons.v1.MsgExecuteProposal",
+  aminoType: "sparkdream/x/commons/MsgExecuteProposal",
   encode(message: MsgExecuteProposal, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.executor !== "") {
       writer.uint32(10).string(message.executor);
@@ -4092,6 +4177,12 @@ export const MsgExecuteProposal = {
   },
   fromAminoMsg(object: MsgExecuteProposalAminoMsg): MsgExecuteProposal {
     return MsgExecuteProposal.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgExecuteProposal): MsgExecuteProposalAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgExecuteProposal",
+      value: MsgExecuteProposal.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgExecuteProposalProtoMsg): MsgExecuteProposal {
     return MsgExecuteProposal.decode(message.value);

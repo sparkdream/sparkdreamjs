@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponse, QueryResolveRequest, QueryResolveResponse, QueryReverseResolveRequest, QueryReverseResolveResponse, QueryNamesRequest, QueryNamesResponse, QueryGetDisputeRequest, QueryGetDisputeResponse, QueryAllDisputeRequest, QueryAllDisputeResponse, QueryGetOwnerInfoRequest, QueryGetOwnerInfoResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryResolveRequest, QueryResolveResponse, QueryReverseResolveRequest, QueryReverseResolveResponse, QueryNamesRequest, QueryNamesResponse, QueryGetDisputeRequest, QueryGetDisputeResponse, QueryAllDisputeRequest, QueryAllDisputeResponse, QueryGetOwnerInfoRequest, QueryGetOwnerInfoResponse, QueryTargetsRequest, QueryTargetsResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -61,5 +61,18 @@ export class LCDQueryClient {
   getOwnerInfo = async (params: QueryGetOwnerInfoRequest): Promise<QueryGetOwnerInfoResponse> => {
     const endpoint = `sparkdream/name/v1/owner_info/${params.address}`;
     return await this.req.get<QueryGetOwnerInfoResponse>(endpoint);
+  };
+  /* Targets returns the list of names where the given address is the
+   accepted resolver target (i.e., names eligible to be set as the
+   address's primary for reverse resolution). */
+  targets = async (params: QueryTargetsRequest): Promise<QueryTargetsResponse> => {
+    const options: any = {
+      params: {}
+    };
+    if (typeof params?.pagination !== "undefined") {
+      setPaginationParams(options, params.pagination);
+    }
+    const endpoint = `sparkdream/name/v1/targets/${params.address}`;
+    return await this.req.get<QueryTargetsResponse>(endpoint, options);
   };
 }

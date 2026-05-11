@@ -81,7 +81,7 @@ export interface MsgRegisterPeerAmino {
   metadata?: string;
 }
 export interface MsgRegisterPeerAminoMsg {
-  type: "/sparkdream.federation.v1.MsgRegisterPeer";
+  type: "sparkdream/x/federation/MsgRegisterPeer";
   value: MsgRegisterPeerAmino;
 }
 /**
@@ -129,7 +129,7 @@ export interface MsgRemovePeerAmino {
   reason?: string;
 }
 export interface MsgRemovePeerAminoMsg {
-  type: "/sparkdream.federation.v1.MsgRemovePeer";
+  type: "sparkdream/x/federation/MsgRemovePeer";
   value: MsgRemovePeerAmino;
 }
 /**
@@ -177,7 +177,7 @@ export interface MsgSuspendPeerAmino {
   reason?: string;
 }
 export interface MsgSuspendPeerAminoMsg {
-  type: "/sparkdream.federation.v1.MsgSuspendPeer";
+  type: "sparkdream/x/federation/MsgSuspendPeer";
   value: MsgSuspendPeerAmino;
 }
 /**
@@ -223,7 +223,7 @@ export interface MsgResumePeerAmino {
   peer_id?: string;
 }
 export interface MsgResumePeerAminoMsg {
-  type: "/sparkdream.federation.v1.MsgResumePeer";
+  type: "sparkdream/x/federation/MsgResumePeer";
   value: MsgResumePeerAmino;
 }
 /**
@@ -271,7 +271,7 @@ export interface MsgUpdatePeerPolicyAmino {
   policy?: PeerPolicyAmino;
 }
 export interface MsgUpdatePeerPolicyAminoMsg {
-  type: "/sparkdream.federation.v1.MsgUpdatePeerPolicy";
+  type: "sparkdream/x/federation/MsgUpdatePeerPolicy";
   value: MsgUpdatePeerPolicyAmino;
 }
 /**
@@ -323,7 +323,7 @@ export interface MsgRegisterBridgeAmino {
   endpoint?: string;
 }
 export interface MsgRegisterBridgeAminoMsg {
-  type: "/sparkdream.federation.v1.MsgRegisterBridge";
+  type: "sparkdream/x/federation/MsgRegisterBridge";
   value: MsgRegisterBridgeAmino;
 }
 /**
@@ -373,7 +373,7 @@ export interface MsgRevokeBridgeAmino {
   reason?: string;
 }
 export interface MsgRevokeBridgeAminoMsg {
-  type: "/sparkdream.federation.v1.MsgRevokeBridge";
+  type: "sparkdream/x/federation/MsgRevokeBridge";
   value: MsgRevokeBridgeAmino;
 }
 /**
@@ -425,7 +425,7 @@ export interface MsgSlashBridgeAmino {
   reason?: string;
 }
 export interface MsgSlashBridgeAminoMsg {
-  type: "/sparkdream.federation.v1.MsgSlashBridge";
+  type: "sparkdream/x/federation/MsgSlashBridge";
   value: MsgSlashBridgeAmino;
 }
 /**
@@ -475,7 +475,7 @@ export interface MsgUpdateBridgeAmino {
   endpoint?: string;
 }
 export interface MsgUpdateBridgeAminoMsg {
-  type: "/sparkdream.federation.v1.MsgUpdateBridge";
+  type: "sparkdream/x/federation/MsgUpdateBridge";
   value: MsgUpdateBridgeAmino;
 }
 /**
@@ -521,7 +521,7 @@ export interface MsgUnbondBridgeAmino {
   peer_id?: string;
 }
 export interface MsgUnbondBridgeAminoMsg {
-  type: "/sparkdream.federation.v1.MsgUnbondBridge";
+  type: "sparkdream/x/federation/MsgUnbondBridge";
   value: MsgUnbondBridgeAmino;
 }
 /**
@@ -569,7 +569,7 @@ export interface MsgTopUpBridgeStakeAmino {
   amount?: CoinAmino;
 }
 export interface MsgTopUpBridgeStakeAminoMsg {
-  type: "/sparkdream.federation.v1.MsgTopUpBridgeStake";
+  type: "sparkdream/x/federation/MsgTopUpBridgeStake";
   value: MsgTopUpBridgeStakeAmino;
 }
 /**
@@ -635,7 +635,7 @@ export interface MsgSubmitFederatedContentAmino {
   content_hash?: string;
 }
 export interface MsgSubmitFederatedContentAminoMsg {
-  type: "/sparkdream.federation.v1.MsgSubmitFederatedContent";
+  type: "sparkdream/x/federation/MsgSubmitFederatedContent";
   value: MsgSubmitFederatedContentAmino;
 }
 /**
@@ -697,7 +697,7 @@ export interface MsgFederateContentAmino {
   content_hash?: string;
 }
 export interface MsgFederateContentAminoMsg {
-  type: "/sparkdream.federation.v1.MsgFederateContent";
+  type: "sparkdream/x/federation/MsgFederateContent";
   value: MsgFederateContentAmino;
 }
 /**
@@ -747,7 +747,7 @@ export interface MsgAttestOutboundAmino {
   local_content_id?: string;
 }
 export interface MsgAttestOutboundAminoMsg {
-  type: "/sparkdream.federation.v1.MsgAttestOutbound";
+  type: "sparkdream/x/federation/MsgAttestOutbound";
   value: MsgAttestOutboundAmino;
 }
 /**
@@ -797,7 +797,7 @@ export interface MsgModerateContentAmino {
   reason?: string;
 }
 export interface MsgModerateContentAminoMsg {
-  type: "/sparkdream.federation.v1.MsgModerateContent";
+  type: "sparkdream/x/federation/MsgModerateContent";
   value: MsgModerateContentAmino;
 }
 /**
@@ -845,7 +845,7 @@ export interface MsgLinkIdentityAmino {
   remote_identity?: string;
 }
 export interface MsgLinkIdentityAminoMsg {
-  type: "/sparkdream.federation.v1.MsgLinkIdentity";
+  type: "sparkdream/x/federation/MsgLinkIdentity";
   value: MsgLinkIdentityAmino;
 }
 /**
@@ -891,7 +891,7 @@ export interface MsgUnlinkIdentityAmino {
   peer_id?: string;
 }
 export interface MsgUnlinkIdentityAminoMsg {
-  type: "/sparkdream.federation.v1.MsgUnlinkIdentity";
+  type: "sparkdream/x/federation/MsgUnlinkIdentity";
   value: MsgUnlinkIdentityAmino;
 }
 /**
@@ -937,7 +937,7 @@ export interface MsgConfirmIdentityLinkAmino {
   claimant_chain_peer_id?: string;
 }
 export interface MsgConfirmIdentityLinkAminoMsg {
-  type: "/sparkdream.federation.v1.MsgConfirmIdentityLink";
+  type: "sparkdream/x/federation/MsgConfirmIdentityLink";
   value: MsgConfirmIdentityLinkAmino;
 }
 /**
@@ -985,7 +985,7 @@ export interface MsgRequestReputationAttestationAmino {
   remote_address?: string;
 }
 export interface MsgRequestReputationAttestationAminoMsg {
-  type: "/sparkdream.federation.v1.MsgRequestReputationAttestation";
+  type: "sparkdream/x/federation/MsgRequestReputationAttestation";
   value: MsgRequestReputationAttestationAmino;
 }
 /**
@@ -1033,7 +1033,7 @@ export interface MsgVerifyContentAmino {
   content_hash?: string;
 }
 export interface MsgVerifyContentAminoMsg {
-  type: "/sparkdream.federation.v1.MsgVerifyContent";
+  type: "sparkdream/x/federation/MsgVerifyContent";
   value: MsgVerifyContentAmino;
 }
 /**
@@ -1083,7 +1083,7 @@ export interface MsgChallengeVerificationAmino {
   evidence?: string;
 }
 export interface MsgChallengeVerificationAminoMsg {
-  type: "/sparkdream.federation.v1.MsgChallengeVerification";
+  type: "sparkdream/x/federation/MsgChallengeVerification";
   value: MsgChallengeVerificationAmino;
 }
 /**
@@ -1131,7 +1131,7 @@ export interface MsgSubmitArbiterHashAmino {
   content_hash?: string;
 }
 export interface MsgSubmitArbiterHashAminoMsg {
-  type: "/sparkdream.federation.v1.MsgSubmitArbiterHash";
+  type: "sparkdream/x/federation/MsgSubmitArbiterHash";
   value: MsgSubmitArbiterHashAmino;
 }
 /**
@@ -1177,7 +1177,7 @@ export interface MsgEscalateChallengeAmino {
   content_id?: string;
 }
 export interface MsgEscalateChallengeAminoMsg {
-  type: "/sparkdream.federation.v1.MsgEscalateChallenge";
+  type: "sparkdream/x/federation/MsgEscalateChallenge";
   value: MsgEscalateChallengeAmino;
 }
 /**
@@ -1223,7 +1223,7 @@ export interface MsgUpdateOperationalParamsAmino {
   operational_params?: FederationOperationalParamsAmino;
 }
 export interface MsgUpdateOperationalParamsAminoMsg {
-  type: "/sparkdream.federation.v1.MsgUpdateOperationalParams";
+  type: "sparkdream/x/federation/MsgUpdateOperationalParams";
   value: MsgUpdateOperationalParamsAmino;
 }
 /**
@@ -1405,6 +1405,7 @@ function createBaseMsgRegisterPeer(): MsgRegisterPeer {
  */
 export const MsgRegisterPeer = {
   typeUrl: "/sparkdream.federation.v1.MsgRegisterPeer",
+  aminoType: "sparkdream/x/federation/MsgRegisterPeer",
   encode(message: MsgRegisterPeer, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -1503,6 +1504,12 @@ export const MsgRegisterPeer = {
   fromAminoMsg(object: MsgRegisterPeerAminoMsg): MsgRegisterPeer {
     return MsgRegisterPeer.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgRegisterPeer): MsgRegisterPeerAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgRegisterPeer",
+      value: MsgRegisterPeer.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgRegisterPeerProtoMsg): MsgRegisterPeer {
     return MsgRegisterPeer.decode(message.value);
   },
@@ -1585,6 +1592,7 @@ function createBaseMsgRemovePeer(): MsgRemovePeer {
  */
 export const MsgRemovePeer = {
   typeUrl: "/sparkdream.federation.v1.MsgRemovePeer",
+  aminoType: "sparkdream/x/federation/MsgRemovePeer",
   encode(message: MsgRemovePeer, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -1649,6 +1657,12 @@ export const MsgRemovePeer = {
   },
   fromAminoMsg(object: MsgRemovePeerAminoMsg): MsgRemovePeer {
     return MsgRemovePeer.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRemovePeer): MsgRemovePeerAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgRemovePeer",
+      value: MsgRemovePeer.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgRemovePeerProtoMsg): MsgRemovePeer {
     return MsgRemovePeer.decode(message.value);
@@ -1732,6 +1746,7 @@ function createBaseMsgSuspendPeer(): MsgSuspendPeer {
  */
 export const MsgSuspendPeer = {
   typeUrl: "/sparkdream.federation.v1.MsgSuspendPeer",
+  aminoType: "sparkdream/x/federation/MsgSuspendPeer",
   encode(message: MsgSuspendPeer, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -1796,6 +1811,12 @@ export const MsgSuspendPeer = {
   },
   fromAminoMsg(object: MsgSuspendPeerAminoMsg): MsgSuspendPeer {
     return MsgSuspendPeer.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSuspendPeer): MsgSuspendPeerAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgSuspendPeer",
+      value: MsgSuspendPeer.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgSuspendPeerProtoMsg): MsgSuspendPeer {
     return MsgSuspendPeer.decode(message.value);
@@ -1878,6 +1899,7 @@ function createBaseMsgResumePeer(): MsgResumePeer {
  */
 export const MsgResumePeer = {
   typeUrl: "/sparkdream.federation.v1.MsgResumePeer",
+  aminoType: "sparkdream/x/federation/MsgResumePeer",
   encode(message: MsgResumePeer, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -1931,6 +1953,12 @@ export const MsgResumePeer = {
   },
   fromAminoMsg(object: MsgResumePeerAminoMsg): MsgResumePeer {
     return MsgResumePeer.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgResumePeer): MsgResumePeerAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgResumePeer",
+      value: MsgResumePeer.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgResumePeerProtoMsg): MsgResumePeer {
     return MsgResumePeer.decode(message.value);
@@ -2014,6 +2042,7 @@ function createBaseMsgUpdatePeerPolicy(): MsgUpdatePeerPolicy {
  */
 export const MsgUpdatePeerPolicy = {
   typeUrl: "/sparkdream.federation.v1.MsgUpdatePeerPolicy",
+  aminoType: "sparkdream/x/federation/MsgUpdatePeerPolicy",
   encode(message: MsgUpdatePeerPolicy, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -2078,6 +2107,12 @@ export const MsgUpdatePeerPolicy = {
   },
   fromAminoMsg(object: MsgUpdatePeerPolicyAminoMsg): MsgUpdatePeerPolicy {
     return MsgUpdatePeerPolicy.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUpdatePeerPolicy): MsgUpdatePeerPolicyAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgUpdatePeerPolicy",
+      value: MsgUpdatePeerPolicy.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUpdatePeerPolicyProtoMsg): MsgUpdatePeerPolicy {
     return MsgUpdatePeerPolicy.decode(message.value);
@@ -2163,6 +2198,7 @@ function createBaseMsgRegisterBridge(): MsgRegisterBridge {
  */
 export const MsgRegisterBridge = {
   typeUrl: "/sparkdream.federation.v1.MsgRegisterBridge",
+  aminoType: "sparkdream/x/federation/MsgRegisterBridge",
   encode(message: MsgRegisterBridge, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -2250,6 +2286,12 @@ export const MsgRegisterBridge = {
   fromAminoMsg(object: MsgRegisterBridgeAminoMsg): MsgRegisterBridge {
     return MsgRegisterBridge.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgRegisterBridge): MsgRegisterBridgeAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgRegisterBridge",
+      value: MsgRegisterBridge.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgRegisterBridgeProtoMsg): MsgRegisterBridge {
     return MsgRegisterBridge.decode(message.value);
   },
@@ -2333,6 +2375,7 @@ function createBaseMsgRevokeBridge(): MsgRevokeBridge {
  */
 export const MsgRevokeBridge = {
   typeUrl: "/sparkdream.federation.v1.MsgRevokeBridge",
+  aminoType: "sparkdream/x/federation/MsgRevokeBridge",
   encode(message: MsgRevokeBridge, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -2408,6 +2451,12 @@ export const MsgRevokeBridge = {
   },
   fromAminoMsg(object: MsgRevokeBridgeAminoMsg): MsgRevokeBridge {
     return MsgRevokeBridge.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRevokeBridge): MsgRevokeBridgeAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgRevokeBridge",
+      value: MsgRevokeBridge.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgRevokeBridgeProtoMsg): MsgRevokeBridge {
     return MsgRevokeBridge.decode(message.value);
@@ -2493,6 +2542,7 @@ function createBaseMsgSlashBridge(): MsgSlashBridge {
  */
 export const MsgSlashBridge = {
   typeUrl: "/sparkdream.federation.v1.MsgSlashBridge",
+  aminoType: "sparkdream/x/federation/MsgSlashBridge",
   encode(message: MsgSlashBridge, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -2580,6 +2630,12 @@ export const MsgSlashBridge = {
   fromAminoMsg(object: MsgSlashBridgeAminoMsg): MsgSlashBridge {
     return MsgSlashBridge.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgSlashBridge): MsgSlashBridgeAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgSlashBridge",
+      value: MsgSlashBridge.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgSlashBridgeProtoMsg): MsgSlashBridge {
     return MsgSlashBridge.decode(message.value);
   },
@@ -2663,6 +2719,7 @@ function createBaseMsgUpdateBridge(): MsgUpdateBridge {
  */
 export const MsgUpdateBridge = {
   typeUrl: "/sparkdream.federation.v1.MsgUpdateBridge",
+  aminoType: "sparkdream/x/federation/MsgUpdateBridge",
   encode(message: MsgUpdateBridge, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -2738,6 +2795,12 @@ export const MsgUpdateBridge = {
   },
   fromAminoMsg(object: MsgUpdateBridgeAminoMsg): MsgUpdateBridge {
     return MsgUpdateBridge.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUpdateBridge): MsgUpdateBridgeAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgUpdateBridge",
+      value: MsgUpdateBridge.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUpdateBridgeProtoMsg): MsgUpdateBridge {
     return MsgUpdateBridge.decode(message.value);
@@ -2820,6 +2883,7 @@ function createBaseMsgUnbondBridge(): MsgUnbondBridge {
  */
 export const MsgUnbondBridge = {
   typeUrl: "/sparkdream.federation.v1.MsgUnbondBridge",
+  aminoType: "sparkdream/x/federation/MsgUnbondBridge",
   encode(message: MsgUnbondBridge, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.operator !== "") {
       writer.uint32(10).string(message.operator);
@@ -2873,6 +2937,12 @@ export const MsgUnbondBridge = {
   },
   fromAminoMsg(object: MsgUnbondBridgeAminoMsg): MsgUnbondBridge {
     return MsgUnbondBridge.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUnbondBridge): MsgUnbondBridgeAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgUnbondBridge",
+      value: MsgUnbondBridge.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUnbondBridgeProtoMsg): MsgUnbondBridge {
     return MsgUnbondBridge.decode(message.value);
@@ -2956,6 +3026,7 @@ function createBaseMsgTopUpBridgeStake(): MsgTopUpBridgeStake {
  */
 export const MsgTopUpBridgeStake = {
   typeUrl: "/sparkdream.federation.v1.MsgTopUpBridgeStake",
+  aminoType: "sparkdream/x/federation/MsgTopUpBridgeStake",
   encode(message: MsgTopUpBridgeStake, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.operator !== "") {
       writer.uint32(10).string(message.operator);
@@ -3020,6 +3091,12 @@ export const MsgTopUpBridgeStake = {
   },
   fromAminoMsg(object: MsgTopUpBridgeStakeAminoMsg): MsgTopUpBridgeStake {
     return MsgTopUpBridgeStake.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgTopUpBridgeStake): MsgTopUpBridgeStakeAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgTopUpBridgeStake",
+      value: MsgTopUpBridgeStake.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgTopUpBridgeStakeProtoMsg): MsgTopUpBridgeStake {
     return MsgTopUpBridgeStake.decode(message.value);
@@ -3112,6 +3189,7 @@ function createBaseMsgSubmitFederatedContent(): MsgSubmitFederatedContent {
  */
 export const MsgSubmitFederatedContent = {
   typeUrl: "/sparkdream.federation.v1.MsgSubmitFederatedContent",
+  aminoType: "sparkdream/x/federation/MsgSubmitFederatedContent",
   encode(message: MsgSubmitFederatedContent, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.operator !== "") {
       writer.uint32(10).string(message.operator);
@@ -3276,6 +3354,12 @@ export const MsgSubmitFederatedContent = {
   fromAminoMsg(object: MsgSubmitFederatedContentAminoMsg): MsgSubmitFederatedContent {
     return MsgSubmitFederatedContent.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgSubmitFederatedContent): MsgSubmitFederatedContentAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgSubmitFederatedContent",
+      value: MsgSubmitFederatedContent.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgSubmitFederatedContentProtoMsg): MsgSubmitFederatedContent {
     return MsgSubmitFederatedContent.decode(message.value);
   },
@@ -3376,6 +3460,7 @@ function createBaseMsgFederateContent(): MsgFederateContent {
  */
 export const MsgFederateContent = {
   typeUrl: "/sparkdream.federation.v1.MsgFederateContent",
+  aminoType: "sparkdream/x/federation/MsgFederateContent",
   encode(message: MsgFederateContent, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3496,6 +3581,12 @@ export const MsgFederateContent = {
   fromAminoMsg(object: MsgFederateContentAminoMsg): MsgFederateContent {
     return MsgFederateContent.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgFederateContent): MsgFederateContentAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgFederateContent",
+      value: MsgFederateContent.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgFederateContentProtoMsg): MsgFederateContent {
     return MsgFederateContent.decode(message.value);
   },
@@ -3579,6 +3670,7 @@ function createBaseMsgAttestOutbound(): MsgAttestOutbound {
  */
 export const MsgAttestOutbound = {
   typeUrl: "/sparkdream.federation.v1.MsgAttestOutbound",
+  aminoType: "sparkdream/x/federation/MsgAttestOutbound",
   encode(message: MsgAttestOutbound, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.operator !== "") {
       writer.uint32(10).string(message.operator);
@@ -3654,6 +3746,12 @@ export const MsgAttestOutbound = {
   },
   fromAminoMsg(object: MsgAttestOutboundAminoMsg): MsgAttestOutbound {
     return MsgAttestOutbound.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAttestOutbound): MsgAttestOutboundAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgAttestOutbound",
+      value: MsgAttestOutbound.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgAttestOutboundProtoMsg): MsgAttestOutbound {
     return MsgAttestOutbound.decode(message.value);
@@ -3738,6 +3836,7 @@ function createBaseMsgModerateContent(): MsgModerateContent {
  */
 export const MsgModerateContent = {
   typeUrl: "/sparkdream.federation.v1.MsgModerateContent",
+  aminoType: "sparkdream/x/federation/MsgModerateContent",
   encode(message: MsgModerateContent, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -3813,6 +3912,12 @@ export const MsgModerateContent = {
   },
   fromAminoMsg(object: MsgModerateContentAminoMsg): MsgModerateContent {
     return MsgModerateContent.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgModerateContent): MsgModerateContentAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgModerateContent",
+      value: MsgModerateContent.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgModerateContentProtoMsg): MsgModerateContent {
     return MsgModerateContent.decode(message.value);
@@ -3896,6 +4001,7 @@ function createBaseMsgLinkIdentity(): MsgLinkIdentity {
  */
 export const MsgLinkIdentity = {
   typeUrl: "/sparkdream.federation.v1.MsgLinkIdentity",
+  aminoType: "sparkdream/x/federation/MsgLinkIdentity",
   encode(message: MsgLinkIdentity, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3960,6 +4066,12 @@ export const MsgLinkIdentity = {
   },
   fromAminoMsg(object: MsgLinkIdentityAminoMsg): MsgLinkIdentity {
     return MsgLinkIdentity.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgLinkIdentity): MsgLinkIdentityAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgLinkIdentity",
+      value: MsgLinkIdentity.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgLinkIdentityProtoMsg): MsgLinkIdentity {
     return MsgLinkIdentity.decode(message.value);
@@ -4042,6 +4154,7 @@ function createBaseMsgUnlinkIdentity(): MsgUnlinkIdentity {
  */
 export const MsgUnlinkIdentity = {
   typeUrl: "/sparkdream.federation.v1.MsgUnlinkIdentity",
+  aminoType: "sparkdream/x/federation/MsgUnlinkIdentity",
   encode(message: MsgUnlinkIdentity, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4095,6 +4208,12 @@ export const MsgUnlinkIdentity = {
   },
   fromAminoMsg(object: MsgUnlinkIdentityAminoMsg): MsgUnlinkIdentity {
     return MsgUnlinkIdentity.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUnlinkIdentity): MsgUnlinkIdentityAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgUnlinkIdentity",
+      value: MsgUnlinkIdentity.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUnlinkIdentityProtoMsg): MsgUnlinkIdentity {
     return MsgUnlinkIdentity.decode(message.value);
@@ -4177,6 +4296,7 @@ function createBaseMsgConfirmIdentityLink(): MsgConfirmIdentityLink {
  */
 export const MsgConfirmIdentityLink = {
   typeUrl: "/sparkdream.federation.v1.MsgConfirmIdentityLink",
+  aminoType: "sparkdream/x/federation/MsgConfirmIdentityLink",
   encode(message: MsgConfirmIdentityLink, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4230,6 +4350,12 @@ export const MsgConfirmIdentityLink = {
   },
   fromAminoMsg(object: MsgConfirmIdentityLinkAminoMsg): MsgConfirmIdentityLink {
     return MsgConfirmIdentityLink.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgConfirmIdentityLink): MsgConfirmIdentityLinkAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgConfirmIdentityLink",
+      value: MsgConfirmIdentityLink.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgConfirmIdentityLinkProtoMsg): MsgConfirmIdentityLink {
     return MsgConfirmIdentityLink.decode(message.value);
@@ -4313,6 +4439,7 @@ function createBaseMsgRequestReputationAttestation(): MsgRequestReputationAttest
  */
 export const MsgRequestReputationAttestation = {
   typeUrl: "/sparkdream.federation.v1.MsgRequestReputationAttestation",
+  aminoType: "sparkdream/x/federation/MsgRequestReputationAttestation",
   encode(message: MsgRequestReputationAttestation, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4377,6 +4504,12 @@ export const MsgRequestReputationAttestation = {
   },
   fromAminoMsg(object: MsgRequestReputationAttestationAminoMsg): MsgRequestReputationAttestation {
     return MsgRequestReputationAttestation.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRequestReputationAttestation): MsgRequestReputationAttestationAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgRequestReputationAttestation",
+      value: MsgRequestReputationAttestation.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgRequestReputationAttestationProtoMsg): MsgRequestReputationAttestation {
     return MsgRequestReputationAttestation.decode(message.value);
@@ -4460,6 +4593,7 @@ function createBaseMsgVerifyContent(): MsgVerifyContent {
  */
 export const MsgVerifyContent = {
   typeUrl: "/sparkdream.federation.v1.MsgVerifyContent",
+  aminoType: "sparkdream/x/federation/MsgVerifyContent",
   encode(message: MsgVerifyContent, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4524,6 +4658,12 @@ export const MsgVerifyContent = {
   },
   fromAminoMsg(object: MsgVerifyContentAminoMsg): MsgVerifyContent {
     return MsgVerifyContent.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgVerifyContent): MsgVerifyContentAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgVerifyContent",
+      value: MsgVerifyContent.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgVerifyContentProtoMsg): MsgVerifyContent {
     return MsgVerifyContent.decode(message.value);
@@ -4608,6 +4748,7 @@ function createBaseMsgChallengeVerification(): MsgChallengeVerification {
  */
 export const MsgChallengeVerification = {
   typeUrl: "/sparkdream.federation.v1.MsgChallengeVerification",
+  aminoType: "sparkdream/x/federation/MsgChallengeVerification",
   encode(message: MsgChallengeVerification, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4683,6 +4824,12 @@ export const MsgChallengeVerification = {
   },
   fromAminoMsg(object: MsgChallengeVerificationAminoMsg): MsgChallengeVerification {
     return MsgChallengeVerification.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgChallengeVerification): MsgChallengeVerificationAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgChallengeVerification",
+      value: MsgChallengeVerification.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgChallengeVerificationProtoMsg): MsgChallengeVerification {
     return MsgChallengeVerification.decode(message.value);
@@ -4766,6 +4913,7 @@ function createBaseMsgSubmitArbiterHash(): MsgSubmitArbiterHash {
  */
 export const MsgSubmitArbiterHash = {
   typeUrl: "/sparkdream.federation.v1.MsgSubmitArbiterHash",
+  aminoType: "sparkdream/x/federation/MsgSubmitArbiterHash",
   encode(message: MsgSubmitArbiterHash, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4830,6 +4978,12 @@ export const MsgSubmitArbiterHash = {
   },
   fromAminoMsg(object: MsgSubmitArbiterHashAminoMsg): MsgSubmitArbiterHash {
     return MsgSubmitArbiterHash.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSubmitArbiterHash): MsgSubmitArbiterHashAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgSubmitArbiterHash",
+      value: MsgSubmitArbiterHash.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgSubmitArbiterHashProtoMsg): MsgSubmitArbiterHash {
     return MsgSubmitArbiterHash.decode(message.value);
@@ -4912,6 +5066,7 @@ function createBaseMsgEscalateChallenge(): MsgEscalateChallenge {
  */
 export const MsgEscalateChallenge = {
   typeUrl: "/sparkdream.federation.v1.MsgEscalateChallenge",
+  aminoType: "sparkdream/x/federation/MsgEscalateChallenge",
   encode(message: MsgEscalateChallenge, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4965,6 +5120,12 @@ export const MsgEscalateChallenge = {
   },
   fromAminoMsg(object: MsgEscalateChallengeAminoMsg): MsgEscalateChallenge {
     return MsgEscalateChallenge.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgEscalateChallenge): MsgEscalateChallengeAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgEscalateChallenge",
+      value: MsgEscalateChallenge.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgEscalateChallengeProtoMsg): MsgEscalateChallenge {
     return MsgEscalateChallenge.decode(message.value);
@@ -5047,6 +5208,7 @@ function createBaseMsgUpdateOperationalParams(): MsgUpdateOperationalParams {
  */
 export const MsgUpdateOperationalParams = {
   typeUrl: "/sparkdream.federation.v1.MsgUpdateOperationalParams",
+  aminoType: "sparkdream/x/federation/MsgUpdateOperationalParams",
   encode(message: MsgUpdateOperationalParams, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -5100,6 +5262,12 @@ export const MsgUpdateOperationalParams = {
   },
   fromAminoMsg(object: MsgUpdateOperationalParamsAminoMsg): MsgUpdateOperationalParams {
     return MsgUpdateOperationalParams.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUpdateOperationalParams): MsgUpdateOperationalParamsAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgUpdateOperationalParams",
+      value: MsgUpdateOperationalParams.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUpdateOperationalParamsProtoMsg): MsgUpdateOperationalParams {
     return MsgUpdateOperationalParams.decode(message.value);

@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetPolicyPermissionsRequest, QueryGetPolicyPermissionsResponse, QueryAllPolicyPermissionsRequest, QueryAllPolicyPermissionsResponse, QueryGetGroupRequest, QueryGetGroupResponse, QueryAllGroupRequest, QueryAllGroupResponse, QueryGetCouncilMembersRequest, QueryGetCouncilMembersResponse, QueryGetProposalRequest, QueryGetProposalResponse, QueryListProposalsRequest, QueryListProposalsResponse, QueryGetProposalVotesRequest, QueryGetProposalVotesResponse, QueryGetCategoryRequest, QueryGetCategoryResponse, QueryAllCategoryRequest, QueryAllCategoryResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetPolicyPermissionsRequest, QueryGetPolicyPermissionsResponse, QueryAllPolicyPermissionsRequest, QueryAllPolicyPermissionsResponse, QueryGetDecisionPolicyRequest, QueryGetDecisionPolicyResponse, QueryAllDecisionPoliciesRequest, QueryAllDecisionPoliciesResponse, QueryGetGroupRequest, QueryGetGroupResponse, QueryAllGroupRequest, QueryAllGroupResponse, QueryGetCouncilMembersRequest, QueryGetCouncilMembersResponse, QueryGetProposalRequest, QueryGetProposalResponse, QueryListProposalsRequest, QueryListProposalsResponse, QueryGetProposalVotesRequest, QueryGetProposalVotesResponse, QueryGetCategoryRequest, QueryGetCategoryResponse, QueryAllCategoryRequest, QueryAllCategoryResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -11,6 +11,17 @@ export interface Query {
   getPolicyPermissions(request: QueryGetPolicyPermissionsRequest): Promise<QueryGetPolicyPermissionsResponse>;
   /** ListPolicyPermissions defines the ListPolicyPermissions RPC. */
   listPolicyPermissions(request?: QueryAllPolicyPermissionsRequest): Promise<QueryAllPolicyPermissionsResponse>;
+  /**
+   * GetDecisionPolicy returns the DecisionPolicy (voting threshold, voting
+   * period, min execution period) for a given council policy address. Read-only.
+   */
+  getDecisionPolicy(request: QueryGetDecisionPolicyRequest): Promise<QueryGetDecisionPolicyResponse>;
+  /**
+   * ListDecisionPolicies returns every stored DecisionPolicy paginated, paired
+   * with its policy_address. Useful for UIs that want to render every council's
+   * voting rules in one pass.
+   */
+  listDecisionPolicies(request?: QueryAllDecisionPoliciesRequest): Promise<QueryAllDecisionPoliciesResponse>;
   /** GetGroup queries a specific group by name. */
   getGroup(request: QueryGetGroupRequest): Promise<QueryGetGroupResponse>;
   /** ListGroups queries all groups. */
@@ -52,6 +63,23 @@ export class QueryClientImpl implements Query {
     const data = QueryAllPolicyPermissionsRequest.encode(request).finish();
     const promise = this.rpc.request("sparkdream.commons.v1.Query", "ListPolicyPermissions", data);
     return promise.then(data => QueryAllPolicyPermissionsResponse.decode(new BinaryReader(data)));
+  };
+  /* GetDecisionPolicy returns the DecisionPolicy (voting threshold, voting
+   period, min execution period) for a given council policy address. Read-only. */
+  getDecisionPolicy = async (request: QueryGetDecisionPolicyRequest): Promise<QueryGetDecisionPolicyResponse> => {
+    const data = QueryGetDecisionPolicyRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Query", "GetDecisionPolicy", data);
+    return promise.then(data => QueryGetDecisionPolicyResponse.decode(new BinaryReader(data)));
+  };
+  /* ListDecisionPolicies returns every stored DecisionPolicy paginated, paired
+   with its policy_address. Useful for UIs that want to render every council's
+   voting rules in one pass. */
+  listDecisionPolicies = async (request: QueryAllDecisionPoliciesRequest = {
+    pagination: undefined
+  }): Promise<QueryAllDecisionPoliciesResponse> => {
+    const data = QueryAllDecisionPoliciesRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Query", "ListDecisionPolicies", data);
+    return promise.then(data => QueryAllDecisionPoliciesResponse.decode(new BinaryReader(data)));
   };
   /* GetGroup queries a specific group by name. */
   getGroup = async (request: QueryGetGroupRequest): Promise<QueryGetGroupResponse> => {
@@ -118,6 +146,12 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     listPolicyPermissions(request?: QueryAllPolicyPermissionsRequest): Promise<QueryAllPolicyPermissionsResponse> {
       return queryService.listPolicyPermissions(request);
+    },
+    getDecisionPolicy(request: QueryGetDecisionPolicyRequest): Promise<QueryGetDecisionPolicyResponse> {
+      return queryService.getDecisionPolicy(request);
+    },
+    listDecisionPolicies(request?: QueryAllDecisionPoliciesRequest): Promise<QueryAllDecisionPoliciesResponse> {
+      return queryService.listDecisionPolicies(request);
     },
     getGroup(request: QueryGetGroupRequest): Promise<QueryGetGroupResponse> {
       return queryService.getGroup(request);

@@ -201,7 +201,7 @@ export interface MsgCreatePostAmino {
   tags?: string[];
 }
 export interface MsgCreatePostAminoMsg {
-  type: "/sparkdream.blog.v1.MsgCreatePost";
+  type: "sparkdream/x/blog/MsgCreatePost";
   value: MsgCreatePostAmino;
 }
 /**
@@ -279,7 +279,7 @@ export interface MsgUpdatePostAmino {
   tags?: string[];
 }
 export interface MsgUpdatePostAminoMsg {
-  type: "/sparkdream.blog.v1.MsgUpdatePost";
+  type: "sparkdream/x/blog/MsgUpdatePost";
   value: MsgUpdatePostAmino;
 }
 /**
@@ -329,7 +329,7 @@ export interface MsgDeletePostAmino {
   id?: string;
 }
 export interface MsgDeletePostAminoMsg {
-  type: "/sparkdream.blog.v1.MsgDeletePost";
+  type: "sparkdream/x/blog/MsgDeletePost";
   value: MsgDeletePostAmino;
 }
 /**
@@ -379,7 +379,7 @@ export interface MsgHidePostAmino {
   id?: string;
 }
 export interface MsgHidePostAminoMsg {
-  type: "/sparkdream.blog.v1.MsgHidePost";
+  type: "sparkdream/x/blog/MsgHidePost";
   value: MsgHidePostAmino;
 }
 /**
@@ -429,7 +429,7 @@ export interface MsgUnhidePostAmino {
   id?: string;
 }
 export interface MsgUnhidePostAminoMsg {
-  type: "/sparkdream.blog.v1.MsgUnhidePost";
+  type: "sparkdream/x/blog/MsgUnhidePost";
   value: MsgUnhidePostAmino;
 }
 /**
@@ -493,7 +493,7 @@ export interface MsgCreateReplyAmino {
   author_bond?: string;
 }
 export interface MsgCreateReplyAminoMsg {
-  type: "/sparkdream.blog.v1.MsgCreateReply";
+  type: "sparkdream/x/blog/MsgCreateReply";
   value: MsgCreateReplyAmino;
 }
 /**
@@ -551,7 +551,7 @@ export interface MsgUpdateReplyAmino {
   content_type?: ContentType;
 }
 export interface MsgUpdateReplyAminoMsg {
-  type: "/sparkdream.blog.v1.MsgUpdateReply";
+  type: "sparkdream/x/blog/MsgUpdateReply";
   value: MsgUpdateReplyAmino;
 }
 /**
@@ -601,7 +601,7 @@ export interface MsgDeleteReplyAmino {
   id?: string;
 }
 export interface MsgDeleteReplyAminoMsg {
-  type: "/sparkdream.blog.v1.MsgDeleteReply";
+  type: "sparkdream/x/blog/MsgDeleteReply";
   value: MsgDeleteReplyAmino;
 }
 /**
@@ -651,7 +651,7 @@ export interface MsgHideReplyAmino {
   id?: string;
 }
 export interface MsgHideReplyAminoMsg {
-  type: "/sparkdream.blog.v1.MsgHideReply";
+  type: "sparkdream/x/blog/MsgHideReply";
   value: MsgHideReplyAmino;
 }
 /**
@@ -701,7 +701,7 @@ export interface MsgUnhideReplyAmino {
   id?: string;
 }
 export interface MsgUnhideReplyAminoMsg {
-  type: "/sparkdream.blog.v1.MsgUnhideReply";
+  type: "sparkdream/x/blog/MsgUnhideReply";
   value: MsgUnhideReplyAmino;
 }
 /**
@@ -761,7 +761,7 @@ export interface MsgReactAmino {
   reaction_type?: ReactionType;
 }
 export interface MsgReactAminoMsg {
-  type: "/sparkdream.blog.v1.MsgReact";
+  type: "sparkdream/x/blog/MsgReact";
   value: MsgReactAmino;
 }
 /**
@@ -813,7 +813,7 @@ export interface MsgRemoveReactionAmino {
   reply_id?: string;
 }
 export interface MsgRemoveReactionAminoMsg {
-  type: "/sparkdream.blog.v1.MsgRemoveReaction";
+  type: "sparkdream/x/blog/MsgRemoveReaction";
   value: MsgRemoveReactionAmino;
 }
 /**
@@ -863,7 +863,7 @@ export interface MsgPinPostAmino {
   id?: string;
 }
 export interface MsgPinPostAminoMsg {
-  type: "/sparkdream.blog.v1.MsgPinPost";
+  type: "sparkdream/x/blog/MsgPinPost";
   value: MsgPinPostAmino;
 }
 /**
@@ -913,7 +913,7 @@ export interface MsgPinReplyAmino {
   id?: string;
 }
 export interface MsgPinReplyAminoMsg {
-  type: "/sparkdream.blog.v1.MsgPinReply";
+  type: "sparkdream/x/blog/MsgPinReply";
   value: MsgPinReplyAmino;
 }
 /**
@@ -1249,6 +1249,7 @@ function createBaseMsgCreatePost(): MsgCreatePost {
  */
 export const MsgCreatePost = {
   typeUrl: "/sparkdream.blog.v1.MsgCreatePost",
+  aminoType: "sparkdream/x/blog/MsgCreatePost",
   encode(message: MsgCreatePost, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -1371,6 +1372,12 @@ export const MsgCreatePost = {
   fromAminoMsg(object: MsgCreatePostAminoMsg): MsgCreatePost {
     return MsgCreatePost.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgCreatePost): MsgCreatePostAminoMsg {
+    return {
+      type: "sparkdream/x/blog/MsgCreatePost",
+      value: MsgCreatePost.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgCreatePostProtoMsg): MsgCreatePost {
     return MsgCreatePost.decode(message.value);
   },
@@ -1473,6 +1480,7 @@ function createBaseMsgUpdatePost(): MsgUpdatePost {
  */
 export const MsgUpdatePost = {
   typeUrl: "/sparkdream.blog.v1.MsgUpdatePost",
+  aminoType: "sparkdream/x/blog/MsgUpdatePost",
   encode(message: MsgUpdatePost, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -1595,6 +1603,12 @@ export const MsgUpdatePost = {
   fromAminoMsg(object: MsgUpdatePostAminoMsg): MsgUpdatePost {
     return MsgUpdatePost.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgUpdatePost): MsgUpdatePostAminoMsg {
+    return {
+      type: "sparkdream/x/blog/MsgUpdatePost",
+      value: MsgUpdatePost.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgUpdatePostProtoMsg): MsgUpdatePost {
     return MsgUpdatePost.decode(message.value);
   },
@@ -1678,6 +1692,7 @@ function createBaseMsgDeletePost(): MsgDeletePost {
  */
 export const MsgDeletePost = {
   typeUrl: "/sparkdream.blog.v1.MsgDeletePost",
+  aminoType: "sparkdream/x/blog/MsgDeletePost",
   encode(message: MsgDeletePost, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -1731,6 +1746,12 @@ export const MsgDeletePost = {
   },
   fromAminoMsg(object: MsgDeletePostAminoMsg): MsgDeletePost {
     return MsgDeletePost.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgDeletePost): MsgDeletePostAminoMsg {
+    return {
+      type: "sparkdream/x/blog/MsgDeletePost",
+      value: MsgDeletePost.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgDeletePostProtoMsg): MsgDeletePost {
     return MsgDeletePost.decode(message.value);
@@ -1815,6 +1836,7 @@ function createBaseMsgHidePost(): MsgHidePost {
  */
 export const MsgHidePost = {
   typeUrl: "/sparkdream.blog.v1.MsgHidePost",
+  aminoType: "sparkdream/x/blog/MsgHidePost",
   encode(message: MsgHidePost, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -1868,6 +1890,12 @@ export const MsgHidePost = {
   },
   fromAminoMsg(object: MsgHidePostAminoMsg): MsgHidePost {
     return MsgHidePost.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgHidePost): MsgHidePostAminoMsg {
+    return {
+      type: "sparkdream/x/blog/MsgHidePost",
+      value: MsgHidePost.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgHidePostProtoMsg): MsgHidePost {
     return MsgHidePost.decode(message.value);
@@ -1952,6 +1980,7 @@ function createBaseMsgUnhidePost(): MsgUnhidePost {
  */
 export const MsgUnhidePost = {
   typeUrl: "/sparkdream.blog.v1.MsgUnhidePost",
+  aminoType: "sparkdream/x/blog/MsgUnhidePost",
   encode(message: MsgUnhidePost, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -2005,6 +2034,12 @@ export const MsgUnhidePost = {
   },
   fromAminoMsg(object: MsgUnhidePostAminoMsg): MsgUnhidePost {
     return MsgUnhidePost.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUnhidePost): MsgUnhidePostAminoMsg {
+    return {
+      type: "sparkdream/x/blog/MsgUnhidePost",
+      value: MsgUnhidePost.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUnhidePostProtoMsg): MsgUnhidePost {
     return MsgUnhidePost.decode(message.value);
@@ -2093,6 +2128,7 @@ function createBaseMsgCreateReply(): MsgCreateReply {
  */
 export const MsgCreateReply = {
   typeUrl: "/sparkdream.blog.v1.MsgCreateReply",
+  aminoType: "sparkdream/x/blog/MsgCreateReply",
   encode(message: MsgCreateReply, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -2190,6 +2226,12 @@ export const MsgCreateReply = {
   },
   fromAminoMsg(object: MsgCreateReplyAminoMsg): MsgCreateReply {
     return MsgCreateReply.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCreateReply): MsgCreateReplyAminoMsg {
+    return {
+      type: "sparkdream/x/blog/MsgCreateReply",
+      value: MsgCreateReply.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgCreateReplyProtoMsg): MsgCreateReply {
     return MsgCreateReply.decode(message.value);
@@ -2289,6 +2331,7 @@ function createBaseMsgUpdateReply(): MsgUpdateReply {
  */
 export const MsgUpdateReply = {
   typeUrl: "/sparkdream.blog.v1.MsgUpdateReply",
+  aminoType: "sparkdream/x/blog/MsgUpdateReply",
   encode(message: MsgUpdateReply, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -2364,6 +2407,12 @@ export const MsgUpdateReply = {
   },
   fromAminoMsg(object: MsgUpdateReplyAminoMsg): MsgUpdateReply {
     return MsgUpdateReply.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUpdateReply): MsgUpdateReplyAminoMsg {
+    return {
+      type: "sparkdream/x/blog/MsgUpdateReply",
+      value: MsgUpdateReply.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUpdateReplyProtoMsg): MsgUpdateReply {
     return MsgUpdateReply.decode(message.value);
@@ -2448,6 +2497,7 @@ function createBaseMsgDeleteReply(): MsgDeleteReply {
  */
 export const MsgDeleteReply = {
   typeUrl: "/sparkdream.blog.v1.MsgDeleteReply",
+  aminoType: "sparkdream/x/blog/MsgDeleteReply",
   encode(message: MsgDeleteReply, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -2501,6 +2551,12 @@ export const MsgDeleteReply = {
   },
   fromAminoMsg(object: MsgDeleteReplyAminoMsg): MsgDeleteReply {
     return MsgDeleteReply.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgDeleteReply): MsgDeleteReplyAminoMsg {
+    return {
+      type: "sparkdream/x/blog/MsgDeleteReply",
+      value: MsgDeleteReply.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgDeleteReplyProtoMsg): MsgDeleteReply {
     return MsgDeleteReply.decode(message.value);
@@ -2585,6 +2641,7 @@ function createBaseMsgHideReply(): MsgHideReply {
  */
 export const MsgHideReply = {
   typeUrl: "/sparkdream.blog.v1.MsgHideReply",
+  aminoType: "sparkdream/x/blog/MsgHideReply",
   encode(message: MsgHideReply, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -2638,6 +2695,12 @@ export const MsgHideReply = {
   },
   fromAminoMsg(object: MsgHideReplyAminoMsg): MsgHideReply {
     return MsgHideReply.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgHideReply): MsgHideReplyAminoMsg {
+    return {
+      type: "sparkdream/x/blog/MsgHideReply",
+      value: MsgHideReply.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgHideReplyProtoMsg): MsgHideReply {
     return MsgHideReply.decode(message.value);
@@ -2722,6 +2785,7 @@ function createBaseMsgUnhideReply(): MsgUnhideReply {
  */
 export const MsgUnhideReply = {
   typeUrl: "/sparkdream.blog.v1.MsgUnhideReply",
+  aminoType: "sparkdream/x/blog/MsgUnhideReply",
   encode(message: MsgUnhideReply, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -2775,6 +2839,12 @@ export const MsgUnhideReply = {
   },
   fromAminoMsg(object: MsgUnhideReplyAminoMsg): MsgUnhideReply {
     return MsgUnhideReply.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUnhideReply): MsgUnhideReplyAminoMsg {
+    return {
+      type: "sparkdream/x/blog/MsgUnhideReply",
+      value: MsgUnhideReply.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUnhideReplyProtoMsg): MsgUnhideReply {
     return MsgUnhideReply.decode(message.value);
@@ -2861,6 +2931,7 @@ function createBaseMsgReact(): MsgReact {
  */
 export const MsgReact = {
   typeUrl: "/sparkdream.blog.v1.MsgReact",
+  aminoType: "sparkdream/x/blog/MsgReact",
   encode(message: MsgReact, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -2936,6 +3007,12 @@ export const MsgReact = {
   },
   fromAminoMsg(object: MsgReactAminoMsg): MsgReact {
     return MsgReact.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgReact): MsgReactAminoMsg {
+    return {
+      type: "sparkdream/x/blog/MsgReact",
+      value: MsgReact.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgReactProtoMsg): MsgReact {
     return MsgReact.decode(message.value);
@@ -3021,6 +3098,7 @@ function createBaseMsgRemoveReaction(): MsgRemoveReaction {
  */
 export const MsgRemoveReaction = {
   typeUrl: "/sparkdream.blog.v1.MsgRemoveReaction",
+  aminoType: "sparkdream/x/blog/MsgRemoveReaction",
   encode(message: MsgRemoveReaction, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3085,6 +3163,12 @@ export const MsgRemoveReaction = {
   },
   fromAminoMsg(object: MsgRemoveReactionAminoMsg): MsgRemoveReaction {
     return MsgRemoveReaction.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRemoveReaction): MsgRemoveReactionAminoMsg {
+    return {
+      type: "sparkdream/x/blog/MsgRemoveReaction",
+      value: MsgRemoveReaction.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgRemoveReactionProtoMsg): MsgRemoveReaction {
     return MsgRemoveReaction.decode(message.value);
@@ -3169,6 +3253,7 @@ function createBaseMsgPinPost(): MsgPinPost {
  */
 export const MsgPinPost = {
   typeUrl: "/sparkdream.blog.v1.MsgPinPost",
+  aminoType: "sparkdream/x/blog/MsgPinPost",
   encode(message: MsgPinPost, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3222,6 +3307,12 @@ export const MsgPinPost = {
   },
   fromAminoMsg(object: MsgPinPostAminoMsg): MsgPinPost {
     return MsgPinPost.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgPinPost): MsgPinPostAminoMsg {
+    return {
+      type: "sparkdream/x/blog/MsgPinPost",
+      value: MsgPinPost.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgPinPostProtoMsg): MsgPinPost {
     return MsgPinPost.decode(message.value);
@@ -3306,6 +3397,7 @@ function createBaseMsgPinReply(): MsgPinReply {
  */
 export const MsgPinReply = {
   typeUrl: "/sparkdream.blog.v1.MsgPinReply",
+  aminoType: "sparkdream/x/blog/MsgPinReply",
   encode(message: MsgPinReply, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3359,6 +3451,12 @@ export const MsgPinReply = {
   },
   fromAminoMsg(object: MsgPinReplyAminoMsg): MsgPinReply {
     return MsgPinReply.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgPinReply): MsgPinReplyAminoMsg {
+    return {
+      type: "sparkdream/x/blog/MsgPinReply",
+      value: MsgPinReply.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgPinReplyProtoMsg): MsgPinReply {
     return MsgPinReply.decode(message.value);

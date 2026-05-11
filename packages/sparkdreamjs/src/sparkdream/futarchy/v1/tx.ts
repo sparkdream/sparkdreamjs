@@ -169,7 +169,7 @@ export interface MsgCreateMarketAmino {
   end_block?: string;
 }
 export interface MsgCreateMarketAminoMsg {
-  type: "/sparkdream.futarchy.v1.MsgCreateMarket";
+  type: "sparkdream/x/futarchy/MsgCreateMarket";
   value: MsgCreateMarketAmino;
 }
 /**
@@ -227,7 +227,7 @@ export interface MsgTradeAmino {
   amount_in?: string;
 }
 export interface MsgTradeAminoMsg {
-  type: "/sparkdream.futarchy.v1.MsgTrade";
+  type: "sparkdream/x/futarchy/MsgTrade";
   value: MsgTradeAmino;
 }
 /**
@@ -281,7 +281,7 @@ export interface MsgRedeemAmino {
   market_id?: string;
 }
 export interface MsgRedeemAminoMsg {
-  type: "/sparkdream.futarchy.v1.MsgRedeem";
+  type: "sparkdream/x/futarchy/MsgRedeem";
   value: MsgRedeemAmino;
 }
 /**
@@ -389,7 +389,7 @@ export interface MsgWithdrawLiquidityAmino {
   market_id?: string;
 }
 export interface MsgWithdrawLiquidityAminoMsg {
-  type: "/sparkdream.futarchy.v1.MsgWithdrawLiquidity";
+  type: "sparkdream/x/futarchy/MsgWithdrawLiquidity";
   value: MsgWithdrawLiquidityAmino;
 }
 /**
@@ -726,6 +726,7 @@ function createBaseMsgCreateMarket(): MsgCreateMarket {
  */
 export const MsgCreateMarket = {
   typeUrl: "/sparkdream.futarchy.v1.MsgCreateMarket",
+  aminoType: "sparkdream/x/futarchy/MsgCreateMarket",
   encode(message: MsgCreateMarket, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -812,6 +813,12 @@ export const MsgCreateMarket = {
   },
   fromAminoMsg(object: MsgCreateMarketAminoMsg): MsgCreateMarket {
     return MsgCreateMarket.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCreateMarket): MsgCreateMarketAminoMsg {
+    return {
+      type: "sparkdream/x/futarchy/MsgCreateMarket",
+      value: MsgCreateMarket.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgCreateMarketProtoMsg): MsgCreateMarket {
     return MsgCreateMarket.decode(message.value);
@@ -911,6 +918,7 @@ function createBaseMsgTrade(): MsgTrade {
  */
 export const MsgTrade = {
   typeUrl: "/sparkdream.futarchy.v1.MsgTrade",
+  aminoType: "sparkdream/x/futarchy/MsgTrade",
   encode(message: MsgTrade, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -986,6 +994,12 @@ export const MsgTrade = {
   },
   fromAminoMsg(object: MsgTradeAminoMsg): MsgTrade {
     return MsgTrade.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgTrade): MsgTradeAminoMsg {
+    return {
+      type: "sparkdream/x/futarchy/MsgTrade",
+      value: MsgTrade.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgTradeProtoMsg): MsgTrade {
     return MsgTrade.decode(message.value);
@@ -1083,6 +1097,7 @@ function createBaseMsgRedeem(): MsgRedeem {
  */
 export const MsgRedeem = {
   typeUrl: "/sparkdream.futarchy.v1.MsgRedeem",
+  aminoType: "sparkdream/x/futarchy/MsgRedeem",
   encode(message: MsgRedeem, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -1136,6 +1151,12 @@ export const MsgRedeem = {
   },
   fromAminoMsg(object: MsgRedeemAminoMsg): MsgRedeem {
     return MsgRedeem.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRedeem): MsgRedeemAminoMsg {
+    return {
+      type: "sparkdream/x/futarchy/MsgRedeem",
+      value: MsgRedeem.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgRedeemProtoMsg): MsgRedeem {
     return MsgRedeem.decode(message.value);
@@ -1376,6 +1397,7 @@ function createBaseMsgWithdrawLiquidity(): MsgWithdrawLiquidity {
  */
 export const MsgWithdrawLiquidity = {
   typeUrl: "/sparkdream.futarchy.v1.MsgWithdrawLiquidity",
+  aminoType: "sparkdream/x/futarchy/MsgWithdrawLiquidity",
   encode(message: MsgWithdrawLiquidity, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -1429,6 +1451,12 @@ export const MsgWithdrawLiquidity = {
   },
   fromAminoMsg(object: MsgWithdrawLiquidityAminoMsg): MsgWithdrawLiquidity {
     return MsgWithdrawLiquidity.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgWithdrawLiquidity): MsgWithdrawLiquidityAminoMsg {
+    return {
+      type: "sparkdream/x/futarchy/MsgWithdrawLiquidity",
+      value: MsgWithdrawLiquidity.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgWithdrawLiquidityProtoMsg): MsgWithdrawLiquidity {
     return MsgWithdrawLiquidity.decode(message.value);

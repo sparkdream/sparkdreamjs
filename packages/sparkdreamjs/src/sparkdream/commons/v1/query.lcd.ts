@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetPolicyPermissionsRequest, QueryGetPolicyPermissionsResponse, QueryAllPolicyPermissionsRequest, QueryAllPolicyPermissionsResponse, QueryGetGroupRequest, QueryGetGroupResponse, QueryAllGroupRequest, QueryAllGroupResponse, QueryGetCouncilMembersRequest, QueryGetCouncilMembersResponse, QueryGetProposalRequest, QueryGetProposalResponse, QueryListProposalsRequest, QueryListProposalsResponse, QueryGetProposalVotesRequest, QueryGetProposalVotesResponse, QueryGetCategoryRequest, QueryGetCategoryResponse, QueryAllCategoryRequest, QueryAllCategoryResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetPolicyPermissionsRequest, QueryGetPolicyPermissionsResponse, QueryAllPolicyPermissionsRequest, QueryAllPolicyPermissionsResponse, QueryGetDecisionPolicyRequest, QueryGetDecisionPolicyResponse, QueryAllDecisionPoliciesRequest, QueryAllDecisionPoliciesResponse, QueryGetGroupRequest, QueryGetGroupResponse, QueryAllGroupRequest, QueryAllGroupResponse, QueryGetCouncilMembersRequest, QueryGetCouncilMembersResponse, QueryGetProposalRequest, QueryGetProposalResponse, QueryListProposalsRequest, QueryListProposalsResponse, QueryGetProposalVotesRequest, QueryGetProposalVotesResponse, QueryGetCategoryRequest, QueryGetCategoryResponse, QueryAllCategoryRequest, QueryAllCategoryResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -33,6 +33,27 @@ export class LCDQueryClient {
     }
     const endpoint = `sparkdream/commons/v1/policy_permissions`;
     return await this.req.get<QueryAllPolicyPermissionsResponse>(endpoint, options);
+  };
+  /* GetDecisionPolicy returns the DecisionPolicy (voting threshold, voting
+   period, min execution period) for a given council policy address. Read-only. */
+  getDecisionPolicy = async (params: QueryGetDecisionPolicyRequest): Promise<QueryGetDecisionPolicyResponse> => {
+    const endpoint = `sparkdream/commons/v1/decision_policy/${params.policyAddress}`;
+    return await this.req.get<QueryGetDecisionPolicyResponse>(endpoint);
+  };
+  /* ListDecisionPolicies returns every stored DecisionPolicy paginated, paired
+   with its policy_address. Useful for UIs that want to render every council's
+   voting rules in one pass. */
+  listDecisionPolicies = async (params: QueryAllDecisionPoliciesRequest = {
+    pagination: undefined
+  }): Promise<QueryAllDecisionPoliciesResponse> => {
+    const options: any = {
+      params: {}
+    };
+    if (typeof params?.pagination !== "undefined") {
+      setPaginationParams(options, params.pagination);
+    }
+    const endpoint = `sparkdream/commons/v1/decision_policy`;
+    return await this.req.get<QueryAllDecisionPoliciesResponse>(endpoint, options);
   };
   /* GetGroup queries a specific group by name. */
   getGroup = async (params: QueryGetGroupRequest): Promise<QueryGetGroupResponse> => {

@@ -12,17 +12,17 @@ export const AminoConverter = {
     fromAmino: MsgUpdateOperationalParams.fromAmino
   },
   "/sparkdream.session.v1.MsgCreateSession": {
-    aminoType: "/sparkdream.session.v1.MsgCreateSession",
+    aminoType: "sparkdream/x/session/MsgCreateSession",
     toAmino: MsgCreateSession.toAmino,
     fromAmino: MsgCreateSession.fromAmino
   },
   "/sparkdream.session.v1.MsgRevokeSession": {
-    aminoType: "/sparkdream.session.v1.MsgRevokeSession",
+    aminoType: "sparkdream/x/session/MsgRevokeSession",
     toAmino: MsgRevokeSession.toAmino,
     fromAmino: MsgRevokeSession.fromAmino
   },
   "/sparkdream.session.v1.MsgExecSession": {
-    aminoType: "/sparkdream.session.v1.MsgExecSession",
+    aminoType: "sparkdream/x/session/MsgExecSession",
     toAmino: MsgExecSession.toAmino,
     fromAmino: MsgExecSession.fromAmino
   }

@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgRegisterName, MsgRegisterNameResponse, MsgSetPrimary, MsgSetPrimaryResponse, MsgFileDispute, MsgFileDisputeResponse, MsgContestDispute, MsgContestDisputeResponse, MsgResolveDispute, MsgResolveDisputeResponse, MsgUpdateName, MsgUpdateNameResponse, MsgSetDisplayName, MsgSetDisplayNameResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgRegisterName, MsgRegisterNameResponse, MsgSetPrimary, MsgSetPrimaryResponse, MsgFileDispute, MsgFileDisputeResponse, MsgContestDispute, MsgContestDisputeResponse, MsgResolveDispute, MsgResolveDisputeResponse, MsgUpdateName, MsgUpdateNameResponse, MsgSetDisplayName, MsgSetDisplayNameResponse, MsgSetTarget, MsgSetTargetResponse, MsgAcceptTarget, MsgAcceptTargetResponse, MsgTransferName, MsgTransferNameResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
@@ -34,6 +34,23 @@ export interface Msg {
    * signer's OwnerInfo. Empty display_name clears the field.
    */
   setDisplayName(request: MsgSetDisplayName): Promise<MsgSetDisplayNameResponse>;
+  /**
+   * SetTarget sets (or clears) the resolver target for an owned name.
+   * Forward resolution returns target when set, owner otherwise.
+   */
+  setTarget(request: MsgSetTarget): Promise<MsgSetTargetResponse>;
+  /**
+   * AcceptTarget consents to a name pointing at the signer's address.
+   * Required before the signer may set the name as primary for reverse
+   * resolution.
+   */
+  acceptTarget(request: MsgAcceptTarget): Promise<MsgAcceptTargetResponse>;
+  /**
+   * TransferName transfers ownership of a name from the current owner to a
+   * new owner. The recipient must be an active x/rep member. Rejected while
+   * the name has an active dispute.
+   */
+  transferName(request: MsgTransferName): Promise<MsgTransferNameResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -97,6 +114,29 @@ export class MsgClientImpl implements Msg {
     const data = MsgSetDisplayName.encode(request).finish();
     const promise = this.rpc.request("sparkdream.name.v1.Msg", "SetDisplayName", data);
     return promise.then(data => MsgSetDisplayNameResponse.decode(new BinaryReader(data)));
+  };
+  /* SetTarget sets (or clears) the resolver target for an owned name.
+   Forward resolution returns target when set, owner otherwise. */
+  setTarget = async (request: MsgSetTarget): Promise<MsgSetTargetResponse> => {
+    const data = MsgSetTarget.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.name.v1.Msg", "SetTarget", data);
+    return promise.then(data => MsgSetTargetResponse.decode(new BinaryReader(data)));
+  };
+  /* AcceptTarget consents to a name pointing at the signer's address.
+   Required before the signer may set the name as primary for reverse
+   resolution. */
+  acceptTarget = async (request: MsgAcceptTarget): Promise<MsgAcceptTargetResponse> => {
+    const data = MsgAcceptTarget.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.name.v1.Msg", "AcceptTarget", data);
+    return promise.then(data => MsgAcceptTargetResponse.decode(new BinaryReader(data)));
+  };
+  /* TransferName transfers ownership of a name from the current owner to a
+   new owner. The recipient must be an active x/rep member. Rejected while
+   the name has an active dispute. */
+  transferName = async (request: MsgTransferName): Promise<MsgTransferNameResponse> => {
+    const data = MsgTransferName.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.name.v1.Msg", "TransferName", data);
+    return promise.then(data => MsgTransferNameResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

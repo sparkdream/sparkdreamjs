@@ -118,7 +118,7 @@ export interface MsgProposeAmino {
   final_license?: string;
 }
 export interface MsgProposeAminoMsg {
-  type: "/sparkdream.reveal.v1.MsgPropose";
+  type: "sparkdream/x/reveal/MsgPropose";
   value: MsgProposeAmino;
 }
 /**
@@ -190,7 +190,7 @@ export interface MsgApproveAmino {
   contribution_id?: string;
 }
 export interface MsgApproveAminoMsg {
-  type: "/sparkdream.reveal.v1.MsgApprove";
+  type: "sparkdream/x/reveal/MsgApprove";
   value: MsgApproveAmino;
 }
 /**
@@ -256,7 +256,7 @@ export interface MsgRejectAmino {
   reason?: string;
 }
 export interface MsgRejectAminoMsg {
-  type: "/sparkdream.reveal.v1.MsgReject";
+  type: "sparkdream/x/reveal/MsgReject";
   value: MsgRejectAmino;
 }
 /**
@@ -320,7 +320,7 @@ export interface MsgStakeAmino {
   amount?: string;
 }
 export interface MsgStakeAminoMsg {
-  type: "/sparkdream.reveal.v1.MsgStake";
+  type: "sparkdream/x/reveal/MsgStake";
   value: MsgStakeAmino;
 }
 /**
@@ -374,7 +374,7 @@ export interface MsgWithdrawAmino {
   stake_id?: string;
 }
 export interface MsgWithdrawAminoMsg {
-  type: "/sparkdream.reveal.v1.MsgWithdraw";
+  type: "sparkdream/x/reveal/MsgWithdraw";
   value: MsgWithdrawAmino;
 }
 /**
@@ -430,7 +430,7 @@ export interface MsgRevealAmino {
   commit_hash?: string;
 }
 export interface MsgRevealAminoMsg {
-  type: "/sparkdream.reveal.v1.MsgReveal";
+  type: "sparkdream/x/reveal/MsgReveal";
   value: MsgRevealAmino;
 }
 /**
@@ -494,7 +494,7 @@ export interface MsgVerifyAmino {
   comments?: string;
 }
 export interface MsgVerifyAminoMsg {
-  type: "/sparkdream.reveal.v1.MsgVerify";
+  type: "sparkdream/x/reveal/MsgVerify";
   value: MsgVerifyAmino;
 }
 /**
@@ -552,7 +552,7 @@ export interface MsgCancelAmino {
   reason?: string;
 }
 export interface MsgCancelAminoMsg {
-  type: "/sparkdream.reveal.v1.MsgCancel";
+  type: "sparkdream/x/reveal/MsgCancel";
   value: MsgCancelAmino;
 }
 /**
@@ -628,7 +628,7 @@ export interface MsgResolveDisputeAmino {
   reason?: string;
 }
 export interface MsgResolveDisputeAminoMsg {
-  type: "/sparkdream.reveal.v1.MsgResolveDispute";
+  type: "sparkdream/x/reveal/MsgResolveDispute";
   value: MsgResolveDisputeAmino;
 }
 /**
@@ -822,6 +822,7 @@ function createBaseMsgPropose(): MsgPropose {
  */
 export const MsgPropose = {
   typeUrl: "/sparkdream.reveal.v1.MsgPropose",
+  aminoType: "sparkdream/x/reveal/MsgPropose",
   encode(message: MsgPropose, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.contributor !== "") {
       writer.uint32(10).string(message.contributor);
@@ -933,6 +934,12 @@ export const MsgPropose = {
   fromAminoMsg(object: MsgProposeAminoMsg): MsgPropose {
     return MsgPropose.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgPropose): MsgProposeAminoMsg {
+    return {
+      type: "sparkdream/x/reveal/MsgPropose",
+      value: MsgPropose.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgProposeProtoMsg): MsgPropose {
     return MsgPropose.decode(message.value);
   },
@@ -1032,6 +1039,7 @@ function createBaseMsgApprove(): MsgApprove {
  */
 export const MsgApprove = {
   typeUrl: "/sparkdream.reveal.v1.MsgApprove",
+  aminoType: "sparkdream/x/reveal/MsgApprove",
   encode(message: MsgApprove, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -1096,6 +1104,12 @@ export const MsgApprove = {
   },
   fromAminoMsg(object: MsgApproveAminoMsg): MsgApprove {
     return MsgApprove.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgApprove): MsgApproveAminoMsg {
+    return {
+      type: "sparkdream/x/reveal/MsgApprove",
+      value: MsgApprove.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgApproveProtoMsg): MsgApprove {
     return MsgApprove.decode(message.value);
@@ -1182,6 +1196,7 @@ function createBaseMsgReject(): MsgReject {
  */
 export const MsgReject = {
   typeUrl: "/sparkdream.reveal.v1.MsgReject",
+  aminoType: "sparkdream/x/reveal/MsgReject",
   encode(message: MsgReject, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -1257,6 +1272,12 @@ export const MsgReject = {
   },
   fromAminoMsg(object: MsgRejectAminoMsg): MsgReject {
     return MsgReject.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgReject): MsgRejectAminoMsg {
+    return {
+      type: "sparkdream/x/reveal/MsgReject",
+      value: MsgReject.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgRejectProtoMsg): MsgReject {
     return MsgReject.decode(message.value);
@@ -1348,6 +1369,7 @@ function createBaseMsgStake(): MsgStake {
  */
 export const MsgStake = {
   typeUrl: "/sparkdream.reveal.v1.MsgStake",
+  aminoType: "sparkdream/x/reveal/MsgStake",
   encode(message: MsgStake, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.staker !== "") {
       writer.uint32(10).string(message.staker);
@@ -1423,6 +1445,12 @@ export const MsgStake = {
   },
   fromAminoMsg(object: MsgStakeAminoMsg): MsgStake {
     return MsgStake.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgStake): MsgStakeAminoMsg {
+    return {
+      type: "sparkdream/x/reveal/MsgStake",
+      value: MsgStake.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgStakeProtoMsg): MsgStake {
     return MsgStake.decode(message.value);
@@ -1520,6 +1548,7 @@ function createBaseMsgWithdraw(): MsgWithdraw {
  */
 export const MsgWithdraw = {
   typeUrl: "/sparkdream.reveal.v1.MsgWithdraw",
+  aminoType: "sparkdream/x/reveal/MsgWithdraw",
   encode(message: MsgWithdraw, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.staker !== "") {
       writer.uint32(10).string(message.staker);
@@ -1573,6 +1602,12 @@ export const MsgWithdraw = {
   },
   fromAminoMsg(object: MsgWithdrawAminoMsg): MsgWithdraw {
     return MsgWithdraw.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgWithdraw): MsgWithdrawAminoMsg {
+    return {
+      type: "sparkdream/x/reveal/MsgWithdraw",
+      value: MsgWithdraw.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgWithdrawProtoMsg): MsgWithdraw {
     return MsgWithdraw.decode(message.value);
@@ -1660,6 +1695,7 @@ function createBaseMsgReveal(): MsgReveal {
  */
 export const MsgReveal = {
   typeUrl: "/sparkdream.reveal.v1.MsgReveal",
+  aminoType: "sparkdream/x/reveal/MsgReveal",
   encode(message: MsgReveal, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.contributor !== "") {
       writer.uint32(10).string(message.contributor);
@@ -1758,6 +1794,12 @@ export const MsgReveal = {
   fromAminoMsg(object: MsgRevealAminoMsg): MsgReveal {
     return MsgReveal.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgReveal): MsgRevealAminoMsg {
+    return {
+      type: "sparkdream/x/reveal/MsgReveal",
+      value: MsgReveal.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgRevealProtoMsg): MsgReveal {
     return MsgReveal.decode(message.value);
   },
@@ -1845,6 +1887,7 @@ function createBaseMsgVerify(): MsgVerify {
  */
 export const MsgVerify = {
   typeUrl: "/sparkdream.reveal.v1.MsgVerify",
+  aminoType: "sparkdream/x/reveal/MsgVerify",
   encode(message: MsgVerify, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.voter !== "") {
       writer.uint32(10).string(message.voter);
@@ -1943,6 +1986,12 @@ export const MsgVerify = {
   fromAminoMsg(object: MsgVerifyAminoMsg): MsgVerify {
     return MsgVerify.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgVerify): MsgVerifyAminoMsg {
+    return {
+      type: "sparkdream/x/reveal/MsgVerify",
+      value: MsgVerify.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgVerifyProtoMsg): MsgVerify {
     return MsgVerify.decode(message.value);
   },
@@ -2027,6 +2076,7 @@ function createBaseMsgCancel(): MsgCancel {
  */
 export const MsgCancel = {
   typeUrl: "/sparkdream.reveal.v1.MsgCancel",
+  aminoType: "sparkdream/x/reveal/MsgCancel",
   encode(message: MsgCancel, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -2091,6 +2141,12 @@ export const MsgCancel = {
   },
   fromAminoMsg(object: MsgCancelAminoMsg): MsgCancel {
     return MsgCancel.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCancel): MsgCancelAminoMsg {
+    return {
+      type: "sparkdream/x/reveal/MsgCancel",
+      value: MsgCancel.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgCancelProtoMsg): MsgCancel {
     return MsgCancel.decode(message.value);
@@ -2179,6 +2235,7 @@ function createBaseMsgResolveDispute(): MsgResolveDispute {
  */
 export const MsgResolveDispute = {
   typeUrl: "/sparkdream.reveal.v1.MsgResolveDispute",
+  aminoType: "sparkdream/x/reveal/MsgResolveDispute",
   encode(message: MsgResolveDispute, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -2276,6 +2333,12 @@ export const MsgResolveDispute = {
   },
   fromAminoMsg(object: MsgResolveDisputeAminoMsg): MsgResolveDispute {
     return MsgResolveDispute.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgResolveDispute): MsgResolveDisputeAminoMsg {
+    return {
+      type: "sparkdream/x/reveal/MsgResolveDispute",
+      value: MsgResolveDispute.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgResolveDisputeProtoMsg): MsgResolveDispute {
     return MsgResolveDispute.decode(message.value);

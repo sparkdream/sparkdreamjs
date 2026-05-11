@@ -205,7 +205,7 @@ export interface MsgInviteMemberAmino {
   vouched_tags?: string[];
 }
 export interface MsgInviteMemberAminoMsg {
-  type: "/sparkdream.rep.v1.MsgInviteMember";
+  type: "sparkdream/x/rep/MsgInviteMember";
   value: MsgInviteMemberAmino;
 }
 /**
@@ -255,7 +255,7 @@ export interface MsgAcceptInvitationAmino {
   invitation_id?: string;
 }
 export interface MsgAcceptInvitationAminoMsg {
-  type: "/sparkdream.rep.v1.MsgAcceptInvitation";
+  type: "sparkdream/x/rep/MsgAcceptInvitation";
   value: MsgAcceptInvitationAmino;
 }
 /**
@@ -311,7 +311,7 @@ export interface MsgTransferDreamAmino {
   reference?: string;
 }
 export interface MsgTransferDreamAminoMsg {
-  type: "/sparkdream.rep.v1.MsgTransferDream";
+  type: "sparkdream/x/rep/MsgTransferDream";
   value: MsgTransferDreamAmino;
 }
 /**
@@ -369,7 +369,7 @@ export interface MsgCreateInterimAmino {
   deadline?: string;
 }
 export interface MsgCreateInterimAminoMsg {
-  type: "/sparkdream.rep.v1.MsgCreateInterim";
+  type: "sparkdream/x/rep/MsgCreateInterim";
   value: MsgCreateInterimAmino;
 }
 /**
@@ -421,7 +421,7 @@ export interface MsgAssignInterimAmino {
   assignee?: string;
 }
 export interface MsgAssignInterimAminoMsg {
-  type: "/sparkdream.rep.v1.MsgAssignInterim";
+  type: "sparkdream/x/rep/MsgAssignInterim";
   value: MsgAssignInterimAmino;
 }
 /**
@@ -475,7 +475,7 @@ export interface MsgSubmitInterimWorkAmino {
   comments?: string;
 }
 export interface MsgSubmitInterimWorkAminoMsg {
-  type: "/sparkdream.rep.v1.MsgSubmitInterimWork";
+  type: "sparkdream/x/rep/MsgSubmitInterimWork";
   value: MsgSubmitInterimWorkAmino;
 }
 /**
@@ -529,7 +529,7 @@ export interface MsgApproveInterimAmino {
   comments?: string;
 }
 export interface MsgApproveInterimAminoMsg {
-  type: "/sparkdream.rep.v1.MsgApproveInterim";
+  type: "sparkdream/x/rep/MsgApproveInterim";
   value: MsgApproveInterimAmino;
 }
 /**
@@ -581,7 +581,7 @@ export interface MsgAbandonInterimAmino {
   reason?: string;
 }
 export interface MsgAbandonInterimAminoMsg {
-  type: "/sparkdream.rep.v1.MsgAbandonInterim";
+  type: "sparkdream/x/rep/MsgAbandonInterim";
   value: MsgAbandonInterimAmino;
 }
 /**
@@ -633,7 +633,7 @@ export interface MsgCompleteInterimAmino {
   completion_notes?: string;
 }
 export interface MsgCompleteInterimAminoMsg {
-  type: "/sparkdream.rep.v1.MsgCompleteInterim";
+  type: "sparkdream/x/rep/MsgCompleteInterim";
   value: MsgCompleteInterimAmino;
 }
 /**
@@ -699,7 +699,7 @@ export interface MsgProposeProjectAmino {
   milestones?: string[];
 }
 export interface MsgProposeProjectAminoMsg {
-  type: "/sparkdream.rep.v1.MsgProposeProject";
+  type: "sparkdream/x/rep/MsgProposeProject";
   value: MsgProposeProjectAmino;
 }
 /**
@@ -753,7 +753,7 @@ export interface MsgApproveProjectBudgetAmino {
   approved_spark?: string;
 }
 export interface MsgApproveProjectBudgetAminoMsg {
-  type: "/sparkdream.rep.v1.MsgApproveProjectBudget";
+  type: "sparkdream/x/rep/MsgApproveProjectBudget";
   value: MsgApproveProjectBudgetAmino;
 }
 /**
@@ -805,7 +805,7 @@ export interface MsgCancelProjectAmino {
   reason?: string;
 }
 export interface MsgCancelProjectAminoMsg {
-  type: "/sparkdream.rep.v1.MsgCancelProject";
+  type: "sparkdream/x/rep/MsgCancelProject";
   value: MsgCancelProjectAmino;
 }
 /**
@@ -869,7 +869,7 @@ export interface MsgCreateInitiativeAmino {
   budget?: string;
 }
 export interface MsgCreateInitiativeAminoMsg {
-  type: "/sparkdream.rep.v1.MsgCreateInitiative";
+  type: "sparkdream/x/rep/MsgCreateInitiative";
   value: MsgCreateInitiativeAmino;
 }
 /**
@@ -925,7 +925,7 @@ export interface MsgAssignInitiativeAmino {
   assignee?: string;
 }
 export interface MsgAssignInitiativeAminoMsg {
-  type: "/sparkdream.rep.v1.MsgAssignInitiative";
+  type: "sparkdream/x/rep/MsgAssignInitiative";
   value: MsgAssignInitiativeAmino;
 }
 /**
@@ -979,7 +979,7 @@ export interface MsgSubmitInitiativeWorkAmino {
   comments?: string;
 }
 export interface MsgSubmitInitiativeWorkAminoMsg {
-  type: "/sparkdream.rep.v1.MsgSubmitInitiativeWork";
+  type: "sparkdream/x/rep/MsgSubmitInitiativeWork";
   value: MsgSubmitInitiativeWorkAmino;
 }
 /**
@@ -1035,7 +1035,7 @@ export interface MsgApproveInitiativeAmino {
   comments?: string;
 }
 export interface MsgApproveInitiativeAminoMsg {
-  type: "/sparkdream.rep.v1.MsgApproveInitiative";
+  type: "sparkdream/x/rep/MsgApproveInitiative";
   value: MsgApproveInitiativeAmino;
 }
 /**
@@ -1087,7 +1087,7 @@ export interface MsgAbandonInitiativeAmino {
   reason?: string;
 }
 export interface MsgAbandonInitiativeAminoMsg {
-  type: "/sparkdream.rep.v1.MsgAbandonInitiative";
+  type: "sparkdream/x/rep/MsgAbandonInitiative";
   value: MsgAbandonInitiativeAmino;
 }
 /**
@@ -1139,7 +1139,7 @@ export interface MsgCompleteInitiativeAmino {
   completion_notes?: string;
 }
 export interface MsgCompleteInitiativeAminoMsg {
-  type: "/sparkdream.rep.v1.MsgCompleteInitiative";
+  type: "sparkdream/x/rep/MsgCompleteInitiative";
   value: MsgCompleteInitiativeAmino;
 }
 /**
@@ -1207,7 +1207,7 @@ export interface MsgStakeAmino {
   amount?: string;
 }
 export interface MsgStakeAminoMsg {
-  type: "/sparkdream.rep.v1.MsgStake";
+  type: "sparkdream/x/rep/MsgStake";
   value: MsgStakeAmino;
 }
 /**
@@ -1263,7 +1263,7 @@ export interface MsgUnstakeAmino {
   amount?: string;
 }
 export interface MsgUnstakeAminoMsg {
-  type: "/sparkdream.rep.v1.MsgUnstake";
+  type: "sparkdream/x/rep/MsgUnstake";
   value: MsgUnstakeAmino;
 }
 /**
@@ -1319,7 +1319,7 @@ export interface MsgClaimStakingRewardsAmino {
   stake_id?: string;
 }
 export interface MsgClaimStakingRewardsAminoMsg {
-  type: "/sparkdream.rep.v1.MsgClaimStakingRewards";
+  type: "sparkdream/x/rep/MsgClaimStakingRewards";
   value: MsgClaimStakingRewardsAmino;
 }
 /**
@@ -1373,7 +1373,7 @@ export interface MsgCompoundStakingRewardsAmino {
   stake_id?: string;
 }
 export interface MsgCompoundStakingRewardsAminoMsg {
-  type: "/sparkdream.rep.v1.MsgCompoundStakingRewards";
+  type: "sparkdream/x/rep/MsgCompoundStakingRewards";
   value: MsgCompoundStakingRewardsAmino;
 }
 /**
@@ -1435,7 +1435,7 @@ export interface MsgCreateChallengeAmino {
   staked_dream?: string;
 }
 export interface MsgCreateChallengeAminoMsg {
-  type: "/sparkdream.rep.v1.MsgCreateChallenge";
+  type: "sparkdream/x/rep/MsgCreateChallenge";
   value: MsgCreateChallengeAmino;
 }
 /**
@@ -1489,7 +1489,7 @@ export interface MsgRespondToChallengeAmino {
   evidence?: string[];
 }
 export interface MsgRespondToChallengeAminoMsg {
-  type: "/sparkdream.rep.v1.MsgRespondToChallenge";
+  type: "sparkdream/x/rep/MsgRespondToChallenge";
   value: MsgRespondToChallengeAmino;
 }
 /**
@@ -1547,7 +1547,7 @@ export interface MsgSubmitJurorVoteAmino {
   reasoning?: string;
 }
 export interface MsgSubmitJurorVoteAminoMsg {
-  type: "/sparkdream.rep.v1.MsgSubmitJurorVote";
+  type: "sparkdream/x/rep/MsgSubmitJurorVote";
   value: MsgSubmitJurorVoteAmino;
 }
 /**
@@ -1601,7 +1601,7 @@ export interface MsgSubmitExpertTestimonyAmino {
   reasoning?: string;
 }
 export interface MsgSubmitExpertTestimonyAminoMsg {
-  type: "/sparkdream.rep.v1.MsgSubmitExpertTestimony";
+  type: "sparkdream/x/rep/MsgSubmitExpertTestimony";
   value: MsgSubmitExpertTestimonyAmino;
 }
 /**
@@ -1665,7 +1665,7 @@ export interface MsgChallengeContentAmino {
   staked_dream?: string;
 }
 export interface MsgChallengeContentAminoMsg {
-  type: "/sparkdream.rep.v1.MsgChallengeContent";
+  type: "sparkdream/x/rep/MsgChallengeContent";
   value: MsgChallengeContentAmino;
 }
 /**
@@ -1723,7 +1723,7 @@ export interface MsgRespondToContentChallengeAmino {
   evidence?: string[];
 }
 export interface MsgRespondToContentChallengeAminoMsg {
-  type: "/sparkdream.rep.v1.MsgRespondToContentChallenge";
+  type: "sparkdream/x/rep/MsgRespondToContentChallenge";
   value: MsgRespondToContentChallengeAmino;
 }
 /**
@@ -1773,7 +1773,7 @@ export interface MsgRegisterZkPublicKeyAmino {
   zk_public_key?: string;
 }
 export interface MsgRegisterZkPublicKeyAminoMsg {
-  type: "/sparkdream.rep.v1.MsgRegisterZkPublicKey";
+  type: "sparkdream/x/rep/MsgRegisterZkPublicKey";
   value: MsgRegisterZkPublicKeyAmino;
 }
 /**
@@ -1827,7 +1827,7 @@ export interface MsgCreateTagAmino {
   name?: string;
 }
 export interface MsgCreateTagAminoMsg {
-  type: "/sparkdream.rep.v1.MsgCreateTag";
+  type: "sparkdream/x/rep/MsgCreateTag";
   value: MsgCreateTagAmino;
 }
 /**
@@ -1883,7 +1883,7 @@ export interface MsgReportTagAmino {
   reason?: string;
 }
 export interface MsgReportTagAminoMsg {
-  type: "/sparkdream.rep.v1.MsgReportTag";
+  type: "sparkdream/x/rep/MsgReportTag";
   value: MsgReportTagAmino;
 }
 /**
@@ -1939,7 +1939,7 @@ export interface MsgResolveTagReportAmino {
   reserve_members_can_use?: boolean;
 }
 export interface MsgResolveTagReportAminoMsg {
-  type: "/sparkdream.rep.v1.MsgResolveTagReport";
+  type: "sparkdream/x/rep/MsgResolveTagReport";
   value: MsgResolveTagReportAmino;
 }
 /**
@@ -1993,7 +1993,7 @@ export interface MsgCreateTagBudgetAmino {
   members_only?: boolean;
 }
 export interface MsgCreateTagBudgetAminoMsg {
-  type: "/sparkdream.rep.v1.MsgCreateTagBudget";
+  type: "sparkdream/x/rep/MsgCreateTagBudget";
   value: MsgCreateTagBudgetAmino;
 }
 /**
@@ -2049,7 +2049,7 @@ export interface MsgAwardFromTagBudgetAmino {
   reason?: string;
 }
 export interface MsgAwardFromTagBudgetAminoMsg {
-  type: "/sparkdream.rep.v1.MsgAwardFromTagBudget";
+  type: "sparkdream/x/rep/MsgAwardFromTagBudget";
   value: MsgAwardFromTagBudgetAmino;
 }
 /**
@@ -2101,7 +2101,7 @@ export interface MsgTopUpTagBudgetAmino {
   amount?: string;
 }
 export interface MsgTopUpTagBudgetAminoMsg {
-  type: "/sparkdream.rep.v1.MsgTopUpTagBudget";
+  type: "sparkdream/x/rep/MsgTopUpTagBudget";
   value: MsgTopUpTagBudgetAmino;
 }
 /**
@@ -2153,7 +2153,7 @@ export interface MsgToggleTagBudgetAmino {
   active?: boolean;
 }
 export interface MsgToggleTagBudgetAminoMsg {
-  type: "/sparkdream.rep.v1.MsgToggleTagBudget";
+  type: "sparkdream/x/rep/MsgToggleTagBudget";
   value: MsgToggleTagBudgetAmino;
 }
 /**
@@ -2203,7 +2203,7 @@ export interface MsgWithdrawTagBudgetAmino {
   budget_id?: string;
 }
 export interface MsgWithdrawTagBudgetAminoMsg {
-  type: "/sparkdream.rep.v1.MsgWithdrawTagBudget";
+  type: "sparkdream/x/rep/MsgWithdrawTagBudget";
   value: MsgWithdrawTagBudgetAmino;
 }
 /**
@@ -2259,7 +2259,7 @@ export interface MsgBondRoleAmino {
   amount?: string;
 }
 export interface MsgBondRoleAminoMsg {
-  type: "/sparkdream.rep.v1.MsgBondRole";
+  type: "sparkdream/x/rep/MsgBondRole";
   value: MsgBondRoleAmino;
 }
 /**
@@ -2315,7 +2315,7 @@ export interface MsgUnbondRoleAmino {
   amount?: string;
 }
 export interface MsgUnbondRoleAminoMsg {
-  type: "/sparkdream.rep.v1.MsgUnbondRole";
+  type: "sparkdream/x/rep/MsgUnbondRole";
   value: MsgUnbondRoleAmino;
 }
 /**
@@ -2369,7 +2369,7 @@ export interface MsgReportMemberAmino {
   recommended_action?: string;
 }
 export interface MsgReportMemberAminoMsg {
-  type: "/sparkdream.rep.v1.MsgReportMember";
+  type: "sparkdream/x/rep/MsgReportMember";
   value: MsgReportMemberAmino;
 }
 /**
@@ -2419,7 +2419,7 @@ export interface MsgCosignMemberReportAmino {
   member?: string;
 }
 export interface MsgCosignMemberReportAminoMsg {
-  type: "/sparkdream.rep.v1.MsgCosignMemberReport";
+  type: "sparkdream/x/rep/MsgCosignMemberReport";
   value: MsgCosignMemberReportAmino;
 }
 /**
@@ -2473,7 +2473,7 @@ export interface MsgResolveMemberReportAmino {
   reason?: string;
 }
 export interface MsgResolveMemberReportAminoMsg {
-  type: "/sparkdream.rep.v1.MsgResolveMemberReport";
+  type: "sparkdream/x/rep/MsgResolveMemberReport";
   value: MsgResolveMemberReportAmino;
 }
 /**
@@ -2523,7 +2523,7 @@ export interface MsgDefendMemberReportAmino {
   defense?: string;
 }
 export interface MsgDefendMemberReportAminoMsg {
-  type: "/sparkdream.rep.v1.MsgDefendMemberReport";
+  type: "sparkdream/x/rep/MsgDefendMemberReport";
   value: MsgDefendMemberReportAmino;
 }
 /**
@@ -2577,7 +2577,7 @@ export interface MsgAppealGovActionAmino {
   appeal_reason?: string;
 }
 export interface MsgAppealGovActionAminoMsg {
-  type: "/sparkdream.rep.v1.MsgAppealGovAction";
+  type: "sparkdream/x/rep/MsgAppealGovAction";
   value: MsgAppealGovActionAmino;
 }
 /**
@@ -2637,7 +2637,7 @@ export interface MsgResolveGovActionAppealAmino {
   reason?: string;
 }
 export interface MsgResolveGovActionAppealAminoMsg {
-  type: "/sparkdream.rep.v1.MsgResolveGovActionAppeal";
+  type: "sparkdream/x/rep/MsgResolveGovActionAppeal";
   value: MsgResolveGovActionAppealAmino;
 }
 /**
@@ -2970,6 +2970,7 @@ function createBaseMsgInviteMember(): MsgInviteMember {
  */
 export const MsgInviteMember = {
   typeUrl: "/sparkdream.rep.v1.MsgInviteMember",
+  aminoType: "sparkdream/x/rep/MsgInviteMember",
   encode(message: MsgInviteMember, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.inviter !== "") {
       writer.uint32(10).string(message.inviter);
@@ -3047,6 +3048,12 @@ export const MsgInviteMember = {
   },
   fromAminoMsg(object: MsgInviteMemberAminoMsg): MsgInviteMember {
     return MsgInviteMember.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgInviteMember): MsgInviteMemberAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgInviteMember",
+      value: MsgInviteMember.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgInviteMemberProtoMsg): MsgInviteMember {
     return MsgInviteMember.decode(message.value);
@@ -3131,6 +3138,7 @@ function createBaseMsgAcceptInvitation(): MsgAcceptInvitation {
  */
 export const MsgAcceptInvitation = {
   typeUrl: "/sparkdream.rep.v1.MsgAcceptInvitation",
+  aminoType: "sparkdream/x/rep/MsgAcceptInvitation",
   encode(message: MsgAcceptInvitation, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.invitee !== "") {
       writer.uint32(10).string(message.invitee);
@@ -3184,6 +3192,12 @@ export const MsgAcceptInvitation = {
   },
   fromAminoMsg(object: MsgAcceptInvitationAminoMsg): MsgAcceptInvitation {
     return MsgAcceptInvitation.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAcceptInvitation): MsgAcceptInvitationAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgAcceptInvitation",
+      value: MsgAcceptInvitation.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgAcceptInvitationProtoMsg): MsgAcceptInvitation {
     return MsgAcceptInvitation.decode(message.value);
@@ -3271,6 +3285,7 @@ function createBaseMsgTransferDream(): MsgTransferDream {
  */
 export const MsgTransferDream = {
   typeUrl: "/sparkdream.rep.v1.MsgTransferDream",
+  aminoType: "sparkdream/x/rep/MsgTransferDream",
   encode(message: MsgTransferDream, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sender !== "") {
       writer.uint32(10).string(message.sender);
@@ -3357,6 +3372,12 @@ export const MsgTransferDream = {
   },
   fromAminoMsg(object: MsgTransferDreamAminoMsg): MsgTransferDream {
     return MsgTransferDream.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgTransferDream): MsgTransferDreamAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgTransferDream",
+      value: MsgTransferDream.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgTransferDreamProtoMsg): MsgTransferDream {
     return MsgTransferDream.decode(message.value);
@@ -3445,6 +3466,7 @@ function createBaseMsgCreateInterim(): MsgCreateInterim {
  */
 export const MsgCreateInterim = {
   typeUrl: "/sparkdream.rep.v1.MsgCreateInterim",
+  aminoType: "sparkdream/x/rep/MsgCreateInterim",
   encode(message: MsgCreateInterim, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3543,6 +3565,12 @@ export const MsgCreateInterim = {
   fromAminoMsg(object: MsgCreateInterimAminoMsg): MsgCreateInterim {
     return MsgCreateInterim.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgCreateInterim): MsgCreateInterimAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgCreateInterim",
+      value: MsgCreateInterim.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgCreateInterimProtoMsg): MsgCreateInterim {
     return MsgCreateInterim.decode(message.value);
   },
@@ -3627,6 +3655,7 @@ function createBaseMsgAssignInterim(): MsgAssignInterim {
  */
 export const MsgAssignInterim = {
   typeUrl: "/sparkdream.rep.v1.MsgAssignInterim",
+  aminoType: "sparkdream/x/rep/MsgAssignInterim",
   encode(message: MsgAssignInterim, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3691,6 +3720,12 @@ export const MsgAssignInterim = {
   },
   fromAminoMsg(object: MsgAssignInterimAminoMsg): MsgAssignInterim {
     return MsgAssignInterim.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAssignInterim): MsgAssignInterimAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgAssignInterim",
+      value: MsgAssignInterim.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgAssignInterimProtoMsg): MsgAssignInterim {
     return MsgAssignInterim.decode(message.value);
@@ -3777,6 +3812,7 @@ function createBaseMsgSubmitInterimWork(): MsgSubmitInterimWork {
  */
 export const MsgSubmitInterimWork = {
   typeUrl: "/sparkdream.rep.v1.MsgSubmitInterimWork",
+  aminoType: "sparkdream/x/rep/MsgSubmitInterimWork",
   encode(message: MsgSubmitInterimWork, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3852,6 +3888,12 @@ export const MsgSubmitInterimWork = {
   },
   fromAminoMsg(object: MsgSubmitInterimWorkAminoMsg): MsgSubmitInterimWork {
     return MsgSubmitInterimWork.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSubmitInterimWork): MsgSubmitInterimWorkAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgSubmitInterimWork",
+      value: MsgSubmitInterimWork.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgSubmitInterimWorkProtoMsg): MsgSubmitInterimWork {
     return MsgSubmitInterimWork.decode(message.value);
@@ -3938,6 +3980,7 @@ function createBaseMsgApproveInterim(): MsgApproveInterim {
  */
 export const MsgApproveInterim = {
   typeUrl: "/sparkdream.rep.v1.MsgApproveInterim",
+  aminoType: "sparkdream/x/rep/MsgApproveInterim",
   encode(message: MsgApproveInterim, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4013,6 +4056,12 @@ export const MsgApproveInterim = {
   },
   fromAminoMsg(object: MsgApproveInterimAminoMsg): MsgApproveInterim {
     return MsgApproveInterim.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgApproveInterim): MsgApproveInterimAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgApproveInterim",
+      value: MsgApproveInterim.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgApproveInterimProtoMsg): MsgApproveInterim {
     return MsgApproveInterim.decode(message.value);
@@ -4098,6 +4147,7 @@ function createBaseMsgAbandonInterim(): MsgAbandonInterim {
  */
 export const MsgAbandonInterim = {
   typeUrl: "/sparkdream.rep.v1.MsgAbandonInterim",
+  aminoType: "sparkdream/x/rep/MsgAbandonInterim",
   encode(message: MsgAbandonInterim, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4162,6 +4212,12 @@ export const MsgAbandonInterim = {
   },
   fromAminoMsg(object: MsgAbandonInterimAminoMsg): MsgAbandonInterim {
     return MsgAbandonInterim.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAbandonInterim): MsgAbandonInterimAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgAbandonInterim",
+      value: MsgAbandonInterim.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgAbandonInterimProtoMsg): MsgAbandonInterim {
     return MsgAbandonInterim.decode(message.value);
@@ -4247,6 +4303,7 @@ function createBaseMsgCompleteInterim(): MsgCompleteInterim {
  */
 export const MsgCompleteInterim = {
   typeUrl: "/sparkdream.rep.v1.MsgCompleteInterim",
+  aminoType: "sparkdream/x/rep/MsgCompleteInterim",
   encode(message: MsgCompleteInterim, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4311,6 +4368,12 @@ export const MsgCompleteInterim = {
   },
   fromAminoMsg(object: MsgCompleteInterimAminoMsg): MsgCompleteInterim {
     return MsgCompleteInterim.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCompleteInterim): MsgCompleteInterimAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgCompleteInterim",
+      value: MsgCompleteInterim.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgCompleteInterimProtoMsg): MsgCompleteInterim {
     return MsgCompleteInterim.decode(message.value);
@@ -4403,6 +4466,7 @@ function createBaseMsgProposeProject(): MsgProposeProject {
  */
 export const MsgProposeProject = {
   typeUrl: "/sparkdream.rep.v1.MsgProposeProject",
+  aminoType: "sparkdream/x/rep/MsgProposeProject",
   encode(message: MsgProposeProject, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4551,6 +4615,12 @@ export const MsgProposeProject = {
   fromAminoMsg(object: MsgProposeProjectAminoMsg): MsgProposeProject {
     return MsgProposeProject.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgProposeProject): MsgProposeProjectAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgProposeProject",
+      value: MsgProposeProject.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgProposeProjectProtoMsg): MsgProposeProject {
     return MsgProposeProject.decode(message.value);
   },
@@ -4636,6 +4706,7 @@ function createBaseMsgApproveProjectBudget(): MsgApproveProjectBudget {
  */
 export const MsgApproveProjectBudget = {
   typeUrl: "/sparkdream.rep.v1.MsgApproveProjectBudget",
+  aminoType: "sparkdream/x/rep/MsgApproveProjectBudget",
   encode(message: MsgApproveProjectBudget, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.approver !== "") {
       writer.uint32(10).string(message.approver);
@@ -4711,6 +4782,12 @@ export const MsgApproveProjectBudget = {
   },
   fromAminoMsg(object: MsgApproveProjectBudgetAminoMsg): MsgApproveProjectBudget {
     return MsgApproveProjectBudget.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgApproveProjectBudget): MsgApproveProjectBudgetAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgApproveProjectBudget",
+      value: MsgApproveProjectBudget.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgApproveProjectBudgetProtoMsg): MsgApproveProjectBudget {
     return MsgApproveProjectBudget.decode(message.value);
@@ -4796,6 +4873,7 @@ function createBaseMsgCancelProject(): MsgCancelProject {
  */
 export const MsgCancelProject = {
   typeUrl: "/sparkdream.rep.v1.MsgCancelProject",
+  aminoType: "sparkdream/x/rep/MsgCancelProject",
   encode(message: MsgCancelProject, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4860,6 +4938,12 @@ export const MsgCancelProject = {
   },
   fromAminoMsg(object: MsgCancelProjectAminoMsg): MsgCancelProject {
     return MsgCancelProject.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCancelProject): MsgCancelProjectAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgCancelProject",
+      value: MsgCancelProject.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgCancelProjectProtoMsg): MsgCancelProject {
     return MsgCancelProject.decode(message.value);
@@ -4951,6 +5035,7 @@ function createBaseMsgCreateInitiative(): MsgCreateInitiative {
  */
 export const MsgCreateInitiative = {
   typeUrl: "/sparkdream.rep.v1.MsgCreateInitiative",
+  aminoType: "sparkdream/x/rep/MsgCreateInitiative",
   encode(message: MsgCreateInitiative, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -5084,6 +5169,12 @@ export const MsgCreateInitiative = {
   fromAminoMsg(object: MsgCreateInitiativeAminoMsg): MsgCreateInitiative {
     return MsgCreateInitiative.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgCreateInitiative): MsgCreateInitiativeAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgCreateInitiative",
+      value: MsgCreateInitiative.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgCreateInitiativeProtoMsg): MsgCreateInitiative {
     return MsgCreateInitiative.decode(message.value);
   },
@@ -5181,6 +5272,7 @@ function createBaseMsgAssignInitiative(): MsgAssignInitiative {
  */
 export const MsgAssignInitiative = {
   typeUrl: "/sparkdream.rep.v1.MsgAssignInitiative",
+  aminoType: "sparkdream/x/rep/MsgAssignInitiative",
   encode(message: MsgAssignInitiative, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -5245,6 +5337,12 @@ export const MsgAssignInitiative = {
   },
   fromAminoMsg(object: MsgAssignInitiativeAminoMsg): MsgAssignInitiative {
     return MsgAssignInitiative.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAssignInitiative): MsgAssignInitiativeAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgAssignInitiative",
+      value: MsgAssignInitiative.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgAssignInitiativeProtoMsg): MsgAssignInitiative {
     return MsgAssignInitiative.decode(message.value);
@@ -5331,6 +5429,7 @@ function createBaseMsgSubmitInitiativeWork(): MsgSubmitInitiativeWork {
  */
 export const MsgSubmitInitiativeWork = {
   typeUrl: "/sparkdream.rep.v1.MsgSubmitInitiativeWork",
+  aminoType: "sparkdream/x/rep/MsgSubmitInitiativeWork",
   encode(message: MsgSubmitInitiativeWork, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -5406,6 +5505,12 @@ export const MsgSubmitInitiativeWork = {
   },
   fromAminoMsg(object: MsgSubmitInitiativeWorkAminoMsg): MsgSubmitInitiativeWork {
     return MsgSubmitInitiativeWork.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSubmitInitiativeWork): MsgSubmitInitiativeWorkAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgSubmitInitiativeWork",
+      value: MsgSubmitInitiativeWork.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgSubmitInitiativeWorkProtoMsg): MsgSubmitInitiativeWork {
     return MsgSubmitInitiativeWork.decode(message.value);
@@ -5493,6 +5598,7 @@ function createBaseMsgApproveInitiative(): MsgApproveInitiative {
  */
 export const MsgApproveInitiative = {
   typeUrl: "/sparkdream.rep.v1.MsgApproveInitiative",
+  aminoType: "sparkdream/x/rep/MsgApproveInitiative",
   encode(message: MsgApproveInitiative, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -5582,6 +5688,12 @@ export const MsgApproveInitiative = {
   fromAminoMsg(object: MsgApproveInitiativeAminoMsg): MsgApproveInitiative {
     return MsgApproveInitiative.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgApproveInitiative): MsgApproveInitiativeAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgApproveInitiative",
+      value: MsgApproveInitiative.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgApproveInitiativeProtoMsg): MsgApproveInitiative {
     return MsgApproveInitiative.decode(message.value);
   },
@@ -5666,6 +5778,7 @@ function createBaseMsgAbandonInitiative(): MsgAbandonInitiative {
  */
 export const MsgAbandonInitiative = {
   typeUrl: "/sparkdream.rep.v1.MsgAbandonInitiative",
+  aminoType: "sparkdream/x/rep/MsgAbandonInitiative",
   encode(message: MsgAbandonInitiative, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -5730,6 +5843,12 @@ export const MsgAbandonInitiative = {
   },
   fromAminoMsg(object: MsgAbandonInitiativeAminoMsg): MsgAbandonInitiative {
     return MsgAbandonInitiative.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAbandonInitiative): MsgAbandonInitiativeAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgAbandonInitiative",
+      value: MsgAbandonInitiative.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgAbandonInitiativeProtoMsg): MsgAbandonInitiative {
     return MsgAbandonInitiative.decode(message.value);
@@ -5815,6 +5934,7 @@ function createBaseMsgCompleteInitiative(): MsgCompleteInitiative {
  */
 export const MsgCompleteInitiative = {
   typeUrl: "/sparkdream.rep.v1.MsgCompleteInitiative",
+  aminoType: "sparkdream/x/rep/MsgCompleteInitiative",
   encode(message: MsgCompleteInitiative, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -5879,6 +5999,12 @@ export const MsgCompleteInitiative = {
   },
   fromAminoMsg(object: MsgCompleteInitiativeAminoMsg): MsgCompleteInitiative {
     return MsgCompleteInitiative.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCompleteInitiative): MsgCompleteInitiativeAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgCompleteInitiative",
+      value: MsgCompleteInitiative.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgCompleteInitiativeProtoMsg): MsgCompleteInitiative {
     return MsgCompleteInitiative.decode(message.value);
@@ -5966,6 +6092,7 @@ function createBaseMsgStake(): MsgStake {
  */
 export const MsgStake = {
   typeUrl: "/sparkdream.rep.v1.MsgStake",
+  aminoType: "sparkdream/x/rep/MsgStake",
   encode(message: MsgStake, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.staker !== "") {
       writer.uint32(10).string(message.staker);
@@ -6052,6 +6179,12 @@ export const MsgStake = {
   },
   fromAminoMsg(object: MsgStakeAminoMsg): MsgStake {
     return MsgStake.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgStake): MsgStakeAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgStake",
+      value: MsgStake.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgStakeProtoMsg): MsgStake {
     return MsgStake.decode(message.value);
@@ -6150,6 +6283,7 @@ function createBaseMsgUnstake(): MsgUnstake {
  */
 export const MsgUnstake = {
   typeUrl: "/sparkdream.rep.v1.MsgUnstake",
+  aminoType: "sparkdream/x/rep/MsgUnstake",
   encode(message: MsgUnstake, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.staker !== "") {
       writer.uint32(10).string(message.staker);
@@ -6214,6 +6348,12 @@ export const MsgUnstake = {
   },
   fromAminoMsg(object: MsgUnstakeAminoMsg): MsgUnstake {
     return MsgUnstake.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUnstake): MsgUnstakeAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgUnstake",
+      value: MsgUnstake.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUnstakeProtoMsg): MsgUnstake {
     return MsgUnstake.decode(message.value);
@@ -6323,6 +6463,7 @@ function createBaseMsgClaimStakingRewards(): MsgClaimStakingRewards {
  */
 export const MsgClaimStakingRewards = {
   typeUrl: "/sparkdream.rep.v1.MsgClaimStakingRewards",
+  aminoType: "sparkdream/x/rep/MsgClaimStakingRewards",
   encode(message: MsgClaimStakingRewards, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.staker !== "") {
       writer.uint32(10).string(message.staker);
@@ -6376,6 +6517,12 @@ export const MsgClaimStakingRewards = {
   },
   fromAminoMsg(object: MsgClaimStakingRewardsAminoMsg): MsgClaimStakingRewards {
     return MsgClaimStakingRewards.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgClaimStakingRewards): MsgClaimStakingRewardsAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgClaimStakingRewards",
+      value: MsgClaimStakingRewards.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgClaimStakingRewardsProtoMsg): MsgClaimStakingRewards {
     return MsgClaimStakingRewards.decode(message.value);
@@ -6473,6 +6620,7 @@ function createBaseMsgCompoundStakingRewards(): MsgCompoundStakingRewards {
  */
 export const MsgCompoundStakingRewards = {
   typeUrl: "/sparkdream.rep.v1.MsgCompoundStakingRewards",
+  aminoType: "sparkdream/x/rep/MsgCompoundStakingRewards",
   encode(message: MsgCompoundStakingRewards, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.staker !== "") {
       writer.uint32(10).string(message.staker);
@@ -6526,6 +6674,12 @@ export const MsgCompoundStakingRewards = {
   },
   fromAminoMsg(object: MsgCompoundStakingRewardsAminoMsg): MsgCompoundStakingRewards {
     return MsgCompoundStakingRewards.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCompoundStakingRewards): MsgCompoundStakingRewardsAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgCompoundStakingRewards",
+      value: MsgCompoundStakingRewards.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgCompoundStakingRewardsProtoMsg): MsgCompoundStakingRewards {
     return MsgCompoundStakingRewards.decode(message.value);
@@ -6638,6 +6792,7 @@ function createBaseMsgCreateChallenge(): MsgCreateChallenge {
  */
 export const MsgCreateChallenge = {
   typeUrl: "/sparkdream.rep.v1.MsgCreateChallenge",
+  aminoType: "sparkdream/x/rep/MsgCreateChallenge",
   encode(message: MsgCreateChallenge, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.challenger !== "") {
       writer.uint32(10).string(message.challenger);
@@ -6727,6 +6882,12 @@ export const MsgCreateChallenge = {
   fromAminoMsg(object: MsgCreateChallengeAminoMsg): MsgCreateChallenge {
     return MsgCreateChallenge.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgCreateChallenge): MsgCreateChallengeAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgCreateChallenge",
+      value: MsgCreateChallenge.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgCreateChallengeProtoMsg): MsgCreateChallenge {
     return MsgCreateChallenge.decode(message.value);
   },
@@ -6812,6 +6973,7 @@ function createBaseMsgRespondToChallenge(): MsgRespondToChallenge {
  */
 export const MsgRespondToChallenge = {
   typeUrl: "/sparkdream.rep.v1.MsgRespondToChallenge",
+  aminoType: "sparkdream/x/rep/MsgRespondToChallenge",
   encode(message: MsgRespondToChallenge, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.assignee !== "") {
       writer.uint32(10).string(message.assignee);
@@ -6889,6 +7051,12 @@ export const MsgRespondToChallenge = {
   },
   fromAminoMsg(object: MsgRespondToChallengeAminoMsg): MsgRespondToChallenge {
     return MsgRespondToChallenge.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRespondToChallenge): MsgRespondToChallengeAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgRespondToChallenge",
+      value: MsgRespondToChallenge.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgRespondToChallengeProtoMsg): MsgRespondToChallenge {
     return MsgRespondToChallenge.decode(message.value);
@@ -6977,6 +7145,7 @@ function createBaseMsgSubmitJurorVote(): MsgSubmitJurorVote {
  */
 export const MsgSubmitJurorVote = {
   typeUrl: "/sparkdream.rep.v1.MsgSubmitJurorVote",
+  aminoType: "sparkdream/x/rep/MsgSubmitJurorVote",
   encode(message: MsgSubmitJurorVote, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.juror !== "") {
       writer.uint32(10).string(message.juror);
@@ -7077,6 +7246,12 @@ export const MsgSubmitJurorVote = {
   fromAminoMsg(object: MsgSubmitJurorVoteAminoMsg): MsgSubmitJurorVote {
     return MsgSubmitJurorVote.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgSubmitJurorVote): MsgSubmitJurorVoteAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgSubmitJurorVote",
+      value: MsgSubmitJurorVote.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgSubmitJurorVoteProtoMsg): MsgSubmitJurorVote {
     return MsgSubmitJurorVote.decode(message.value);
   },
@@ -7162,6 +7337,7 @@ function createBaseMsgSubmitExpertTestimony(): MsgSubmitExpertTestimony {
  */
 export const MsgSubmitExpertTestimony = {
   typeUrl: "/sparkdream.rep.v1.MsgSubmitExpertTestimony",
+  aminoType: "sparkdream/x/rep/MsgSubmitExpertTestimony",
   encode(message: MsgSubmitExpertTestimony, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.expert !== "") {
       writer.uint32(10).string(message.expert);
@@ -7237,6 +7413,12 @@ export const MsgSubmitExpertTestimony = {
   },
   fromAminoMsg(object: MsgSubmitExpertTestimonyAminoMsg): MsgSubmitExpertTestimony {
     return MsgSubmitExpertTestimony.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSubmitExpertTestimony): MsgSubmitExpertTestimonyAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgSubmitExpertTestimony",
+      value: MsgSubmitExpertTestimony.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgSubmitExpertTestimonyProtoMsg): MsgSubmitExpertTestimony {
     return MsgSubmitExpertTestimony.decode(message.value);
@@ -7325,6 +7507,7 @@ function createBaseMsgChallengeContent(): MsgChallengeContent {
  */
 export const MsgChallengeContent = {
   typeUrl: "/sparkdream.rep.v1.MsgChallengeContent",
+  aminoType: "sparkdream/x/rep/MsgChallengeContent",
   encode(message: MsgChallengeContent, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.challenger !== "") {
       writer.uint32(10).string(message.challenger);
@@ -7425,6 +7608,12 @@ export const MsgChallengeContent = {
   fromAminoMsg(object: MsgChallengeContentAminoMsg): MsgChallengeContent {
     return MsgChallengeContent.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgChallengeContent): MsgChallengeContentAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgChallengeContent",
+      value: MsgChallengeContent.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgChallengeContentProtoMsg): MsgChallengeContent {
     return MsgChallengeContent.decode(message.value);
   },
@@ -7523,6 +7712,7 @@ function createBaseMsgRespondToContentChallenge(): MsgRespondToContentChallenge 
  */
 export const MsgRespondToContentChallenge = {
   typeUrl: "/sparkdream.rep.v1.MsgRespondToContentChallenge",
+  aminoType: "sparkdream/x/rep/MsgRespondToContentChallenge",
   encode(message: MsgRespondToContentChallenge, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.author !== "") {
       writer.uint32(10).string(message.author);
@@ -7600,6 +7790,12 @@ export const MsgRespondToContentChallenge = {
   },
   fromAminoMsg(object: MsgRespondToContentChallengeAminoMsg): MsgRespondToContentChallenge {
     return MsgRespondToContentChallenge.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRespondToContentChallenge): MsgRespondToContentChallengeAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgRespondToContentChallenge",
+      value: MsgRespondToContentChallenge.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgRespondToContentChallengeProtoMsg): MsgRespondToContentChallenge {
     return MsgRespondToContentChallenge.decode(message.value);
@@ -7684,6 +7880,7 @@ function createBaseMsgRegisterZkPublicKey(): MsgRegisterZkPublicKey {
  */
 export const MsgRegisterZkPublicKey = {
   typeUrl: "/sparkdream.rep.v1.MsgRegisterZkPublicKey",
+  aminoType: "sparkdream/x/rep/MsgRegisterZkPublicKey",
   encode(message: MsgRegisterZkPublicKey, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.member !== "") {
       writer.uint32(10).string(message.member);
@@ -7737,6 +7934,12 @@ export const MsgRegisterZkPublicKey = {
   },
   fromAminoMsg(object: MsgRegisterZkPublicKeyAminoMsg): MsgRegisterZkPublicKey {
     return MsgRegisterZkPublicKey.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRegisterZkPublicKey): MsgRegisterZkPublicKeyAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgRegisterZkPublicKey",
+      value: MsgRegisterZkPublicKey.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgRegisterZkPublicKeyProtoMsg): MsgRegisterZkPublicKey {
     return MsgRegisterZkPublicKey.decode(message.value);
@@ -7823,6 +8026,7 @@ function createBaseMsgCreateTag(): MsgCreateTag {
  */
 export const MsgCreateTag = {
   typeUrl: "/sparkdream.rep.v1.MsgCreateTag",
+  aminoType: "sparkdream/x/rep/MsgCreateTag",
   encode(message: MsgCreateTag, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -7876,6 +8080,12 @@ export const MsgCreateTag = {
   },
   fromAminoMsg(object: MsgCreateTagAminoMsg): MsgCreateTag {
     return MsgCreateTag.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCreateTag): MsgCreateTagAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgCreateTag",
+      value: MsgCreateTag.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgCreateTagProtoMsg): MsgCreateTag {
     return MsgCreateTag.decode(message.value);
@@ -7974,6 +8184,7 @@ function createBaseMsgReportTag(): MsgReportTag {
  */
 export const MsgReportTag = {
   typeUrl: "/sparkdream.rep.v1.MsgReportTag",
+  aminoType: "sparkdream/x/rep/MsgReportTag",
   encode(message: MsgReportTag, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -8038,6 +8249,12 @@ export const MsgReportTag = {
   },
   fromAminoMsg(object: MsgReportTagAminoMsg): MsgReportTag {
     return MsgReportTag.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgReportTag): MsgReportTagAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgReportTag",
+      value: MsgReportTag.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgReportTagProtoMsg): MsgReportTag {
     return MsgReportTag.decode(message.value);
@@ -8125,6 +8342,7 @@ function createBaseMsgResolveTagReport(): MsgResolveTagReport {
  */
 export const MsgResolveTagReport = {
   typeUrl: "/sparkdream.rep.v1.MsgResolveTagReport",
+  aminoType: "sparkdream/x/rep/MsgResolveTagReport",
   encode(message: MsgResolveTagReport, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -8212,6 +8430,12 @@ export const MsgResolveTagReport = {
   fromAminoMsg(object: MsgResolveTagReportAminoMsg): MsgResolveTagReport {
     return MsgResolveTagReport.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgResolveTagReport): MsgResolveTagReportAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgResolveTagReport",
+      value: MsgResolveTagReport.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgResolveTagReportProtoMsg): MsgResolveTagReport {
     return MsgResolveTagReport.decode(message.value);
   },
@@ -8297,6 +8521,7 @@ function createBaseMsgCreateTagBudget(): MsgCreateTagBudget {
  */
 export const MsgCreateTagBudget = {
   typeUrl: "/sparkdream.rep.v1.MsgCreateTagBudget",
+  aminoType: "sparkdream/x/rep/MsgCreateTagBudget",
   encode(message: MsgCreateTagBudget, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -8372,6 +8597,12 @@ export const MsgCreateTagBudget = {
   },
   fromAminoMsg(object: MsgCreateTagBudgetAminoMsg): MsgCreateTagBudget {
     return MsgCreateTagBudget.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCreateTagBudget): MsgCreateTagBudgetAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgCreateTagBudget",
+      value: MsgCreateTagBudget.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgCreateTagBudgetProtoMsg): MsgCreateTagBudget {
     return MsgCreateTagBudget.decode(message.value);
@@ -8459,6 +8690,7 @@ function createBaseMsgAwardFromTagBudget(): MsgAwardFromTagBudget {
  */
 export const MsgAwardFromTagBudget = {
   typeUrl: "/sparkdream.rep.v1.MsgAwardFromTagBudget",
+  aminoType: "sparkdream/x/rep/MsgAwardFromTagBudget",
   encode(message: MsgAwardFromTagBudget, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -8546,6 +8778,12 @@ export const MsgAwardFromTagBudget = {
   fromAminoMsg(object: MsgAwardFromTagBudgetAminoMsg): MsgAwardFromTagBudget {
     return MsgAwardFromTagBudget.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgAwardFromTagBudget): MsgAwardFromTagBudgetAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgAwardFromTagBudget",
+      value: MsgAwardFromTagBudget.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgAwardFromTagBudgetProtoMsg): MsgAwardFromTagBudget {
     return MsgAwardFromTagBudget.decode(message.value);
   },
@@ -8630,6 +8868,7 @@ function createBaseMsgTopUpTagBudget(): MsgTopUpTagBudget {
  */
 export const MsgTopUpTagBudget = {
   typeUrl: "/sparkdream.rep.v1.MsgTopUpTagBudget",
+  aminoType: "sparkdream/x/rep/MsgTopUpTagBudget",
   encode(message: MsgTopUpTagBudget, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -8694,6 +8933,12 @@ export const MsgTopUpTagBudget = {
   },
   fromAminoMsg(object: MsgTopUpTagBudgetAminoMsg): MsgTopUpTagBudget {
     return MsgTopUpTagBudget.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgTopUpTagBudget): MsgTopUpTagBudgetAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgTopUpTagBudget",
+      value: MsgTopUpTagBudget.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgTopUpTagBudgetProtoMsg): MsgTopUpTagBudget {
     return MsgTopUpTagBudget.decode(message.value);
@@ -8779,6 +9024,7 @@ function createBaseMsgToggleTagBudget(): MsgToggleTagBudget {
  */
 export const MsgToggleTagBudget = {
   typeUrl: "/sparkdream.rep.v1.MsgToggleTagBudget",
+  aminoType: "sparkdream/x/rep/MsgToggleTagBudget",
   encode(message: MsgToggleTagBudget, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -8843,6 +9089,12 @@ export const MsgToggleTagBudget = {
   },
   fromAminoMsg(object: MsgToggleTagBudgetAminoMsg): MsgToggleTagBudget {
     return MsgToggleTagBudget.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgToggleTagBudget): MsgToggleTagBudgetAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgToggleTagBudget",
+      value: MsgToggleTagBudget.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgToggleTagBudgetProtoMsg): MsgToggleTagBudget {
     return MsgToggleTagBudget.decode(message.value);
@@ -8927,6 +9179,7 @@ function createBaseMsgWithdrawTagBudget(): MsgWithdrawTagBudget {
  */
 export const MsgWithdrawTagBudget = {
   typeUrl: "/sparkdream.rep.v1.MsgWithdrawTagBudget",
+  aminoType: "sparkdream/x/rep/MsgWithdrawTagBudget",
   encode(message: MsgWithdrawTagBudget, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -8980,6 +9233,12 @@ export const MsgWithdrawTagBudget = {
   },
   fromAminoMsg(object: MsgWithdrawTagBudgetAminoMsg): MsgWithdrawTagBudget {
     return MsgWithdrawTagBudget.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgWithdrawTagBudget): MsgWithdrawTagBudgetAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgWithdrawTagBudget",
+      value: MsgWithdrawTagBudget.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgWithdrawTagBudgetProtoMsg): MsgWithdrawTagBudget {
     return MsgWithdrawTagBudget.decode(message.value);
@@ -9067,6 +9326,7 @@ function createBaseMsgBondRole(): MsgBondRole {
  */
 export const MsgBondRole = {
   typeUrl: "/sparkdream.rep.v1.MsgBondRole",
+  aminoType: "sparkdream/x/rep/MsgBondRole",
   encode(message: MsgBondRole, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -9131,6 +9391,12 @@ export const MsgBondRole = {
   },
   fromAminoMsg(object: MsgBondRoleAminoMsg): MsgBondRole {
     return MsgBondRole.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgBondRole): MsgBondRoleAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgBondRole",
+      value: MsgBondRole.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgBondRoleProtoMsg): MsgBondRole {
     return MsgBondRole.decode(message.value);
@@ -9218,6 +9484,7 @@ function createBaseMsgUnbondRole(): MsgUnbondRole {
  */
 export const MsgUnbondRole = {
   typeUrl: "/sparkdream.rep.v1.MsgUnbondRole",
+  aminoType: "sparkdream/x/rep/MsgUnbondRole",
   encode(message: MsgUnbondRole, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -9282,6 +9549,12 @@ export const MsgUnbondRole = {
   },
   fromAminoMsg(object: MsgUnbondRoleAminoMsg): MsgUnbondRole {
     return MsgUnbondRole.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUnbondRole): MsgUnbondRoleAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgUnbondRole",
+      value: MsgUnbondRole.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUnbondRoleProtoMsg): MsgUnbondRole {
     return MsgUnbondRole.decode(message.value);
@@ -9368,6 +9641,7 @@ function createBaseMsgReportMember(): MsgReportMember {
  */
 export const MsgReportMember = {
   typeUrl: "/sparkdream.rep.v1.MsgReportMember",
+  aminoType: "sparkdream/x/rep/MsgReportMember",
   encode(message: MsgReportMember, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -9443,6 +9717,12 @@ export const MsgReportMember = {
   },
   fromAminoMsg(object: MsgReportMemberAminoMsg): MsgReportMember {
     return MsgReportMember.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgReportMember): MsgReportMemberAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgReportMember",
+      value: MsgReportMember.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgReportMemberProtoMsg): MsgReportMember {
     return MsgReportMember.decode(message.value);
@@ -9527,6 +9807,7 @@ function createBaseMsgCosignMemberReport(): MsgCosignMemberReport {
  */
 export const MsgCosignMemberReport = {
   typeUrl: "/sparkdream.rep.v1.MsgCosignMemberReport",
+  aminoType: "sparkdream/x/rep/MsgCosignMemberReport",
   encode(message: MsgCosignMemberReport, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -9580,6 +9861,12 @@ export const MsgCosignMemberReport = {
   },
   fromAminoMsg(object: MsgCosignMemberReportAminoMsg): MsgCosignMemberReport {
     return MsgCosignMemberReport.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCosignMemberReport): MsgCosignMemberReportAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgCosignMemberReport",
+      value: MsgCosignMemberReport.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgCosignMemberReportProtoMsg): MsgCosignMemberReport {
     return MsgCosignMemberReport.decode(message.value);
@@ -9666,6 +9953,7 @@ function createBaseMsgResolveMemberReport(): MsgResolveMemberReport {
  */
 export const MsgResolveMemberReport = {
   typeUrl: "/sparkdream.rep.v1.MsgResolveMemberReport",
+  aminoType: "sparkdream/x/rep/MsgResolveMemberReport",
   encode(message: MsgResolveMemberReport, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -9741,6 +10029,12 @@ export const MsgResolveMemberReport = {
   },
   fromAminoMsg(object: MsgResolveMemberReportAminoMsg): MsgResolveMemberReport {
     return MsgResolveMemberReport.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgResolveMemberReport): MsgResolveMemberReportAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgResolveMemberReport",
+      value: MsgResolveMemberReport.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgResolveMemberReportProtoMsg): MsgResolveMemberReport {
     return MsgResolveMemberReport.decode(message.value);
@@ -9825,6 +10119,7 @@ function createBaseMsgDefendMemberReport(): MsgDefendMemberReport {
  */
 export const MsgDefendMemberReport = {
   typeUrl: "/sparkdream.rep.v1.MsgDefendMemberReport",
+  aminoType: "sparkdream/x/rep/MsgDefendMemberReport",
   encode(message: MsgDefendMemberReport, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -9878,6 +10173,12 @@ export const MsgDefendMemberReport = {
   },
   fromAminoMsg(object: MsgDefendMemberReportAminoMsg): MsgDefendMemberReport {
     return MsgDefendMemberReport.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgDefendMemberReport): MsgDefendMemberReportAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgDefendMemberReport",
+      value: MsgDefendMemberReport.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgDefendMemberReportProtoMsg): MsgDefendMemberReport {
     return MsgDefendMemberReport.decode(message.value);
@@ -9964,6 +10265,7 @@ function createBaseMsgAppealGovAction(): MsgAppealGovAction {
  */
 export const MsgAppealGovAction = {
   typeUrl: "/sparkdream.rep.v1.MsgAppealGovAction",
+  aminoType: "sparkdream/x/rep/MsgAppealGovAction",
   encode(message: MsgAppealGovAction, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -10039,6 +10341,12 @@ export const MsgAppealGovAction = {
   },
   fromAminoMsg(object: MsgAppealGovActionAminoMsg): MsgAppealGovAction {
     return MsgAppealGovAction.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAppealGovAction): MsgAppealGovActionAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgAppealGovAction",
+      value: MsgAppealGovAction.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgAppealGovActionProtoMsg): MsgAppealGovAction {
     return MsgAppealGovAction.decode(message.value);
@@ -10128,6 +10436,7 @@ function createBaseMsgResolveGovActionAppeal(): MsgResolveGovActionAppeal {
  */
 export const MsgResolveGovActionAppeal = {
   typeUrl: "/sparkdream.rep.v1.MsgResolveGovActionAppeal",
+  aminoType: "sparkdream/x/rep/MsgResolveGovActionAppeal",
   encode(message: MsgResolveGovActionAppeal, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.resolver !== "") {
       writer.uint32(10).string(message.resolver);
@@ -10203,6 +10512,12 @@ export const MsgResolveGovActionAppeal = {
   },
   fromAminoMsg(object: MsgResolveGovActionAppealAminoMsg): MsgResolveGovActionAppeal {
     return MsgResolveGovActionAppeal.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgResolveGovActionAppeal): MsgResolveGovActionAppealAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgResolveGovActionAppeal",
+      value: MsgResolveGovActionAppeal.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgResolveGovActionAppealProtoMsg): MsgResolveGovActionAppeal {
     return MsgResolveGovActionAppeal.decode(message.value);

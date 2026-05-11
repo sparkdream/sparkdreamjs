@@ -382,6 +382,64 @@ export interface QueryGetOwnerInfoResponseAminoMsg {
   type: "/sparkdream.name.v1.QueryGetOwnerInfoResponse";
   value: QueryGetOwnerInfoResponseAmino;
 }
+/**
+ * QueryTargetsRequest defines the request type for the Targets RPC.
+ * @name QueryTargetsRequest
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.QueryTargetsRequest
+ */
+export interface QueryTargetsRequest {
+  address: string;
+  pagination?: PageRequest;
+}
+export interface QueryTargetsRequestProtoMsg {
+  typeUrl: "/sparkdream.name.v1.QueryTargetsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryTargetsRequest defines the request type for the Targets RPC.
+ * @name QueryTargetsRequestAmino
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.QueryTargetsRequest
+ */
+export interface QueryTargetsRequestAmino {
+  address?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryTargetsRequestAminoMsg {
+  type: "/sparkdream.name.v1.QueryTargetsRequest";
+  value: QueryTargetsRequestAmino;
+}
+/**
+ * QueryTargetsResponse defines the response type for the Targets RPC.
+ * Returns NameRecord entries for which `address` is the accepted target.
+ * @name QueryTargetsResponse
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.QueryTargetsResponse
+ */
+export interface QueryTargetsResponse {
+  names: NameRecord[];
+  pagination?: PageResponse;
+}
+export interface QueryTargetsResponseProtoMsg {
+  typeUrl: "/sparkdream.name.v1.QueryTargetsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryTargetsResponse defines the response type for the Targets RPC.
+ * Returns NameRecord entries for which `address` is the accepted target.
+ * @name QueryTargetsResponseAmino
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.QueryTargetsResponse
+ */
+export interface QueryTargetsResponseAmino {
+  names?: NameRecordAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryTargetsResponseAminoMsg {
+  type: "/sparkdream.name.v1.QueryTargetsResponse";
+  value: QueryTargetsResponseAmino;
+}
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
 }
@@ -1374,6 +1432,171 @@ export const QueryGetOwnerInfoResponse = {
     return {
       typeUrl: "/sparkdream.name.v1.QueryGetOwnerInfoResponse",
       value: QueryGetOwnerInfoResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryTargetsRequest(): QueryTargetsRequest {
+  return {
+    address: "",
+    pagination: undefined
+  };
+}
+/**
+ * QueryTargetsRequest defines the request type for the Targets RPC.
+ * @name QueryTargetsRequest
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.QueryTargetsRequest
+ */
+export const QueryTargetsRequest = {
+  typeUrl: "/sparkdream.name.v1.QueryTargetsRequest",
+  encode(message: QueryTargetsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.address !== "") {
+      writer.uint32(10).string(message.address);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryTargetsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryTargetsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.address = reader.string();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryTargetsRequest>): QueryTargetsRequest {
+    const message = createBaseQueryTargetsRequest();
+    message.address = object.address ?? "";
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryTargetsRequestAmino): QueryTargetsRequest {
+    const message = createBaseQueryTargetsRequest();
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryTargetsRequest): QueryTargetsRequestAmino {
+    const obj: any = {};
+    obj.address = message.address === "" ? undefined : message.address;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryTargetsRequestAminoMsg): QueryTargetsRequest {
+    return QueryTargetsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryTargetsRequestProtoMsg): QueryTargetsRequest {
+    return QueryTargetsRequest.decode(message.value);
+  },
+  toProto(message: QueryTargetsRequest): Uint8Array {
+    return QueryTargetsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryTargetsRequest): QueryTargetsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.name.v1.QueryTargetsRequest",
+      value: QueryTargetsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryTargetsResponse(): QueryTargetsResponse {
+  return {
+    names: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryTargetsResponse defines the response type for the Targets RPC.
+ * Returns NameRecord entries for which `address` is the accepted target.
+ * @name QueryTargetsResponse
+ * @package sparkdream.name.v1
+ * @see proto type: sparkdream.name.v1.QueryTargetsResponse
+ */
+export const QueryTargetsResponse = {
+  typeUrl: "/sparkdream.name.v1.QueryTargetsResponse",
+  encode(message: QueryTargetsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.names) {
+      NameRecord.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryTargetsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryTargetsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.names.push(NameRecord.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryTargetsResponse>): QueryTargetsResponse {
+    const message = createBaseQueryTargetsResponse();
+    message.names = object.names?.map(e => NameRecord.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryTargetsResponseAmino): QueryTargetsResponse {
+    const message = createBaseQueryTargetsResponse();
+    message.names = object.names?.map(e => NameRecord.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryTargetsResponse): QueryTargetsResponseAmino {
+    const obj: any = {};
+    if (message.names) {
+      obj.names = message.names.map(e => e ? NameRecord.toAmino(e) : undefined);
+    } else {
+      obj.names = message.names;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryTargetsResponseAminoMsg): QueryTargetsResponse {
+    return QueryTargetsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryTargetsResponseProtoMsg): QueryTargetsResponse {
+    return QueryTargetsResponse.decode(message.value);
+  },
+  toProto(message: QueryTargetsResponse): Uint8Array {
+    return QueryTargetsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryTargetsResponse): QueryTargetsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.name.v1.QueryTargetsResponse",
+      value: QueryTargetsResponse.encode(message).finish()
     };
   }
 };

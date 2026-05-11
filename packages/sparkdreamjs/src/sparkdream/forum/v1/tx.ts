@@ -182,7 +182,7 @@ export interface MsgCreatePostAmino {
   initiative_id?: string;
 }
 export interface MsgCreatePostAminoMsg {
-  type: "/sparkdream.forum.v1.MsgCreatePost";
+  type: "sparkdream/x/forum/MsgCreatePost";
   value: MsgCreatePostAmino;
 }
 /**
@@ -238,7 +238,7 @@ export interface MsgEditPostAmino {
   content_type?: ContentType;
 }
 export interface MsgEditPostAminoMsg {
-  type: "/sparkdream.forum.v1.MsgEditPost";
+  type: "sparkdream/x/forum/MsgEditPost";
   value: MsgEditPostAmino;
 }
 /**
@@ -288,7 +288,7 @@ export interface MsgDeletePostAmino {
   post_id?: string;
 }
 export interface MsgDeletePostAminoMsg {
-  type: "/sparkdream.forum.v1.MsgDeletePost";
+  type: "sparkdream/x/forum/MsgDeletePost";
   value: MsgDeletePostAmino;
 }
 /**
@@ -338,7 +338,7 @@ export interface MsgFreezeThreadAmino {
   root_id?: string;
 }
 export interface MsgFreezeThreadAminoMsg {
-  type: "/sparkdream.forum.v1.MsgFreezeThread";
+  type: "sparkdream/x/forum/MsgFreezeThread";
   value: MsgFreezeThreadAmino;
 }
 /**
@@ -388,7 +388,7 @@ export interface MsgUnarchiveThreadAmino {
   root_id?: string;
 }
 export interface MsgUnarchiveThreadAminoMsg {
-  type: "/sparkdream.forum.v1.MsgUnarchiveThread";
+  type: "sparkdream/x/forum/MsgUnarchiveThread";
   value: MsgUnarchiveThreadAmino;
 }
 /**
@@ -440,7 +440,7 @@ export interface MsgPinPostAmino {
   priority?: string;
 }
 export interface MsgPinPostAminoMsg {
-  type: "/sparkdream.forum.v1.MsgPinPost";
+  type: "sparkdream/x/forum/MsgPinPost";
   value: MsgPinPostAmino;
 }
 /**
@@ -490,7 +490,7 @@ export interface MsgUnpinPostAmino {
   post_id?: string;
 }
 export interface MsgUnpinPostAminoMsg {
-  type: "/sparkdream.forum.v1.MsgUnpinPost";
+  type: "sparkdream/x/forum/MsgUnpinPost";
   value: MsgUnpinPostAmino;
 }
 /**
@@ -542,7 +542,7 @@ export interface MsgLockThreadAmino {
   reason?: string;
 }
 export interface MsgLockThreadAminoMsg {
-  type: "/sparkdream.forum.v1.MsgLockThread";
+  type: "sparkdream/x/forum/MsgLockThread";
   value: MsgLockThreadAmino;
 }
 /**
@@ -592,7 +592,7 @@ export interface MsgUnlockThreadAmino {
   root_id?: string;
 }
 export interface MsgUnlockThreadAminoMsg {
-  type: "/sparkdream.forum.v1.MsgUnlockThread";
+  type: "sparkdream/x/forum/MsgUnlockThread";
   value: MsgUnlockThreadAmino;
 }
 /**
@@ -646,7 +646,7 @@ export interface MsgMoveThreadAmino {
   reason?: string;
 }
 export interface MsgMoveThreadAminoMsg {
-  type: "/sparkdream.forum.v1.MsgMoveThread";
+  type: "sparkdream/x/forum/MsgMoveThread";
   value: MsgMoveThreadAmino;
 }
 /**
@@ -696,7 +696,7 @@ export interface MsgFollowThreadAmino {
   thread_id?: string;
 }
 export interface MsgFollowThreadAminoMsg {
-  type: "/sparkdream.forum.v1.MsgFollowThread";
+  type: "sparkdream/x/forum/MsgFollowThread";
   value: MsgFollowThreadAmino;
 }
 /**
@@ -746,7 +746,7 @@ export interface MsgUnfollowThreadAmino {
   thread_id?: string;
 }
 export interface MsgUnfollowThreadAminoMsg {
-  type: "/sparkdream.forum.v1.MsgUnfollowThread";
+  type: "sparkdream/x/forum/MsgUnfollowThread";
   value: MsgUnfollowThreadAmino;
 }
 /**
@@ -796,7 +796,7 @@ export interface MsgUpvotePostAmino {
   post_id?: string;
 }
 export interface MsgUpvotePostAminoMsg {
-  type: "/sparkdream.forum.v1.MsgUpvotePost";
+  type: "sparkdream/x/forum/MsgUpvotePost";
   value: MsgUpvotePostAmino;
 }
 /**
@@ -846,7 +846,7 @@ export interface MsgDownvotePostAmino {
   post_id?: string;
 }
 export interface MsgDownvotePostAminoMsg {
-  type: "/sparkdream.forum.v1.MsgDownvotePost";
+  type: "sparkdream/x/forum/MsgDownvotePost";
   value: MsgDownvotePostAmino;
 }
 /**
@@ -900,7 +900,7 @@ export interface MsgFlagPostAmino {
   reason?: string;
 }
 export interface MsgFlagPostAminoMsg {
-  type: "/sparkdream.forum.v1.MsgFlagPost";
+  type: "sparkdream/x/forum/MsgFlagPost";
   value: MsgFlagPostAmino;
 }
 /**
@@ -952,7 +952,7 @@ export interface MsgDismissFlagsAmino {
   reason?: string;
 }
 export interface MsgDismissFlagsAminoMsg {
-  type: "/sparkdream.forum.v1.MsgDismissFlags";
+  type: "sparkdream/x/forum/MsgDismissFlags";
   value: MsgDismissFlagsAmino;
 }
 /**
@@ -1006,7 +1006,7 @@ export interface MsgHidePostAmino {
   reason_text?: string;
 }
 export interface MsgHidePostAminoMsg {
-  type: "/sparkdream.forum.v1.MsgHidePost";
+  type: "sparkdream/x/forum/MsgHidePost";
   value: MsgHidePostAmino;
 }
 /**
@@ -1056,7 +1056,7 @@ export interface MsgAppealPostAmino {
   post_id?: string;
 }
 export interface MsgAppealPostAminoMsg {
-  type: "/sparkdream.forum.v1.MsgAppealPost";
+  type: "sparkdream/x/forum/MsgAppealPost";
   value: MsgAppealPostAmino;
 }
 /**
@@ -1106,7 +1106,7 @@ export interface MsgAppealThreadLockAmino {
   root_id?: string;
 }
 export interface MsgAppealThreadLockAminoMsg {
-  type: "/sparkdream.forum.v1.MsgAppealThreadLock";
+  type: "sparkdream/x/forum/MsgAppealThreadLock";
   value: MsgAppealThreadLockAmino;
 }
 /**
@@ -1156,7 +1156,7 @@ export interface MsgAppealThreadMoveAmino {
   root_id?: string;
 }
 export interface MsgAppealThreadMoveAminoMsg {
-  type: "/sparkdream.forum.v1.MsgAppealThreadMove";
+  type: "sparkdream/x/forum/MsgAppealThreadMove";
   value: MsgAppealThreadMoveAmino;
 }
 /**
@@ -1210,7 +1210,7 @@ export interface MsgCreateBountyAmino {
   duration?: string;
 }
 export interface MsgCreateBountyAminoMsg {
-  type: "/sparkdream.forum.v1.MsgCreateBounty";
+  type: "sparkdream/x/forum/MsgCreateBounty";
   value: MsgCreateBountyAmino;
 }
 /**
@@ -1260,7 +1260,7 @@ export interface MsgAwardBountyAmino {
   bounty_id?: string;
 }
 export interface MsgAwardBountyAminoMsg {
-  type: "/sparkdream.forum.v1.MsgAwardBounty";
+  type: "sparkdream/x/forum/MsgAwardBounty";
   value: MsgAwardBountyAmino;
 }
 /**
@@ -1312,7 +1312,7 @@ export interface MsgIncreaseBountyAmino {
   additional_amount?: string;
 }
 export interface MsgIncreaseBountyAminoMsg {
-  type: "/sparkdream.forum.v1.MsgIncreaseBounty";
+  type: "sparkdream/x/forum/MsgIncreaseBounty";
   value: MsgIncreaseBountyAmino;
 }
 /**
@@ -1362,7 +1362,7 @@ export interface MsgCancelBountyAmino {
   bounty_id?: string;
 }
 export interface MsgCancelBountyAminoMsg {
-  type: "/sparkdream.forum.v1.MsgCancelBounty";
+  type: "sparkdream/x/forum/MsgCancelBounty";
   value: MsgCancelBountyAmino;
 }
 /**
@@ -1416,7 +1416,7 @@ export interface MsgAssignBountyToReplyAmino {
   reason?: string;
 }
 export interface MsgAssignBountyToReplyAminoMsg {
-  type: "/sparkdream.forum.v1.MsgAssignBountyToReply";
+  type: "sparkdream/x/forum/MsgAssignBountyToReply";
   value: MsgAssignBountyToReplyAmino;
 }
 /**
@@ -1468,7 +1468,7 @@ export interface MsgPinReplyAmino {
   reply_id?: string;
 }
 export interface MsgPinReplyAminoMsg {
-  type: "/sparkdream.forum.v1.MsgPinReply";
+  type: "sparkdream/x/forum/MsgPinReply";
   value: MsgPinReplyAmino;
 }
 /**
@@ -1520,7 +1520,7 @@ export interface MsgUnpinReplyAmino {
   reply_id?: string;
 }
 export interface MsgUnpinReplyAminoMsg {
-  type: "/sparkdream.forum.v1.MsgUnpinReply";
+  type: "sparkdream/x/forum/MsgUnpinReply";
   value: MsgUnpinReplyAmino;
 }
 /**
@@ -1574,7 +1574,7 @@ export interface MsgDisputePinAmino {
   reason?: string;
 }
 export interface MsgDisputePinAminoMsg {
-  type: "/sparkdream.forum.v1.MsgDisputePin";
+  type: "sparkdream/x/forum/MsgDisputePin";
   value: MsgDisputePinAmino;
 }
 /**
@@ -1626,7 +1626,7 @@ export interface MsgMarkAcceptedReplyAmino {
   reply_id?: string;
 }
 export interface MsgMarkAcceptedReplyAminoMsg {
-  type: "/sparkdream.forum.v1.MsgMarkAcceptedReply";
+  type: "sparkdream/x/forum/MsgMarkAcceptedReply";
   value: MsgMarkAcceptedReplyAmino;
 }
 /**
@@ -1676,7 +1676,7 @@ export interface MsgConfirmProposedReplyAmino {
   thread_id?: string;
 }
 export interface MsgConfirmProposedReplyAminoMsg {
-  type: "/sparkdream.forum.v1.MsgConfirmProposedReply";
+  type: "sparkdream/x/forum/MsgConfirmProposedReply";
   value: MsgConfirmProposedReplyAmino;
 }
 /**
@@ -1728,7 +1728,7 @@ export interface MsgRejectProposedReplyAmino {
   reason?: string;
 }
 export interface MsgRejectProposedReplyAminoMsg {
-  type: "/sparkdream.forum.v1.MsgRejectProposedReply";
+  type: "sparkdream/x/forum/MsgRejectProposedReply";
   value: MsgRejectProposedReplyAmino;
 }
 /**
@@ -1778,7 +1778,7 @@ export interface MsgSetForumPausedAmino {
   paused?: boolean;
 }
 export interface MsgSetForumPausedAminoMsg {
-  type: "/sparkdream.forum.v1.MsgSetForumPaused";
+  type: "sparkdream/x/forum/MsgSetForumPaused";
   value: MsgSetForumPausedAmino;
 }
 /**
@@ -1828,7 +1828,7 @@ export interface MsgSetModerationPausedAmino {
   paused?: boolean;
 }
 export interface MsgSetModerationPausedAminoMsg {
-  type: "/sparkdream.forum.v1.MsgSetModerationPaused";
+  type: "sparkdream/x/forum/MsgSetModerationPaused";
   value: MsgSetModerationPausedAmino;
 }
 /**
@@ -2164,6 +2164,7 @@ function createBaseMsgCreatePost(): MsgCreatePost {
  */
 export const MsgCreatePost = {
   typeUrl: "/sparkdream.forum.v1.MsgCreatePost",
+  aminoType: "sparkdream/x/forum/MsgCreatePost",
   encode(message: MsgCreatePost, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -2286,6 +2287,12 @@ export const MsgCreatePost = {
   fromAminoMsg(object: MsgCreatePostAminoMsg): MsgCreatePost {
     return MsgCreatePost.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgCreatePost): MsgCreatePostAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgCreatePost",
+      value: MsgCreatePost.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgCreatePostProtoMsg): MsgCreatePost {
     return MsgCreatePost.decode(message.value);
   },
@@ -2372,6 +2379,7 @@ function createBaseMsgEditPost(): MsgEditPost {
  */
 export const MsgEditPost = {
   typeUrl: "/sparkdream.forum.v1.MsgEditPost",
+  aminoType: "sparkdream/x/forum/MsgEditPost",
   encode(message: MsgEditPost, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -2461,6 +2469,12 @@ export const MsgEditPost = {
   fromAminoMsg(object: MsgEditPostAminoMsg): MsgEditPost {
     return MsgEditPost.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgEditPost): MsgEditPostAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgEditPost",
+      value: MsgEditPost.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgEditPostProtoMsg): MsgEditPost {
     return MsgEditPost.decode(message.value);
   },
@@ -2544,6 +2558,7 @@ function createBaseMsgDeletePost(): MsgDeletePost {
  */
 export const MsgDeletePost = {
   typeUrl: "/sparkdream.forum.v1.MsgDeletePost",
+  aminoType: "sparkdream/x/forum/MsgDeletePost",
   encode(message: MsgDeletePost, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -2597,6 +2612,12 @@ export const MsgDeletePost = {
   },
   fromAminoMsg(object: MsgDeletePostAminoMsg): MsgDeletePost {
     return MsgDeletePost.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgDeletePost): MsgDeletePostAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgDeletePost",
+      value: MsgDeletePost.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgDeletePostProtoMsg): MsgDeletePost {
     return MsgDeletePost.decode(message.value);
@@ -2681,6 +2702,7 @@ function createBaseMsgFreezeThread(): MsgFreezeThread {
  */
 export const MsgFreezeThread = {
   typeUrl: "/sparkdream.forum.v1.MsgFreezeThread",
+  aminoType: "sparkdream/x/forum/MsgFreezeThread",
   encode(message: MsgFreezeThread, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -2734,6 +2756,12 @@ export const MsgFreezeThread = {
   },
   fromAminoMsg(object: MsgFreezeThreadAminoMsg): MsgFreezeThread {
     return MsgFreezeThread.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgFreezeThread): MsgFreezeThreadAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgFreezeThread",
+      value: MsgFreezeThread.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgFreezeThreadProtoMsg): MsgFreezeThread {
     return MsgFreezeThread.decode(message.value);
@@ -2818,6 +2846,7 @@ function createBaseMsgUnarchiveThread(): MsgUnarchiveThread {
  */
 export const MsgUnarchiveThread = {
   typeUrl: "/sparkdream.forum.v1.MsgUnarchiveThread",
+  aminoType: "sparkdream/x/forum/MsgUnarchiveThread",
   encode(message: MsgUnarchiveThread, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -2871,6 +2900,12 @@ export const MsgUnarchiveThread = {
   },
   fromAminoMsg(object: MsgUnarchiveThreadAminoMsg): MsgUnarchiveThread {
     return MsgUnarchiveThread.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUnarchiveThread): MsgUnarchiveThreadAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgUnarchiveThread",
+      value: MsgUnarchiveThread.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUnarchiveThreadProtoMsg): MsgUnarchiveThread {
     return MsgUnarchiveThread.decode(message.value);
@@ -2956,6 +2991,7 @@ function createBaseMsgPinPost(): MsgPinPost {
  */
 export const MsgPinPost = {
   typeUrl: "/sparkdream.forum.v1.MsgPinPost",
+  aminoType: "sparkdream/x/forum/MsgPinPost",
   encode(message: MsgPinPost, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3020,6 +3056,12 @@ export const MsgPinPost = {
   },
   fromAminoMsg(object: MsgPinPostAminoMsg): MsgPinPost {
     return MsgPinPost.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgPinPost): MsgPinPostAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgPinPost",
+      value: MsgPinPost.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgPinPostProtoMsg): MsgPinPost {
     return MsgPinPost.decode(message.value);
@@ -3104,6 +3146,7 @@ function createBaseMsgUnpinPost(): MsgUnpinPost {
  */
 export const MsgUnpinPost = {
   typeUrl: "/sparkdream.forum.v1.MsgUnpinPost",
+  aminoType: "sparkdream/x/forum/MsgUnpinPost",
   encode(message: MsgUnpinPost, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3157,6 +3200,12 @@ export const MsgUnpinPost = {
   },
   fromAminoMsg(object: MsgUnpinPostAminoMsg): MsgUnpinPost {
     return MsgUnpinPost.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUnpinPost): MsgUnpinPostAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgUnpinPost",
+      value: MsgUnpinPost.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUnpinPostProtoMsg): MsgUnpinPost {
     return MsgUnpinPost.decode(message.value);
@@ -3242,6 +3291,7 @@ function createBaseMsgLockThread(): MsgLockThread {
  */
 export const MsgLockThread = {
   typeUrl: "/sparkdream.forum.v1.MsgLockThread",
+  aminoType: "sparkdream/x/forum/MsgLockThread",
   encode(message: MsgLockThread, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3306,6 +3356,12 @@ export const MsgLockThread = {
   },
   fromAminoMsg(object: MsgLockThreadAminoMsg): MsgLockThread {
     return MsgLockThread.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgLockThread): MsgLockThreadAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgLockThread",
+      value: MsgLockThread.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgLockThreadProtoMsg): MsgLockThread {
     return MsgLockThread.decode(message.value);
@@ -3390,6 +3446,7 @@ function createBaseMsgUnlockThread(): MsgUnlockThread {
  */
 export const MsgUnlockThread = {
   typeUrl: "/sparkdream.forum.v1.MsgUnlockThread",
+  aminoType: "sparkdream/x/forum/MsgUnlockThread",
   encode(message: MsgUnlockThread, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3443,6 +3500,12 @@ export const MsgUnlockThread = {
   },
   fromAminoMsg(object: MsgUnlockThreadAminoMsg): MsgUnlockThread {
     return MsgUnlockThread.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUnlockThread): MsgUnlockThreadAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgUnlockThread",
+      value: MsgUnlockThread.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUnlockThreadProtoMsg): MsgUnlockThread {
     return MsgUnlockThread.decode(message.value);
@@ -3529,6 +3592,7 @@ function createBaseMsgMoveThread(): MsgMoveThread {
  */
 export const MsgMoveThread = {
   typeUrl: "/sparkdream.forum.v1.MsgMoveThread",
+  aminoType: "sparkdream/x/forum/MsgMoveThread",
   encode(message: MsgMoveThread, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3604,6 +3668,12 @@ export const MsgMoveThread = {
   },
   fromAminoMsg(object: MsgMoveThreadAminoMsg): MsgMoveThread {
     return MsgMoveThread.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgMoveThread): MsgMoveThreadAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgMoveThread",
+      value: MsgMoveThread.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgMoveThreadProtoMsg): MsgMoveThread {
     return MsgMoveThread.decode(message.value);
@@ -3688,6 +3758,7 @@ function createBaseMsgFollowThread(): MsgFollowThread {
  */
 export const MsgFollowThread = {
   typeUrl: "/sparkdream.forum.v1.MsgFollowThread",
+  aminoType: "sparkdream/x/forum/MsgFollowThread",
   encode(message: MsgFollowThread, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3741,6 +3812,12 @@ export const MsgFollowThread = {
   },
   fromAminoMsg(object: MsgFollowThreadAminoMsg): MsgFollowThread {
     return MsgFollowThread.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgFollowThread): MsgFollowThreadAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgFollowThread",
+      value: MsgFollowThread.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgFollowThreadProtoMsg): MsgFollowThread {
     return MsgFollowThread.decode(message.value);
@@ -3825,6 +3902,7 @@ function createBaseMsgUnfollowThread(): MsgUnfollowThread {
  */
 export const MsgUnfollowThread = {
   typeUrl: "/sparkdream.forum.v1.MsgUnfollowThread",
+  aminoType: "sparkdream/x/forum/MsgUnfollowThread",
   encode(message: MsgUnfollowThread, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -3878,6 +3956,12 @@ export const MsgUnfollowThread = {
   },
   fromAminoMsg(object: MsgUnfollowThreadAminoMsg): MsgUnfollowThread {
     return MsgUnfollowThread.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUnfollowThread): MsgUnfollowThreadAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgUnfollowThread",
+      value: MsgUnfollowThread.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUnfollowThreadProtoMsg): MsgUnfollowThread {
     return MsgUnfollowThread.decode(message.value);
@@ -3962,6 +4046,7 @@ function createBaseMsgUpvotePost(): MsgUpvotePost {
  */
 export const MsgUpvotePost = {
   typeUrl: "/sparkdream.forum.v1.MsgUpvotePost",
+  aminoType: "sparkdream/x/forum/MsgUpvotePost",
   encode(message: MsgUpvotePost, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4015,6 +4100,12 @@ export const MsgUpvotePost = {
   },
   fromAminoMsg(object: MsgUpvotePostAminoMsg): MsgUpvotePost {
     return MsgUpvotePost.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUpvotePost): MsgUpvotePostAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgUpvotePost",
+      value: MsgUpvotePost.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUpvotePostProtoMsg): MsgUpvotePost {
     return MsgUpvotePost.decode(message.value);
@@ -4099,6 +4190,7 @@ function createBaseMsgDownvotePost(): MsgDownvotePost {
  */
 export const MsgDownvotePost = {
   typeUrl: "/sparkdream.forum.v1.MsgDownvotePost",
+  aminoType: "sparkdream/x/forum/MsgDownvotePost",
   encode(message: MsgDownvotePost, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4152,6 +4244,12 @@ export const MsgDownvotePost = {
   },
   fromAminoMsg(object: MsgDownvotePostAminoMsg): MsgDownvotePost {
     return MsgDownvotePost.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgDownvotePost): MsgDownvotePostAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgDownvotePost",
+      value: MsgDownvotePost.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgDownvotePostProtoMsg): MsgDownvotePost {
     return MsgDownvotePost.decode(message.value);
@@ -4238,6 +4336,7 @@ function createBaseMsgFlagPost(): MsgFlagPost {
  */
 export const MsgFlagPost = {
   typeUrl: "/sparkdream.forum.v1.MsgFlagPost",
+  aminoType: "sparkdream/x/forum/MsgFlagPost",
   encode(message: MsgFlagPost, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4313,6 +4412,12 @@ export const MsgFlagPost = {
   },
   fromAminoMsg(object: MsgFlagPostAminoMsg): MsgFlagPost {
     return MsgFlagPost.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgFlagPost): MsgFlagPostAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgFlagPost",
+      value: MsgFlagPost.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgFlagPostProtoMsg): MsgFlagPost {
     return MsgFlagPost.decode(message.value);
@@ -4398,6 +4503,7 @@ function createBaseMsgDismissFlags(): MsgDismissFlags {
  */
 export const MsgDismissFlags = {
   typeUrl: "/sparkdream.forum.v1.MsgDismissFlags",
+  aminoType: "sparkdream/x/forum/MsgDismissFlags",
   encode(message: MsgDismissFlags, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4462,6 +4568,12 @@ export const MsgDismissFlags = {
   },
   fromAminoMsg(object: MsgDismissFlagsAminoMsg): MsgDismissFlags {
     return MsgDismissFlags.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgDismissFlags): MsgDismissFlagsAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgDismissFlags",
+      value: MsgDismissFlags.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgDismissFlagsProtoMsg): MsgDismissFlags {
     return MsgDismissFlags.decode(message.value);
@@ -4548,6 +4660,7 @@ function createBaseMsgHidePost(): MsgHidePost {
  */
 export const MsgHidePost = {
   typeUrl: "/sparkdream.forum.v1.MsgHidePost",
+  aminoType: "sparkdream/x/forum/MsgHidePost",
   encode(message: MsgHidePost, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4623,6 +4736,12 @@ export const MsgHidePost = {
   },
   fromAminoMsg(object: MsgHidePostAminoMsg): MsgHidePost {
     return MsgHidePost.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgHidePost): MsgHidePostAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgHidePost",
+      value: MsgHidePost.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgHidePostProtoMsg): MsgHidePost {
     return MsgHidePost.decode(message.value);
@@ -4707,6 +4826,7 @@ function createBaseMsgAppealPost(): MsgAppealPost {
  */
 export const MsgAppealPost = {
   typeUrl: "/sparkdream.forum.v1.MsgAppealPost",
+  aminoType: "sparkdream/x/forum/MsgAppealPost",
   encode(message: MsgAppealPost, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4760,6 +4880,12 @@ export const MsgAppealPost = {
   },
   fromAminoMsg(object: MsgAppealPostAminoMsg): MsgAppealPost {
     return MsgAppealPost.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAppealPost): MsgAppealPostAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgAppealPost",
+      value: MsgAppealPost.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgAppealPostProtoMsg): MsgAppealPost {
     return MsgAppealPost.decode(message.value);
@@ -4844,6 +4970,7 @@ function createBaseMsgAppealThreadLock(): MsgAppealThreadLock {
  */
 export const MsgAppealThreadLock = {
   typeUrl: "/sparkdream.forum.v1.MsgAppealThreadLock",
+  aminoType: "sparkdream/x/forum/MsgAppealThreadLock",
   encode(message: MsgAppealThreadLock, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -4897,6 +5024,12 @@ export const MsgAppealThreadLock = {
   },
   fromAminoMsg(object: MsgAppealThreadLockAminoMsg): MsgAppealThreadLock {
     return MsgAppealThreadLock.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAppealThreadLock): MsgAppealThreadLockAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgAppealThreadLock",
+      value: MsgAppealThreadLock.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgAppealThreadLockProtoMsg): MsgAppealThreadLock {
     return MsgAppealThreadLock.decode(message.value);
@@ -4981,6 +5114,7 @@ function createBaseMsgAppealThreadMove(): MsgAppealThreadMove {
  */
 export const MsgAppealThreadMove = {
   typeUrl: "/sparkdream.forum.v1.MsgAppealThreadMove",
+  aminoType: "sparkdream/x/forum/MsgAppealThreadMove",
   encode(message: MsgAppealThreadMove, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -5034,6 +5168,12 @@ export const MsgAppealThreadMove = {
   },
   fromAminoMsg(object: MsgAppealThreadMoveAminoMsg): MsgAppealThreadMove {
     return MsgAppealThreadMove.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAppealThreadMove): MsgAppealThreadMoveAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgAppealThreadMove",
+      value: MsgAppealThreadMove.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgAppealThreadMoveProtoMsg): MsgAppealThreadMove {
     return MsgAppealThreadMove.decode(message.value);
@@ -5120,6 +5260,7 @@ function createBaseMsgCreateBounty(): MsgCreateBounty {
  */
 export const MsgCreateBounty = {
   typeUrl: "/sparkdream.forum.v1.MsgCreateBounty",
+  aminoType: "sparkdream/x/forum/MsgCreateBounty",
   encode(message: MsgCreateBounty, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -5195,6 +5336,12 @@ export const MsgCreateBounty = {
   },
   fromAminoMsg(object: MsgCreateBountyAminoMsg): MsgCreateBounty {
     return MsgCreateBounty.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCreateBounty): MsgCreateBountyAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgCreateBounty",
+      value: MsgCreateBounty.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgCreateBountyProtoMsg): MsgCreateBounty {
     return MsgCreateBounty.decode(message.value);
@@ -5279,6 +5426,7 @@ function createBaseMsgAwardBounty(): MsgAwardBounty {
  */
 export const MsgAwardBounty = {
   typeUrl: "/sparkdream.forum.v1.MsgAwardBounty",
+  aminoType: "sparkdream/x/forum/MsgAwardBounty",
   encode(message: MsgAwardBounty, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -5332,6 +5480,12 @@ export const MsgAwardBounty = {
   },
   fromAminoMsg(object: MsgAwardBountyAminoMsg): MsgAwardBounty {
     return MsgAwardBounty.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAwardBounty): MsgAwardBountyAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgAwardBounty",
+      value: MsgAwardBounty.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgAwardBountyProtoMsg): MsgAwardBounty {
     return MsgAwardBounty.decode(message.value);
@@ -5417,6 +5571,7 @@ function createBaseMsgIncreaseBounty(): MsgIncreaseBounty {
  */
 export const MsgIncreaseBounty = {
   typeUrl: "/sparkdream.forum.v1.MsgIncreaseBounty",
+  aminoType: "sparkdream/x/forum/MsgIncreaseBounty",
   encode(message: MsgIncreaseBounty, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -5481,6 +5636,12 @@ export const MsgIncreaseBounty = {
   },
   fromAminoMsg(object: MsgIncreaseBountyAminoMsg): MsgIncreaseBounty {
     return MsgIncreaseBounty.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgIncreaseBounty): MsgIncreaseBountyAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgIncreaseBounty",
+      value: MsgIncreaseBounty.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgIncreaseBountyProtoMsg): MsgIncreaseBounty {
     return MsgIncreaseBounty.decode(message.value);
@@ -5565,6 +5726,7 @@ function createBaseMsgCancelBounty(): MsgCancelBounty {
  */
 export const MsgCancelBounty = {
   typeUrl: "/sparkdream.forum.v1.MsgCancelBounty",
+  aminoType: "sparkdream/x/forum/MsgCancelBounty",
   encode(message: MsgCancelBounty, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -5618,6 +5780,12 @@ export const MsgCancelBounty = {
   },
   fromAminoMsg(object: MsgCancelBountyAminoMsg): MsgCancelBounty {
     return MsgCancelBounty.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCancelBounty): MsgCancelBountyAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgCancelBounty",
+      value: MsgCancelBounty.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgCancelBountyProtoMsg): MsgCancelBounty {
     return MsgCancelBounty.decode(message.value);
@@ -5704,6 +5872,7 @@ function createBaseMsgAssignBountyToReply(): MsgAssignBountyToReply {
  */
 export const MsgAssignBountyToReply = {
   typeUrl: "/sparkdream.forum.v1.MsgAssignBountyToReply",
+  aminoType: "sparkdream/x/forum/MsgAssignBountyToReply",
   encode(message: MsgAssignBountyToReply, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -5779,6 +5948,12 @@ export const MsgAssignBountyToReply = {
   },
   fromAminoMsg(object: MsgAssignBountyToReplyAminoMsg): MsgAssignBountyToReply {
     return MsgAssignBountyToReply.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAssignBountyToReply): MsgAssignBountyToReplyAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgAssignBountyToReply",
+      value: MsgAssignBountyToReply.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgAssignBountyToReplyProtoMsg): MsgAssignBountyToReply {
     return MsgAssignBountyToReply.decode(message.value);
@@ -5864,6 +6039,7 @@ function createBaseMsgPinReply(): MsgPinReply {
  */
 export const MsgPinReply = {
   typeUrl: "/sparkdream.forum.v1.MsgPinReply",
+  aminoType: "sparkdream/x/forum/MsgPinReply",
   encode(message: MsgPinReply, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -5928,6 +6104,12 @@ export const MsgPinReply = {
   },
   fromAminoMsg(object: MsgPinReplyAminoMsg): MsgPinReply {
     return MsgPinReply.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgPinReply): MsgPinReplyAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgPinReply",
+      value: MsgPinReply.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgPinReplyProtoMsg): MsgPinReply {
     return MsgPinReply.decode(message.value);
@@ -6013,6 +6195,7 @@ function createBaseMsgUnpinReply(): MsgUnpinReply {
  */
 export const MsgUnpinReply = {
   typeUrl: "/sparkdream.forum.v1.MsgUnpinReply",
+  aminoType: "sparkdream/x/forum/MsgUnpinReply",
   encode(message: MsgUnpinReply, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -6077,6 +6260,12 @@ export const MsgUnpinReply = {
   },
   fromAminoMsg(object: MsgUnpinReplyAminoMsg): MsgUnpinReply {
     return MsgUnpinReply.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUnpinReply): MsgUnpinReplyAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgUnpinReply",
+      value: MsgUnpinReply.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgUnpinReplyProtoMsg): MsgUnpinReply {
     return MsgUnpinReply.decode(message.value);
@@ -6163,6 +6352,7 @@ function createBaseMsgDisputePin(): MsgDisputePin {
  */
 export const MsgDisputePin = {
   typeUrl: "/sparkdream.forum.v1.MsgDisputePin",
+  aminoType: "sparkdream/x/forum/MsgDisputePin",
   encode(message: MsgDisputePin, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -6238,6 +6428,12 @@ export const MsgDisputePin = {
   },
   fromAminoMsg(object: MsgDisputePinAminoMsg): MsgDisputePin {
     return MsgDisputePin.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgDisputePin): MsgDisputePinAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgDisputePin",
+      value: MsgDisputePin.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgDisputePinProtoMsg): MsgDisputePin {
     return MsgDisputePin.decode(message.value);
@@ -6323,6 +6519,7 @@ function createBaseMsgMarkAcceptedReply(): MsgMarkAcceptedReply {
  */
 export const MsgMarkAcceptedReply = {
   typeUrl: "/sparkdream.forum.v1.MsgMarkAcceptedReply",
+  aminoType: "sparkdream/x/forum/MsgMarkAcceptedReply",
   encode(message: MsgMarkAcceptedReply, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -6387,6 +6584,12 @@ export const MsgMarkAcceptedReply = {
   },
   fromAminoMsg(object: MsgMarkAcceptedReplyAminoMsg): MsgMarkAcceptedReply {
     return MsgMarkAcceptedReply.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgMarkAcceptedReply): MsgMarkAcceptedReplyAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgMarkAcceptedReply",
+      value: MsgMarkAcceptedReply.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgMarkAcceptedReplyProtoMsg): MsgMarkAcceptedReply {
     return MsgMarkAcceptedReply.decode(message.value);
@@ -6471,6 +6674,7 @@ function createBaseMsgConfirmProposedReply(): MsgConfirmProposedReply {
  */
 export const MsgConfirmProposedReply = {
   typeUrl: "/sparkdream.forum.v1.MsgConfirmProposedReply",
+  aminoType: "sparkdream/x/forum/MsgConfirmProposedReply",
   encode(message: MsgConfirmProposedReply, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -6524,6 +6728,12 @@ export const MsgConfirmProposedReply = {
   },
   fromAminoMsg(object: MsgConfirmProposedReplyAminoMsg): MsgConfirmProposedReply {
     return MsgConfirmProposedReply.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgConfirmProposedReply): MsgConfirmProposedReplyAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgConfirmProposedReply",
+      value: MsgConfirmProposedReply.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgConfirmProposedReplyProtoMsg): MsgConfirmProposedReply {
     return MsgConfirmProposedReply.decode(message.value);
@@ -6609,6 +6819,7 @@ function createBaseMsgRejectProposedReply(): MsgRejectProposedReply {
  */
 export const MsgRejectProposedReply = {
   typeUrl: "/sparkdream.forum.v1.MsgRejectProposedReply",
+  aminoType: "sparkdream/x/forum/MsgRejectProposedReply",
   encode(message: MsgRejectProposedReply, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -6673,6 +6884,12 @@ export const MsgRejectProposedReply = {
   },
   fromAminoMsg(object: MsgRejectProposedReplyAminoMsg): MsgRejectProposedReply {
     return MsgRejectProposedReply.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRejectProposedReply): MsgRejectProposedReplyAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgRejectProposedReply",
+      value: MsgRejectProposedReply.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgRejectProposedReplyProtoMsg): MsgRejectProposedReply {
     return MsgRejectProposedReply.decode(message.value);
@@ -6757,6 +6974,7 @@ function createBaseMsgSetForumPaused(): MsgSetForumPaused {
  */
 export const MsgSetForumPaused = {
   typeUrl: "/sparkdream.forum.v1.MsgSetForumPaused",
+  aminoType: "sparkdream/x/forum/MsgSetForumPaused",
   encode(message: MsgSetForumPaused, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -6810,6 +7028,12 @@ export const MsgSetForumPaused = {
   },
   fromAminoMsg(object: MsgSetForumPausedAminoMsg): MsgSetForumPaused {
     return MsgSetForumPaused.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSetForumPaused): MsgSetForumPausedAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgSetForumPaused",
+      value: MsgSetForumPaused.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgSetForumPausedProtoMsg): MsgSetForumPaused {
     return MsgSetForumPaused.decode(message.value);
@@ -6894,6 +7118,7 @@ function createBaseMsgSetModerationPaused(): MsgSetModerationPaused {
  */
 export const MsgSetModerationPaused = {
   typeUrl: "/sparkdream.forum.v1.MsgSetModerationPaused",
+  aminoType: "sparkdream/x/forum/MsgSetModerationPaused",
   encode(message: MsgSetModerationPaused, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
@@ -6947,6 +7172,12 @@ export const MsgSetModerationPaused = {
   },
   fromAminoMsg(object: MsgSetModerationPausedAminoMsg): MsgSetModerationPaused {
     return MsgSetModerationPaused.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSetModerationPaused): MsgSetModerationPausedAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgSetModerationPaused",
+      value: MsgSetModerationPaused.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgSetModerationPausedProtoMsg): MsgSetModerationPaused {
     return MsgSetModerationPaused.decode(message.value);

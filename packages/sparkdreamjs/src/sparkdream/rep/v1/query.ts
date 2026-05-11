@@ -2,7 +2,7 @@
 import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "../../../cosmos/base/query/v1beta1/pagination";
 import { RoleType, BondedRole, BondedRoleAmino, BondedRoleConfig, BondedRoleConfigAmino } from "./bonded_role";
 import { Params, ParamsAmino } from "./params";
-import { Member, MemberAmino } from "./member";
+import { Member, MemberAmino, TrustLevel } from "./member";
 import { Invitation, InvitationAmino } from "./invitation";
 import { Project, ProjectAmino } from "./project";
 import { Initiative, InitiativeAmino } from "./initiative";
@@ -2527,6 +2527,7 @@ export interface QueryContentByInitiativeResponseAminoMsg {
   value: QueryContentByInitiativeResponseAmino;
 }
 /**
+ * Economic health queries
  * @name QueryDreamSupplyStatsRequest
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.QueryDreamSupplyStatsRequest
@@ -2537,6 +2538,7 @@ export interface QueryDreamSupplyStatsRequestProtoMsg {
   value: Uint8Array;
 }
 /**
+ * Economic health queries
  * @name QueryDreamSupplyStatsRequestAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.QueryDreamSupplyStatsRequest
@@ -4303,6 +4305,114 @@ export interface QueryMemberStandingResponseAmino {
 export interface QueryMemberStandingResponseAminoMsg {
   type: "/sparkdream.rep.v1.QueryMemberStandingResponse";
   value: QueryMemberStandingResponseAmino;
+}
+/**
+ * QueryRequiredInvitationStakeRequest is the request type for
+ * Query/RequiredInvitationStake. Frontend clients call this to determine the
+ * minimum DREAM stake an inviter must lock for their next invitation.
+ * @name QueryRequiredInvitationStakeRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRequiredInvitationStakeRequest
+ */
+export interface QueryRequiredInvitationStakeRequest {
+  inviter: string;
+}
+export interface QueryRequiredInvitationStakeRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryRequiredInvitationStakeRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryRequiredInvitationStakeRequest is the request type for
+ * Query/RequiredInvitationStake. Frontend clients call this to determine the
+ * minimum DREAM stake an inviter must lock for their next invitation.
+ * @name QueryRequiredInvitationStakeRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRequiredInvitationStakeRequest
+ */
+export interface QueryRequiredInvitationStakeRequestAmino {
+  inviter?: string;
+}
+export interface QueryRequiredInvitationStakeRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryRequiredInvitationStakeRequest";
+  value: QueryRequiredInvitationStakeRequestAmino;
+}
+/**
+ * QueryRequiredInvitationStakeResponse reports the effective minimum stake
+ * (in micro-DREAM) and the inputs used to derive it. The required_stake
+ * already accounts for InvitationCostMultiplier escalation based on how many
+ * of the inviter's seasonal credits have been spent.
+ * @name QueryRequiredInvitationStakeResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRequiredInvitationStakeResponse
+ */
+export interface QueryRequiredInvitationStakeResponse {
+  /**
+   * Effective minimum stake required for the next invitation, in micro-DREAM.
+   */
+  requiredStake: string;
+  /**
+   * Base floor (params.MinInvitationStake) before any cost-multiplier escalation.
+   */
+  baseStake: string;
+  /**
+   * InvitationCostMultiplier raised to credits_used (mirror of the on-chain math).
+   */
+  costMultiplier: string;
+  /**
+   * Number of invitation credits the inviter has already spent this season.
+   */
+  creditsUsed: number;
+  /**
+   * Credits the inviter has remaining for the current season.
+   */
+  creditsRemaining: number;
+  /**
+   * Trust level enum used to derive the credit cap.
+   */
+  trustLevel: TrustLevel;
+}
+export interface QueryRequiredInvitationStakeResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryRequiredInvitationStakeResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryRequiredInvitationStakeResponse reports the effective minimum stake
+ * (in micro-DREAM) and the inputs used to derive it. The required_stake
+ * already accounts for InvitationCostMultiplier escalation based on how many
+ * of the inviter's seasonal credits have been spent.
+ * @name QueryRequiredInvitationStakeResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRequiredInvitationStakeResponse
+ */
+export interface QueryRequiredInvitationStakeResponseAmino {
+  /**
+   * Effective minimum stake required for the next invitation, in micro-DREAM.
+   */
+  required_stake?: string;
+  /**
+   * Base floor (params.MinInvitationStake) before any cost-multiplier escalation.
+   */
+  base_stake?: string;
+  /**
+   * InvitationCostMultiplier raised to credits_used (mirror of the on-chain math).
+   */
+  cost_multiplier?: string;
+  /**
+   * Number of invitation credits the inviter has already spent this season.
+   */
+  credits_used?: number;
+  /**
+   * Credits the inviter has remaining for the current season.
+   */
+  credits_remaining?: number;
+  /**
+   * Trust level enum used to derive the credit cap.
+   */
+  trust_level?: TrustLevel;
+}
+export interface QueryRequiredInvitationStakeResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryRequiredInvitationStakeResponse";
+  value: QueryRequiredInvitationStakeResponseAmino;
 }
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
@@ -11328,6 +11438,7 @@ function createBaseQueryDreamSupplyStatsRequest(): QueryDreamSupplyStatsRequest 
   return {};
 }
 /**
+ * Economic health queries
  * @name QueryDreamSupplyStatsRequest
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.QueryDreamSupplyStatsRequest
@@ -16399,6 +16510,209 @@ export const QueryMemberStandingResponse = {
     return {
       typeUrl: "/sparkdream.rep.v1.QueryMemberStandingResponse",
       value: QueryMemberStandingResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRequiredInvitationStakeRequest(): QueryRequiredInvitationStakeRequest {
+  return {
+    inviter: ""
+  };
+}
+/**
+ * QueryRequiredInvitationStakeRequest is the request type for
+ * Query/RequiredInvitationStake. Frontend clients call this to determine the
+ * minimum DREAM stake an inviter must lock for their next invitation.
+ * @name QueryRequiredInvitationStakeRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRequiredInvitationStakeRequest
+ */
+export const QueryRequiredInvitationStakeRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryRequiredInvitationStakeRequest",
+  encode(message: QueryRequiredInvitationStakeRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.inviter !== "") {
+      writer.uint32(10).string(message.inviter);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRequiredInvitationStakeRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRequiredInvitationStakeRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.inviter = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryRequiredInvitationStakeRequest>): QueryRequiredInvitationStakeRequest {
+    const message = createBaseQueryRequiredInvitationStakeRequest();
+    message.inviter = object.inviter ?? "";
+    return message;
+  },
+  fromAmino(object: QueryRequiredInvitationStakeRequestAmino): QueryRequiredInvitationStakeRequest {
+    const message = createBaseQueryRequiredInvitationStakeRequest();
+    if (object.inviter !== undefined && object.inviter !== null) {
+      message.inviter = object.inviter;
+    }
+    return message;
+  },
+  toAmino(message: QueryRequiredInvitationStakeRequest): QueryRequiredInvitationStakeRequestAmino {
+    const obj: any = {};
+    obj.inviter = message.inviter === "" ? undefined : message.inviter;
+    return obj;
+  },
+  fromAminoMsg(object: QueryRequiredInvitationStakeRequestAminoMsg): QueryRequiredInvitationStakeRequest {
+    return QueryRequiredInvitationStakeRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRequiredInvitationStakeRequestProtoMsg): QueryRequiredInvitationStakeRequest {
+    return QueryRequiredInvitationStakeRequest.decode(message.value);
+  },
+  toProto(message: QueryRequiredInvitationStakeRequest): Uint8Array {
+    return QueryRequiredInvitationStakeRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRequiredInvitationStakeRequest): QueryRequiredInvitationStakeRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryRequiredInvitationStakeRequest",
+      value: QueryRequiredInvitationStakeRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRequiredInvitationStakeResponse(): QueryRequiredInvitationStakeResponse {
+  return {
+    requiredStake: "",
+    baseStake: "",
+    costMultiplier: "",
+    creditsUsed: 0,
+    creditsRemaining: 0,
+    trustLevel: 0
+  };
+}
+/**
+ * QueryRequiredInvitationStakeResponse reports the effective minimum stake
+ * (in micro-DREAM) and the inputs used to derive it. The required_stake
+ * already accounts for InvitationCostMultiplier escalation based on how many
+ * of the inviter's seasonal credits have been spent.
+ * @name QueryRequiredInvitationStakeResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRequiredInvitationStakeResponse
+ */
+export const QueryRequiredInvitationStakeResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryRequiredInvitationStakeResponse",
+  encode(message: QueryRequiredInvitationStakeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.requiredStake !== "") {
+      writer.uint32(10).string(message.requiredStake);
+    }
+    if (message.baseStake !== "") {
+      writer.uint32(18).string(message.baseStake);
+    }
+    if (message.costMultiplier !== "") {
+      writer.uint32(26).string(Decimal.fromUserInput(message.costMultiplier, 18).atomics);
+    }
+    if (message.creditsUsed !== 0) {
+      writer.uint32(32).uint32(message.creditsUsed);
+    }
+    if (message.creditsRemaining !== 0) {
+      writer.uint32(40).uint32(message.creditsRemaining);
+    }
+    if (message.trustLevel !== 0) {
+      writer.uint32(48).int32(message.trustLevel);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRequiredInvitationStakeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRequiredInvitationStakeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.requiredStake = reader.string();
+          break;
+        case 2:
+          message.baseStake = reader.string();
+          break;
+        case 3:
+          message.costMultiplier = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 4:
+          message.creditsUsed = reader.uint32();
+          break;
+        case 5:
+          message.creditsRemaining = reader.uint32();
+          break;
+        case 6:
+          message.trustLevel = reader.int32() as any;
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryRequiredInvitationStakeResponse>): QueryRequiredInvitationStakeResponse {
+    const message = createBaseQueryRequiredInvitationStakeResponse();
+    message.requiredStake = object.requiredStake ?? "";
+    message.baseStake = object.baseStake ?? "";
+    message.costMultiplier = object.costMultiplier ?? "";
+    message.creditsUsed = object.creditsUsed ?? 0;
+    message.creditsRemaining = object.creditsRemaining ?? 0;
+    message.trustLevel = object.trustLevel ?? 0;
+    return message;
+  },
+  fromAmino(object: QueryRequiredInvitationStakeResponseAmino): QueryRequiredInvitationStakeResponse {
+    const message = createBaseQueryRequiredInvitationStakeResponse();
+    if (object.required_stake !== undefined && object.required_stake !== null) {
+      message.requiredStake = object.required_stake;
+    }
+    if (object.base_stake !== undefined && object.base_stake !== null) {
+      message.baseStake = object.base_stake;
+    }
+    if (object.cost_multiplier !== undefined && object.cost_multiplier !== null) {
+      message.costMultiplier = object.cost_multiplier;
+    }
+    if (object.credits_used !== undefined && object.credits_used !== null) {
+      message.creditsUsed = object.credits_used;
+    }
+    if (object.credits_remaining !== undefined && object.credits_remaining !== null) {
+      message.creditsRemaining = object.credits_remaining;
+    }
+    if (object.trust_level !== undefined && object.trust_level !== null) {
+      message.trustLevel = object.trust_level;
+    }
+    return message;
+  },
+  toAmino(message: QueryRequiredInvitationStakeResponse): QueryRequiredInvitationStakeResponseAmino {
+    const obj: any = {};
+    obj.required_stake = message.requiredStake === "" ? undefined : message.requiredStake;
+    obj.base_stake = message.baseStake === "" ? undefined : message.baseStake;
+    obj.cost_multiplier = message.costMultiplier === "" ? undefined : message.costMultiplier;
+    obj.credits_used = message.creditsUsed === 0 ? undefined : message.creditsUsed;
+    obj.credits_remaining = message.creditsRemaining === 0 ? undefined : message.creditsRemaining;
+    obj.trust_level = message.trustLevel === 0 ? undefined : message.trustLevel;
+    return obj;
+  },
+  fromAminoMsg(object: QueryRequiredInvitationStakeResponseAminoMsg): QueryRequiredInvitationStakeResponse {
+    return QueryRequiredInvitationStakeResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRequiredInvitationStakeResponseProtoMsg): QueryRequiredInvitationStakeResponse {
+    return QueryRequiredInvitationStakeResponse.decode(message.value);
+  },
+  toProto(message: QueryRequiredInvitationStakeResponse): Uint8Array {
+    return QueryRequiredInvitationStakeResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRequiredInvitationStakeResponse): QueryRequiredInvitationStakeResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryRequiredInvitationStakeResponse",
+      value: QueryRequiredInvitationStakeResponse.encode(message).finish()
     };
   }
 };

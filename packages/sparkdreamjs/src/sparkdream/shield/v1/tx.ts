@@ -169,7 +169,7 @@ export interface MsgShieldedExecAmino {
   target_epoch?: string;
 }
 export interface MsgShieldedExecAminoMsg {
-  type: "/sparkdream.shield.v1.MsgShieldedExec";
+  type: "sparkdream/x/shield/MsgShieldedExec";
   value: MsgShieldedExecAmino;
 }
 /**
@@ -237,7 +237,7 @@ export interface MsgTriggerDkgAmino {
   threshold_denominator?: string;
 }
 export interface MsgTriggerDkgAminoMsg {
-  type: "/sparkdream.shield.v1.MsgTriggerDkg";
+  type: "sparkdream/x/shield/MsgTriggerDkg";
   value: MsgTriggerDkgAmino;
 }
 /**
@@ -285,7 +285,7 @@ export interface MsgRegisterShieldedOpAmino {
   registration?: ShieldedOpRegistrationAmino;
 }
 export interface MsgRegisterShieldedOpAminoMsg {
-  type: "/sparkdream.shield.v1.MsgRegisterShieldedOp";
+  type: "sparkdream/x/shield/MsgRegisterShieldedOp";
   value: MsgRegisterShieldedOpAmino;
 }
 /**
@@ -333,7 +333,7 @@ export interface MsgDeregisterShieldedOpAmino {
   message_type_url?: string;
 }
 export interface MsgDeregisterShieldedOpAminoMsg {
-  type: "/sparkdream.shield.v1.MsgDeregisterShieldedOp";
+  type: "sparkdream/x/shield/MsgDeregisterShieldedOp";
   value: MsgDeregisterShieldedOpAmino;
 }
 /**
@@ -522,6 +522,7 @@ function createBaseMsgShieldedExec(): MsgShieldedExec {
  */
 export const MsgShieldedExec = {
   typeUrl: "/sparkdream.shield.v1.MsgShieldedExec",
+  aminoType: "sparkdream/x/shield/MsgShieldedExec",
   encode(message: MsgShieldedExec, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.submitter !== "") {
       writer.uint32(10).string(message.submitter);
@@ -675,6 +676,12 @@ export const MsgShieldedExec = {
   fromAminoMsg(object: MsgShieldedExecAminoMsg): MsgShieldedExec {
     return MsgShieldedExec.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgShieldedExec): MsgShieldedExecAminoMsg {
+    return {
+      type: "sparkdream/x/shield/MsgShieldedExec",
+      value: MsgShieldedExec.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgShieldedExecProtoMsg): MsgShieldedExec {
     return MsgShieldedExec.decode(message.value);
   },
@@ -783,6 +790,7 @@ function createBaseMsgTriggerDkg(): MsgTriggerDkg {
  */
 export const MsgTriggerDkg = {
   typeUrl: "/sparkdream.shield.v1.MsgTriggerDkg",
+  aminoType: "sparkdream/x/shield/MsgTriggerDkg",
   encode(message: MsgTriggerDkg, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -847,6 +855,12 @@ export const MsgTriggerDkg = {
   },
   fromAminoMsg(object: MsgTriggerDkgAminoMsg): MsgTriggerDkg {
     return MsgTriggerDkg.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgTriggerDkg): MsgTriggerDkgAminoMsg {
+    return {
+      type: "sparkdream/x/shield/MsgTriggerDkg",
+      value: MsgTriggerDkg.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgTriggerDkgProtoMsg): MsgTriggerDkg {
     return MsgTriggerDkg.decode(message.value);
@@ -930,6 +944,7 @@ function createBaseMsgRegisterShieldedOp(): MsgRegisterShieldedOp {
  */
 export const MsgRegisterShieldedOp = {
   typeUrl: "/sparkdream.shield.v1.MsgRegisterShieldedOp",
+  aminoType: "sparkdream/x/shield/MsgRegisterShieldedOp",
   encode(message: MsgRegisterShieldedOp, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -983,6 +998,12 @@ export const MsgRegisterShieldedOp = {
   },
   fromAminoMsg(object: MsgRegisterShieldedOpAminoMsg): MsgRegisterShieldedOp {
     return MsgRegisterShieldedOp.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRegisterShieldedOp): MsgRegisterShieldedOpAminoMsg {
+    return {
+      type: "sparkdream/x/shield/MsgRegisterShieldedOp",
+      value: MsgRegisterShieldedOp.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgRegisterShieldedOpProtoMsg): MsgRegisterShieldedOp {
     return MsgRegisterShieldedOp.decode(message.value);
@@ -1066,6 +1087,7 @@ function createBaseMsgDeregisterShieldedOp(): MsgDeregisterShieldedOp {
  */
 export const MsgDeregisterShieldedOp = {
   typeUrl: "/sparkdream.shield.v1.MsgDeregisterShieldedOp",
+  aminoType: "sparkdream/x/shield/MsgDeregisterShieldedOp",
   encode(message: MsgDeregisterShieldedOp, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -1119,6 +1141,12 @@ export const MsgDeregisterShieldedOp = {
   },
   fromAminoMsg(object: MsgDeregisterShieldedOpAminoMsg): MsgDeregisterShieldedOp {
     return MsgDeregisterShieldedOp.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgDeregisterShieldedOp): MsgDeregisterShieldedOpAminoMsg {
+    return {
+      type: "sparkdream/x/shield/MsgDeregisterShieldedOp",
+      value: MsgDeregisterShieldedOp.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgDeregisterShieldedOpProtoMsg): MsgDeregisterShieldedOp {
     return MsgDeregisterShieldedOp.decode(message.value);

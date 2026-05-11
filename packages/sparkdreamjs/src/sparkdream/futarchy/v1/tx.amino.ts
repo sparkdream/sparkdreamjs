@@ -12,17 +12,17 @@ export const AminoConverter = {
     fromAmino: MsgUpdateOperationalParams.fromAmino
   },
   "/sparkdream.futarchy.v1.MsgCreateMarket": {
-    aminoType: "/sparkdream.futarchy.v1.MsgCreateMarket",
+    aminoType: "sparkdream/x/futarchy/MsgCreateMarket",
     toAmino: MsgCreateMarket.toAmino,
     fromAmino: MsgCreateMarket.fromAmino
   },
   "/sparkdream.futarchy.v1.MsgTrade": {
-    aminoType: "/sparkdream.futarchy.v1.MsgTrade",
+    aminoType: "sparkdream/x/futarchy/MsgTrade",
     toAmino: MsgTrade.toAmino,
     fromAmino: MsgTrade.fromAmino
   },
   "/sparkdream.futarchy.v1.MsgRedeem": {
-    aminoType: "/sparkdream.futarchy.v1.MsgRedeem",
+    aminoType: "sparkdream/x/futarchy/MsgRedeem",
     toAmino: MsgRedeem.toAmino,
     fromAmino: MsgRedeem.fromAmino
   },
@@ -32,7 +32,7 @@ export const AminoConverter = {
     fromAmino: MsgCancelMarket.fromAmino
   },
   "/sparkdream.futarchy.v1.MsgWithdrawLiquidity": {
-    aminoType: "/sparkdream.futarchy.v1.MsgWithdrawLiquidity",
+    aminoType: "sparkdream/x/futarchy/MsgWithdrawLiquidity",
     toAmino: MsgWithdrawLiquidity.toAmino,
     fromAmino: MsgWithdrawLiquidity.fromAmino
   }

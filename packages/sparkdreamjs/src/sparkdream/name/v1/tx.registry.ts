@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { TelescopeGeneratedType } from "../../../types";
 import { Registry } from "@cosmjs/proto-signing";
-import { MsgUpdateParams, MsgUpdateOperationalParams, MsgRegisterName, MsgSetPrimary, MsgFileDispute, MsgContestDispute, MsgResolveDispute, MsgUpdateName, MsgSetDisplayName } from "./tx";
-export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.name.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.name.v1.MsgUpdateOperationalParams", MsgUpdateOperationalParams], ["/sparkdream.name.v1.MsgRegisterName", MsgRegisterName], ["/sparkdream.name.v1.MsgSetPrimary", MsgSetPrimary], ["/sparkdream.name.v1.MsgFileDispute", MsgFileDispute], ["/sparkdream.name.v1.MsgContestDispute", MsgContestDispute], ["/sparkdream.name.v1.MsgResolveDispute", MsgResolveDispute], ["/sparkdream.name.v1.MsgUpdateName", MsgUpdateName], ["/sparkdream.name.v1.MsgSetDisplayName", MsgSetDisplayName]];
+import { MsgUpdateParams, MsgUpdateOperationalParams, MsgRegisterName, MsgSetPrimary, MsgFileDispute, MsgContestDispute, MsgResolveDispute, MsgUpdateName, MsgSetDisplayName, MsgSetTarget, MsgAcceptTarget, MsgTransferName } from "./tx";
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.name.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.name.v1.MsgUpdateOperationalParams", MsgUpdateOperationalParams], ["/sparkdream.name.v1.MsgRegisterName", MsgRegisterName], ["/sparkdream.name.v1.MsgSetPrimary", MsgSetPrimary], ["/sparkdream.name.v1.MsgFileDispute", MsgFileDispute], ["/sparkdream.name.v1.MsgContestDispute", MsgContestDispute], ["/sparkdream.name.v1.MsgResolveDispute", MsgResolveDispute], ["/sparkdream.name.v1.MsgUpdateName", MsgUpdateName], ["/sparkdream.name.v1.MsgSetDisplayName", MsgSetDisplayName], ["/sparkdream.name.v1.MsgSetTarget", MsgSetTarget], ["/sparkdream.name.v1.MsgAcceptTarget", MsgAcceptTarget], ["/sparkdream.name.v1.MsgTransferName", MsgTransferName]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -63,6 +63,24 @@ export const MessageComposer = {
         typeUrl: "/sparkdream.name.v1.MsgSetDisplayName",
         value: MsgSetDisplayName.encode(value).finish()
       };
+    },
+    setTarget(value: MsgSetTarget) {
+      return {
+        typeUrl: "/sparkdream.name.v1.MsgSetTarget",
+        value: MsgSetTarget.encode(value).finish()
+      };
+    },
+    acceptTarget(value: MsgAcceptTarget) {
+      return {
+        typeUrl: "/sparkdream.name.v1.MsgAcceptTarget",
+        value: MsgAcceptTarget.encode(value).finish()
+      };
+    },
+    transferName(value: MsgTransferName) {
+      return {
+        typeUrl: "/sparkdream.name.v1.MsgTransferName",
+        value: MsgTransferName.encode(value).finish()
+      };
     }
   },
   withTypeUrl: {
@@ -117,6 +135,24 @@ export const MessageComposer = {
     setDisplayName(value: MsgSetDisplayName) {
       return {
         typeUrl: "/sparkdream.name.v1.MsgSetDisplayName",
+        value
+      };
+    },
+    setTarget(value: MsgSetTarget) {
+      return {
+        typeUrl: "/sparkdream.name.v1.MsgSetTarget",
+        value
+      };
+    },
+    acceptTarget(value: MsgAcceptTarget) {
+      return {
+        typeUrl: "/sparkdream.name.v1.MsgAcceptTarget",
+        value
+      };
+    },
+    transferName(value: MsgTransferName) {
+      return {
+        typeUrl: "/sparkdream.name.v1.MsgTransferName",
         value
       };
     }
@@ -174,6 +210,24 @@ export const MessageComposer = {
       return {
         typeUrl: "/sparkdream.name.v1.MsgSetDisplayName",
         value: MsgSetDisplayName.fromPartial(value)
+      };
+    },
+    setTarget(value: MsgSetTarget) {
+      return {
+        typeUrl: "/sparkdream.name.v1.MsgSetTarget",
+        value: MsgSetTarget.fromPartial(value)
+      };
+    },
+    acceptTarget(value: MsgAcceptTarget) {
+      return {
+        typeUrl: "/sparkdream.name.v1.MsgAcceptTarget",
+        value: MsgAcceptTarget.fromPartial(value)
+      };
+    },
+    transferName(value: MsgTransferName) {
+      return {
+        typeUrl: "/sparkdream.name.v1.MsgTransferName",
+        value: MsgTransferName.fromPartial(value)
       };
     }
   }

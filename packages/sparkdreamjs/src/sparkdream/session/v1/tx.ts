@@ -164,7 +164,7 @@ export interface MsgCreateSessionAmino {
   max_exec_count?: string;
 }
 export interface MsgCreateSessionAminoMsg {
-  type: "/sparkdream.session.v1.MsgCreateSession";
+  type: "sparkdream/x/session/MsgCreateSession";
   value: MsgCreateSessionAmino;
 }
 /**
@@ -212,7 +212,7 @@ export interface MsgRevokeSessionAmino {
   grantee?: string;
 }
 export interface MsgRevokeSessionAminoMsg {
-  type: "/sparkdream.session.v1.MsgRevokeSession";
+  type: "sparkdream/x/session/MsgRevokeSession";
   value: MsgRevokeSessionAmino;
 }
 /**
@@ -268,7 +268,7 @@ export interface MsgExecSessionAmino {
   msgs?: AnyAmino[];
 }
 export interface MsgExecSessionAminoMsg {
-  type: "/sparkdream.session.v1.MsgExecSession";
+  type: "sparkdream/x/session/MsgExecSession";
   value: MsgExecSessionAmino;
 }
 /**
@@ -596,6 +596,7 @@ function createBaseMsgCreateSession(): MsgCreateSession {
  */
 export const MsgCreateSession = {
   typeUrl: "/sparkdream.session.v1.MsgCreateSession",
+  aminoType: "sparkdream/x/session/MsgCreateSession",
   encode(message: MsgCreateSession, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.granter !== "") {
       writer.uint32(10).string(message.granter);
@@ -696,6 +697,12 @@ export const MsgCreateSession = {
   fromAminoMsg(object: MsgCreateSessionAminoMsg): MsgCreateSession {
     return MsgCreateSession.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgCreateSession): MsgCreateSessionAminoMsg {
+    return {
+      type: "sparkdream/x/session/MsgCreateSession",
+      value: MsgCreateSession.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgCreateSessionProtoMsg): MsgCreateSession {
     return MsgCreateSession.decode(message.value);
   },
@@ -778,6 +785,7 @@ function createBaseMsgRevokeSession(): MsgRevokeSession {
  */
 export const MsgRevokeSession = {
   typeUrl: "/sparkdream.session.v1.MsgRevokeSession",
+  aminoType: "sparkdream/x/session/MsgRevokeSession",
   encode(message: MsgRevokeSession, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.granter !== "") {
       writer.uint32(10).string(message.granter);
@@ -831,6 +839,12 @@ export const MsgRevokeSession = {
   },
   fromAminoMsg(object: MsgRevokeSessionAminoMsg): MsgRevokeSession {
     return MsgRevokeSession.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRevokeSession): MsgRevokeSessionAminoMsg {
+    return {
+      type: "sparkdream/x/session/MsgRevokeSession",
+      value: MsgRevokeSession.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgRevokeSessionProtoMsg): MsgRevokeSession {
     return MsgRevokeSession.decode(message.value);
@@ -915,6 +929,7 @@ function createBaseMsgExecSession(): MsgExecSession {
  */
 export const MsgExecSession = {
   typeUrl: "/sparkdream.session.v1.MsgExecSession",
+  aminoType: "sparkdream/x/session/MsgExecSession",
   encode(message: MsgExecSession, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.grantee !== "") {
       writer.uint32(10).string(message.grantee);
@@ -981,6 +996,12 @@ export const MsgExecSession = {
   },
   fromAminoMsg(object: MsgExecSessionAminoMsg): MsgExecSession {
     return MsgExecSession.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgExecSession): MsgExecSessionAminoMsg {
+    return {
+      type: "sparkdream/x/session/MsgExecSession",
+      value: MsgExecSession.toAmino(message)
+    };
   },
   fromProtoMsg(message: MsgExecSessionProtoMsg): MsgExecSession {
     return MsgExecSession.decode(message.value);

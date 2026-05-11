@@ -12,102 +12,102 @@ export const AminoConverter = {
     fromAmino: MsgUpdateOperationalParams.fromAmino
   },
   "/sparkdream.season.v1.MsgSetDisplayName": {
-    aminoType: "/sparkdream.season.v1.MsgSetDisplayName",
+    aminoType: "sparkdream/x/season/MsgSetDisplayName",
     toAmino: MsgSetDisplayName.toAmino,
     fromAmino: MsgSetDisplayName.fromAmino
   },
   "/sparkdream.season.v1.MsgSetUsername": {
-    aminoType: "/sparkdream.season.v1.MsgSetUsername",
+    aminoType: "sparkdream/x/season/MsgSetUsername",
     toAmino: MsgSetUsername.toAmino,
     fromAmino: MsgSetUsername.fromAmino
   },
   "/sparkdream.season.v1.MsgSetDisplayTitle": {
-    aminoType: "/sparkdream.season.v1.MsgSetDisplayTitle",
+    aminoType: "sparkdream/x/season/MsgSetDisplayTitle",
     toAmino: MsgSetDisplayTitle.toAmino,
     fromAmino: MsgSetDisplayTitle.fromAmino
   },
   "/sparkdream.season.v1.MsgCreateGuild": {
-    aminoType: "/sparkdream.season.v1.MsgCreateGuild",
+    aminoType: "sparkdream/x/season/MsgCreateGuild",
     toAmino: MsgCreateGuild.toAmino,
     fromAmino: MsgCreateGuild.fromAmino
   },
   "/sparkdream.season.v1.MsgJoinGuild": {
-    aminoType: "/sparkdream.season.v1.MsgJoinGuild",
+    aminoType: "sparkdream/x/season/MsgJoinGuild",
     toAmino: MsgJoinGuild.toAmino,
     fromAmino: MsgJoinGuild.fromAmino
   },
   "/sparkdream.season.v1.MsgLeaveGuild": {
-    aminoType: "/sparkdream.season.v1.MsgLeaveGuild",
+    aminoType: "sparkdream/x/season/MsgLeaveGuild",
     toAmino: MsgLeaveGuild.toAmino,
     fromAmino: MsgLeaveGuild.fromAmino
   },
   "/sparkdream.season.v1.MsgTransferGuildFounder": {
-    aminoType: "/sparkdream.season.v1.MsgTransferGuildFounder",
+    aminoType: "sparkdream/x/season/MsgTransferGuildFounder",
     toAmino: MsgTransferGuildFounder.toAmino,
     fromAmino: MsgTransferGuildFounder.fromAmino
   },
   "/sparkdream.season.v1.MsgDissolveGuild": {
-    aminoType: "/sparkdream.season.v1.MsgDissolveGuild",
+    aminoType: "sparkdream/x/season/MsgDissolveGuild",
     toAmino: MsgDissolveGuild.toAmino,
     fromAmino: MsgDissolveGuild.fromAmino
   },
   "/sparkdream.season.v1.MsgPromoteToOfficer": {
-    aminoType: "/sparkdream.season.v1.MsgPromoteToOfficer",
+    aminoType: "sparkdream/x/season/MsgPromoteToOfficer",
     toAmino: MsgPromoteToOfficer.toAmino,
     fromAmino: MsgPromoteToOfficer.fromAmino
   },
   "/sparkdream.season.v1.MsgDemoteOfficer": {
-    aminoType: "/sparkdream.season.v1.MsgDemoteOfficer",
+    aminoType: "sparkdream/x/season/MsgDemoteOfficer",
     toAmino: MsgDemoteOfficer.toAmino,
     fromAmino: MsgDemoteOfficer.fromAmino
   },
   "/sparkdream.season.v1.MsgInviteToGuild": {
-    aminoType: "/sparkdream.season.v1.MsgInviteToGuild",
+    aminoType: "sparkdream/x/season/MsgInviteToGuild",
     toAmino: MsgInviteToGuild.toAmino,
     fromAmino: MsgInviteToGuild.fromAmino
   },
   "/sparkdream.season.v1.MsgAcceptGuildInvite": {
-    aminoType: "/sparkdream.season.v1.MsgAcceptGuildInvite",
+    aminoType: "sparkdream/x/season/MsgAcceptGuildInvite",
     toAmino: MsgAcceptGuildInvite.toAmino,
     fromAmino: MsgAcceptGuildInvite.fromAmino
   },
   "/sparkdream.season.v1.MsgRevokeGuildInvite": {
-    aminoType: "/sparkdream.season.v1.MsgRevokeGuildInvite",
+    aminoType: "sparkdream/x/season/MsgRevokeGuildInvite",
     toAmino: MsgRevokeGuildInvite.toAmino,
     fromAmino: MsgRevokeGuildInvite.fromAmino
   },
   "/sparkdream.season.v1.MsgSetGuildInviteOnly": {
-    aminoType: "/sparkdream.season.v1.MsgSetGuildInviteOnly",
+    aminoType: "sparkdream/x/season/MsgSetGuildInviteOnly",
     toAmino: MsgSetGuildInviteOnly.toAmino,
     fromAmino: MsgSetGuildInviteOnly.fromAmino
   },
   "/sparkdream.season.v1.MsgUpdateGuildDescription": {
-    aminoType: "/sparkdream.season.v1.MsgUpdateGuildDescription",
+    aminoType: "sparkdream/x/season/MsgUpdateGuildDescription",
     toAmino: MsgUpdateGuildDescription.toAmino,
     fromAmino: MsgUpdateGuildDescription.fromAmino
   },
   "/sparkdream.season.v1.MsgKickFromGuild": {
-    aminoType: "/sparkdream.season.v1.MsgKickFromGuild",
+    aminoType: "sparkdream/x/season/MsgKickFromGuild",
     toAmino: MsgKickFromGuild.toAmino,
     fromAmino: MsgKickFromGuild.fromAmino
   },
   "/sparkdream.season.v1.MsgClaimGuildFounder": {
-    aminoType: "/sparkdream.season.v1.MsgClaimGuildFounder",
+    aminoType: "sparkdream/x/season/MsgClaimGuildFounder",
     toAmino: MsgClaimGuildFounder.toAmino,
     fromAmino: MsgClaimGuildFounder.fromAmino
   },
   "/sparkdream.season.v1.MsgStartQuest": {
-    aminoType: "/sparkdream.season.v1.MsgStartQuest",
+    aminoType: "sparkdream/x/season/MsgStartQuest",
     toAmino: MsgStartQuest.toAmino,
     fromAmino: MsgStartQuest.fromAmino
   },
   "/sparkdream.season.v1.MsgClaimQuestReward": {
-    aminoType: "/sparkdream.season.v1.MsgClaimQuestReward",
+    aminoType: "sparkdream/x/season/MsgClaimQuestReward",
     toAmino: MsgClaimQuestReward.toAmino,
     fromAmino: MsgClaimQuestReward.fromAmino
   },
   "/sparkdream.season.v1.MsgAbandonQuest": {
-    aminoType: "/sparkdream.season.v1.MsgAbandonQuest",
+    aminoType: "sparkdream/x/season/MsgAbandonQuest",
     toAmino: MsgAbandonQuest.toAmino,
     fromAmino: MsgAbandonQuest.fromAmino
   },
@@ -147,12 +147,12 @@ export const AminoConverter = {
     fromAmino: MsgSkipTransitionPhase.fromAmino
   },
   "/sparkdream.season.v1.MsgReportDisplayName": {
-    aminoType: "/sparkdream.season.v1.MsgReportDisplayName",
+    aminoType: "sparkdream/x/season/MsgReportDisplayName",
     toAmino: MsgReportDisplayName.toAmino,
     fromAmino: MsgReportDisplayName.fromAmino
   },
   "/sparkdream.season.v1.MsgAppealDisplayNameModeration": {
-    aminoType: "/sparkdream.season.v1.MsgAppealDisplayNameModeration",
+    aminoType: "sparkdream/x/season/MsgAppealDisplayNameModeration",
     toAmino: MsgAppealDisplayNameModeration.toAmino,
     fromAmino: MsgAppealDisplayNameModeration.fromAmino
   },
@@ -202,17 +202,17 @@ export const AminoConverter = {
     fromAmino: MsgResolveUnappealedModeration.fromAmino
   },
   "/sparkdream.season.v1.MsgNominate": {
-    aminoType: "/sparkdream.season.v1.MsgNominate",
+    aminoType: "sparkdream/x/season/MsgNominate",
     toAmino: MsgNominate.toAmino,
     fromAmino: MsgNominate.fromAmino
   },
   "/sparkdream.season.v1.MsgStakeNomination": {
-    aminoType: "/sparkdream.season.v1.MsgStakeNomination",
+    aminoType: "sparkdream/x/season/MsgStakeNomination",
     toAmino: MsgStakeNomination.toAmino,
     fromAmino: MsgStakeNomination.fromAmino
   },
   "/sparkdream.season.v1.MsgUnstakeNomination": {
-    aminoType: "/sparkdream.season.v1.MsgUnstakeNomination",
+    aminoType: "sparkdream/x/season/MsgUnstakeNomination",
     toAmino: MsgUnstakeNomination.toAmino,
     fromAmino: MsgUnstakeNomination.fromAmino
   }

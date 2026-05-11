@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryResolveRequest, QueryResolveResponse, QueryReverseResolveRequest, QueryReverseResolveResponse, QueryNamesRequest, QueryNamesResponse, QueryGetDisputeRequest, QueryGetDisputeResponse, QueryAllDisputeRequest, QueryAllDisputeResponse, QueryGetOwnerInfoRequest, QueryGetOwnerInfoResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryResolveRequest, QueryResolveResponse, QueryReverseResolveRequest, QueryReverseResolveResponse, QueryNamesRequest, QueryNamesResponse, QueryGetDisputeRequest, QueryGetDisputeResponse, QueryAllDisputeRequest, QueryAllDisputeResponse, QueryGetOwnerInfoRequest, QueryGetOwnerInfoResponse, QueryTargetsRequest, QueryTargetsResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -23,6 +23,12 @@ export interface Query {
    * ones that never registered a handle.
    */
   getOwnerInfo(request: QueryGetOwnerInfoRequest): Promise<QueryGetOwnerInfoResponse>;
+  /**
+   * Targets returns the list of names where the given address is the
+   * accepted resolver target (i.e., names eligible to be set as the
+   * address's primary for reverse resolution).
+   */
+  targets(request: QueryTargetsRequest): Promise<QueryTargetsResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -75,6 +81,14 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.name.v1.Query", "GetOwnerInfo", data);
     return promise.then(data => QueryGetOwnerInfoResponse.decode(new BinaryReader(data)));
   };
+  /* Targets returns the list of names where the given address is the
+   accepted resolver target (i.e., names eligible to be set as the
+   address's primary for reverse resolution). */
+  targets = async (request: QueryTargetsRequest): Promise<QueryTargetsResponse> => {
+    const data = QueryTargetsRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.name.v1.Query", "Targets", data);
+    return promise.then(data => QueryTargetsResponse.decode(new BinaryReader(data)));
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);
@@ -100,6 +114,9 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     getOwnerInfo(request: QueryGetOwnerInfoRequest): Promise<QueryGetOwnerInfoResponse> {
       return queryService.getOwnerInfo(request);
+    },
+    targets(request: QueryTargetsRequest): Promise<QueryTargetsResponse> {
+      return queryService.targets(request);
     }
   };
 };
