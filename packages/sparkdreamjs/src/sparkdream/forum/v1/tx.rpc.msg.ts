@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgCreatePost, MsgCreatePostResponse, MsgEditPost, MsgEditPostResponse, MsgDeletePost, MsgDeletePostResponse, MsgFreezeThread, MsgFreezeThreadResponse, MsgUnarchiveThread, MsgUnarchiveThreadResponse, MsgPinPost, MsgPinPostResponse, MsgUnpinPost, MsgUnpinPostResponse, MsgLockThread, MsgLockThreadResponse, MsgUnlockThread, MsgUnlockThreadResponse, MsgMoveThread, MsgMoveThreadResponse, MsgFollowThread, MsgFollowThreadResponse, MsgUnfollowThread, MsgUnfollowThreadResponse, MsgUpvotePost, MsgUpvotePostResponse, MsgDownvotePost, MsgDownvotePostResponse, MsgFlagPost, MsgFlagPostResponse, MsgDismissFlags, MsgDismissFlagsResponse, MsgHidePost, MsgHidePostResponse, MsgAppealPost, MsgAppealPostResponse, MsgAppealThreadLock, MsgAppealThreadLockResponse, MsgAppealThreadMove, MsgAppealThreadMoveResponse, MsgCreateBounty, MsgCreateBountyResponse, MsgAwardBounty, MsgAwardBountyResponse, MsgIncreaseBounty, MsgIncreaseBountyResponse, MsgCancelBounty, MsgCancelBountyResponse, MsgAssignBountyToReply, MsgAssignBountyToReplyResponse, MsgPinReply, MsgPinReplyResponse, MsgUnpinReply, MsgUnpinReplyResponse, MsgDisputePin, MsgDisputePinResponse, MsgMarkAcceptedReply, MsgMarkAcceptedReplyResponse, MsgConfirmProposedReply, MsgConfirmProposedReplyResponse, MsgRejectProposedReply, MsgRejectProposedReplyResponse, MsgSetForumPaused, MsgSetForumPausedResponse, MsgSetModerationPaused, MsgSetModerationPausedResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgCreatePost, MsgCreatePostResponse, MsgEditPost, MsgEditPostResponse, MsgDeletePost, MsgDeletePostResponse, MsgFreezeThread, MsgFreezeThreadResponse, MsgUnarchiveThread, MsgUnarchiveThreadResponse, MsgPinPost, MsgPinPostResponse, MsgUnpinPost, MsgUnpinPostResponse, MsgLockThread, MsgLockThreadResponse, MsgUnlockThread, MsgUnlockThreadResponse, MsgMoveThread, MsgMoveThreadResponse, MsgFollowThread, MsgFollowThreadResponse, MsgUnfollowThread, MsgUnfollowThreadResponse, MsgUpvotePost, MsgUpvotePostResponse, MsgDownvotePost, MsgDownvotePostResponse, MsgFlagPost, MsgFlagPostResponse, MsgDismissFlags, MsgDismissFlagsResponse, MsgHidePost, MsgHidePostResponse, MsgUnhidePost, MsgUnhidePostResponse, MsgAppealPost, MsgAppealPostResponse, MsgAppealThreadLock, MsgAppealThreadLockResponse, MsgAppealThreadMove, MsgAppealThreadMoveResponse, MsgCreateBounty, MsgCreateBountyResponse, MsgAwardBounty, MsgAwardBountyResponse, MsgIncreaseBounty, MsgIncreaseBountyResponse, MsgCancelBounty, MsgCancelBountyResponse, MsgAssignBountyToReply, MsgAssignBountyToReplyResponse, MsgPinReply, MsgPinReplyResponse, MsgUnpinReply, MsgUnpinReplyResponse, MsgDisputePin, MsgDisputePinResponse, MsgMarkAcceptedReply, MsgMarkAcceptedReplyResponse, MsgConfirmProposedReply, MsgConfirmProposedReplyResponse, MsgRejectProposedReply, MsgRejectProposedReplyResponse, MsgSetForumPaused, MsgSetForumPausedResponse, MsgSetModerationPaused, MsgSetModerationPausedResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
@@ -48,6 +48,15 @@ export interface Msg {
   dismissFlags(request: MsgDismissFlags): Promise<MsgDismissFlagsResponse>;
   /** HidePost defines the HidePost RPC. */
   hidePost(request: MsgHidePost): Promise<MsgHidePostResponse>;
+  /**
+   * UnhidePost reverses a prior MsgHidePost. Authorized for (a) the sentinel
+   * who originally hid the post, but only within sentinel_unhide_window
+   * seconds of the hide (self-correction grace window analogous to the
+   * edit_max_window for authors); and (b) the Commons Operations Committee
+   * / governance at any time (council override). Refuses if the post's
+   * parent category has since been deleted (dangling reference guard).
+   */
+  unhidePost(request: MsgUnhidePost): Promise<MsgUnhidePostResponse>;
   /** AppealPost defines the AppealPost RPC. */
   appealPost(request: MsgAppealPost): Promise<MsgAppealPostResponse>;
   /** AppealThreadLock defines the AppealThreadLock RPC. */
@@ -201,6 +210,17 @@ export class MsgClientImpl implements Msg {
     const data = MsgHidePost.encode(request).finish();
     const promise = this.rpc.request("sparkdream.forum.v1.Msg", "HidePost", data);
     return promise.then(data => MsgHidePostResponse.decode(new BinaryReader(data)));
+  };
+  /* UnhidePost reverses a prior MsgHidePost. Authorized for (a) the sentinel
+   who originally hid the post, but only within sentinel_unhide_window
+   seconds of the hide (self-correction grace window analogous to the
+   edit_max_window for authors); and (b) the Commons Operations Committee
+   / governance at any time (council override). Refuses if the post's
+   parent category has since been deleted (dangling reference guard). */
+  unhidePost = async (request: MsgUnhidePost): Promise<MsgUnhidePostResponse> => {
+    const data = MsgUnhidePost.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "UnhidePost", data);
+    return promise.then(data => MsgUnhidePostResponse.decode(new BinaryReader(data)));
   };
   /* AppealPost defines the AppealPost RPC. */
   appealPost = async (request: MsgAppealPost): Promise<MsgAppealPostResponse> => {

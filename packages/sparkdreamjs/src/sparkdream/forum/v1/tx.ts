@@ -1032,6 +1032,56 @@ export interface MsgHidePostResponseAminoMsg {
   value: MsgHidePostResponseAmino;
 }
 /**
+ * MsgUnhidePost reverses MsgHidePost.
+ * @name MsgUnhidePost
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgUnhidePost
+ */
+export interface MsgUnhidePost {
+  creator: string;
+  postId: bigint;
+}
+export interface MsgUnhidePostProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.MsgUnhidePost";
+  value: Uint8Array;
+}
+/**
+ * MsgUnhidePost reverses MsgHidePost.
+ * @name MsgUnhidePostAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgUnhidePost
+ */
+export interface MsgUnhidePostAmino {
+  creator?: string;
+  post_id?: string;
+}
+export interface MsgUnhidePostAminoMsg {
+  type: "sparkdream/x/forum/MsgUnhidePost";
+  value: MsgUnhidePostAmino;
+}
+/**
+ * MsgUnhidePostResponse defines the MsgUnhidePostResponse message.
+ * @name MsgUnhidePostResponse
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgUnhidePostResponse
+ */
+export interface MsgUnhidePostResponse {}
+export interface MsgUnhidePostResponseProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.MsgUnhidePostResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgUnhidePostResponse defines the MsgUnhidePostResponse message.
+ * @name MsgUnhidePostResponseAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgUnhidePostResponse
+ */
+export interface MsgUnhidePostResponseAmino {}
+export interface MsgUnhidePostResponseAminoMsg {
+  type: "/sparkdream.forum.v1.MsgUnhidePostResponse";
+  value: MsgUnhidePostResponseAmino;
+}
+/**
  * MsgAppealPost defines the MsgAppealPost message.
  * @name MsgAppealPost
  * @package sparkdream.forum.v1
@@ -4809,6 +4859,150 @@ export const MsgHidePostResponse = {
     return {
       typeUrl: "/sparkdream.forum.v1.MsgHidePostResponse",
       value: MsgHidePostResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUnhidePost(): MsgUnhidePost {
+  return {
+    creator: "",
+    postId: BigInt(0)
+  };
+}
+/**
+ * MsgUnhidePost reverses MsgHidePost.
+ * @name MsgUnhidePost
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgUnhidePost
+ */
+export const MsgUnhidePost = {
+  typeUrl: "/sparkdream.forum.v1.MsgUnhidePost",
+  aminoType: "sparkdream/x/forum/MsgUnhidePost",
+  encode(message: MsgUnhidePost, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.postId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.postId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUnhidePost {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUnhidePost();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.postId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgUnhidePost>): MsgUnhidePost {
+    const message = createBaseMsgUnhidePost();
+    message.creator = object.creator ?? "";
+    message.postId = object.postId !== undefined && object.postId !== null ? BigInt(object.postId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgUnhidePostAmino): MsgUnhidePost {
+    const message = createBaseMsgUnhidePost();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.post_id !== undefined && object.post_id !== null) {
+      message.postId = BigInt(object.post_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgUnhidePost): MsgUnhidePostAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.post_id = message.postId !== BigInt(0) ? message.postId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgUnhidePostAminoMsg): MsgUnhidePost {
+    return MsgUnhidePost.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUnhidePost): MsgUnhidePostAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgUnhidePost",
+      value: MsgUnhidePost.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgUnhidePostProtoMsg): MsgUnhidePost {
+    return MsgUnhidePost.decode(message.value);
+  },
+  toProto(message: MsgUnhidePost): Uint8Array {
+    return MsgUnhidePost.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUnhidePost): MsgUnhidePostProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.MsgUnhidePost",
+      value: MsgUnhidePost.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUnhidePostResponse(): MsgUnhidePostResponse {
+  return {};
+}
+/**
+ * MsgUnhidePostResponse defines the MsgUnhidePostResponse message.
+ * @name MsgUnhidePostResponse
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgUnhidePostResponse
+ */
+export const MsgUnhidePostResponse = {
+  typeUrl: "/sparkdream.forum.v1.MsgUnhidePostResponse",
+  encode(_: MsgUnhidePostResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUnhidePostResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUnhidePostResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgUnhidePostResponse>): MsgUnhidePostResponse {
+    const message = createBaseMsgUnhidePostResponse();
+    return message;
+  },
+  fromAmino(_: MsgUnhidePostResponseAmino): MsgUnhidePostResponse {
+    const message = createBaseMsgUnhidePostResponse();
+    return message;
+  },
+  toAmino(_: MsgUnhidePostResponse): MsgUnhidePostResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgUnhidePostResponseAminoMsg): MsgUnhidePostResponse {
+    return MsgUnhidePostResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgUnhidePostResponseProtoMsg): MsgUnhidePostResponse {
+    return MsgUnhidePostResponse.decode(message.value);
+  },
+  toProto(message: MsgUnhidePostResponse): Uint8Array {
+    return MsgUnhidePostResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUnhidePostResponse): MsgUnhidePostResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.MsgUnhidePostResponse",
+      value: MsgUnhidePostResponse.encode(message).finish()
     };
   }
 };

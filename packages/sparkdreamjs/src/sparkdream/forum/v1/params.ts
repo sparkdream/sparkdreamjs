@@ -162,6 +162,13 @@ export interface Params {
    * sentinel_demotion_threshold — see ForumOperationalParams.sentinel_demotion_threshold.
    */
   sentinelDemotionThreshold: string;
+  /**
+   * sentinel_unhide_window in seconds. A sentinel who hid a post may
+   * self-correct (call MsgUnhidePost) within this window of the original
+   * hide; after it expires, only the Commons Operations Committee or
+   * governance can unhide. Analogous to edit_max_window for authors.
+   */
+  sentinelUnhideWindow: bigint;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.forum.v1.Params";
@@ -326,6 +333,13 @@ export interface ParamsAmino {
    * sentinel_demotion_threshold — see ForumOperationalParams.sentinel_demotion_threshold.
    */
   sentinel_demotion_threshold?: string;
+  /**
+   * sentinel_unhide_window in seconds. A sentinel who hid a post may
+   * self-correct (call MsgUnhidePost) within this window of the original
+   * hide; after it expires, only the Commons Operations Committee or
+   * governance can unhide. Analogous to edit_max_window for authors.
+   */
+  sentinel_unhide_window?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/forum/Params";
@@ -420,6 +434,13 @@ export interface ForumOperationalParams {
    * transitions from RECOVERY to DEMOTED (math.Int string).
    */
   sentinelDemotionThreshold: string;
+  /**
+   * sentinel_unhide_window in seconds. A sentinel who hid a post may
+   * self-correct (call MsgUnhidePost) within this window of the original
+   * hide; after it expires, only the Commons Operations Committee or
+   * governance can unhide.
+   */
+  sentinelUnhideWindow: bigint;
 }
 export interface ForumOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.forum.v1.ForumOperationalParams";
@@ -514,6 +535,13 @@ export interface ForumOperationalParamsAmino {
    * transitions from RECOVERY to DEMOTED (math.Int string).
    */
   sentinel_demotion_threshold?: string;
+  /**
+   * sentinel_unhide_window in seconds. A sentinel who hid a post may
+   * self-correct (call MsgUnhidePost) within this window of the original
+   * hide; after it expires, only the Commons Operations Committee or
+   * governance can unhide.
+   */
+  sentinel_unhide_window?: string;
 }
 export interface ForumOperationalParamsAminoMsg {
   type: "sparkdream/x/forum/ForumOperationalParams";
@@ -558,7 +586,8 @@ function createBaseParams(): Params {
     minSentinelTrustLevel: "",
     minSentinelAgeBlocks: BigInt(0),
     sentinelDemotionCooldown: BigInt(0),
-    sentinelDemotionThreshold: ""
+    sentinelDemotionThreshold: "",
+    sentinelUnhideWindow: BigInt(0)
   };
 }
 /**
@@ -685,6 +714,9 @@ export const Params = {
     if (message.sentinelDemotionThreshold !== "") {
       writer.uint32(362).string(message.sentinelDemotionThreshold);
     }
+    if (message.sentinelUnhideWindow !== BigInt(0)) {
+      writer.uint32(368).int64(message.sentinelUnhideWindow);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -808,6 +840,9 @@ export const Params = {
         case 45:
           message.sentinelDemotionThreshold = reader.string();
           break;
+        case 46:
+          message.sentinelUnhideWindow = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -855,6 +890,7 @@ export const Params = {
     message.minSentinelAgeBlocks = object.minSentinelAgeBlocks !== undefined && object.minSentinelAgeBlocks !== null ? BigInt(object.minSentinelAgeBlocks.toString()) : BigInt(0);
     message.sentinelDemotionCooldown = object.sentinelDemotionCooldown !== undefined && object.sentinelDemotionCooldown !== null ? BigInt(object.sentinelDemotionCooldown.toString()) : BigInt(0);
     message.sentinelDemotionThreshold = object.sentinelDemotionThreshold ?? "";
+    message.sentinelUnhideWindow = object.sentinelUnhideWindow !== undefined && object.sentinelUnhideWindow !== null ? BigInt(object.sentinelUnhideWindow.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -973,6 +1009,9 @@ export const Params = {
     if (object.sentinel_demotion_threshold !== undefined && object.sentinel_demotion_threshold !== null) {
       message.sentinelDemotionThreshold = object.sentinel_demotion_threshold;
     }
+    if (object.sentinel_unhide_window !== undefined && object.sentinel_unhide_window !== null) {
+      message.sentinelUnhideWindow = BigInt(object.sentinel_unhide_window);
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -1015,6 +1054,7 @@ export const Params = {
     obj.min_sentinel_age_blocks = message.minSentinelAgeBlocks !== BigInt(0) ? message.minSentinelAgeBlocks?.toString() : undefined;
     obj.sentinel_demotion_cooldown = message.sentinelDemotionCooldown !== BigInt(0) ? message.sentinelDemotionCooldown?.toString() : undefined;
     obj.sentinel_demotion_threshold = message.sentinelDemotionThreshold === "" ? undefined : message.sentinelDemotionThreshold;
+    obj.sentinel_unhide_window = message.sentinelUnhideWindow !== BigInt(0) ? message.sentinelUnhideWindow?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {
@@ -1075,7 +1115,8 @@ function createBaseForumOperationalParams(): ForumOperationalParams {
     minSentinelTrustLevel: "",
     minSentinelAgeBlocks: BigInt(0),
     sentinelDemotionCooldown: BigInt(0),
-    sentinelDemotionThreshold: ""
+    sentinelDemotionThreshold: "",
+    sentinelUnhideWindow: BigInt(0)
   };
 }
 /**
@@ -1196,6 +1237,9 @@ export const ForumOperationalParams = {
     if (message.sentinelDemotionThreshold !== "") {
       writer.uint32(362).string(message.sentinelDemotionThreshold);
     }
+    if (message.sentinelUnhideWindow !== BigInt(0)) {
+      writer.uint32(368).int64(message.sentinelUnhideWindow);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): ForumOperationalParams {
@@ -1310,6 +1354,9 @@ export const ForumOperationalParams = {
         case 45:
           message.sentinelDemotionThreshold = reader.string();
           break;
+        case 46:
+          message.sentinelUnhideWindow = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1354,6 +1401,7 @@ export const ForumOperationalParams = {
     message.minSentinelAgeBlocks = object.minSentinelAgeBlocks !== undefined && object.minSentinelAgeBlocks !== null ? BigInt(object.minSentinelAgeBlocks.toString()) : BigInt(0);
     message.sentinelDemotionCooldown = object.sentinelDemotionCooldown !== undefined && object.sentinelDemotionCooldown !== null ? BigInt(object.sentinelDemotionCooldown.toString()) : BigInt(0);
     message.sentinelDemotionThreshold = object.sentinelDemotionThreshold ?? "";
+    message.sentinelUnhideWindow = object.sentinelUnhideWindow !== undefined && object.sentinelUnhideWindow !== null ? BigInt(object.sentinelUnhideWindow.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ForumOperationalParamsAmino): ForumOperationalParams {
@@ -1463,6 +1511,9 @@ export const ForumOperationalParams = {
     if (object.sentinel_demotion_threshold !== undefined && object.sentinel_demotion_threshold !== null) {
       message.sentinelDemotionThreshold = object.sentinel_demotion_threshold;
     }
+    if (object.sentinel_unhide_window !== undefined && object.sentinel_unhide_window !== null) {
+      message.sentinelUnhideWindow = BigInt(object.sentinel_unhide_window);
+    }
     return message;
   },
   toAmino(message: ForumOperationalParams): ForumOperationalParamsAmino {
@@ -1502,6 +1553,7 @@ export const ForumOperationalParams = {
     obj.min_sentinel_age_blocks = message.minSentinelAgeBlocks !== BigInt(0) ? message.minSentinelAgeBlocks?.toString() : undefined;
     obj.sentinel_demotion_cooldown = message.sentinelDemotionCooldown !== BigInt(0) ? message.sentinelDemotionCooldown?.toString() : undefined;
     obj.sentinel_demotion_threshold = message.sentinelDemotionThreshold === "" ? undefined : message.sentinelDemotionThreshold;
+    obj.sentinel_unhide_window = message.sentinelUnhideWindow !== BigInt(0) ? message.sentinelUnhideWindow?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ForumOperationalParamsAminoMsg): ForumOperationalParams {

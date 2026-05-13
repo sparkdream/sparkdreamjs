@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgSpendFromCommons, MsgSpendFromCommonsResponse, MsgEmergencyCancelGovProposal, MsgEmergencyCancelGovProposalResponse, MsgCreatePolicyPermissions, MsgCreatePolicyPermissionsResponse, MsgUpdatePolicyPermissions, MsgUpdatePolicyPermissionsResponse, MsgDeletePolicyPermissions, MsgDeletePolicyPermissionsResponse, MsgRegisterGroup, MsgRegisterGroupResponse, MsgRenewGroup, MsgRenewGroupResponse, MsgUpdateGroupMembers, MsgUpdateGroupMembersResponse, MsgUpdateGroupConfig, MsgUpdateGroupConfigResponse, MsgForceUpgrade, MsgForceUpgradeResponse, MsgDeleteGroup, MsgDeleteGroupResponse, MsgVetoGroupProposals, MsgVetoGroupProposalsResponse, MsgSubmitProposal, MsgSubmitProposalResponse, MsgVoteProposal, MsgVoteProposalResponse, MsgExecuteProposal, MsgExecuteProposalResponse, MsgSubmitAnonymousProposal, MsgSubmitAnonymousProposalResponse, MsgAnonymousVoteProposal, MsgAnonymousVoteProposalResponse, MsgCreateCategory, MsgCreateCategoryResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgSpendFromCommons, MsgSpendFromCommonsResponse, MsgEmergencyCancelGovProposal, MsgEmergencyCancelGovProposalResponse, MsgCreatePolicyPermissions, MsgCreatePolicyPermissionsResponse, MsgUpdatePolicyPermissions, MsgUpdatePolicyPermissionsResponse, MsgDeletePolicyPermissions, MsgDeletePolicyPermissionsResponse, MsgRegisterGroup, MsgRegisterGroupResponse, MsgRenewGroup, MsgRenewGroupResponse, MsgUpdateGroupMembers, MsgUpdateGroupMembersResponse, MsgUpdateGroupConfig, MsgUpdateGroupConfigResponse, MsgForceUpgrade, MsgForceUpgradeResponse, MsgDeleteGroup, MsgDeleteGroupResponse, MsgVetoGroupProposals, MsgVetoGroupProposalsResponse, MsgSubmitProposal, MsgSubmitProposalResponse, MsgVoteProposal, MsgVoteProposalResponse, MsgExecuteProposal, MsgExecuteProposalResponse, MsgSubmitAnonymousProposal, MsgSubmitAnonymousProposalResponse, MsgAnonymousVoteProposal, MsgAnonymousVoteProposalResponse, MsgCreateCategory, MsgCreateCategoryResponse, MsgDeleteCategory, MsgDeleteCategoryResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
@@ -54,6 +54,7 @@ export interface Msg {
    * governance or the Commons Council Operations Committee.
    */
   createCategory(request: MsgCreateCategory): Promise<MsgCreateCategoryResponse>;
+  deleteCategory(request: MsgDeleteCategory): Promise<MsgDeleteCategoryResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -177,6 +178,12 @@ export class MsgClientImpl implements Msg {
     const data = MsgCreateCategory.encode(request).finish();
     const promise = this.rpc.request("sparkdream.commons.v1.Msg", "CreateCategory", data);
     return promise.then(data => MsgCreateCategoryResponse.decode(new BinaryReader(data)));
+  };
+  /* DeleteCategory */
+  deleteCategory = async (request: MsgDeleteCategory): Promise<MsgDeleteCategoryResponse> => {
+    const data = MsgDeleteCategory.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Msg", "DeleteCategory", data);
+    return promise.then(data => MsgDeleteCategoryResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

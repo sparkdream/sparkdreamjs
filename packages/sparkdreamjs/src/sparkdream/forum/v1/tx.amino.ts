@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { MsgUpdateParams, MsgUpdateOperationalParams, MsgCreatePost, MsgEditPost, MsgDeletePost, MsgFreezeThread, MsgUnarchiveThread, MsgPinPost, MsgUnpinPost, MsgLockThread, MsgUnlockThread, MsgMoveThread, MsgFollowThread, MsgUnfollowThread, MsgUpvotePost, MsgDownvotePost, MsgFlagPost, MsgDismissFlags, MsgHidePost, MsgAppealPost, MsgAppealThreadLock, MsgAppealThreadMove, MsgCreateBounty, MsgAwardBounty, MsgIncreaseBounty, MsgCancelBounty, MsgAssignBountyToReply, MsgPinReply, MsgUnpinReply, MsgDisputePin, MsgMarkAcceptedReply, MsgConfirmProposedReply, MsgRejectProposedReply, MsgSetForumPaused, MsgSetModerationPaused } from "./tx";
+import { MsgUpdateParams, MsgUpdateOperationalParams, MsgCreatePost, MsgEditPost, MsgDeletePost, MsgFreezeThread, MsgUnarchiveThread, MsgPinPost, MsgUnpinPost, MsgLockThread, MsgUnlockThread, MsgMoveThread, MsgFollowThread, MsgUnfollowThread, MsgUpvotePost, MsgDownvotePost, MsgFlagPost, MsgDismissFlags, MsgHidePost, MsgUnhidePost, MsgAppealPost, MsgAppealThreadLock, MsgAppealThreadMove, MsgCreateBounty, MsgAwardBounty, MsgIncreaseBounty, MsgCancelBounty, MsgAssignBountyToReply, MsgPinReply, MsgUnpinReply, MsgDisputePin, MsgMarkAcceptedReply, MsgConfirmProposedReply, MsgRejectProposedReply, MsgSetForumPaused, MsgSetModerationPaused } from "./tx";
 export const AminoConverter = {
   "/sparkdream.forum.v1.MsgUpdateParams": {
     aminoType: "sparkdream/x/forum/MsgUpdateParams",
@@ -95,6 +95,11 @@ export const AminoConverter = {
     aminoType: "sparkdream/x/forum/MsgHidePost",
     toAmino: MsgHidePost.toAmino,
     fromAmino: MsgHidePost.fromAmino
+  },
+  "/sparkdream.forum.v1.MsgUnhidePost": {
+    aminoType: "sparkdream/x/forum/MsgUnhidePost",
+    toAmino: MsgUnhidePost.toAmino,
+    fromAmino: MsgUnhidePost.fromAmino
   },
   "/sparkdream.forum.v1.MsgAppealPost": {
     aminoType: "sparkdream/x/forum/MsgAppealPost",

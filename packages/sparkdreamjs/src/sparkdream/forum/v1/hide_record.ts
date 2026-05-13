@@ -4,12 +4,24 @@ import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
  * HideRecord defines the HideRecord message.
+ * 
+ * Created by MsgHidePost for both sentinel hides and gov-authority hides.
+ * The `sentinel` field distinguishes the two: a non-empty address means a
+ * sentinel performed the hide and the record drives the appeal flow; an
+ * empty string is the gov-hide marker and the record exists only to enable
+ * council-driven reversal (author-bond restore + HideRecord cleanup).
  * @name HideRecord
  * @package sparkdream.forum.v1
  * @see proto type: sparkdream.forum.v1.HideRecord
  */
 export interface HideRecord {
   postId: bigint;
+  /**
+   * Address of the sentinel who hid the post. Empty string is the gov-hide
+   * marker: AppealPost rejects these as ErrGovLockNotAppealable (must go
+   * through MsgAppealGovAction); GetActionSentinel / RecordSentinelAction*
+   * helpers soft-skip on empty.
+   */
   sentinel: string;
   hiddenAt: bigint;
   sentinelBondSnapshot: string;
@@ -17,6 +29,16 @@ export interface HideRecord {
   committedAmount: string;
   reasonCode: ModerationReason;
   reasonText: string;
+  /**
+   * author_bond_amount captures the author bond that was slashed by MsgHidePost
+   * (math.Int as string; empty / "0" means no bond was attached). On reversal
+   * (MsgUnhidePost or appeal-OVERTURNED via ReverseSentinelAction) this amount
+   * is minted back to the author and re-locked as a fresh author bond, so the
+   * round-trip net DREAM supply change is zero. Populated for BOTH sentinel
+   * hides and gov-authority hides — see the `sentinel` field for how the two
+   * hide flavors are distinguished.
+   */
+  authorBondAmount: string;
 }
 export interface HideRecordProtoMsg {
   typeUrl: "/sparkdream.forum.v1.HideRecord";
@@ -24,12 +46,24 @@ export interface HideRecordProtoMsg {
 }
 /**
  * HideRecord defines the HideRecord message.
+ * 
+ * Created by MsgHidePost for both sentinel hides and gov-authority hides.
+ * The `sentinel` field distinguishes the two: a non-empty address means a
+ * sentinel performed the hide and the record drives the appeal flow; an
+ * empty string is the gov-hide marker and the record exists only to enable
+ * council-driven reversal (author-bond restore + HideRecord cleanup).
  * @name HideRecordAmino
  * @package sparkdream.forum.v1
  * @see proto type: sparkdream.forum.v1.HideRecord
  */
 export interface HideRecordAmino {
   post_id?: string;
+  /**
+   * Address of the sentinel who hid the post. Empty string is the gov-hide
+   * marker: AppealPost rejects these as ErrGovLockNotAppealable (must go
+   * through MsgAppealGovAction); GetActionSentinel / RecordSentinelAction*
+   * helpers soft-skip on empty.
+   */
   sentinel?: string;
   hidden_at?: string;
   sentinel_bond_snapshot?: string;
@@ -37,6 +71,16 @@ export interface HideRecordAmino {
   committed_amount?: string;
   reason_code?: ModerationReason;
   reason_text?: string;
+  /**
+   * author_bond_amount captures the author bond that was slashed by MsgHidePost
+   * (math.Int as string; empty / "0" means no bond was attached). On reversal
+   * (MsgUnhidePost or appeal-OVERTURNED via ReverseSentinelAction) this amount
+   * is minted back to the author and re-locked as a fresh author bond, so the
+   * round-trip net DREAM supply change is zero. Populated for BOTH sentinel
+   * hides and gov-authority hides — see the `sentinel` field for how the two
+   * hide flavors are distinguished.
+   */
+  author_bond_amount?: string;
 }
 export interface HideRecordAminoMsg {
   type: "/sparkdream.forum.v1.HideRecord";
@@ -51,11 +95,18 @@ function createBaseHideRecord(): HideRecord {
     sentinelBackingSnapshot: "",
     committedAmount: "",
     reasonCode: 0,
-    reasonText: ""
+    reasonText: "",
+    authorBondAmount: ""
   };
 }
 /**
  * HideRecord defines the HideRecord message.
+ * 
+ * Created by MsgHidePost for both sentinel hides and gov-authority hides.
+ * The `sentinel` field distinguishes the two: a non-empty address means a
+ * sentinel performed the hide and the record drives the appeal flow; an
+ * empty string is the gov-hide marker and the record exists only to enable
+ * council-driven reversal (author-bond restore + HideRecord cleanup).
  * @name HideRecord
  * @package sparkdream.forum.v1
  * @see proto type: sparkdream.forum.v1.HideRecord
@@ -86,6 +137,9 @@ export const HideRecord = {
     }
     if (message.reasonText !== "") {
       writer.uint32(66).string(message.reasonText);
+    }
+    if (message.authorBondAmount !== "") {
+      writer.uint32(74).string(message.authorBondAmount);
     }
     return writer;
   },
@@ -120,6 +174,9 @@ export const HideRecord = {
         case 8:
           message.reasonText = reader.string();
           break;
+        case 9:
+          message.authorBondAmount = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -137,6 +194,7 @@ export const HideRecord = {
     message.committedAmount = object.committedAmount ?? "";
     message.reasonCode = object.reasonCode ?? 0;
     message.reasonText = object.reasonText ?? "";
+    message.authorBondAmount = object.authorBondAmount ?? "";
     return message;
   },
   fromAmino(object: HideRecordAmino): HideRecord {
@@ -165,6 +223,9 @@ export const HideRecord = {
     if (object.reason_text !== undefined && object.reason_text !== null) {
       message.reasonText = object.reason_text;
     }
+    if (object.author_bond_amount !== undefined && object.author_bond_amount !== null) {
+      message.authorBondAmount = object.author_bond_amount;
+    }
     return message;
   },
   toAmino(message: HideRecord): HideRecordAmino {
@@ -177,6 +238,7 @@ export const HideRecord = {
     obj.committed_amount = message.committedAmount === "" ? undefined : message.committedAmount;
     obj.reason_code = message.reasonCode === 0 ? undefined : message.reasonCode;
     obj.reason_text = message.reasonText === "" ? undefined : message.reasonText;
+    obj.author_bond_amount = message.authorBondAmount === "" ? undefined : message.authorBondAmount;
     return obj;
   },
   fromAminoMsg(object: HideRecordAminoMsg): HideRecord {

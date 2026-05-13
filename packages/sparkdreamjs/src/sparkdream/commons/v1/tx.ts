@@ -1256,6 +1256,62 @@ export interface MsgCreateCategoryResponseAminoMsg {
   type: "/sparkdream.commons.v1.MsgCreateCategoryResponse";
   value: MsgCreateCategoryResponseAmino;
 }
+/**
+ * MsgDeleteCategory removes a shared content category. Restricted to
+ * governance or the Commons Council Operations Committee. Refuses to
+ * delete a category that still has forum posts attached — admins must
+ * move/archive those first.
+ * @name MsgDeleteCategory
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgDeleteCategory
+ */
+export interface MsgDeleteCategory {
+  creator: string;
+  categoryId: bigint;
+}
+export interface MsgDeleteCategoryProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgDeleteCategory";
+  value: Uint8Array;
+}
+/**
+ * MsgDeleteCategory removes a shared content category. Restricted to
+ * governance or the Commons Council Operations Committee. Refuses to
+ * delete a category that still has forum posts attached — admins must
+ * move/archive those first.
+ * @name MsgDeleteCategoryAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgDeleteCategory
+ */
+export interface MsgDeleteCategoryAmino {
+  creator?: string;
+  category_id?: string;
+}
+export interface MsgDeleteCategoryAminoMsg {
+  type: "sparkdream/x/commons/MsgDeleteCategory";
+  value: MsgDeleteCategoryAmino;
+}
+/**
+ * MsgDeleteCategoryResponse defines the MsgDeleteCategoryResponse message.
+ * @name MsgDeleteCategoryResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgDeleteCategoryResponse
+ */
+export interface MsgDeleteCategoryResponse {}
+export interface MsgDeleteCategoryResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgDeleteCategoryResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgDeleteCategoryResponse defines the MsgDeleteCategoryResponse message.
+ * @name MsgDeleteCategoryResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgDeleteCategoryResponse
+ */
+export interface MsgDeleteCategoryResponseAmino {}
+export interface MsgDeleteCategoryResponseAminoMsg {
+  type: "/sparkdream.commons.v1.MsgDeleteCategoryResponse";
+  value: MsgDeleteCategoryResponseAmino;
+}
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
     authority: "",
@@ -4800,6 +4856,153 @@ export const MsgCreateCategoryResponse = {
     return {
       typeUrl: "/sparkdream.commons.v1.MsgCreateCategoryResponse",
       value: MsgCreateCategoryResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgDeleteCategory(): MsgDeleteCategory {
+  return {
+    creator: "",
+    categoryId: BigInt(0)
+  };
+}
+/**
+ * MsgDeleteCategory removes a shared content category. Restricted to
+ * governance or the Commons Council Operations Committee. Refuses to
+ * delete a category that still has forum posts attached — admins must
+ * move/archive those first.
+ * @name MsgDeleteCategory
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgDeleteCategory
+ */
+export const MsgDeleteCategory = {
+  typeUrl: "/sparkdream.commons.v1.MsgDeleteCategory",
+  aminoType: "sparkdream/x/commons/MsgDeleteCategory",
+  encode(message: MsgDeleteCategory, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.categoryId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.categoryId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgDeleteCategory {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgDeleteCategory();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.categoryId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgDeleteCategory>): MsgDeleteCategory {
+    const message = createBaseMsgDeleteCategory();
+    message.creator = object.creator ?? "";
+    message.categoryId = object.categoryId !== undefined && object.categoryId !== null ? BigInt(object.categoryId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgDeleteCategoryAmino): MsgDeleteCategory {
+    const message = createBaseMsgDeleteCategory();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.category_id !== undefined && object.category_id !== null) {
+      message.categoryId = BigInt(object.category_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgDeleteCategory): MsgDeleteCategoryAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.category_id = message.categoryId !== BigInt(0) ? message.categoryId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgDeleteCategoryAminoMsg): MsgDeleteCategory {
+    return MsgDeleteCategory.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgDeleteCategory): MsgDeleteCategoryAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgDeleteCategory",
+      value: MsgDeleteCategory.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgDeleteCategoryProtoMsg): MsgDeleteCategory {
+    return MsgDeleteCategory.decode(message.value);
+  },
+  toProto(message: MsgDeleteCategory): Uint8Array {
+    return MsgDeleteCategory.encode(message).finish();
+  },
+  toProtoMsg(message: MsgDeleteCategory): MsgDeleteCategoryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgDeleteCategory",
+      value: MsgDeleteCategory.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgDeleteCategoryResponse(): MsgDeleteCategoryResponse {
+  return {};
+}
+/**
+ * MsgDeleteCategoryResponse defines the MsgDeleteCategoryResponse message.
+ * @name MsgDeleteCategoryResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgDeleteCategoryResponse
+ */
+export const MsgDeleteCategoryResponse = {
+  typeUrl: "/sparkdream.commons.v1.MsgDeleteCategoryResponse",
+  encode(_: MsgDeleteCategoryResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgDeleteCategoryResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgDeleteCategoryResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgDeleteCategoryResponse>): MsgDeleteCategoryResponse {
+    const message = createBaseMsgDeleteCategoryResponse();
+    return message;
+  },
+  fromAmino(_: MsgDeleteCategoryResponseAmino): MsgDeleteCategoryResponse {
+    const message = createBaseMsgDeleteCategoryResponse();
+    return message;
+  },
+  toAmino(_: MsgDeleteCategoryResponse): MsgDeleteCategoryResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgDeleteCategoryResponseAminoMsg): MsgDeleteCategoryResponse {
+    return MsgDeleteCategoryResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgDeleteCategoryResponseProtoMsg): MsgDeleteCategoryResponse {
+    return MsgDeleteCategoryResponse.decode(message.value);
+  },
+  toProto(message: MsgDeleteCategoryResponse): Uint8Array {
+    return MsgDeleteCategoryResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgDeleteCategoryResponse): MsgDeleteCategoryResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgDeleteCategoryResponse",
+      value: MsgDeleteCategoryResponse.encode(message).finish()
     };
   }
 };
