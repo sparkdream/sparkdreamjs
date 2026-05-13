@@ -351,6 +351,25 @@ export interface Params {
    * resets at the first MintDREAM of each new epoch. 0 = unbounded.
    */
   maxDreamMintPerEpoch: string;
+  /**
+   * Absolute upper bound on requested_budget at proposal time. Distinct from
+   * large_project_budget_threshold (which is an approval-time routing rule):
+   * this is a hard cap that rejects nonsense values (e.g. 10^30 DREAM) and
+   * keeps state clean. Set well above any legitimate project size so council-
+   * gated large proposals are not blocked. Must be positive.
+   */
+  maxProjectRequestedBudget: string;
+  /**
+   * Absolute upper bound on requested_spark at proposal time. Same role as
+   * max_project_requested_budget but for SPARK (uspark). Must be positive.
+   */
+  maxProjectRequestedSpark: string;
+  /**
+   * Number of blocks a PROPOSED (non-permissionless) project stays open before
+   * the EndBlocker transitions it to PROJECT_STATUS_EXPIRED. Prevents state
+   * pollution by stale unapproved proposals. Must be positive.
+   */
+  proposedProjectExpiryBlocks: bigint;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Params";
@@ -615,6 +634,25 @@ export interface ParamsAmino {
    * resets at the first MintDREAM of each new epoch. 0 = unbounded.
    */
   max_dream_mint_per_epoch?: string;
+  /**
+   * Absolute upper bound on requested_budget at proposal time. Distinct from
+   * large_project_budget_threshold (which is an approval-time routing rule):
+   * this is a hard cap that rejects nonsense values (e.g. 10^30 DREAM) and
+   * keeps state clean. Set well above any legitimate project size so council-
+   * gated large proposals are not blocked. Must be positive.
+   */
+  max_project_requested_budget?: string;
+  /**
+   * Absolute upper bound on requested_spark at proposal time. Same role as
+   * max_project_requested_budget but for SPARK (uspark). Must be positive.
+   */
+  max_project_requested_spark?: string;
+  /**
+   * Number of blocks a PROPOSED (non-permissionless) project stays open before
+   * the EndBlocker transitions it to PROJECT_STATUS_EXPIRED. Prevents state
+   * pollution by stale unapproved proposals. Must be positive.
+   */
+  proposed_project_expiry_blocks?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/rep/Params";
@@ -803,6 +841,13 @@ export interface RepOperationalParams {
    * Global per-epoch DREAM minting cap (mirrors Params.max_dream_mint_per_epoch). 0 = unbounded.
    */
   maxDreamMintPerEpoch: string;
+  /**
+   * Proposal-time hard caps and expiry (mirror Params.max_project_requested_*
+   * and Params.proposed_project_expiry_blocks).
+   */
+  maxProjectRequestedBudget: string;
+  maxProjectRequestedSpark: string;
+  proposedProjectExpiryBlocks: bigint;
 }
 export interface RepOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.rep.v1.RepOperationalParams";
@@ -991,6 +1036,13 @@ export interface RepOperationalParamsAmino {
    * Global per-epoch DREAM minting cap (mirrors Params.max_dream_mint_per_epoch). 0 = unbounded.
    */
   max_dream_mint_per_epoch?: string;
+  /**
+   * Proposal-time hard caps and expiry (mirror Params.max_project_requested_*
+   * and Params.proposed_project_expiry_blocks).
+   */
+  max_project_requested_budget?: string;
+  max_project_requested_spark?: string;
+  proposed_project_expiry_blocks?: string;
 }
 export interface RepOperationalParamsAminoMsg {
   type: "sparkdream/x/rep/RepOperationalParams";
@@ -1402,7 +1454,10 @@ function createBaseParams(): Params {
     minAppealRate: "",
     maxActiveInitiativesPerMember: 0,
     maxActiveInterimsPerMember: 0,
-    maxDreamMintPerEpoch: ""
+    maxDreamMintPerEpoch: "",
+    maxProjectRequestedBudget: "",
+    maxProjectRequestedSpark: "",
+    proposedProjectExpiryBlocks: BigInt(0)
   };
 }
 /**
@@ -1676,6 +1731,15 @@ export const Params = {
     if (message.maxDreamMintPerEpoch !== "") {
       writer.uint32(698).string(message.maxDreamMintPerEpoch);
     }
+    if (message.maxProjectRequestedBudget !== "") {
+      writer.uint32(706).string(message.maxProjectRequestedBudget);
+    }
+    if (message.maxProjectRequestedSpark !== "") {
+      writer.uint32(714).string(message.maxProjectRequestedSpark);
+    }
+    if (message.proposedProjectExpiryBlocks !== BigInt(0)) {
+      writer.uint32(720).int64(message.proposedProjectExpiryBlocks);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -1946,6 +2010,15 @@ export const Params = {
         case 87:
           message.maxDreamMintPerEpoch = reader.string();
           break;
+        case 88:
+          message.maxProjectRequestedBudget = reader.string();
+          break;
+        case 89:
+          message.maxProjectRequestedSpark = reader.string();
+          break;
+        case 90:
+          message.proposedProjectExpiryBlocks = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2042,6 +2115,9 @@ export const Params = {
     message.maxActiveInitiativesPerMember = object.maxActiveInitiativesPerMember ?? 0;
     message.maxActiveInterimsPerMember = object.maxActiveInterimsPerMember ?? 0;
     message.maxDreamMintPerEpoch = object.maxDreamMintPerEpoch ?? "";
+    message.maxProjectRequestedBudget = object.maxProjectRequestedBudget ?? "";
+    message.maxProjectRequestedSpark = object.maxProjectRequestedSpark ?? "";
+    message.proposedProjectExpiryBlocks = object.proposedProjectExpiryBlocks !== undefined && object.proposedProjectExpiryBlocks !== null ? BigInt(object.proposedProjectExpiryBlocks.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -2307,6 +2383,15 @@ export const Params = {
     if (object.max_dream_mint_per_epoch !== undefined && object.max_dream_mint_per_epoch !== null) {
       message.maxDreamMintPerEpoch = object.max_dream_mint_per_epoch;
     }
+    if (object.max_project_requested_budget !== undefined && object.max_project_requested_budget !== null) {
+      message.maxProjectRequestedBudget = object.max_project_requested_budget;
+    }
+    if (object.max_project_requested_spark !== undefined && object.max_project_requested_spark !== null) {
+      message.maxProjectRequestedSpark = object.max_project_requested_spark;
+    }
+    if (object.proposed_project_expiry_blocks !== undefined && object.proposed_project_expiry_blocks !== null) {
+      message.proposedProjectExpiryBlocks = BigInt(object.proposed_project_expiry_blocks);
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -2398,6 +2483,9 @@ export const Params = {
     obj.max_active_initiatives_per_member = message.maxActiveInitiativesPerMember === 0 ? undefined : message.maxActiveInitiativesPerMember;
     obj.max_active_interims_per_member = message.maxActiveInterimsPerMember === 0 ? undefined : message.maxActiveInterimsPerMember;
     obj.max_dream_mint_per_epoch = message.maxDreamMintPerEpoch === "" ? undefined : message.maxDreamMintPerEpoch;
+    obj.max_project_requested_budget = message.maxProjectRequestedBudget === "" ? undefined : message.maxProjectRequestedBudget;
+    obj.max_project_requested_spark = message.maxProjectRequestedSpark === "" ? undefined : message.maxProjectRequestedSpark;
+    obj.proposed_project_expiry_blocks = message.proposedProjectExpiryBlocks !== BigInt(0) ? message.proposedProjectExpiryBlocks?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {
@@ -2494,7 +2582,10 @@ function createBaseRepOperationalParams(): RepOperationalParams {
     minAppealRate: "",
     maxActiveInitiativesPerMember: 0,
     maxActiveInterimsPerMember: 0,
-    maxDreamMintPerEpoch: ""
+    maxDreamMintPerEpoch: "",
+    maxProjectRequestedBudget: "",
+    maxProjectRequestedSpark: "",
+    proposedProjectExpiryBlocks: BigInt(0)
   };
 }
 /**
@@ -2722,6 +2813,15 @@ export const RepOperationalParams = {
     if (message.maxDreamMintPerEpoch !== "") {
       writer.uint32(570).string(message.maxDreamMintPerEpoch);
     }
+    if (message.maxProjectRequestedBudget !== "") {
+      writer.uint32(578).string(message.maxProjectRequestedBudget);
+    }
+    if (message.maxProjectRequestedSpark !== "") {
+      writer.uint32(586).string(message.maxProjectRequestedSpark);
+    }
+    if (message.proposedProjectExpiryBlocks !== BigInt(0)) {
+      writer.uint32(592).int64(message.proposedProjectExpiryBlocks);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): RepOperationalParams {
@@ -2944,6 +3044,15 @@ export const RepOperationalParams = {
         case 71:
           message.maxDreamMintPerEpoch = reader.string();
           break;
+        case 72:
+          message.maxProjectRequestedBudget = reader.string();
+          break;
+        case 73:
+          message.maxProjectRequestedSpark = reader.string();
+          break;
+        case 74:
+          message.proposedProjectExpiryBlocks = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3024,6 +3133,9 @@ export const RepOperationalParams = {
     message.maxActiveInitiativesPerMember = object.maxActiveInitiativesPerMember ?? 0;
     message.maxActiveInterimsPerMember = object.maxActiveInterimsPerMember ?? 0;
     message.maxDreamMintPerEpoch = object.maxDreamMintPerEpoch ?? "";
+    message.maxProjectRequestedBudget = object.maxProjectRequestedBudget ?? "";
+    message.maxProjectRequestedSpark = object.maxProjectRequestedSpark ?? "";
+    message.proposedProjectExpiryBlocks = object.proposedProjectExpiryBlocks !== undefined && object.proposedProjectExpiryBlocks !== null ? BigInt(object.proposedProjectExpiryBlocks.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: RepOperationalParamsAmino): RepOperationalParams {
@@ -3241,6 +3353,15 @@ export const RepOperationalParams = {
     if (object.max_dream_mint_per_epoch !== undefined && object.max_dream_mint_per_epoch !== null) {
       message.maxDreamMintPerEpoch = object.max_dream_mint_per_epoch;
     }
+    if (object.max_project_requested_budget !== undefined && object.max_project_requested_budget !== null) {
+      message.maxProjectRequestedBudget = object.max_project_requested_budget;
+    }
+    if (object.max_project_requested_spark !== undefined && object.max_project_requested_spark !== null) {
+      message.maxProjectRequestedSpark = object.max_project_requested_spark;
+    }
+    if (object.proposed_project_expiry_blocks !== undefined && object.proposed_project_expiry_blocks !== null) {
+      message.proposedProjectExpiryBlocks = BigInt(object.proposed_project_expiry_blocks);
+    }
     return message;
   },
   toAmino(message: RepOperationalParams): RepOperationalParamsAmino {
@@ -3316,6 +3437,9 @@ export const RepOperationalParams = {
     obj.max_active_initiatives_per_member = message.maxActiveInitiativesPerMember === 0 ? undefined : message.maxActiveInitiativesPerMember;
     obj.max_active_interims_per_member = message.maxActiveInterimsPerMember === 0 ? undefined : message.maxActiveInterimsPerMember;
     obj.max_dream_mint_per_epoch = message.maxDreamMintPerEpoch === "" ? undefined : message.maxDreamMintPerEpoch;
+    obj.max_project_requested_budget = message.maxProjectRequestedBudget === "" ? undefined : message.maxProjectRequestedBudget;
+    obj.max_project_requested_spark = message.maxProjectRequestedSpark === "" ? undefined : message.maxProjectRequestedSpark;
+    obj.proposed_project_expiry_blocks = message.proposedProjectExpiryBlocks !== BigInt(0) ? message.proposedProjectExpiryBlocks?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: RepOperationalParamsAminoMsg): RepOperationalParams {

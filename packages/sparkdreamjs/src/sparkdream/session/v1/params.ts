@@ -36,6 +36,11 @@ export interface Params {
    * Maximum gas budget per session.
    */
   maxSpendLimit: Coin;
+  /**
+   * Maximum exec_count per session. Must be > 0; sessions must declare
+   * a finite cap (1 <= session.max_exec_count <= params.max_exec_count).
+   */
+  maxExecCount: bigint;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.session.v1.Params";
@@ -74,6 +79,11 @@ export interface ParamsAmino {
    * Maximum gas budget per session.
    */
   max_spend_limit: CoinAmino;
+  /**
+   * Maximum exec_count per session. Must be > 0; sessions must declare
+   * a finite cap (1 <= session.max_exec_count <= params.max_exec_count).
+   */
+  max_exec_count?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/session/Params";
@@ -97,6 +107,7 @@ export interface SessionOperationalParams {
   maxMsgTypesPerSession: bigint;
   maxExpiration: Duration;
   maxSpendLimit: Coin;
+  maxExecCount: bigint;
 }
 export interface SessionOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.session.v1.SessionOperationalParams";
@@ -120,6 +131,7 @@ export interface SessionOperationalParamsAmino {
   max_msg_types_per_session?: string;
   max_expiration?: DurationAmino;
   max_spend_limit: CoinAmino;
+  max_exec_count?: string;
 }
 export interface SessionOperationalParamsAminoMsg {
   type: "sparkdream/x/session/SessionOperationalParams";
@@ -132,7 +144,8 @@ function createBaseParams(): Params {
     maxSessionsPerGranter: BigInt(0),
     maxMsgTypesPerSession: BigInt(0),
     maxExpiration: Duration.fromPartial({}),
-    maxSpendLimit: Coin.fromPartial({})
+    maxSpendLimit: Coin.fromPartial({}),
+    maxExecCount: BigInt(0)
   };
 }
 /**
@@ -163,6 +176,9 @@ export const Params = {
     if (message.maxSpendLimit !== undefined) {
       Coin.encode(message.maxSpendLimit, writer.uint32(50).fork()).ldelim();
     }
+    if (message.maxExecCount !== BigInt(0)) {
+      writer.uint32(56).uint64(message.maxExecCount);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -190,6 +206,9 @@ export const Params = {
         case 6:
           message.maxSpendLimit = Coin.decode(reader, reader.uint32());
           break;
+        case 7:
+          message.maxExecCount = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -205,6 +224,7 @@ export const Params = {
     message.maxMsgTypesPerSession = object.maxMsgTypesPerSession !== undefined && object.maxMsgTypesPerSession !== null ? BigInt(object.maxMsgTypesPerSession.toString()) : BigInt(0);
     message.maxExpiration = object.maxExpiration !== undefined && object.maxExpiration !== null ? Duration.fromPartial(object.maxExpiration) : undefined;
     message.maxSpendLimit = object.maxSpendLimit !== undefined && object.maxSpendLimit !== null ? Coin.fromPartial(object.maxSpendLimit) : undefined;
+    message.maxExecCount = object.maxExecCount !== undefined && object.maxExecCount !== null ? BigInt(object.maxExecCount.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -222,6 +242,9 @@ export const Params = {
     }
     if (object.max_spend_limit !== undefined && object.max_spend_limit !== null) {
       message.maxSpendLimit = Coin.fromAmino(object.max_spend_limit);
+    }
+    if (object.max_exec_count !== undefined && object.max_exec_count !== null) {
+      message.maxExecCount = BigInt(object.max_exec_count);
     }
     return message;
   },
@@ -241,6 +264,7 @@ export const Params = {
     obj.max_msg_types_per_session = message.maxMsgTypesPerSession !== BigInt(0) ? message.maxMsgTypesPerSession?.toString() : undefined;
     obj.max_expiration = message.maxExpiration ? Duration.toAmino(message.maxExpiration) : undefined;
     obj.max_spend_limit = message.maxSpendLimit ? Coin.toAmino(message.maxSpendLimit) : Coin.toAmino(Coin.fromPartial({}));
+    obj.max_exec_count = message.maxExecCount !== BigInt(0) ? message.maxExecCount?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {
@@ -271,7 +295,8 @@ function createBaseSessionOperationalParams(): SessionOperationalParams {
     maxSessionsPerGranter: BigInt(0),
     maxMsgTypesPerSession: BigInt(0),
     maxExpiration: Duration.fromPartial({}),
-    maxSpendLimit: Coin.fromPartial({})
+    maxSpendLimit: Coin.fromPartial({}),
+    maxExecCount: BigInt(0)
   };
 }
 /**
@@ -301,6 +326,9 @@ export const SessionOperationalParams = {
     if (message.maxSpendLimit !== undefined) {
       Coin.encode(message.maxSpendLimit, writer.uint32(42).fork()).ldelim();
     }
+    if (message.maxExecCount !== BigInt(0)) {
+      writer.uint32(48).uint64(message.maxExecCount);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): SessionOperationalParams {
@@ -325,6 +353,9 @@ export const SessionOperationalParams = {
         case 5:
           message.maxSpendLimit = Coin.decode(reader, reader.uint32());
           break;
+        case 6:
+          message.maxExecCount = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -339,6 +370,7 @@ export const SessionOperationalParams = {
     message.maxMsgTypesPerSession = object.maxMsgTypesPerSession !== undefined && object.maxMsgTypesPerSession !== null ? BigInt(object.maxMsgTypesPerSession.toString()) : BigInt(0);
     message.maxExpiration = object.maxExpiration !== undefined && object.maxExpiration !== null ? Duration.fromPartial(object.maxExpiration) : undefined;
     message.maxSpendLimit = object.maxSpendLimit !== undefined && object.maxSpendLimit !== null ? Coin.fromPartial(object.maxSpendLimit) : undefined;
+    message.maxExecCount = object.maxExecCount !== undefined && object.maxExecCount !== null ? BigInt(object.maxExecCount.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: SessionOperationalParamsAmino): SessionOperationalParams {
@@ -356,6 +388,9 @@ export const SessionOperationalParams = {
     if (object.max_spend_limit !== undefined && object.max_spend_limit !== null) {
       message.maxSpendLimit = Coin.fromAmino(object.max_spend_limit);
     }
+    if (object.max_exec_count !== undefined && object.max_exec_count !== null) {
+      message.maxExecCount = BigInt(object.max_exec_count);
+    }
     return message;
   },
   toAmino(message: SessionOperationalParams): SessionOperationalParamsAmino {
@@ -369,6 +404,7 @@ export const SessionOperationalParams = {
     obj.max_msg_types_per_session = message.maxMsgTypesPerSession !== BigInt(0) ? message.maxMsgTypesPerSession?.toString() : undefined;
     obj.max_expiration = message.maxExpiration ? Duration.toAmino(message.maxExpiration) : undefined;
     obj.max_spend_limit = message.maxSpendLimit ? Coin.toAmino(message.maxSpendLimit) : Coin.toAmino(Coin.fromPartial({}));
+    obj.max_exec_count = message.maxExecCount !== BigInt(0) ? message.maxExecCount?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: SessionOperationalParamsAminoMsg): SessionOperationalParams {

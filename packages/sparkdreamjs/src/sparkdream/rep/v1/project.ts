@@ -56,6 +56,12 @@ export enum ProjectStatus {
   PROJECT_STATUS_ACTIVE = 1,
   PROJECT_STATUS_COMPLETED = 2,
   PROJECT_STATUS_CANCELLED = 3,
+  /**
+   * PROJECT_STATUS_EXPIRED - EXPIRED is set by the EndBlocker when a PROPOSED project has not been
+   * approved before its expiry_block_height. Terminal state — kept (not
+   * deleted) so the audit trail of stale proposals survives.
+   */
+  PROJECT_STATUS_EXPIRED = 4,
   UNRECOGNIZED = -1,
 }
 export const ProjectStatusAmino = ProjectStatus;
@@ -73,6 +79,9 @@ export function projectStatusFromJSON(object: any): ProjectStatus {
     case 3:
     case "PROJECT_STATUS_CANCELLED":
       return ProjectStatus.PROJECT_STATUS_CANCELLED;
+    case 4:
+    case "PROJECT_STATUS_EXPIRED":
+      return ProjectStatus.PROJECT_STATUS_EXPIRED;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -89,6 +98,8 @@ export function projectStatusToJSON(object: ProjectStatus): string {
       return "PROJECT_STATUS_COMPLETED";
     case ProjectStatus.PROJECT_STATUS_CANCELLED:
       return "PROJECT_STATUS_CANCELLED";
+    case ProjectStatus.PROJECT_STATUS_EXPIRED:
+      return "PROJECT_STATUS_EXPIRED";
     case ProjectStatus.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -166,6 +177,14 @@ export interface Project {
    * Zero budget, APPRENTICE/STANDARD initiatives only, rewards minted on completion.
    */
   permissionless: boolean;
+  /**
+   * Block height at which this project will be expired by the EndBlocker if it
+   * is still in PROPOSED status. Set at creation for non-permissionless
+   * projects (creation_height + params.proposed_project_expiry_blocks). Zero
+   * for permissionless projects (no expiry — ACTIVE on creation) and cleared
+   * when the project transitions out of PROPOSED.
+   */
+  expiryBlockHeight: bigint;
 }
 export interface ProjectProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Project";
@@ -200,6 +219,14 @@ export interface ProjectAmino {
    * Zero budget, APPRENTICE/STANDARD initiatives only, rewards minted on completion.
    */
   permissionless?: boolean;
+  /**
+   * Block height at which this project will be expired by the EndBlocker if it
+   * is still in PROPOSED status. Set at creation for non-permissionless
+   * projects (creation_height + params.proposed_project_expiry_blocks). Zero
+   * for permissionless projects (no expiry — ACTIVE on creation) and cleared
+   * when the project transitions out of PROPOSED.
+   */
+  expiry_block_height?: string;
 }
 export interface ProjectAminoMsg {
   type: "/sparkdream.rep.v1.Project";
@@ -260,7 +287,8 @@ function createBaseProject(): Project {
     approvedBy: "",
     approvedAt: BigInt(0),
     completedAt: BigInt(0),
-    permissionless: false
+    permissionless: false,
+    expiryBlockHeight: BigInt(0)
   };
 }
 /**
@@ -326,6 +354,9 @@ export const Project = {
     if (message.permissionless === true) {
       writer.uint32(144).bool(message.permissionless);
     }
+    if (message.expiryBlockHeight !== BigInt(0)) {
+      writer.uint32(152).int64(message.expiryBlockHeight);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Project {
@@ -389,6 +420,9 @@ export const Project = {
         case 18:
           message.permissionless = reader.bool();
           break;
+        case 19:
+          message.expiryBlockHeight = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -416,6 +450,7 @@ export const Project = {
     message.approvedAt = object.approvedAt !== undefined && object.approvedAt !== null ? BigInt(object.approvedAt.toString()) : BigInt(0);
     message.completedAt = object.completedAt !== undefined && object.completedAt !== null ? BigInt(object.completedAt.toString()) : BigInt(0);
     message.permissionless = object.permissionless ?? false;
+    message.expiryBlockHeight = object.expiryBlockHeight !== undefined && object.expiryBlockHeight !== null ? BigInt(object.expiryBlockHeight.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ProjectAmino): Project {
@@ -472,6 +507,9 @@ export const Project = {
     if (object.permissionless !== undefined && object.permissionless !== null) {
       message.permissionless = object.permissionless;
     }
+    if (object.expiry_block_height !== undefined && object.expiry_block_height !== null) {
+      message.expiryBlockHeight = BigInt(object.expiry_block_height);
+    }
     return message;
   },
   toAmino(message: Project): ProjectAmino {
@@ -498,6 +536,7 @@ export const Project = {
     obj.approved_at = message.approvedAt !== BigInt(0) ? message.approvedAt?.toString() : undefined;
     obj.completed_at = message.completedAt !== BigInt(0) ? message.completedAt?.toString() : undefined;
     obj.permissionless = message.permissionless === false ? undefined : message.permissionless;
+    obj.expiry_block_height = message.expiryBlockHeight !== BigInt(0) ? message.expiryBlockHeight?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ProjectAminoMsg): Project {
