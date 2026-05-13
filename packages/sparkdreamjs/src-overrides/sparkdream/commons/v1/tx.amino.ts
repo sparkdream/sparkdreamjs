@@ -21,7 +21,7 @@ import {
   MsgForceUpgrade, MsgDeleteGroup, MsgVetoGroupProposals,
   MsgSubmitProposal, MsgVoteProposal, MsgExecuteProposal,
   MsgSubmitAnonymousProposal, MsgAnonymousVoteProposal,
-  MsgCreateCategory,
+  MsgCreateCategory, MsgDeleteCategory,
 } from "./tx";
 import { anyToAmino, aminoToAny } from "../../../nested-amino";
 
@@ -174,5 +174,10 @@ export const AminoConverter = {
     aminoType: "sparkdream/x/commons/MsgCreateCategory",
     toAmino: MsgCreateCategory.toAmino,
     fromAmino: MsgCreateCategory.fromAmino,
+  },
+  "/sparkdream.commons.v1.MsgDeleteCategory": {
+    aminoType: "sparkdream/x/commons/MsgDeleteCategory",
+    toAmino: MsgDeleteCategory.toAmino,
+    fromAmino: MsgDeleteCategory.fromAmino,
   },
 };
