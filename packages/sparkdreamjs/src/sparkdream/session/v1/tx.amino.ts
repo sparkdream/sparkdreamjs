@@ -9,6 +9,9 @@ import {
   MsgUpdateParams, MsgUpdateOperationalParams,
   MsgCreateSession, MsgRevokeSession, MsgExecSession,
 } from "./tx";
+import { Coin } from "../../../cosmos/base/v1beta1/coin";
+import { Timestamp } from "../../../google/protobuf/timestamp";
+import { toTimestamp } from "../../../helpers";
 import { anyToAmino, aminoToAny } from "../../../nested-amino";
 
 export const AminoConverter = {
@@ -22,9 +25,22 @@ export const AminoConverter = {
     toAmino: MsgUpdateOperationalParams.toAmino,
     fromAmino: MsgUpdateOperationalParams.fromAmino,
   },
+  // `allowed_msg_types` is the repeated string field that gets emitted as `[]`
+  // when a session is created with no type allowlist (i.e. allow-all).
   "/sparkdream.session.v1.MsgCreateSession": {
     aminoType: "sparkdream/x/session/MsgCreateSession",
-    toAmino: MsgCreateSession.toAmino,
+    toAmino(message: any): any {
+      const obj: any = {};
+      obj.granter = message.granter === "" ? undefined : message.granter;
+      obj.grantee = message.grantee === "" ? undefined : message.grantee;
+      obj.allowed_msg_types = (message.allowedMsgTypes?.length ?? 0) > 0
+        ? message.allowedMsgTypes.map((e: string) => e)
+        : undefined;
+      obj.spend_limit = message.spendLimit ? Coin.toAmino(message.spendLimit) : undefined;
+      obj.expiration = message.expiration ? Timestamp.toAmino(toTimestamp(message.expiration)) : undefined;
+      obj.max_exec_count = message.maxExecCount !== BigInt(0) ? message.maxExecCount?.toString() : undefined;
+      return obj;
+    },
     fromAmino: MsgCreateSession.fromAmino,
   },
   "/sparkdream.session.v1.MsgRevokeSession": {

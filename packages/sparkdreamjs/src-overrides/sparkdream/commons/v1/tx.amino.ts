@@ -23,6 +23,7 @@ import {
   MsgSubmitAnonymousProposal, MsgAnonymousVoteProposal,
   MsgCreateCategory, MsgDeleteCategory,
 } from "./tx";
+import { Coin } from "../../../cosmos/base/v1beta1/coin";
 import { anyToAmino, aminoToAny } from "../../../nested-amino";
 
 export { configureNestedAminoConverter } from "../../../nested-amino";
@@ -65,7 +66,15 @@ export const AminoConverter = {
   },
   "/sparkdream.commons.v1.MsgSpendFromCommons": {
     aminoType: "sparkdream/x/commons/MsgSpendFromCommons",
-    toAmino: MsgSpendFromCommons.toAmino,
+    toAmino(message: any): any {
+      const obj: any = {};
+      obj.authority = message.authority === "" ? undefined : message.authority;
+      obj.recipient = message.recipient === "" ? undefined : message.recipient;
+      obj.amount = (message.amount?.length ?? 0) > 0
+        ? message.amount.map((e: any) => e ? Coin.toAmino(e) : undefined)
+        : undefined;
+      return obj;
+    },
     fromAmino: MsgSpendFromCommons.fromAmino,
   },
   "/sparkdream.commons.v1.MsgEmergencyCancelGovProposal": {
@@ -75,12 +84,28 @@ export const AminoConverter = {
   },
   "/sparkdream.commons.v1.MsgCreatePolicyPermissions": {
     aminoType: "sparkdream/x/commons/MsgCreatePolicyPermissions",
-    toAmino: MsgCreatePolicyPermissions.toAmino,
+    toAmino(message: any): any {
+      const obj: any = {};
+      obj.authority = message.authority === "" ? undefined : message.authority;
+      obj.policy_address = message.policyAddress === "" ? undefined : message.policyAddress;
+      obj.allowed_messages = (message.allowedMessages?.length ?? 0) > 0
+        ? message.allowedMessages.map((e: string) => e)
+        : undefined;
+      return obj;
+    },
     fromAmino: MsgCreatePolicyPermissions.fromAmino,
   },
   "/sparkdream.commons.v1.MsgUpdatePolicyPermissions": {
     aminoType: "sparkdream/x/commons/MsgUpdatePolicyPermissions",
-    toAmino: MsgUpdatePolicyPermissions.toAmino,
+    toAmino(message: any): any {
+      const obj: any = {};
+      obj.authority = message.authority === "" ? undefined : message.authority;
+      obj.policy_address = message.policyAddress === "" ? undefined : message.policyAddress;
+      obj.allowed_messages = (message.allowedMessages?.length ?? 0) > 0
+        ? message.allowedMessages.map((e: string) => e)
+        : undefined;
+      return obj;
+    },
     fromAmino: MsgUpdatePolicyPermissions.fromAmino,
   },
   "/sparkdream.commons.v1.MsgDeletePolicyPermissions": {
@@ -90,12 +115,52 @@ export const AminoConverter = {
   },
   "/sparkdream.commons.v1.MsgRegisterGroup": {
     aminoType: "sparkdream/x/commons/MsgRegisterGroup",
-    toAmino: MsgRegisterGroup.toAmino,
+    toAmino(message: any): any {
+      const obj: any = {};
+      obj.authority = message.authority === "" ? undefined : message.authority;
+      obj.name = message.name === "" ? undefined : message.name;
+      obj.description = message.description === "" ? undefined : message.description;
+      obj.members = (message.members?.length ?? 0) > 0
+        ? message.members.map((e: string) => e)
+        : undefined;
+      obj.member_weights = (message.memberWeights?.length ?? 0) > 0
+        ? message.memberWeights.map((e: string) => e)
+        : undefined;
+      obj.funding_weight = message.fundingWeight !== BigInt(0) ? message.fundingWeight?.toString() : undefined;
+      obj.max_spend_per_epoch = message.maxSpendPerEpoch === "" ? undefined : message.maxSpendPerEpoch;
+      obj.update_cooldown = message.updateCooldown !== BigInt(0) ? message.updateCooldown?.toString() : undefined;
+      obj.intended_parent_address = message.intendedParentAddress === "" ? undefined : message.intendedParentAddress;
+      obj.min_members = message.minMembers !== BigInt(0) ? message.minMembers?.toString() : undefined;
+      obj.max_members = message.maxMembers !== BigInt(0) ? message.maxMembers?.toString() : undefined;
+      obj.term_duration = message.termDuration !== BigInt(0) ? message.termDuration?.toString() : undefined;
+      obj.activation_time = message.activationTime !== BigInt(0) ? message.activationTime?.toString() : undefined;
+      obj.voting_period = message.votingPeriod !== BigInt(0) ? message.votingPeriod?.toString() : undefined;
+      obj.min_execution_period = message.minExecutionPeriod !== BigInt(0) ? message.minExecutionPeriod?.toString() : undefined;
+      obj.futarchy_enabled = message.futarchyEnabled === false ? undefined : message.futarchyEnabled;
+      obj.vote_threshold = message.voteThreshold === "" ? undefined : message.voteThreshold;
+      obj.policy_type = message.policyType === "" ? undefined : message.policyType;
+      obj.allowed_messages = (message.allowedMessages?.length ?? 0) > 0
+        ? message.allowedMessages.map((e: string) => e)
+        : undefined;
+      obj.electoral_policy_address = message.electoralPolicyAddress === "" ? undefined : message.electoralPolicyAddress;
+      return obj;
+    },
     fromAmino: MsgRegisterGroup.fromAmino,
   },
   "/sparkdream.commons.v1.MsgRenewGroup": {
     aminoType: "sparkdream/x/commons/MsgRenewGroup",
-    toAmino: MsgRenewGroup.toAmino,
+    toAmino(message: any): any {
+      const obj: any = {};
+      obj.authority = message.authority === "" ? undefined : message.authority;
+      obj.group_name = message.groupName === "" ? undefined : message.groupName;
+      obj.new_members = (message.newMembers?.length ?? 0) > 0
+        ? message.newMembers.map((e: string) => e)
+        : undefined;
+      obj.new_member_weights = (message.newMemberWeights?.length ?? 0) > 0
+        ? message.newMemberWeights.map((e: string) => e)
+        : undefined;
+      return obj;
+    },
     fromAmino: MsgRenewGroup.fromAmino,
   },
   // Telescope's auto-generated toAmino emits `[]` for empty repeated fields
