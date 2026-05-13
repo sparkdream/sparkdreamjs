@@ -98,9 +98,33 @@ export const AminoConverter = {
     toAmino: MsgRenewGroup.toAmino,
     fromAmino: MsgRenewGroup.fromAmino,
   },
+  // Telescope's auto-generated toAmino emits `[]` for empty repeated fields
+  // (the `if (message.membersToAdd)` check is truthy for `[]` in JS), but
+  // aminojson on the chain side omits them. An invite has empty
+  // `members_to_remove`, a remove has empty `members_to_add`/`weights_to_add`,
+  // and either combination produces sign-bytes that don't match what the
+  // chain reconstructs — surfacing as "signature verification failed" /
+  // "unauthorized". Mirror the omitempty pattern used by the proposal
+  // converter above.
   "/sparkdream.commons.v1.MsgUpdateGroupMembers": {
     aminoType: "sparkdream/x/commons/MsgUpdateGroupMembers",
-    toAmino: MsgUpdateGroupMembers.toAmino,
+    toAmino(message: any): any {
+      const obj: any = {};
+      obj.authority = message.authority === "" ? undefined : message.authority;
+      obj.group_policy_address = message.groupPolicyAddress === ""
+        ? undefined
+        : message.groupPolicyAddress;
+      obj.members_to_add = (message.membersToAdd?.length ?? 0) > 0
+        ? message.membersToAdd.map((e: string) => e)
+        : undefined;
+      obj.weights_to_add = (message.weightsToAdd?.length ?? 0) > 0
+        ? message.weightsToAdd.map((e: string) => e)
+        : undefined;
+      obj.members_to_remove = (message.membersToRemove?.length ?? 0) > 0
+        ? message.membersToRemove.map((e: string) => e)
+        : undefined;
+      return obj;
+    },
     fromAmino: MsgUpdateGroupMembers.fromAmino,
   },
   "/sparkdream.commons.v1.MsgUpdateGroupConfig": {
