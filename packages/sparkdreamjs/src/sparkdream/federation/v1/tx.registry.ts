@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { TelescopeGeneratedType } from "../../../types";
 import { Registry } from "@cosmjs/proto-signing";
-import { MsgUpdateParams, MsgRegisterPeer, MsgRemovePeer, MsgSuspendPeer, MsgResumePeer, MsgUpdatePeerPolicy, MsgRegisterBridge, MsgRevokeBridge, MsgSlashBridge, MsgUpdateBridge, MsgUnbondBridge, MsgTopUpBridgeStake, MsgSubmitFederatedContent, MsgFederateContent, MsgAttestOutbound, MsgModerateContent, MsgLinkIdentity, MsgUnlinkIdentity, MsgConfirmIdentityLink, MsgRequestReputationAttestation, MsgVerifyContent, MsgChallengeVerification, MsgSubmitArbiterHash, MsgEscalateChallenge, MsgUpdateOperationalParams } from "./tx";
-export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.federation.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.federation.v1.MsgRegisterPeer", MsgRegisterPeer], ["/sparkdream.federation.v1.MsgRemovePeer", MsgRemovePeer], ["/sparkdream.federation.v1.MsgSuspendPeer", MsgSuspendPeer], ["/sparkdream.federation.v1.MsgResumePeer", MsgResumePeer], ["/sparkdream.federation.v1.MsgUpdatePeerPolicy", MsgUpdatePeerPolicy], ["/sparkdream.federation.v1.MsgRegisterBridge", MsgRegisterBridge], ["/sparkdream.federation.v1.MsgRevokeBridge", MsgRevokeBridge], ["/sparkdream.federation.v1.MsgSlashBridge", MsgSlashBridge], ["/sparkdream.federation.v1.MsgUpdateBridge", MsgUpdateBridge], ["/sparkdream.federation.v1.MsgUnbondBridge", MsgUnbondBridge], ["/sparkdream.federation.v1.MsgTopUpBridgeStake", MsgTopUpBridgeStake], ["/sparkdream.federation.v1.MsgSubmitFederatedContent", MsgSubmitFederatedContent], ["/sparkdream.federation.v1.MsgFederateContent", MsgFederateContent], ["/sparkdream.federation.v1.MsgAttestOutbound", MsgAttestOutbound], ["/sparkdream.federation.v1.MsgModerateContent", MsgModerateContent], ["/sparkdream.federation.v1.MsgLinkIdentity", MsgLinkIdentity], ["/sparkdream.federation.v1.MsgUnlinkIdentity", MsgUnlinkIdentity], ["/sparkdream.federation.v1.MsgConfirmIdentityLink", MsgConfirmIdentityLink], ["/sparkdream.federation.v1.MsgRequestReputationAttestation", MsgRequestReputationAttestation], ["/sparkdream.federation.v1.MsgVerifyContent", MsgVerifyContent], ["/sparkdream.federation.v1.MsgChallengeVerification", MsgChallengeVerification], ["/sparkdream.federation.v1.MsgSubmitArbiterHash", MsgSubmitArbiterHash], ["/sparkdream.federation.v1.MsgEscalateChallenge", MsgEscalateChallenge], ["/sparkdream.federation.v1.MsgUpdateOperationalParams", MsgUpdateOperationalParams]];
+import { MsgUpdateParams, MsgRegisterPeer, MsgRemovePeer, MsgSuspendPeer, MsgResumePeer, MsgUpdatePeerPolicy, MsgRegisterBridge, MsgUpdateBridge, MsgSubmitFederatedContent, MsgFederateContent, MsgAttestOutbound, MsgModerateContent, MsgLinkIdentity, MsgUnlinkIdentity, MsgConfirmIdentityLink, MsgRequestReputationAttestation, MsgVerifyContent, MsgChallengeVerification, MsgSubmitArbiterHash, MsgEscalateChallenge, MsgResolveEscalatedChallenge, MsgUpdateOperationalParams, MsgUpdatePeerController, MsgResyncBridgeCount, MsgPruneOrphanBindings } from "./tx";
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.federation.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.federation.v1.MsgRegisterPeer", MsgRegisterPeer], ["/sparkdream.federation.v1.MsgRemovePeer", MsgRemovePeer], ["/sparkdream.federation.v1.MsgSuspendPeer", MsgSuspendPeer], ["/sparkdream.federation.v1.MsgResumePeer", MsgResumePeer], ["/sparkdream.federation.v1.MsgUpdatePeerPolicy", MsgUpdatePeerPolicy], ["/sparkdream.federation.v1.MsgRegisterBridge", MsgRegisterBridge], ["/sparkdream.federation.v1.MsgUpdateBridge", MsgUpdateBridge], ["/sparkdream.federation.v1.MsgSubmitFederatedContent", MsgSubmitFederatedContent], ["/sparkdream.federation.v1.MsgFederateContent", MsgFederateContent], ["/sparkdream.federation.v1.MsgAttestOutbound", MsgAttestOutbound], ["/sparkdream.federation.v1.MsgModerateContent", MsgModerateContent], ["/sparkdream.federation.v1.MsgLinkIdentity", MsgLinkIdentity], ["/sparkdream.federation.v1.MsgUnlinkIdentity", MsgUnlinkIdentity], ["/sparkdream.federation.v1.MsgConfirmIdentityLink", MsgConfirmIdentityLink], ["/sparkdream.federation.v1.MsgRequestReputationAttestation", MsgRequestReputationAttestation], ["/sparkdream.federation.v1.MsgVerifyContent", MsgVerifyContent], ["/sparkdream.federation.v1.MsgChallengeVerification", MsgChallengeVerification], ["/sparkdream.federation.v1.MsgSubmitArbiterHash", MsgSubmitArbiterHash], ["/sparkdream.federation.v1.MsgEscalateChallenge", MsgEscalateChallenge], ["/sparkdream.federation.v1.MsgResolveEscalatedChallenge", MsgResolveEscalatedChallenge], ["/sparkdream.federation.v1.MsgUpdateOperationalParams", MsgUpdateOperationalParams], ["/sparkdream.federation.v1.MsgUpdatePeerController", MsgUpdatePeerController], ["/sparkdream.federation.v1.MsgResyncBridgeCount", MsgResyncBridgeCount], ["/sparkdream.federation.v1.MsgPruneOrphanBindings", MsgPruneOrphanBindings]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -52,34 +52,10 @@ export const MessageComposer = {
         value: MsgRegisterBridge.encode(value).finish()
       };
     },
-    revokeBridge(value: MsgRevokeBridge) {
-      return {
-        typeUrl: "/sparkdream.federation.v1.MsgRevokeBridge",
-        value: MsgRevokeBridge.encode(value).finish()
-      };
-    },
-    slashBridge(value: MsgSlashBridge) {
-      return {
-        typeUrl: "/sparkdream.federation.v1.MsgSlashBridge",
-        value: MsgSlashBridge.encode(value).finish()
-      };
-    },
     updateBridge(value: MsgUpdateBridge) {
       return {
         typeUrl: "/sparkdream.federation.v1.MsgUpdateBridge",
         value: MsgUpdateBridge.encode(value).finish()
-      };
-    },
-    unbondBridge(value: MsgUnbondBridge) {
-      return {
-        typeUrl: "/sparkdream.federation.v1.MsgUnbondBridge",
-        value: MsgUnbondBridge.encode(value).finish()
-      };
-    },
-    topUpBridgeStake(value: MsgTopUpBridgeStake) {
-      return {
-        typeUrl: "/sparkdream.federation.v1.MsgTopUpBridgeStake",
-        value: MsgTopUpBridgeStake.encode(value).finish()
       };
     },
     submitFederatedContent(value: MsgSubmitFederatedContent) {
@@ -154,10 +130,34 @@ export const MessageComposer = {
         value: MsgEscalateChallenge.encode(value).finish()
       };
     },
+    resolveEscalatedChallenge(value: MsgResolveEscalatedChallenge) {
+      return {
+        typeUrl: "/sparkdream.federation.v1.MsgResolveEscalatedChallenge",
+        value: MsgResolveEscalatedChallenge.encode(value).finish()
+      };
+    },
     updateOperationalParams(value: MsgUpdateOperationalParams) {
       return {
         typeUrl: "/sparkdream.federation.v1.MsgUpdateOperationalParams",
         value: MsgUpdateOperationalParams.encode(value).finish()
+      };
+    },
+    updatePeerController(value: MsgUpdatePeerController) {
+      return {
+        typeUrl: "/sparkdream.federation.v1.MsgUpdatePeerController",
+        value: MsgUpdatePeerController.encode(value).finish()
+      };
+    },
+    resyncBridgeCount(value: MsgResyncBridgeCount) {
+      return {
+        typeUrl: "/sparkdream.federation.v1.MsgResyncBridgeCount",
+        value: MsgResyncBridgeCount.encode(value).finish()
+      };
+    },
+    pruneOrphanBindings(value: MsgPruneOrphanBindings) {
+      return {
+        typeUrl: "/sparkdream.federation.v1.MsgPruneOrphanBindings",
+        value: MsgPruneOrphanBindings.encode(value).finish()
       };
     }
   },
@@ -204,33 +204,9 @@ export const MessageComposer = {
         value
       };
     },
-    revokeBridge(value: MsgRevokeBridge) {
-      return {
-        typeUrl: "/sparkdream.federation.v1.MsgRevokeBridge",
-        value
-      };
-    },
-    slashBridge(value: MsgSlashBridge) {
-      return {
-        typeUrl: "/sparkdream.federation.v1.MsgSlashBridge",
-        value
-      };
-    },
     updateBridge(value: MsgUpdateBridge) {
       return {
         typeUrl: "/sparkdream.federation.v1.MsgUpdateBridge",
-        value
-      };
-    },
-    unbondBridge(value: MsgUnbondBridge) {
-      return {
-        typeUrl: "/sparkdream.federation.v1.MsgUnbondBridge",
-        value
-      };
-    },
-    topUpBridgeStake(value: MsgTopUpBridgeStake) {
-      return {
-        typeUrl: "/sparkdream.federation.v1.MsgTopUpBridgeStake",
         value
       };
     },
@@ -306,9 +282,33 @@ export const MessageComposer = {
         value
       };
     },
+    resolveEscalatedChallenge(value: MsgResolveEscalatedChallenge) {
+      return {
+        typeUrl: "/sparkdream.federation.v1.MsgResolveEscalatedChallenge",
+        value
+      };
+    },
     updateOperationalParams(value: MsgUpdateOperationalParams) {
       return {
         typeUrl: "/sparkdream.federation.v1.MsgUpdateOperationalParams",
+        value
+      };
+    },
+    updatePeerController(value: MsgUpdatePeerController) {
+      return {
+        typeUrl: "/sparkdream.federation.v1.MsgUpdatePeerController",
+        value
+      };
+    },
+    resyncBridgeCount(value: MsgResyncBridgeCount) {
+      return {
+        typeUrl: "/sparkdream.federation.v1.MsgResyncBridgeCount",
+        value
+      };
+    },
+    pruneOrphanBindings(value: MsgPruneOrphanBindings) {
+      return {
+        typeUrl: "/sparkdream.federation.v1.MsgPruneOrphanBindings",
         value
       };
     }
@@ -356,34 +356,10 @@ export const MessageComposer = {
         value: MsgRegisterBridge.fromPartial(value)
       };
     },
-    revokeBridge(value: MsgRevokeBridge) {
-      return {
-        typeUrl: "/sparkdream.federation.v1.MsgRevokeBridge",
-        value: MsgRevokeBridge.fromPartial(value)
-      };
-    },
-    slashBridge(value: MsgSlashBridge) {
-      return {
-        typeUrl: "/sparkdream.federation.v1.MsgSlashBridge",
-        value: MsgSlashBridge.fromPartial(value)
-      };
-    },
     updateBridge(value: MsgUpdateBridge) {
       return {
         typeUrl: "/sparkdream.federation.v1.MsgUpdateBridge",
         value: MsgUpdateBridge.fromPartial(value)
-      };
-    },
-    unbondBridge(value: MsgUnbondBridge) {
-      return {
-        typeUrl: "/sparkdream.federation.v1.MsgUnbondBridge",
-        value: MsgUnbondBridge.fromPartial(value)
-      };
-    },
-    topUpBridgeStake(value: MsgTopUpBridgeStake) {
-      return {
-        typeUrl: "/sparkdream.federation.v1.MsgTopUpBridgeStake",
-        value: MsgTopUpBridgeStake.fromPartial(value)
       };
     },
     submitFederatedContent(value: MsgSubmitFederatedContent) {
@@ -458,10 +434,34 @@ export const MessageComposer = {
         value: MsgEscalateChallenge.fromPartial(value)
       };
     },
+    resolveEscalatedChallenge(value: MsgResolveEscalatedChallenge) {
+      return {
+        typeUrl: "/sparkdream.federation.v1.MsgResolveEscalatedChallenge",
+        value: MsgResolveEscalatedChallenge.fromPartial(value)
+      };
+    },
     updateOperationalParams(value: MsgUpdateOperationalParams) {
       return {
         typeUrl: "/sparkdream.federation.v1.MsgUpdateOperationalParams",
         value: MsgUpdateOperationalParams.fromPartial(value)
+      };
+    },
+    updatePeerController(value: MsgUpdatePeerController) {
+      return {
+        typeUrl: "/sparkdream.federation.v1.MsgUpdatePeerController",
+        value: MsgUpdatePeerController.fromPartial(value)
+      };
+    },
+    resyncBridgeCount(value: MsgResyncBridgeCount) {
+      return {
+        typeUrl: "/sparkdream.federation.v1.MsgResyncBridgeCount",
+        value: MsgResyncBridgeCount.fromPartial(value)
+      };
+    },
+    pruneOrphanBindings(value: MsgPruneOrphanBindings) {
+      return {
+        typeUrl: "/sparkdream.federation.v1.MsgPruneOrphanBindings",
+        value: MsgPruneOrphanBindings.fromPartial(value)
       };
     }
   }

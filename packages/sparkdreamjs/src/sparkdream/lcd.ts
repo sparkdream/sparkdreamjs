@@ -137,6 +137,16 @@ export const createLCDClient = async ({
           requestClient
         })
       },
+      guardian: {
+        v1: new (await import("./guardian/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
+      identity: {
+        v1: new (await import("./identity/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
       name: {
         v1: new (await import("./name/v1/query.lcd")).LCDQueryClient({
           requestClient
@@ -154,6 +164,11 @@ export const createLCDClient = async ({
       },
       season: {
         v1: new (await import("./season/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
+      service: {
+        v1: new (await import("./service/v1/query.lcd")).LCDQueryClient({
           requestClient
         })
       },

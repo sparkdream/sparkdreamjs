@@ -1,5 +1,4 @@
 //@ts-nocheck
-import { Coin, CoinAmino } from "../../../cosmos/base/v1beta1/coin";
 import { Duration, DurationAmino } from "../../../google/protobuf/duration";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { Decimal } from "@interchainjs/math";
@@ -12,12 +11,18 @@ import { DeepPartial } from "../../../helpers";
  */
 export interface Params {
   /**
-   * Bridge operator requirements
+   * Bridge operator requirements. Bond minimums, revocation lifecycle,
+   * and unbonding period live on x/service ServiceTypeConfig per
+   * service_type (federation-bridge-activitypub / federation-bridge-atproto).
+   * 
+   * max_bridges_per_peer is intentionally KEPT as a kill-switch (Decision 6):
+   * default 1000 leaves it effectively no-op against any realistic legit
+   * use. The real defenses against runaway registration are the
+   * service.MinBond economic gate, content-hash deduplication, and per-
+   * peer rate limits. Gov may dial it down without a chain upgrade if
+   * some unknown-unknown materializes. It is NOT a normal policy lever.
    */
-  minBridgeStake: Coin;
   maxBridgesPerPeer: bigint;
-  bridgeRevocationCooldown: Duration;
-  bridgeUnbondingPeriod: Duration;
   /**
    * Content types
    */
@@ -73,7 +78,13 @@ export interface Params {
   verifierSlashAmount: string;
   verificationWindow: Duration;
   challengeWindow: Duration;
-  challengeFee: Coin;
+  /**
+   * challenge_fee_amount is the per-challenge fee escrowed by a verifier
+   * challenger, in bond-denom micro-units. Denom is resolved at runtime
+   * from x/identity (see x-identity-spec.md). Escalating multiplier in
+   * msg_server_challenge_verification.go applies to this amount.
+   */
+  challengeFeeAmount: string;
   challengeJuryDeadline: Duration;
   verifierDemotionCooldown: Duration;
   verifierOverturnBaseCooldown: Duration;
@@ -89,8 +100,22 @@ export interface Params {
   arbiterQuorum: number;
   arbiterResolutionWindow: Duration;
   arbiterEscalationWindow: Duration;
-  escalationFee: Coin;
+  /**
+   * escalation_fee_amount is the fee escrowed by a party escalating a
+   * challenge to a system report, in bond-denom micro-units. Denom is
+   * resolved at runtime from x/identity (see x-identity-spec.md).
+   */
+  escalationFeeAmount: string;
   challengeCooldown: Duration;
+  /**
+   * verifier_unbond_cooldown is the period a verifier's bond stays locked
+   * and slashable after MsgUnbondRole. During the cooldown the BondedRole's
+   * status is UNBONDING and federation action handlers refuse authority.
+   * Propagated to x/rep BondedRoleConfig via SyncVerifierBondedRoleConfig.
+   * Mirrors bridge_unbonding_period — verifier and bridge operator both
+   * face a 14-day slashable window after exit-of-role intent.
+   */
+  verifierUnbondCooldown: Duration;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.federation.v1.Params";
@@ -104,12 +129,18 @@ export interface ParamsProtoMsg {
  */
 export interface ParamsAmino {
   /**
-   * Bridge operator requirements
+   * Bridge operator requirements. Bond minimums, revocation lifecycle,
+   * and unbonding period live on x/service ServiceTypeConfig per
+   * service_type (federation-bridge-activitypub / federation-bridge-atproto).
+   * 
+   * max_bridges_per_peer is intentionally KEPT as a kill-switch (Decision 6):
+   * default 1000 leaves it effectively no-op against any realistic legit
+   * use. The real defenses against runaway registration are the
+   * service.MinBond economic gate, content-hash deduplication, and per-
+   * peer rate limits. Gov may dial it down without a chain upgrade if
+   * some unknown-unknown materializes. It is NOT a normal policy lever.
    */
-  min_bridge_stake?: CoinAmino;
   max_bridges_per_peer?: string;
-  bridge_revocation_cooldown?: DurationAmino;
-  bridge_unbonding_period?: DurationAmino;
   /**
    * Content types
    */
@@ -165,7 +196,13 @@ export interface ParamsAmino {
   verifier_slash_amount?: string;
   verification_window?: DurationAmino;
   challenge_window?: DurationAmino;
-  challenge_fee?: CoinAmino;
+  /**
+   * challenge_fee_amount is the per-challenge fee escrowed by a verifier
+   * challenger, in bond-denom micro-units. Denom is resolved at runtime
+   * from x/identity (see x-identity-spec.md). Escalating multiplier in
+   * msg_server_challenge_verification.go applies to this amount.
+   */
+  challenge_fee_amount?: string;
   challenge_jury_deadline?: DurationAmino;
   verifier_demotion_cooldown?: DurationAmino;
   verifier_overturn_base_cooldown?: DurationAmino;
@@ -181,8 +218,22 @@ export interface ParamsAmino {
   arbiter_quorum?: number;
   arbiter_resolution_window?: DurationAmino;
   arbiter_escalation_window?: DurationAmino;
-  escalation_fee?: CoinAmino;
+  /**
+   * escalation_fee_amount is the fee escrowed by a party escalating a
+   * challenge to a system report, in bond-denom micro-units. Denom is
+   * resolved at runtime from x/identity (see x-identity-spec.md).
+   */
+  escalation_fee_amount?: string;
   challenge_cooldown?: DurationAmino;
+  /**
+   * verifier_unbond_cooldown is the period a verifier's bond stays locked
+   * and slashable after MsgUnbondRole. During the cooldown the BondedRole's
+   * status is UNBONDING and federation action handlers refuse authority.
+   * Propagated to x/rep BondedRoleConfig via SyncVerifierBondedRoleConfig.
+   * Mirrors bridge_unbonding_period — verifier and bridge operator both
+   * face a 14-day slashable window after exit-of-role intent.
+   */
+  verifier_unbond_cooldown?: DurationAmino;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/federation/Params";
@@ -236,10 +287,7 @@ export interface FederationOperationalParamsAminoMsg {
 }
 function createBaseParams(): Params {
   return {
-    minBridgeStake: Coin.fromPartial({}),
     maxBridgesPerPeer: BigInt(0),
-    bridgeRevocationCooldown: Duration.fromPartial({}),
-    bridgeUnbondingPeriod: Duration.fromPartial({}),
     knownContentTypes: [],
     maxInboundPerBlock: BigInt(0),
     maxContentBodySize: BigInt(0),
@@ -265,7 +313,7 @@ function createBaseParams(): Params {
     verifierSlashAmount: "",
     verificationWindow: Duration.fromPartial({}),
     challengeWindow: Duration.fromPartial({}),
-    challengeFee: Coin.fromPartial({}),
+    challengeFeeAmount: "",
     challengeJuryDeadline: Duration.fromPartial({}),
     verifierDemotionCooldown: Duration.fromPartial({}),
     verifierOverturnBaseCooldown: Duration.fromPartial({}),
@@ -278,8 +326,9 @@ function createBaseParams(): Params {
     arbiterQuorum: 0,
     arbiterResolutionWindow: Duration.fromPartial({}),
     arbiterEscalationWindow: Duration.fromPartial({}),
-    escalationFee: Coin.fromPartial({}),
-    challengeCooldown: Duration.fromPartial({})
+    escalationFeeAmount: "",
+    challengeCooldown: Duration.fromPartial({}),
+    verifierUnbondCooldown: Duration.fromPartial({})
   };
 }
 /**
@@ -292,17 +341,8 @@ export const Params = {
   typeUrl: "/sparkdream.federation.v1.Params",
   aminoType: "sparkdream/x/federation/Params",
   encode(message: Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.minBridgeStake !== undefined) {
-      Coin.encode(message.minBridgeStake, writer.uint32(10).fork()).ldelim();
-    }
     if (message.maxBridgesPerPeer !== BigInt(0)) {
       writer.uint32(16).uint64(message.maxBridgesPerPeer);
-    }
-    if (message.bridgeRevocationCooldown !== undefined) {
-      Duration.encode(message.bridgeRevocationCooldown, writer.uint32(26).fork()).ldelim();
-    }
-    if (message.bridgeUnbondingPeriod !== undefined) {
-      Duration.encode(message.bridgeUnbondingPeriod, writer.uint32(34).fork()).ldelim();
     }
     for (const v of message.knownContentTypes) {
       writer.uint32(42).string(v!);
@@ -379,8 +419,8 @@ export const Params = {
     if (message.challengeWindow !== undefined) {
       Duration.encode(message.challengeWindow, writer.uint32(234).fork()).ldelim();
     }
-    if (message.challengeFee !== undefined) {
-      Coin.encode(message.challengeFee, writer.uint32(242).fork()).ldelim();
+    if (message.challengeFeeAmount !== "") {
+      writer.uint32(242).string(message.challengeFeeAmount);
     }
     if (message.challengeJuryDeadline !== undefined) {
       Duration.encode(message.challengeJuryDeadline, writer.uint32(250).fork()).ldelim();
@@ -418,11 +458,14 @@ export const Params = {
     if (message.arbiterEscalationWindow !== undefined) {
       Duration.encode(message.arbiterEscalationWindow, writer.uint32(338).fork()).ldelim();
     }
-    if (message.escalationFee !== undefined) {
-      Coin.encode(message.escalationFee, writer.uint32(346).fork()).ldelim();
+    if (message.escalationFeeAmount !== "") {
+      writer.uint32(346).string(message.escalationFeeAmount);
     }
     if (message.challengeCooldown !== undefined) {
       Duration.encode(message.challengeCooldown, writer.uint32(354).fork()).ldelim();
+    }
+    if (message.verifierUnbondCooldown !== undefined) {
+      Duration.encode(message.verifierUnbondCooldown, writer.uint32(362).fork()).ldelim();
     }
     return writer;
   },
@@ -433,17 +476,8 @@ export const Params = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1:
-          message.minBridgeStake = Coin.decode(reader, reader.uint32());
-          break;
         case 2:
           message.maxBridgesPerPeer = reader.uint64();
-          break;
-        case 3:
-          message.bridgeRevocationCooldown = Duration.decode(reader, reader.uint32());
-          break;
-        case 4:
-          message.bridgeUnbondingPeriod = Duration.decode(reader, reader.uint32());
           break;
         case 5:
           message.knownContentTypes.push(reader.string());
@@ -521,7 +555,7 @@ export const Params = {
           message.challengeWindow = Duration.decode(reader, reader.uint32());
           break;
         case 30:
-          message.challengeFee = Coin.decode(reader, reader.uint32());
+          message.challengeFeeAmount = reader.string();
           break;
         case 31:
           message.challengeJuryDeadline = Duration.decode(reader, reader.uint32());
@@ -560,10 +594,13 @@ export const Params = {
           message.arbiterEscalationWindow = Duration.decode(reader, reader.uint32());
           break;
         case 43:
-          message.escalationFee = Coin.decode(reader, reader.uint32());
+          message.escalationFeeAmount = reader.string();
           break;
         case 44:
           message.challengeCooldown = Duration.decode(reader, reader.uint32());
+          break;
+        case 45:
+          message.verifierUnbondCooldown = Duration.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -574,10 +611,7 @@ export const Params = {
   },
   fromPartial(object: DeepPartial<Params>): Params {
     const message = createBaseParams();
-    message.minBridgeStake = object.minBridgeStake !== undefined && object.minBridgeStake !== null ? Coin.fromPartial(object.minBridgeStake) : undefined;
     message.maxBridgesPerPeer = object.maxBridgesPerPeer !== undefined && object.maxBridgesPerPeer !== null ? BigInt(object.maxBridgesPerPeer.toString()) : BigInt(0);
-    message.bridgeRevocationCooldown = object.bridgeRevocationCooldown !== undefined && object.bridgeRevocationCooldown !== null ? Duration.fromPartial(object.bridgeRevocationCooldown) : undefined;
-    message.bridgeUnbondingPeriod = object.bridgeUnbondingPeriod !== undefined && object.bridgeUnbondingPeriod !== null ? Duration.fromPartial(object.bridgeUnbondingPeriod) : undefined;
     message.knownContentTypes = object.knownContentTypes?.map(e => e) || [];
     message.maxInboundPerBlock = object.maxInboundPerBlock !== undefined && object.maxInboundPerBlock !== null ? BigInt(object.maxInboundPerBlock.toString()) : BigInt(0);
     message.maxContentBodySize = object.maxContentBodySize !== undefined && object.maxContentBodySize !== null ? BigInt(object.maxContentBodySize.toString()) : BigInt(0);
@@ -603,7 +637,7 @@ export const Params = {
     message.verifierSlashAmount = object.verifierSlashAmount ?? "";
     message.verificationWindow = object.verificationWindow !== undefined && object.verificationWindow !== null ? Duration.fromPartial(object.verificationWindow) : undefined;
     message.challengeWindow = object.challengeWindow !== undefined && object.challengeWindow !== null ? Duration.fromPartial(object.challengeWindow) : undefined;
-    message.challengeFee = object.challengeFee !== undefined && object.challengeFee !== null ? Coin.fromPartial(object.challengeFee) : undefined;
+    message.challengeFeeAmount = object.challengeFeeAmount ?? "";
     message.challengeJuryDeadline = object.challengeJuryDeadline !== undefined && object.challengeJuryDeadline !== null ? Duration.fromPartial(object.challengeJuryDeadline) : undefined;
     message.verifierDemotionCooldown = object.verifierDemotionCooldown !== undefined && object.verifierDemotionCooldown !== null ? Duration.fromPartial(object.verifierDemotionCooldown) : undefined;
     message.verifierOverturnBaseCooldown = object.verifierOverturnBaseCooldown !== undefined && object.verifierOverturnBaseCooldown !== null ? Duration.fromPartial(object.verifierOverturnBaseCooldown) : undefined;
@@ -616,23 +650,15 @@ export const Params = {
     message.arbiterQuorum = object.arbiterQuorum ?? 0;
     message.arbiterResolutionWindow = object.arbiterResolutionWindow !== undefined && object.arbiterResolutionWindow !== null ? Duration.fromPartial(object.arbiterResolutionWindow) : undefined;
     message.arbiterEscalationWindow = object.arbiterEscalationWindow !== undefined && object.arbiterEscalationWindow !== null ? Duration.fromPartial(object.arbiterEscalationWindow) : undefined;
-    message.escalationFee = object.escalationFee !== undefined && object.escalationFee !== null ? Coin.fromPartial(object.escalationFee) : undefined;
+    message.escalationFeeAmount = object.escalationFeeAmount ?? "";
     message.challengeCooldown = object.challengeCooldown !== undefined && object.challengeCooldown !== null ? Duration.fromPartial(object.challengeCooldown) : undefined;
+    message.verifierUnbondCooldown = object.verifierUnbondCooldown !== undefined && object.verifierUnbondCooldown !== null ? Duration.fromPartial(object.verifierUnbondCooldown) : undefined;
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
     const message = createBaseParams();
-    if (object.min_bridge_stake !== undefined && object.min_bridge_stake !== null) {
-      message.minBridgeStake = Coin.fromAmino(object.min_bridge_stake);
-    }
     if (object.max_bridges_per_peer !== undefined && object.max_bridges_per_peer !== null) {
       message.maxBridgesPerPeer = BigInt(object.max_bridges_per_peer);
-    }
-    if (object.bridge_revocation_cooldown !== undefined && object.bridge_revocation_cooldown !== null) {
-      message.bridgeRevocationCooldown = Duration.fromAmino(object.bridge_revocation_cooldown);
-    }
-    if (object.bridge_unbonding_period !== undefined && object.bridge_unbonding_period !== null) {
-      message.bridgeUnbondingPeriod = Duration.fromAmino(object.bridge_unbonding_period);
     }
     message.knownContentTypes = object.known_content_types?.map(e => e) || [];
     if (object.max_inbound_per_block !== undefined && object.max_inbound_per_block !== null) {
@@ -707,8 +733,8 @@ export const Params = {
     if (object.challenge_window !== undefined && object.challenge_window !== null) {
       message.challengeWindow = Duration.fromAmino(object.challenge_window);
     }
-    if (object.challenge_fee !== undefined && object.challenge_fee !== null) {
-      message.challengeFee = Coin.fromAmino(object.challenge_fee);
+    if (object.challenge_fee_amount !== undefined && object.challenge_fee_amount !== null) {
+      message.challengeFeeAmount = object.challenge_fee_amount;
     }
     if (object.challenge_jury_deadline !== undefined && object.challenge_jury_deadline !== null) {
       message.challengeJuryDeadline = Duration.fromAmino(object.challenge_jury_deadline);
@@ -746,20 +772,20 @@ export const Params = {
     if (object.arbiter_escalation_window !== undefined && object.arbiter_escalation_window !== null) {
       message.arbiterEscalationWindow = Duration.fromAmino(object.arbiter_escalation_window);
     }
-    if (object.escalation_fee !== undefined && object.escalation_fee !== null) {
-      message.escalationFee = Coin.fromAmino(object.escalation_fee);
+    if (object.escalation_fee_amount !== undefined && object.escalation_fee_amount !== null) {
+      message.escalationFeeAmount = object.escalation_fee_amount;
     }
     if (object.challenge_cooldown !== undefined && object.challenge_cooldown !== null) {
       message.challengeCooldown = Duration.fromAmino(object.challenge_cooldown);
+    }
+    if (object.verifier_unbond_cooldown !== undefined && object.verifier_unbond_cooldown !== null) {
+      message.verifierUnbondCooldown = Duration.fromAmino(object.verifier_unbond_cooldown);
     }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
     const obj: any = {};
-    obj.min_bridge_stake = message.minBridgeStake ? Coin.toAmino(message.minBridgeStake) : undefined;
     obj.max_bridges_per_peer = message.maxBridgesPerPeer !== BigInt(0) ? message.maxBridgesPerPeer?.toString() : undefined;
-    obj.bridge_revocation_cooldown = message.bridgeRevocationCooldown ? Duration.toAmino(message.bridgeRevocationCooldown) : undefined;
-    obj.bridge_unbonding_period = message.bridgeUnbondingPeriod ? Duration.toAmino(message.bridgeUnbondingPeriod) : undefined;
     if (message.knownContentTypes) {
       obj.known_content_types = message.knownContentTypes.map(e => e);
     } else {
@@ -789,7 +815,7 @@ export const Params = {
     obj.verifier_slash_amount = message.verifierSlashAmount === "" ? undefined : message.verifierSlashAmount;
     obj.verification_window = message.verificationWindow ? Duration.toAmino(message.verificationWindow) : undefined;
     obj.challenge_window = message.challengeWindow ? Duration.toAmino(message.challengeWindow) : undefined;
-    obj.challenge_fee = message.challengeFee ? Coin.toAmino(message.challengeFee) : undefined;
+    obj.challenge_fee_amount = message.challengeFeeAmount === "" ? undefined : message.challengeFeeAmount;
     obj.challenge_jury_deadline = message.challengeJuryDeadline ? Duration.toAmino(message.challengeJuryDeadline) : undefined;
     obj.verifier_demotion_cooldown = message.verifierDemotionCooldown ? Duration.toAmino(message.verifierDemotionCooldown) : undefined;
     obj.verifier_overturn_base_cooldown = message.verifierOverturnBaseCooldown ? Duration.toAmino(message.verifierOverturnBaseCooldown) : undefined;
@@ -802,8 +828,9 @@ export const Params = {
     obj.arbiter_quorum = message.arbiterQuorum === 0 ? undefined : message.arbiterQuorum;
     obj.arbiter_resolution_window = message.arbiterResolutionWindow ? Duration.toAmino(message.arbiterResolutionWindow) : undefined;
     obj.arbiter_escalation_window = message.arbiterEscalationWindow ? Duration.toAmino(message.arbiterEscalationWindow) : undefined;
-    obj.escalation_fee = message.escalationFee ? Coin.toAmino(message.escalationFee) : undefined;
+    obj.escalation_fee_amount = message.escalationFeeAmount === "" ? undefined : message.escalationFeeAmount;
     obj.challenge_cooldown = message.challengeCooldown ? Duration.toAmino(message.challengeCooldown) : undefined;
+    obj.verifier_unbond_cooldown = message.verifierUnbondCooldown ? Duration.toAmino(message.verifierUnbondCooldown) : undefined;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {

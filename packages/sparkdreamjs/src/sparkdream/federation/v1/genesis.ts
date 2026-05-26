@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { Params, ParamsAmino } from "./params";
-import { Peer, PeerAmino, PeerPolicy, PeerPolicyAmino, BridgeOperator, BridgeOperatorAmino, FederatedContent, FederatedContentAmino, IdentityLink, IdentityLinkAmino, ReputationAttestation, ReputationAttestationAmino, OutboundAttestation, OutboundAttestationAmino, VerificationRecord, VerificationRecordAmino } from "./types";
+import { Peer, PeerAmino, PeerPolicy, PeerPolicyAmino, BridgeBinding, BridgeBindingAmino, FederatedContent, FederatedContentAmino, IdentityLink, IdentityLinkAmino, ReputationAttestation, ReputationAttestationAmino, OutboundAttestation, OutboundAttestationAmino, VerificationRecord, VerificationRecordAmino } from "./types";
 import { VerifierActivity, VerifierActivityAmino } from "./verifier_activity";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
@@ -18,7 +18,7 @@ export interface GenesisState {
   portId: string;
   peers: Peer[];
   peerPolicies: PeerPolicy[];
-  bridgeOperators: BridgeOperator[];
+  bridgeBindings: BridgeBinding[];
   federatedContent: FederatedContent[];
   identityLinks: IdentityLink[];
   reputationAttestations: ReputationAttestation[];
@@ -46,7 +46,7 @@ export interface GenesisStateAmino {
   port_id?: string;
   peers?: PeerAmino[];
   peer_policies?: PeerPolicyAmino[];
-  bridge_operators?: BridgeOperatorAmino[];
+  bridge_bindings?: BridgeBindingAmino[];
   federated_content?: FederatedContentAmino[];
   identity_links?: IdentityLinkAmino[];
   reputation_attestations?: ReputationAttestationAmino[];
@@ -66,7 +66,7 @@ function createBaseGenesisState(): GenesisState {
     portId: "",
     peers: [],
     peerPolicies: [],
-    bridgeOperators: [],
+    bridgeBindings: [],
     federatedContent: [],
     identityLinks: [],
     reputationAttestations: [],
@@ -98,8 +98,8 @@ export const GenesisState = {
     for (const v of message.peerPolicies) {
       PeerPolicy.encode(v!, writer.uint32(34).fork()).ldelim();
     }
-    for (const v of message.bridgeOperators) {
-      BridgeOperator.encode(v!, writer.uint32(42).fork()).ldelim();
+    for (const v of message.bridgeBindings) {
+      BridgeBinding.encode(v!, writer.uint32(42).fork()).ldelim();
     }
     for (const v of message.federatedContent) {
       FederatedContent.encode(v!, writer.uint32(50).fork()).ldelim();
@@ -147,7 +147,7 @@ export const GenesisState = {
           message.peerPolicies.push(PeerPolicy.decode(reader, reader.uint32()));
           break;
         case 5:
-          message.bridgeOperators.push(BridgeOperator.decode(reader, reader.uint32()));
+          message.bridgeBindings.push(BridgeBinding.decode(reader, reader.uint32()));
           break;
         case 6:
           message.federatedContent.push(FederatedContent.decode(reader, reader.uint32()));
@@ -186,7 +186,7 @@ export const GenesisState = {
     message.portId = object.portId ?? "";
     message.peers = object.peers?.map(e => Peer.fromPartial(e)) || [];
     message.peerPolicies = object.peerPolicies?.map(e => PeerPolicy.fromPartial(e)) || [];
-    message.bridgeOperators = object.bridgeOperators?.map(e => BridgeOperator.fromPartial(e)) || [];
+    message.bridgeBindings = object.bridgeBindings?.map(e => BridgeBinding.fromPartial(e)) || [];
     message.federatedContent = object.federatedContent?.map(e => FederatedContent.fromPartial(e)) || [];
     message.identityLinks = object.identityLinks?.map(e => IdentityLink.fromPartial(e)) || [];
     message.reputationAttestations = object.reputationAttestations?.map(e => ReputationAttestation.fromPartial(e)) || [];
@@ -207,7 +207,7 @@ export const GenesisState = {
     }
     message.peers = object.peers?.map(e => Peer.fromAmino(e)) || [];
     message.peerPolicies = object.peer_policies?.map(e => PeerPolicy.fromAmino(e)) || [];
-    message.bridgeOperators = object.bridge_operators?.map(e => BridgeOperator.fromAmino(e)) || [];
+    message.bridgeBindings = object.bridge_bindings?.map(e => BridgeBinding.fromAmino(e)) || [];
     message.federatedContent = object.federated_content?.map(e => FederatedContent.fromAmino(e)) || [];
     message.identityLinks = object.identity_links?.map(e => IdentityLink.fromAmino(e)) || [];
     message.reputationAttestations = object.reputation_attestations?.map(e => ReputationAttestation.fromAmino(e)) || [];
@@ -236,10 +236,10 @@ export const GenesisState = {
     } else {
       obj.peer_policies = message.peerPolicies;
     }
-    if (message.bridgeOperators) {
-      obj.bridge_operators = message.bridgeOperators.map(e => e ? BridgeOperator.toAmino(e) : undefined);
+    if (message.bridgeBindings) {
+      obj.bridge_bindings = message.bridgeBindings.map(e => e ? BridgeBinding.toAmino(e) : undefined);
     } else {
-      obj.bridge_operators = message.bridgeOperators;
+      obj.bridge_bindings = message.bridgeBindings;
     }
     if (message.federatedContent) {
       obj.federated_content = message.federatedContent.map(e => e ? FederatedContent.toAmino(e) : undefined);

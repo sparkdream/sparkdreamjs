@@ -2,15 +2,15 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetPeerRequest, QueryGetPeerResponse, QueryListPeersRequest, QueryListPeersResponse, QueryGetPeerPolicyRequest, QueryGetPeerPolicyResponse, QueryGetBridgeOperatorRequest, QueryGetBridgeOperatorResponse, QueryListBridgeOperatorsRequest, QueryListBridgeOperatorsResponse, QueryGetFederatedContentRequest, QueryGetFederatedContentResponse, QueryListFederatedContentRequest, QueryListFederatedContentResponse, QueryGetIdentityLinkRequest, QueryGetIdentityLinkResponse, QueryListIdentityLinksRequest, QueryListIdentityLinksResponse, QueryResolveRemoteIdentityRequest, QueryResolveRemoteIdentityResponse, QueryGetPendingIdentityChallengeRequest, QueryGetPendingIdentityChallengeResponse, QueryListPendingIdentityChallengesRequest, QueryListPendingIdentityChallengesResponse, QueryGetReputationAttestationRequest, QueryGetReputationAttestationResponse, QueryListOutboundAttestationsRequest, QueryListOutboundAttestationsResponse, QueryVerifierActivityRequest, QueryVerifierActivityResponse, QueryGetVerificationRecordRequest, QueryGetVerificationRecordResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetPeerRequest, QueryGetPeerResponse, QueryListPeersRequest, QueryListPeersResponse, QueryGetPeerPolicyRequest, QueryGetPeerPolicyResponse, QueryGetBridgeBindingRequest, QueryGetBridgeBindingResponse, QueryListBridgeBindingsRequest, QueryListBridgeBindingsResponse, QueryGetFederatedContentRequest, QueryGetFederatedContentResponse, QueryListFederatedContentRequest, QueryListFederatedContentResponse, QueryGetIdentityLinkRequest, QueryGetIdentityLinkResponse, QueryListIdentityLinksRequest, QueryListIdentityLinksResponse, QueryResolveRemoteIdentityRequest, QueryResolveRemoteIdentityResponse, QueryGetPendingIdentityChallengeRequest, QueryGetPendingIdentityChallengeResponse, QueryListPendingIdentityChallengesRequest, QueryListPendingIdentityChallengesResponse, QueryGetReputationAttestationRequest, QueryGetReputationAttestationResponse, QueryListOutboundAttestationsRequest, QueryListOutboundAttestationsResponse, QueryVerifierActivityRequest, QueryVerifierActivityResponse, QueryGetVerificationRecordRequest, QueryGetVerificationRecordResponse, QueryGetEscalatedChallengeRequest, QueryGetEscalatedChallengeResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   params(request?: QueryParamsRequest): Promise<QueryParamsResponse>;
   getPeer(request: QueryGetPeerRequest): Promise<QueryGetPeerResponse>;
   listPeers(request?: QueryListPeersRequest): Promise<QueryListPeersResponse>;
   getPeerPolicy(request: QueryGetPeerPolicyRequest): Promise<QueryGetPeerPolicyResponse>;
-  getBridgeOperator(request: QueryGetBridgeOperatorRequest): Promise<QueryGetBridgeOperatorResponse>;
-  listBridgeOperators(request?: QueryListBridgeOperatorsRequest): Promise<QueryListBridgeOperatorsResponse>;
+  getBridgeBinding(request: QueryGetBridgeBindingRequest): Promise<QueryGetBridgeBindingResponse>;
+  listBridgeBindings(request?: QueryListBridgeBindingsRequest): Promise<QueryListBridgeBindingsResponse>;
   getFederatedContent(request: QueryGetFederatedContentRequest): Promise<QueryGetFederatedContentResponse>;
   listFederatedContent(request?: QueryListFederatedContentRequest): Promise<QueryListFederatedContentResponse>;
   getIdentityLink(request: QueryGetIdentityLinkRequest): Promise<QueryGetIdentityLinkResponse>;
@@ -28,6 +28,7 @@ export interface Query {
    */
   verifierActivity(request: QueryVerifierActivityRequest): Promise<QueryVerifierActivityResponse>;
   getVerificationRecord(request: QueryGetVerificationRecordRequest): Promise<QueryGetVerificationRecordResponse>;
+  getEscalatedChallenge(request: QueryGetEscalatedChallengeRequest): Promise<QueryGetEscalatedChallengeResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -60,19 +61,19 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.federation.v1.Query", "GetPeerPolicy", data);
     return promise.then(data => QueryGetPeerPolicyResponse.decode(new BinaryReader(data)));
   };
-  /* GetBridgeOperator */
-  getBridgeOperator = async (request: QueryGetBridgeOperatorRequest): Promise<QueryGetBridgeOperatorResponse> => {
-    const data = QueryGetBridgeOperatorRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.federation.v1.Query", "GetBridgeOperator", data);
-    return promise.then(data => QueryGetBridgeOperatorResponse.decode(new BinaryReader(data)));
+  /* GetBridgeBinding */
+  getBridgeBinding = async (request: QueryGetBridgeBindingRequest): Promise<QueryGetBridgeBindingResponse> => {
+    const data = QueryGetBridgeBindingRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.federation.v1.Query", "GetBridgeBinding", data);
+    return promise.then(data => QueryGetBridgeBindingResponse.decode(new BinaryReader(data)));
   };
-  /* ListBridgeOperators */
-  listBridgeOperators = async (request: QueryListBridgeOperatorsRequest = {
+  /* ListBridgeBindings */
+  listBridgeBindings = async (request: QueryListBridgeBindingsRequest = {
     pagination: undefined
-  }): Promise<QueryListBridgeOperatorsResponse> => {
-    const data = QueryListBridgeOperatorsRequest.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.federation.v1.Query", "ListBridgeOperators", data);
-    return promise.then(data => QueryListBridgeOperatorsResponse.decode(new BinaryReader(data)));
+  }): Promise<QueryListBridgeBindingsResponse> => {
+    const data = QueryListBridgeBindingsRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.federation.v1.Query", "ListBridgeBindings", data);
+    return promise.then(data => QueryListBridgeBindingsResponse.decode(new BinaryReader(data)));
   };
   /* GetFederatedContent */
   getFederatedContent = async (request: QueryGetFederatedContentRequest): Promise<QueryGetFederatedContentResponse> => {
@@ -149,6 +150,12 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.federation.v1.Query", "GetVerificationRecord", data);
     return promise.then(data => QueryGetVerificationRecordResponse.decode(new BinaryReader(data)));
   };
+  /* GetEscalatedChallenge */
+  getEscalatedChallenge = async (request: QueryGetEscalatedChallengeRequest): Promise<QueryGetEscalatedChallengeResponse> => {
+    const data = QueryGetEscalatedChallengeRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.federation.v1.Query", "GetEscalatedChallenge", data);
+    return promise.then(data => QueryGetEscalatedChallengeResponse.decode(new BinaryReader(data)));
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);
@@ -166,11 +173,11 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     getPeerPolicy(request: QueryGetPeerPolicyRequest): Promise<QueryGetPeerPolicyResponse> {
       return queryService.getPeerPolicy(request);
     },
-    getBridgeOperator(request: QueryGetBridgeOperatorRequest): Promise<QueryGetBridgeOperatorResponse> {
-      return queryService.getBridgeOperator(request);
+    getBridgeBinding(request: QueryGetBridgeBindingRequest): Promise<QueryGetBridgeBindingResponse> {
+      return queryService.getBridgeBinding(request);
     },
-    listBridgeOperators(request?: QueryListBridgeOperatorsRequest): Promise<QueryListBridgeOperatorsResponse> {
-      return queryService.listBridgeOperators(request);
+    listBridgeBindings(request?: QueryListBridgeBindingsRequest): Promise<QueryListBridgeBindingsResponse> {
+      return queryService.listBridgeBindings(request);
     },
     getFederatedContent(request: QueryGetFederatedContentRequest): Promise<QueryGetFederatedContentResponse> {
       return queryService.getFederatedContent(request);
@@ -204,6 +211,9 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     getVerificationRecord(request: QueryGetVerificationRecordRequest): Promise<QueryGetVerificationRecordResponse> {
       return queryService.getVerificationRecord(request);
+    },
+    getEscalatedChallenge(request: QueryGetEscalatedChallengeRequest): Promise<QueryGetEscalatedChallengeResponse> {
+      return queryService.getEscalatedChallenge(request);
     }
   };
 };

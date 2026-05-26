@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetPolicyPermissionsRequest, QueryGetPolicyPermissionsResponse, QueryAllPolicyPermissionsRequest, QueryAllPolicyPermissionsResponse, QueryGetDecisionPolicyRequest, QueryGetDecisionPolicyResponse, QueryAllDecisionPoliciesRequest, QueryAllDecisionPoliciesResponse, QueryGetGroupRequest, QueryGetGroupResponse, QueryAllGroupRequest, QueryAllGroupResponse, QueryGetCouncilMembersRequest, QueryGetCouncilMembersResponse, QueryGetProposalRequest, QueryGetProposalResponse, QueryListProposalsRequest, QueryListProposalsResponse, QueryGetProposalVotesRequest, QueryGetProposalVotesResponse, QueryGetCategoryRequest, QueryGetCategoryResponse, QueryAllCategoryRequest, QueryAllCategoryResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetPolicyPermissionsRequest, QueryGetPolicyPermissionsResponse, QueryAllPolicyPermissionsRequest, QueryAllPolicyPermissionsResponse, QueryGetDecisionPolicyRequest, QueryGetDecisionPolicyResponse, QueryAllDecisionPoliciesRequest, QueryAllDecisionPoliciesResponse, QueryGetGroupRequest, QueryGetGroupResponse, QueryAllGroupRequest, QueryAllGroupResponse, QueryGetCouncilMembersRequest, QueryGetCouncilMembersResponse, QueryGetProposalRequest, QueryGetProposalResponse, QueryListProposalsRequest, QueryListProposalsResponse, QueryGetProposalVotesRequest, QueryGetProposalVotesResponse, QueryGetCategoryRequest, QueryGetCategoryResponse, QueryAllCategoryRequest, QueryAllCategoryResponse, QueryGetRecurringSpendRequest, QueryGetRecurringSpendResponse, QueryListRecurringSpendsRequest, QueryListRecurringSpendsResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -119,5 +119,28 @@ export class LCDQueryClient {
     }
     const endpoint = `sparkdream/commons/v1/category`;
     return await this.req.get<QueryAllCategoryResponse>(endpoint, options);
+  };
+  /* GetRecurringSpend queries a single recurring spend schedule by id. */
+  getRecurringSpend = async (params: QueryGetRecurringSpendRequest): Promise<QueryGetRecurringSpendResponse> => {
+    const endpoint = `sparkdream/commons/v1/recurring_spend/${params.id}`;
+    return await this.req.get<QueryGetRecurringSpendResponse>(endpoint);
+  };
+  /* ListRecurringSpends queries recurring spend schedules, optionally
+   filtered by authority (council policy address) or recipient. */
+  listRecurringSpends = async (params: QueryListRecurringSpendsRequest): Promise<QueryListRecurringSpendsResponse> => {
+    const options: any = {
+      params: {}
+    };
+    if (typeof params?.authority !== "undefined") {
+      options.params.authority = params.authority;
+    }
+    if (typeof params?.recipient !== "undefined") {
+      options.params.recipient = params.recipient;
+    }
+    if (typeof params?.pagination !== "undefined") {
+      setPaginationParams(options, params.pagination);
+    }
+    const endpoint = `sparkdream/commons/v1/recurring_spends`;
+    return await this.req.get<QueryListRecurringSpendsResponse>(endpoint, options);
   };
 }

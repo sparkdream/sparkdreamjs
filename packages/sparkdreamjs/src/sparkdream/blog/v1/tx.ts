@@ -152,7 +152,7 @@ export interface MsgCreatePost {
   body: string;
   contentType: ContentType;
   /**
-   * Minimum trust level to reply (-1 to 4, default: 0)
+   * Minimum trust level to reply AND react (-1 open, 0-4, default: 0)
    */
   minReplyTrustLevel: number;
   /**
@@ -184,7 +184,7 @@ export interface MsgCreatePostAmino {
   body?: string;
   content_type?: ContentType;
   /**
-   * Minimum trust level to reply (-1 to 4, default: 0)
+   * Minimum trust level to reply AND react (-1 open, 0-4, default: 0)
    */
   min_reply_trust_level?: number;
   /**
@@ -244,7 +244,7 @@ export interface MsgUpdatePost {
   contentType: ContentType;
   repliesEnabled: boolean;
   /**
-   * Minimum trust level to reply (-1 to 4)
+   * Minimum trust level to reply AND react (-1 open, 0-4)
    */
   minReplyTrustLevel: number;
   /**
@@ -270,7 +270,7 @@ export interface MsgUpdatePostAmino {
   content_type?: ContentType;
   replies_enabled?: boolean;
   /**
-   * Minimum trust level to reply (-1 to 4)
+   * Minimum trust level to reply AND react (-1 open, 0-4)
    */
   min_reply_trust_level?: number;
   /**

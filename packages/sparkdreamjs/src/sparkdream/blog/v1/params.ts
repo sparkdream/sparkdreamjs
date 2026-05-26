@@ -1,10 +1,11 @@
 //@ts-nocheck
-import { Coin, CoinAmino } from "../../../cosmos/base/v1beta1/coin";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { Decimal } from "@interchainjs/math";
 import { DeepPartial } from "../../../helpers";
 /**
- * Params defines the parameters for the module.
+ * Params defines the parameters for the module. Fee/cost fields are stored
+ * as bare amounts in the chain's bond denom (resolved at runtime from
+ * x/identity); the keeper wraps them into sdk.Coin at the point of use.
  * @name Params
  * @package sparkdream.blog.v1
  * @see proto type: sparkdream.blog.v1.Params
@@ -19,9 +20,10 @@ export interface Params {
    */
   maxBodyLength: bigint;
   /**
-   * cost_per_byte charged for on-chain content storage (applies to all posts, burned)
+   * cost_per_byte_amount charged for on-chain content storage, in bond-denom
+   * micro-units. Applies to all posts; burned.
    */
-  costPerByte: Coin;
+  costPerByteAmount: string;
   /**
    * cost_per_byte_exempt when true, disables cost_per_byte fee collection
    */
@@ -35,9 +37,9 @@ export interface Params {
    */
   maxReplyDepth: number;
   /**
-   * Flat fee per reaction
+   * Flat fee per reaction, in bond-denom micro-units.
    */
-  reactionFee: Coin;
+  reactionFeeAmount: string;
   /**
    * Disable reaction fees
    */
@@ -71,13 +73,13 @@ export interface Params {
    */
   minEphemeralContentTtl: bigint;
   /**
-   * Governance-only ceiling for cost_per_byte
+   * Governance-only ceiling for cost_per_byte_amount.
    */
-  maxCostPerByte: Coin;
+  maxCostPerByteAmount: string;
   /**
-   * Governance-only ceiling for reaction_fee
+   * Governance-only ceiling for reaction_fee_amount.
    */
-  maxReactionFee: Coin;
+  maxReactionFeeAmount: string;
   /**
    * Min conviction score to renew anonymous content at TTL expiry (default: 100.0; 0 = disabled)
    */
@@ -100,7 +102,9 @@ export interface ParamsProtoMsg {
   value: Uint8Array;
 }
 /**
- * Params defines the parameters for the module.
+ * Params defines the parameters for the module. Fee/cost fields are stored
+ * as bare amounts in the chain's bond denom (resolved at runtime from
+ * x/identity); the keeper wraps them into sdk.Coin at the point of use.
  * @name ParamsAmino
  * @package sparkdream.blog.v1
  * @see proto type: sparkdream.blog.v1.Params
@@ -115,9 +119,10 @@ export interface ParamsAmino {
    */
   max_body_length?: string;
   /**
-   * cost_per_byte charged for on-chain content storage (applies to all posts, burned)
+   * cost_per_byte_amount charged for on-chain content storage, in bond-denom
+   * micro-units. Applies to all posts; burned.
    */
-  cost_per_byte?: CoinAmino;
+  cost_per_byte_amount?: string;
   /**
    * cost_per_byte_exempt when true, disables cost_per_byte fee collection
    */
@@ -131,9 +136,9 @@ export interface ParamsAmino {
    */
   max_reply_depth?: number;
   /**
-   * Flat fee per reaction
+   * Flat fee per reaction, in bond-denom micro-units.
    */
-  reaction_fee?: CoinAmino;
+  reaction_fee_amount?: string;
   /**
    * Disable reaction fees
    */
@@ -167,13 +172,13 @@ export interface ParamsAmino {
    */
   min_ephemeral_content_ttl?: string;
   /**
-   * Governance-only ceiling for cost_per_byte
+   * Governance-only ceiling for cost_per_byte_amount.
    */
-  max_cost_per_byte?: CoinAmino;
+  max_cost_per_byte_amount?: string;
   /**
-   * Governance-only ceiling for reaction_fee
+   * Governance-only ceiling for reaction_fee_amount.
    */
-  max_reaction_fee?: CoinAmino;
+  max_reaction_fee_amount?: string;
   /**
    * Min conviction score to renew anonymous content at TTL expiry (default: 100.0; 0 = disabled)
    */
@@ -204,17 +209,18 @@ export interface ParamsAminoMsg {
  */
 export interface BlogOperationalParams {
   /**
-   * cost_per_byte charged for on-chain content storage (applies to all posts, burned)
+   * cost_per_byte_amount charged for on-chain content storage, in bond-denom
+   * micro-units. Applies to all posts; burned.
    */
-  costPerByte: Coin;
+  costPerByteAmount: string;
   /**
    * cost_per_byte_exempt when true, disables cost_per_byte fee collection
    */
   costPerByteExempt: boolean;
   /**
-   * Flat fee per reaction
+   * Flat fee per reaction, in bond-denom micro-units.
    */
-  reactionFee: Coin;
+  reactionFeeAmount: string;
   /**
    * Disable reaction fees
    */
@@ -261,17 +267,18 @@ export interface BlogOperationalParamsProtoMsg {
  */
 export interface BlogOperationalParamsAmino {
   /**
-   * cost_per_byte charged for on-chain content storage (applies to all posts, burned)
+   * cost_per_byte_amount charged for on-chain content storage, in bond-denom
+   * micro-units. Applies to all posts; burned.
    */
-  cost_per_byte?: CoinAmino;
+  cost_per_byte_amount?: string;
   /**
    * cost_per_byte_exempt when true, disables cost_per_byte fee collection
    */
   cost_per_byte_exempt?: boolean;
   /**
-   * Flat fee per reaction
+   * Flat fee per reaction, in bond-denom micro-units.
    */
-  reaction_fee?: CoinAmino;
+  reaction_fee_amount?: string;
   /**
    * Disable reaction fees
    */
@@ -313,11 +320,11 @@ function createBaseParams(): Params {
   return {
     maxTitleLength: BigInt(0),
     maxBodyLength: BigInt(0),
-    costPerByte: Coin.fromPartial({}),
+    costPerByteAmount: "",
     costPerByteExempt: false,
     maxReplyLength: BigInt(0),
     maxReplyDepth: 0,
-    reactionFee: Coin.fromPartial({}),
+    reactionFeeAmount: "",
     reactionFeeExempt: false,
     maxPostsPerDay: 0,
     maxRepliesPerDay: 0,
@@ -326,8 +333,8 @@ function createBaseParams(): Params {
     pinMinTrustLevel: 0,
     maxPinsPerDay: 0,
     minEphemeralContentTtl: BigInt(0),
-    maxCostPerByte: Coin.fromPartial({}),
-    maxReactionFee: Coin.fromPartial({}),
+    maxCostPerByteAmount: "",
+    maxReactionFeeAmount: "",
     convictionRenewalThreshold: "",
     convictionRenewalPeriod: BigInt(0),
     maxTagsPerPost: 0,
@@ -335,7 +342,9 @@ function createBaseParams(): Params {
   };
 }
 /**
- * Params defines the parameters for the module.
+ * Params defines the parameters for the module. Fee/cost fields are stored
+ * as bare amounts in the chain's bond denom (resolved at runtime from
+ * x/identity); the keeper wraps them into sdk.Coin at the point of use.
  * @name Params
  * @package sparkdream.blog.v1
  * @see proto type: sparkdream.blog.v1.Params
@@ -350,8 +359,8 @@ export const Params = {
     if (message.maxBodyLength !== BigInt(0)) {
       writer.uint32(16).uint64(message.maxBodyLength);
     }
-    if (message.costPerByte !== undefined) {
-      Coin.encode(message.costPerByte, writer.uint32(26).fork()).ldelim();
+    if (message.costPerByteAmount !== "") {
+      writer.uint32(26).string(message.costPerByteAmount);
     }
     if (message.costPerByteExempt === true) {
       writer.uint32(32).bool(message.costPerByteExempt);
@@ -362,8 +371,8 @@ export const Params = {
     if (message.maxReplyDepth !== 0) {
       writer.uint32(48).uint32(message.maxReplyDepth);
     }
-    if (message.reactionFee !== undefined) {
-      Coin.encode(message.reactionFee, writer.uint32(58).fork()).ldelim();
+    if (message.reactionFeeAmount !== "") {
+      writer.uint32(58).string(message.reactionFeeAmount);
     }
     if (message.reactionFeeExempt === true) {
       writer.uint32(64).bool(message.reactionFeeExempt);
@@ -389,11 +398,11 @@ export const Params = {
     if (message.minEphemeralContentTtl !== BigInt(0)) {
       writer.uint32(160).int64(message.minEphemeralContentTtl);
     }
-    if (message.maxCostPerByte !== undefined) {
-      Coin.encode(message.maxCostPerByte, writer.uint32(170).fork()).ldelim();
+    if (message.maxCostPerByteAmount !== "") {
+      writer.uint32(170).string(message.maxCostPerByteAmount);
     }
-    if (message.maxReactionFee !== undefined) {
-      Coin.encode(message.maxReactionFee, writer.uint32(178).fork()).ldelim();
+    if (message.maxReactionFeeAmount !== "") {
+      writer.uint32(178).string(message.maxReactionFeeAmount);
     }
     if (message.convictionRenewalThreshold !== "") {
       writer.uint32(186).string(Decimal.fromUserInput(message.convictionRenewalThreshold, 18).atomics);
@@ -423,7 +432,7 @@ export const Params = {
           message.maxBodyLength = reader.uint64();
           break;
         case 3:
-          message.costPerByte = Coin.decode(reader, reader.uint32());
+          message.costPerByteAmount = reader.string();
           break;
         case 4:
           message.costPerByteExempt = reader.bool();
@@ -435,7 +444,7 @@ export const Params = {
           message.maxReplyDepth = reader.uint32();
           break;
         case 7:
-          message.reactionFee = Coin.decode(reader, reader.uint32());
+          message.reactionFeeAmount = reader.string();
           break;
         case 8:
           message.reactionFeeExempt = reader.bool();
@@ -462,10 +471,10 @@ export const Params = {
           message.minEphemeralContentTtl = reader.int64();
           break;
         case 21:
-          message.maxCostPerByte = Coin.decode(reader, reader.uint32());
+          message.maxCostPerByteAmount = reader.string();
           break;
         case 22:
-          message.maxReactionFee = Coin.decode(reader, reader.uint32());
+          message.maxReactionFeeAmount = reader.string();
           break;
         case 23:
           message.convictionRenewalThreshold = Decimal.fromAtomics(reader.string(), 18).toString();
@@ -490,11 +499,11 @@ export const Params = {
     const message = createBaseParams();
     message.maxTitleLength = object.maxTitleLength !== undefined && object.maxTitleLength !== null ? BigInt(object.maxTitleLength.toString()) : BigInt(0);
     message.maxBodyLength = object.maxBodyLength !== undefined && object.maxBodyLength !== null ? BigInt(object.maxBodyLength.toString()) : BigInt(0);
-    message.costPerByte = object.costPerByte !== undefined && object.costPerByte !== null ? Coin.fromPartial(object.costPerByte) : undefined;
+    message.costPerByteAmount = object.costPerByteAmount ?? "";
     message.costPerByteExempt = object.costPerByteExempt ?? false;
     message.maxReplyLength = object.maxReplyLength !== undefined && object.maxReplyLength !== null ? BigInt(object.maxReplyLength.toString()) : BigInt(0);
     message.maxReplyDepth = object.maxReplyDepth ?? 0;
-    message.reactionFee = object.reactionFee !== undefined && object.reactionFee !== null ? Coin.fromPartial(object.reactionFee) : undefined;
+    message.reactionFeeAmount = object.reactionFeeAmount ?? "";
     message.reactionFeeExempt = object.reactionFeeExempt ?? false;
     message.maxPostsPerDay = object.maxPostsPerDay ?? 0;
     message.maxRepliesPerDay = object.maxRepliesPerDay ?? 0;
@@ -503,8 +512,8 @@ export const Params = {
     message.pinMinTrustLevel = object.pinMinTrustLevel ?? 0;
     message.maxPinsPerDay = object.maxPinsPerDay ?? 0;
     message.minEphemeralContentTtl = object.minEphemeralContentTtl !== undefined && object.minEphemeralContentTtl !== null ? BigInt(object.minEphemeralContentTtl.toString()) : BigInt(0);
-    message.maxCostPerByte = object.maxCostPerByte !== undefined && object.maxCostPerByte !== null ? Coin.fromPartial(object.maxCostPerByte) : undefined;
-    message.maxReactionFee = object.maxReactionFee !== undefined && object.maxReactionFee !== null ? Coin.fromPartial(object.maxReactionFee) : undefined;
+    message.maxCostPerByteAmount = object.maxCostPerByteAmount ?? "";
+    message.maxReactionFeeAmount = object.maxReactionFeeAmount ?? "";
     message.convictionRenewalThreshold = object.convictionRenewalThreshold ?? "";
     message.convictionRenewalPeriod = object.convictionRenewalPeriod !== undefined && object.convictionRenewalPeriod !== null ? BigInt(object.convictionRenewalPeriod.toString()) : BigInt(0);
     message.maxTagsPerPost = object.maxTagsPerPost ?? 0;
@@ -519,8 +528,8 @@ export const Params = {
     if (object.max_body_length !== undefined && object.max_body_length !== null) {
       message.maxBodyLength = BigInt(object.max_body_length);
     }
-    if (object.cost_per_byte !== undefined && object.cost_per_byte !== null) {
-      message.costPerByte = Coin.fromAmino(object.cost_per_byte);
+    if (object.cost_per_byte_amount !== undefined && object.cost_per_byte_amount !== null) {
+      message.costPerByteAmount = object.cost_per_byte_amount;
     }
     if (object.cost_per_byte_exempt !== undefined && object.cost_per_byte_exempt !== null) {
       message.costPerByteExempt = object.cost_per_byte_exempt;
@@ -531,8 +540,8 @@ export const Params = {
     if (object.max_reply_depth !== undefined && object.max_reply_depth !== null) {
       message.maxReplyDepth = object.max_reply_depth;
     }
-    if (object.reaction_fee !== undefined && object.reaction_fee !== null) {
-      message.reactionFee = Coin.fromAmino(object.reaction_fee);
+    if (object.reaction_fee_amount !== undefined && object.reaction_fee_amount !== null) {
+      message.reactionFeeAmount = object.reaction_fee_amount;
     }
     if (object.reaction_fee_exempt !== undefined && object.reaction_fee_exempt !== null) {
       message.reactionFeeExempt = object.reaction_fee_exempt;
@@ -558,11 +567,11 @@ export const Params = {
     if (object.min_ephemeral_content_ttl !== undefined && object.min_ephemeral_content_ttl !== null) {
       message.minEphemeralContentTtl = BigInt(object.min_ephemeral_content_ttl);
     }
-    if (object.max_cost_per_byte !== undefined && object.max_cost_per_byte !== null) {
-      message.maxCostPerByte = Coin.fromAmino(object.max_cost_per_byte);
+    if (object.max_cost_per_byte_amount !== undefined && object.max_cost_per_byte_amount !== null) {
+      message.maxCostPerByteAmount = object.max_cost_per_byte_amount;
     }
-    if (object.max_reaction_fee !== undefined && object.max_reaction_fee !== null) {
-      message.maxReactionFee = Coin.fromAmino(object.max_reaction_fee);
+    if (object.max_reaction_fee_amount !== undefined && object.max_reaction_fee_amount !== null) {
+      message.maxReactionFeeAmount = object.max_reaction_fee_amount;
     }
     if (object.conviction_renewal_threshold !== undefined && object.conviction_renewal_threshold !== null) {
       message.convictionRenewalThreshold = object.conviction_renewal_threshold;
@@ -582,11 +591,11 @@ export const Params = {
     const obj: any = {};
     obj.max_title_length = message.maxTitleLength !== BigInt(0) ? message.maxTitleLength?.toString() : undefined;
     obj.max_body_length = message.maxBodyLength !== BigInt(0) ? message.maxBodyLength?.toString() : undefined;
-    obj.cost_per_byte = message.costPerByte ? Coin.toAmino(message.costPerByte) : undefined;
+    obj.cost_per_byte_amount = message.costPerByteAmount === "" ? undefined : message.costPerByteAmount;
     obj.cost_per_byte_exempt = message.costPerByteExempt === false ? undefined : message.costPerByteExempt;
     obj.max_reply_length = message.maxReplyLength !== BigInt(0) ? message.maxReplyLength?.toString() : undefined;
     obj.max_reply_depth = message.maxReplyDepth === 0 ? undefined : message.maxReplyDepth;
-    obj.reaction_fee = message.reactionFee ? Coin.toAmino(message.reactionFee) : undefined;
+    obj.reaction_fee_amount = message.reactionFeeAmount === "" ? undefined : message.reactionFeeAmount;
     obj.reaction_fee_exempt = message.reactionFeeExempt === false ? undefined : message.reactionFeeExempt;
     obj.max_posts_per_day = message.maxPostsPerDay === 0 ? undefined : message.maxPostsPerDay;
     obj.max_replies_per_day = message.maxRepliesPerDay === 0 ? undefined : message.maxRepliesPerDay;
@@ -595,8 +604,8 @@ export const Params = {
     obj.pin_min_trust_level = message.pinMinTrustLevel === 0 ? undefined : message.pinMinTrustLevel;
     obj.max_pins_per_day = message.maxPinsPerDay === 0 ? undefined : message.maxPinsPerDay;
     obj.min_ephemeral_content_ttl = message.minEphemeralContentTtl !== BigInt(0) ? message.minEphemeralContentTtl?.toString() : undefined;
-    obj.max_cost_per_byte = message.maxCostPerByte ? Coin.toAmino(message.maxCostPerByte) : undefined;
-    obj.max_reaction_fee = message.maxReactionFee ? Coin.toAmino(message.maxReactionFee) : undefined;
+    obj.max_cost_per_byte_amount = message.maxCostPerByteAmount === "" ? undefined : message.maxCostPerByteAmount;
+    obj.max_reaction_fee_amount = message.maxReactionFeeAmount === "" ? undefined : message.maxReactionFeeAmount;
     obj.conviction_renewal_threshold = message.convictionRenewalThreshold === "" ? undefined : message.convictionRenewalThreshold;
     obj.conviction_renewal_period = message.convictionRenewalPeriod !== BigInt(0) ? message.convictionRenewalPeriod?.toString() : undefined;
     obj.max_tags_per_post = message.maxTagsPerPost === 0 ? undefined : message.maxTagsPerPost;
@@ -627,9 +636,9 @@ export const Params = {
 };
 function createBaseBlogOperationalParams(): BlogOperationalParams {
   return {
-    costPerByte: Coin.fromPartial({}),
+    costPerByteAmount: "",
     costPerByteExempt: false,
-    reactionFee: Coin.fromPartial({}),
+    reactionFeeAmount: "",
     reactionFeeExempt: false,
     maxPostsPerDay: 0,
     maxRepliesPerDay: 0,
@@ -651,14 +660,14 @@ export const BlogOperationalParams = {
   typeUrl: "/sparkdream.blog.v1.BlogOperationalParams",
   aminoType: "sparkdream/x/blog/BlogOperationalParams",
   encode(message: BlogOperationalParams, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.costPerByte !== undefined) {
-      Coin.encode(message.costPerByte, writer.uint32(10).fork()).ldelim();
+    if (message.costPerByteAmount !== "") {
+      writer.uint32(10).string(message.costPerByteAmount);
     }
     if (message.costPerByteExempt === true) {
       writer.uint32(16).bool(message.costPerByteExempt);
     }
-    if (message.reactionFee !== undefined) {
-      Coin.encode(message.reactionFee, writer.uint32(26).fork()).ldelim();
+    if (message.reactionFeeAmount !== "") {
+      writer.uint32(26).string(message.reactionFeeAmount);
     }
     if (message.reactionFeeExempt === true) {
       writer.uint32(32).bool(message.reactionFeeExempt);
@@ -694,13 +703,13 @@ export const BlogOperationalParams = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.costPerByte = Coin.decode(reader, reader.uint32());
+          message.costPerByteAmount = reader.string();
           break;
         case 2:
           message.costPerByteExempt = reader.bool();
           break;
         case 3:
-          message.reactionFee = Coin.decode(reader, reader.uint32());
+          message.reactionFeeAmount = reader.string();
           break;
         case 4:
           message.reactionFeeExempt = reader.bool();
@@ -735,9 +744,9 @@ export const BlogOperationalParams = {
   },
   fromPartial(object: DeepPartial<BlogOperationalParams>): BlogOperationalParams {
     const message = createBaseBlogOperationalParams();
-    message.costPerByte = object.costPerByte !== undefined && object.costPerByte !== null ? Coin.fromPartial(object.costPerByte) : undefined;
+    message.costPerByteAmount = object.costPerByteAmount ?? "";
     message.costPerByteExempt = object.costPerByteExempt ?? false;
-    message.reactionFee = object.reactionFee !== undefined && object.reactionFee !== null ? Coin.fromPartial(object.reactionFee) : undefined;
+    message.reactionFeeAmount = object.reactionFeeAmount ?? "";
     message.reactionFeeExempt = object.reactionFeeExempt ?? false;
     message.maxPostsPerDay = object.maxPostsPerDay ?? 0;
     message.maxRepliesPerDay = object.maxRepliesPerDay ?? 0;
@@ -750,14 +759,14 @@ export const BlogOperationalParams = {
   },
   fromAmino(object: BlogOperationalParamsAmino): BlogOperationalParams {
     const message = createBaseBlogOperationalParams();
-    if (object.cost_per_byte !== undefined && object.cost_per_byte !== null) {
-      message.costPerByte = Coin.fromAmino(object.cost_per_byte);
+    if (object.cost_per_byte_amount !== undefined && object.cost_per_byte_amount !== null) {
+      message.costPerByteAmount = object.cost_per_byte_amount;
     }
     if (object.cost_per_byte_exempt !== undefined && object.cost_per_byte_exempt !== null) {
       message.costPerByteExempt = object.cost_per_byte_exempt;
     }
-    if (object.reaction_fee !== undefined && object.reaction_fee !== null) {
-      message.reactionFee = Coin.fromAmino(object.reaction_fee);
+    if (object.reaction_fee_amount !== undefined && object.reaction_fee_amount !== null) {
+      message.reactionFeeAmount = object.reaction_fee_amount;
     }
     if (object.reaction_fee_exempt !== undefined && object.reaction_fee_exempt !== null) {
       message.reactionFeeExempt = object.reaction_fee_exempt;
@@ -787,9 +796,9 @@ export const BlogOperationalParams = {
   },
   toAmino(message: BlogOperationalParams): BlogOperationalParamsAmino {
     const obj: any = {};
-    obj.cost_per_byte = message.costPerByte ? Coin.toAmino(message.costPerByte) : undefined;
+    obj.cost_per_byte_amount = message.costPerByteAmount === "" ? undefined : message.costPerByteAmount;
     obj.cost_per_byte_exempt = message.costPerByteExempt === false ? undefined : message.costPerByteExempt;
-    obj.reaction_fee = message.reactionFee ? Coin.toAmino(message.reactionFee) : undefined;
+    obj.reaction_fee_amount = message.reactionFeeAmount === "" ? undefined : message.reactionFeeAmount;
     obj.reaction_fee_exempt = message.reactionFeeExempt === false ? undefined : message.reactionFeeExempt;
     obj.max_posts_per_day = message.maxPostsPerDay === 0 ? undefined : message.maxPostsPerDay;
     obj.max_replies_per_day = message.maxRepliesPerDay === 0 ? undefined : message.maxRepliesPerDay;

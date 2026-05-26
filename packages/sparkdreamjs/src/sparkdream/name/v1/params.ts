@@ -1,10 +1,11 @@
 //@ts-nocheck
 import { Duration, DurationAmino } from "../../../google/protobuf/duration";
-import { Coin, CoinAmino } from "../../../cosmos/base/v1beta1/coin";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
- * Params defines the parameters for the module.
+ * Params defines the parameters for the module. Fee amounts are bare
+ * math.Int values in the chain's bond/dream denom — wrapped into sdk.Coin
+ * at the point of use via the identity keeper.
  * @name Params
  * @package sparkdream.name.v1
  * @see proto type: sparkdream.name.v1.Params
@@ -15,7 +16,10 @@ export interface Params {
   maxNameLength: bigint;
   maxNamesPerAddress: bigint;
   expirationDuration: Duration;
-  registrationFee: Coin;
+  /**
+   * Registration fee amount in bond-denom micro-units.
+   */
+  registrationFeeAmount: string;
   /**
    * DREAM tokens staked by claimant when filing a dispute (default 50)
    */
@@ -34,7 +38,9 @@ export interface ParamsProtoMsg {
   value: Uint8Array;
 }
 /**
- * Params defines the parameters for the module.
+ * Params defines the parameters for the module. Fee amounts are bare
+ * math.Int values in the chain's bond/dream denom — wrapped into sdk.Coin
+ * at the point of use via the identity keeper.
  * @name ParamsAmino
  * @package sparkdream.name.v1
  * @see proto type: sparkdream.name.v1.Params
@@ -45,7 +51,10 @@ export interface ParamsAmino {
   max_name_length?: string;
   max_names_per_address?: string;
   expiration_duration?: DurationAmino;
-  registration_fee: CoinAmino;
+  /**
+   * Registration fee amount in bond-denom micro-units.
+   */
+  registration_fee_amount?: string;
   /**
    * DREAM tokens staked by claimant when filing a dispute (default 50)
    */
@@ -74,7 +83,10 @@ export interface ParamsAminoMsg {
  */
 export interface NameOperationalParams {
   expirationDuration: Duration;
-  registrationFee: Coin;
+  /**
+   * Registration fee amount in bond-denom micro-units.
+   */
+  registrationFeeAmount: string;
   /**
    * DREAM tokens staked by claimant when filing a dispute (default 50)
    */
@@ -103,7 +115,10 @@ export interface NameOperationalParamsProtoMsg {
  */
 export interface NameOperationalParamsAmino {
   expiration_duration?: DurationAmino;
-  registration_fee: CoinAmino;
+  /**
+   * Registration fee amount in bond-denom micro-units.
+   */
+  registration_fee_amount?: string;
   /**
    * DREAM tokens staked by claimant when filing a dispute (default 50)
    */
@@ -128,14 +143,16 @@ function createBaseParams(): Params {
     maxNameLength: BigInt(0),
     maxNamesPerAddress: BigInt(0),
     expirationDuration: Duration.fromPartial({}),
-    registrationFee: Coin.fromPartial({}),
+    registrationFeeAmount: "",
     disputeStakeDream: "",
     disputeTimeoutBlocks: BigInt(0),
     contestStakeDream: ""
   };
 }
 /**
- * Params defines the parameters for the module.
+ * Params defines the parameters for the module. Fee amounts are bare
+ * math.Int values in the chain's bond/dream denom — wrapped into sdk.Coin
+ * at the point of use via the identity keeper.
  * @name Params
  * @package sparkdream.name.v1
  * @see proto type: sparkdream.name.v1.Params
@@ -159,8 +176,8 @@ export const Params = {
     if (message.expirationDuration !== undefined) {
       Duration.encode(message.expirationDuration, writer.uint32(42).fork()).ldelim();
     }
-    if (message.registrationFee !== undefined) {
-      Coin.encode(message.registrationFee, writer.uint32(50).fork()).ldelim();
+    if (message.registrationFeeAmount !== "") {
+      writer.uint32(50).string(message.registrationFeeAmount);
     }
     if (message.disputeStakeDream !== "") {
       writer.uint32(58).string(message.disputeStakeDream);
@@ -196,7 +213,7 @@ export const Params = {
           message.expirationDuration = Duration.decode(reader, reader.uint32());
           break;
         case 6:
-          message.registrationFee = Coin.decode(reader, reader.uint32());
+          message.registrationFeeAmount = reader.string();
           break;
         case 7:
           message.disputeStakeDream = reader.string();
@@ -221,7 +238,7 @@ export const Params = {
     message.maxNameLength = object.maxNameLength !== undefined && object.maxNameLength !== null ? BigInt(object.maxNameLength.toString()) : BigInt(0);
     message.maxNamesPerAddress = object.maxNamesPerAddress !== undefined && object.maxNamesPerAddress !== null ? BigInt(object.maxNamesPerAddress.toString()) : BigInt(0);
     message.expirationDuration = object.expirationDuration !== undefined && object.expirationDuration !== null ? Duration.fromPartial(object.expirationDuration) : undefined;
-    message.registrationFee = object.registrationFee !== undefined && object.registrationFee !== null ? Coin.fromPartial(object.registrationFee) : undefined;
+    message.registrationFeeAmount = object.registrationFeeAmount ?? "";
     message.disputeStakeDream = object.disputeStakeDream ?? "";
     message.disputeTimeoutBlocks = object.disputeTimeoutBlocks !== undefined && object.disputeTimeoutBlocks !== null ? BigInt(object.disputeTimeoutBlocks.toString()) : BigInt(0);
     message.contestStakeDream = object.contestStakeDream ?? "";
@@ -242,8 +259,8 @@ export const Params = {
     if (object.expiration_duration !== undefined && object.expiration_duration !== null) {
       message.expirationDuration = Duration.fromAmino(object.expiration_duration);
     }
-    if (object.registration_fee !== undefined && object.registration_fee !== null) {
-      message.registrationFee = Coin.fromAmino(object.registration_fee);
+    if (object.registration_fee_amount !== undefined && object.registration_fee_amount !== null) {
+      message.registrationFeeAmount = object.registration_fee_amount;
     }
     if (object.dispute_stake_dream !== undefined && object.dispute_stake_dream !== null) {
       message.disputeStakeDream = object.dispute_stake_dream;
@@ -267,7 +284,7 @@ export const Params = {
     obj.max_name_length = message.maxNameLength !== BigInt(0) ? message.maxNameLength?.toString() : undefined;
     obj.max_names_per_address = message.maxNamesPerAddress !== BigInt(0) ? message.maxNamesPerAddress?.toString() : undefined;
     obj.expiration_duration = message.expirationDuration ? Duration.toAmino(message.expirationDuration) : undefined;
-    obj.registration_fee = message.registrationFee ? Coin.toAmino(message.registrationFee) : Coin.toAmino(Coin.fromPartial({}));
+    obj.registration_fee_amount = message.registrationFeeAmount === "" ? undefined : message.registrationFeeAmount;
     obj.dispute_stake_dream = message.disputeStakeDream === "" ? undefined : message.disputeStakeDream;
     obj.dispute_timeout_blocks = message.disputeTimeoutBlocks !== BigInt(0) ? message.disputeTimeoutBlocks?.toString() : undefined;
     obj.contest_stake_dream = message.contestStakeDream === "" ? undefined : message.contestStakeDream;
@@ -298,7 +315,7 @@ export const Params = {
 function createBaseNameOperationalParams(): NameOperationalParams {
   return {
     expirationDuration: Duration.fromPartial({}),
-    registrationFee: Coin.fromPartial({}),
+    registrationFeeAmount: "",
     disputeStakeDream: "",
     disputeTimeoutBlocks: BigInt(0),
     contestStakeDream: ""
@@ -320,8 +337,8 @@ export const NameOperationalParams = {
     if (message.expirationDuration !== undefined) {
       Duration.encode(message.expirationDuration, writer.uint32(10).fork()).ldelim();
     }
-    if (message.registrationFee !== undefined) {
-      Coin.encode(message.registrationFee, writer.uint32(18).fork()).ldelim();
+    if (message.registrationFeeAmount !== "") {
+      writer.uint32(18).string(message.registrationFeeAmount);
     }
     if (message.disputeStakeDream !== "") {
       writer.uint32(26).string(message.disputeStakeDream);
@@ -345,7 +362,7 @@ export const NameOperationalParams = {
           message.expirationDuration = Duration.decode(reader, reader.uint32());
           break;
         case 2:
-          message.registrationFee = Coin.decode(reader, reader.uint32());
+          message.registrationFeeAmount = reader.string();
           break;
         case 3:
           message.disputeStakeDream = reader.string();
@@ -366,7 +383,7 @@ export const NameOperationalParams = {
   fromPartial(object: DeepPartial<NameOperationalParams>): NameOperationalParams {
     const message = createBaseNameOperationalParams();
     message.expirationDuration = object.expirationDuration !== undefined && object.expirationDuration !== null ? Duration.fromPartial(object.expirationDuration) : undefined;
-    message.registrationFee = object.registrationFee !== undefined && object.registrationFee !== null ? Coin.fromPartial(object.registrationFee) : undefined;
+    message.registrationFeeAmount = object.registrationFeeAmount ?? "";
     message.disputeStakeDream = object.disputeStakeDream ?? "";
     message.disputeTimeoutBlocks = object.disputeTimeoutBlocks !== undefined && object.disputeTimeoutBlocks !== null ? BigInt(object.disputeTimeoutBlocks.toString()) : BigInt(0);
     message.contestStakeDream = object.contestStakeDream ?? "";
@@ -377,8 +394,8 @@ export const NameOperationalParams = {
     if (object.expiration_duration !== undefined && object.expiration_duration !== null) {
       message.expirationDuration = Duration.fromAmino(object.expiration_duration);
     }
-    if (object.registration_fee !== undefined && object.registration_fee !== null) {
-      message.registrationFee = Coin.fromAmino(object.registration_fee);
+    if (object.registration_fee_amount !== undefined && object.registration_fee_amount !== null) {
+      message.registrationFeeAmount = object.registration_fee_amount;
     }
     if (object.dispute_stake_dream !== undefined && object.dispute_stake_dream !== null) {
       message.disputeStakeDream = object.dispute_stake_dream;
@@ -394,7 +411,7 @@ export const NameOperationalParams = {
   toAmino(message: NameOperationalParams): NameOperationalParamsAmino {
     const obj: any = {};
     obj.expiration_duration = message.expirationDuration ? Duration.toAmino(message.expirationDuration) : undefined;
-    obj.registration_fee = message.registrationFee ? Coin.toAmino(message.registrationFee) : Coin.toAmino(Coin.fromPartial({}));
+    obj.registration_fee_amount = message.registrationFeeAmount === "" ? undefined : message.registrationFeeAmount;
     obj.dispute_stake_dream = message.disputeStakeDream === "" ? undefined : message.disputeStakeDream;
     obj.dispute_timeout_blocks = message.disputeTimeoutBlocks !== BigInt(0) ? message.disputeTimeoutBlocks?.toString() : undefined;
     obj.contest_stake_dream = message.contestStakeDream === "" ? undefined : message.contestStakeDream;

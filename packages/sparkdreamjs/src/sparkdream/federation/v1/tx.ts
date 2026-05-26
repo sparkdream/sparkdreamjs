@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { Params, ParamsAmino, FederationOperationalParams, FederationOperationalParamsAmino } from "./params";
-import { PeerType, PeerPolicy, PeerPolicyAmino, FederatedContentStatus } from "./types";
-import { Coin, CoinAmino } from "../../../cosmos/base/v1beta1/coin";
+import { PeerType, PeerPolicy, PeerPolicyAmino, FederatedContentStatus, JuryVerdict } from "./types";
+import { ChainIdentity, ChainIdentityAmino } from "../../identity/v1/chain_identity";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /**
@@ -62,6 +62,22 @@ export interface MsgRegisterPeer {
   type: PeerType;
   ibcChannelId: string;
   metadata: string;
+  /**
+   * controller_group is the x/commons Group policy address that will
+   * resolve tier-1 reports against this peer's bridge operators
+   * (federation→service migration, Decision 2). Optional — if empty,
+   * federation defaults to the Operations Committee at bridge-
+   * registration time. If non-empty, the address MUST be a valid
+   * registered group policy (validated via commonsKeeper.IsGroupPolicyAddress).
+   */
+  controllerGroup: string;
+  /**
+   * peer_identity is the chain identity of the peer being registered (see
+   * spec §9 and x-identity-spec.md). Optional. When set for
+   * PEER_TYPE_SPARK_DREAM peers, federation pre-registers IBC voucher
+   * metadata so wallets render <SYMBOL>.ibc instead of ibc/<hash>.
+   */
+  peerIdentity?: ChainIdentity;
 }
 export interface MsgRegisterPeerProtoMsg {
   typeUrl: "/sparkdream.federation.v1.MsgRegisterPeer";
@@ -79,6 +95,22 @@ export interface MsgRegisterPeerAmino {
   type?: PeerType;
   ibc_channel_id?: string;
   metadata?: string;
+  /**
+   * controller_group is the x/commons Group policy address that will
+   * resolve tier-1 reports against this peer's bridge operators
+   * (federation→service migration, Decision 2). Optional — if empty,
+   * federation defaults to the Operations Committee at bridge-
+   * registration time. If non-empty, the address MUST be a valid
+   * registered group policy (validated via commonsKeeper.IsGroupPolicyAddress).
+   */
+  controller_group?: string;
+  /**
+   * peer_identity is the chain identity of the peer being registered (see
+   * spec §9 and x-identity-spec.md). Optional. When set for
+   * PEER_TYPE_SPARK_DREAM peers, federation pre-registers IBC voucher
+   * metadata so wallets render <SYMBOL>.ibc instead of ibc/<hash>.
+   */
+  peer_identity?: ChainIdentityAmino;
 }
 export interface MsgRegisterPeerAminoMsg {
   type: "sparkdream/x/federation/MsgRegisterPeer";
@@ -295,32 +327,58 @@ export interface MsgUpdatePeerPolicyResponseAminoMsg {
   value: MsgUpdatePeerPolicyResponseAmino;
 }
 /**
+ * MsgRegisterBridge registers a bridge operator for a peer. Operator-
+ * signed (federation→service migration): the operator pays their own
+ * bond into x/service, so they must sign the tx. Peer existence and
+ * per-peer cap are federation-side gates; bond amount, slash caps,
+ * unbonding period live on x/service ServiceTypeConfig per service_type.
  * @name MsgRegisterBridge
  * @package sparkdream.federation.v1
  * @see proto type: sparkdream.federation.v1.MsgRegisterBridge
  */
 export interface MsgRegisterBridge {
-  authority: string;
   operator: string;
   peerId: string;
   protocol: string;
   endpoint: string;
+  /**
+   * stake_amount is the SPARK the operator escrows as their service.Operator
+   * bond, in bond-denom micro-units. Denom is resolved at runtime from
+   * x/identity. Must be ≥ ServiceTypeConfig.min_bond for the protocol's
+   * service_type. If the operator already has a live service.Operator
+   * under the same service_type (re-registering for a different peer
+   * per Decision 1a), this amount is added on top via TopUpBond.
+   */
+  stakeAmount: string;
 }
 export interface MsgRegisterBridgeProtoMsg {
   typeUrl: "/sparkdream.federation.v1.MsgRegisterBridge";
   value: Uint8Array;
 }
 /**
+ * MsgRegisterBridge registers a bridge operator for a peer. Operator-
+ * signed (federation→service migration): the operator pays their own
+ * bond into x/service, so they must sign the tx. Peer existence and
+ * per-peer cap are federation-side gates; bond amount, slash caps,
+ * unbonding period live on x/service ServiceTypeConfig per service_type.
  * @name MsgRegisterBridgeAmino
  * @package sparkdream.federation.v1
  * @see proto type: sparkdream.federation.v1.MsgRegisterBridge
  */
 export interface MsgRegisterBridgeAmino {
-  authority?: string;
   operator?: string;
   peer_id?: string;
   protocol?: string;
   endpoint?: string;
+  /**
+   * stake_amount is the SPARK the operator escrows as their service.Operator
+   * bond, in bond-denom micro-units. Denom is resolved at runtime from
+   * x/identity. Must be ≥ ServiceTypeConfig.min_bond for the protocol's
+   * service_type. If the operator already has a live service.Operator
+   * under the same service_type (re-registering for a different peer
+   * per Decision 1a), this amount is added on top via TopUpBond.
+   */
+  stake_amount?: string;
 }
 export interface MsgRegisterBridgeAminoMsg {
   type: "sparkdream/x/federation/MsgRegisterBridge";
@@ -345,108 +403,6 @@ export interface MsgRegisterBridgeResponseAmino {}
 export interface MsgRegisterBridgeResponseAminoMsg {
   type: "/sparkdream.federation.v1.MsgRegisterBridgeResponse";
   value: MsgRegisterBridgeResponseAmino;
-}
-/**
- * @name MsgRevokeBridge
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgRevokeBridge
- */
-export interface MsgRevokeBridge {
-  authority: string;
-  operator: string;
-  peerId: string;
-  reason: string;
-}
-export interface MsgRevokeBridgeProtoMsg {
-  typeUrl: "/sparkdream.federation.v1.MsgRevokeBridge";
-  value: Uint8Array;
-}
-/**
- * @name MsgRevokeBridgeAmino
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgRevokeBridge
- */
-export interface MsgRevokeBridgeAmino {
-  authority?: string;
-  operator?: string;
-  peer_id?: string;
-  reason?: string;
-}
-export interface MsgRevokeBridgeAminoMsg {
-  type: "sparkdream/x/federation/MsgRevokeBridge";
-  value: MsgRevokeBridgeAmino;
-}
-/**
- * @name MsgRevokeBridgeResponse
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgRevokeBridgeResponse
- */
-export interface MsgRevokeBridgeResponse {}
-export interface MsgRevokeBridgeResponseProtoMsg {
-  typeUrl: "/sparkdream.federation.v1.MsgRevokeBridgeResponse";
-  value: Uint8Array;
-}
-/**
- * @name MsgRevokeBridgeResponseAmino
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgRevokeBridgeResponse
- */
-export interface MsgRevokeBridgeResponseAmino {}
-export interface MsgRevokeBridgeResponseAminoMsg {
-  type: "/sparkdream.federation.v1.MsgRevokeBridgeResponse";
-  value: MsgRevokeBridgeResponseAmino;
-}
-/**
- * @name MsgSlashBridge
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgSlashBridge
- */
-export interface MsgSlashBridge {
-  authority: string;
-  operator: string;
-  peerId: string;
-  amount: string;
-  reason: string;
-}
-export interface MsgSlashBridgeProtoMsg {
-  typeUrl: "/sparkdream.federation.v1.MsgSlashBridge";
-  value: Uint8Array;
-}
-/**
- * @name MsgSlashBridgeAmino
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgSlashBridge
- */
-export interface MsgSlashBridgeAmino {
-  authority?: string;
-  operator?: string;
-  peer_id?: string;
-  amount?: string;
-  reason?: string;
-}
-export interface MsgSlashBridgeAminoMsg {
-  type: "sparkdream/x/federation/MsgSlashBridge";
-  value: MsgSlashBridgeAmino;
-}
-/**
- * @name MsgSlashBridgeResponse
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgSlashBridgeResponse
- */
-export interface MsgSlashBridgeResponse {}
-export interface MsgSlashBridgeResponseProtoMsg {
-  typeUrl: "/sparkdream.federation.v1.MsgSlashBridgeResponse";
-  value: Uint8Array;
-}
-/**
- * @name MsgSlashBridgeResponseAmino
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgSlashBridgeResponse
- */
-export interface MsgSlashBridgeResponseAmino {}
-export interface MsgSlashBridgeResponseAminoMsg {
-  type: "/sparkdream.federation.v1.MsgSlashBridgeResponse";
-  value: MsgSlashBridgeResponseAmino;
 }
 /**
  * @name MsgUpdateBridge
@@ -497,100 +453,6 @@ export interface MsgUpdateBridgeResponseAmino {}
 export interface MsgUpdateBridgeResponseAminoMsg {
   type: "/sparkdream.federation.v1.MsgUpdateBridgeResponse";
   value: MsgUpdateBridgeResponseAmino;
-}
-/**
- * @name MsgUnbondBridge
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgUnbondBridge
- */
-export interface MsgUnbondBridge {
-  operator: string;
-  peerId: string;
-}
-export interface MsgUnbondBridgeProtoMsg {
-  typeUrl: "/sparkdream.federation.v1.MsgUnbondBridge";
-  value: Uint8Array;
-}
-/**
- * @name MsgUnbondBridgeAmino
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgUnbondBridge
- */
-export interface MsgUnbondBridgeAmino {
-  operator?: string;
-  peer_id?: string;
-}
-export interface MsgUnbondBridgeAminoMsg {
-  type: "sparkdream/x/federation/MsgUnbondBridge";
-  value: MsgUnbondBridgeAmino;
-}
-/**
- * @name MsgUnbondBridgeResponse
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgUnbondBridgeResponse
- */
-export interface MsgUnbondBridgeResponse {}
-export interface MsgUnbondBridgeResponseProtoMsg {
-  typeUrl: "/sparkdream.federation.v1.MsgUnbondBridgeResponse";
-  value: Uint8Array;
-}
-/**
- * @name MsgUnbondBridgeResponseAmino
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgUnbondBridgeResponse
- */
-export interface MsgUnbondBridgeResponseAmino {}
-export interface MsgUnbondBridgeResponseAminoMsg {
-  type: "/sparkdream.federation.v1.MsgUnbondBridgeResponse";
-  value: MsgUnbondBridgeResponseAmino;
-}
-/**
- * @name MsgTopUpBridgeStake
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgTopUpBridgeStake
- */
-export interface MsgTopUpBridgeStake {
-  operator: string;
-  peerId: string;
-  amount: Coin;
-}
-export interface MsgTopUpBridgeStakeProtoMsg {
-  typeUrl: "/sparkdream.federation.v1.MsgTopUpBridgeStake";
-  value: Uint8Array;
-}
-/**
- * @name MsgTopUpBridgeStakeAmino
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgTopUpBridgeStake
- */
-export interface MsgTopUpBridgeStakeAmino {
-  operator?: string;
-  peer_id?: string;
-  amount?: CoinAmino;
-}
-export interface MsgTopUpBridgeStakeAminoMsg {
-  type: "sparkdream/x/federation/MsgTopUpBridgeStake";
-  value: MsgTopUpBridgeStakeAmino;
-}
-/**
- * @name MsgTopUpBridgeStakeResponse
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgTopUpBridgeStakeResponse
- */
-export interface MsgTopUpBridgeStakeResponse {}
-export interface MsgTopUpBridgeStakeResponseProtoMsg {
-  typeUrl: "/sparkdream.federation.v1.MsgTopUpBridgeStakeResponse";
-  value: Uint8Array;
-}
-/**
- * @name MsgTopUpBridgeStakeResponseAmino
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgTopUpBridgeStakeResponse
- */
-export interface MsgTopUpBridgeStakeResponseAmino {}
-export interface MsgTopUpBridgeStakeResponseAminoMsg {
-  type: "/sparkdream.federation.v1.MsgTopUpBridgeStakeResponse";
-  value: MsgTopUpBridgeStakeResponseAmino;
 }
 /**
  * @name MsgSubmitFederatedContent
@@ -1201,6 +1063,68 @@ export interface MsgEscalateChallengeResponseAminoMsg {
   value: MsgEscalateChallengeResponseAmino;
 }
 /**
+ * MsgResolveEscalatedChallenge applies a Phase 2 (human jury) verdict
+ * to an EscalatedChallenge. Operations Committee only; signature is
+ * the council policy address. Verdict must be CHALLENGE_UPHELD,
+ * CHALLENGE_REJECTED, or CHALLENGE_TIMEOUT (the EndBlocker reaches the
+ * TIMEOUT branch automatically on jury_deadline expiry — submitting
+ * TIMEOUT here is an explicit early-cancel).
+ * @name MsgResolveEscalatedChallenge
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgResolveEscalatedChallenge
+ */
+export interface MsgResolveEscalatedChallenge {
+  authority: string;
+  contentId: bigint;
+  verdict: JuryVerdict;
+  reasoning: string;
+}
+export interface MsgResolveEscalatedChallengeProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.MsgResolveEscalatedChallenge";
+  value: Uint8Array;
+}
+/**
+ * MsgResolveEscalatedChallenge applies a Phase 2 (human jury) verdict
+ * to an EscalatedChallenge. Operations Committee only; signature is
+ * the council policy address. Verdict must be CHALLENGE_UPHELD,
+ * CHALLENGE_REJECTED, or CHALLENGE_TIMEOUT (the EndBlocker reaches the
+ * TIMEOUT branch automatically on jury_deadline expiry — submitting
+ * TIMEOUT here is an explicit early-cancel).
+ * @name MsgResolveEscalatedChallengeAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgResolveEscalatedChallenge
+ */
+export interface MsgResolveEscalatedChallengeAmino {
+  authority?: string;
+  content_id?: string;
+  verdict?: JuryVerdict;
+  reasoning?: string;
+}
+export interface MsgResolveEscalatedChallengeAminoMsg {
+  type: "sparkdream/x/federation/MsgResolveEscalatedChallenge";
+  value: MsgResolveEscalatedChallengeAmino;
+}
+/**
+ * @name MsgResolveEscalatedChallengeResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgResolveEscalatedChallengeResponse
+ */
+export interface MsgResolveEscalatedChallengeResponse {}
+export interface MsgResolveEscalatedChallengeResponseProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.MsgResolveEscalatedChallengeResponse";
+  value: Uint8Array;
+}
+/**
+ * @name MsgResolveEscalatedChallengeResponseAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgResolveEscalatedChallengeResponse
+ */
+export interface MsgResolveEscalatedChallengeResponseAmino {}
+export interface MsgResolveEscalatedChallengeResponseAminoMsg {
+  type: "/sparkdream.federation.v1.MsgResolveEscalatedChallengeResponse";
+  value: MsgResolveEscalatedChallengeResponseAmino;
+}
+/**
  * @name MsgUpdateOperationalParams
  * @package sparkdream.federation.v1
  * @see proto type: sparkdream.federation.v1.MsgUpdateOperationalParams
@@ -1245,6 +1169,186 @@ export interface MsgUpdateOperationalParamsResponseAmino {}
 export interface MsgUpdateOperationalParamsResponseAminoMsg {
   type: "/sparkdream.federation.v1.MsgUpdateOperationalParamsResponse";
   value: MsgUpdateOperationalParamsResponseAmino;
+}
+/**
+ * MsgUpdatePeerController is a gov-authority message that changes the
+ * controller_group on an existing peer. Affects only new bridge
+ * registrations under that peer — existing bridges keep the controller
+ * captured on their service.Operator at registration time. Transferring
+ * existing bridges requires service.MsgOpenControllerTransferCase.
+ * @name MsgUpdatePeerController
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgUpdatePeerController
+ */
+export interface MsgUpdatePeerController {
+  authority: string;
+  peerId: string;
+  controllerGroup: string;
+}
+export interface MsgUpdatePeerControllerProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.MsgUpdatePeerController";
+  value: Uint8Array;
+}
+/**
+ * MsgUpdatePeerController is a gov-authority message that changes the
+ * controller_group on an existing peer. Affects only new bridge
+ * registrations under that peer — existing bridges keep the controller
+ * captured on their service.Operator at registration time. Transferring
+ * existing bridges requires service.MsgOpenControllerTransferCase.
+ * @name MsgUpdatePeerControllerAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgUpdatePeerController
+ */
+export interface MsgUpdatePeerControllerAmino {
+  authority?: string;
+  peer_id?: string;
+  controller_group?: string;
+}
+export interface MsgUpdatePeerControllerAminoMsg {
+  type: "sparkdream/x/federation/MsgUpdatePeerController";
+  value: MsgUpdatePeerControllerAmino;
+}
+/**
+ * @name MsgUpdatePeerControllerResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgUpdatePeerControllerResponse
+ */
+export interface MsgUpdatePeerControllerResponse {}
+export interface MsgUpdatePeerControllerResponseProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.MsgUpdatePeerControllerResponse";
+  value: Uint8Array;
+}
+/**
+ * @name MsgUpdatePeerControllerResponseAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgUpdatePeerControllerResponse
+ */
+export interface MsgUpdatePeerControllerResponseAmino {}
+export interface MsgUpdatePeerControllerResponseAminoMsg {
+  type: "/sparkdream.federation.v1.MsgUpdatePeerControllerResponse";
+  value: MsgUpdatePeerControllerResponseAmino;
+}
+/**
+ * MsgResyncBridgeCount is a dual-authority message (Operations Committee
+ * OR gov) that re-counts BridgesByPeer for the given peer and overwrites
+ * the peer's bridges_count counter. Recovery path when the count
+ * invariant triggers without needing a chain upgrade — pure cleanup,
+ * can't be abused to mutate operator state.
+ * @name MsgResyncBridgeCount
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgResyncBridgeCount
+ */
+export interface MsgResyncBridgeCount {
+  authority: string;
+  peerId: string;
+}
+export interface MsgResyncBridgeCountProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.MsgResyncBridgeCount";
+  value: Uint8Array;
+}
+/**
+ * MsgResyncBridgeCount is a dual-authority message (Operations Committee
+ * OR gov) that re-counts BridgesByPeer for the given peer and overwrites
+ * the peer's bridges_count counter. Recovery path when the count
+ * invariant triggers without needing a chain upgrade — pure cleanup,
+ * can't be abused to mutate operator state.
+ * @name MsgResyncBridgeCountAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgResyncBridgeCount
+ */
+export interface MsgResyncBridgeCountAmino {
+  authority?: string;
+  peer_id?: string;
+}
+export interface MsgResyncBridgeCountAminoMsg {
+  type: "sparkdream/x/federation/MsgResyncBridgeCount";
+  value: MsgResyncBridgeCountAmino;
+}
+/**
+ * @name MsgResyncBridgeCountResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgResyncBridgeCountResponse
+ */
+export interface MsgResyncBridgeCountResponse {
+  newCount: bigint;
+}
+export interface MsgResyncBridgeCountResponseProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.MsgResyncBridgeCountResponse";
+  value: Uint8Array;
+}
+/**
+ * @name MsgResyncBridgeCountResponseAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgResyncBridgeCountResponse
+ */
+export interface MsgResyncBridgeCountResponseAmino {
+  new_count?: string;
+}
+export interface MsgResyncBridgeCountResponseAminoMsg {
+  type: "/sparkdream.federation.v1.MsgResyncBridgeCountResponse";
+  value: MsgResyncBridgeCountResponseAmino;
+}
+/**
+ * MsgPruneOrphanBindings is a dual-authority message (Operations
+ * Committee OR gov) that runs the AfterOperatorDissolved/Retired
+ * cleanup logic for any BridgeBinding whose referenced service.Operator
+ * is in a terminal state (SLASHED/RETIRED/missing). Recovery path when
+ * the fail-soft hook pattern swallowed a panic and left an orphan.
+ * Pure cleanup, no value mutation.
+ * @name MsgPruneOrphanBindings
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgPruneOrphanBindings
+ */
+export interface MsgPruneOrphanBindings {
+  authority: string;
+  peerId: string;
+}
+export interface MsgPruneOrphanBindingsProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.MsgPruneOrphanBindings";
+  value: Uint8Array;
+}
+/**
+ * MsgPruneOrphanBindings is a dual-authority message (Operations
+ * Committee OR gov) that runs the AfterOperatorDissolved/Retired
+ * cleanup logic for any BridgeBinding whose referenced service.Operator
+ * is in a terminal state (SLASHED/RETIRED/missing). Recovery path when
+ * the fail-soft hook pattern swallowed a panic and left an orphan.
+ * Pure cleanup, no value mutation.
+ * @name MsgPruneOrphanBindingsAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgPruneOrphanBindings
+ */
+export interface MsgPruneOrphanBindingsAmino {
+  authority?: string;
+  peer_id?: string;
+}
+export interface MsgPruneOrphanBindingsAminoMsg {
+  type: "sparkdream/x/federation/MsgPruneOrphanBindings";
+  value: MsgPruneOrphanBindingsAmino;
+}
+/**
+ * @name MsgPruneOrphanBindingsResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgPruneOrphanBindingsResponse
+ */
+export interface MsgPruneOrphanBindingsResponse {
+  pruned: bigint;
+}
+export interface MsgPruneOrphanBindingsResponseProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.MsgPruneOrphanBindingsResponse";
+  value: Uint8Array;
+}
+/**
+ * @name MsgPruneOrphanBindingsResponseAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgPruneOrphanBindingsResponse
+ */
+export interface MsgPruneOrphanBindingsResponseAmino {
+  pruned?: string;
+}
+export interface MsgPruneOrphanBindingsResponseAminoMsg {
+  type: "/sparkdream.federation.v1.MsgPruneOrphanBindingsResponse";
+  value: MsgPruneOrphanBindingsResponseAmino;
 }
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
@@ -1395,7 +1499,9 @@ function createBaseMsgRegisterPeer(): MsgRegisterPeer {
     displayName: "",
     type: 0,
     ibcChannelId: "",
-    metadata: ""
+    metadata: "",
+    controllerGroup: "",
+    peerIdentity: undefined
   };
 }
 /**
@@ -1425,6 +1531,12 @@ export const MsgRegisterPeer = {
     if (message.metadata !== "") {
       writer.uint32(50).string(message.metadata);
     }
+    if (message.controllerGroup !== "") {
+      writer.uint32(58).string(message.controllerGroup);
+    }
+    if (message.peerIdentity !== undefined) {
+      ChainIdentity.encode(message.peerIdentity, writer.uint32(66).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgRegisterPeer {
@@ -1452,6 +1564,12 @@ export const MsgRegisterPeer = {
         case 6:
           message.metadata = reader.string();
           break;
+        case 7:
+          message.controllerGroup = reader.string();
+          break;
+        case 8:
+          message.peerIdentity = ChainIdentity.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1467,6 +1585,8 @@ export const MsgRegisterPeer = {
     message.type = object.type ?? 0;
     message.ibcChannelId = object.ibcChannelId ?? "";
     message.metadata = object.metadata ?? "";
+    message.controllerGroup = object.controllerGroup ?? "";
+    message.peerIdentity = object.peerIdentity !== undefined && object.peerIdentity !== null ? ChainIdentity.fromPartial(object.peerIdentity) : undefined;
     return message;
   },
   fromAmino(object: MsgRegisterPeerAmino): MsgRegisterPeer {
@@ -1489,6 +1609,12 @@ export const MsgRegisterPeer = {
     if (object.metadata !== undefined && object.metadata !== null) {
       message.metadata = object.metadata;
     }
+    if (object.controller_group !== undefined && object.controller_group !== null) {
+      message.controllerGroup = object.controller_group;
+    }
+    if (object.peer_identity !== undefined && object.peer_identity !== null) {
+      message.peerIdentity = ChainIdentity.fromAmino(object.peer_identity);
+    }
     return message;
   },
   toAmino(message: MsgRegisterPeer): MsgRegisterPeerAmino {
@@ -1499,6 +1625,8 @@ export const MsgRegisterPeer = {
     obj.type = message.type === 0 ? undefined : message.type;
     obj.ibc_channel_id = message.ibcChannelId === "" ? undefined : message.ibcChannelId;
     obj.metadata = message.metadata === "" ? undefined : message.metadata;
+    obj.controller_group = message.controllerGroup === "" ? undefined : message.controllerGroup;
+    obj.peer_identity = message.peerIdentity ? ChainIdentity.toAmino(message.peerIdentity) : undefined;
     return obj;
   },
   fromAminoMsg(object: MsgRegisterPeerAminoMsg): MsgRegisterPeer {
@@ -2184,14 +2312,19 @@ export const MsgUpdatePeerPolicyResponse = {
 };
 function createBaseMsgRegisterBridge(): MsgRegisterBridge {
   return {
-    authority: "",
     operator: "",
     peerId: "",
     protocol: "",
-    endpoint: ""
+    endpoint: "",
+    stakeAmount: ""
   };
 }
 /**
+ * MsgRegisterBridge registers a bridge operator for a peer. Operator-
+ * signed (federation→service migration): the operator pays their own
+ * bond into x/service, so they must sign the tx. Peer existence and
+ * per-peer cap are federation-side gates; bond amount, slash caps,
+ * unbonding period live on x/service ServiceTypeConfig per service_type.
  * @name MsgRegisterBridge
  * @package sparkdream.federation.v1
  * @see proto type: sparkdream.federation.v1.MsgRegisterBridge
@@ -2200,20 +2333,20 @@ export const MsgRegisterBridge = {
   typeUrl: "/sparkdream.federation.v1.MsgRegisterBridge",
   aminoType: "sparkdream/x/federation/MsgRegisterBridge",
   encode(message: MsgRegisterBridge, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.authority !== "") {
-      writer.uint32(10).string(message.authority);
-    }
     if (message.operator !== "") {
-      writer.uint32(18).string(message.operator);
+      writer.uint32(10).string(message.operator);
     }
     if (message.peerId !== "") {
-      writer.uint32(26).string(message.peerId);
+      writer.uint32(18).string(message.peerId);
     }
     if (message.protocol !== "") {
-      writer.uint32(34).string(message.protocol);
+      writer.uint32(26).string(message.protocol);
     }
     if (message.endpoint !== "") {
-      writer.uint32(42).string(message.endpoint);
+      writer.uint32(34).string(message.endpoint);
+    }
+    if (message.stakeAmount !== "") {
+      writer.uint32(42).string(message.stakeAmount);
     }
     return writer;
   },
@@ -2225,19 +2358,19 @@ export const MsgRegisterBridge = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.authority = reader.string();
-          break;
-        case 2:
           message.operator = reader.string();
           break;
-        case 3:
+        case 2:
           message.peerId = reader.string();
           break;
-        case 4:
+        case 3:
           message.protocol = reader.string();
           break;
-        case 5:
+        case 4:
           message.endpoint = reader.string();
+          break;
+        case 5:
+          message.stakeAmount = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -2248,18 +2381,15 @@ export const MsgRegisterBridge = {
   },
   fromPartial(object: DeepPartial<MsgRegisterBridge>): MsgRegisterBridge {
     const message = createBaseMsgRegisterBridge();
-    message.authority = object.authority ?? "";
     message.operator = object.operator ?? "";
     message.peerId = object.peerId ?? "";
     message.protocol = object.protocol ?? "";
     message.endpoint = object.endpoint ?? "";
+    message.stakeAmount = object.stakeAmount ?? "";
     return message;
   },
   fromAmino(object: MsgRegisterBridgeAmino): MsgRegisterBridge {
     const message = createBaseMsgRegisterBridge();
-    if (object.authority !== undefined && object.authority !== null) {
-      message.authority = object.authority;
-    }
     if (object.operator !== undefined && object.operator !== null) {
       message.operator = object.operator;
     }
@@ -2272,15 +2402,18 @@ export const MsgRegisterBridge = {
     if (object.endpoint !== undefined && object.endpoint !== null) {
       message.endpoint = object.endpoint;
     }
+    if (object.stake_amount !== undefined && object.stake_amount !== null) {
+      message.stakeAmount = object.stake_amount;
+    }
     return message;
   },
   toAmino(message: MsgRegisterBridge): MsgRegisterBridgeAmino {
     const obj: any = {};
-    obj.authority = message.authority === "" ? undefined : message.authority;
     obj.operator = message.operator === "" ? undefined : message.operator;
     obj.peer_id = message.peerId === "" ? undefined : message.peerId;
     obj.protocol = message.protocol === "" ? undefined : message.protocol;
     obj.endpoint = message.endpoint === "" ? undefined : message.endpoint;
+    obj.stake_amount = message.stakeAmount === "" ? undefined : message.stakeAmount;
     return obj;
   },
   fromAminoMsg(object: MsgRegisterBridgeAminoMsg): MsgRegisterBridge {
@@ -2357,350 +2490,6 @@ export const MsgRegisterBridgeResponse = {
     return {
       typeUrl: "/sparkdream.federation.v1.MsgRegisterBridgeResponse",
       value: MsgRegisterBridgeResponse.encode(message).finish()
-    };
-  }
-};
-function createBaseMsgRevokeBridge(): MsgRevokeBridge {
-  return {
-    authority: "",
-    operator: "",
-    peerId: "",
-    reason: ""
-  };
-}
-/**
- * @name MsgRevokeBridge
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgRevokeBridge
- */
-export const MsgRevokeBridge = {
-  typeUrl: "/sparkdream.federation.v1.MsgRevokeBridge",
-  aminoType: "sparkdream/x/federation/MsgRevokeBridge",
-  encode(message: MsgRevokeBridge, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.authority !== "") {
-      writer.uint32(10).string(message.authority);
-    }
-    if (message.operator !== "") {
-      writer.uint32(18).string(message.operator);
-    }
-    if (message.peerId !== "") {
-      writer.uint32(26).string(message.peerId);
-    }
-    if (message.reason !== "") {
-      writer.uint32(34).string(message.reason);
-    }
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): MsgRevokeBridge {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgRevokeBridge();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.authority = reader.string();
-          break;
-        case 2:
-          message.operator = reader.string();
-          break;
-        case 3:
-          message.peerId = reader.string();
-          break;
-        case 4:
-          message.reason = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial(object: DeepPartial<MsgRevokeBridge>): MsgRevokeBridge {
-    const message = createBaseMsgRevokeBridge();
-    message.authority = object.authority ?? "";
-    message.operator = object.operator ?? "";
-    message.peerId = object.peerId ?? "";
-    message.reason = object.reason ?? "";
-    return message;
-  },
-  fromAmino(object: MsgRevokeBridgeAmino): MsgRevokeBridge {
-    const message = createBaseMsgRevokeBridge();
-    if (object.authority !== undefined && object.authority !== null) {
-      message.authority = object.authority;
-    }
-    if (object.operator !== undefined && object.operator !== null) {
-      message.operator = object.operator;
-    }
-    if (object.peer_id !== undefined && object.peer_id !== null) {
-      message.peerId = object.peer_id;
-    }
-    if (object.reason !== undefined && object.reason !== null) {
-      message.reason = object.reason;
-    }
-    return message;
-  },
-  toAmino(message: MsgRevokeBridge): MsgRevokeBridgeAmino {
-    const obj: any = {};
-    obj.authority = message.authority === "" ? undefined : message.authority;
-    obj.operator = message.operator === "" ? undefined : message.operator;
-    obj.peer_id = message.peerId === "" ? undefined : message.peerId;
-    obj.reason = message.reason === "" ? undefined : message.reason;
-    return obj;
-  },
-  fromAminoMsg(object: MsgRevokeBridgeAminoMsg): MsgRevokeBridge {
-    return MsgRevokeBridge.fromAmino(object.value);
-  },
-  toAminoMsg(message: MsgRevokeBridge): MsgRevokeBridgeAminoMsg {
-    return {
-      type: "sparkdream/x/federation/MsgRevokeBridge",
-      value: MsgRevokeBridge.toAmino(message)
-    };
-  },
-  fromProtoMsg(message: MsgRevokeBridgeProtoMsg): MsgRevokeBridge {
-    return MsgRevokeBridge.decode(message.value);
-  },
-  toProto(message: MsgRevokeBridge): Uint8Array {
-    return MsgRevokeBridge.encode(message).finish();
-  },
-  toProtoMsg(message: MsgRevokeBridge): MsgRevokeBridgeProtoMsg {
-    return {
-      typeUrl: "/sparkdream.federation.v1.MsgRevokeBridge",
-      value: MsgRevokeBridge.encode(message).finish()
-    };
-  }
-};
-function createBaseMsgRevokeBridgeResponse(): MsgRevokeBridgeResponse {
-  return {};
-}
-/**
- * @name MsgRevokeBridgeResponse
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgRevokeBridgeResponse
- */
-export const MsgRevokeBridgeResponse = {
-  typeUrl: "/sparkdream.federation.v1.MsgRevokeBridgeResponse",
-  encode(_: MsgRevokeBridgeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): MsgRevokeBridgeResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgRevokeBridgeResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial(_: DeepPartial<MsgRevokeBridgeResponse>): MsgRevokeBridgeResponse {
-    const message = createBaseMsgRevokeBridgeResponse();
-    return message;
-  },
-  fromAmino(_: MsgRevokeBridgeResponseAmino): MsgRevokeBridgeResponse {
-    const message = createBaseMsgRevokeBridgeResponse();
-    return message;
-  },
-  toAmino(_: MsgRevokeBridgeResponse): MsgRevokeBridgeResponseAmino {
-    const obj: any = {};
-    return obj;
-  },
-  fromAminoMsg(object: MsgRevokeBridgeResponseAminoMsg): MsgRevokeBridgeResponse {
-    return MsgRevokeBridgeResponse.fromAmino(object.value);
-  },
-  fromProtoMsg(message: MsgRevokeBridgeResponseProtoMsg): MsgRevokeBridgeResponse {
-    return MsgRevokeBridgeResponse.decode(message.value);
-  },
-  toProto(message: MsgRevokeBridgeResponse): Uint8Array {
-    return MsgRevokeBridgeResponse.encode(message).finish();
-  },
-  toProtoMsg(message: MsgRevokeBridgeResponse): MsgRevokeBridgeResponseProtoMsg {
-    return {
-      typeUrl: "/sparkdream.federation.v1.MsgRevokeBridgeResponse",
-      value: MsgRevokeBridgeResponse.encode(message).finish()
-    };
-  }
-};
-function createBaseMsgSlashBridge(): MsgSlashBridge {
-  return {
-    authority: "",
-    operator: "",
-    peerId: "",
-    amount: "",
-    reason: ""
-  };
-}
-/**
- * @name MsgSlashBridge
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgSlashBridge
- */
-export const MsgSlashBridge = {
-  typeUrl: "/sparkdream.federation.v1.MsgSlashBridge",
-  aminoType: "sparkdream/x/federation/MsgSlashBridge",
-  encode(message: MsgSlashBridge, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.authority !== "") {
-      writer.uint32(10).string(message.authority);
-    }
-    if (message.operator !== "") {
-      writer.uint32(18).string(message.operator);
-    }
-    if (message.peerId !== "") {
-      writer.uint32(26).string(message.peerId);
-    }
-    if (message.amount !== "") {
-      writer.uint32(34).string(message.amount);
-    }
-    if (message.reason !== "") {
-      writer.uint32(42).string(message.reason);
-    }
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): MsgSlashBridge {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgSlashBridge();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.authority = reader.string();
-          break;
-        case 2:
-          message.operator = reader.string();
-          break;
-        case 3:
-          message.peerId = reader.string();
-          break;
-        case 4:
-          message.amount = reader.string();
-          break;
-        case 5:
-          message.reason = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial(object: DeepPartial<MsgSlashBridge>): MsgSlashBridge {
-    const message = createBaseMsgSlashBridge();
-    message.authority = object.authority ?? "";
-    message.operator = object.operator ?? "";
-    message.peerId = object.peerId ?? "";
-    message.amount = object.amount ?? "";
-    message.reason = object.reason ?? "";
-    return message;
-  },
-  fromAmino(object: MsgSlashBridgeAmino): MsgSlashBridge {
-    const message = createBaseMsgSlashBridge();
-    if (object.authority !== undefined && object.authority !== null) {
-      message.authority = object.authority;
-    }
-    if (object.operator !== undefined && object.operator !== null) {
-      message.operator = object.operator;
-    }
-    if (object.peer_id !== undefined && object.peer_id !== null) {
-      message.peerId = object.peer_id;
-    }
-    if (object.amount !== undefined && object.amount !== null) {
-      message.amount = object.amount;
-    }
-    if (object.reason !== undefined && object.reason !== null) {
-      message.reason = object.reason;
-    }
-    return message;
-  },
-  toAmino(message: MsgSlashBridge): MsgSlashBridgeAmino {
-    const obj: any = {};
-    obj.authority = message.authority === "" ? undefined : message.authority;
-    obj.operator = message.operator === "" ? undefined : message.operator;
-    obj.peer_id = message.peerId === "" ? undefined : message.peerId;
-    obj.amount = message.amount === "" ? undefined : message.amount;
-    obj.reason = message.reason === "" ? undefined : message.reason;
-    return obj;
-  },
-  fromAminoMsg(object: MsgSlashBridgeAminoMsg): MsgSlashBridge {
-    return MsgSlashBridge.fromAmino(object.value);
-  },
-  toAminoMsg(message: MsgSlashBridge): MsgSlashBridgeAminoMsg {
-    return {
-      type: "sparkdream/x/federation/MsgSlashBridge",
-      value: MsgSlashBridge.toAmino(message)
-    };
-  },
-  fromProtoMsg(message: MsgSlashBridgeProtoMsg): MsgSlashBridge {
-    return MsgSlashBridge.decode(message.value);
-  },
-  toProto(message: MsgSlashBridge): Uint8Array {
-    return MsgSlashBridge.encode(message).finish();
-  },
-  toProtoMsg(message: MsgSlashBridge): MsgSlashBridgeProtoMsg {
-    return {
-      typeUrl: "/sparkdream.federation.v1.MsgSlashBridge",
-      value: MsgSlashBridge.encode(message).finish()
-    };
-  }
-};
-function createBaseMsgSlashBridgeResponse(): MsgSlashBridgeResponse {
-  return {};
-}
-/**
- * @name MsgSlashBridgeResponse
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgSlashBridgeResponse
- */
-export const MsgSlashBridgeResponse = {
-  typeUrl: "/sparkdream.federation.v1.MsgSlashBridgeResponse",
-  encode(_: MsgSlashBridgeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): MsgSlashBridgeResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgSlashBridgeResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial(_: DeepPartial<MsgSlashBridgeResponse>): MsgSlashBridgeResponse {
-    const message = createBaseMsgSlashBridgeResponse();
-    return message;
-  },
-  fromAmino(_: MsgSlashBridgeResponseAmino): MsgSlashBridgeResponse {
-    const message = createBaseMsgSlashBridgeResponse();
-    return message;
-  },
-  toAmino(_: MsgSlashBridgeResponse): MsgSlashBridgeResponseAmino {
-    const obj: any = {};
-    return obj;
-  },
-  fromAminoMsg(object: MsgSlashBridgeResponseAminoMsg): MsgSlashBridgeResponse {
-    return MsgSlashBridgeResponse.fromAmino(object.value);
-  },
-  fromProtoMsg(message: MsgSlashBridgeResponseProtoMsg): MsgSlashBridgeResponse {
-    return MsgSlashBridgeResponse.decode(message.value);
-  },
-  toProto(message: MsgSlashBridgeResponse): Uint8Array {
-    return MsgSlashBridgeResponse.encode(message).finish();
-  },
-  toProtoMsg(message: MsgSlashBridgeResponse): MsgSlashBridgeResponseProtoMsg {
-    return {
-      typeUrl: "/sparkdream.federation.v1.MsgSlashBridgeResponse",
-      value: MsgSlashBridgeResponse.encode(message).finish()
     };
   }
 };
@@ -2867,302 +2656,6 @@ export const MsgUpdateBridgeResponse = {
     return {
       typeUrl: "/sparkdream.federation.v1.MsgUpdateBridgeResponse",
       value: MsgUpdateBridgeResponse.encode(message).finish()
-    };
-  }
-};
-function createBaseMsgUnbondBridge(): MsgUnbondBridge {
-  return {
-    operator: "",
-    peerId: ""
-  };
-}
-/**
- * @name MsgUnbondBridge
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgUnbondBridge
- */
-export const MsgUnbondBridge = {
-  typeUrl: "/sparkdream.federation.v1.MsgUnbondBridge",
-  aminoType: "sparkdream/x/federation/MsgUnbondBridge",
-  encode(message: MsgUnbondBridge, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.operator !== "") {
-      writer.uint32(10).string(message.operator);
-    }
-    if (message.peerId !== "") {
-      writer.uint32(18).string(message.peerId);
-    }
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): MsgUnbondBridge {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgUnbondBridge();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.operator = reader.string();
-          break;
-        case 2:
-          message.peerId = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial(object: DeepPartial<MsgUnbondBridge>): MsgUnbondBridge {
-    const message = createBaseMsgUnbondBridge();
-    message.operator = object.operator ?? "";
-    message.peerId = object.peerId ?? "";
-    return message;
-  },
-  fromAmino(object: MsgUnbondBridgeAmino): MsgUnbondBridge {
-    const message = createBaseMsgUnbondBridge();
-    if (object.operator !== undefined && object.operator !== null) {
-      message.operator = object.operator;
-    }
-    if (object.peer_id !== undefined && object.peer_id !== null) {
-      message.peerId = object.peer_id;
-    }
-    return message;
-  },
-  toAmino(message: MsgUnbondBridge): MsgUnbondBridgeAmino {
-    const obj: any = {};
-    obj.operator = message.operator === "" ? undefined : message.operator;
-    obj.peer_id = message.peerId === "" ? undefined : message.peerId;
-    return obj;
-  },
-  fromAminoMsg(object: MsgUnbondBridgeAminoMsg): MsgUnbondBridge {
-    return MsgUnbondBridge.fromAmino(object.value);
-  },
-  toAminoMsg(message: MsgUnbondBridge): MsgUnbondBridgeAminoMsg {
-    return {
-      type: "sparkdream/x/federation/MsgUnbondBridge",
-      value: MsgUnbondBridge.toAmino(message)
-    };
-  },
-  fromProtoMsg(message: MsgUnbondBridgeProtoMsg): MsgUnbondBridge {
-    return MsgUnbondBridge.decode(message.value);
-  },
-  toProto(message: MsgUnbondBridge): Uint8Array {
-    return MsgUnbondBridge.encode(message).finish();
-  },
-  toProtoMsg(message: MsgUnbondBridge): MsgUnbondBridgeProtoMsg {
-    return {
-      typeUrl: "/sparkdream.federation.v1.MsgUnbondBridge",
-      value: MsgUnbondBridge.encode(message).finish()
-    };
-  }
-};
-function createBaseMsgUnbondBridgeResponse(): MsgUnbondBridgeResponse {
-  return {};
-}
-/**
- * @name MsgUnbondBridgeResponse
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgUnbondBridgeResponse
- */
-export const MsgUnbondBridgeResponse = {
-  typeUrl: "/sparkdream.federation.v1.MsgUnbondBridgeResponse",
-  encode(_: MsgUnbondBridgeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): MsgUnbondBridgeResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgUnbondBridgeResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial(_: DeepPartial<MsgUnbondBridgeResponse>): MsgUnbondBridgeResponse {
-    const message = createBaseMsgUnbondBridgeResponse();
-    return message;
-  },
-  fromAmino(_: MsgUnbondBridgeResponseAmino): MsgUnbondBridgeResponse {
-    const message = createBaseMsgUnbondBridgeResponse();
-    return message;
-  },
-  toAmino(_: MsgUnbondBridgeResponse): MsgUnbondBridgeResponseAmino {
-    const obj: any = {};
-    return obj;
-  },
-  fromAminoMsg(object: MsgUnbondBridgeResponseAminoMsg): MsgUnbondBridgeResponse {
-    return MsgUnbondBridgeResponse.fromAmino(object.value);
-  },
-  fromProtoMsg(message: MsgUnbondBridgeResponseProtoMsg): MsgUnbondBridgeResponse {
-    return MsgUnbondBridgeResponse.decode(message.value);
-  },
-  toProto(message: MsgUnbondBridgeResponse): Uint8Array {
-    return MsgUnbondBridgeResponse.encode(message).finish();
-  },
-  toProtoMsg(message: MsgUnbondBridgeResponse): MsgUnbondBridgeResponseProtoMsg {
-    return {
-      typeUrl: "/sparkdream.federation.v1.MsgUnbondBridgeResponse",
-      value: MsgUnbondBridgeResponse.encode(message).finish()
-    };
-  }
-};
-function createBaseMsgTopUpBridgeStake(): MsgTopUpBridgeStake {
-  return {
-    operator: "",
-    peerId: "",
-    amount: Coin.fromPartial({})
-  };
-}
-/**
- * @name MsgTopUpBridgeStake
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgTopUpBridgeStake
- */
-export const MsgTopUpBridgeStake = {
-  typeUrl: "/sparkdream.federation.v1.MsgTopUpBridgeStake",
-  aminoType: "sparkdream/x/federation/MsgTopUpBridgeStake",
-  encode(message: MsgTopUpBridgeStake, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.operator !== "") {
-      writer.uint32(10).string(message.operator);
-    }
-    if (message.peerId !== "") {
-      writer.uint32(18).string(message.peerId);
-    }
-    if (message.amount !== undefined) {
-      Coin.encode(message.amount, writer.uint32(26).fork()).ldelim();
-    }
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): MsgTopUpBridgeStake {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgTopUpBridgeStake();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.operator = reader.string();
-          break;
-        case 2:
-          message.peerId = reader.string();
-          break;
-        case 3:
-          message.amount = Coin.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial(object: DeepPartial<MsgTopUpBridgeStake>): MsgTopUpBridgeStake {
-    const message = createBaseMsgTopUpBridgeStake();
-    message.operator = object.operator ?? "";
-    message.peerId = object.peerId ?? "";
-    message.amount = object.amount !== undefined && object.amount !== null ? Coin.fromPartial(object.amount) : undefined;
-    return message;
-  },
-  fromAmino(object: MsgTopUpBridgeStakeAmino): MsgTopUpBridgeStake {
-    const message = createBaseMsgTopUpBridgeStake();
-    if (object.operator !== undefined && object.operator !== null) {
-      message.operator = object.operator;
-    }
-    if (object.peer_id !== undefined && object.peer_id !== null) {
-      message.peerId = object.peer_id;
-    }
-    if (object.amount !== undefined && object.amount !== null) {
-      message.amount = Coin.fromAmino(object.amount);
-    }
-    return message;
-  },
-  toAmino(message: MsgTopUpBridgeStake): MsgTopUpBridgeStakeAmino {
-    const obj: any = {};
-    obj.operator = message.operator === "" ? undefined : message.operator;
-    obj.peer_id = message.peerId === "" ? undefined : message.peerId;
-    obj.amount = message.amount ? Coin.toAmino(message.amount) : undefined;
-    return obj;
-  },
-  fromAminoMsg(object: MsgTopUpBridgeStakeAminoMsg): MsgTopUpBridgeStake {
-    return MsgTopUpBridgeStake.fromAmino(object.value);
-  },
-  toAminoMsg(message: MsgTopUpBridgeStake): MsgTopUpBridgeStakeAminoMsg {
-    return {
-      type: "sparkdream/x/federation/MsgTopUpBridgeStake",
-      value: MsgTopUpBridgeStake.toAmino(message)
-    };
-  },
-  fromProtoMsg(message: MsgTopUpBridgeStakeProtoMsg): MsgTopUpBridgeStake {
-    return MsgTopUpBridgeStake.decode(message.value);
-  },
-  toProto(message: MsgTopUpBridgeStake): Uint8Array {
-    return MsgTopUpBridgeStake.encode(message).finish();
-  },
-  toProtoMsg(message: MsgTopUpBridgeStake): MsgTopUpBridgeStakeProtoMsg {
-    return {
-      typeUrl: "/sparkdream.federation.v1.MsgTopUpBridgeStake",
-      value: MsgTopUpBridgeStake.encode(message).finish()
-    };
-  }
-};
-function createBaseMsgTopUpBridgeStakeResponse(): MsgTopUpBridgeStakeResponse {
-  return {};
-}
-/**
- * @name MsgTopUpBridgeStakeResponse
- * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.MsgTopUpBridgeStakeResponse
- */
-export const MsgTopUpBridgeStakeResponse = {
-  typeUrl: "/sparkdream.federation.v1.MsgTopUpBridgeStakeResponse",
-  encode(_: MsgTopUpBridgeStakeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): MsgTopUpBridgeStakeResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgTopUpBridgeStakeResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial(_: DeepPartial<MsgTopUpBridgeStakeResponse>): MsgTopUpBridgeStakeResponse {
-    const message = createBaseMsgTopUpBridgeStakeResponse();
-    return message;
-  },
-  fromAmino(_: MsgTopUpBridgeStakeResponseAmino): MsgTopUpBridgeStakeResponse {
-    const message = createBaseMsgTopUpBridgeStakeResponse();
-    return message;
-  },
-  toAmino(_: MsgTopUpBridgeStakeResponse): MsgTopUpBridgeStakeResponseAmino {
-    const obj: any = {};
-    return obj;
-  },
-  fromAminoMsg(object: MsgTopUpBridgeStakeResponseAminoMsg): MsgTopUpBridgeStakeResponse {
-    return MsgTopUpBridgeStakeResponse.fromAmino(object.value);
-  },
-  fromProtoMsg(message: MsgTopUpBridgeStakeResponseProtoMsg): MsgTopUpBridgeStakeResponse {
-    return MsgTopUpBridgeStakeResponse.decode(message.value);
-  },
-  toProto(message: MsgTopUpBridgeStakeResponse): Uint8Array {
-    return MsgTopUpBridgeStakeResponse.encode(message).finish();
-  },
-  toProtoMsg(message: MsgTopUpBridgeStakeResponse): MsgTopUpBridgeStakeResponseProtoMsg {
-    return {
-      typeUrl: "/sparkdream.federation.v1.MsgTopUpBridgeStakeResponse",
-      value: MsgTopUpBridgeStakeResponse.encode(message).finish()
     };
   }
 };
@@ -5195,6 +4688,178 @@ export const MsgEscalateChallengeResponse = {
     };
   }
 };
+function createBaseMsgResolveEscalatedChallenge(): MsgResolveEscalatedChallenge {
+  return {
+    authority: "",
+    contentId: BigInt(0),
+    verdict: 0,
+    reasoning: ""
+  };
+}
+/**
+ * MsgResolveEscalatedChallenge applies a Phase 2 (human jury) verdict
+ * to an EscalatedChallenge. Operations Committee only; signature is
+ * the council policy address. Verdict must be CHALLENGE_UPHELD,
+ * CHALLENGE_REJECTED, or CHALLENGE_TIMEOUT (the EndBlocker reaches the
+ * TIMEOUT branch automatically on jury_deadline expiry — submitting
+ * TIMEOUT here is an explicit early-cancel).
+ * @name MsgResolveEscalatedChallenge
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgResolveEscalatedChallenge
+ */
+export const MsgResolveEscalatedChallenge = {
+  typeUrl: "/sparkdream.federation.v1.MsgResolveEscalatedChallenge",
+  aminoType: "sparkdream/x/federation/MsgResolveEscalatedChallenge",
+  encode(message: MsgResolveEscalatedChallenge, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.contentId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.contentId);
+    }
+    if (message.verdict !== 0) {
+      writer.uint32(24).int32(message.verdict);
+    }
+    if (message.reasoning !== "") {
+      writer.uint32(34).string(message.reasoning);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgResolveEscalatedChallenge {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgResolveEscalatedChallenge();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+        case 2:
+          message.contentId = reader.uint64();
+          break;
+        case 3:
+          message.verdict = reader.int32() as any;
+          break;
+        case 4:
+          message.reasoning = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgResolveEscalatedChallenge>): MsgResolveEscalatedChallenge {
+    const message = createBaseMsgResolveEscalatedChallenge();
+    message.authority = object.authority ?? "";
+    message.contentId = object.contentId !== undefined && object.contentId !== null ? BigInt(object.contentId.toString()) : BigInt(0);
+    message.verdict = object.verdict ?? 0;
+    message.reasoning = object.reasoning ?? "";
+    return message;
+  },
+  fromAmino(object: MsgResolveEscalatedChallengeAmino): MsgResolveEscalatedChallenge {
+    const message = createBaseMsgResolveEscalatedChallenge();
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
+    if (object.content_id !== undefined && object.content_id !== null) {
+      message.contentId = BigInt(object.content_id);
+    }
+    if (object.verdict !== undefined && object.verdict !== null) {
+      message.verdict = object.verdict;
+    }
+    if (object.reasoning !== undefined && object.reasoning !== null) {
+      message.reasoning = object.reasoning;
+    }
+    return message;
+  },
+  toAmino(message: MsgResolveEscalatedChallenge): MsgResolveEscalatedChallengeAmino {
+    const obj: any = {};
+    obj.authority = message.authority === "" ? undefined : message.authority;
+    obj.content_id = message.contentId !== BigInt(0) ? message.contentId?.toString() : undefined;
+    obj.verdict = message.verdict === 0 ? undefined : message.verdict;
+    obj.reasoning = message.reasoning === "" ? undefined : message.reasoning;
+    return obj;
+  },
+  fromAminoMsg(object: MsgResolveEscalatedChallengeAminoMsg): MsgResolveEscalatedChallenge {
+    return MsgResolveEscalatedChallenge.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgResolveEscalatedChallenge): MsgResolveEscalatedChallengeAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgResolveEscalatedChallenge",
+      value: MsgResolveEscalatedChallenge.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgResolveEscalatedChallengeProtoMsg): MsgResolveEscalatedChallenge {
+    return MsgResolveEscalatedChallenge.decode(message.value);
+  },
+  toProto(message: MsgResolveEscalatedChallenge): Uint8Array {
+    return MsgResolveEscalatedChallenge.encode(message).finish();
+  },
+  toProtoMsg(message: MsgResolveEscalatedChallenge): MsgResolveEscalatedChallengeProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.MsgResolveEscalatedChallenge",
+      value: MsgResolveEscalatedChallenge.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgResolveEscalatedChallengeResponse(): MsgResolveEscalatedChallengeResponse {
+  return {};
+}
+/**
+ * @name MsgResolveEscalatedChallengeResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgResolveEscalatedChallengeResponse
+ */
+export const MsgResolveEscalatedChallengeResponse = {
+  typeUrl: "/sparkdream.federation.v1.MsgResolveEscalatedChallengeResponse",
+  encode(_: MsgResolveEscalatedChallengeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgResolveEscalatedChallengeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgResolveEscalatedChallengeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgResolveEscalatedChallengeResponse>): MsgResolveEscalatedChallengeResponse {
+    const message = createBaseMsgResolveEscalatedChallengeResponse();
+    return message;
+  },
+  fromAmino(_: MsgResolveEscalatedChallengeResponseAmino): MsgResolveEscalatedChallengeResponse {
+    const message = createBaseMsgResolveEscalatedChallengeResponse();
+    return message;
+  },
+  toAmino(_: MsgResolveEscalatedChallengeResponse): MsgResolveEscalatedChallengeResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgResolveEscalatedChallengeResponseAminoMsg): MsgResolveEscalatedChallengeResponse {
+    return MsgResolveEscalatedChallengeResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgResolveEscalatedChallengeResponseProtoMsg): MsgResolveEscalatedChallengeResponse {
+    return MsgResolveEscalatedChallengeResponse.decode(message.value);
+  },
+  toProto(message: MsgResolveEscalatedChallengeResponse): Uint8Array {
+    return MsgResolveEscalatedChallengeResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgResolveEscalatedChallengeResponse): MsgResolveEscalatedChallengeResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.MsgResolveEscalatedChallengeResponse",
+      value: MsgResolveEscalatedChallengeResponse.encode(message).finish()
+    };
+  }
+};
 function createBaseMsgUpdateOperationalParams(): MsgUpdateOperationalParams {
   return {
     authority: "",
@@ -5334,6 +4999,486 @@ export const MsgUpdateOperationalParamsResponse = {
     return {
       typeUrl: "/sparkdream.federation.v1.MsgUpdateOperationalParamsResponse",
       value: MsgUpdateOperationalParamsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUpdatePeerController(): MsgUpdatePeerController {
+  return {
+    authority: "",
+    peerId: "",
+    controllerGroup: ""
+  };
+}
+/**
+ * MsgUpdatePeerController is a gov-authority message that changes the
+ * controller_group on an existing peer. Affects only new bridge
+ * registrations under that peer — existing bridges keep the controller
+ * captured on their service.Operator at registration time. Transferring
+ * existing bridges requires service.MsgOpenControllerTransferCase.
+ * @name MsgUpdatePeerController
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgUpdatePeerController
+ */
+export const MsgUpdatePeerController = {
+  typeUrl: "/sparkdream.federation.v1.MsgUpdatePeerController",
+  aminoType: "sparkdream/x/federation/MsgUpdatePeerController",
+  encode(message: MsgUpdatePeerController, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.peerId !== "") {
+      writer.uint32(18).string(message.peerId);
+    }
+    if (message.controllerGroup !== "") {
+      writer.uint32(26).string(message.controllerGroup);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUpdatePeerController {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUpdatePeerController();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+        case 2:
+          message.peerId = reader.string();
+          break;
+        case 3:
+          message.controllerGroup = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgUpdatePeerController>): MsgUpdatePeerController {
+    const message = createBaseMsgUpdatePeerController();
+    message.authority = object.authority ?? "";
+    message.peerId = object.peerId ?? "";
+    message.controllerGroup = object.controllerGroup ?? "";
+    return message;
+  },
+  fromAmino(object: MsgUpdatePeerControllerAmino): MsgUpdatePeerController {
+    const message = createBaseMsgUpdatePeerController();
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
+    if (object.peer_id !== undefined && object.peer_id !== null) {
+      message.peerId = object.peer_id;
+    }
+    if (object.controller_group !== undefined && object.controller_group !== null) {
+      message.controllerGroup = object.controller_group;
+    }
+    return message;
+  },
+  toAmino(message: MsgUpdatePeerController): MsgUpdatePeerControllerAmino {
+    const obj: any = {};
+    obj.authority = message.authority === "" ? undefined : message.authority;
+    obj.peer_id = message.peerId === "" ? undefined : message.peerId;
+    obj.controller_group = message.controllerGroup === "" ? undefined : message.controllerGroup;
+    return obj;
+  },
+  fromAminoMsg(object: MsgUpdatePeerControllerAminoMsg): MsgUpdatePeerController {
+    return MsgUpdatePeerController.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUpdatePeerController): MsgUpdatePeerControllerAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgUpdatePeerController",
+      value: MsgUpdatePeerController.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgUpdatePeerControllerProtoMsg): MsgUpdatePeerController {
+    return MsgUpdatePeerController.decode(message.value);
+  },
+  toProto(message: MsgUpdatePeerController): Uint8Array {
+    return MsgUpdatePeerController.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUpdatePeerController): MsgUpdatePeerControllerProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.MsgUpdatePeerController",
+      value: MsgUpdatePeerController.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUpdatePeerControllerResponse(): MsgUpdatePeerControllerResponse {
+  return {};
+}
+/**
+ * @name MsgUpdatePeerControllerResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgUpdatePeerControllerResponse
+ */
+export const MsgUpdatePeerControllerResponse = {
+  typeUrl: "/sparkdream.federation.v1.MsgUpdatePeerControllerResponse",
+  encode(_: MsgUpdatePeerControllerResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUpdatePeerControllerResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUpdatePeerControllerResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgUpdatePeerControllerResponse>): MsgUpdatePeerControllerResponse {
+    const message = createBaseMsgUpdatePeerControllerResponse();
+    return message;
+  },
+  fromAmino(_: MsgUpdatePeerControllerResponseAmino): MsgUpdatePeerControllerResponse {
+    const message = createBaseMsgUpdatePeerControllerResponse();
+    return message;
+  },
+  toAmino(_: MsgUpdatePeerControllerResponse): MsgUpdatePeerControllerResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgUpdatePeerControllerResponseAminoMsg): MsgUpdatePeerControllerResponse {
+    return MsgUpdatePeerControllerResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgUpdatePeerControllerResponseProtoMsg): MsgUpdatePeerControllerResponse {
+    return MsgUpdatePeerControllerResponse.decode(message.value);
+  },
+  toProto(message: MsgUpdatePeerControllerResponse): Uint8Array {
+    return MsgUpdatePeerControllerResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUpdatePeerControllerResponse): MsgUpdatePeerControllerResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.MsgUpdatePeerControllerResponse",
+      value: MsgUpdatePeerControllerResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgResyncBridgeCount(): MsgResyncBridgeCount {
+  return {
+    authority: "",
+    peerId: ""
+  };
+}
+/**
+ * MsgResyncBridgeCount is a dual-authority message (Operations Committee
+ * OR gov) that re-counts BridgesByPeer for the given peer and overwrites
+ * the peer's bridges_count counter. Recovery path when the count
+ * invariant triggers without needing a chain upgrade — pure cleanup,
+ * can't be abused to mutate operator state.
+ * @name MsgResyncBridgeCount
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgResyncBridgeCount
+ */
+export const MsgResyncBridgeCount = {
+  typeUrl: "/sparkdream.federation.v1.MsgResyncBridgeCount",
+  aminoType: "sparkdream/x/federation/MsgResyncBridgeCount",
+  encode(message: MsgResyncBridgeCount, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.peerId !== "") {
+      writer.uint32(18).string(message.peerId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgResyncBridgeCount {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgResyncBridgeCount();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+        case 2:
+          message.peerId = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgResyncBridgeCount>): MsgResyncBridgeCount {
+    const message = createBaseMsgResyncBridgeCount();
+    message.authority = object.authority ?? "";
+    message.peerId = object.peerId ?? "";
+    return message;
+  },
+  fromAmino(object: MsgResyncBridgeCountAmino): MsgResyncBridgeCount {
+    const message = createBaseMsgResyncBridgeCount();
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
+    if (object.peer_id !== undefined && object.peer_id !== null) {
+      message.peerId = object.peer_id;
+    }
+    return message;
+  },
+  toAmino(message: MsgResyncBridgeCount): MsgResyncBridgeCountAmino {
+    const obj: any = {};
+    obj.authority = message.authority === "" ? undefined : message.authority;
+    obj.peer_id = message.peerId === "" ? undefined : message.peerId;
+    return obj;
+  },
+  fromAminoMsg(object: MsgResyncBridgeCountAminoMsg): MsgResyncBridgeCount {
+    return MsgResyncBridgeCount.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgResyncBridgeCount): MsgResyncBridgeCountAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgResyncBridgeCount",
+      value: MsgResyncBridgeCount.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgResyncBridgeCountProtoMsg): MsgResyncBridgeCount {
+    return MsgResyncBridgeCount.decode(message.value);
+  },
+  toProto(message: MsgResyncBridgeCount): Uint8Array {
+    return MsgResyncBridgeCount.encode(message).finish();
+  },
+  toProtoMsg(message: MsgResyncBridgeCount): MsgResyncBridgeCountProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.MsgResyncBridgeCount",
+      value: MsgResyncBridgeCount.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgResyncBridgeCountResponse(): MsgResyncBridgeCountResponse {
+  return {
+    newCount: BigInt(0)
+  };
+}
+/**
+ * @name MsgResyncBridgeCountResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgResyncBridgeCountResponse
+ */
+export const MsgResyncBridgeCountResponse = {
+  typeUrl: "/sparkdream.federation.v1.MsgResyncBridgeCountResponse",
+  encode(message: MsgResyncBridgeCountResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.newCount !== BigInt(0)) {
+      writer.uint32(8).uint64(message.newCount);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgResyncBridgeCountResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgResyncBridgeCountResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.newCount = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgResyncBridgeCountResponse>): MsgResyncBridgeCountResponse {
+    const message = createBaseMsgResyncBridgeCountResponse();
+    message.newCount = object.newCount !== undefined && object.newCount !== null ? BigInt(object.newCount.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgResyncBridgeCountResponseAmino): MsgResyncBridgeCountResponse {
+    const message = createBaseMsgResyncBridgeCountResponse();
+    if (object.new_count !== undefined && object.new_count !== null) {
+      message.newCount = BigInt(object.new_count);
+    }
+    return message;
+  },
+  toAmino(message: MsgResyncBridgeCountResponse): MsgResyncBridgeCountResponseAmino {
+    const obj: any = {};
+    obj.new_count = message.newCount !== BigInt(0) ? message.newCount?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgResyncBridgeCountResponseAminoMsg): MsgResyncBridgeCountResponse {
+    return MsgResyncBridgeCountResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgResyncBridgeCountResponseProtoMsg): MsgResyncBridgeCountResponse {
+    return MsgResyncBridgeCountResponse.decode(message.value);
+  },
+  toProto(message: MsgResyncBridgeCountResponse): Uint8Array {
+    return MsgResyncBridgeCountResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgResyncBridgeCountResponse): MsgResyncBridgeCountResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.MsgResyncBridgeCountResponse",
+      value: MsgResyncBridgeCountResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgPruneOrphanBindings(): MsgPruneOrphanBindings {
+  return {
+    authority: "",
+    peerId: ""
+  };
+}
+/**
+ * MsgPruneOrphanBindings is a dual-authority message (Operations
+ * Committee OR gov) that runs the AfterOperatorDissolved/Retired
+ * cleanup logic for any BridgeBinding whose referenced service.Operator
+ * is in a terminal state (SLASHED/RETIRED/missing). Recovery path when
+ * the fail-soft hook pattern swallowed a panic and left an orphan.
+ * Pure cleanup, no value mutation.
+ * @name MsgPruneOrphanBindings
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgPruneOrphanBindings
+ */
+export const MsgPruneOrphanBindings = {
+  typeUrl: "/sparkdream.federation.v1.MsgPruneOrphanBindings",
+  aminoType: "sparkdream/x/federation/MsgPruneOrphanBindings",
+  encode(message: MsgPruneOrphanBindings, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.peerId !== "") {
+      writer.uint32(18).string(message.peerId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgPruneOrphanBindings {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgPruneOrphanBindings();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+        case 2:
+          message.peerId = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgPruneOrphanBindings>): MsgPruneOrphanBindings {
+    const message = createBaseMsgPruneOrphanBindings();
+    message.authority = object.authority ?? "";
+    message.peerId = object.peerId ?? "";
+    return message;
+  },
+  fromAmino(object: MsgPruneOrphanBindingsAmino): MsgPruneOrphanBindings {
+    const message = createBaseMsgPruneOrphanBindings();
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
+    if (object.peer_id !== undefined && object.peer_id !== null) {
+      message.peerId = object.peer_id;
+    }
+    return message;
+  },
+  toAmino(message: MsgPruneOrphanBindings): MsgPruneOrphanBindingsAmino {
+    const obj: any = {};
+    obj.authority = message.authority === "" ? undefined : message.authority;
+    obj.peer_id = message.peerId === "" ? undefined : message.peerId;
+    return obj;
+  },
+  fromAminoMsg(object: MsgPruneOrphanBindingsAminoMsg): MsgPruneOrphanBindings {
+    return MsgPruneOrphanBindings.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgPruneOrphanBindings): MsgPruneOrphanBindingsAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgPruneOrphanBindings",
+      value: MsgPruneOrphanBindings.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgPruneOrphanBindingsProtoMsg): MsgPruneOrphanBindings {
+    return MsgPruneOrphanBindings.decode(message.value);
+  },
+  toProto(message: MsgPruneOrphanBindings): Uint8Array {
+    return MsgPruneOrphanBindings.encode(message).finish();
+  },
+  toProtoMsg(message: MsgPruneOrphanBindings): MsgPruneOrphanBindingsProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.MsgPruneOrphanBindings",
+      value: MsgPruneOrphanBindings.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgPruneOrphanBindingsResponse(): MsgPruneOrphanBindingsResponse {
+  return {
+    pruned: BigInt(0)
+  };
+}
+/**
+ * @name MsgPruneOrphanBindingsResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgPruneOrphanBindingsResponse
+ */
+export const MsgPruneOrphanBindingsResponse = {
+  typeUrl: "/sparkdream.federation.v1.MsgPruneOrphanBindingsResponse",
+  encode(message: MsgPruneOrphanBindingsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pruned !== BigInt(0)) {
+      writer.uint32(8).uint64(message.pruned);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgPruneOrphanBindingsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgPruneOrphanBindingsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pruned = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgPruneOrphanBindingsResponse>): MsgPruneOrphanBindingsResponse {
+    const message = createBaseMsgPruneOrphanBindingsResponse();
+    message.pruned = object.pruned !== undefined && object.pruned !== null ? BigInt(object.pruned.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgPruneOrphanBindingsResponseAmino): MsgPruneOrphanBindingsResponse {
+    const message = createBaseMsgPruneOrphanBindingsResponse();
+    if (object.pruned !== undefined && object.pruned !== null) {
+      message.pruned = BigInt(object.pruned);
+    }
+    return message;
+  },
+  toAmino(message: MsgPruneOrphanBindingsResponse): MsgPruneOrphanBindingsResponseAmino {
+    const obj: any = {};
+    obj.pruned = message.pruned !== BigInt(0) ? message.pruned?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgPruneOrphanBindingsResponseAminoMsg): MsgPruneOrphanBindingsResponse {
+    return MsgPruneOrphanBindingsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgPruneOrphanBindingsResponseProtoMsg): MsgPruneOrphanBindingsResponse {
+    return MsgPruneOrphanBindingsResponse.decode(message.value);
+  },
+  toProto(message: MsgPruneOrphanBindingsResponse): Uint8Array {
+    return MsgPruneOrphanBindingsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgPruneOrphanBindingsResponse): MsgPruneOrphanBindingsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.MsgPruneOrphanBindingsResponse",
+      value: MsgPruneOrphanBindingsResponse.encode(message).finish()
     };
   }
 };

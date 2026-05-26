@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetPolicyPermissionsRequest, QueryGetPolicyPermissionsResponse, QueryAllPolicyPermissionsRequest, QueryAllPolicyPermissionsResponse, QueryGetDecisionPolicyRequest, QueryGetDecisionPolicyResponse, QueryAllDecisionPoliciesRequest, QueryAllDecisionPoliciesResponse, QueryGetGroupRequest, QueryGetGroupResponse, QueryAllGroupRequest, QueryAllGroupResponse, QueryGetCouncilMembersRequest, QueryGetCouncilMembersResponse, QueryGetProposalRequest, QueryGetProposalResponse, QueryListProposalsRequest, QueryListProposalsResponse, QueryGetProposalVotesRequest, QueryGetProposalVotesResponse, QueryGetCategoryRequest, QueryGetCategoryResponse, QueryAllCategoryRequest, QueryAllCategoryResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetPolicyPermissionsRequest, QueryGetPolicyPermissionsResponse, QueryAllPolicyPermissionsRequest, QueryAllPolicyPermissionsResponse, QueryGetDecisionPolicyRequest, QueryGetDecisionPolicyResponse, QueryAllDecisionPoliciesRequest, QueryAllDecisionPoliciesResponse, QueryGetGroupRequest, QueryGetGroupResponse, QueryAllGroupRequest, QueryAllGroupResponse, QueryGetCouncilMembersRequest, QueryGetCouncilMembersResponse, QueryGetProposalRequest, QueryGetProposalResponse, QueryListProposalsRequest, QueryListProposalsResponse, QueryGetProposalVotesRequest, QueryGetProposalVotesResponse, QueryGetCategoryRequest, QueryGetCategoryResponse, QueryAllCategoryRequest, QueryAllCategoryResponse, QueryGetRecurringSpendRequest, QueryGetRecurringSpendResponse, QueryListRecurringSpendsRequest, QueryListRecurringSpendsResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -38,6 +38,13 @@ export interface Query {
   getCategory(request: QueryGetCategoryRequest): Promise<QueryGetCategoryResponse>;
   /** ListCategory queries all shared content categories. */
   listCategory(request?: QueryAllCategoryRequest): Promise<QueryAllCategoryResponse>;
+  /** GetRecurringSpend queries a single recurring spend schedule by id. */
+  getRecurringSpend(request: QueryGetRecurringSpendRequest): Promise<QueryGetRecurringSpendResponse>;
+  /**
+   * ListRecurringSpends queries recurring spend schedules, optionally
+   * filtered by authority (council policy address) or recipient.
+   */
+  listRecurringSpends(request: QueryListRecurringSpendsRequest): Promise<QueryListRecurringSpendsResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -133,6 +140,19 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.commons.v1.Query", "ListCategory", data);
     return promise.then(data => QueryAllCategoryResponse.decode(new BinaryReader(data)));
   };
+  /* GetRecurringSpend queries a single recurring spend schedule by id. */
+  getRecurringSpend = async (request: QueryGetRecurringSpendRequest): Promise<QueryGetRecurringSpendResponse> => {
+    const data = QueryGetRecurringSpendRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Query", "GetRecurringSpend", data);
+    return promise.then(data => QueryGetRecurringSpendResponse.decode(new BinaryReader(data)));
+  };
+  /* ListRecurringSpends queries recurring spend schedules, optionally
+   filtered by authority (council policy address) or recipient. */
+  listRecurringSpends = async (request: QueryListRecurringSpendsRequest): Promise<QueryListRecurringSpendsResponse> => {
+    const data = QueryListRecurringSpendsRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Query", "ListRecurringSpends", data);
+    return promise.then(data => QueryListRecurringSpendsResponse.decode(new BinaryReader(data)));
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);
@@ -176,6 +196,12 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     listCategory(request?: QueryAllCategoryRequest): Promise<QueryAllCategoryResponse> {
       return queryService.listCategory(request);
+    },
+    getRecurringSpend(request: QueryGetRecurringSpendRequest): Promise<QueryGetRecurringSpendResponse> {
+      return queryService.getRecurringSpend(request);
+    },
+    listRecurringSpends(request: QueryListRecurringSpendsRequest): Promise<QueryListRecurringSpendsResponse> {
+      return queryService.listRecurringSpends(request);
     }
   };
 };

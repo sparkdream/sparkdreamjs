@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { MsgUpdateParams, MsgRegisterPeer, MsgRemovePeer, MsgSuspendPeer, MsgResumePeer, MsgUpdatePeerPolicy, MsgRegisterBridge, MsgRevokeBridge, MsgSlashBridge, MsgUpdateBridge, MsgUnbondBridge, MsgTopUpBridgeStake, MsgSubmitFederatedContent, MsgFederateContent, MsgAttestOutbound, MsgModerateContent, MsgLinkIdentity, MsgUnlinkIdentity, MsgConfirmIdentityLink, MsgRequestReputationAttestation, MsgVerifyContent, MsgChallengeVerification, MsgSubmitArbiterHash, MsgEscalateChallenge, MsgUpdateOperationalParams } from "./tx";
+import { MsgUpdateParams, MsgRegisterPeer, MsgRemovePeer, MsgSuspendPeer, MsgResumePeer, MsgUpdatePeerPolicy, MsgRegisterBridge, MsgUpdateBridge, MsgSubmitFederatedContent, MsgFederateContent, MsgAttestOutbound, MsgModerateContent, MsgLinkIdentity, MsgUnlinkIdentity, MsgConfirmIdentityLink, MsgRequestReputationAttestation, MsgVerifyContent, MsgChallengeVerification, MsgSubmitArbiterHash, MsgEscalateChallenge, MsgResolveEscalatedChallenge, MsgUpdateOperationalParams, MsgUpdatePeerController, MsgResyncBridgeCount, MsgPruneOrphanBindings } from "./tx";
 export const AminoConverter = {
   "/sparkdream.federation.v1.MsgUpdateParams": {
     aminoType: "sparkdream/x/federation/MsgUpdateParams",
@@ -36,30 +36,10 @@ export const AminoConverter = {
     toAmino: MsgRegisterBridge.toAmino,
     fromAmino: MsgRegisterBridge.fromAmino
   },
-  "/sparkdream.federation.v1.MsgRevokeBridge": {
-    aminoType: "sparkdream/x/federation/MsgRevokeBridge",
-    toAmino: MsgRevokeBridge.toAmino,
-    fromAmino: MsgRevokeBridge.fromAmino
-  },
-  "/sparkdream.federation.v1.MsgSlashBridge": {
-    aminoType: "sparkdream/x/federation/MsgSlashBridge",
-    toAmino: MsgSlashBridge.toAmino,
-    fromAmino: MsgSlashBridge.fromAmino
-  },
   "/sparkdream.federation.v1.MsgUpdateBridge": {
     aminoType: "sparkdream/x/federation/MsgUpdateBridge",
     toAmino: MsgUpdateBridge.toAmino,
     fromAmino: MsgUpdateBridge.fromAmino
-  },
-  "/sparkdream.federation.v1.MsgUnbondBridge": {
-    aminoType: "sparkdream/x/federation/MsgUnbondBridge",
-    toAmino: MsgUnbondBridge.toAmino,
-    fromAmino: MsgUnbondBridge.fromAmino
-  },
-  "/sparkdream.federation.v1.MsgTopUpBridgeStake": {
-    aminoType: "sparkdream/x/federation/MsgTopUpBridgeStake",
-    toAmino: MsgTopUpBridgeStake.toAmino,
-    fromAmino: MsgTopUpBridgeStake.fromAmino
   },
   "/sparkdream.federation.v1.MsgSubmitFederatedContent": {
     aminoType: "sparkdream/x/federation/MsgSubmitFederatedContent",
@@ -121,9 +101,29 @@ export const AminoConverter = {
     toAmino: MsgEscalateChallenge.toAmino,
     fromAmino: MsgEscalateChallenge.fromAmino
   },
+  "/sparkdream.federation.v1.MsgResolveEscalatedChallenge": {
+    aminoType: "sparkdream/x/federation/MsgResolveEscalatedChallenge",
+    toAmino: MsgResolveEscalatedChallenge.toAmino,
+    fromAmino: MsgResolveEscalatedChallenge.fromAmino
+  },
   "/sparkdream.federation.v1.MsgUpdateOperationalParams": {
     aminoType: "sparkdream/x/federation/MsgUpdateOperationalParams",
     toAmino: MsgUpdateOperationalParams.toAmino,
     fromAmino: MsgUpdateOperationalParams.fromAmino
+  },
+  "/sparkdream.federation.v1.MsgUpdatePeerController": {
+    aminoType: "sparkdream/x/federation/MsgUpdatePeerController",
+    toAmino: MsgUpdatePeerController.toAmino,
+    fromAmino: MsgUpdatePeerController.fromAmino
+  },
+  "/sparkdream.federation.v1.MsgResyncBridgeCount": {
+    aminoType: "sparkdream/x/federation/MsgResyncBridgeCount",
+    toAmino: MsgResyncBridgeCount.toAmino,
+    fromAmino: MsgResyncBridgeCount.fromAmino
+  },
+  "/sparkdream.federation.v1.MsgPruneOrphanBindings": {
+    aminoType: "sparkdream/x/federation/MsgPruneOrphanBindings",
+    toAmino: MsgPruneOrphanBindings.toAmino,
+    fromAmino: MsgPruneOrphanBindings.fromAmino
   }
 };

@@ -59,12 +59,17 @@ export function roleTypeToJSON(object: RoleType): string {
  *   reduced privileges depending on role, rewards may auto-bond.
  * DEMOTED: bond below demotion_threshold; privileges revoked; cooldown
  *   enforced before re-bonding.
+ * UNBONDING: role-holder called MsgUnbondRole. DREAM remains locked and the
+ *   bond remains slashable until unbond_completion_time. Action-time gates in
+ *   owning modules must refuse on this status to contain new liability while
+ *   the bond drains.
  */
 export enum BondedRoleStatus {
   BONDED_ROLE_STATUS_UNSPECIFIED = 0,
   BONDED_ROLE_STATUS_NORMAL = 1,
   BONDED_ROLE_STATUS_RECOVERY = 2,
   BONDED_ROLE_STATUS_DEMOTED = 3,
+  BONDED_ROLE_STATUS_UNBONDING = 4,
   UNRECOGNIZED = -1,
 }
 export const BondedRoleStatusAmino = BondedRoleStatus;
@@ -82,6 +87,9 @@ export function bondedRoleStatusFromJSON(object: any): BondedRoleStatus {
     case 3:
     case "BONDED_ROLE_STATUS_DEMOTED":
       return BondedRoleStatus.BONDED_ROLE_STATUS_DEMOTED;
+    case 4:
+    case "BONDED_ROLE_STATUS_UNBONDING":
+      return BondedRoleStatus.BONDED_ROLE_STATUS_UNBONDING;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -98,6 +106,8 @@ export function bondedRoleStatusToJSON(object: BondedRoleStatus): string {
       return "BONDED_ROLE_STATUS_RECOVERY";
     case BondedRoleStatus.BONDED_ROLE_STATUS_DEMOTED:
       return "BONDED_ROLE_STATUS_DEMOTED";
+    case BondedRoleStatus.BONDED_ROLE_STATUS_UNBONDING:
+      return "BONDED_ROLE_STATUS_UNBONDING";
     case BondedRoleStatus.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -165,6 +175,21 @@ export interface BondedRole {
    * this role.
    */
   lastRewardEpoch: bigint;
+  /**
+   * pending_unbond_amount is DREAM queued for withdrawal via MsgUnbondRole and
+   * not yet released to the holder's available balance (math.Int string).
+   * Counts toward current_bond — i.e., slashes consume current_bond as a
+   * whole and the pending amount is reduced symmetrically on slash. Zero when
+   * no unbond is in flight.
+   */
+  pendingUnbondAmount: string;
+  /**
+   * unbond_completion_time is the unix timestamp at which an in-flight unbond
+   * matures: the EndBlocker unlocks pending_unbond_amount, resets the field,
+   * and flips bond_status (typically to DEMOTED, starting demotion_cooldown).
+   * Zero when no unbond is in flight.
+   */
+  unbondCompletionTime: bigint;
 }
 export interface BondedRoleProtoMsg {
   typeUrl: "/sparkdream.rep.v1.BondedRole";
@@ -232,6 +257,21 @@ export interface BondedRoleAmino {
    * this role.
    */
   last_reward_epoch?: string;
+  /**
+   * pending_unbond_amount is DREAM queued for withdrawal via MsgUnbondRole and
+   * not yet released to the holder's available balance (math.Int string).
+   * Counts toward current_bond — i.e., slashes consume current_bond as a
+   * whole and the pending amount is reduced symmetrically on slash. Zero when
+   * no unbond is in flight.
+   */
+  pending_unbond_amount?: string;
+  /**
+   * unbond_completion_time is the unix timestamp at which an in-flight unbond
+   * matures: the EndBlocker unlocks pending_unbond_amount, resets the field,
+   * and flips bond_status (typically to DEMOTED, starting demotion_cooldown).
+   * Zero when no unbond is in flight.
+   */
+  unbond_completion_time?: string;
 }
 export interface BondedRoleAminoMsg {
   type: "/sparkdream.rep.v1.BondedRole";
@@ -288,6 +328,14 @@ export interface BondedRoleConfig {
    * from RECOVERY to DEMOTED (math.Int string).
    */
   demotionThreshold: string;
+  /**
+   * unbond_cooldown is the number of seconds DREAM stays locked and slashable
+   * after MsgUnbondRole is called. While the cooldown is pending, the role's
+   * bond_status is UNBONDING and the owning module refuses authority. Zero =
+   * no cooldown (immediate withdrawal, legacy behavior). Source of truth is
+   * the owning module's operational params.
+   */
+  unbondCooldown: bigint;
 }
 export interface BondedRoleConfigProtoMsg {
   typeUrl: "/sparkdream.rep.v1.BondedRoleConfig";
@@ -344,6 +392,14 @@ export interface BondedRoleConfigAmino {
    * from RECOVERY to DEMOTED (math.Int string).
    */
   demotion_threshold?: string;
+  /**
+   * unbond_cooldown is the number of seconds DREAM stays locked and slashable
+   * after MsgUnbondRole is called. While the cooldown is pending, the role's
+   * bond_status is UNBONDING and the owning module refuses authority. Zero =
+   * no cooldown (immediate withdrawal, legacy behavior). Source of truth is
+   * the owning module's operational params.
+   */
+  unbond_cooldown?: string;
 }
 export interface BondedRoleConfigAminoMsg {
   type: "/sparkdream.rep.v1.BondedRoleConfig";
@@ -361,7 +417,9 @@ function createBaseBondedRole(): BondedRole {
     consecutiveInactiveEpochs: BigInt(0),
     demotionCooldownUntil: BigInt(0),
     cumulativeRewards: "",
-    lastRewardEpoch: BigInt(0)
+    lastRewardEpoch: BigInt(0),
+    pendingUnbondAmount: "",
+    unbondCompletionTime: BigInt(0)
   };
 }
 /**
@@ -409,6 +467,12 @@ export const BondedRole = {
     if (message.lastRewardEpoch !== BigInt(0)) {
       writer.uint32(88).int64(message.lastRewardEpoch);
     }
+    if (message.pendingUnbondAmount !== "") {
+      writer.uint32(98).string(message.pendingUnbondAmount);
+    }
+    if (message.unbondCompletionTime !== BigInt(0)) {
+      writer.uint32(104).int64(message.unbondCompletionTime);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): BondedRole {
@@ -451,6 +515,12 @@ export const BondedRole = {
         case 11:
           message.lastRewardEpoch = reader.int64();
           break;
+        case 12:
+          message.pendingUnbondAmount = reader.string();
+          break;
+        case 13:
+          message.unbondCompletionTime = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -471,6 +541,8 @@ export const BondedRole = {
     message.demotionCooldownUntil = object.demotionCooldownUntil !== undefined && object.demotionCooldownUntil !== null ? BigInt(object.demotionCooldownUntil.toString()) : BigInt(0);
     message.cumulativeRewards = object.cumulativeRewards ?? "";
     message.lastRewardEpoch = object.lastRewardEpoch !== undefined && object.lastRewardEpoch !== null ? BigInt(object.lastRewardEpoch.toString()) : BigInt(0);
+    message.pendingUnbondAmount = object.pendingUnbondAmount ?? "";
+    message.unbondCompletionTime = object.unbondCompletionTime !== undefined && object.unbondCompletionTime !== null ? BigInt(object.unbondCompletionTime.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: BondedRoleAmino): BondedRole {
@@ -508,6 +580,12 @@ export const BondedRole = {
     if (object.last_reward_epoch !== undefined && object.last_reward_epoch !== null) {
       message.lastRewardEpoch = BigInt(object.last_reward_epoch);
     }
+    if (object.pending_unbond_amount !== undefined && object.pending_unbond_amount !== null) {
+      message.pendingUnbondAmount = object.pending_unbond_amount;
+    }
+    if (object.unbond_completion_time !== undefined && object.unbond_completion_time !== null) {
+      message.unbondCompletionTime = BigInt(object.unbond_completion_time);
+    }
     return message;
   },
   toAmino(message: BondedRole): BondedRoleAmino {
@@ -523,6 +601,8 @@ export const BondedRole = {
     obj.demotion_cooldown_until = message.demotionCooldownUntil !== BigInt(0) ? message.demotionCooldownUntil?.toString() : undefined;
     obj.cumulative_rewards = message.cumulativeRewards === "" ? undefined : message.cumulativeRewards;
     obj.last_reward_epoch = message.lastRewardEpoch !== BigInt(0) ? message.lastRewardEpoch?.toString() : undefined;
+    obj.pending_unbond_amount = message.pendingUnbondAmount === "" ? undefined : message.pendingUnbondAmount;
+    obj.unbond_completion_time = message.unbondCompletionTime !== BigInt(0) ? message.unbondCompletionTime?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: BondedRoleAminoMsg): BondedRole {
@@ -549,7 +629,8 @@ function createBaseBondedRoleConfig(): BondedRoleConfig {
     minTrustLevel: "",
     minAgeBlocks: BigInt(0),
     demotionCooldown: BigInt(0),
-    demotionThreshold: ""
+    demotionThreshold: "",
+    unbondCooldown: BigInt(0)
   };
 }
 /**
@@ -589,6 +670,9 @@ export const BondedRoleConfig = {
     if (message.demotionThreshold !== "") {
       writer.uint32(58).string(message.demotionThreshold);
     }
+    if (message.unbondCooldown !== BigInt(0)) {
+      writer.uint32(64).int64(message.unbondCooldown);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): BondedRoleConfig {
@@ -619,6 +703,9 @@ export const BondedRoleConfig = {
         case 7:
           message.demotionThreshold = reader.string();
           break;
+        case 8:
+          message.unbondCooldown = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -635,6 +722,7 @@ export const BondedRoleConfig = {
     message.minAgeBlocks = object.minAgeBlocks !== undefined && object.minAgeBlocks !== null ? BigInt(object.minAgeBlocks.toString()) : BigInt(0);
     message.demotionCooldown = object.demotionCooldown !== undefined && object.demotionCooldown !== null ? BigInt(object.demotionCooldown.toString()) : BigInt(0);
     message.demotionThreshold = object.demotionThreshold ?? "";
+    message.unbondCooldown = object.unbondCooldown !== undefined && object.unbondCooldown !== null ? BigInt(object.unbondCooldown.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: BondedRoleConfigAmino): BondedRoleConfig {
@@ -660,6 +748,9 @@ export const BondedRoleConfig = {
     if (object.demotion_threshold !== undefined && object.demotion_threshold !== null) {
       message.demotionThreshold = object.demotion_threshold;
     }
+    if (object.unbond_cooldown !== undefined && object.unbond_cooldown !== null) {
+      message.unbondCooldown = BigInt(object.unbond_cooldown);
+    }
     return message;
   },
   toAmino(message: BondedRoleConfig): BondedRoleConfigAmino {
@@ -671,6 +762,7 @@ export const BondedRoleConfig = {
     obj.min_age_blocks = message.minAgeBlocks !== BigInt(0) ? message.minAgeBlocks?.toString() : undefined;
     obj.demotion_cooldown = message.demotionCooldown !== BigInt(0) ? message.demotionCooldown?.toString() : undefined;
     obj.demotion_threshold = message.demotionThreshold === "" ? undefined : message.demotionThreshold;
+    obj.unbond_cooldown = message.unbondCooldown !== BigInt(0) ? message.unbondCooldown?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: BondedRoleConfigAminoMsg): BondedRoleConfig {

@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgSpendFromCommons, MsgSpendFromCommonsResponse, MsgEmergencyCancelGovProposal, MsgEmergencyCancelGovProposalResponse, MsgCreatePolicyPermissions, MsgCreatePolicyPermissionsResponse, MsgUpdatePolicyPermissions, MsgUpdatePolicyPermissionsResponse, MsgDeletePolicyPermissions, MsgDeletePolicyPermissionsResponse, MsgRegisterGroup, MsgRegisterGroupResponse, MsgRenewGroup, MsgRenewGroupResponse, MsgUpdateGroupMembers, MsgUpdateGroupMembersResponse, MsgUpdateGroupConfig, MsgUpdateGroupConfigResponse, MsgForceUpgrade, MsgForceUpgradeResponse, MsgDeleteGroup, MsgDeleteGroupResponse, MsgVetoGroupProposals, MsgVetoGroupProposalsResponse, MsgSubmitProposal, MsgSubmitProposalResponse, MsgVoteProposal, MsgVoteProposalResponse, MsgExecuteProposal, MsgExecuteProposalResponse, MsgSubmitAnonymousProposal, MsgSubmitAnonymousProposalResponse, MsgAnonymousVoteProposal, MsgAnonymousVoteProposalResponse, MsgCreateCategory, MsgCreateCategoryResponse, MsgDeleteCategory, MsgDeleteCategoryResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgSpendFromCommons, MsgSpendFromCommonsResponse, MsgEmergencyCancelGovProposal, MsgEmergencyCancelGovProposalResponse, MsgCreatePolicyPermissions, MsgCreatePolicyPermissionsResponse, MsgUpdatePolicyPermissions, MsgUpdatePolicyPermissionsResponse, MsgDeletePolicyPermissions, MsgDeletePolicyPermissionsResponse, MsgRegisterGroup, MsgRegisterGroupResponse, MsgRenewGroup, MsgRenewGroupResponse, MsgUpdateGroupMembers, MsgUpdateGroupMembersResponse, MsgUpdateGroupConfig, MsgUpdateGroupConfigResponse, MsgForceUpgrade, MsgForceUpgradeResponse, MsgDeleteGroup, MsgDeleteGroupResponse, MsgVetoGroupProposals, MsgVetoGroupProposalsResponse, MsgSubmitProposal, MsgSubmitProposalResponse, MsgVoteProposal, MsgVoteProposalResponse, MsgExecuteProposal, MsgExecuteProposalResponse, MsgSubmitAnonymousProposal, MsgSubmitAnonymousProposalResponse, MsgAnonymousVoteProposal, MsgAnonymousVoteProposalResponse, MsgCreateCategory, MsgCreateCategoryResponse, MsgDeleteCategory, MsgDeleteCategoryResponse, MsgScheduleRecurringSpend, MsgScheduleRecurringSpendResponse, MsgCancelRecurringSpend, MsgCancelRecurringSpendResponse, MsgClaimRecurringSpend, MsgClaimRecurringSpendResponse, MsgDeclineRecurringSpend, MsgDeclineRecurringSpendResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
@@ -55,6 +55,30 @@ export interface Msg {
    */
   createCategory(request: MsgCreateCategory): Promise<MsgCreateCategoryResponse>;
   deleteCategory(request: MsgDeleteCategory): Promise<MsgDeleteCategoryResponse>;
+  /**
+   * ScheduleRecurringSpend schedules a council-approved recurring
+   * disbursement. The signer must be the council policy address (so it is
+   * wrapped in a MsgSubmitProposal).
+   */
+  scheduleRecurringSpend(request: MsgScheduleRecurringSpend): Promise<MsgScheduleRecurringSpendResponse>;
+  /**
+   * CancelRecurringSpend cancels an active recurring spend schedule. The
+   * signer must be the same council policy address that scheduled it,
+   * requiring a council proposal.
+   */
+  cancelRecurringSpend(request: MsgCancelRecurringSpend): Promise<MsgCancelRecurringSpendResponse>;
+  /**
+   * ClaimRecurringSpend disburses one period of an active recurring
+   * spend. The signer must be the recipient. Each claim advances the
+   * schedule's logical clock by exactly one period.
+   */
+  claimRecurringSpend(request: MsgClaimRecurringSpend): Promise<MsgClaimRecurringSpendResponse>;
+  /**
+   * DeclineRecurringSpend lets the recipient unilaterally opt out of
+   * future claims on a schedule (graceful exit when leaving a role). The
+   * signer must be the recipient.
+   */
+  declineRecurringSpend(request: MsgDeclineRecurringSpend): Promise<MsgDeclineRecurringSpendResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -184,6 +208,38 @@ export class MsgClientImpl implements Msg {
     const data = MsgDeleteCategory.encode(request).finish();
     const promise = this.rpc.request("sparkdream.commons.v1.Msg", "DeleteCategory", data);
     return promise.then(data => MsgDeleteCategoryResponse.decode(new BinaryReader(data)));
+  };
+  /* ScheduleRecurringSpend schedules a council-approved recurring
+   disbursement. The signer must be the council policy address (so it is
+   wrapped in a MsgSubmitProposal). */
+  scheduleRecurringSpend = async (request: MsgScheduleRecurringSpend): Promise<MsgScheduleRecurringSpendResponse> => {
+    const data = MsgScheduleRecurringSpend.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Msg", "ScheduleRecurringSpend", data);
+    return promise.then(data => MsgScheduleRecurringSpendResponse.decode(new BinaryReader(data)));
+  };
+  /* CancelRecurringSpend cancels an active recurring spend schedule. The
+   signer must be the same council policy address that scheduled it,
+   requiring a council proposal. */
+  cancelRecurringSpend = async (request: MsgCancelRecurringSpend): Promise<MsgCancelRecurringSpendResponse> => {
+    const data = MsgCancelRecurringSpend.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Msg", "CancelRecurringSpend", data);
+    return promise.then(data => MsgCancelRecurringSpendResponse.decode(new BinaryReader(data)));
+  };
+  /* ClaimRecurringSpend disburses one period of an active recurring
+   spend. The signer must be the recipient. Each claim advances the
+   schedule's logical clock by exactly one period. */
+  claimRecurringSpend = async (request: MsgClaimRecurringSpend): Promise<MsgClaimRecurringSpendResponse> => {
+    const data = MsgClaimRecurringSpend.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Msg", "ClaimRecurringSpend", data);
+    return promise.then(data => MsgClaimRecurringSpendResponse.decode(new BinaryReader(data)));
+  };
+  /* DeclineRecurringSpend lets the recipient unilaterally opt out of
+   future claims on a schedule (graceful exit when leaving a role). The
+   signer must be the recipient. */
+  declineRecurringSpend = async (request: MsgDeclineRecurringSpend): Promise<MsgDeclineRecurringSpendResponse> => {
+    const data = MsgDeclineRecurringSpend.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Msg", "DeclineRecurringSpend", data);
+    return promise.then(data => MsgDeclineRecurringSpendResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

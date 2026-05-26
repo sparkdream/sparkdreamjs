@@ -4,6 +4,7 @@ import { Params, ParamsAmino } from "./params";
 import { PolicyPermissions, PolicyPermissionsAmino } from "./policy_permissions";
 import { DecisionPolicy, DecisionPolicyAmino, Group, GroupAmino, Member, MemberAmino, Proposal, ProposalAmino, Vote, VoteAmino, TallyResult, TallyResultAmino } from "./group";
 import { Category, CategoryAmino } from "./category";
+import { RecurringSpend, RecurringSpendAmino } from "./recurring_spend";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -747,6 +748,118 @@ export interface QueryAllCategoryResponseAmino {
 export interface QueryAllCategoryResponseAminoMsg {
   type: "/sparkdream.commons.v1.QueryAllCategoryResponse";
   value: QueryAllCategoryResponseAmino;
+}
+/**
+ * QueryGetRecurringSpendRequest fetches a single schedule by id.
+ * @name QueryGetRecurringSpendRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetRecurringSpendRequest
+ */
+export interface QueryGetRecurringSpendRequest {
+  id: bigint;
+}
+export interface QueryGetRecurringSpendRequestProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryGetRecurringSpendRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryGetRecurringSpendRequest fetches a single schedule by id.
+ * @name QueryGetRecurringSpendRequestAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetRecurringSpendRequest
+ */
+export interface QueryGetRecurringSpendRequestAmino {
+  id?: string;
+}
+export interface QueryGetRecurringSpendRequestAminoMsg {
+  type: "/sparkdream.commons.v1.QueryGetRecurringSpendRequest";
+  value: QueryGetRecurringSpendRequestAmino;
+}
+/**
+ * QueryGetRecurringSpendResponse returns the schedule.
+ * @name QueryGetRecurringSpendResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetRecurringSpendResponse
+ */
+export interface QueryGetRecurringSpendResponse {
+  recurringSpend: RecurringSpend;
+}
+export interface QueryGetRecurringSpendResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryGetRecurringSpendResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryGetRecurringSpendResponse returns the schedule.
+ * @name QueryGetRecurringSpendResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetRecurringSpendResponse
+ */
+export interface QueryGetRecurringSpendResponseAmino {
+  recurring_spend?: RecurringSpendAmino;
+}
+export interface QueryGetRecurringSpendResponseAminoMsg {
+  type: "/sparkdream.commons.v1.QueryGetRecurringSpendResponse";
+  value: QueryGetRecurringSpendResponseAmino;
+}
+/**
+ * QueryListRecurringSpendsRequest lists schedules. authority and recipient
+ * are optional filters; if both are empty, every schedule is returned.
+ * @name QueryListRecurringSpendsRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryListRecurringSpendsRequest
+ */
+export interface QueryListRecurringSpendsRequest {
+  authority: string;
+  recipient: string;
+  pagination?: PageRequest;
+}
+export interface QueryListRecurringSpendsRequestProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryListRecurringSpendsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryListRecurringSpendsRequest lists schedules. authority and recipient
+ * are optional filters; if both are empty, every schedule is returned.
+ * @name QueryListRecurringSpendsRequestAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryListRecurringSpendsRequest
+ */
+export interface QueryListRecurringSpendsRequestAmino {
+  authority?: string;
+  recipient?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryListRecurringSpendsRequestAminoMsg {
+  type: "/sparkdream.commons.v1.QueryListRecurringSpendsRequest";
+  value: QueryListRecurringSpendsRequestAmino;
+}
+/**
+ * QueryListRecurringSpendsResponse returns the matching schedules.
+ * @name QueryListRecurringSpendsResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryListRecurringSpendsResponse
+ */
+export interface QueryListRecurringSpendsResponse {
+  recurringSpends: RecurringSpend[];
+  pagination?: PageResponse;
+}
+export interface QueryListRecurringSpendsResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryListRecurringSpendsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryListRecurringSpendsResponse returns the matching schedules.
+ * @name QueryListRecurringSpendsResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryListRecurringSpendsResponse
+ */
+export interface QueryListRecurringSpendsResponseAmino {
+  recurring_spends?: RecurringSpendAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryListRecurringSpendsResponseAminoMsg {
+  type: "/sparkdream.commons.v1.QueryListRecurringSpendsResponse";
+  value: QueryListRecurringSpendsResponseAmino;
 }
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
@@ -2737,6 +2850,321 @@ export const QueryAllCategoryResponse = {
     return {
       typeUrl: "/sparkdream.commons.v1.QueryAllCategoryResponse",
       value: QueryAllCategoryResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetRecurringSpendRequest(): QueryGetRecurringSpendRequest {
+  return {
+    id: BigInt(0)
+  };
+}
+/**
+ * QueryGetRecurringSpendRequest fetches a single schedule by id.
+ * @name QueryGetRecurringSpendRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetRecurringSpendRequest
+ */
+export const QueryGetRecurringSpendRequest = {
+  typeUrl: "/sparkdream.commons.v1.QueryGetRecurringSpendRequest",
+  encode(message: QueryGetRecurringSpendRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.id !== BigInt(0)) {
+      writer.uint32(8).uint64(message.id);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetRecurringSpendRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetRecurringSpendRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetRecurringSpendRequest>): QueryGetRecurringSpendRequest {
+    const message = createBaseQueryGetRecurringSpendRequest();
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryGetRecurringSpendRequestAmino): QueryGetRecurringSpendRequest {
+    const message = createBaseQueryGetRecurringSpendRequest();
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetRecurringSpendRequest): QueryGetRecurringSpendRequestAmino {
+    const obj: any = {};
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetRecurringSpendRequestAminoMsg): QueryGetRecurringSpendRequest {
+    return QueryGetRecurringSpendRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetRecurringSpendRequestProtoMsg): QueryGetRecurringSpendRequest {
+    return QueryGetRecurringSpendRequest.decode(message.value);
+  },
+  toProto(message: QueryGetRecurringSpendRequest): Uint8Array {
+    return QueryGetRecurringSpendRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetRecurringSpendRequest): QueryGetRecurringSpendRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryGetRecurringSpendRequest",
+      value: QueryGetRecurringSpendRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetRecurringSpendResponse(): QueryGetRecurringSpendResponse {
+  return {
+    recurringSpend: RecurringSpend.fromPartial({})
+  };
+}
+/**
+ * QueryGetRecurringSpendResponse returns the schedule.
+ * @name QueryGetRecurringSpendResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetRecurringSpendResponse
+ */
+export const QueryGetRecurringSpendResponse = {
+  typeUrl: "/sparkdream.commons.v1.QueryGetRecurringSpendResponse",
+  encode(message: QueryGetRecurringSpendResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.recurringSpend !== undefined) {
+      RecurringSpend.encode(message.recurringSpend, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetRecurringSpendResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetRecurringSpendResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.recurringSpend = RecurringSpend.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetRecurringSpendResponse>): QueryGetRecurringSpendResponse {
+    const message = createBaseQueryGetRecurringSpendResponse();
+    message.recurringSpend = object.recurringSpend !== undefined && object.recurringSpend !== null ? RecurringSpend.fromPartial(object.recurringSpend) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetRecurringSpendResponseAmino): QueryGetRecurringSpendResponse {
+    const message = createBaseQueryGetRecurringSpendResponse();
+    if (object.recurring_spend !== undefined && object.recurring_spend !== null) {
+      message.recurringSpend = RecurringSpend.fromAmino(object.recurring_spend);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetRecurringSpendResponse): QueryGetRecurringSpendResponseAmino {
+    const obj: any = {};
+    obj.recurring_spend = message.recurringSpend ? RecurringSpend.toAmino(message.recurringSpend) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetRecurringSpendResponseAminoMsg): QueryGetRecurringSpendResponse {
+    return QueryGetRecurringSpendResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetRecurringSpendResponseProtoMsg): QueryGetRecurringSpendResponse {
+    return QueryGetRecurringSpendResponse.decode(message.value);
+  },
+  toProto(message: QueryGetRecurringSpendResponse): Uint8Array {
+    return QueryGetRecurringSpendResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetRecurringSpendResponse): QueryGetRecurringSpendResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryGetRecurringSpendResponse",
+      value: QueryGetRecurringSpendResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryListRecurringSpendsRequest(): QueryListRecurringSpendsRequest {
+  return {
+    authority: "",
+    recipient: "",
+    pagination: undefined
+  };
+}
+/**
+ * QueryListRecurringSpendsRequest lists schedules. authority and recipient
+ * are optional filters; if both are empty, every schedule is returned.
+ * @name QueryListRecurringSpendsRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryListRecurringSpendsRequest
+ */
+export const QueryListRecurringSpendsRequest = {
+  typeUrl: "/sparkdream.commons.v1.QueryListRecurringSpendsRequest",
+  encode(message: QueryListRecurringSpendsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.recipient !== "") {
+      writer.uint32(18).string(message.recipient);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryListRecurringSpendsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryListRecurringSpendsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+        case 2:
+          message.recipient = reader.string();
+          break;
+        case 3:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryListRecurringSpendsRequest>): QueryListRecurringSpendsRequest {
+    const message = createBaseQueryListRecurringSpendsRequest();
+    message.authority = object.authority ?? "";
+    message.recipient = object.recipient ?? "";
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryListRecurringSpendsRequestAmino): QueryListRecurringSpendsRequest {
+    const message = createBaseQueryListRecurringSpendsRequest();
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
+    if (object.recipient !== undefined && object.recipient !== null) {
+      message.recipient = object.recipient;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryListRecurringSpendsRequest): QueryListRecurringSpendsRequestAmino {
+    const obj: any = {};
+    obj.authority = message.authority === "" ? undefined : message.authority;
+    obj.recipient = message.recipient === "" ? undefined : message.recipient;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryListRecurringSpendsRequestAminoMsg): QueryListRecurringSpendsRequest {
+    return QueryListRecurringSpendsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryListRecurringSpendsRequestProtoMsg): QueryListRecurringSpendsRequest {
+    return QueryListRecurringSpendsRequest.decode(message.value);
+  },
+  toProto(message: QueryListRecurringSpendsRequest): Uint8Array {
+    return QueryListRecurringSpendsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryListRecurringSpendsRequest): QueryListRecurringSpendsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryListRecurringSpendsRequest",
+      value: QueryListRecurringSpendsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryListRecurringSpendsResponse(): QueryListRecurringSpendsResponse {
+  return {
+    recurringSpends: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryListRecurringSpendsResponse returns the matching schedules.
+ * @name QueryListRecurringSpendsResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryListRecurringSpendsResponse
+ */
+export const QueryListRecurringSpendsResponse = {
+  typeUrl: "/sparkdream.commons.v1.QueryListRecurringSpendsResponse",
+  encode(message: QueryListRecurringSpendsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.recurringSpends) {
+      RecurringSpend.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryListRecurringSpendsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryListRecurringSpendsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.recurringSpends.push(RecurringSpend.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryListRecurringSpendsResponse>): QueryListRecurringSpendsResponse {
+    const message = createBaseQueryListRecurringSpendsResponse();
+    message.recurringSpends = object.recurringSpends?.map(e => RecurringSpend.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryListRecurringSpendsResponseAmino): QueryListRecurringSpendsResponse {
+    const message = createBaseQueryListRecurringSpendsResponse();
+    message.recurringSpends = object.recurring_spends?.map(e => RecurringSpend.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryListRecurringSpendsResponse): QueryListRecurringSpendsResponseAmino {
+    const obj: any = {};
+    if (message.recurringSpends) {
+      obj.recurring_spends = message.recurringSpends.map(e => e ? RecurringSpend.toAmino(e) : undefined);
+    } else {
+      obj.recurring_spends = message.recurringSpends;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryListRecurringSpendsResponseAminoMsg): QueryListRecurringSpendsResponse {
+    return QueryListRecurringSpendsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryListRecurringSpendsResponseProtoMsg): QueryListRecurringSpendsResponse {
+    return QueryListRecurringSpendsResponse.decode(message.value);
+  },
+  toProto(message: QueryListRecurringSpendsResponse): Uint8Array {
+    return QueryListRecurringSpendsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryListRecurringSpendsResponse): QueryListRecurringSpendsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryListRecurringSpendsResponse",
+      value: QueryListRecurringSpendsResponse.encode(message).finish()
     };
   }
 };

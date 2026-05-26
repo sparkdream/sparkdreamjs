@@ -2,7 +2,6 @@ syntax = "proto3";
 package sparkdream.federation.v1;
 
 import "amino/amino.proto";
-import "cosmos/base/v1beta1/coin.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
@@ -14,17 +13,17 @@ message Params {
   option (amino.name) = "sparkdream/x/federation/Params";
   option (gogoproto.equal) = true;
 
-  // Bridge operator requirements
-  cosmos.base.v1beta1.Coin min_bridge_stake = 1 [(gogoproto.nullable) = false];
+  // Bridge operator requirements. Bond minimums, revocation lifecycle,
+  // and unbonding period live on x/service ServiceTypeConfig per
+  // service_type (federation-bridge-activitypub / federation-bridge-atproto).
+  //
+  // max_bridges_per_peer is intentionally KEPT as a kill-switch (Decision 6):
+  // default 1000 leaves it effectively no-op against any realistic legit
+  // use. The real defenses against runaway registration are the
+  // service.MinBond economic gate, content-hash deduplication, and per-
+  // peer rate limits. Gov may dial it down without a chain upgrade if
+  // some unknown-unknown materializes. It is NOT a normal policy lever.
   uint64 max_bridges_per_peer = 2;
-  google.protobuf.Duration bridge_revocation_cooldown = 3 [
-    (gogoproto.nullable) = false,
-    (gogoproto.stdduration) = true
-  ];
-  google.protobuf.Duration bridge_unbonding_period = 4 [
-    (gogoproto.nullable) = false,
-    (gogoproto.stdduration) = true
-  ];
 
   // Content types
   repeated string known_content_types = 5;
@@ -109,7 +108,15 @@ message Params {
     (gogoproto.nullable) = false,
     (gogoproto.stdduration) = true
   ];
-  cosmos.base.v1beta1.Coin challenge_fee = 30 [(gogoproto.nullable) = false];
+  // challenge_fee_amount is the per-challenge fee escrowed by a verifier
+  // challenger, in bond-denom micro-units. Denom is resolved at runtime
+  // from x/identity (see x-identity-spec.md). Escalating multiplier in
+  // msg_server_challenge_verification.go applies to this amount.
+  string challenge_fee_amount = 30 [
+    (cosmos_proto.scalar) = "cosmos.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
   google.protobuf.Duration challenge_jury_deadline = 31 [
     (gogoproto.nullable) = false,
     (gogoproto.stdduration) = true
@@ -153,8 +160,26 @@ message Params {
     (gogoproto.nullable) = false,
     (gogoproto.stdduration) = true
   ];
-  cosmos.base.v1beta1.Coin escalation_fee = 43 [(gogoproto.nullable) = false];
+  // escalation_fee_amount is the fee escrowed by a party escalating a
+  // challenge to a system report, in bond-denom micro-units. Denom is
+  // resolved at runtime from x/identity (see x-identity-spec.md).
+  string escalation_fee_amount = 43 [
+    (cosmos_proto.scalar) = "cosmos.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
   google.protobuf.Duration challenge_cooldown = 44 [
+    (gogoproto.nullable) = false,
+    (gogoproto.stdduration) = true
+  ];
+
+  // verifier_unbond_cooldown is the period a verifier's bond stays locked
+  // and slashable after MsgUnbondRole. During the cooldown the BondedRole's
+  // status is UNBONDING and federation action handlers refuse authority.
+  // Propagated to x/rep BondedRoleConfig via SyncVerifierBondedRoleConfig.
+  // Mirrors bridge_unbonding_period — verifier and bridge operator both
+  // face a 14-day slashable window after exit-of-role intent.
+  google.protobuf.Duration verifier_unbond_cooldown = 45 [
     (gogoproto.nullable) = false,
     (gogoproto.stdduration) = true
   ];

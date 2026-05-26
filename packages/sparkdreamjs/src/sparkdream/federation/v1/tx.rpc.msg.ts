@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgRegisterPeer, MsgRegisterPeerResponse, MsgRemovePeer, MsgRemovePeerResponse, MsgSuspendPeer, MsgSuspendPeerResponse, MsgResumePeer, MsgResumePeerResponse, MsgUpdatePeerPolicy, MsgUpdatePeerPolicyResponse, MsgRegisterBridge, MsgRegisterBridgeResponse, MsgRevokeBridge, MsgRevokeBridgeResponse, MsgSlashBridge, MsgSlashBridgeResponse, MsgUpdateBridge, MsgUpdateBridgeResponse, MsgUnbondBridge, MsgUnbondBridgeResponse, MsgTopUpBridgeStake, MsgTopUpBridgeStakeResponse, MsgSubmitFederatedContent, MsgSubmitFederatedContentResponse, MsgFederateContent, MsgFederateContentResponse, MsgAttestOutbound, MsgAttestOutboundResponse, MsgModerateContent, MsgModerateContentResponse, MsgLinkIdentity, MsgLinkIdentityResponse, MsgUnlinkIdentity, MsgUnlinkIdentityResponse, MsgConfirmIdentityLink, MsgConfirmIdentityLinkResponse, MsgRequestReputationAttestation, MsgRequestReputationAttestationResponse, MsgVerifyContent, MsgVerifyContentResponse, MsgChallengeVerification, MsgChallengeVerificationResponse, MsgSubmitArbiterHash, MsgSubmitArbiterHashResponse, MsgEscalateChallenge, MsgEscalateChallengeResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgRegisterPeer, MsgRegisterPeerResponse, MsgRemovePeer, MsgRemovePeerResponse, MsgSuspendPeer, MsgSuspendPeerResponse, MsgResumePeer, MsgResumePeerResponse, MsgUpdatePeerPolicy, MsgUpdatePeerPolicyResponse, MsgRegisterBridge, MsgRegisterBridgeResponse, MsgUpdateBridge, MsgUpdateBridgeResponse, MsgSubmitFederatedContent, MsgSubmitFederatedContentResponse, MsgFederateContent, MsgFederateContentResponse, MsgAttestOutbound, MsgAttestOutboundResponse, MsgModerateContent, MsgModerateContentResponse, MsgLinkIdentity, MsgLinkIdentityResponse, MsgUnlinkIdentity, MsgUnlinkIdentityResponse, MsgConfirmIdentityLink, MsgConfirmIdentityLinkResponse, MsgRequestReputationAttestation, MsgRequestReputationAttestationResponse, MsgVerifyContent, MsgVerifyContentResponse, MsgChallengeVerification, MsgChallengeVerificationResponse, MsgSubmitArbiterHash, MsgSubmitArbiterHashResponse, MsgEscalateChallenge, MsgEscalateChallengeResponse, MsgResolveEscalatedChallenge, MsgResolveEscalatedChallengeResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgUpdatePeerController, MsgUpdatePeerControllerResponse, MsgResyncBridgeCount, MsgResyncBridgeCountResponse, MsgPruneOrphanBindings, MsgPruneOrphanBindingsResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   updateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
@@ -11,11 +11,16 @@ export interface Msg {
   resumePeer(request: MsgResumePeer): Promise<MsgResumePeerResponse>;
   updatePeerPolicy(request: MsgUpdatePeerPolicy): Promise<MsgUpdatePeerPolicyResponse>;
   registerBridge(request: MsgRegisterBridge): Promise<MsgRegisterBridgeResponse>;
-  revokeBridge(request: MsgRevokeBridge): Promise<MsgRevokeBridgeResponse>;
-  slashBridge(request: MsgSlashBridge): Promise<MsgSlashBridgeResponse>;
   updateBridge(request: MsgUpdateBridge): Promise<MsgUpdateBridgeResponse>;
-  unbondBridge(request: MsgUnbondBridge): Promise<MsgUnbondBridgeResponse>;
-  topUpBridgeStake(request: MsgTopUpBridgeStake): Promise<MsgTopUpBridgeStakeResponse>;
+  /**
+   * RevokeBridge, SlashBridge, UnbondBridge, TopUpBridgeStake were removed
+   * in Phase 4 of the federation→service migration:
+   *   - slashing  → x/service MsgReportOperator → MsgResolveReport
+   *   - unbond    → x/service MsgUnbondOperator (operator-signed directly)
+   *   - top-up    → x/service MsgTopUpBond (operator-signed directly)
+   *   - revoke    → covered by AfterOperatorDissolved hook via T1_SLASH
+   *                 with dissolve=true
+   */
   submitFederatedContent(request: MsgSubmitFederatedContent): Promise<MsgSubmitFederatedContentResponse>;
   federateContent(request: MsgFederateContent): Promise<MsgFederateContentResponse>;
   attestOutbound(request: MsgAttestOutbound): Promise<MsgAttestOutboundResponse>;
@@ -33,7 +38,11 @@ export interface Msg {
   challengeVerification(request: MsgChallengeVerification): Promise<MsgChallengeVerificationResponse>;
   submitArbiterHash(request: MsgSubmitArbiterHash): Promise<MsgSubmitArbiterHashResponse>;
   escalateChallenge(request: MsgEscalateChallenge): Promise<MsgEscalateChallengeResponse>;
+  resolveEscalatedChallenge(request: MsgResolveEscalatedChallenge): Promise<MsgResolveEscalatedChallengeResponse>;
   updateOperationalParams(request: MsgUpdateOperationalParams): Promise<MsgUpdateOperationalParamsResponse>;
+  updatePeerController(request: MsgUpdatePeerController): Promise<MsgUpdatePeerControllerResponse>;
+  resyncBridgeCount(request: MsgResyncBridgeCount): Promise<MsgResyncBridgeCountResponse>;
+  pruneOrphanBindings(request: MsgPruneOrphanBindings): Promise<MsgPruneOrphanBindingsResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -82,37 +91,19 @@ export class MsgClientImpl implements Msg {
     const promise = this.rpc.request("sparkdream.federation.v1.Msg", "RegisterBridge", data);
     return promise.then(data => MsgRegisterBridgeResponse.decode(new BinaryReader(data)));
   };
-  /* RevokeBridge */
-  revokeBridge = async (request: MsgRevokeBridge): Promise<MsgRevokeBridgeResponse> => {
-    const data = MsgRevokeBridge.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.federation.v1.Msg", "RevokeBridge", data);
-    return promise.then(data => MsgRevokeBridgeResponse.decode(new BinaryReader(data)));
-  };
-  /* SlashBridge */
-  slashBridge = async (request: MsgSlashBridge): Promise<MsgSlashBridgeResponse> => {
-    const data = MsgSlashBridge.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.federation.v1.Msg", "SlashBridge", data);
-    return promise.then(data => MsgSlashBridgeResponse.decode(new BinaryReader(data)));
-  };
   /* UpdateBridge */
   updateBridge = async (request: MsgUpdateBridge): Promise<MsgUpdateBridgeResponse> => {
     const data = MsgUpdateBridge.encode(request).finish();
     const promise = this.rpc.request("sparkdream.federation.v1.Msg", "UpdateBridge", data);
     return promise.then(data => MsgUpdateBridgeResponse.decode(new BinaryReader(data)));
   };
-  /* UnbondBridge */
-  unbondBridge = async (request: MsgUnbondBridge): Promise<MsgUnbondBridgeResponse> => {
-    const data = MsgUnbondBridge.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.federation.v1.Msg", "UnbondBridge", data);
-    return promise.then(data => MsgUnbondBridgeResponse.decode(new BinaryReader(data)));
-  };
-  /* TopUpBridgeStake */
-  topUpBridgeStake = async (request: MsgTopUpBridgeStake): Promise<MsgTopUpBridgeStakeResponse> => {
-    const data = MsgTopUpBridgeStake.encode(request).finish();
-    const promise = this.rpc.request("sparkdream.federation.v1.Msg", "TopUpBridgeStake", data);
-    return promise.then(data => MsgTopUpBridgeStakeResponse.decode(new BinaryReader(data)));
-  };
-  /* SubmitFederatedContent */
+  /* RevokeBridge, SlashBridge, UnbondBridge, TopUpBridgeStake were removed
+   in Phase 4 of the federation→service migration:
+     - slashing  → x/service MsgReportOperator → MsgResolveReport
+     - unbond    → x/service MsgUnbondOperator (operator-signed directly)
+     - top-up    → x/service MsgTopUpBond (operator-signed directly)
+     - revoke    → covered by AfterOperatorDissolved hook via T1_SLASH
+                   with dissolve=true */
   submitFederatedContent = async (request: MsgSubmitFederatedContent): Promise<MsgSubmitFederatedContentResponse> => {
     const data = MsgSubmitFederatedContent.encode(request).finish();
     const promise = this.rpc.request("sparkdream.federation.v1.Msg", "SubmitFederatedContent", data);
@@ -186,11 +177,35 @@ export class MsgClientImpl implements Msg {
     const promise = this.rpc.request("sparkdream.federation.v1.Msg", "EscalateChallenge", data);
     return promise.then(data => MsgEscalateChallengeResponse.decode(new BinaryReader(data)));
   };
+  /* ResolveEscalatedChallenge */
+  resolveEscalatedChallenge = async (request: MsgResolveEscalatedChallenge): Promise<MsgResolveEscalatedChallengeResponse> => {
+    const data = MsgResolveEscalatedChallenge.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.federation.v1.Msg", "ResolveEscalatedChallenge", data);
+    return promise.then(data => MsgResolveEscalatedChallengeResponse.decode(new BinaryReader(data)));
+  };
   /* UpdateOperationalParams */
   updateOperationalParams = async (request: MsgUpdateOperationalParams): Promise<MsgUpdateOperationalParamsResponse> => {
     const data = MsgUpdateOperationalParams.encode(request).finish();
     const promise = this.rpc.request("sparkdream.federation.v1.Msg", "UpdateOperationalParams", data);
     return promise.then(data => MsgUpdateOperationalParamsResponse.decode(new BinaryReader(data)));
+  };
+  /* UpdatePeerController */
+  updatePeerController = async (request: MsgUpdatePeerController): Promise<MsgUpdatePeerControllerResponse> => {
+    const data = MsgUpdatePeerController.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.federation.v1.Msg", "UpdatePeerController", data);
+    return promise.then(data => MsgUpdatePeerControllerResponse.decode(new BinaryReader(data)));
+  };
+  /* ResyncBridgeCount */
+  resyncBridgeCount = async (request: MsgResyncBridgeCount): Promise<MsgResyncBridgeCountResponse> => {
+    const data = MsgResyncBridgeCount.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.federation.v1.Msg", "ResyncBridgeCount", data);
+    return promise.then(data => MsgResyncBridgeCountResponse.decode(new BinaryReader(data)));
+  };
+  /* PruneOrphanBindings */
+  pruneOrphanBindings = async (request: MsgPruneOrphanBindings): Promise<MsgPruneOrphanBindingsResponse> => {
+    const data = MsgPruneOrphanBindings.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.federation.v1.Msg", "PruneOrphanBindings", data);
+    return promise.then(data => MsgPruneOrphanBindingsResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

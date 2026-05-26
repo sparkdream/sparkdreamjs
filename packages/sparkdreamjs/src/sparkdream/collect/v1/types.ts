@@ -929,6 +929,7 @@ export interface CollectOperationalParams {
   curatorDemotionCooldown: bigint;
   curatorDemotionThreshold: string;
   curatorOverturnDemotionStreak: bigint;
+  curatorUnbondCooldown: bigint;
 }
 export interface CollectOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.collect.v1.CollectOperationalParams";
@@ -993,6 +994,7 @@ export interface CollectOperationalParamsAmino {
   curator_demotion_cooldown?: string;
   curator_demotion_threshold?: string;
   curator_overturn_demotion_streak?: string;
+  curator_unbond_cooldown?: string;
 }
 export interface CollectOperationalParamsAminoMsg {
   type: "/sparkdream.collect.v1.CollectOperationalParams";
@@ -3115,7 +3117,8 @@ function createBaseCollectOperationalParams(): CollectOperationalParams {
     maxPinsPerDay: 0,
     curatorDemotionCooldown: BigInt(0),
     curatorDemotionThreshold: "",
-    curatorOverturnDemotionStreak: BigInt(0)
+    curatorOverturnDemotionStreak: BigInt(0),
+    curatorUnbondCooldown: BigInt(0)
   };
 }
 /**
@@ -3256,6 +3259,9 @@ export const CollectOperationalParams = {
     if (message.curatorOverturnDemotionStreak !== BigInt(0)) {
       writer.uint32(376).uint64(message.curatorOverturnDemotionStreak);
     }
+    if (message.curatorUnbondCooldown !== BigInt(0)) {
+      writer.uint32(384).int64(message.curatorUnbondCooldown);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): CollectOperationalParams {
@@ -3394,6 +3400,9 @@ export const CollectOperationalParams = {
         case 47:
           message.curatorOverturnDemotionStreak = reader.uint64();
           break;
+        case 48:
+          message.curatorUnbondCooldown = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3446,6 +3455,7 @@ export const CollectOperationalParams = {
     message.curatorDemotionCooldown = object.curatorDemotionCooldown !== undefined && object.curatorDemotionCooldown !== null ? BigInt(object.curatorDemotionCooldown.toString()) : BigInt(0);
     message.curatorDemotionThreshold = object.curatorDemotionThreshold ?? "";
     message.curatorOverturnDemotionStreak = object.curatorOverturnDemotionStreak !== undefined && object.curatorOverturnDemotionStreak !== null ? BigInt(object.curatorOverturnDemotionStreak.toString()) : BigInt(0);
+    message.curatorUnbondCooldown = object.curatorUnbondCooldown !== undefined && object.curatorUnbondCooldown !== null ? BigInt(object.curatorUnbondCooldown.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: CollectOperationalParamsAmino): CollectOperationalParams {
@@ -3579,6 +3589,9 @@ export const CollectOperationalParams = {
     if (object.curator_overturn_demotion_streak !== undefined && object.curator_overturn_demotion_streak !== null) {
       message.curatorOverturnDemotionStreak = BigInt(object.curator_overturn_demotion_streak);
     }
+    if (object.curator_unbond_cooldown !== undefined && object.curator_unbond_cooldown !== null) {
+      message.curatorUnbondCooldown = BigInt(object.curator_unbond_cooldown);
+    }
     return message;
   },
   toAmino(message: CollectOperationalParams): CollectOperationalParamsAmino {
@@ -3626,6 +3639,7 @@ export const CollectOperationalParams = {
     obj.curator_demotion_cooldown = message.curatorDemotionCooldown !== BigInt(0) ? message.curatorDemotionCooldown?.toString() : undefined;
     obj.curator_demotion_threshold = message.curatorDemotionThreshold === "" ? undefined : message.curatorDemotionThreshold;
     obj.curator_overturn_demotion_streak = message.curatorOverturnDemotionStreak !== BigInt(0) ? message.curatorOverturnDemotionStreak?.toString() : undefined;
+    obj.curator_unbond_cooldown = message.curatorUnbondCooldown !== BigInt(0) ? message.curatorUnbondCooldown?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: CollectOperationalParamsAminoMsg): CollectOperationalParams {

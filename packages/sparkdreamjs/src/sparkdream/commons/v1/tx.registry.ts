@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { TelescopeGeneratedType } from "../../../types";
 import { Registry } from "@cosmjs/proto-signing";
-import { MsgUpdateParams, MsgSpendFromCommons, MsgEmergencyCancelGovProposal, MsgCreatePolicyPermissions, MsgUpdatePolicyPermissions, MsgDeletePolicyPermissions, MsgRegisterGroup, MsgRenewGroup, MsgUpdateGroupMembers, MsgUpdateGroupConfig, MsgForceUpgrade, MsgDeleteGroup, MsgVetoGroupProposals, MsgSubmitProposal, MsgVoteProposal, MsgExecuteProposal, MsgSubmitAnonymousProposal, MsgAnonymousVoteProposal, MsgCreateCategory, MsgDeleteCategory } from "./tx";
-export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.commons.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.commons.v1.MsgSpendFromCommons", MsgSpendFromCommons], ["/sparkdream.commons.v1.MsgEmergencyCancelGovProposal", MsgEmergencyCancelGovProposal], ["/sparkdream.commons.v1.MsgCreatePolicyPermissions", MsgCreatePolicyPermissions], ["/sparkdream.commons.v1.MsgUpdatePolicyPermissions", MsgUpdatePolicyPermissions], ["/sparkdream.commons.v1.MsgDeletePolicyPermissions", MsgDeletePolicyPermissions], ["/sparkdream.commons.v1.MsgRegisterGroup", MsgRegisterGroup], ["/sparkdream.commons.v1.MsgRenewGroup", MsgRenewGroup], ["/sparkdream.commons.v1.MsgUpdateGroupMembers", MsgUpdateGroupMembers], ["/sparkdream.commons.v1.MsgUpdateGroupConfig", MsgUpdateGroupConfig], ["/sparkdream.commons.v1.MsgForceUpgrade", MsgForceUpgrade], ["/sparkdream.commons.v1.MsgDeleteGroup", MsgDeleteGroup], ["/sparkdream.commons.v1.MsgVetoGroupProposals", MsgVetoGroupProposals], ["/sparkdream.commons.v1.MsgSubmitProposal", MsgSubmitProposal], ["/sparkdream.commons.v1.MsgVoteProposal", MsgVoteProposal], ["/sparkdream.commons.v1.MsgExecuteProposal", MsgExecuteProposal], ["/sparkdream.commons.v1.MsgSubmitAnonymousProposal", MsgSubmitAnonymousProposal], ["/sparkdream.commons.v1.MsgAnonymousVoteProposal", MsgAnonymousVoteProposal], ["/sparkdream.commons.v1.MsgCreateCategory", MsgCreateCategory], ["/sparkdream.commons.v1.MsgDeleteCategory", MsgDeleteCategory]];
+import { MsgUpdateParams, MsgSpendFromCommons, MsgEmergencyCancelGovProposal, MsgCreatePolicyPermissions, MsgUpdatePolicyPermissions, MsgDeletePolicyPermissions, MsgRegisterGroup, MsgRenewGroup, MsgUpdateGroupMembers, MsgUpdateGroupConfig, MsgForceUpgrade, MsgDeleteGroup, MsgVetoGroupProposals, MsgSubmitProposal, MsgVoteProposal, MsgExecuteProposal, MsgSubmitAnonymousProposal, MsgAnonymousVoteProposal, MsgCreateCategory, MsgDeleteCategory, MsgScheduleRecurringSpend, MsgCancelRecurringSpend, MsgClaimRecurringSpend, MsgDeclineRecurringSpend } from "./tx";
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.commons.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.commons.v1.MsgSpendFromCommons", MsgSpendFromCommons], ["/sparkdream.commons.v1.MsgEmergencyCancelGovProposal", MsgEmergencyCancelGovProposal], ["/sparkdream.commons.v1.MsgCreatePolicyPermissions", MsgCreatePolicyPermissions], ["/sparkdream.commons.v1.MsgUpdatePolicyPermissions", MsgUpdatePolicyPermissions], ["/sparkdream.commons.v1.MsgDeletePolicyPermissions", MsgDeletePolicyPermissions], ["/sparkdream.commons.v1.MsgRegisterGroup", MsgRegisterGroup], ["/sparkdream.commons.v1.MsgRenewGroup", MsgRenewGroup], ["/sparkdream.commons.v1.MsgUpdateGroupMembers", MsgUpdateGroupMembers], ["/sparkdream.commons.v1.MsgUpdateGroupConfig", MsgUpdateGroupConfig], ["/sparkdream.commons.v1.MsgForceUpgrade", MsgForceUpgrade], ["/sparkdream.commons.v1.MsgDeleteGroup", MsgDeleteGroup], ["/sparkdream.commons.v1.MsgVetoGroupProposals", MsgVetoGroupProposals], ["/sparkdream.commons.v1.MsgSubmitProposal", MsgSubmitProposal], ["/sparkdream.commons.v1.MsgVoteProposal", MsgVoteProposal], ["/sparkdream.commons.v1.MsgExecuteProposal", MsgExecuteProposal], ["/sparkdream.commons.v1.MsgSubmitAnonymousProposal", MsgSubmitAnonymousProposal], ["/sparkdream.commons.v1.MsgAnonymousVoteProposal", MsgAnonymousVoteProposal], ["/sparkdream.commons.v1.MsgCreateCategory", MsgCreateCategory], ["/sparkdream.commons.v1.MsgDeleteCategory", MsgDeleteCategory], ["/sparkdream.commons.v1.MsgScheduleRecurringSpend", MsgScheduleRecurringSpend], ["/sparkdream.commons.v1.MsgCancelRecurringSpend", MsgCancelRecurringSpend], ["/sparkdream.commons.v1.MsgClaimRecurringSpend", MsgClaimRecurringSpend], ["/sparkdream.commons.v1.MsgDeclineRecurringSpend", MsgDeclineRecurringSpend]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -129,6 +129,30 @@ export const MessageComposer = {
         typeUrl: "/sparkdream.commons.v1.MsgDeleteCategory",
         value: MsgDeleteCategory.encode(value).finish()
       };
+    },
+    scheduleRecurringSpend(value: MsgScheduleRecurringSpend) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgScheduleRecurringSpend",
+        value: MsgScheduleRecurringSpend.encode(value).finish()
+      };
+    },
+    cancelRecurringSpend(value: MsgCancelRecurringSpend) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgCancelRecurringSpend",
+        value: MsgCancelRecurringSpend.encode(value).finish()
+      };
+    },
+    claimRecurringSpend(value: MsgClaimRecurringSpend) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgClaimRecurringSpend",
+        value: MsgClaimRecurringSpend.encode(value).finish()
+      };
+    },
+    declineRecurringSpend(value: MsgDeclineRecurringSpend) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgDeclineRecurringSpend",
+        value: MsgDeclineRecurringSpend.encode(value).finish()
+      };
     }
   },
   withTypeUrl: {
@@ -249,6 +273,30 @@ export const MessageComposer = {
     deleteCategory(value: MsgDeleteCategory) {
       return {
         typeUrl: "/sparkdream.commons.v1.MsgDeleteCategory",
+        value
+      };
+    },
+    scheduleRecurringSpend(value: MsgScheduleRecurringSpend) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgScheduleRecurringSpend",
+        value
+      };
+    },
+    cancelRecurringSpend(value: MsgCancelRecurringSpend) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgCancelRecurringSpend",
+        value
+      };
+    },
+    claimRecurringSpend(value: MsgClaimRecurringSpend) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgClaimRecurringSpend",
+        value
+      };
+    },
+    declineRecurringSpend(value: MsgDeclineRecurringSpend) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgDeclineRecurringSpend",
         value
       };
     }
@@ -372,6 +420,30 @@ export const MessageComposer = {
       return {
         typeUrl: "/sparkdream.commons.v1.MsgDeleteCategory",
         value: MsgDeleteCategory.fromPartial(value)
+      };
+    },
+    scheduleRecurringSpend(value: MsgScheduleRecurringSpend) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgScheduleRecurringSpend",
+        value: MsgScheduleRecurringSpend.fromPartial(value)
+      };
+    },
+    cancelRecurringSpend(value: MsgCancelRecurringSpend) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgCancelRecurringSpend",
+        value: MsgCancelRecurringSpend.fromPartial(value)
+      };
+    },
+    claimRecurringSpend(value: MsgClaimRecurringSpend) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgClaimRecurringSpend",
+        value: MsgClaimRecurringSpend.fromPartial(value)
+      };
+    },
+    declineRecurringSpend(value: MsgDeclineRecurringSpend) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgDeclineRecurringSpend",
+        value: MsgDeclineRecurringSpend.fromPartial(value)
       };
     }
   }

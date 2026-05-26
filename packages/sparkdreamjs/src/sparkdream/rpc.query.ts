@@ -90,6 +90,12 @@ export const createRPCQueryClient = async ({
       futarchy: {
         v1: (await import("./futarchy/v1/query.rpc.Query")).createRpcQueryExtension(client)
       },
+      guardian: {
+        v1: (await import("./guardian/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
+      identity: {
+        v1: (await import("./identity/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
       name: {
         v1: (await import("./name/v1/query.rpc.Query")).createRpcQueryExtension(client)
       },
@@ -101,6 +107,9 @@ export const createRPCQueryClient = async ({
       },
       season: {
         v1: (await import("./season/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
+      service: {
+        v1: (await import("./service/v1/query.rpc.Query")).createRpcQueryExtension(client)
       },
       session: {
         v1: (await import("./session/v1/query.rpc.Query")).createRpcQueryExtension(client)

@@ -5,6 +5,12 @@ import { BinaryReader, BinaryWriter } from "../../../binary";
 import { toTimestamp, fromTimestamp, DeepPartial } from "../../../helpers";
 /**
  * Session represents an active session key delegation from granter to grantee.
+ * 
+ * DEPRECATED: kept as the response shape for the legacy Session / SessionsByGranter
+ * / SessionsByGrantee queries while the registry transitions to the unified Grant
+ * model in grant.proto. Internally the keeper now persists every session as a
+ * SESSION_KEY-type Grant; the query handlers project Session views back from those
+ * grants. New grant types must use Grant directly.
  * @name Session
  * @package sparkdream.session.v1
  * @see proto type: sparkdream.session.v1.Session
@@ -57,6 +63,12 @@ export interface SessionProtoMsg {
 }
 /**
  * Session represents an active session key delegation from granter to grantee.
+ * 
+ * DEPRECATED: kept as the response shape for the legacy Session / SessionsByGranter
+ * / SessionsByGrantee queries while the registry transitions to the unified Grant
+ * model in grant.proto. Internally the keeper now persists every session as a
+ * SESSION_KEY-type Grant; the query handlers project Session views back from those
+ * grants. New grant types must use Grant directly.
  * @name SessionAmino
  * @package sparkdream.session.v1
  * @see proto type: sparkdream.session.v1.Session
@@ -123,6 +135,12 @@ function createBaseSession(): Session {
 }
 /**
  * Session represents an active session key delegation from granter to grantee.
+ * 
+ * DEPRECATED: kept as the response shape for the legacy Session / SessionsByGranter
+ * / SessionsByGrantee queries while the registry transitions to the unified Grant
+ * model in grant.proto. Internally the keeper now persists every session as a
+ * SESSION_KEY-type Grant; the query handlers project Session views back from those
+ * grants. New grant types must use Grant directly.
  * @name Session
  * @package sparkdream.session.v1
  * @see proto type: sparkdream.session.v1.Session

@@ -39,7 +39,7 @@ export interface Post {
    */
   replyCount: bigint;
   /**
-   * Minimum trust level to reply (default: 0)
+   * Minimum trust level to reply AND react (-1 open, 0 default = active members)
    */
   minReplyTrustLevel: number;
   /**
@@ -139,7 +139,7 @@ export interface PostAmino {
    */
   reply_count?: string;
   /**
-   * Minimum trust level to reply (default: 0)
+   * Minimum trust level to reply AND react (-1 open, 0 default = active members)
    */
   min_reply_trust_level?: number;
   /**

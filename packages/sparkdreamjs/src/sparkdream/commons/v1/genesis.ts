@@ -3,6 +3,7 @@ import { Params, ParamsAmino } from "./params";
 import { PolicyPermissions, PolicyPermissionsAmino } from "./policy_permissions";
 import { Group, GroupAmino, Proposal, ProposalAmino, Member, MemberAmino, DecisionPolicy, DecisionPolicyAmino, Vote, VoteAmino } from "./group";
 import { Category, CategoryAmino } from "./category";
+import { RecurringSpend, RecurringSpendAmino } from "./recurring_spend";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -54,6 +55,14 @@ export interface GenesisState {
    * next_category_id is the next auto-increment category ID
    */
   nextCategoryId: bigint;
+  /**
+   * recurring_spends stores all schedules for export.
+   */
+  recurringSpends: RecurringSpend[];
+  /**
+   * next_recurring_spend_id is the next auto-increment recurring spend ID.
+   */
+  nextRecurringSpendId: bigint;
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.commons.v1.GenesisState";
@@ -108,6 +117,14 @@ export interface GenesisStateAmino {
    * next_category_id is the next auto-increment category ID
    */
   next_category_id?: string;
+  /**
+   * recurring_spends stores all schedules for export.
+   */
+  recurring_spends?: RecurringSpendAmino[];
+  /**
+   * next_recurring_spend_id is the next auto-increment recurring spend ID.
+   */
+  next_recurring_spend_id?: string;
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.commons.v1.GenesisState";
@@ -238,7 +255,9 @@ function createBaseGenesisState(): GenesisState {
     policyVersions: [],
     proposalVotes: [],
     categoryMap: [],
-    nextCategoryId: BigInt(0)
+    nextCategoryId: BigInt(0),
+    recurringSpends: [],
+    nextRecurringSpendId: BigInt(0)
   };
 }
 /**
@@ -286,6 +305,12 @@ export const GenesisState = {
     if (message.nextCategoryId !== BigInt(0)) {
       writer.uint32(96).uint64(message.nextCategoryId);
     }
+    for (const v of message.recurringSpends) {
+      RecurringSpend.encode(v!, writer.uint32(106).fork()).ldelim();
+    }
+    if (message.nextRecurringSpendId !== BigInt(0)) {
+      writer.uint32(112).uint64(message.nextRecurringSpendId);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -331,6 +356,12 @@ export const GenesisState = {
         case 12:
           message.nextCategoryId = reader.uint64();
           break;
+        case 13:
+          message.recurringSpends.push(RecurringSpend.decode(reader, reader.uint32()));
+          break;
+        case 14:
+          message.nextRecurringSpendId = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -352,6 +383,8 @@ export const GenesisState = {
     message.proposalVotes = object.proposalVotes?.map(e => ProposalVotes.fromPartial(e)) || [];
     message.categoryMap = object.categoryMap?.map(e => Category.fromPartial(e)) || [];
     message.nextCategoryId = object.nextCategoryId !== undefined && object.nextCategoryId !== null ? BigInt(object.nextCategoryId.toString()) : BigInt(0);
+    message.recurringSpends = object.recurringSpends?.map(e => RecurringSpend.fromPartial(e)) || [];
+    message.nextRecurringSpendId = object.nextRecurringSpendId !== undefined && object.nextRecurringSpendId !== null ? BigInt(object.nextRecurringSpendId.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -375,6 +408,10 @@ export const GenesisState = {
     message.categoryMap = object.category_map?.map(e => Category.fromAmino(e)) || [];
     if (object.next_category_id !== undefined && object.next_category_id !== null) {
       message.nextCategoryId = BigInt(object.next_category_id);
+    }
+    message.recurringSpends = object.recurring_spends?.map(e => RecurringSpend.fromAmino(e)) || [];
+    if (object.next_recurring_spend_id !== undefined && object.next_recurring_spend_id !== null) {
+      message.nextRecurringSpendId = BigInt(object.next_recurring_spend_id);
     }
     return message;
   },
@@ -424,6 +461,12 @@ export const GenesisState = {
       obj.category_map = message.categoryMap;
     }
     obj.next_category_id = message.nextCategoryId !== BigInt(0) ? message.nextCategoryId?.toString() : undefined;
+    if (message.recurringSpends) {
+      obj.recurring_spends = message.recurringSpends.map(e => e ? RecurringSpend.toAmino(e) : undefined);
+    } else {
+      obj.recurring_spends = message.recurringSpends;
+    }
+    obj.next_recurring_spend_id = message.nextRecurringSpendId !== BigInt(0) ? message.nextRecurringSpendId?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {

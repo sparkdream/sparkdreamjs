@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetPeerRequest, QueryGetPeerResponse, QueryListPeersRequest, QueryListPeersResponse, QueryGetPeerPolicyRequest, QueryGetPeerPolicyResponse, QueryGetBridgeOperatorRequest, QueryGetBridgeOperatorResponse, QueryListBridgeOperatorsRequest, QueryListBridgeOperatorsResponse, QueryGetFederatedContentRequest, QueryGetFederatedContentResponse, QueryListFederatedContentRequest, QueryListFederatedContentResponse, QueryGetIdentityLinkRequest, QueryGetIdentityLinkResponse, QueryListIdentityLinksRequest, QueryListIdentityLinksResponse, QueryResolveRemoteIdentityRequest, QueryResolveRemoteIdentityResponse, QueryGetPendingIdentityChallengeRequest, QueryGetPendingIdentityChallengeResponse, QueryListPendingIdentityChallengesRequest, QueryListPendingIdentityChallengesResponse, QueryGetReputationAttestationRequest, QueryGetReputationAttestationResponse, QueryListOutboundAttestationsRequest, QueryListOutboundAttestationsResponse, QueryVerifierActivityRequest, QueryVerifierActivityResponse, QueryGetVerificationRecordRequest, QueryGetVerificationRecordResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetPeerRequest, QueryGetPeerResponse, QueryListPeersRequest, QueryListPeersResponse, QueryGetPeerPolicyRequest, QueryGetPeerPolicyResponse, QueryGetBridgeBindingRequest, QueryGetBridgeBindingResponse, QueryListBridgeBindingsRequest, QueryListBridgeBindingsResponse, QueryGetFederatedContentRequest, QueryGetFederatedContentResponse, QueryListFederatedContentRequest, QueryListFederatedContentResponse, QueryGetIdentityLinkRequest, QueryGetIdentityLinkResponse, QueryListIdentityLinksRequest, QueryListIdentityLinksResponse, QueryResolveRemoteIdentityRequest, QueryResolveRemoteIdentityResponse, QueryGetPendingIdentityChallengeRequest, QueryGetPendingIdentityChallengeResponse, QueryListPendingIdentityChallengesRequest, QueryListPendingIdentityChallengesResponse, QueryGetReputationAttestationRequest, QueryGetReputationAttestationResponse, QueryListOutboundAttestationsRequest, QueryListOutboundAttestationsResponse, QueryVerifierActivityRequest, QueryVerifierActivityResponse, QueryGetVerificationRecordRequest, QueryGetVerificationRecordResponse, QueryGetEscalatedChallengeRequest, QueryGetEscalatedChallengeResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -39,23 +39,23 @@ export class LCDQueryClient {
     const endpoint = `sparkdream/federation/v1/get_peer_policy/${params.peerId}`;
     return await this.req.get<QueryGetPeerPolicyResponse>(endpoint);
   };
-  /* GetBridgeOperator */
-  getBridgeOperator = async (params: QueryGetBridgeOperatorRequest): Promise<QueryGetBridgeOperatorResponse> => {
-    const endpoint = `sparkdream/federation/v1/get_bridge_operator/${params.address}/${params.peerId}`;
-    return await this.req.get<QueryGetBridgeOperatorResponse>(endpoint);
+  /* GetBridgeBinding */
+  getBridgeBinding = async (params: QueryGetBridgeBindingRequest): Promise<QueryGetBridgeBindingResponse> => {
+    const endpoint = `sparkdream/federation/v1/get_bridge_binding/${params.address}/${params.peerId}`;
+    return await this.req.get<QueryGetBridgeBindingResponse>(endpoint);
   };
-  /* ListBridgeOperators */
-  listBridgeOperators = async (params: QueryListBridgeOperatorsRequest = {
+  /* ListBridgeBindings */
+  listBridgeBindings = async (params: QueryListBridgeBindingsRequest = {
     pagination: undefined
-  }): Promise<QueryListBridgeOperatorsResponse> => {
+  }): Promise<QueryListBridgeBindingsResponse> => {
     const options: any = {
       params: {}
     };
     if (typeof params?.pagination !== "undefined") {
       setPaginationParams(options, params.pagination);
     }
-    const endpoint = `sparkdream/federation/v1/list_bridge_operators`;
-    return await this.req.get<QueryListBridgeOperatorsResponse>(endpoint, options);
+    const endpoint = `sparkdream/federation/v1/list_bridge_bindings`;
+    return await this.req.get<QueryListBridgeBindingsResponse>(endpoint, options);
   };
   /* GetFederatedContent */
   getFederatedContent = async (params: QueryGetFederatedContentRequest): Promise<QueryGetFederatedContentResponse> => {
@@ -144,5 +144,10 @@ export class LCDQueryClient {
   getVerificationRecord = async (params: QueryGetVerificationRecordRequest): Promise<QueryGetVerificationRecordResponse> => {
     const endpoint = `sparkdream/federation/v1/get_verification_record/${params.contentId}`;
     return await this.req.get<QueryGetVerificationRecordResponse>(endpoint);
+  };
+  /* GetEscalatedChallenge */
+  getEscalatedChallenge = async (params: QueryGetEscalatedChallengeRequest): Promise<QueryGetEscalatedChallengeResponse> => {
+    const endpoint = `sparkdream/federation/v1/get_escalated_challenge/${params.contentId}`;
+    return await this.req.get<QueryGetEscalatedChallengeResponse>(endpoint);
   };
 }

@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Coin, CoinAmino } from "../../../cosmos/base/v1beta1/coin";
+import { ChainIdentity, ChainIdentityAmino } from "../../identity/v1/chain_identity";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 export enum PeerType {
@@ -7,6 +7,23 @@ export enum PeerType {
   PEER_TYPE_SPARK_DREAM = 1,
   PEER_TYPE_ACTIVITYPUB = 2,
   PEER_TYPE_ATPROTO = 3,
+  /**
+   * PEER_TYPE_NOSTR - NOSTR peers are modeled per-relay (one Peer = one relay endpoint).
+   * Uses an off-chain bridge daemon, same accountability model as
+   * ActivityPub/AT Protocol. NOSTR identity (pubkey) is global, so the
+   * same remote_identity may be linked across multiple NOSTR-relay peers.
+   */
+  PEER_TYPE_NOSTR = 4,
+  /**
+   * PEER_TYPE_LENS - Lens peers represent a Lens Chain deployment (zkSync L2 + Avail DA).
+   * Identity is on-chain (wallet address + tokenized handle NFT); the
+   * off-chain bridge daemon is expected to query Lens Chain RPC to
+   * verify NFT ownership before attesting, raising the bar relative to
+   * pure HTTP-signature attestation used for ActivityPub. Future work
+   * (deferred): MsgLinkIdentityViaStateProof for fully on-chain
+   * verification via EVM state proofs.
+   */
+  PEER_TYPE_LENS = 5,
   UNRECOGNIZED = -1,
 }
 export const PeerTypeAmino = PeerType;
@@ -24,6 +41,12 @@ export function peerTypeFromJSON(object: any): PeerType {
     case 3:
     case "PEER_TYPE_ATPROTO":
       return PeerType.PEER_TYPE_ATPROTO;
+    case 4:
+    case "PEER_TYPE_NOSTR":
+      return PeerType.PEER_TYPE_NOSTR;
+    case 5:
+    case "PEER_TYPE_LENS":
+      return PeerType.PEER_TYPE_LENS;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -40,6 +63,10 @@ export function peerTypeToJSON(object: PeerType): string {
       return "PEER_TYPE_ACTIVITYPUB";
     case PeerType.PEER_TYPE_ATPROTO:
       return "PEER_TYPE_ATPROTO";
+    case PeerType.PEER_TYPE_NOSTR:
+      return "PEER_TYPE_NOSTR";
+    case PeerType.PEER_TYPE_LENS:
+      return "PEER_TYPE_LENS";
     case PeerType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -291,6 +318,98 @@ export function verificationOutcomeToJSON(object: VerificationOutcome): string {
   }
 }
 /**
+ * PendingVerifierVerdict captures an arbiter-quorum auto-verdict that
+ * hasn't yet been applied (escalation window still open). Drives the
+ * fee-disbursement and slash logic in EndBlocker phase
+ * finalizeAutoResolutions.
+ */
+export enum PendingVerifierVerdict {
+  PENDING_VERIFIER_VERDICT_UNSPECIFIED = 0,
+  PENDING_VERIFIER_VERDICT_VERIFIER_RIGHT = 1,
+  PENDING_VERIFIER_VERDICT_VERIFIER_WRONG = 2,
+  UNRECOGNIZED = -1,
+}
+export const PendingVerifierVerdictAmino = PendingVerifierVerdict;
+export function pendingVerifierVerdictFromJSON(object: any): PendingVerifierVerdict {
+  switch (object) {
+    case 0:
+    case "PENDING_VERIFIER_VERDICT_UNSPECIFIED":
+      return PendingVerifierVerdict.PENDING_VERIFIER_VERDICT_UNSPECIFIED;
+    case 1:
+    case "PENDING_VERIFIER_VERDICT_VERIFIER_RIGHT":
+      return PendingVerifierVerdict.PENDING_VERIFIER_VERDICT_VERIFIER_RIGHT;
+    case 2:
+    case "PENDING_VERIFIER_VERDICT_VERIFIER_WRONG":
+      return PendingVerifierVerdict.PENDING_VERIFIER_VERDICT_VERIFIER_WRONG;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return PendingVerifierVerdict.UNRECOGNIZED;
+  }
+}
+export function pendingVerifierVerdictToJSON(object: PendingVerifierVerdict): string {
+  switch (object) {
+    case PendingVerifierVerdict.PENDING_VERIFIER_VERDICT_UNSPECIFIED:
+      return "PENDING_VERIFIER_VERDICT_UNSPECIFIED";
+    case PendingVerifierVerdict.PENDING_VERIFIER_VERDICT_VERIFIER_RIGHT:
+      return "PENDING_VERIFIER_VERDICT_VERIFIER_RIGHT";
+    case PendingVerifierVerdict.PENDING_VERIFIER_VERDICT_VERIFIER_WRONG:
+      return "PENDING_VERIFIER_VERDICT_VERIFIER_WRONG";
+    case PendingVerifierVerdict.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+/**
+ * JuryVerdict is the Phase 2 (human jury) outcome for an escalated
+ * challenge. Submitted via MsgResolveEscalatedChallenge or stamped
+ * automatically on jury deadline expiry (TIMEOUT). Drives the final
+ * fee disbursement, content status, and verifier-side accounting.
+ */
+export enum JuryVerdict {
+  JURY_VERDICT_UNSPECIFIED = 0,
+  JURY_VERDICT_CHALLENGE_UPHELD = 1,
+  JURY_VERDICT_CHALLENGE_REJECTED = 2,
+  JURY_VERDICT_CHALLENGE_TIMEOUT = 3,
+  UNRECOGNIZED = -1,
+}
+export const JuryVerdictAmino = JuryVerdict;
+export function juryVerdictFromJSON(object: any): JuryVerdict {
+  switch (object) {
+    case 0:
+    case "JURY_VERDICT_UNSPECIFIED":
+      return JuryVerdict.JURY_VERDICT_UNSPECIFIED;
+    case 1:
+    case "JURY_VERDICT_CHALLENGE_UPHELD":
+      return JuryVerdict.JURY_VERDICT_CHALLENGE_UPHELD;
+    case 2:
+    case "JURY_VERDICT_CHALLENGE_REJECTED":
+      return JuryVerdict.JURY_VERDICT_CHALLENGE_REJECTED;
+    case 3:
+    case "JURY_VERDICT_CHALLENGE_TIMEOUT":
+      return JuryVerdict.JURY_VERDICT_CHALLENGE_TIMEOUT;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return JuryVerdict.UNRECOGNIZED;
+  }
+}
+export function juryVerdictToJSON(object: JuryVerdict): string {
+  switch (object) {
+    case JuryVerdict.JURY_VERDICT_UNSPECIFIED:
+      return "JURY_VERDICT_UNSPECIFIED";
+    case JuryVerdict.JURY_VERDICT_CHALLENGE_UPHELD:
+      return "JURY_VERDICT_CHALLENGE_UPHELD";
+    case JuryVerdict.JURY_VERDICT_CHALLENGE_REJECTED:
+      return "JURY_VERDICT_CHALLENGE_REJECTED";
+    case JuryVerdict.JURY_VERDICT_CHALLENGE_TIMEOUT:
+      return "JURY_VERDICT_CHALLENGE_TIMEOUT";
+    case JuryVerdict.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+/**
  * Peer represents a federation peer (another Spark Dream chain or external protocol).
  * @name Peer
  * @package sparkdream.federation.v1
@@ -307,6 +426,25 @@ export interface Peer {
   registeredBy: string;
   metadata: string;
   removedAt: bigint;
+  /**
+   * controller_group is the x/commons Group policy address that resolves
+   * tier-1 reports against this peer's bridge operators (federation→
+   * service migration, Decision 2). If empty, federation resolves it to
+   * the Operations Committee policy address at MsgRegisterBridge time.
+   * The resolved address is captured on the resulting service.Operator;
+   * changing it later (MsgUpdatePeerController) affects only new
+   * registrations, not existing bridges.
+   */
+  controllerGroup: string;
+  /**
+   * peer_identity carries the chain identity (denoms, display symbols,
+   * chain human name) supplied at peer registration. Used for IBC voucher
+   * metadata pre-registration (see spec §9.2 and x-identity-spec.md) so
+   * wallets render PSPK.ibc instead of ibc/<hash>. Optional for backwards
+   * compatibility with pre-extension peers; populated for PEER_TYPE_SPARK_DREAM
+   * peers registered via MsgRegisterPeer with --peer-identity.
+   */
+  peerIdentity?: ChainIdentity;
 }
 export interface PeerProtoMsg {
   typeUrl: "/sparkdream.federation.v1.Peer";
@@ -329,6 +467,25 @@ export interface PeerAmino {
   registered_by?: string;
   metadata?: string;
   removed_at?: string;
+  /**
+   * controller_group is the x/commons Group policy address that resolves
+   * tier-1 reports against this peer's bridge operators (federation→
+   * service migration, Decision 2). If empty, federation resolves it to
+   * the Operations Committee policy address at MsgRegisterBridge time.
+   * The resolved address is captured on the resulting service.Operator;
+   * changing it later (MsgUpdatePeerController) affects only new
+   * registrations, not existing bridges.
+   */
+  controller_group?: string;
+  /**
+   * peer_identity carries the chain identity (denoms, display symbols,
+   * chain human name) supplied at peer registration. Used for IBC voucher
+   * metadata pre-registration (see spec §9.2 and x-identity-spec.md) so
+   * wallets render PSPK.ibc instead of ibc/<hash>. Optional for backwards
+   * compatibility with pre-extension peers; populated for PEER_TYPE_SPARK_DREAM
+   * peers registered via MsgRegisterPeer with --peer-identity.
+   */
+  peer_identity?: ChainIdentityAmino;
 }
 export interface PeerAminoMsg {
   type: "/sparkdream.federation.v1.Peer";
@@ -399,58 +556,82 @@ export interface PeerPolicyAminoMsg {
   value: PeerPolicyAmino;
 }
 /**
- * BridgeOperator represents an off-chain bridge operator.
- * @name BridgeOperator
+ * BridgeBinding represents the federation-owned binding between a bridge
+ * operator and a peer. Economic state (bond, status, unbonding, slashing
+ * history) lives on the corresponding x/service Operator record keyed
+ * by (address, service_type). This binding holds only federation-
+ * specific data: which peer + protocol + endpoint URL + content stats
+ * + suspended flag (toggled by underfunded/refunded hooks).
+ * 
+ * Per Decision 1a of the federation→service migration, one operator
+ * address may hold multiple bindings under the same protocol (one per
+ * peer) backed by a single shared service.Operator and a single shared
+ * bond. Suspending a binding refuses new content submissions but does
+ * not delete it.
+ * @name BridgeBinding
  * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.BridgeOperator
+ * @see proto type: sparkdream.federation.v1.BridgeBinding
  */
-export interface BridgeOperator {
+export interface BridgeBinding {
   address: string;
   peerId: string;
   protocol: string;
   endpoint: string;
-  stake: Coin;
   registeredAt: bigint;
-  status: BridgeStatus;
   contentSubmitted: bigint;
-  contentRejected: bigint;
-  slashCount: bigint;
-  revokedAt: bigint;
-  lastSubmissionAt: bigint;
-  unbondingEndTime: bigint;
   contentVerified: bigint;
+  contentRejected: bigint;
   contentUnverified: bigint;
+  lastSubmissionAt: bigint;
+  /**
+   * suspended is set to true by AfterOperatorUnderfunded and cleared
+   * by AfterOperatorReFunded. Federation rejects new content
+   * submissions from suspended bindings.
+   */
+  suspended: boolean;
 }
-export interface BridgeOperatorProtoMsg {
-  typeUrl: "/sparkdream.federation.v1.BridgeOperator";
+export interface BridgeBindingProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.BridgeBinding";
   value: Uint8Array;
 }
 /**
- * BridgeOperator represents an off-chain bridge operator.
- * @name BridgeOperatorAmino
+ * BridgeBinding represents the federation-owned binding between a bridge
+ * operator and a peer. Economic state (bond, status, unbonding, slashing
+ * history) lives on the corresponding x/service Operator record keyed
+ * by (address, service_type). This binding holds only federation-
+ * specific data: which peer + protocol + endpoint URL + content stats
+ * + suspended flag (toggled by underfunded/refunded hooks).
+ * 
+ * Per Decision 1a of the federation→service migration, one operator
+ * address may hold multiple bindings under the same protocol (one per
+ * peer) backed by a single shared service.Operator and a single shared
+ * bond. Suspending a binding refuses new content submissions but does
+ * not delete it.
+ * @name BridgeBindingAmino
  * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.BridgeOperator
+ * @see proto type: sparkdream.federation.v1.BridgeBinding
  */
-export interface BridgeOperatorAmino {
+export interface BridgeBindingAmino {
   address?: string;
   peer_id?: string;
   protocol?: string;
   endpoint?: string;
-  stake?: CoinAmino;
   registered_at?: string;
-  status?: BridgeStatus;
   content_submitted?: string;
-  content_rejected?: string;
-  slash_count?: string;
-  revoked_at?: string;
-  last_submission_at?: string;
-  unbonding_end_time?: string;
   content_verified?: string;
+  content_rejected?: string;
   content_unverified?: string;
+  last_submission_at?: string;
+  /**
+   * suspended is set to true by AfterOperatorUnderfunded and cleared
+   * by AfterOperatorReFunded. Federation rejects new content
+   * submissions from suspended bindings.
+   */
+  suspended?: boolean;
 }
-export interface BridgeOperatorAminoMsg {
-  type: "/sparkdream.federation.v1.BridgeOperator";
-  value: BridgeOperatorAmino;
+export interface BridgeBindingAminoMsg {
+  type: "/sparkdream.federation.v1.BridgeBinding";
+  value: BridgeBindingAmino;
 }
 /**
  * VerificationRecord tracks a verifier's verification of specific content.
@@ -470,6 +651,23 @@ export interface VerificationRecord {
   priorRejectedChallenges: number;
   lastChallengeResolvedAt: bigint;
   challenger: string;
+  /**
+   * escrowed_challenge_fee is the per-challenge SPARK amount the
+   * challenger escrowed at MsgChallengeVerification time. Snapshotted
+   * because the effective fee escalates with prior_rejected_challenges
+   * (2^N multiplier) — recomputing at resolution time would be fragile.
+   * Used by the auto-resolve path to refund (UPHELD) or split
+   * (REJECTED) the escrow.
+   */
+  escrowedChallengeFee: string;
+  /**
+   * pending_verifier_verdict snapshots the would-be auto-verdict from
+   * the arbiter-quorum branch (UNSPECIFIED until quorum lands, then
+   * VERIFIER_RIGHT or VERIFIER_WRONG). The verdict is applied by the
+   * EndBlocker when the escalation window expires; MsgEscalateChallenge
+   * clears it back to UNSPECIFIED, deferring resolution to the jury path.
+   */
+  pendingVerifierVerdict: PendingVerifierVerdict;
 }
 export interface VerificationRecordProtoMsg {
   typeUrl: "/sparkdream.federation.v1.VerificationRecord";
@@ -493,10 +691,113 @@ export interface VerificationRecordAmino {
   prior_rejected_challenges?: number;
   last_challenge_resolved_at?: string;
   challenger?: string;
+  /**
+   * escrowed_challenge_fee is the per-challenge SPARK amount the
+   * challenger escrowed at MsgChallengeVerification time. Snapshotted
+   * because the effective fee escalates with prior_rejected_challenges
+   * (2^N multiplier) — recomputing at resolution time would be fragile.
+   * Used by the auto-resolve path to refund (UPHELD) or split
+   * (REJECTED) the escrow.
+   */
+  escrowed_challenge_fee?: string;
+  /**
+   * pending_verifier_verdict snapshots the would-be auto-verdict from
+   * the arbiter-quorum branch (UNSPECIFIED until quorum lands, then
+   * VERIFIER_RIGHT or VERIFIER_WRONG). The verdict is applied by the
+   * EndBlocker when the escalation window expires; MsgEscalateChallenge
+   * clears it back to UNSPECIFIED, deferring resolution to the jury path.
+   */
+  pending_verifier_verdict?: PendingVerifierVerdict;
 }
 export interface VerificationRecordAminoMsg {
   type: "/sparkdream.federation.v1.VerificationRecord";
   value: VerificationRecordAmino;
+}
+/**
+ * EscalatedChallenge tracks the Phase 2 (human jury) lifecycle for a
+ * challenge whose Phase 1 auto-verdict was contested via
+ * MsgEscalateChallenge. Operations Committee submits the jury verdict
+ * via MsgResolveEscalatedChallenge; the EndBlocker stamps TIMEOUT on
+ * jury_deadline expiry. Both paths feed the same applyJuryVerdict
+ * helper which disposes of the escrowed challenge_fee + escalation_fee
+ * and (on UPHELD/REJECTED) applies the same verifier-side accounting
+ * as the auto-resolution path.
+ * @name EscalatedChallenge
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.EscalatedChallenge
+ */
+export interface EscalatedChallenge {
+  contentId: bigint;
+  /**
+   * escalator is the address that paid the escalation_fee (challenger
+   * or verifier — either party can escalate within the window).
+   */
+  escalator: string;
+  /**
+   * escrowed_escalation_fee snapshots the SPARK amount escrowed at
+   * escalation time. Refunded to the escalator if the jury verdict
+   * overturns the auto-verdict; burned otherwise.
+   */
+  escrowedEscalationFee: string;
+  /**
+   * auto_verdict_before_escalation snapshots the Phase 1 verdict that
+   * was about to apply. Compared to the jury verdict to determine if
+   * the jury "overturned" the auto-verdict (escalation fee refund).
+   */
+  autoVerdictBeforeEscalation: PendingVerifierVerdict;
+  /**
+   * jury_deadline is the unix-time block-time after which the
+   * EndBlocker stamps TIMEOUT if no MsgResolveEscalatedChallenge has
+   * landed.
+   */
+  juryDeadline: bigint;
+}
+export interface EscalatedChallengeProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.EscalatedChallenge";
+  value: Uint8Array;
+}
+/**
+ * EscalatedChallenge tracks the Phase 2 (human jury) lifecycle for a
+ * challenge whose Phase 1 auto-verdict was contested via
+ * MsgEscalateChallenge. Operations Committee submits the jury verdict
+ * via MsgResolveEscalatedChallenge; the EndBlocker stamps TIMEOUT on
+ * jury_deadline expiry. Both paths feed the same applyJuryVerdict
+ * helper which disposes of the escrowed challenge_fee + escalation_fee
+ * and (on UPHELD/REJECTED) applies the same verifier-side accounting
+ * as the auto-resolution path.
+ * @name EscalatedChallengeAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.EscalatedChallenge
+ */
+export interface EscalatedChallengeAmino {
+  content_id?: string;
+  /**
+   * escalator is the address that paid the escalation_fee (challenger
+   * or verifier — either party can escalate within the window).
+   */
+  escalator?: string;
+  /**
+   * escrowed_escalation_fee snapshots the SPARK amount escrowed at
+   * escalation time. Refunded to the escalator if the jury verdict
+   * overturns the auto-verdict; burned otherwise.
+   */
+  escrowed_escalation_fee?: string;
+  /**
+   * auto_verdict_before_escalation snapshots the Phase 1 verdict that
+   * was about to apply. Compared to the jury verdict to determine if
+   * the jury "overturned" the auto-verdict (escalation fee refund).
+   */
+  auto_verdict_before_escalation?: PendingVerifierVerdict;
+  /**
+   * jury_deadline is the unix-time block-time after which the
+   * EndBlocker stamps TIMEOUT if no MsgResolveEscalatedChallenge has
+   * landed.
+   */
+  jury_deadline?: string;
+}
+export interface EscalatedChallengeAminoMsg {
+  type: "/sparkdream.federation.v1.EscalatedChallenge";
+  value: EscalatedChallengeAmino;
 }
 /**
  * ArbiterHashSubmission stores an arbiter's hash for quorum-based challenge resolution.
@@ -827,7 +1128,9 @@ function createBasePeer(): Peer {
     lastActivity: BigInt(0),
     registeredBy: "",
     metadata: "",
-    removedAt: BigInt(0)
+    removedAt: BigInt(0),
+    controllerGroup: "",
+    peerIdentity: undefined
   };
 }
 /**
@@ -869,6 +1172,12 @@ export const Peer = {
     if (message.removedAt !== BigInt(0)) {
       writer.uint32(80).int64(message.removedAt);
     }
+    if (message.controllerGroup !== "") {
+      writer.uint32(90).string(message.controllerGroup);
+    }
+    if (message.peerIdentity !== undefined) {
+      ChainIdentity.encode(message.peerIdentity, writer.uint32(98).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Peer {
@@ -908,6 +1217,12 @@ export const Peer = {
         case 10:
           message.removedAt = reader.int64();
           break;
+        case 11:
+          message.controllerGroup = reader.string();
+          break;
+        case 12:
+          message.peerIdentity = ChainIdentity.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -927,6 +1242,8 @@ export const Peer = {
     message.registeredBy = object.registeredBy ?? "";
     message.metadata = object.metadata ?? "";
     message.removedAt = object.removedAt !== undefined && object.removedAt !== null ? BigInt(object.removedAt.toString()) : BigInt(0);
+    message.controllerGroup = object.controllerGroup ?? "";
+    message.peerIdentity = object.peerIdentity !== undefined && object.peerIdentity !== null ? ChainIdentity.fromPartial(object.peerIdentity) : undefined;
     return message;
   },
   fromAmino(object: PeerAmino): Peer {
@@ -961,6 +1278,12 @@ export const Peer = {
     if (object.removed_at !== undefined && object.removed_at !== null) {
       message.removedAt = BigInt(object.removed_at);
     }
+    if (object.controller_group !== undefined && object.controller_group !== null) {
+      message.controllerGroup = object.controller_group;
+    }
+    if (object.peer_identity !== undefined && object.peer_identity !== null) {
+      message.peerIdentity = ChainIdentity.fromAmino(object.peer_identity);
+    }
     return message;
   },
   toAmino(message: Peer): PeerAmino {
@@ -975,6 +1298,8 @@ export const Peer = {
     obj.registered_by = message.registeredBy === "" ? undefined : message.registeredBy;
     obj.metadata = message.metadata === "" ? undefined : message.metadata;
     obj.removed_at = message.removedAt !== BigInt(0) ? message.removedAt?.toString() : undefined;
+    obj.controller_group = message.controllerGroup === "" ? undefined : message.controllerGroup;
+    obj.peer_identity = message.peerIdentity ? ChainIdentity.toAmino(message.peerIdentity) : undefined;
     return obj;
   },
   fromAminoMsg(object: PeerAminoMsg): Peer {
@@ -1188,34 +1513,41 @@ export const PeerPolicy = {
     };
   }
 };
-function createBaseBridgeOperator(): BridgeOperator {
+function createBaseBridgeBinding(): BridgeBinding {
   return {
     address: "",
     peerId: "",
     protocol: "",
     endpoint: "",
-    stake: Coin.fromPartial({}),
     registeredAt: BigInt(0),
-    status: 0,
     contentSubmitted: BigInt(0),
-    contentRejected: BigInt(0),
-    slashCount: BigInt(0),
-    revokedAt: BigInt(0),
-    lastSubmissionAt: BigInt(0),
-    unbondingEndTime: BigInt(0),
     contentVerified: BigInt(0),
-    contentUnverified: BigInt(0)
+    contentRejected: BigInt(0),
+    contentUnverified: BigInt(0),
+    lastSubmissionAt: BigInt(0),
+    suspended: false
   };
 }
 /**
- * BridgeOperator represents an off-chain bridge operator.
- * @name BridgeOperator
+ * BridgeBinding represents the federation-owned binding between a bridge
+ * operator and a peer. Economic state (bond, status, unbonding, slashing
+ * history) lives on the corresponding x/service Operator record keyed
+ * by (address, service_type). This binding holds only federation-
+ * specific data: which peer + protocol + endpoint URL + content stats
+ * + suspended flag (toggled by underfunded/refunded hooks).
+ * 
+ * Per Decision 1a of the federation→service migration, one operator
+ * address may hold multiple bindings under the same protocol (one per
+ * peer) backed by a single shared service.Operator and a single shared
+ * bond. Suspending a binding refuses new content submissions but does
+ * not delete it.
+ * @name BridgeBinding
  * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.BridgeOperator
+ * @see proto type: sparkdream.federation.v1.BridgeBinding
  */
-export const BridgeOperator = {
-  typeUrl: "/sparkdream.federation.v1.BridgeOperator",
-  encode(message: BridgeOperator, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+export const BridgeBinding = {
+  typeUrl: "/sparkdream.federation.v1.BridgeBinding",
+  encode(message: BridgeBinding, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
     }
@@ -1228,45 +1560,33 @@ export const BridgeOperator = {
     if (message.endpoint !== "") {
       writer.uint32(34).string(message.endpoint);
     }
-    if (message.stake !== undefined) {
-      Coin.encode(message.stake, writer.uint32(42).fork()).ldelim();
-    }
     if (message.registeredAt !== BigInt(0)) {
-      writer.uint32(48).int64(message.registeredAt);
-    }
-    if (message.status !== 0) {
-      writer.uint32(56).int32(message.status);
+      writer.uint32(40).int64(message.registeredAt);
     }
     if (message.contentSubmitted !== BigInt(0)) {
-      writer.uint32(64).uint64(message.contentSubmitted);
-    }
-    if (message.contentRejected !== BigInt(0)) {
-      writer.uint32(72).uint64(message.contentRejected);
-    }
-    if (message.slashCount !== BigInt(0)) {
-      writer.uint32(80).uint64(message.slashCount);
-    }
-    if (message.revokedAt !== BigInt(0)) {
-      writer.uint32(88).int64(message.revokedAt);
-    }
-    if (message.lastSubmissionAt !== BigInt(0)) {
-      writer.uint32(96).int64(message.lastSubmissionAt);
-    }
-    if (message.unbondingEndTime !== BigInt(0)) {
-      writer.uint32(104).int64(message.unbondingEndTime);
+      writer.uint32(48).uint64(message.contentSubmitted);
     }
     if (message.contentVerified !== BigInt(0)) {
-      writer.uint32(112).uint64(message.contentVerified);
+      writer.uint32(56).uint64(message.contentVerified);
+    }
+    if (message.contentRejected !== BigInt(0)) {
+      writer.uint32(64).uint64(message.contentRejected);
     }
     if (message.contentUnverified !== BigInt(0)) {
-      writer.uint32(120).uint64(message.contentUnverified);
+      writer.uint32(72).uint64(message.contentUnverified);
+    }
+    if (message.lastSubmissionAt !== BigInt(0)) {
+      writer.uint32(80).int64(message.lastSubmissionAt);
+    }
+    if (message.suspended === true) {
+      writer.uint32(88).bool(message.suspended);
     }
     return writer;
   },
-  decode(input: BinaryReader | Uint8Array, length?: number): BridgeOperator {
+  decode(input: BinaryReader | Uint8Array, length?: number): BridgeBinding {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseBridgeOperator();
+    const message = createBaseBridgeBinding();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1283,37 +1603,25 @@ export const BridgeOperator = {
           message.endpoint = reader.string();
           break;
         case 5:
-          message.stake = Coin.decode(reader, reader.uint32());
-          break;
-        case 6:
           message.registeredAt = reader.int64();
           break;
-        case 7:
-          message.status = reader.int32() as any;
-          break;
-        case 8:
+        case 6:
           message.contentSubmitted = reader.uint64();
           break;
-        case 9:
-          message.contentRejected = reader.uint64();
-          break;
-        case 10:
-          message.slashCount = reader.uint64();
-          break;
-        case 11:
-          message.revokedAt = reader.int64();
-          break;
-        case 12:
-          message.lastSubmissionAt = reader.int64();
-          break;
-        case 13:
-          message.unbondingEndTime = reader.int64();
-          break;
-        case 14:
+        case 7:
           message.contentVerified = reader.uint64();
           break;
-        case 15:
+        case 8:
+          message.contentRejected = reader.uint64();
+          break;
+        case 9:
           message.contentUnverified = reader.uint64();
+          break;
+        case 10:
+          message.lastSubmissionAt = reader.int64();
+          break;
+        case 11:
+          message.suspended = reader.bool();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1322,27 +1630,23 @@ export const BridgeOperator = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<BridgeOperator>): BridgeOperator {
-    const message = createBaseBridgeOperator();
+  fromPartial(object: DeepPartial<BridgeBinding>): BridgeBinding {
+    const message = createBaseBridgeBinding();
     message.address = object.address ?? "";
     message.peerId = object.peerId ?? "";
     message.protocol = object.protocol ?? "";
     message.endpoint = object.endpoint ?? "";
-    message.stake = object.stake !== undefined && object.stake !== null ? Coin.fromPartial(object.stake) : undefined;
     message.registeredAt = object.registeredAt !== undefined && object.registeredAt !== null ? BigInt(object.registeredAt.toString()) : BigInt(0);
-    message.status = object.status ?? 0;
     message.contentSubmitted = object.contentSubmitted !== undefined && object.contentSubmitted !== null ? BigInt(object.contentSubmitted.toString()) : BigInt(0);
-    message.contentRejected = object.contentRejected !== undefined && object.contentRejected !== null ? BigInt(object.contentRejected.toString()) : BigInt(0);
-    message.slashCount = object.slashCount !== undefined && object.slashCount !== null ? BigInt(object.slashCount.toString()) : BigInt(0);
-    message.revokedAt = object.revokedAt !== undefined && object.revokedAt !== null ? BigInt(object.revokedAt.toString()) : BigInt(0);
-    message.lastSubmissionAt = object.lastSubmissionAt !== undefined && object.lastSubmissionAt !== null ? BigInt(object.lastSubmissionAt.toString()) : BigInt(0);
-    message.unbondingEndTime = object.unbondingEndTime !== undefined && object.unbondingEndTime !== null ? BigInt(object.unbondingEndTime.toString()) : BigInt(0);
     message.contentVerified = object.contentVerified !== undefined && object.contentVerified !== null ? BigInt(object.contentVerified.toString()) : BigInt(0);
+    message.contentRejected = object.contentRejected !== undefined && object.contentRejected !== null ? BigInt(object.contentRejected.toString()) : BigInt(0);
     message.contentUnverified = object.contentUnverified !== undefined && object.contentUnverified !== null ? BigInt(object.contentUnverified.toString()) : BigInt(0);
+    message.lastSubmissionAt = object.lastSubmissionAt !== undefined && object.lastSubmissionAt !== null ? BigInt(object.lastSubmissionAt.toString()) : BigInt(0);
+    message.suspended = object.suspended ?? false;
     return message;
   },
-  fromAmino(object: BridgeOperatorAmino): BridgeOperator {
-    const message = createBaseBridgeOperator();
+  fromAmino(object: BridgeBindingAmino): BridgeBinding {
+    const message = createBaseBridgeBinding();
     if (object.address !== undefined && object.address !== null) {
       message.address = object.address;
     }
@@ -1355,73 +1659,57 @@ export const BridgeOperator = {
     if (object.endpoint !== undefined && object.endpoint !== null) {
       message.endpoint = object.endpoint;
     }
-    if (object.stake !== undefined && object.stake !== null) {
-      message.stake = Coin.fromAmino(object.stake);
-    }
     if (object.registered_at !== undefined && object.registered_at !== null) {
       message.registeredAt = BigInt(object.registered_at);
-    }
-    if (object.status !== undefined && object.status !== null) {
-      message.status = object.status;
     }
     if (object.content_submitted !== undefined && object.content_submitted !== null) {
       message.contentSubmitted = BigInt(object.content_submitted);
     }
-    if (object.content_rejected !== undefined && object.content_rejected !== null) {
-      message.contentRejected = BigInt(object.content_rejected);
-    }
-    if (object.slash_count !== undefined && object.slash_count !== null) {
-      message.slashCount = BigInt(object.slash_count);
-    }
-    if (object.revoked_at !== undefined && object.revoked_at !== null) {
-      message.revokedAt = BigInt(object.revoked_at);
-    }
-    if (object.last_submission_at !== undefined && object.last_submission_at !== null) {
-      message.lastSubmissionAt = BigInt(object.last_submission_at);
-    }
-    if (object.unbonding_end_time !== undefined && object.unbonding_end_time !== null) {
-      message.unbondingEndTime = BigInt(object.unbonding_end_time);
-    }
     if (object.content_verified !== undefined && object.content_verified !== null) {
       message.contentVerified = BigInt(object.content_verified);
+    }
+    if (object.content_rejected !== undefined && object.content_rejected !== null) {
+      message.contentRejected = BigInt(object.content_rejected);
     }
     if (object.content_unverified !== undefined && object.content_unverified !== null) {
       message.contentUnverified = BigInt(object.content_unverified);
     }
+    if (object.last_submission_at !== undefined && object.last_submission_at !== null) {
+      message.lastSubmissionAt = BigInt(object.last_submission_at);
+    }
+    if (object.suspended !== undefined && object.suspended !== null) {
+      message.suspended = object.suspended;
+    }
     return message;
   },
-  toAmino(message: BridgeOperator): BridgeOperatorAmino {
+  toAmino(message: BridgeBinding): BridgeBindingAmino {
     const obj: any = {};
     obj.address = message.address === "" ? undefined : message.address;
     obj.peer_id = message.peerId === "" ? undefined : message.peerId;
     obj.protocol = message.protocol === "" ? undefined : message.protocol;
     obj.endpoint = message.endpoint === "" ? undefined : message.endpoint;
-    obj.stake = message.stake ? Coin.toAmino(message.stake) : undefined;
     obj.registered_at = message.registeredAt !== BigInt(0) ? message.registeredAt?.toString() : undefined;
-    obj.status = message.status === 0 ? undefined : message.status;
     obj.content_submitted = message.contentSubmitted !== BigInt(0) ? message.contentSubmitted?.toString() : undefined;
-    obj.content_rejected = message.contentRejected !== BigInt(0) ? message.contentRejected?.toString() : undefined;
-    obj.slash_count = message.slashCount !== BigInt(0) ? message.slashCount?.toString() : undefined;
-    obj.revoked_at = message.revokedAt !== BigInt(0) ? message.revokedAt?.toString() : undefined;
-    obj.last_submission_at = message.lastSubmissionAt !== BigInt(0) ? message.lastSubmissionAt?.toString() : undefined;
-    obj.unbonding_end_time = message.unbondingEndTime !== BigInt(0) ? message.unbondingEndTime?.toString() : undefined;
     obj.content_verified = message.contentVerified !== BigInt(0) ? message.contentVerified?.toString() : undefined;
+    obj.content_rejected = message.contentRejected !== BigInt(0) ? message.contentRejected?.toString() : undefined;
     obj.content_unverified = message.contentUnverified !== BigInt(0) ? message.contentUnverified?.toString() : undefined;
+    obj.last_submission_at = message.lastSubmissionAt !== BigInt(0) ? message.lastSubmissionAt?.toString() : undefined;
+    obj.suspended = message.suspended === false ? undefined : message.suspended;
     return obj;
   },
-  fromAminoMsg(object: BridgeOperatorAminoMsg): BridgeOperator {
-    return BridgeOperator.fromAmino(object.value);
+  fromAminoMsg(object: BridgeBindingAminoMsg): BridgeBinding {
+    return BridgeBinding.fromAmino(object.value);
   },
-  fromProtoMsg(message: BridgeOperatorProtoMsg): BridgeOperator {
-    return BridgeOperator.decode(message.value);
+  fromProtoMsg(message: BridgeBindingProtoMsg): BridgeBinding {
+    return BridgeBinding.decode(message.value);
   },
-  toProto(message: BridgeOperator): Uint8Array {
-    return BridgeOperator.encode(message).finish();
+  toProto(message: BridgeBinding): Uint8Array {
+    return BridgeBinding.encode(message).finish();
   },
-  toProtoMsg(message: BridgeOperator): BridgeOperatorProtoMsg {
+  toProtoMsg(message: BridgeBinding): BridgeBindingProtoMsg {
     return {
-      typeUrl: "/sparkdream.federation.v1.BridgeOperator",
-      value: BridgeOperator.encode(message).finish()
+      typeUrl: "/sparkdream.federation.v1.BridgeBinding",
+      value: BridgeBinding.encode(message).finish()
     };
   }
 };
@@ -1437,7 +1725,9 @@ function createBaseVerificationRecord(): VerificationRecord {
     outcome: 0,
     priorRejectedChallenges: 0,
     lastChallengeResolvedAt: BigInt(0),
-    challenger: ""
+    challenger: "",
+    escrowedChallengeFee: "",
+    pendingVerifierVerdict: 0
   };
 }
 /**
@@ -1482,6 +1772,12 @@ export const VerificationRecord = {
     if (message.challenger !== "") {
       writer.uint32(90).string(message.challenger);
     }
+    if (message.escrowedChallengeFee !== "") {
+      writer.uint32(98).string(message.escrowedChallengeFee);
+    }
+    if (message.pendingVerifierVerdict !== 0) {
+      writer.uint32(104).int32(message.pendingVerifierVerdict);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): VerificationRecord {
@@ -1524,6 +1820,12 @@ export const VerificationRecord = {
         case 11:
           message.challenger = reader.string();
           break;
+        case 12:
+          message.escrowedChallengeFee = reader.string();
+          break;
+        case 13:
+          message.pendingVerifierVerdict = reader.int32() as any;
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1544,6 +1846,8 @@ export const VerificationRecord = {
     message.priorRejectedChallenges = object.priorRejectedChallenges ?? 0;
     message.lastChallengeResolvedAt = object.lastChallengeResolvedAt !== undefined && object.lastChallengeResolvedAt !== null ? BigInt(object.lastChallengeResolvedAt.toString()) : BigInt(0);
     message.challenger = object.challenger ?? "";
+    message.escrowedChallengeFee = object.escrowedChallengeFee ?? "";
+    message.pendingVerifierVerdict = object.pendingVerifierVerdict ?? 0;
     return message;
   },
   fromAmino(object: VerificationRecordAmino): VerificationRecord {
@@ -1581,6 +1885,12 @@ export const VerificationRecord = {
     if (object.challenger !== undefined && object.challenger !== null) {
       message.challenger = object.challenger;
     }
+    if (object.escrowed_challenge_fee !== undefined && object.escrowed_challenge_fee !== null) {
+      message.escrowedChallengeFee = object.escrowed_challenge_fee;
+    }
+    if (object.pending_verifier_verdict !== undefined && object.pending_verifier_verdict !== null) {
+      message.pendingVerifierVerdict = object.pending_verifier_verdict;
+    }
     return message;
   },
   toAmino(message: VerificationRecord): VerificationRecordAmino {
@@ -1596,6 +1906,8 @@ export const VerificationRecord = {
     obj.prior_rejected_challenges = message.priorRejectedChallenges === 0 ? undefined : message.priorRejectedChallenges;
     obj.last_challenge_resolved_at = message.lastChallengeResolvedAt !== BigInt(0) ? message.lastChallengeResolvedAt?.toString() : undefined;
     obj.challenger = message.challenger === "" ? undefined : message.challenger;
+    obj.escrowed_challenge_fee = message.escrowedChallengeFee === "" ? undefined : message.escrowedChallengeFee;
+    obj.pending_verifier_verdict = message.pendingVerifierVerdict === 0 ? undefined : message.pendingVerifierVerdict;
     return obj;
   },
   fromAminoMsg(object: VerificationRecordAminoMsg): VerificationRecord {
@@ -1611,6 +1923,130 @@ export const VerificationRecord = {
     return {
       typeUrl: "/sparkdream.federation.v1.VerificationRecord",
       value: VerificationRecord.encode(message).finish()
+    };
+  }
+};
+function createBaseEscalatedChallenge(): EscalatedChallenge {
+  return {
+    contentId: BigInt(0),
+    escalator: "",
+    escrowedEscalationFee: "",
+    autoVerdictBeforeEscalation: 0,
+    juryDeadline: BigInt(0)
+  };
+}
+/**
+ * EscalatedChallenge tracks the Phase 2 (human jury) lifecycle for a
+ * challenge whose Phase 1 auto-verdict was contested via
+ * MsgEscalateChallenge. Operations Committee submits the jury verdict
+ * via MsgResolveEscalatedChallenge; the EndBlocker stamps TIMEOUT on
+ * jury_deadline expiry. Both paths feed the same applyJuryVerdict
+ * helper which disposes of the escrowed challenge_fee + escalation_fee
+ * and (on UPHELD/REJECTED) applies the same verifier-side accounting
+ * as the auto-resolution path.
+ * @name EscalatedChallenge
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.EscalatedChallenge
+ */
+export const EscalatedChallenge = {
+  typeUrl: "/sparkdream.federation.v1.EscalatedChallenge",
+  encode(message: EscalatedChallenge, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.contentId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.contentId);
+    }
+    if (message.escalator !== "") {
+      writer.uint32(18).string(message.escalator);
+    }
+    if (message.escrowedEscalationFee !== "") {
+      writer.uint32(26).string(message.escrowedEscalationFee);
+    }
+    if (message.autoVerdictBeforeEscalation !== 0) {
+      writer.uint32(32).int32(message.autoVerdictBeforeEscalation);
+    }
+    if (message.juryDeadline !== BigInt(0)) {
+      writer.uint32(40).int64(message.juryDeadline);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): EscalatedChallenge {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEscalatedChallenge();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.contentId = reader.uint64();
+          break;
+        case 2:
+          message.escalator = reader.string();
+          break;
+        case 3:
+          message.escrowedEscalationFee = reader.string();
+          break;
+        case 4:
+          message.autoVerdictBeforeEscalation = reader.int32() as any;
+          break;
+        case 5:
+          message.juryDeadline = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<EscalatedChallenge>): EscalatedChallenge {
+    const message = createBaseEscalatedChallenge();
+    message.contentId = object.contentId !== undefined && object.contentId !== null ? BigInt(object.contentId.toString()) : BigInt(0);
+    message.escalator = object.escalator ?? "";
+    message.escrowedEscalationFee = object.escrowedEscalationFee ?? "";
+    message.autoVerdictBeforeEscalation = object.autoVerdictBeforeEscalation ?? 0;
+    message.juryDeadline = object.juryDeadline !== undefined && object.juryDeadline !== null ? BigInt(object.juryDeadline.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: EscalatedChallengeAmino): EscalatedChallenge {
+    const message = createBaseEscalatedChallenge();
+    if (object.content_id !== undefined && object.content_id !== null) {
+      message.contentId = BigInt(object.content_id);
+    }
+    if (object.escalator !== undefined && object.escalator !== null) {
+      message.escalator = object.escalator;
+    }
+    if (object.escrowed_escalation_fee !== undefined && object.escrowed_escalation_fee !== null) {
+      message.escrowedEscalationFee = object.escrowed_escalation_fee;
+    }
+    if (object.auto_verdict_before_escalation !== undefined && object.auto_verdict_before_escalation !== null) {
+      message.autoVerdictBeforeEscalation = object.auto_verdict_before_escalation;
+    }
+    if (object.jury_deadline !== undefined && object.jury_deadline !== null) {
+      message.juryDeadline = BigInt(object.jury_deadline);
+    }
+    return message;
+  },
+  toAmino(message: EscalatedChallenge): EscalatedChallengeAmino {
+    const obj: any = {};
+    obj.content_id = message.contentId !== BigInt(0) ? message.contentId?.toString() : undefined;
+    obj.escalator = message.escalator === "" ? undefined : message.escalator;
+    obj.escrowed_escalation_fee = message.escrowedEscalationFee === "" ? undefined : message.escrowedEscalationFee;
+    obj.auto_verdict_before_escalation = message.autoVerdictBeforeEscalation === 0 ? undefined : message.autoVerdictBeforeEscalation;
+    obj.jury_deadline = message.juryDeadline !== BigInt(0) ? message.juryDeadline?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: EscalatedChallengeAminoMsg): EscalatedChallenge {
+    return EscalatedChallenge.fromAmino(object.value);
+  },
+  fromProtoMsg(message: EscalatedChallengeProtoMsg): EscalatedChallenge {
+    return EscalatedChallenge.decode(message.value);
+  },
+  toProto(message: EscalatedChallenge): Uint8Array {
+    return EscalatedChallenge.encode(message).finish();
+  },
+  toProtoMsg(message: EscalatedChallenge): EscalatedChallengeProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.EscalatedChallenge",
+      value: EscalatedChallenge.encode(message).finish()
     };
   }
 };

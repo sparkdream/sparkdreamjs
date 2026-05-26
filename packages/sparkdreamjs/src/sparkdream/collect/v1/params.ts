@@ -122,6 +122,14 @@ export interface Params {
    * streak-based demotion.
    */
   curatorOverturnDemotionStreak: bigint;
+  /**
+   * curator_unbond_cooldown is the number of seconds a curator's bond stays
+   * locked and slashable after MsgUnbondRole. During the cooldown the
+   * BondedRole status is UNBONDING and MsgRateCollection refuses authority.
+   * Propagated to x/rep BondedRoleConfig via SyncCuratorBondedRoleConfig.
+   * Zero = immediate withdrawal (legacy behavior).
+   */
+  curatorUnbondCooldown: bigint;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.collect.v1.Params";
@@ -247,6 +255,14 @@ export interface ParamsAmino {
    * streak-based demotion.
    */
   curator_overturn_demotion_streak?: string;
+  /**
+   * curator_unbond_cooldown is the number of seconds a curator's bond stays
+   * locked and slashable after MsgUnbondRole. During the cooldown the
+   * BondedRole status is UNBONDING and MsgRateCollection refuses authority.
+   * Propagated to x/rep BondedRoleConfig via SyncCuratorBondedRoleConfig.
+   * Zero = immediate withdrawal (legacy behavior).
+   */
+  curator_unbond_cooldown?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/collect/Params";
@@ -314,7 +330,8 @@ function createBaseParams(): Params {
     maxPinsPerDay: 0,
     curatorDemotionCooldown: BigInt(0),
     curatorDemotionThreshold: "",
-    curatorOverturnDemotionStreak: BigInt(0)
+    curatorOverturnDemotionStreak: BigInt(0),
+    curatorUnbondCooldown: BigInt(0)
   };
 }
 /**
@@ -510,6 +527,9 @@ export const Params = {
     if (message.curatorOverturnDemotionStreak !== BigInt(0)) {
       writer.uint32(520).uint64(message.curatorOverturnDemotionStreak);
     }
+    if (message.curatorUnbondCooldown !== BigInt(0)) {
+      writer.uint32(528).int64(message.curatorUnbondCooldown);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -702,6 +722,9 @@ export const Params = {
         case 65:
           message.curatorOverturnDemotionStreak = reader.uint64();
           break;
+        case 66:
+          message.curatorUnbondCooldown = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -772,6 +795,7 @@ export const Params = {
     message.curatorDemotionCooldown = object.curatorDemotionCooldown !== undefined && object.curatorDemotionCooldown !== null ? BigInt(object.curatorDemotionCooldown.toString()) : BigInt(0);
     message.curatorDemotionThreshold = object.curatorDemotionThreshold ?? "";
     message.curatorOverturnDemotionStreak = object.curatorOverturnDemotionStreak !== undefined && object.curatorOverturnDemotionStreak !== null ? BigInt(object.curatorOverturnDemotionStreak.toString()) : BigInt(0);
+    message.curatorUnbondCooldown = object.curatorUnbondCooldown !== undefined && object.curatorUnbondCooldown !== null ? BigInt(object.curatorUnbondCooldown.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -959,6 +983,9 @@ export const Params = {
     if (object.curator_overturn_demotion_streak !== undefined && object.curator_overturn_demotion_streak !== null) {
       message.curatorOverturnDemotionStreak = BigInt(object.curator_overturn_demotion_streak);
     }
+    if (object.curator_unbond_cooldown !== undefined && object.curator_unbond_cooldown !== null) {
+      message.curatorUnbondCooldown = BigInt(object.curator_unbond_cooldown);
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -1024,6 +1051,7 @@ export const Params = {
     obj.curator_demotion_cooldown = message.curatorDemotionCooldown !== BigInt(0) ? message.curatorDemotionCooldown?.toString() : undefined;
     obj.curator_demotion_threshold = message.curatorDemotionThreshold === "" ? undefined : message.curatorDemotionThreshold;
     obj.curator_overturn_demotion_streak = message.curatorOverturnDemotionStreak !== BigInt(0) ? message.curatorOverturnDemotionStreak?.toString() : undefined;
+    obj.curator_unbond_cooldown = message.curatorUnbondCooldown !== BigInt(0) ? message.curatorUnbondCooldown?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {

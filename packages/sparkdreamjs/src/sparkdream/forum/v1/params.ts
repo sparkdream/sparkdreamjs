@@ -1,10 +1,11 @@
 //@ts-nocheck
-import { Coin, CoinAmino } from "../../../cosmos/base/v1beta1/coin";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { Decimal } from "@interchainjs/math";
 import { DeepPartial } from "../../../helpers";
 /**
- * Params defines the parameters for the module.
+ * Params defines the parameters for the module. Fee/cost fields are stored
+ * as bare amounts in the chain's bond denom (resolved at runtime from
+ * x/identity); the keeper wraps them into sdk.Coin at the point of use.
  * @name Params
  * @package sparkdream.forum.v1
  * @see proto type: sparkdream.forum.v1.Params
@@ -35,37 +36,37 @@ export interface Params {
    */
   editingEnabled: boolean;
   /**
-   * spam_tax charged to non-members for posting
+   * spam_tax_amount charged to non-members for posting, in bond-denom micro-units.
    */
-  spamTax: Coin;
+  spamTaxAmount: string;
   /**
-   * reaction_spam_tax charged to non-members for reactions
+   * reaction_spam_tax_amount charged to non-members for reactions, in bond-denom micro-units.
    */
-  reactionSpamTax: Coin;
+  reactionSpamTaxAmount: string;
   /**
-   * flag_spam_tax charged to non-members for flagging
+   * flag_spam_tax_amount charged to non-members for flagging, in bond-denom micro-units.
    */
-  flagSpamTax: Coin;
+  flagSpamTaxAmount: string;
   /**
-   * downvote_deposit burned when downvoting
+   * downvote_deposit_amount burned when downvoting, in bond-denom micro-units.
    */
-  downvoteDeposit: Coin;
+  downvoteDepositAmount: string;
   /**
-   * appeal_fee charged for appeals
+   * appeal_fee_amount charged for appeals, in bond-denom micro-units.
    */
-  appealFee: Coin;
+  appealFeeAmount: string;
   /**
-   * lock_appeal_fee charged for thread lock appeals
+   * lock_appeal_fee_amount charged for thread lock appeals, in bond-denom micro-units.
    */
-  lockAppealFee: Coin;
+  lockAppealFeeAmount: string;
   /**
-   * move_appeal_fee charged for thread move appeals
+   * move_appeal_fee_amount charged for thread move appeals, in bond-denom micro-units.
    */
-  moveAppealFee: Coin;
+  moveAppealFeeAmount: string;
   /**
-   * edit_fee charged for edits past grace period
+   * edit_fee_amount charged for edits past grace period, in bond-denom micro-units.
    */
-  editFee: Coin;
+  editFeeAmount: string;
   /**
    * bounty_cancellation_fee_percent percentage of bounty taken on cancellation (0-100)
    */
@@ -119,9 +120,10 @@ export interface Params {
    */
   moveAppealCooldown: bigint;
   /**
-   * cost_per_byte charged for on-chain content storage (applies to all posts, burned)
+   * cost_per_byte_amount charged for on-chain content storage (applies to all
+   * posts, burned), in bond-denom micro-units.
    */
-  costPerByte: Coin;
+  costPerByteAmount: string;
   /**
    * cost_per_byte_exempt when true, disables cost_per_byte fee collection
    */
@@ -169,13 +171,23 @@ export interface Params {
    * governance can unhide. Analogous to edit_max_window for authors.
    */
   sentinelUnhideWindow: bigint;
+  /**
+   * sentinel_unbond_cooldown is the number of seconds a sentinel's bond stays
+   * locked and slashable after MsgUnbondRole. During the cooldown, the
+   * BondedRole status is UNBONDING and forum action gates refuse authority.
+   * Propagated to x/rep BondedRoleConfig via SyncSentinelBondedRoleConfig.
+   * Zero = immediate withdrawal (legacy behavior).
+   */
+  sentinelUnbondCooldown: bigint;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.forum.v1.Params";
   value: Uint8Array;
 }
 /**
- * Params defines the parameters for the module.
+ * Params defines the parameters for the module. Fee/cost fields are stored
+ * as bare amounts in the chain's bond denom (resolved at runtime from
+ * x/identity); the keeper wraps them into sdk.Coin at the point of use.
  * @name ParamsAmino
  * @package sparkdream.forum.v1
  * @see proto type: sparkdream.forum.v1.Params
@@ -206,37 +218,37 @@ export interface ParamsAmino {
    */
   editing_enabled?: boolean;
   /**
-   * spam_tax charged to non-members for posting
+   * spam_tax_amount charged to non-members for posting, in bond-denom micro-units.
    */
-  spam_tax?: CoinAmino;
+  spam_tax_amount?: string;
   /**
-   * reaction_spam_tax charged to non-members for reactions
+   * reaction_spam_tax_amount charged to non-members for reactions, in bond-denom micro-units.
    */
-  reaction_spam_tax?: CoinAmino;
+  reaction_spam_tax_amount?: string;
   /**
-   * flag_spam_tax charged to non-members for flagging
+   * flag_spam_tax_amount charged to non-members for flagging, in bond-denom micro-units.
    */
-  flag_spam_tax?: CoinAmino;
+  flag_spam_tax_amount?: string;
   /**
-   * downvote_deposit burned when downvoting
+   * downvote_deposit_amount burned when downvoting, in bond-denom micro-units.
    */
-  downvote_deposit?: CoinAmino;
+  downvote_deposit_amount?: string;
   /**
-   * appeal_fee charged for appeals
+   * appeal_fee_amount charged for appeals, in bond-denom micro-units.
    */
-  appeal_fee?: CoinAmino;
+  appeal_fee_amount?: string;
   /**
-   * lock_appeal_fee charged for thread lock appeals
+   * lock_appeal_fee_amount charged for thread lock appeals, in bond-denom micro-units.
    */
-  lock_appeal_fee?: CoinAmino;
+  lock_appeal_fee_amount?: string;
   /**
-   * move_appeal_fee charged for thread move appeals
+   * move_appeal_fee_amount charged for thread move appeals, in bond-denom micro-units.
    */
-  move_appeal_fee?: CoinAmino;
+  move_appeal_fee_amount?: string;
   /**
-   * edit_fee charged for edits past grace period
+   * edit_fee_amount charged for edits past grace period, in bond-denom micro-units.
    */
-  edit_fee?: CoinAmino;
+  edit_fee_amount?: string;
   /**
    * bounty_cancellation_fee_percent percentage of bounty taken on cancellation (0-100)
    */
@@ -290,9 +302,10 @@ export interface ParamsAmino {
    */
   move_appeal_cooldown?: string;
   /**
-   * cost_per_byte charged for on-chain content storage (applies to all posts, burned)
+   * cost_per_byte_amount charged for on-chain content storage (applies to all
+   * posts, burned), in bond-denom micro-units.
    */
-  cost_per_byte?: CoinAmino;
+  cost_per_byte_amount?: string;
   /**
    * cost_per_byte_exempt when true, disables cost_per_byte fee collection
    */
@@ -340,6 +353,14 @@ export interface ParamsAmino {
    * governance can unhide. Analogous to edit_max_window for authors.
    */
   sentinel_unhide_window?: string;
+  /**
+   * sentinel_unbond_cooldown is the number of seconds a sentinel's bond stays
+   * locked and slashable after MsgUnbondRole. During the cooldown, the
+   * BondedRole status is UNBONDING and forum action gates refuse authority.
+   * Propagated to x/rep BondedRoleConfig via SyncSentinelBondedRoleConfig.
+   * Zero = immediate withdrawal (legacy behavior).
+   */
+  sentinel_unbond_cooldown?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/forum/Params";
@@ -362,17 +383,17 @@ export interface ForumOperationalParams {
   reactionsEnabled: boolean;
   editingEnabled: boolean;
   /**
-   * Fees
+   * Fees, all in bond-denom micro-units.
    */
-  spamTax: Coin;
-  reactionSpamTax: Coin;
-  flagSpamTax: Coin;
-  downvoteDeposit: Coin;
-  appealFee: Coin;
-  lockAppealFee: Coin;
-  moveAppealFee: Coin;
-  editFee: Coin;
-  costPerByte: Coin;
+  spamTaxAmount: string;
+  reactionSpamTaxAmount: string;
+  flagSpamTaxAmount: string;
+  downvoteDepositAmount: string;
+  appealFeeAmount: string;
+  lockAppealFeeAmount: string;
+  moveAppealFeeAmount: string;
+  editFeeAmount: string;
+  costPerByteAmount: string;
   costPerByteExempt: boolean;
   /**
    * Limits
@@ -441,6 +462,13 @@ export interface ForumOperationalParams {
    * governance can unhide.
    */
   sentinelUnhideWindow: bigint;
+  /**
+   * sentinel_unbond_cooldown is the number of seconds a sentinel's bond stays
+   * locked and slashable after MsgUnbondRole. During the cooldown the
+   * BondedRole is in UNBONDING status and forum action gates refuse
+   * authority. Zero = immediate withdrawal.
+   */
+  sentinelUnbondCooldown: bigint;
 }
 export interface ForumOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.forum.v1.ForumOperationalParams";
@@ -463,17 +491,17 @@ export interface ForumOperationalParamsAmino {
   reactions_enabled?: boolean;
   editing_enabled?: boolean;
   /**
-   * Fees
+   * Fees, all in bond-denom micro-units.
    */
-  spam_tax?: CoinAmino;
-  reaction_spam_tax?: CoinAmino;
-  flag_spam_tax?: CoinAmino;
-  downvote_deposit?: CoinAmino;
-  appeal_fee?: CoinAmino;
-  lock_appeal_fee?: CoinAmino;
-  move_appeal_fee?: CoinAmino;
-  edit_fee?: CoinAmino;
-  cost_per_byte?: CoinAmino;
+  spam_tax_amount?: string;
+  reaction_spam_tax_amount?: string;
+  flag_spam_tax_amount?: string;
+  downvote_deposit_amount?: string;
+  appeal_fee_amount?: string;
+  lock_appeal_fee_amount?: string;
+  move_appeal_fee_amount?: string;
+  edit_fee_amount?: string;
+  cost_per_byte_amount?: string;
   cost_per_byte_exempt?: boolean;
   /**
    * Limits
@@ -542,6 +570,13 @@ export interface ForumOperationalParamsAmino {
    * governance can unhide.
    */
   sentinel_unhide_window?: string;
+  /**
+   * sentinel_unbond_cooldown is the number of seconds a sentinel's bond stays
+   * locked and slashable after MsgUnbondRole. During the cooldown the
+   * BondedRole is in UNBONDING status and forum action gates refuse
+   * authority. Zero = immediate withdrawal.
+   */
+  sentinel_unbond_cooldown?: string;
 }
 export interface ForumOperationalParamsAminoMsg {
   type: "sparkdream/x/forum/ForumOperationalParams";
@@ -555,14 +590,14 @@ function createBaseParams(): Params {
     reactionsEnabled: false,
     appealsPaused: false,
     editingEnabled: false,
-    spamTax: Coin.fromPartial({}),
-    reactionSpamTax: Coin.fromPartial({}),
-    flagSpamTax: Coin.fromPartial({}),
-    downvoteDeposit: Coin.fromPartial({}),
-    appealFee: Coin.fromPartial({}),
-    lockAppealFee: Coin.fromPartial({}),
-    moveAppealFee: Coin.fromPartial({}),
-    editFee: Coin.fromPartial({}),
+    spamTaxAmount: "",
+    reactionSpamTaxAmount: "",
+    flagSpamTaxAmount: "",
+    downvoteDepositAmount: "",
+    appealFeeAmount: "",
+    lockAppealFeeAmount: "",
+    moveAppealFeeAmount: "",
+    editFeeAmount: "",
     bountyCancellationFeePercent: BigInt(0),
     maxContentSize: BigInt(0),
     dailyPostLimit: BigInt(0),
@@ -576,7 +611,7 @@ function createBaseParams(): Params {
     hideAppealCooldown: BigInt(0),
     lockAppealCooldown: BigInt(0),
     moveAppealCooldown: BigInt(0),
-    costPerByte: Coin.fromPartial({}),
+    costPerByteAmount: "",
     costPerByteExempt: false,
     ephemeralTtl: BigInt(0),
     convictionRenewalThreshold: "",
@@ -587,11 +622,14 @@ function createBaseParams(): Params {
     minSentinelAgeBlocks: BigInt(0),
     sentinelDemotionCooldown: BigInt(0),
     sentinelDemotionThreshold: "",
-    sentinelUnhideWindow: BigInt(0)
+    sentinelUnhideWindow: BigInt(0),
+    sentinelUnbondCooldown: BigInt(0)
   };
 }
 /**
- * Params defines the parameters for the module.
+ * Params defines the parameters for the module. Fee/cost fields are stored
+ * as bare amounts in the chain's bond denom (resolved at runtime from
+ * x/identity); the keeper wraps them into sdk.Coin at the point of use.
  * @name Params
  * @package sparkdream.forum.v1
  * @see proto type: sparkdream.forum.v1.Params
@@ -618,29 +656,29 @@ export const Params = {
     if (message.editingEnabled === true) {
       writer.uint32(48).bool(message.editingEnabled);
     }
-    if (message.spamTax !== undefined) {
-      Coin.encode(message.spamTax, writer.uint32(58).fork()).ldelim();
+    if (message.spamTaxAmount !== "") {
+      writer.uint32(58).string(message.spamTaxAmount);
     }
-    if (message.reactionSpamTax !== undefined) {
-      Coin.encode(message.reactionSpamTax, writer.uint32(66).fork()).ldelim();
+    if (message.reactionSpamTaxAmount !== "") {
+      writer.uint32(66).string(message.reactionSpamTaxAmount);
     }
-    if (message.flagSpamTax !== undefined) {
-      Coin.encode(message.flagSpamTax, writer.uint32(74).fork()).ldelim();
+    if (message.flagSpamTaxAmount !== "") {
+      writer.uint32(74).string(message.flagSpamTaxAmount);
     }
-    if (message.downvoteDeposit !== undefined) {
-      Coin.encode(message.downvoteDeposit, writer.uint32(82).fork()).ldelim();
+    if (message.downvoteDepositAmount !== "") {
+      writer.uint32(82).string(message.downvoteDepositAmount);
     }
-    if (message.appealFee !== undefined) {
-      Coin.encode(message.appealFee, writer.uint32(90).fork()).ldelim();
+    if (message.appealFeeAmount !== "") {
+      writer.uint32(90).string(message.appealFeeAmount);
     }
-    if (message.lockAppealFee !== undefined) {
-      Coin.encode(message.lockAppealFee, writer.uint32(98).fork()).ldelim();
+    if (message.lockAppealFeeAmount !== "") {
+      writer.uint32(98).string(message.lockAppealFeeAmount);
     }
-    if (message.moveAppealFee !== undefined) {
-      Coin.encode(message.moveAppealFee, writer.uint32(106).fork()).ldelim();
+    if (message.moveAppealFeeAmount !== "") {
+      writer.uint32(106).string(message.moveAppealFeeAmount);
     }
-    if (message.editFee !== undefined) {
-      Coin.encode(message.editFee, writer.uint32(114).fork()).ldelim();
+    if (message.editFeeAmount !== "") {
+      writer.uint32(114).string(message.editFeeAmount);
     }
     if (message.bountyCancellationFeePercent !== BigInt(0)) {
       writer.uint32(120).uint64(message.bountyCancellationFeePercent);
@@ -681,8 +719,8 @@ export const Params = {
     if (message.moveAppealCooldown !== BigInt(0)) {
       writer.uint32(216).int64(message.moveAppealCooldown);
     }
-    if (message.costPerByte !== undefined) {
-      Coin.encode(message.costPerByte, writer.uint32(226).fork()).ldelim();
+    if (message.costPerByteAmount !== "") {
+      writer.uint32(226).string(message.costPerByteAmount);
     }
     if (message.costPerByteExempt === true) {
       writer.uint32(232).bool(message.costPerByteExempt);
@@ -717,6 +755,9 @@ export const Params = {
     if (message.sentinelUnhideWindow !== BigInt(0)) {
       writer.uint32(368).int64(message.sentinelUnhideWindow);
     }
+    if (message.sentinelUnbondCooldown !== BigInt(0)) {
+      writer.uint32(376).int64(message.sentinelUnbondCooldown);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -745,28 +786,28 @@ export const Params = {
           message.editingEnabled = reader.bool();
           break;
         case 7:
-          message.spamTax = Coin.decode(reader, reader.uint32());
+          message.spamTaxAmount = reader.string();
           break;
         case 8:
-          message.reactionSpamTax = Coin.decode(reader, reader.uint32());
+          message.reactionSpamTaxAmount = reader.string();
           break;
         case 9:
-          message.flagSpamTax = Coin.decode(reader, reader.uint32());
+          message.flagSpamTaxAmount = reader.string();
           break;
         case 10:
-          message.downvoteDeposit = Coin.decode(reader, reader.uint32());
+          message.downvoteDepositAmount = reader.string();
           break;
         case 11:
-          message.appealFee = Coin.decode(reader, reader.uint32());
+          message.appealFeeAmount = reader.string();
           break;
         case 12:
-          message.lockAppealFee = Coin.decode(reader, reader.uint32());
+          message.lockAppealFeeAmount = reader.string();
           break;
         case 13:
-          message.moveAppealFee = Coin.decode(reader, reader.uint32());
+          message.moveAppealFeeAmount = reader.string();
           break;
         case 14:
-          message.editFee = Coin.decode(reader, reader.uint32());
+          message.editFeeAmount = reader.string();
           break;
         case 15:
           message.bountyCancellationFeePercent = reader.uint64();
@@ -808,7 +849,7 @@ export const Params = {
           message.moveAppealCooldown = reader.int64();
           break;
         case 28:
-          message.costPerByte = Coin.decode(reader, reader.uint32());
+          message.costPerByteAmount = reader.string();
           break;
         case 29:
           message.costPerByteExempt = reader.bool();
@@ -843,6 +884,9 @@ export const Params = {
         case 46:
           message.sentinelUnhideWindow = reader.int64();
           break;
+        case 47:
+          message.sentinelUnbondCooldown = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -858,14 +902,14 @@ export const Params = {
     message.reactionsEnabled = object.reactionsEnabled ?? false;
     message.appealsPaused = object.appealsPaused ?? false;
     message.editingEnabled = object.editingEnabled ?? false;
-    message.spamTax = object.spamTax !== undefined && object.spamTax !== null ? Coin.fromPartial(object.spamTax) : undefined;
-    message.reactionSpamTax = object.reactionSpamTax !== undefined && object.reactionSpamTax !== null ? Coin.fromPartial(object.reactionSpamTax) : undefined;
-    message.flagSpamTax = object.flagSpamTax !== undefined && object.flagSpamTax !== null ? Coin.fromPartial(object.flagSpamTax) : undefined;
-    message.downvoteDeposit = object.downvoteDeposit !== undefined && object.downvoteDeposit !== null ? Coin.fromPartial(object.downvoteDeposit) : undefined;
-    message.appealFee = object.appealFee !== undefined && object.appealFee !== null ? Coin.fromPartial(object.appealFee) : undefined;
-    message.lockAppealFee = object.lockAppealFee !== undefined && object.lockAppealFee !== null ? Coin.fromPartial(object.lockAppealFee) : undefined;
-    message.moveAppealFee = object.moveAppealFee !== undefined && object.moveAppealFee !== null ? Coin.fromPartial(object.moveAppealFee) : undefined;
-    message.editFee = object.editFee !== undefined && object.editFee !== null ? Coin.fromPartial(object.editFee) : undefined;
+    message.spamTaxAmount = object.spamTaxAmount ?? "";
+    message.reactionSpamTaxAmount = object.reactionSpamTaxAmount ?? "";
+    message.flagSpamTaxAmount = object.flagSpamTaxAmount ?? "";
+    message.downvoteDepositAmount = object.downvoteDepositAmount ?? "";
+    message.appealFeeAmount = object.appealFeeAmount ?? "";
+    message.lockAppealFeeAmount = object.lockAppealFeeAmount ?? "";
+    message.moveAppealFeeAmount = object.moveAppealFeeAmount ?? "";
+    message.editFeeAmount = object.editFeeAmount ?? "";
     message.bountyCancellationFeePercent = object.bountyCancellationFeePercent !== undefined && object.bountyCancellationFeePercent !== null ? BigInt(object.bountyCancellationFeePercent.toString()) : BigInt(0);
     message.maxContentSize = object.maxContentSize !== undefined && object.maxContentSize !== null ? BigInt(object.maxContentSize.toString()) : BigInt(0);
     message.dailyPostLimit = object.dailyPostLimit !== undefined && object.dailyPostLimit !== null ? BigInt(object.dailyPostLimit.toString()) : BigInt(0);
@@ -879,7 +923,7 @@ export const Params = {
     message.hideAppealCooldown = object.hideAppealCooldown !== undefined && object.hideAppealCooldown !== null ? BigInt(object.hideAppealCooldown.toString()) : BigInt(0);
     message.lockAppealCooldown = object.lockAppealCooldown !== undefined && object.lockAppealCooldown !== null ? BigInt(object.lockAppealCooldown.toString()) : BigInt(0);
     message.moveAppealCooldown = object.moveAppealCooldown !== undefined && object.moveAppealCooldown !== null ? BigInt(object.moveAppealCooldown.toString()) : BigInt(0);
-    message.costPerByte = object.costPerByte !== undefined && object.costPerByte !== null ? Coin.fromPartial(object.costPerByte) : undefined;
+    message.costPerByteAmount = object.costPerByteAmount ?? "";
     message.costPerByteExempt = object.costPerByteExempt ?? false;
     message.ephemeralTtl = object.ephemeralTtl !== undefined && object.ephemeralTtl !== null ? BigInt(object.ephemeralTtl.toString()) : BigInt(0);
     message.convictionRenewalThreshold = object.convictionRenewalThreshold ?? "";
@@ -891,6 +935,7 @@ export const Params = {
     message.sentinelDemotionCooldown = object.sentinelDemotionCooldown !== undefined && object.sentinelDemotionCooldown !== null ? BigInt(object.sentinelDemotionCooldown.toString()) : BigInt(0);
     message.sentinelDemotionThreshold = object.sentinelDemotionThreshold ?? "";
     message.sentinelUnhideWindow = object.sentinelUnhideWindow !== undefined && object.sentinelUnhideWindow !== null ? BigInt(object.sentinelUnhideWindow.toString()) : BigInt(0);
+    message.sentinelUnbondCooldown = object.sentinelUnbondCooldown !== undefined && object.sentinelUnbondCooldown !== null ? BigInt(object.sentinelUnbondCooldown.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -913,29 +958,29 @@ export const Params = {
     if (object.editing_enabled !== undefined && object.editing_enabled !== null) {
       message.editingEnabled = object.editing_enabled;
     }
-    if (object.spam_tax !== undefined && object.spam_tax !== null) {
-      message.spamTax = Coin.fromAmino(object.spam_tax);
+    if (object.spam_tax_amount !== undefined && object.spam_tax_amount !== null) {
+      message.spamTaxAmount = object.spam_tax_amount;
     }
-    if (object.reaction_spam_tax !== undefined && object.reaction_spam_tax !== null) {
-      message.reactionSpamTax = Coin.fromAmino(object.reaction_spam_tax);
+    if (object.reaction_spam_tax_amount !== undefined && object.reaction_spam_tax_amount !== null) {
+      message.reactionSpamTaxAmount = object.reaction_spam_tax_amount;
     }
-    if (object.flag_spam_tax !== undefined && object.flag_spam_tax !== null) {
-      message.flagSpamTax = Coin.fromAmino(object.flag_spam_tax);
+    if (object.flag_spam_tax_amount !== undefined && object.flag_spam_tax_amount !== null) {
+      message.flagSpamTaxAmount = object.flag_spam_tax_amount;
     }
-    if (object.downvote_deposit !== undefined && object.downvote_deposit !== null) {
-      message.downvoteDeposit = Coin.fromAmino(object.downvote_deposit);
+    if (object.downvote_deposit_amount !== undefined && object.downvote_deposit_amount !== null) {
+      message.downvoteDepositAmount = object.downvote_deposit_amount;
     }
-    if (object.appeal_fee !== undefined && object.appeal_fee !== null) {
-      message.appealFee = Coin.fromAmino(object.appeal_fee);
+    if (object.appeal_fee_amount !== undefined && object.appeal_fee_amount !== null) {
+      message.appealFeeAmount = object.appeal_fee_amount;
     }
-    if (object.lock_appeal_fee !== undefined && object.lock_appeal_fee !== null) {
-      message.lockAppealFee = Coin.fromAmino(object.lock_appeal_fee);
+    if (object.lock_appeal_fee_amount !== undefined && object.lock_appeal_fee_amount !== null) {
+      message.lockAppealFeeAmount = object.lock_appeal_fee_amount;
     }
-    if (object.move_appeal_fee !== undefined && object.move_appeal_fee !== null) {
-      message.moveAppealFee = Coin.fromAmino(object.move_appeal_fee);
+    if (object.move_appeal_fee_amount !== undefined && object.move_appeal_fee_amount !== null) {
+      message.moveAppealFeeAmount = object.move_appeal_fee_amount;
     }
-    if (object.edit_fee !== undefined && object.edit_fee !== null) {
-      message.editFee = Coin.fromAmino(object.edit_fee);
+    if (object.edit_fee_amount !== undefined && object.edit_fee_amount !== null) {
+      message.editFeeAmount = object.edit_fee_amount;
     }
     if (object.bounty_cancellation_fee_percent !== undefined && object.bounty_cancellation_fee_percent !== null) {
       message.bountyCancellationFeePercent = BigInt(object.bounty_cancellation_fee_percent);
@@ -976,8 +1021,8 @@ export const Params = {
     if (object.move_appeal_cooldown !== undefined && object.move_appeal_cooldown !== null) {
       message.moveAppealCooldown = BigInt(object.move_appeal_cooldown);
     }
-    if (object.cost_per_byte !== undefined && object.cost_per_byte !== null) {
-      message.costPerByte = Coin.fromAmino(object.cost_per_byte);
+    if (object.cost_per_byte_amount !== undefined && object.cost_per_byte_amount !== null) {
+      message.costPerByteAmount = object.cost_per_byte_amount;
     }
     if (object.cost_per_byte_exempt !== undefined && object.cost_per_byte_exempt !== null) {
       message.costPerByteExempt = object.cost_per_byte_exempt;
@@ -1012,6 +1057,9 @@ export const Params = {
     if (object.sentinel_unhide_window !== undefined && object.sentinel_unhide_window !== null) {
       message.sentinelUnhideWindow = BigInt(object.sentinel_unhide_window);
     }
+    if (object.sentinel_unbond_cooldown !== undefined && object.sentinel_unbond_cooldown !== null) {
+      message.sentinelUnbondCooldown = BigInt(object.sentinel_unbond_cooldown);
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -1022,14 +1070,14 @@ export const Params = {
     obj.reactions_enabled = message.reactionsEnabled === false ? undefined : message.reactionsEnabled;
     obj.appeals_paused = message.appealsPaused === false ? undefined : message.appealsPaused;
     obj.editing_enabled = message.editingEnabled === false ? undefined : message.editingEnabled;
-    obj.spam_tax = message.spamTax ? Coin.toAmino(message.spamTax) : undefined;
-    obj.reaction_spam_tax = message.reactionSpamTax ? Coin.toAmino(message.reactionSpamTax) : undefined;
-    obj.flag_spam_tax = message.flagSpamTax ? Coin.toAmino(message.flagSpamTax) : undefined;
-    obj.downvote_deposit = message.downvoteDeposit ? Coin.toAmino(message.downvoteDeposit) : undefined;
-    obj.appeal_fee = message.appealFee ? Coin.toAmino(message.appealFee) : undefined;
-    obj.lock_appeal_fee = message.lockAppealFee ? Coin.toAmino(message.lockAppealFee) : undefined;
-    obj.move_appeal_fee = message.moveAppealFee ? Coin.toAmino(message.moveAppealFee) : undefined;
-    obj.edit_fee = message.editFee ? Coin.toAmino(message.editFee) : undefined;
+    obj.spam_tax_amount = message.spamTaxAmount === "" ? undefined : message.spamTaxAmount;
+    obj.reaction_spam_tax_amount = message.reactionSpamTaxAmount === "" ? undefined : message.reactionSpamTaxAmount;
+    obj.flag_spam_tax_amount = message.flagSpamTaxAmount === "" ? undefined : message.flagSpamTaxAmount;
+    obj.downvote_deposit_amount = message.downvoteDepositAmount === "" ? undefined : message.downvoteDepositAmount;
+    obj.appeal_fee_amount = message.appealFeeAmount === "" ? undefined : message.appealFeeAmount;
+    obj.lock_appeal_fee_amount = message.lockAppealFeeAmount === "" ? undefined : message.lockAppealFeeAmount;
+    obj.move_appeal_fee_amount = message.moveAppealFeeAmount === "" ? undefined : message.moveAppealFeeAmount;
+    obj.edit_fee_amount = message.editFeeAmount === "" ? undefined : message.editFeeAmount;
     obj.bounty_cancellation_fee_percent = message.bountyCancellationFeePercent !== BigInt(0) ? message.bountyCancellationFeePercent?.toString() : undefined;
     obj.max_content_size = message.maxContentSize !== BigInt(0) ? message.maxContentSize?.toString() : undefined;
     obj.daily_post_limit = message.dailyPostLimit !== BigInt(0) ? message.dailyPostLimit?.toString() : undefined;
@@ -1043,7 +1091,7 @@ export const Params = {
     obj.hide_appeal_cooldown = message.hideAppealCooldown !== BigInt(0) ? message.hideAppealCooldown?.toString() : undefined;
     obj.lock_appeal_cooldown = message.lockAppealCooldown !== BigInt(0) ? message.lockAppealCooldown?.toString() : undefined;
     obj.move_appeal_cooldown = message.moveAppealCooldown !== BigInt(0) ? message.moveAppealCooldown?.toString() : undefined;
-    obj.cost_per_byte = message.costPerByte ? Coin.toAmino(message.costPerByte) : undefined;
+    obj.cost_per_byte_amount = message.costPerByteAmount === "" ? undefined : message.costPerByteAmount;
     obj.cost_per_byte_exempt = message.costPerByteExempt === false ? undefined : message.costPerByteExempt;
     obj.ephemeral_ttl = message.ephemeralTtl !== BigInt(0) ? message.ephemeralTtl?.toString() : undefined;
     obj.conviction_renewal_threshold = message.convictionRenewalThreshold === "" ? undefined : message.convictionRenewalThreshold;
@@ -1055,6 +1103,7 @@ export const Params = {
     obj.sentinel_demotion_cooldown = message.sentinelDemotionCooldown !== BigInt(0) ? message.sentinelDemotionCooldown?.toString() : undefined;
     obj.sentinel_demotion_threshold = message.sentinelDemotionThreshold === "" ? undefined : message.sentinelDemotionThreshold;
     obj.sentinel_unhide_window = message.sentinelUnhideWindow !== BigInt(0) ? message.sentinelUnhideWindow?.toString() : undefined;
+    obj.sentinel_unbond_cooldown = message.sentinelUnbondCooldown !== BigInt(0) ? message.sentinelUnbondCooldown?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {
@@ -1084,15 +1133,15 @@ function createBaseForumOperationalParams(): ForumOperationalParams {
     bountiesEnabled: false,
     reactionsEnabled: false,
     editingEnabled: false,
-    spamTax: Coin.fromPartial({}),
-    reactionSpamTax: Coin.fromPartial({}),
-    flagSpamTax: Coin.fromPartial({}),
-    downvoteDeposit: Coin.fromPartial({}),
-    appealFee: Coin.fromPartial({}),
-    lockAppealFee: Coin.fromPartial({}),
-    moveAppealFee: Coin.fromPartial({}),
-    editFee: Coin.fromPartial({}),
-    costPerByte: Coin.fromPartial({}),
+    spamTaxAmount: "",
+    reactionSpamTaxAmount: "",
+    flagSpamTaxAmount: "",
+    downvoteDepositAmount: "",
+    appealFeeAmount: "",
+    lockAppealFeeAmount: "",
+    moveAppealFeeAmount: "",
+    editFeeAmount: "",
+    costPerByteAmount: "",
     costPerByteExempt: false,
     maxContentSize: BigInt(0),
     dailyPostLimit: BigInt(0),
@@ -1116,7 +1165,8 @@ function createBaseForumOperationalParams(): ForumOperationalParams {
     minSentinelAgeBlocks: BigInt(0),
     sentinelDemotionCooldown: BigInt(0),
     sentinelDemotionThreshold: "",
-    sentinelUnhideWindow: BigInt(0)
+    sentinelUnhideWindow: BigInt(0),
+    sentinelUnbondCooldown: BigInt(0)
   };
 }
 /**
@@ -1141,32 +1191,32 @@ export const ForumOperationalParams = {
     if (message.editingEnabled === true) {
       writer.uint32(24).bool(message.editingEnabled);
     }
-    if (message.spamTax !== undefined) {
-      Coin.encode(message.spamTax, writer.uint32(34).fork()).ldelim();
+    if (message.spamTaxAmount !== "") {
+      writer.uint32(34).string(message.spamTaxAmount);
     }
-    if (message.reactionSpamTax !== undefined) {
-      Coin.encode(message.reactionSpamTax, writer.uint32(42).fork()).ldelim();
+    if (message.reactionSpamTaxAmount !== "") {
+      writer.uint32(42).string(message.reactionSpamTaxAmount);
     }
-    if (message.flagSpamTax !== undefined) {
-      Coin.encode(message.flagSpamTax, writer.uint32(50).fork()).ldelim();
+    if (message.flagSpamTaxAmount !== "") {
+      writer.uint32(50).string(message.flagSpamTaxAmount);
     }
-    if (message.downvoteDeposit !== undefined) {
-      Coin.encode(message.downvoteDeposit, writer.uint32(58).fork()).ldelim();
+    if (message.downvoteDepositAmount !== "") {
+      writer.uint32(58).string(message.downvoteDepositAmount);
     }
-    if (message.appealFee !== undefined) {
-      Coin.encode(message.appealFee, writer.uint32(66).fork()).ldelim();
+    if (message.appealFeeAmount !== "") {
+      writer.uint32(66).string(message.appealFeeAmount);
     }
-    if (message.lockAppealFee !== undefined) {
-      Coin.encode(message.lockAppealFee, writer.uint32(74).fork()).ldelim();
+    if (message.lockAppealFeeAmount !== "") {
+      writer.uint32(74).string(message.lockAppealFeeAmount);
     }
-    if (message.moveAppealFee !== undefined) {
-      Coin.encode(message.moveAppealFee, writer.uint32(82).fork()).ldelim();
+    if (message.moveAppealFeeAmount !== "") {
+      writer.uint32(82).string(message.moveAppealFeeAmount);
     }
-    if (message.editFee !== undefined) {
-      Coin.encode(message.editFee, writer.uint32(90).fork()).ldelim();
+    if (message.editFeeAmount !== "") {
+      writer.uint32(90).string(message.editFeeAmount);
     }
-    if (message.costPerByte !== undefined) {
-      Coin.encode(message.costPerByte, writer.uint32(98).fork()).ldelim();
+    if (message.costPerByteAmount !== "") {
+      writer.uint32(98).string(message.costPerByteAmount);
     }
     if (message.costPerByteExempt === true) {
       writer.uint32(104).bool(message.costPerByteExempt);
@@ -1240,6 +1290,9 @@ export const ForumOperationalParams = {
     if (message.sentinelUnhideWindow !== BigInt(0)) {
       writer.uint32(368).int64(message.sentinelUnhideWindow);
     }
+    if (message.sentinelUnbondCooldown !== BigInt(0)) {
+      writer.uint32(376).int64(message.sentinelUnbondCooldown);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): ForumOperationalParams {
@@ -1259,31 +1312,31 @@ export const ForumOperationalParams = {
           message.editingEnabled = reader.bool();
           break;
         case 4:
-          message.spamTax = Coin.decode(reader, reader.uint32());
+          message.spamTaxAmount = reader.string();
           break;
         case 5:
-          message.reactionSpamTax = Coin.decode(reader, reader.uint32());
+          message.reactionSpamTaxAmount = reader.string();
           break;
         case 6:
-          message.flagSpamTax = Coin.decode(reader, reader.uint32());
+          message.flagSpamTaxAmount = reader.string();
           break;
         case 7:
-          message.downvoteDeposit = Coin.decode(reader, reader.uint32());
+          message.downvoteDepositAmount = reader.string();
           break;
         case 8:
-          message.appealFee = Coin.decode(reader, reader.uint32());
+          message.appealFeeAmount = reader.string();
           break;
         case 9:
-          message.lockAppealFee = Coin.decode(reader, reader.uint32());
+          message.lockAppealFeeAmount = reader.string();
           break;
         case 10:
-          message.moveAppealFee = Coin.decode(reader, reader.uint32());
+          message.moveAppealFeeAmount = reader.string();
           break;
         case 11:
-          message.editFee = Coin.decode(reader, reader.uint32());
+          message.editFeeAmount = reader.string();
           break;
         case 12:
-          message.costPerByte = Coin.decode(reader, reader.uint32());
+          message.costPerByteAmount = reader.string();
           break;
         case 13:
           message.costPerByteExempt = reader.bool();
@@ -1357,6 +1410,9 @@ export const ForumOperationalParams = {
         case 46:
           message.sentinelUnhideWindow = reader.int64();
           break;
+        case 47:
+          message.sentinelUnbondCooldown = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1369,15 +1425,15 @@ export const ForumOperationalParams = {
     message.bountiesEnabled = object.bountiesEnabled ?? false;
     message.reactionsEnabled = object.reactionsEnabled ?? false;
     message.editingEnabled = object.editingEnabled ?? false;
-    message.spamTax = object.spamTax !== undefined && object.spamTax !== null ? Coin.fromPartial(object.spamTax) : undefined;
-    message.reactionSpamTax = object.reactionSpamTax !== undefined && object.reactionSpamTax !== null ? Coin.fromPartial(object.reactionSpamTax) : undefined;
-    message.flagSpamTax = object.flagSpamTax !== undefined && object.flagSpamTax !== null ? Coin.fromPartial(object.flagSpamTax) : undefined;
-    message.downvoteDeposit = object.downvoteDeposit !== undefined && object.downvoteDeposit !== null ? Coin.fromPartial(object.downvoteDeposit) : undefined;
-    message.appealFee = object.appealFee !== undefined && object.appealFee !== null ? Coin.fromPartial(object.appealFee) : undefined;
-    message.lockAppealFee = object.lockAppealFee !== undefined && object.lockAppealFee !== null ? Coin.fromPartial(object.lockAppealFee) : undefined;
-    message.moveAppealFee = object.moveAppealFee !== undefined && object.moveAppealFee !== null ? Coin.fromPartial(object.moveAppealFee) : undefined;
-    message.editFee = object.editFee !== undefined && object.editFee !== null ? Coin.fromPartial(object.editFee) : undefined;
-    message.costPerByte = object.costPerByte !== undefined && object.costPerByte !== null ? Coin.fromPartial(object.costPerByte) : undefined;
+    message.spamTaxAmount = object.spamTaxAmount ?? "";
+    message.reactionSpamTaxAmount = object.reactionSpamTaxAmount ?? "";
+    message.flagSpamTaxAmount = object.flagSpamTaxAmount ?? "";
+    message.downvoteDepositAmount = object.downvoteDepositAmount ?? "";
+    message.appealFeeAmount = object.appealFeeAmount ?? "";
+    message.lockAppealFeeAmount = object.lockAppealFeeAmount ?? "";
+    message.moveAppealFeeAmount = object.moveAppealFeeAmount ?? "";
+    message.editFeeAmount = object.editFeeAmount ?? "";
+    message.costPerByteAmount = object.costPerByteAmount ?? "";
     message.costPerByteExempt = object.costPerByteExempt ?? false;
     message.maxContentSize = object.maxContentSize !== undefined && object.maxContentSize !== null ? BigInt(object.maxContentSize.toString()) : BigInt(0);
     message.dailyPostLimit = object.dailyPostLimit !== undefined && object.dailyPostLimit !== null ? BigInt(object.dailyPostLimit.toString()) : BigInt(0);
@@ -1402,6 +1458,7 @@ export const ForumOperationalParams = {
     message.sentinelDemotionCooldown = object.sentinelDemotionCooldown !== undefined && object.sentinelDemotionCooldown !== null ? BigInt(object.sentinelDemotionCooldown.toString()) : BigInt(0);
     message.sentinelDemotionThreshold = object.sentinelDemotionThreshold ?? "";
     message.sentinelUnhideWindow = object.sentinelUnhideWindow !== undefined && object.sentinelUnhideWindow !== null ? BigInt(object.sentinelUnhideWindow.toString()) : BigInt(0);
+    message.sentinelUnbondCooldown = object.sentinelUnbondCooldown !== undefined && object.sentinelUnbondCooldown !== null ? BigInt(object.sentinelUnbondCooldown.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ForumOperationalParamsAmino): ForumOperationalParams {
@@ -1415,32 +1472,32 @@ export const ForumOperationalParams = {
     if (object.editing_enabled !== undefined && object.editing_enabled !== null) {
       message.editingEnabled = object.editing_enabled;
     }
-    if (object.spam_tax !== undefined && object.spam_tax !== null) {
-      message.spamTax = Coin.fromAmino(object.spam_tax);
+    if (object.spam_tax_amount !== undefined && object.spam_tax_amount !== null) {
+      message.spamTaxAmount = object.spam_tax_amount;
     }
-    if (object.reaction_spam_tax !== undefined && object.reaction_spam_tax !== null) {
-      message.reactionSpamTax = Coin.fromAmino(object.reaction_spam_tax);
+    if (object.reaction_spam_tax_amount !== undefined && object.reaction_spam_tax_amount !== null) {
+      message.reactionSpamTaxAmount = object.reaction_spam_tax_amount;
     }
-    if (object.flag_spam_tax !== undefined && object.flag_spam_tax !== null) {
-      message.flagSpamTax = Coin.fromAmino(object.flag_spam_tax);
+    if (object.flag_spam_tax_amount !== undefined && object.flag_spam_tax_amount !== null) {
+      message.flagSpamTaxAmount = object.flag_spam_tax_amount;
     }
-    if (object.downvote_deposit !== undefined && object.downvote_deposit !== null) {
-      message.downvoteDeposit = Coin.fromAmino(object.downvote_deposit);
+    if (object.downvote_deposit_amount !== undefined && object.downvote_deposit_amount !== null) {
+      message.downvoteDepositAmount = object.downvote_deposit_amount;
     }
-    if (object.appeal_fee !== undefined && object.appeal_fee !== null) {
-      message.appealFee = Coin.fromAmino(object.appeal_fee);
+    if (object.appeal_fee_amount !== undefined && object.appeal_fee_amount !== null) {
+      message.appealFeeAmount = object.appeal_fee_amount;
     }
-    if (object.lock_appeal_fee !== undefined && object.lock_appeal_fee !== null) {
-      message.lockAppealFee = Coin.fromAmino(object.lock_appeal_fee);
+    if (object.lock_appeal_fee_amount !== undefined && object.lock_appeal_fee_amount !== null) {
+      message.lockAppealFeeAmount = object.lock_appeal_fee_amount;
     }
-    if (object.move_appeal_fee !== undefined && object.move_appeal_fee !== null) {
-      message.moveAppealFee = Coin.fromAmino(object.move_appeal_fee);
+    if (object.move_appeal_fee_amount !== undefined && object.move_appeal_fee_amount !== null) {
+      message.moveAppealFeeAmount = object.move_appeal_fee_amount;
     }
-    if (object.edit_fee !== undefined && object.edit_fee !== null) {
-      message.editFee = Coin.fromAmino(object.edit_fee);
+    if (object.edit_fee_amount !== undefined && object.edit_fee_amount !== null) {
+      message.editFeeAmount = object.edit_fee_amount;
     }
-    if (object.cost_per_byte !== undefined && object.cost_per_byte !== null) {
-      message.costPerByte = Coin.fromAmino(object.cost_per_byte);
+    if (object.cost_per_byte_amount !== undefined && object.cost_per_byte_amount !== null) {
+      message.costPerByteAmount = object.cost_per_byte_amount;
     }
     if (object.cost_per_byte_exempt !== undefined && object.cost_per_byte_exempt !== null) {
       message.costPerByteExempt = object.cost_per_byte_exempt;
@@ -1514,6 +1571,9 @@ export const ForumOperationalParams = {
     if (object.sentinel_unhide_window !== undefined && object.sentinel_unhide_window !== null) {
       message.sentinelUnhideWindow = BigInt(object.sentinel_unhide_window);
     }
+    if (object.sentinel_unbond_cooldown !== undefined && object.sentinel_unbond_cooldown !== null) {
+      message.sentinelUnbondCooldown = BigInt(object.sentinel_unbond_cooldown);
+    }
     return message;
   },
   toAmino(message: ForumOperationalParams): ForumOperationalParamsAmino {
@@ -1521,15 +1581,15 @@ export const ForumOperationalParams = {
     obj.bounties_enabled = message.bountiesEnabled === false ? undefined : message.bountiesEnabled;
     obj.reactions_enabled = message.reactionsEnabled === false ? undefined : message.reactionsEnabled;
     obj.editing_enabled = message.editingEnabled === false ? undefined : message.editingEnabled;
-    obj.spam_tax = message.spamTax ? Coin.toAmino(message.spamTax) : undefined;
-    obj.reaction_spam_tax = message.reactionSpamTax ? Coin.toAmino(message.reactionSpamTax) : undefined;
-    obj.flag_spam_tax = message.flagSpamTax ? Coin.toAmino(message.flagSpamTax) : undefined;
-    obj.downvote_deposit = message.downvoteDeposit ? Coin.toAmino(message.downvoteDeposit) : undefined;
-    obj.appeal_fee = message.appealFee ? Coin.toAmino(message.appealFee) : undefined;
-    obj.lock_appeal_fee = message.lockAppealFee ? Coin.toAmino(message.lockAppealFee) : undefined;
-    obj.move_appeal_fee = message.moveAppealFee ? Coin.toAmino(message.moveAppealFee) : undefined;
-    obj.edit_fee = message.editFee ? Coin.toAmino(message.editFee) : undefined;
-    obj.cost_per_byte = message.costPerByte ? Coin.toAmino(message.costPerByte) : undefined;
+    obj.spam_tax_amount = message.spamTaxAmount === "" ? undefined : message.spamTaxAmount;
+    obj.reaction_spam_tax_amount = message.reactionSpamTaxAmount === "" ? undefined : message.reactionSpamTaxAmount;
+    obj.flag_spam_tax_amount = message.flagSpamTaxAmount === "" ? undefined : message.flagSpamTaxAmount;
+    obj.downvote_deposit_amount = message.downvoteDepositAmount === "" ? undefined : message.downvoteDepositAmount;
+    obj.appeal_fee_amount = message.appealFeeAmount === "" ? undefined : message.appealFeeAmount;
+    obj.lock_appeal_fee_amount = message.lockAppealFeeAmount === "" ? undefined : message.lockAppealFeeAmount;
+    obj.move_appeal_fee_amount = message.moveAppealFeeAmount === "" ? undefined : message.moveAppealFeeAmount;
+    obj.edit_fee_amount = message.editFeeAmount === "" ? undefined : message.editFeeAmount;
+    obj.cost_per_byte_amount = message.costPerByteAmount === "" ? undefined : message.costPerByteAmount;
     obj.cost_per_byte_exempt = message.costPerByteExempt === false ? undefined : message.costPerByteExempt;
     obj.max_content_size = message.maxContentSize !== BigInt(0) ? message.maxContentSize?.toString() : undefined;
     obj.daily_post_limit = message.dailyPostLimit !== BigInt(0) ? message.dailyPostLimit?.toString() : undefined;
@@ -1554,6 +1614,7 @@ export const ForumOperationalParams = {
     obj.sentinel_demotion_cooldown = message.sentinelDemotionCooldown !== BigInt(0) ? message.sentinelDemotionCooldown?.toString() : undefined;
     obj.sentinel_demotion_threshold = message.sentinelDemotionThreshold === "" ? undefined : message.sentinelDemotionThreshold;
     obj.sentinel_unhide_window = message.sentinelUnhideWindow !== BigInt(0) ? message.sentinelUnhideWindow?.toString() : undefined;
+    obj.sentinel_unbond_cooldown = message.sentinelUnbondCooldown !== BigInt(0) ? message.sentinelUnbondCooldown?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ForumOperationalParamsAminoMsg): ForumOperationalParams {

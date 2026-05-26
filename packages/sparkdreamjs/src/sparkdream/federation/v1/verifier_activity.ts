@@ -41,6 +41,15 @@ export interface VerifierActivity {
    * slashed (overturn verdicts).
    */
   slashCount: bigint;
+  /**
+   * last_slash_epoch records the Phase 11 reward-epoch number
+   * (height / GetVerifierRewardEpochBlocks) in which this verifier was
+   * most recently slashed. Phase 11's "no slashing this epoch"
+   * eligibility gate compares this against the current reward epoch —
+   * an exact match disqualifies the verifier for the current epoch's
+   * payout. Zero means "never slashed under the current accounting".
+   */
+  lastSlashEpoch: bigint;
 }
 export interface VerifierActivityProtoMsg {
   typeUrl: "/sparkdream.federation.v1.VerifierActivity";
@@ -86,6 +95,15 @@ export interface VerifierActivityAmino {
    * slashed (overturn verdicts).
    */
   slash_count?: string;
+  /**
+   * last_slash_epoch records the Phase 11 reward-epoch number
+   * (height / GetVerifierRewardEpochBlocks) in which this verifier was
+   * most recently slashed. Phase 11's "no slashing this epoch"
+   * eligibility gate compares this against the current reward epoch —
+   * an exact match disqualifies the verifier for the current epoch's
+   * payout. Zero means "never slashed under the current accounting".
+   */
+  last_slash_epoch?: string;
 }
 export interface VerifierActivityAminoMsg {
   type: "/sparkdream.federation.v1.VerifierActivity";
@@ -103,7 +121,8 @@ function createBaseVerifierActivity(): VerifierActivity {
     consecutiveOverturns: BigInt(0),
     consecutiveUpheld: BigInt(0),
     overturnCooldownUntil: BigInt(0),
-    slashCount: BigInt(0)
+    slashCount: BigInt(0),
+    lastSlashEpoch: BigInt(0)
   };
 }
 /**
@@ -151,6 +170,9 @@ export const VerifierActivity = {
     if (message.slashCount !== BigInt(0)) {
       writer.uint32(88).uint64(message.slashCount);
     }
+    if (message.lastSlashEpoch !== BigInt(0)) {
+      writer.uint32(96).int64(message.lastSlashEpoch);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): VerifierActivity {
@@ -193,6 +215,9 @@ export const VerifierActivity = {
         case 11:
           message.slashCount = reader.uint64();
           break;
+        case 12:
+          message.lastSlashEpoch = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -213,6 +238,7 @@ export const VerifierActivity = {
     message.consecutiveUpheld = object.consecutiveUpheld !== undefined && object.consecutiveUpheld !== null ? BigInt(object.consecutiveUpheld.toString()) : BigInt(0);
     message.overturnCooldownUntil = object.overturnCooldownUntil !== undefined && object.overturnCooldownUntil !== null ? BigInt(object.overturnCooldownUntil.toString()) : BigInt(0);
     message.slashCount = object.slashCount !== undefined && object.slashCount !== null ? BigInt(object.slashCount.toString()) : BigInt(0);
+    message.lastSlashEpoch = object.lastSlashEpoch !== undefined && object.lastSlashEpoch !== null ? BigInt(object.lastSlashEpoch.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: VerifierActivityAmino): VerifierActivity {
@@ -250,6 +276,9 @@ export const VerifierActivity = {
     if (object.slash_count !== undefined && object.slash_count !== null) {
       message.slashCount = BigInt(object.slash_count);
     }
+    if (object.last_slash_epoch !== undefined && object.last_slash_epoch !== null) {
+      message.lastSlashEpoch = BigInt(object.last_slash_epoch);
+    }
     return message;
   },
   toAmino(message: VerifierActivity): VerifierActivityAmino {
@@ -265,6 +294,7 @@ export const VerifierActivity = {
     obj.consecutive_upheld = message.consecutiveUpheld !== BigInt(0) ? message.consecutiveUpheld?.toString() : undefined;
     obj.overturn_cooldown_until = message.overturnCooldownUntil !== BigInt(0) ? message.overturnCooldownUntil?.toString() : undefined;
     obj.slash_count = message.slashCount !== BigInt(0) ? message.slashCount?.toString() : undefined;
+    obj.last_slash_epoch = message.lastSlashEpoch !== BigInt(0) ? message.lastSlashEpoch?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: VerifierActivityAminoMsg): VerifierActivity {

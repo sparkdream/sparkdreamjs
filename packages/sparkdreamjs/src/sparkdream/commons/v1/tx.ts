@@ -1312,6 +1312,306 @@ export interface MsgDeleteCategoryResponseAminoMsg {
   type: "/sparkdream.commons.v1.MsgDeleteCategoryResponse";
   value: MsgDeleteCategoryResponseAmino;
 }
+/**
+ * MsgScheduleRecurringSpend schedules a recurring disbursement from the
+ * council policy account. The signer is the policy address — this message
+ * is intended to be wrapped in a MsgSubmitProposal so it executes only on
+ * council approval.
+ * @name MsgScheduleRecurringSpend
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgScheduleRecurringSpend
+ */
+export interface MsgScheduleRecurringSpend {
+  /**
+   * authority is the council policy address that will fund the
+   * disbursements.
+   */
+  authority: string;
+  /**
+   * recipient is the address that will pull each period's disbursement.
+   */
+  recipient: string;
+  /**
+   * amount_per_period is the disbursement transferred on each claim.
+   */
+  amountPerPeriod: Coin[];
+  /**
+   * period_seconds is the cadence; must be >= Params.min_recurring_period_seconds.
+   */
+  periodSeconds: bigint;
+  /**
+   * start_time is the unix timestamp of the first claimable window. If
+   * zero, defaults to block time at schedule creation.
+   */
+  startTime: bigint;
+  /**
+   * end_time is the unix timestamp after which no further claims succeed.
+   * Capped by Params.max_recurring_duration_seconds from start_time.
+   */
+  endTime: bigint;
+  /**
+   * note is a short human-readable purpose, capped at 256 chars.
+   */
+  note: string;
+}
+export interface MsgScheduleRecurringSpendProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgScheduleRecurringSpend";
+  value: Uint8Array;
+}
+/**
+ * MsgScheduleRecurringSpend schedules a recurring disbursement from the
+ * council policy account. The signer is the policy address — this message
+ * is intended to be wrapped in a MsgSubmitProposal so it executes only on
+ * council approval.
+ * @name MsgScheduleRecurringSpendAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgScheduleRecurringSpend
+ */
+export interface MsgScheduleRecurringSpendAmino {
+  /**
+   * authority is the council policy address that will fund the
+   * disbursements.
+   */
+  authority?: string;
+  /**
+   * recipient is the address that will pull each period's disbursement.
+   */
+  recipient?: string;
+  /**
+   * amount_per_period is the disbursement transferred on each claim.
+   */
+  amount_per_period?: CoinAmino[];
+  /**
+   * period_seconds is the cadence; must be >= Params.min_recurring_period_seconds.
+   */
+  period_seconds?: string;
+  /**
+   * start_time is the unix timestamp of the first claimable window. If
+   * zero, defaults to block time at schedule creation.
+   */
+  start_time?: string;
+  /**
+   * end_time is the unix timestamp after which no further claims succeed.
+   * Capped by Params.max_recurring_duration_seconds from start_time.
+   */
+  end_time?: string;
+  /**
+   * note is a short human-readable purpose, capped at 256 chars.
+   */
+  note?: string;
+}
+export interface MsgScheduleRecurringSpendAminoMsg {
+  type: "sparkdream/x/commons/MsgScheduleRecurringSpend";
+  value: MsgScheduleRecurringSpendAmino;
+}
+/**
+ * MsgScheduleRecurringSpendResponse returns the new schedule's ID.
+ * @name MsgScheduleRecurringSpendResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgScheduleRecurringSpendResponse
+ */
+export interface MsgScheduleRecurringSpendResponse {
+  id: bigint;
+}
+export interface MsgScheduleRecurringSpendResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgScheduleRecurringSpendResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgScheduleRecurringSpendResponse returns the new schedule's ID.
+ * @name MsgScheduleRecurringSpendResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgScheduleRecurringSpendResponse
+ */
+export interface MsgScheduleRecurringSpendResponseAmino {
+  id?: string;
+}
+export interface MsgScheduleRecurringSpendResponseAminoMsg {
+  type: "/sparkdream.commons.v1.MsgScheduleRecurringSpendResponse";
+  value: MsgScheduleRecurringSpendResponseAmino;
+}
+/**
+ * MsgCancelRecurringSpend cancels an existing recurring schedule. The
+ * signer must be the same authority that scheduled it (so this is also
+ * wrapped in a MsgSubmitProposal).
+ * @name MsgCancelRecurringSpend
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgCancelRecurringSpend
+ */
+export interface MsgCancelRecurringSpend {
+  authority: string;
+  id: bigint;
+}
+export interface MsgCancelRecurringSpendProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgCancelRecurringSpend";
+  value: Uint8Array;
+}
+/**
+ * MsgCancelRecurringSpend cancels an existing recurring schedule. The
+ * signer must be the same authority that scheduled it (so this is also
+ * wrapped in a MsgSubmitProposal).
+ * @name MsgCancelRecurringSpendAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgCancelRecurringSpend
+ */
+export interface MsgCancelRecurringSpendAmino {
+  authority?: string;
+  id?: string;
+}
+export interface MsgCancelRecurringSpendAminoMsg {
+  type: "sparkdream/x/commons/MsgCancelRecurringSpend";
+  value: MsgCancelRecurringSpendAmino;
+}
+/**
+ * MsgCancelRecurringSpendResponse is empty.
+ * @name MsgCancelRecurringSpendResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgCancelRecurringSpendResponse
+ */
+export interface MsgCancelRecurringSpendResponse {}
+export interface MsgCancelRecurringSpendResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgCancelRecurringSpendResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgCancelRecurringSpendResponse is empty.
+ * @name MsgCancelRecurringSpendResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgCancelRecurringSpendResponse
+ */
+export interface MsgCancelRecurringSpendResponseAmino {}
+export interface MsgCancelRecurringSpendResponseAminoMsg {
+  type: "/sparkdream.commons.v1.MsgCancelRecurringSpendResponse";
+  value: MsgCancelRecurringSpendResponseAmino;
+}
+/**
+ * MsgClaimRecurringSpend disburses one period of an active schedule. The
+ * signer is the recipient. Each claim:
+ *   - checks the schedule is ACTIVE,
+ *   - checks at least `period_seconds` have elapsed since the schedule's
+ *     logical clock (last_claim_advance, defaulting to start_time),
+ *   - runs CheckSpendPreconditions on the council (term + rate limit),
+ *   - transfers amount_per_period via bankKeeper.SendCoins,
+ *   - advances last_claim_advance by exactly period_seconds.
+ * @name MsgClaimRecurringSpend
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgClaimRecurringSpend
+ */
+export interface MsgClaimRecurringSpend {
+  recipient: string;
+  id: bigint;
+}
+export interface MsgClaimRecurringSpendProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgClaimRecurringSpend";
+  value: Uint8Array;
+}
+/**
+ * MsgClaimRecurringSpend disburses one period of an active schedule. The
+ * signer is the recipient. Each claim:
+ *   - checks the schedule is ACTIVE,
+ *   - checks at least `period_seconds` have elapsed since the schedule's
+ *     logical clock (last_claim_advance, defaulting to start_time),
+ *   - runs CheckSpendPreconditions on the council (term + rate limit),
+ *   - transfers amount_per_period via bankKeeper.SendCoins,
+ *   - advances last_claim_advance by exactly period_seconds.
+ * @name MsgClaimRecurringSpendAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgClaimRecurringSpend
+ */
+export interface MsgClaimRecurringSpendAmino {
+  recipient?: string;
+  id?: string;
+}
+export interface MsgClaimRecurringSpendAminoMsg {
+  type: "sparkdream/x/commons/MsgClaimRecurringSpend";
+  value: MsgClaimRecurringSpendAmino;
+}
+/**
+ * MsgClaimRecurringSpendResponse returns the claim number that was
+ * disbursed (1-indexed) and the unix timestamp the schedule's clock now
+ * points to.
+ * @name MsgClaimRecurringSpendResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgClaimRecurringSpendResponse
+ */
+export interface MsgClaimRecurringSpendResponse {
+  claimNumber: bigint;
+  nextClaimTime: bigint;
+}
+export interface MsgClaimRecurringSpendResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgClaimRecurringSpendResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgClaimRecurringSpendResponse returns the claim number that was
+ * disbursed (1-indexed) and the unix timestamp the schedule's clock now
+ * points to.
+ * @name MsgClaimRecurringSpendResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgClaimRecurringSpendResponse
+ */
+export interface MsgClaimRecurringSpendResponseAmino {
+  claim_number?: string;
+  next_claim_time?: string;
+}
+export interface MsgClaimRecurringSpendResponseAminoMsg {
+  type: "/sparkdream.commons.v1.MsgClaimRecurringSpendResponse";
+  value: MsgClaimRecurringSpendResponseAmino;
+}
+/**
+ * MsgDeclineRecurringSpend lets the recipient permanently opt out of a
+ * schedule. After decline the schedule moves to
+ * RECURRING_SPEND_STATUS_RECIPIENT_DECLINED and no further claims succeed.
+ * @name MsgDeclineRecurringSpend
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgDeclineRecurringSpend
+ */
+export interface MsgDeclineRecurringSpend {
+  recipient: string;
+  id: bigint;
+}
+export interface MsgDeclineRecurringSpendProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgDeclineRecurringSpend";
+  value: Uint8Array;
+}
+/**
+ * MsgDeclineRecurringSpend lets the recipient permanently opt out of a
+ * schedule. After decline the schedule moves to
+ * RECURRING_SPEND_STATUS_RECIPIENT_DECLINED and no further claims succeed.
+ * @name MsgDeclineRecurringSpendAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgDeclineRecurringSpend
+ */
+export interface MsgDeclineRecurringSpendAmino {
+  recipient?: string;
+  id?: string;
+}
+export interface MsgDeclineRecurringSpendAminoMsg {
+  type: "sparkdream/x/commons/MsgDeclineRecurringSpend";
+  value: MsgDeclineRecurringSpendAmino;
+}
+/**
+ * MsgDeclineRecurringSpendResponse is empty.
+ * @name MsgDeclineRecurringSpendResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgDeclineRecurringSpendResponse
+ */
+export interface MsgDeclineRecurringSpendResponse {}
+export interface MsgDeclineRecurringSpendResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgDeclineRecurringSpendResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgDeclineRecurringSpendResponse is empty.
+ * @name MsgDeclineRecurringSpendResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgDeclineRecurringSpendResponse
+ */
+export interface MsgDeclineRecurringSpendResponseAmino {}
+export interface MsgDeclineRecurringSpendResponseAminoMsg {
+  type: "/sparkdream.commons.v1.MsgDeclineRecurringSpendResponse";
+  value: MsgDeclineRecurringSpendResponseAmino;
+}
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
     authority: "",
@@ -5003,6 +5303,698 @@ export const MsgDeleteCategoryResponse = {
     return {
       typeUrl: "/sparkdream.commons.v1.MsgDeleteCategoryResponse",
       value: MsgDeleteCategoryResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgScheduleRecurringSpend(): MsgScheduleRecurringSpend {
+  return {
+    authority: "",
+    recipient: "",
+    amountPerPeriod: [],
+    periodSeconds: BigInt(0),
+    startTime: BigInt(0),
+    endTime: BigInt(0),
+    note: ""
+  };
+}
+/**
+ * MsgScheduleRecurringSpend schedules a recurring disbursement from the
+ * council policy account. The signer is the policy address — this message
+ * is intended to be wrapped in a MsgSubmitProposal so it executes only on
+ * council approval.
+ * @name MsgScheduleRecurringSpend
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgScheduleRecurringSpend
+ */
+export const MsgScheduleRecurringSpend = {
+  typeUrl: "/sparkdream.commons.v1.MsgScheduleRecurringSpend",
+  aminoType: "sparkdream/x/commons/MsgScheduleRecurringSpend",
+  encode(message: MsgScheduleRecurringSpend, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.recipient !== "") {
+      writer.uint32(18).string(message.recipient);
+    }
+    for (const v of message.amountPerPeriod) {
+      Coin.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.periodSeconds !== BigInt(0)) {
+      writer.uint32(32).int64(message.periodSeconds);
+    }
+    if (message.startTime !== BigInt(0)) {
+      writer.uint32(40).int64(message.startTime);
+    }
+    if (message.endTime !== BigInt(0)) {
+      writer.uint32(48).int64(message.endTime);
+    }
+    if (message.note !== "") {
+      writer.uint32(58).string(message.note);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgScheduleRecurringSpend {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgScheduleRecurringSpend();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+        case 2:
+          message.recipient = reader.string();
+          break;
+        case 3:
+          message.amountPerPeriod.push(Coin.decode(reader, reader.uint32()));
+          break;
+        case 4:
+          message.periodSeconds = reader.int64();
+          break;
+        case 5:
+          message.startTime = reader.int64();
+          break;
+        case 6:
+          message.endTime = reader.int64();
+          break;
+        case 7:
+          message.note = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgScheduleRecurringSpend>): MsgScheduleRecurringSpend {
+    const message = createBaseMsgScheduleRecurringSpend();
+    message.authority = object.authority ?? "";
+    message.recipient = object.recipient ?? "";
+    message.amountPerPeriod = object.amountPerPeriod?.map(e => Coin.fromPartial(e)) || [];
+    message.periodSeconds = object.periodSeconds !== undefined && object.periodSeconds !== null ? BigInt(object.periodSeconds.toString()) : BigInt(0);
+    message.startTime = object.startTime !== undefined && object.startTime !== null ? BigInt(object.startTime.toString()) : BigInt(0);
+    message.endTime = object.endTime !== undefined && object.endTime !== null ? BigInt(object.endTime.toString()) : BigInt(0);
+    message.note = object.note ?? "";
+    return message;
+  },
+  fromAmino(object: MsgScheduleRecurringSpendAmino): MsgScheduleRecurringSpend {
+    const message = createBaseMsgScheduleRecurringSpend();
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
+    if (object.recipient !== undefined && object.recipient !== null) {
+      message.recipient = object.recipient;
+    }
+    message.amountPerPeriod = object.amount_per_period?.map(e => Coin.fromAmino(e)) || [];
+    if (object.period_seconds !== undefined && object.period_seconds !== null) {
+      message.periodSeconds = BigInt(object.period_seconds);
+    }
+    if (object.start_time !== undefined && object.start_time !== null) {
+      message.startTime = BigInt(object.start_time);
+    }
+    if (object.end_time !== undefined && object.end_time !== null) {
+      message.endTime = BigInt(object.end_time);
+    }
+    if (object.note !== undefined && object.note !== null) {
+      message.note = object.note;
+    }
+    return message;
+  },
+  toAmino(message: MsgScheduleRecurringSpend): MsgScheduleRecurringSpendAmino {
+    const obj: any = {};
+    obj.authority = message.authority === "" ? undefined : message.authority;
+    obj.recipient = message.recipient === "" ? undefined : message.recipient;
+    if (message.amountPerPeriod) {
+      obj.amount_per_period = message.amountPerPeriod.map(e => e ? Coin.toAmino(e) : undefined);
+    } else {
+      obj.amount_per_period = message.amountPerPeriod;
+    }
+    obj.period_seconds = message.periodSeconds !== BigInt(0) ? message.periodSeconds?.toString() : undefined;
+    obj.start_time = message.startTime !== BigInt(0) ? message.startTime?.toString() : undefined;
+    obj.end_time = message.endTime !== BigInt(0) ? message.endTime?.toString() : undefined;
+    obj.note = message.note === "" ? undefined : message.note;
+    return obj;
+  },
+  fromAminoMsg(object: MsgScheduleRecurringSpendAminoMsg): MsgScheduleRecurringSpend {
+    return MsgScheduleRecurringSpend.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgScheduleRecurringSpend): MsgScheduleRecurringSpendAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgScheduleRecurringSpend",
+      value: MsgScheduleRecurringSpend.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgScheduleRecurringSpendProtoMsg): MsgScheduleRecurringSpend {
+    return MsgScheduleRecurringSpend.decode(message.value);
+  },
+  toProto(message: MsgScheduleRecurringSpend): Uint8Array {
+    return MsgScheduleRecurringSpend.encode(message).finish();
+  },
+  toProtoMsg(message: MsgScheduleRecurringSpend): MsgScheduleRecurringSpendProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgScheduleRecurringSpend",
+      value: MsgScheduleRecurringSpend.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgScheduleRecurringSpendResponse(): MsgScheduleRecurringSpendResponse {
+  return {
+    id: BigInt(0)
+  };
+}
+/**
+ * MsgScheduleRecurringSpendResponse returns the new schedule's ID.
+ * @name MsgScheduleRecurringSpendResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgScheduleRecurringSpendResponse
+ */
+export const MsgScheduleRecurringSpendResponse = {
+  typeUrl: "/sparkdream.commons.v1.MsgScheduleRecurringSpendResponse",
+  encode(message: MsgScheduleRecurringSpendResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.id !== BigInt(0)) {
+      writer.uint32(8).uint64(message.id);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgScheduleRecurringSpendResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgScheduleRecurringSpendResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgScheduleRecurringSpendResponse>): MsgScheduleRecurringSpendResponse {
+    const message = createBaseMsgScheduleRecurringSpendResponse();
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgScheduleRecurringSpendResponseAmino): MsgScheduleRecurringSpendResponse {
+    const message = createBaseMsgScheduleRecurringSpendResponse();
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    return message;
+  },
+  toAmino(message: MsgScheduleRecurringSpendResponse): MsgScheduleRecurringSpendResponseAmino {
+    const obj: any = {};
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgScheduleRecurringSpendResponseAminoMsg): MsgScheduleRecurringSpendResponse {
+    return MsgScheduleRecurringSpendResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgScheduleRecurringSpendResponseProtoMsg): MsgScheduleRecurringSpendResponse {
+    return MsgScheduleRecurringSpendResponse.decode(message.value);
+  },
+  toProto(message: MsgScheduleRecurringSpendResponse): Uint8Array {
+    return MsgScheduleRecurringSpendResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgScheduleRecurringSpendResponse): MsgScheduleRecurringSpendResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgScheduleRecurringSpendResponse",
+      value: MsgScheduleRecurringSpendResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCancelRecurringSpend(): MsgCancelRecurringSpend {
+  return {
+    authority: "",
+    id: BigInt(0)
+  };
+}
+/**
+ * MsgCancelRecurringSpend cancels an existing recurring schedule. The
+ * signer must be the same authority that scheduled it (so this is also
+ * wrapped in a MsgSubmitProposal).
+ * @name MsgCancelRecurringSpend
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgCancelRecurringSpend
+ */
+export const MsgCancelRecurringSpend = {
+  typeUrl: "/sparkdream.commons.v1.MsgCancelRecurringSpend",
+  aminoType: "sparkdream/x/commons/MsgCancelRecurringSpend",
+  encode(message: MsgCancelRecurringSpend, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.id !== BigInt(0)) {
+      writer.uint32(16).uint64(message.id);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCancelRecurringSpend {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCancelRecurringSpend();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+        case 2:
+          message.id = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCancelRecurringSpend>): MsgCancelRecurringSpend {
+    const message = createBaseMsgCancelRecurringSpend();
+    message.authority = object.authority ?? "";
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgCancelRecurringSpendAmino): MsgCancelRecurringSpend {
+    const message = createBaseMsgCancelRecurringSpend();
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    return message;
+  },
+  toAmino(message: MsgCancelRecurringSpend): MsgCancelRecurringSpendAmino {
+    const obj: any = {};
+    obj.authority = message.authority === "" ? undefined : message.authority;
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgCancelRecurringSpendAminoMsg): MsgCancelRecurringSpend {
+    return MsgCancelRecurringSpend.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCancelRecurringSpend): MsgCancelRecurringSpendAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgCancelRecurringSpend",
+      value: MsgCancelRecurringSpend.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgCancelRecurringSpendProtoMsg): MsgCancelRecurringSpend {
+    return MsgCancelRecurringSpend.decode(message.value);
+  },
+  toProto(message: MsgCancelRecurringSpend): Uint8Array {
+    return MsgCancelRecurringSpend.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCancelRecurringSpend): MsgCancelRecurringSpendProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgCancelRecurringSpend",
+      value: MsgCancelRecurringSpend.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCancelRecurringSpendResponse(): MsgCancelRecurringSpendResponse {
+  return {};
+}
+/**
+ * MsgCancelRecurringSpendResponse is empty.
+ * @name MsgCancelRecurringSpendResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgCancelRecurringSpendResponse
+ */
+export const MsgCancelRecurringSpendResponse = {
+  typeUrl: "/sparkdream.commons.v1.MsgCancelRecurringSpendResponse",
+  encode(_: MsgCancelRecurringSpendResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCancelRecurringSpendResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCancelRecurringSpendResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgCancelRecurringSpendResponse>): MsgCancelRecurringSpendResponse {
+    const message = createBaseMsgCancelRecurringSpendResponse();
+    return message;
+  },
+  fromAmino(_: MsgCancelRecurringSpendResponseAmino): MsgCancelRecurringSpendResponse {
+    const message = createBaseMsgCancelRecurringSpendResponse();
+    return message;
+  },
+  toAmino(_: MsgCancelRecurringSpendResponse): MsgCancelRecurringSpendResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgCancelRecurringSpendResponseAminoMsg): MsgCancelRecurringSpendResponse {
+    return MsgCancelRecurringSpendResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgCancelRecurringSpendResponseProtoMsg): MsgCancelRecurringSpendResponse {
+    return MsgCancelRecurringSpendResponse.decode(message.value);
+  },
+  toProto(message: MsgCancelRecurringSpendResponse): Uint8Array {
+    return MsgCancelRecurringSpendResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCancelRecurringSpendResponse): MsgCancelRecurringSpendResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgCancelRecurringSpendResponse",
+      value: MsgCancelRecurringSpendResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgClaimRecurringSpend(): MsgClaimRecurringSpend {
+  return {
+    recipient: "",
+    id: BigInt(0)
+  };
+}
+/**
+ * MsgClaimRecurringSpend disburses one period of an active schedule. The
+ * signer is the recipient. Each claim:
+ *   - checks the schedule is ACTIVE,
+ *   - checks at least `period_seconds` have elapsed since the schedule's
+ *     logical clock (last_claim_advance, defaulting to start_time),
+ *   - runs CheckSpendPreconditions on the council (term + rate limit),
+ *   - transfers amount_per_period via bankKeeper.SendCoins,
+ *   - advances last_claim_advance by exactly period_seconds.
+ * @name MsgClaimRecurringSpend
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgClaimRecurringSpend
+ */
+export const MsgClaimRecurringSpend = {
+  typeUrl: "/sparkdream.commons.v1.MsgClaimRecurringSpend",
+  aminoType: "sparkdream/x/commons/MsgClaimRecurringSpend",
+  encode(message: MsgClaimRecurringSpend, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.recipient !== "") {
+      writer.uint32(10).string(message.recipient);
+    }
+    if (message.id !== BigInt(0)) {
+      writer.uint32(16).uint64(message.id);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgClaimRecurringSpend {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgClaimRecurringSpend();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.recipient = reader.string();
+          break;
+        case 2:
+          message.id = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgClaimRecurringSpend>): MsgClaimRecurringSpend {
+    const message = createBaseMsgClaimRecurringSpend();
+    message.recipient = object.recipient ?? "";
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgClaimRecurringSpendAmino): MsgClaimRecurringSpend {
+    const message = createBaseMsgClaimRecurringSpend();
+    if (object.recipient !== undefined && object.recipient !== null) {
+      message.recipient = object.recipient;
+    }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    return message;
+  },
+  toAmino(message: MsgClaimRecurringSpend): MsgClaimRecurringSpendAmino {
+    const obj: any = {};
+    obj.recipient = message.recipient === "" ? undefined : message.recipient;
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgClaimRecurringSpendAminoMsg): MsgClaimRecurringSpend {
+    return MsgClaimRecurringSpend.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgClaimRecurringSpend): MsgClaimRecurringSpendAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgClaimRecurringSpend",
+      value: MsgClaimRecurringSpend.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgClaimRecurringSpendProtoMsg): MsgClaimRecurringSpend {
+    return MsgClaimRecurringSpend.decode(message.value);
+  },
+  toProto(message: MsgClaimRecurringSpend): Uint8Array {
+    return MsgClaimRecurringSpend.encode(message).finish();
+  },
+  toProtoMsg(message: MsgClaimRecurringSpend): MsgClaimRecurringSpendProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgClaimRecurringSpend",
+      value: MsgClaimRecurringSpend.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgClaimRecurringSpendResponse(): MsgClaimRecurringSpendResponse {
+  return {
+    claimNumber: BigInt(0),
+    nextClaimTime: BigInt(0)
+  };
+}
+/**
+ * MsgClaimRecurringSpendResponse returns the claim number that was
+ * disbursed (1-indexed) and the unix timestamp the schedule's clock now
+ * points to.
+ * @name MsgClaimRecurringSpendResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgClaimRecurringSpendResponse
+ */
+export const MsgClaimRecurringSpendResponse = {
+  typeUrl: "/sparkdream.commons.v1.MsgClaimRecurringSpendResponse",
+  encode(message: MsgClaimRecurringSpendResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.claimNumber !== BigInt(0)) {
+      writer.uint32(8).uint64(message.claimNumber);
+    }
+    if (message.nextClaimTime !== BigInt(0)) {
+      writer.uint32(16).int64(message.nextClaimTime);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgClaimRecurringSpendResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgClaimRecurringSpendResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.claimNumber = reader.uint64();
+          break;
+        case 2:
+          message.nextClaimTime = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgClaimRecurringSpendResponse>): MsgClaimRecurringSpendResponse {
+    const message = createBaseMsgClaimRecurringSpendResponse();
+    message.claimNumber = object.claimNumber !== undefined && object.claimNumber !== null ? BigInt(object.claimNumber.toString()) : BigInt(0);
+    message.nextClaimTime = object.nextClaimTime !== undefined && object.nextClaimTime !== null ? BigInt(object.nextClaimTime.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgClaimRecurringSpendResponseAmino): MsgClaimRecurringSpendResponse {
+    const message = createBaseMsgClaimRecurringSpendResponse();
+    if (object.claim_number !== undefined && object.claim_number !== null) {
+      message.claimNumber = BigInt(object.claim_number);
+    }
+    if (object.next_claim_time !== undefined && object.next_claim_time !== null) {
+      message.nextClaimTime = BigInt(object.next_claim_time);
+    }
+    return message;
+  },
+  toAmino(message: MsgClaimRecurringSpendResponse): MsgClaimRecurringSpendResponseAmino {
+    const obj: any = {};
+    obj.claim_number = message.claimNumber !== BigInt(0) ? message.claimNumber?.toString() : undefined;
+    obj.next_claim_time = message.nextClaimTime !== BigInt(0) ? message.nextClaimTime?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgClaimRecurringSpendResponseAminoMsg): MsgClaimRecurringSpendResponse {
+    return MsgClaimRecurringSpendResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgClaimRecurringSpendResponseProtoMsg): MsgClaimRecurringSpendResponse {
+    return MsgClaimRecurringSpendResponse.decode(message.value);
+  },
+  toProto(message: MsgClaimRecurringSpendResponse): Uint8Array {
+    return MsgClaimRecurringSpendResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgClaimRecurringSpendResponse): MsgClaimRecurringSpendResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgClaimRecurringSpendResponse",
+      value: MsgClaimRecurringSpendResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgDeclineRecurringSpend(): MsgDeclineRecurringSpend {
+  return {
+    recipient: "",
+    id: BigInt(0)
+  };
+}
+/**
+ * MsgDeclineRecurringSpend lets the recipient permanently opt out of a
+ * schedule. After decline the schedule moves to
+ * RECURRING_SPEND_STATUS_RECIPIENT_DECLINED and no further claims succeed.
+ * @name MsgDeclineRecurringSpend
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgDeclineRecurringSpend
+ */
+export const MsgDeclineRecurringSpend = {
+  typeUrl: "/sparkdream.commons.v1.MsgDeclineRecurringSpend",
+  aminoType: "sparkdream/x/commons/MsgDeclineRecurringSpend",
+  encode(message: MsgDeclineRecurringSpend, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.recipient !== "") {
+      writer.uint32(10).string(message.recipient);
+    }
+    if (message.id !== BigInt(0)) {
+      writer.uint32(16).uint64(message.id);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgDeclineRecurringSpend {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgDeclineRecurringSpend();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.recipient = reader.string();
+          break;
+        case 2:
+          message.id = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgDeclineRecurringSpend>): MsgDeclineRecurringSpend {
+    const message = createBaseMsgDeclineRecurringSpend();
+    message.recipient = object.recipient ?? "";
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgDeclineRecurringSpendAmino): MsgDeclineRecurringSpend {
+    const message = createBaseMsgDeclineRecurringSpend();
+    if (object.recipient !== undefined && object.recipient !== null) {
+      message.recipient = object.recipient;
+    }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    return message;
+  },
+  toAmino(message: MsgDeclineRecurringSpend): MsgDeclineRecurringSpendAmino {
+    const obj: any = {};
+    obj.recipient = message.recipient === "" ? undefined : message.recipient;
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgDeclineRecurringSpendAminoMsg): MsgDeclineRecurringSpend {
+    return MsgDeclineRecurringSpend.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgDeclineRecurringSpend): MsgDeclineRecurringSpendAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgDeclineRecurringSpend",
+      value: MsgDeclineRecurringSpend.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgDeclineRecurringSpendProtoMsg): MsgDeclineRecurringSpend {
+    return MsgDeclineRecurringSpend.decode(message.value);
+  },
+  toProto(message: MsgDeclineRecurringSpend): Uint8Array {
+    return MsgDeclineRecurringSpend.encode(message).finish();
+  },
+  toProtoMsg(message: MsgDeclineRecurringSpend): MsgDeclineRecurringSpendProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgDeclineRecurringSpend",
+      value: MsgDeclineRecurringSpend.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgDeclineRecurringSpendResponse(): MsgDeclineRecurringSpendResponse {
+  return {};
+}
+/**
+ * MsgDeclineRecurringSpendResponse is empty.
+ * @name MsgDeclineRecurringSpendResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgDeclineRecurringSpendResponse
+ */
+export const MsgDeclineRecurringSpendResponse = {
+  typeUrl: "/sparkdream.commons.v1.MsgDeclineRecurringSpendResponse",
+  encode(_: MsgDeclineRecurringSpendResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgDeclineRecurringSpendResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgDeclineRecurringSpendResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgDeclineRecurringSpendResponse>): MsgDeclineRecurringSpendResponse {
+    const message = createBaseMsgDeclineRecurringSpendResponse();
+    return message;
+  },
+  fromAmino(_: MsgDeclineRecurringSpendResponseAmino): MsgDeclineRecurringSpendResponse {
+    const message = createBaseMsgDeclineRecurringSpendResponse();
+    return message;
+  },
+  toAmino(_: MsgDeclineRecurringSpendResponse): MsgDeclineRecurringSpendResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgDeclineRecurringSpendResponseAminoMsg): MsgDeclineRecurringSpendResponse {
+    return MsgDeclineRecurringSpendResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgDeclineRecurringSpendResponseProtoMsg): MsgDeclineRecurringSpendResponse {
+    return MsgDeclineRecurringSpendResponse.decode(message.value);
+  },
+  toProto(message: MsgDeclineRecurringSpendResponse): Uint8Array {
+    return MsgDeclineRecurringSpendResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgDeclineRecurringSpendResponse): MsgDeclineRecurringSpendResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgDeclineRecurringSpendResponse",
+      value: MsgDeclineRecurringSpendResponse.encode(message).finish()
     };
   }
 };

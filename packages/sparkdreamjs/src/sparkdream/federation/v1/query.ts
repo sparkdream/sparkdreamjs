@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "../../../cosmos/base/query/v1beta1/pagination";
 import { Params, ParamsAmino } from "./params";
-import { Peer, PeerAmino, PeerPolicy, PeerPolicyAmino, BridgeOperator, BridgeOperatorAmino, FederatedContent, FederatedContentAmino, IdentityLink, IdentityLinkAmino, PendingIdentityChallenge, PendingIdentityChallengeAmino, ReputationAttestation, ReputationAttestationAmino, OutboundAttestation, OutboundAttestationAmino, VerificationRecord, VerificationRecordAmino } from "./types";
+import { Peer, PeerAmino, PeerPolicy, PeerPolicyAmino, BridgeBinding, BridgeBindingAmino, FederatedContent, FederatedContentAmino, IdentityLink, IdentityLinkAmino, PendingIdentityChallenge, PendingIdentityChallengeAmino, ReputationAttestation, ReputationAttestationAmino, OutboundAttestation, OutboundAttestationAmino, VerificationRecord, VerificationRecordAmino, EscalatedChallenge, EscalatedChallengeAmino } from "./types";
 import { VerifierActivity, VerifierActivityAmino } from "./verifier_activity";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
@@ -202,106 +202,116 @@ export interface QueryGetPeerPolicyResponseAminoMsg {
   value: QueryGetPeerPolicyResponseAmino;
 }
 /**
- * --- BridgeOperator ---
- * @name QueryGetBridgeOperatorRequest
+ * --- BridgeBinding ---
+ * Note: Phase 7 of the federation→service migration will enrich these
+ * responses with joined service.Operator status (bond, status,
+ * unbond_complete_at). For now the response carries only the federation-
+ * side binding; callers wanting live economic state can query x/service
+ * separately by (address, federation-bridge-<protocol>).
+ * @name QueryGetBridgeBindingRequest
  * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.QueryGetBridgeOperatorRequest
+ * @see proto type: sparkdream.federation.v1.QueryGetBridgeBindingRequest
  */
-export interface QueryGetBridgeOperatorRequest {
+export interface QueryGetBridgeBindingRequest {
   address: string;
   peerId: string;
 }
-export interface QueryGetBridgeOperatorRequestProtoMsg {
-  typeUrl: "/sparkdream.federation.v1.QueryGetBridgeOperatorRequest";
+export interface QueryGetBridgeBindingRequestProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.QueryGetBridgeBindingRequest";
   value: Uint8Array;
 }
 /**
- * --- BridgeOperator ---
- * @name QueryGetBridgeOperatorRequestAmino
+ * --- BridgeBinding ---
+ * Note: Phase 7 of the federation→service migration will enrich these
+ * responses with joined service.Operator status (bond, status,
+ * unbond_complete_at). For now the response carries only the federation-
+ * side binding; callers wanting live economic state can query x/service
+ * separately by (address, federation-bridge-<protocol>).
+ * @name QueryGetBridgeBindingRequestAmino
  * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.QueryGetBridgeOperatorRequest
+ * @see proto type: sparkdream.federation.v1.QueryGetBridgeBindingRequest
  */
-export interface QueryGetBridgeOperatorRequestAmino {
+export interface QueryGetBridgeBindingRequestAmino {
   address?: string;
   peer_id?: string;
 }
-export interface QueryGetBridgeOperatorRequestAminoMsg {
-  type: "/sparkdream.federation.v1.QueryGetBridgeOperatorRequest";
-  value: QueryGetBridgeOperatorRequestAmino;
+export interface QueryGetBridgeBindingRequestAminoMsg {
+  type: "/sparkdream.federation.v1.QueryGetBridgeBindingRequest";
+  value: QueryGetBridgeBindingRequestAmino;
 }
 /**
- * @name QueryGetBridgeOperatorResponse
+ * @name QueryGetBridgeBindingResponse
  * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.QueryGetBridgeOperatorResponse
+ * @see proto type: sparkdream.federation.v1.QueryGetBridgeBindingResponse
  */
-export interface QueryGetBridgeOperatorResponse {
-  bridgeOperator: BridgeOperator;
+export interface QueryGetBridgeBindingResponse {
+  bridgeBinding: BridgeBinding;
 }
-export interface QueryGetBridgeOperatorResponseProtoMsg {
-  typeUrl: "/sparkdream.federation.v1.QueryGetBridgeOperatorResponse";
+export interface QueryGetBridgeBindingResponseProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.QueryGetBridgeBindingResponse";
   value: Uint8Array;
 }
 /**
- * @name QueryGetBridgeOperatorResponseAmino
+ * @name QueryGetBridgeBindingResponseAmino
  * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.QueryGetBridgeOperatorResponse
+ * @see proto type: sparkdream.federation.v1.QueryGetBridgeBindingResponse
  */
-export interface QueryGetBridgeOperatorResponseAmino {
-  bridge_operator?: BridgeOperatorAmino;
+export interface QueryGetBridgeBindingResponseAmino {
+  bridge_binding?: BridgeBindingAmino;
 }
-export interface QueryGetBridgeOperatorResponseAminoMsg {
-  type: "/sparkdream.federation.v1.QueryGetBridgeOperatorResponse";
-  value: QueryGetBridgeOperatorResponseAmino;
+export interface QueryGetBridgeBindingResponseAminoMsg {
+  type: "/sparkdream.federation.v1.QueryGetBridgeBindingResponse";
+  value: QueryGetBridgeBindingResponseAmino;
 }
 /**
- * @name QueryListBridgeOperatorsRequest
+ * @name QueryListBridgeBindingsRequest
  * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.QueryListBridgeOperatorsRequest
+ * @see proto type: sparkdream.federation.v1.QueryListBridgeBindingsRequest
  */
-export interface QueryListBridgeOperatorsRequest {
+export interface QueryListBridgeBindingsRequest {
   pagination?: PageRequest;
 }
-export interface QueryListBridgeOperatorsRequestProtoMsg {
-  typeUrl: "/sparkdream.federation.v1.QueryListBridgeOperatorsRequest";
+export interface QueryListBridgeBindingsRequestProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.QueryListBridgeBindingsRequest";
   value: Uint8Array;
 }
 /**
- * @name QueryListBridgeOperatorsRequestAmino
+ * @name QueryListBridgeBindingsRequestAmino
  * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.QueryListBridgeOperatorsRequest
+ * @see proto type: sparkdream.federation.v1.QueryListBridgeBindingsRequest
  */
-export interface QueryListBridgeOperatorsRequestAmino {
+export interface QueryListBridgeBindingsRequestAmino {
   pagination?: PageRequestAmino;
 }
-export interface QueryListBridgeOperatorsRequestAminoMsg {
-  type: "/sparkdream.federation.v1.QueryListBridgeOperatorsRequest";
-  value: QueryListBridgeOperatorsRequestAmino;
+export interface QueryListBridgeBindingsRequestAminoMsg {
+  type: "/sparkdream.federation.v1.QueryListBridgeBindingsRequest";
+  value: QueryListBridgeBindingsRequestAmino;
 }
 /**
- * @name QueryListBridgeOperatorsResponse
+ * @name QueryListBridgeBindingsResponse
  * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.QueryListBridgeOperatorsResponse
+ * @see proto type: sparkdream.federation.v1.QueryListBridgeBindingsResponse
  */
-export interface QueryListBridgeOperatorsResponse {
-  bridgeOperators: BridgeOperator[];
+export interface QueryListBridgeBindingsResponse {
+  bridgeBindings: BridgeBinding[];
   pagination?: PageResponse;
 }
-export interface QueryListBridgeOperatorsResponseProtoMsg {
-  typeUrl: "/sparkdream.federation.v1.QueryListBridgeOperatorsResponse";
+export interface QueryListBridgeBindingsResponseProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.QueryListBridgeBindingsResponse";
   value: Uint8Array;
 }
 /**
- * @name QueryListBridgeOperatorsResponseAmino
+ * @name QueryListBridgeBindingsResponseAmino
  * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.QueryListBridgeOperatorsResponse
+ * @see proto type: sparkdream.federation.v1.QueryListBridgeBindingsResponse
  */
-export interface QueryListBridgeOperatorsResponseAmino {
-  bridge_operators?: BridgeOperatorAmino[];
+export interface QueryListBridgeBindingsResponseAmino {
+  bridge_bindings?: BridgeBindingAmino[];
   pagination?: PageResponseAmino;
 }
-export interface QueryListBridgeOperatorsResponseAminoMsg {
-  type: "/sparkdream.federation.v1.QueryListBridgeOperatorsResponse";
-  value: QueryListBridgeOperatorsResponseAmino;
+export interface QueryListBridgeBindingsResponseAminoMsg {
+  type: "/sparkdream.federation.v1.QueryListBridgeBindingsResponse";
+  value: QueryListBridgeBindingsResponseAmino;
 }
 /**
  * --- FederatedContent ---
@@ -865,6 +875,62 @@ export interface QueryGetVerificationRecordResponseAminoMsg {
   type: "/sparkdream.federation.v1.QueryGetVerificationRecordResponse";
   value: QueryGetVerificationRecordResponseAmino;
 }
+/**
+ * EscalatedChallenge lookup. Returns the Phase 2 (jury) lifecycle
+ * record for a content_id whose challenge has been escalated past the
+ * auto-resolution window. Returns NotFound when no jury lifecycle is
+ * currently open.
+ * @name QueryGetEscalatedChallengeRequest
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.QueryGetEscalatedChallengeRequest
+ */
+export interface QueryGetEscalatedChallengeRequest {
+  contentId: bigint;
+}
+export interface QueryGetEscalatedChallengeRequestProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.QueryGetEscalatedChallengeRequest";
+  value: Uint8Array;
+}
+/**
+ * EscalatedChallenge lookup. Returns the Phase 2 (jury) lifecycle
+ * record for a content_id whose challenge has been escalated past the
+ * auto-resolution window. Returns NotFound when no jury lifecycle is
+ * currently open.
+ * @name QueryGetEscalatedChallengeRequestAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.QueryGetEscalatedChallengeRequest
+ */
+export interface QueryGetEscalatedChallengeRequestAmino {
+  content_id?: string;
+}
+export interface QueryGetEscalatedChallengeRequestAminoMsg {
+  type: "/sparkdream.federation.v1.QueryGetEscalatedChallengeRequest";
+  value: QueryGetEscalatedChallengeRequestAmino;
+}
+/**
+ * @name QueryGetEscalatedChallengeResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.QueryGetEscalatedChallengeResponse
+ */
+export interface QueryGetEscalatedChallengeResponse {
+  escalated: EscalatedChallenge;
+}
+export interface QueryGetEscalatedChallengeResponseProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.QueryGetEscalatedChallengeResponse";
+  value: Uint8Array;
+}
+/**
+ * @name QueryGetEscalatedChallengeResponseAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.QueryGetEscalatedChallengeResponse
+ */
+export interface QueryGetEscalatedChallengeResponseAmino {
+  escalated?: EscalatedChallengeAmino;
+}
+export interface QueryGetEscalatedChallengeResponseAminoMsg {
+  type: "/sparkdream.federation.v1.QueryGetEscalatedChallengeResponse";
+  value: QueryGetEscalatedChallengeResponseAmino;
+}
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
 }
@@ -1413,21 +1479,26 @@ export const QueryGetPeerPolicyResponse = {
     };
   }
 };
-function createBaseQueryGetBridgeOperatorRequest(): QueryGetBridgeOperatorRequest {
+function createBaseQueryGetBridgeBindingRequest(): QueryGetBridgeBindingRequest {
   return {
     address: "",
     peerId: ""
   };
 }
 /**
- * --- BridgeOperator ---
- * @name QueryGetBridgeOperatorRequest
+ * --- BridgeBinding ---
+ * Note: Phase 7 of the federation→service migration will enrich these
+ * responses with joined service.Operator status (bond, status,
+ * unbond_complete_at). For now the response carries only the federation-
+ * side binding; callers wanting live economic state can query x/service
+ * separately by (address, federation-bridge-<protocol>).
+ * @name QueryGetBridgeBindingRequest
  * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.QueryGetBridgeOperatorRequest
+ * @see proto type: sparkdream.federation.v1.QueryGetBridgeBindingRequest
  */
-export const QueryGetBridgeOperatorRequest = {
-  typeUrl: "/sparkdream.federation.v1.QueryGetBridgeOperatorRequest",
-  encode(message: QueryGetBridgeOperatorRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+export const QueryGetBridgeBindingRequest = {
+  typeUrl: "/sparkdream.federation.v1.QueryGetBridgeBindingRequest",
+  encode(message: QueryGetBridgeBindingRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
     }
@@ -1436,10 +1507,10 @@ export const QueryGetBridgeOperatorRequest = {
     }
     return writer;
   },
-  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetBridgeOperatorRequest {
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetBridgeBindingRequest {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryGetBridgeOperatorRequest();
+    const message = createBaseQueryGetBridgeBindingRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1456,14 +1527,14 @@ export const QueryGetBridgeOperatorRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryGetBridgeOperatorRequest>): QueryGetBridgeOperatorRequest {
-    const message = createBaseQueryGetBridgeOperatorRequest();
+  fromPartial(object: DeepPartial<QueryGetBridgeBindingRequest>): QueryGetBridgeBindingRequest {
+    const message = createBaseQueryGetBridgeBindingRequest();
     message.address = object.address ?? "";
     message.peerId = object.peerId ?? "";
     return message;
   },
-  fromAmino(object: QueryGetBridgeOperatorRequestAmino): QueryGetBridgeOperatorRequest {
-    const message = createBaseQueryGetBridgeOperatorRequest();
+  fromAmino(object: QueryGetBridgeBindingRequestAmino): QueryGetBridgeBindingRequest {
+    const message = createBaseQueryGetBridgeBindingRequest();
     if (object.address !== undefined && object.address !== null) {
       message.address = object.address;
     }
@@ -1472,55 +1543,55 @@ export const QueryGetBridgeOperatorRequest = {
     }
     return message;
   },
-  toAmino(message: QueryGetBridgeOperatorRequest): QueryGetBridgeOperatorRequestAmino {
+  toAmino(message: QueryGetBridgeBindingRequest): QueryGetBridgeBindingRequestAmino {
     const obj: any = {};
     obj.address = message.address === "" ? undefined : message.address;
     obj.peer_id = message.peerId === "" ? undefined : message.peerId;
     return obj;
   },
-  fromAminoMsg(object: QueryGetBridgeOperatorRequestAminoMsg): QueryGetBridgeOperatorRequest {
-    return QueryGetBridgeOperatorRequest.fromAmino(object.value);
+  fromAminoMsg(object: QueryGetBridgeBindingRequestAminoMsg): QueryGetBridgeBindingRequest {
+    return QueryGetBridgeBindingRequest.fromAmino(object.value);
   },
-  fromProtoMsg(message: QueryGetBridgeOperatorRequestProtoMsg): QueryGetBridgeOperatorRequest {
-    return QueryGetBridgeOperatorRequest.decode(message.value);
+  fromProtoMsg(message: QueryGetBridgeBindingRequestProtoMsg): QueryGetBridgeBindingRequest {
+    return QueryGetBridgeBindingRequest.decode(message.value);
   },
-  toProto(message: QueryGetBridgeOperatorRequest): Uint8Array {
-    return QueryGetBridgeOperatorRequest.encode(message).finish();
+  toProto(message: QueryGetBridgeBindingRequest): Uint8Array {
+    return QueryGetBridgeBindingRequest.encode(message).finish();
   },
-  toProtoMsg(message: QueryGetBridgeOperatorRequest): QueryGetBridgeOperatorRequestProtoMsg {
+  toProtoMsg(message: QueryGetBridgeBindingRequest): QueryGetBridgeBindingRequestProtoMsg {
     return {
-      typeUrl: "/sparkdream.federation.v1.QueryGetBridgeOperatorRequest",
-      value: QueryGetBridgeOperatorRequest.encode(message).finish()
+      typeUrl: "/sparkdream.federation.v1.QueryGetBridgeBindingRequest",
+      value: QueryGetBridgeBindingRequest.encode(message).finish()
     };
   }
 };
-function createBaseQueryGetBridgeOperatorResponse(): QueryGetBridgeOperatorResponse {
+function createBaseQueryGetBridgeBindingResponse(): QueryGetBridgeBindingResponse {
   return {
-    bridgeOperator: BridgeOperator.fromPartial({})
+    bridgeBinding: BridgeBinding.fromPartial({})
   };
 }
 /**
- * @name QueryGetBridgeOperatorResponse
+ * @name QueryGetBridgeBindingResponse
  * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.QueryGetBridgeOperatorResponse
+ * @see proto type: sparkdream.federation.v1.QueryGetBridgeBindingResponse
  */
-export const QueryGetBridgeOperatorResponse = {
-  typeUrl: "/sparkdream.federation.v1.QueryGetBridgeOperatorResponse",
-  encode(message: QueryGetBridgeOperatorResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.bridgeOperator !== undefined) {
-      BridgeOperator.encode(message.bridgeOperator, writer.uint32(10).fork()).ldelim();
+export const QueryGetBridgeBindingResponse = {
+  typeUrl: "/sparkdream.federation.v1.QueryGetBridgeBindingResponse",
+  encode(message: QueryGetBridgeBindingResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.bridgeBinding !== undefined) {
+      BridgeBinding.encode(message.bridgeBinding, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
-  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetBridgeOperatorResponse {
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetBridgeBindingResponse {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryGetBridgeOperatorResponse();
+    const message = createBaseQueryGetBridgeBindingResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.bridgeOperator = BridgeOperator.decode(reader, reader.uint32());
+          message.bridgeBinding = BridgeBinding.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -1529,61 +1600,61 @@ export const QueryGetBridgeOperatorResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryGetBridgeOperatorResponse>): QueryGetBridgeOperatorResponse {
-    const message = createBaseQueryGetBridgeOperatorResponse();
-    message.bridgeOperator = object.bridgeOperator !== undefined && object.bridgeOperator !== null ? BridgeOperator.fromPartial(object.bridgeOperator) : undefined;
+  fromPartial(object: DeepPartial<QueryGetBridgeBindingResponse>): QueryGetBridgeBindingResponse {
+    const message = createBaseQueryGetBridgeBindingResponse();
+    message.bridgeBinding = object.bridgeBinding !== undefined && object.bridgeBinding !== null ? BridgeBinding.fromPartial(object.bridgeBinding) : undefined;
     return message;
   },
-  fromAmino(object: QueryGetBridgeOperatorResponseAmino): QueryGetBridgeOperatorResponse {
-    const message = createBaseQueryGetBridgeOperatorResponse();
-    if (object.bridge_operator !== undefined && object.bridge_operator !== null) {
-      message.bridgeOperator = BridgeOperator.fromAmino(object.bridge_operator);
+  fromAmino(object: QueryGetBridgeBindingResponseAmino): QueryGetBridgeBindingResponse {
+    const message = createBaseQueryGetBridgeBindingResponse();
+    if (object.bridge_binding !== undefined && object.bridge_binding !== null) {
+      message.bridgeBinding = BridgeBinding.fromAmino(object.bridge_binding);
     }
     return message;
   },
-  toAmino(message: QueryGetBridgeOperatorResponse): QueryGetBridgeOperatorResponseAmino {
+  toAmino(message: QueryGetBridgeBindingResponse): QueryGetBridgeBindingResponseAmino {
     const obj: any = {};
-    obj.bridge_operator = message.bridgeOperator ? BridgeOperator.toAmino(message.bridgeOperator) : undefined;
+    obj.bridge_binding = message.bridgeBinding ? BridgeBinding.toAmino(message.bridgeBinding) : undefined;
     return obj;
   },
-  fromAminoMsg(object: QueryGetBridgeOperatorResponseAminoMsg): QueryGetBridgeOperatorResponse {
-    return QueryGetBridgeOperatorResponse.fromAmino(object.value);
+  fromAminoMsg(object: QueryGetBridgeBindingResponseAminoMsg): QueryGetBridgeBindingResponse {
+    return QueryGetBridgeBindingResponse.fromAmino(object.value);
   },
-  fromProtoMsg(message: QueryGetBridgeOperatorResponseProtoMsg): QueryGetBridgeOperatorResponse {
-    return QueryGetBridgeOperatorResponse.decode(message.value);
+  fromProtoMsg(message: QueryGetBridgeBindingResponseProtoMsg): QueryGetBridgeBindingResponse {
+    return QueryGetBridgeBindingResponse.decode(message.value);
   },
-  toProto(message: QueryGetBridgeOperatorResponse): Uint8Array {
-    return QueryGetBridgeOperatorResponse.encode(message).finish();
+  toProto(message: QueryGetBridgeBindingResponse): Uint8Array {
+    return QueryGetBridgeBindingResponse.encode(message).finish();
   },
-  toProtoMsg(message: QueryGetBridgeOperatorResponse): QueryGetBridgeOperatorResponseProtoMsg {
+  toProtoMsg(message: QueryGetBridgeBindingResponse): QueryGetBridgeBindingResponseProtoMsg {
     return {
-      typeUrl: "/sparkdream.federation.v1.QueryGetBridgeOperatorResponse",
-      value: QueryGetBridgeOperatorResponse.encode(message).finish()
+      typeUrl: "/sparkdream.federation.v1.QueryGetBridgeBindingResponse",
+      value: QueryGetBridgeBindingResponse.encode(message).finish()
     };
   }
 };
-function createBaseQueryListBridgeOperatorsRequest(): QueryListBridgeOperatorsRequest {
+function createBaseQueryListBridgeBindingsRequest(): QueryListBridgeBindingsRequest {
   return {
     pagination: undefined
   };
 }
 /**
- * @name QueryListBridgeOperatorsRequest
+ * @name QueryListBridgeBindingsRequest
  * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.QueryListBridgeOperatorsRequest
+ * @see proto type: sparkdream.federation.v1.QueryListBridgeBindingsRequest
  */
-export const QueryListBridgeOperatorsRequest = {
-  typeUrl: "/sparkdream.federation.v1.QueryListBridgeOperatorsRequest",
-  encode(message: QueryListBridgeOperatorsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+export const QueryListBridgeBindingsRequest = {
+  typeUrl: "/sparkdream.federation.v1.QueryListBridgeBindingsRequest",
+  encode(message: QueryListBridgeBindingsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
-  decode(input: BinaryReader | Uint8Array, length?: number): QueryListBridgeOperatorsRequest {
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryListBridgeBindingsRequest {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryListBridgeOperatorsRequest();
+    const message = createBaseQueryListBridgeBindingsRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1597,70 +1668,70 @@ export const QueryListBridgeOperatorsRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryListBridgeOperatorsRequest>): QueryListBridgeOperatorsRequest {
-    const message = createBaseQueryListBridgeOperatorsRequest();
+  fromPartial(object: DeepPartial<QueryListBridgeBindingsRequest>): QueryListBridgeBindingsRequest {
+    const message = createBaseQueryListBridgeBindingsRequest();
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
     return message;
   },
-  fromAmino(object: QueryListBridgeOperatorsRequestAmino): QueryListBridgeOperatorsRequest {
-    const message = createBaseQueryListBridgeOperatorsRequest();
+  fromAmino(object: QueryListBridgeBindingsRequestAmino): QueryListBridgeBindingsRequest {
+    const message = createBaseQueryListBridgeBindingsRequest();
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromAmino(object.pagination);
     }
     return message;
   },
-  toAmino(message: QueryListBridgeOperatorsRequest): QueryListBridgeOperatorsRequestAmino {
+  toAmino(message: QueryListBridgeBindingsRequest): QueryListBridgeBindingsRequestAmino {
     const obj: any = {};
     obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
     return obj;
   },
-  fromAminoMsg(object: QueryListBridgeOperatorsRequestAminoMsg): QueryListBridgeOperatorsRequest {
-    return QueryListBridgeOperatorsRequest.fromAmino(object.value);
+  fromAminoMsg(object: QueryListBridgeBindingsRequestAminoMsg): QueryListBridgeBindingsRequest {
+    return QueryListBridgeBindingsRequest.fromAmino(object.value);
   },
-  fromProtoMsg(message: QueryListBridgeOperatorsRequestProtoMsg): QueryListBridgeOperatorsRequest {
-    return QueryListBridgeOperatorsRequest.decode(message.value);
+  fromProtoMsg(message: QueryListBridgeBindingsRequestProtoMsg): QueryListBridgeBindingsRequest {
+    return QueryListBridgeBindingsRequest.decode(message.value);
   },
-  toProto(message: QueryListBridgeOperatorsRequest): Uint8Array {
-    return QueryListBridgeOperatorsRequest.encode(message).finish();
+  toProto(message: QueryListBridgeBindingsRequest): Uint8Array {
+    return QueryListBridgeBindingsRequest.encode(message).finish();
   },
-  toProtoMsg(message: QueryListBridgeOperatorsRequest): QueryListBridgeOperatorsRequestProtoMsg {
+  toProtoMsg(message: QueryListBridgeBindingsRequest): QueryListBridgeBindingsRequestProtoMsg {
     return {
-      typeUrl: "/sparkdream.federation.v1.QueryListBridgeOperatorsRequest",
-      value: QueryListBridgeOperatorsRequest.encode(message).finish()
+      typeUrl: "/sparkdream.federation.v1.QueryListBridgeBindingsRequest",
+      value: QueryListBridgeBindingsRequest.encode(message).finish()
     };
   }
 };
-function createBaseQueryListBridgeOperatorsResponse(): QueryListBridgeOperatorsResponse {
+function createBaseQueryListBridgeBindingsResponse(): QueryListBridgeBindingsResponse {
   return {
-    bridgeOperators: [],
+    bridgeBindings: [],
     pagination: undefined
   };
 }
 /**
- * @name QueryListBridgeOperatorsResponse
+ * @name QueryListBridgeBindingsResponse
  * @package sparkdream.federation.v1
- * @see proto type: sparkdream.federation.v1.QueryListBridgeOperatorsResponse
+ * @see proto type: sparkdream.federation.v1.QueryListBridgeBindingsResponse
  */
-export const QueryListBridgeOperatorsResponse = {
-  typeUrl: "/sparkdream.federation.v1.QueryListBridgeOperatorsResponse",
-  encode(message: QueryListBridgeOperatorsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    for (const v of message.bridgeOperators) {
-      BridgeOperator.encode(v!, writer.uint32(10).fork()).ldelim();
+export const QueryListBridgeBindingsResponse = {
+  typeUrl: "/sparkdream.federation.v1.QueryListBridgeBindingsResponse",
+  encode(message: QueryListBridgeBindingsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.bridgeBindings) {
+      BridgeBinding.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.pagination !== undefined) {
       PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
-  decode(input: BinaryReader | Uint8Array, length?: number): QueryListBridgeOperatorsResponse {
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryListBridgeBindingsResponse {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryListBridgeOperatorsResponse();
+    const message = createBaseQueryListBridgeBindingsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.bridgeOperators.push(BridgeOperator.decode(reader, reader.uint32()));
+          message.bridgeBindings.push(BridgeBinding.decode(reader, reader.uint32()));
           break;
         case 2:
           message.pagination = PageResponse.decode(reader, reader.uint32());
@@ -1672,43 +1743,43 @@ export const QueryListBridgeOperatorsResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryListBridgeOperatorsResponse>): QueryListBridgeOperatorsResponse {
-    const message = createBaseQueryListBridgeOperatorsResponse();
-    message.bridgeOperators = object.bridgeOperators?.map(e => BridgeOperator.fromPartial(e)) || [];
+  fromPartial(object: DeepPartial<QueryListBridgeBindingsResponse>): QueryListBridgeBindingsResponse {
+    const message = createBaseQueryListBridgeBindingsResponse();
+    message.bridgeBindings = object.bridgeBindings?.map(e => BridgeBinding.fromPartial(e)) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
     return message;
   },
-  fromAmino(object: QueryListBridgeOperatorsResponseAmino): QueryListBridgeOperatorsResponse {
-    const message = createBaseQueryListBridgeOperatorsResponse();
-    message.bridgeOperators = object.bridge_operators?.map(e => BridgeOperator.fromAmino(e)) || [];
+  fromAmino(object: QueryListBridgeBindingsResponseAmino): QueryListBridgeBindingsResponse {
+    const message = createBaseQueryListBridgeBindingsResponse();
+    message.bridgeBindings = object.bridge_bindings?.map(e => BridgeBinding.fromAmino(e)) || [];
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageResponse.fromAmino(object.pagination);
     }
     return message;
   },
-  toAmino(message: QueryListBridgeOperatorsResponse): QueryListBridgeOperatorsResponseAmino {
+  toAmino(message: QueryListBridgeBindingsResponse): QueryListBridgeBindingsResponseAmino {
     const obj: any = {};
-    if (message.bridgeOperators) {
-      obj.bridge_operators = message.bridgeOperators.map(e => e ? BridgeOperator.toAmino(e) : undefined);
+    if (message.bridgeBindings) {
+      obj.bridge_bindings = message.bridgeBindings.map(e => e ? BridgeBinding.toAmino(e) : undefined);
     } else {
-      obj.bridge_operators = message.bridgeOperators;
+      obj.bridge_bindings = message.bridgeBindings;
     }
     obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
     return obj;
   },
-  fromAminoMsg(object: QueryListBridgeOperatorsResponseAminoMsg): QueryListBridgeOperatorsResponse {
-    return QueryListBridgeOperatorsResponse.fromAmino(object.value);
+  fromAminoMsg(object: QueryListBridgeBindingsResponseAminoMsg): QueryListBridgeBindingsResponse {
+    return QueryListBridgeBindingsResponse.fromAmino(object.value);
   },
-  fromProtoMsg(message: QueryListBridgeOperatorsResponseProtoMsg): QueryListBridgeOperatorsResponse {
-    return QueryListBridgeOperatorsResponse.decode(message.value);
+  fromProtoMsg(message: QueryListBridgeBindingsResponseProtoMsg): QueryListBridgeBindingsResponse {
+    return QueryListBridgeBindingsResponse.decode(message.value);
   },
-  toProto(message: QueryListBridgeOperatorsResponse): Uint8Array {
-    return QueryListBridgeOperatorsResponse.encode(message).finish();
+  toProto(message: QueryListBridgeBindingsResponse): Uint8Array {
+    return QueryListBridgeBindingsResponse.encode(message).finish();
   },
-  toProtoMsg(message: QueryListBridgeOperatorsResponse): QueryListBridgeOperatorsResponseProtoMsg {
+  toProtoMsg(message: QueryListBridgeBindingsResponse): QueryListBridgeBindingsResponseProtoMsg {
     return {
-      typeUrl: "/sparkdream.federation.v1.QueryListBridgeOperatorsResponse",
-      value: QueryListBridgeOperatorsResponse.encode(message).finish()
+      typeUrl: "/sparkdream.federation.v1.QueryListBridgeBindingsResponse",
+      value: QueryListBridgeBindingsResponse.encode(message).finish()
     };
   }
 };
@@ -3329,6 +3400,146 @@ export const QueryGetVerificationRecordResponse = {
     return {
       typeUrl: "/sparkdream.federation.v1.QueryGetVerificationRecordResponse",
       value: QueryGetVerificationRecordResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetEscalatedChallengeRequest(): QueryGetEscalatedChallengeRequest {
+  return {
+    contentId: BigInt(0)
+  };
+}
+/**
+ * EscalatedChallenge lookup. Returns the Phase 2 (jury) lifecycle
+ * record for a content_id whose challenge has been escalated past the
+ * auto-resolution window. Returns NotFound when no jury lifecycle is
+ * currently open.
+ * @name QueryGetEscalatedChallengeRequest
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.QueryGetEscalatedChallengeRequest
+ */
+export const QueryGetEscalatedChallengeRequest = {
+  typeUrl: "/sparkdream.federation.v1.QueryGetEscalatedChallengeRequest",
+  encode(message: QueryGetEscalatedChallengeRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.contentId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.contentId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetEscalatedChallengeRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetEscalatedChallengeRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.contentId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetEscalatedChallengeRequest>): QueryGetEscalatedChallengeRequest {
+    const message = createBaseQueryGetEscalatedChallengeRequest();
+    message.contentId = object.contentId !== undefined && object.contentId !== null ? BigInt(object.contentId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryGetEscalatedChallengeRequestAmino): QueryGetEscalatedChallengeRequest {
+    const message = createBaseQueryGetEscalatedChallengeRequest();
+    if (object.content_id !== undefined && object.content_id !== null) {
+      message.contentId = BigInt(object.content_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetEscalatedChallengeRequest): QueryGetEscalatedChallengeRequestAmino {
+    const obj: any = {};
+    obj.content_id = message.contentId !== BigInt(0) ? message.contentId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetEscalatedChallengeRequestAminoMsg): QueryGetEscalatedChallengeRequest {
+    return QueryGetEscalatedChallengeRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetEscalatedChallengeRequestProtoMsg): QueryGetEscalatedChallengeRequest {
+    return QueryGetEscalatedChallengeRequest.decode(message.value);
+  },
+  toProto(message: QueryGetEscalatedChallengeRequest): Uint8Array {
+    return QueryGetEscalatedChallengeRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetEscalatedChallengeRequest): QueryGetEscalatedChallengeRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.QueryGetEscalatedChallengeRequest",
+      value: QueryGetEscalatedChallengeRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetEscalatedChallengeResponse(): QueryGetEscalatedChallengeResponse {
+  return {
+    escalated: EscalatedChallenge.fromPartial({})
+  };
+}
+/**
+ * @name QueryGetEscalatedChallengeResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.QueryGetEscalatedChallengeResponse
+ */
+export const QueryGetEscalatedChallengeResponse = {
+  typeUrl: "/sparkdream.federation.v1.QueryGetEscalatedChallengeResponse",
+  encode(message: QueryGetEscalatedChallengeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.escalated !== undefined) {
+      EscalatedChallenge.encode(message.escalated, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetEscalatedChallengeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetEscalatedChallengeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.escalated = EscalatedChallenge.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetEscalatedChallengeResponse>): QueryGetEscalatedChallengeResponse {
+    const message = createBaseQueryGetEscalatedChallengeResponse();
+    message.escalated = object.escalated !== undefined && object.escalated !== null ? EscalatedChallenge.fromPartial(object.escalated) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetEscalatedChallengeResponseAmino): QueryGetEscalatedChallengeResponse {
+    const message = createBaseQueryGetEscalatedChallengeResponse();
+    if (object.escalated !== undefined && object.escalated !== null) {
+      message.escalated = EscalatedChallenge.fromAmino(object.escalated);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetEscalatedChallengeResponse): QueryGetEscalatedChallengeResponseAmino {
+    const obj: any = {};
+    obj.escalated = message.escalated ? EscalatedChallenge.toAmino(message.escalated) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetEscalatedChallengeResponseAminoMsg): QueryGetEscalatedChallengeResponse {
+    return QueryGetEscalatedChallengeResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetEscalatedChallengeResponseProtoMsg): QueryGetEscalatedChallengeResponse {
+    return QueryGetEscalatedChallengeResponse.decode(message.value);
+  },
+  toProto(message: QueryGetEscalatedChallengeResponse): Uint8Array {
+    return QueryGetEscalatedChallengeResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetEscalatedChallengeResponse): QueryGetEscalatedChallengeResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.QueryGetEscalatedChallengeResponse",
+      value: QueryGetEscalatedChallengeResponse.encode(message).finish()
     };
   }
 };

@@ -78,6 +78,9 @@ export const createRPCMsgClient = async ({
     futarchy: {
       v1: new (await import("./futarchy/v1/tx.rpc.msg")).MsgClientImpl(rpc)
     },
+    guardian: {
+      v1: new (await import("./guardian/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    },
     name: {
       v1: new (await import("./name/v1/tx.rpc.msg")).MsgClientImpl(rpc)
     },
@@ -89,6 +92,9 @@ export const createRPCMsgClient = async ({
     },
     season: {
       v1: new (await import("./season/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    },
+    service: {
+      v1: new (await import("./service/v1/tx.rpc.msg")).MsgClientImpl(rpc)
     },
     session: {
       v1: new (await import("./session/v1/tx.rpc.msg")).MsgClientImpl(rpc)

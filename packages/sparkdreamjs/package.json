@@ -1,6 +1,6 @@
 {
   "name": "@sparkdreamnft/sparkdreamjs",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "author": "kob <kob@sparkdream.io>",
   "description": "Spark Dream blockchain TypeScript library",
   "main": "index.js",

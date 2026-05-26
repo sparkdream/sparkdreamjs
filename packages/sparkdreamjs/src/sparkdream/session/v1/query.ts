@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "../../../cosmos/base/query/v1beta1/pagination";
+import { GrantType, Grant, GrantAmino } from "./grant";
 import { Params, ParamsAmino } from "./params";
 import { Session, SessionAmino } from "./session";
 import { BinaryReader, BinaryWriter } from "../../../binary";
@@ -201,6 +202,168 @@ export interface QuerySessionsByGranteeResponseAmino {
 export interface QuerySessionsByGranteeResponseAminoMsg {
   type: "/sparkdream.session.v1.QuerySessionsByGranteeResponse";
   value: QuerySessionsByGranteeResponseAmino;
+}
+/**
+ * @name QueryGrantRequest
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.QueryGrantRequest
+ */
+export interface QueryGrantRequest {
+  id: bigint;
+}
+export interface QueryGrantRequestProtoMsg {
+  typeUrl: "/sparkdream.session.v1.QueryGrantRequest";
+  value: Uint8Array;
+}
+/**
+ * @name QueryGrantRequestAmino
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.QueryGrantRequest
+ */
+export interface QueryGrantRequestAmino {
+  id?: string;
+}
+export interface QueryGrantRequestAminoMsg {
+  type: "/sparkdream.session.v1.QueryGrantRequest";
+  value: QueryGrantRequestAmino;
+}
+/**
+ * @name QueryGrantResponse
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.QueryGrantResponse
+ */
+export interface QueryGrantResponse {
+  grant: Grant;
+}
+export interface QueryGrantResponseProtoMsg {
+  typeUrl: "/sparkdream.session.v1.QueryGrantResponse";
+  value: Uint8Array;
+}
+/**
+ * @name QueryGrantResponseAmino
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.QueryGrantResponse
+ */
+export interface QueryGrantResponseAmino {
+  grant?: GrantAmino;
+}
+export interface QueryGrantResponseAminoMsg {
+  type: "/sparkdream.session.v1.QueryGrantResponse";
+  value: QueryGrantResponseAmino;
+}
+/**
+ * @name QueryGrantsByGranterRequest
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.QueryGrantsByGranterRequest
+ */
+export interface QueryGrantsByGranterRequest {
+  granter: string;
+  /**
+   * Optional type filter. UNSPECIFIED returns all types.
+   */
+  type: GrantType;
+  pagination?: PageRequest;
+}
+export interface QueryGrantsByGranterRequestProtoMsg {
+  typeUrl: "/sparkdream.session.v1.QueryGrantsByGranterRequest";
+  value: Uint8Array;
+}
+/**
+ * @name QueryGrantsByGranterRequestAmino
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.QueryGrantsByGranterRequest
+ */
+export interface QueryGrantsByGranterRequestAmino {
+  granter?: string;
+  /**
+   * Optional type filter. UNSPECIFIED returns all types.
+   */
+  type?: GrantType;
+  pagination?: PageRequestAmino;
+}
+export interface QueryGrantsByGranterRequestAminoMsg {
+  type: "/sparkdream.session.v1.QueryGrantsByGranterRequest";
+  value: QueryGrantsByGranterRequestAmino;
+}
+/**
+ * @name QueryGrantsByGranterResponse
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.QueryGrantsByGranterResponse
+ */
+export interface QueryGrantsByGranterResponse {
+  grants: Grant[];
+  pagination?: PageResponse;
+}
+export interface QueryGrantsByGranterResponseProtoMsg {
+  typeUrl: "/sparkdream.session.v1.QueryGrantsByGranterResponse";
+  value: Uint8Array;
+}
+/**
+ * @name QueryGrantsByGranterResponseAmino
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.QueryGrantsByGranterResponse
+ */
+export interface QueryGrantsByGranterResponseAmino {
+  grants?: GrantAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryGrantsByGranterResponseAminoMsg {
+  type: "/sparkdream.session.v1.QueryGrantsByGranterResponse";
+  value: QueryGrantsByGranterResponseAmino;
+}
+/**
+ * @name QueryGrantsByGranteeRequest
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.QueryGrantsByGranteeRequest
+ */
+export interface QueryGrantsByGranteeRequest {
+  grantee: string;
+  type: GrantType;
+  pagination?: PageRequest;
+}
+export interface QueryGrantsByGranteeRequestProtoMsg {
+  typeUrl: "/sparkdream.session.v1.QueryGrantsByGranteeRequest";
+  value: Uint8Array;
+}
+/**
+ * @name QueryGrantsByGranteeRequestAmino
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.QueryGrantsByGranteeRequest
+ */
+export interface QueryGrantsByGranteeRequestAmino {
+  grantee?: string;
+  type?: GrantType;
+  pagination?: PageRequestAmino;
+}
+export interface QueryGrantsByGranteeRequestAminoMsg {
+  type: "/sparkdream.session.v1.QueryGrantsByGranteeRequest";
+  value: QueryGrantsByGranteeRequestAmino;
+}
+/**
+ * @name QueryGrantsByGranteeResponse
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.QueryGrantsByGranteeResponse
+ */
+export interface QueryGrantsByGranteeResponse {
+  grants: Grant[];
+  pagination?: PageResponse;
+}
+export interface QueryGrantsByGranteeResponseProtoMsg {
+  typeUrl: "/sparkdream.session.v1.QueryGrantsByGranteeResponse";
+  value: Uint8Array;
+}
+/**
+ * @name QueryGrantsByGranteeResponseAmino
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.QueryGrantsByGranteeResponse
+ */
+export interface QueryGrantsByGranteeResponseAmino {
+  grants?: GrantAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryGrantsByGranteeResponseAminoMsg {
+  type: "/sparkdream.session.v1.QueryGrantsByGranteeResponse";
+  value: QueryGrantsByGranteeResponseAmino;
 }
 /**
  * @name QueryAllowedMsgTypesRequest
@@ -840,6 +1003,490 @@ export const QuerySessionsByGranteeResponse = {
     return {
       typeUrl: "/sparkdream.session.v1.QuerySessionsByGranteeResponse",
       value: QuerySessionsByGranteeResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGrantRequest(): QueryGrantRequest {
+  return {
+    id: BigInt(0)
+  };
+}
+/**
+ * @name QueryGrantRequest
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.QueryGrantRequest
+ */
+export const QueryGrantRequest = {
+  typeUrl: "/sparkdream.session.v1.QueryGrantRequest",
+  encode(message: QueryGrantRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.id !== BigInt(0)) {
+      writer.uint32(8).uint64(message.id);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGrantRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGrantRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGrantRequest>): QueryGrantRequest {
+    const message = createBaseQueryGrantRequest();
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryGrantRequestAmino): QueryGrantRequest {
+    const message = createBaseQueryGrantRequest();
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    return message;
+  },
+  toAmino(message: QueryGrantRequest): QueryGrantRequestAmino {
+    const obj: any = {};
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGrantRequestAminoMsg): QueryGrantRequest {
+    return QueryGrantRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGrantRequestProtoMsg): QueryGrantRequest {
+    return QueryGrantRequest.decode(message.value);
+  },
+  toProto(message: QueryGrantRequest): Uint8Array {
+    return QueryGrantRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGrantRequest): QueryGrantRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.session.v1.QueryGrantRequest",
+      value: QueryGrantRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGrantResponse(): QueryGrantResponse {
+  return {
+    grant: Grant.fromPartial({})
+  };
+}
+/**
+ * @name QueryGrantResponse
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.QueryGrantResponse
+ */
+export const QueryGrantResponse = {
+  typeUrl: "/sparkdream.session.v1.QueryGrantResponse",
+  encode(message: QueryGrantResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.grant !== undefined) {
+      Grant.encode(message.grant, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGrantResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGrantResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.grant = Grant.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGrantResponse>): QueryGrantResponse {
+    const message = createBaseQueryGrantResponse();
+    message.grant = object.grant !== undefined && object.grant !== null ? Grant.fromPartial(object.grant) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGrantResponseAmino): QueryGrantResponse {
+    const message = createBaseQueryGrantResponse();
+    if (object.grant !== undefined && object.grant !== null) {
+      message.grant = Grant.fromAmino(object.grant);
+    }
+    return message;
+  },
+  toAmino(message: QueryGrantResponse): QueryGrantResponseAmino {
+    const obj: any = {};
+    obj.grant = message.grant ? Grant.toAmino(message.grant) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGrantResponseAminoMsg): QueryGrantResponse {
+    return QueryGrantResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGrantResponseProtoMsg): QueryGrantResponse {
+    return QueryGrantResponse.decode(message.value);
+  },
+  toProto(message: QueryGrantResponse): Uint8Array {
+    return QueryGrantResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGrantResponse): QueryGrantResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.session.v1.QueryGrantResponse",
+      value: QueryGrantResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGrantsByGranterRequest(): QueryGrantsByGranterRequest {
+  return {
+    granter: "",
+    type: 0,
+    pagination: undefined
+  };
+}
+/**
+ * @name QueryGrantsByGranterRequest
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.QueryGrantsByGranterRequest
+ */
+export const QueryGrantsByGranterRequest = {
+  typeUrl: "/sparkdream.session.v1.QueryGrantsByGranterRequest",
+  encode(message: QueryGrantsByGranterRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.granter !== "") {
+      writer.uint32(10).string(message.granter);
+    }
+    if (message.type !== 0) {
+      writer.uint32(16).int32(message.type);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGrantsByGranterRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGrantsByGranterRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.granter = reader.string();
+          break;
+        case 2:
+          message.type = reader.int32() as any;
+          break;
+        case 3:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGrantsByGranterRequest>): QueryGrantsByGranterRequest {
+    const message = createBaseQueryGrantsByGranterRequest();
+    message.granter = object.granter ?? "";
+    message.type = object.type ?? 0;
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGrantsByGranterRequestAmino): QueryGrantsByGranterRequest {
+    const message = createBaseQueryGrantsByGranterRequest();
+    if (object.granter !== undefined && object.granter !== null) {
+      message.granter = object.granter;
+    }
+    if (object.type !== undefined && object.type !== null) {
+      message.type = object.type;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryGrantsByGranterRequest): QueryGrantsByGranterRequestAmino {
+    const obj: any = {};
+    obj.granter = message.granter === "" ? undefined : message.granter;
+    obj.type = message.type === 0 ? undefined : message.type;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGrantsByGranterRequestAminoMsg): QueryGrantsByGranterRequest {
+    return QueryGrantsByGranterRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGrantsByGranterRequestProtoMsg): QueryGrantsByGranterRequest {
+    return QueryGrantsByGranterRequest.decode(message.value);
+  },
+  toProto(message: QueryGrantsByGranterRequest): Uint8Array {
+    return QueryGrantsByGranterRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGrantsByGranterRequest): QueryGrantsByGranterRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.session.v1.QueryGrantsByGranterRequest",
+      value: QueryGrantsByGranterRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGrantsByGranterResponse(): QueryGrantsByGranterResponse {
+  return {
+    grants: [],
+    pagination: undefined
+  };
+}
+/**
+ * @name QueryGrantsByGranterResponse
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.QueryGrantsByGranterResponse
+ */
+export const QueryGrantsByGranterResponse = {
+  typeUrl: "/sparkdream.session.v1.QueryGrantsByGranterResponse",
+  encode(message: QueryGrantsByGranterResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.grants) {
+      Grant.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGrantsByGranterResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGrantsByGranterResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.grants.push(Grant.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGrantsByGranterResponse>): QueryGrantsByGranterResponse {
+    const message = createBaseQueryGrantsByGranterResponse();
+    message.grants = object.grants?.map(e => Grant.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGrantsByGranterResponseAmino): QueryGrantsByGranterResponse {
+    const message = createBaseQueryGrantsByGranterResponse();
+    message.grants = object.grants?.map(e => Grant.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryGrantsByGranterResponse): QueryGrantsByGranterResponseAmino {
+    const obj: any = {};
+    if (message.grants) {
+      obj.grants = message.grants.map(e => e ? Grant.toAmino(e) : undefined);
+    } else {
+      obj.grants = message.grants;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGrantsByGranterResponseAminoMsg): QueryGrantsByGranterResponse {
+    return QueryGrantsByGranterResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGrantsByGranterResponseProtoMsg): QueryGrantsByGranterResponse {
+    return QueryGrantsByGranterResponse.decode(message.value);
+  },
+  toProto(message: QueryGrantsByGranterResponse): Uint8Array {
+    return QueryGrantsByGranterResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGrantsByGranterResponse): QueryGrantsByGranterResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.session.v1.QueryGrantsByGranterResponse",
+      value: QueryGrantsByGranterResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGrantsByGranteeRequest(): QueryGrantsByGranteeRequest {
+  return {
+    grantee: "",
+    type: 0,
+    pagination: undefined
+  };
+}
+/**
+ * @name QueryGrantsByGranteeRequest
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.QueryGrantsByGranteeRequest
+ */
+export const QueryGrantsByGranteeRequest = {
+  typeUrl: "/sparkdream.session.v1.QueryGrantsByGranteeRequest",
+  encode(message: QueryGrantsByGranteeRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.grantee !== "") {
+      writer.uint32(10).string(message.grantee);
+    }
+    if (message.type !== 0) {
+      writer.uint32(16).int32(message.type);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGrantsByGranteeRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGrantsByGranteeRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.grantee = reader.string();
+          break;
+        case 2:
+          message.type = reader.int32() as any;
+          break;
+        case 3:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGrantsByGranteeRequest>): QueryGrantsByGranteeRequest {
+    const message = createBaseQueryGrantsByGranteeRequest();
+    message.grantee = object.grantee ?? "";
+    message.type = object.type ?? 0;
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGrantsByGranteeRequestAmino): QueryGrantsByGranteeRequest {
+    const message = createBaseQueryGrantsByGranteeRequest();
+    if (object.grantee !== undefined && object.grantee !== null) {
+      message.grantee = object.grantee;
+    }
+    if (object.type !== undefined && object.type !== null) {
+      message.type = object.type;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryGrantsByGranteeRequest): QueryGrantsByGranteeRequestAmino {
+    const obj: any = {};
+    obj.grantee = message.grantee === "" ? undefined : message.grantee;
+    obj.type = message.type === 0 ? undefined : message.type;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGrantsByGranteeRequestAminoMsg): QueryGrantsByGranteeRequest {
+    return QueryGrantsByGranteeRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGrantsByGranteeRequestProtoMsg): QueryGrantsByGranteeRequest {
+    return QueryGrantsByGranteeRequest.decode(message.value);
+  },
+  toProto(message: QueryGrantsByGranteeRequest): Uint8Array {
+    return QueryGrantsByGranteeRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGrantsByGranteeRequest): QueryGrantsByGranteeRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.session.v1.QueryGrantsByGranteeRequest",
+      value: QueryGrantsByGranteeRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGrantsByGranteeResponse(): QueryGrantsByGranteeResponse {
+  return {
+    grants: [],
+    pagination: undefined
+  };
+}
+/**
+ * @name QueryGrantsByGranteeResponse
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.QueryGrantsByGranteeResponse
+ */
+export const QueryGrantsByGranteeResponse = {
+  typeUrl: "/sparkdream.session.v1.QueryGrantsByGranteeResponse",
+  encode(message: QueryGrantsByGranteeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.grants) {
+      Grant.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGrantsByGranteeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGrantsByGranteeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.grants.push(Grant.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGrantsByGranteeResponse>): QueryGrantsByGranteeResponse {
+    const message = createBaseQueryGrantsByGranteeResponse();
+    message.grants = object.grants?.map(e => Grant.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGrantsByGranteeResponseAmino): QueryGrantsByGranteeResponse {
+    const message = createBaseQueryGrantsByGranteeResponse();
+    message.grants = object.grants?.map(e => Grant.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryGrantsByGranteeResponse): QueryGrantsByGranteeResponseAmino {
+    const obj: any = {};
+    if (message.grants) {
+      obj.grants = message.grants.map(e => e ? Grant.toAmino(e) : undefined);
+    } else {
+      obj.grants = message.grants;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGrantsByGranteeResponseAminoMsg): QueryGrantsByGranteeResponse {
+    return QueryGrantsByGranteeResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGrantsByGranteeResponseProtoMsg): QueryGrantsByGranteeResponse {
+    return QueryGrantsByGranteeResponse.decode(message.value);
+  },
+  toProto(message: QueryGrantsByGranteeResponse): Uint8Array {
+    return QueryGrantsByGranteeResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGrantsByGranteeResponse): QueryGrantsByGranteeResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.session.v1.QueryGrantsByGranteeResponse",
+      value: QueryGrantsByGranteeResponse.encode(message).finish()
     };
   }
 };

@@ -4,6 +4,11 @@ import { DeepPartial } from "../../../helpers";
 /**
  * Tag defines a content-tagging label. Owned by x/rep.
  * Consumed by x/forum, x/collect, and x/rep's own initiative/reputation systems.
+ * 
+ * GC is driven by `last_used_at + DefaultTagExpiration` (see x/rep ExpireTags
+ * in abci.go). IncrementTagUsage refreshes last_used_at on every reference,
+ * so actively used tags roll their deadline forward; stale tags hit their
+ * deadline and get reclaimed. Tags with last_used_at == 0 are permanent.
  * @name Tag
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.Tag
@@ -13,7 +18,6 @@ export interface Tag {
   usageCount: bigint;
   createdAt: bigint;
   lastUsedAt: bigint;
-  expirationIndex: bigint;
 }
 export interface TagProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Tag";
@@ -22,6 +26,11 @@ export interface TagProtoMsg {
 /**
  * Tag defines a content-tagging label. Owned by x/rep.
  * Consumed by x/forum, x/collect, and x/rep's own initiative/reputation systems.
+ * 
+ * GC is driven by `last_used_at + DefaultTagExpiration` (see x/rep ExpireTags
+ * in abci.go). IncrementTagUsage refreshes last_used_at on every reference,
+ * so actively used tags roll their deadline forward; stale tags hit their
+ * deadline and get reclaimed. Tags with last_used_at == 0 are permanent.
  * @name TagAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.Tag
@@ -31,7 +40,6 @@ export interface TagAmino {
   usage_count?: string;
   created_at?: string;
   last_used_at?: string;
-  expiration_index?: string;
 }
 export interface TagAminoMsg {
   type: "/sparkdream.rep.v1.Tag";
@@ -42,13 +50,17 @@ function createBaseTag(): Tag {
     name: "",
     usageCount: BigInt(0),
     createdAt: BigInt(0),
-    lastUsedAt: BigInt(0),
-    expirationIndex: BigInt(0)
+    lastUsedAt: BigInt(0)
   };
 }
 /**
  * Tag defines a content-tagging label. Owned by x/rep.
  * Consumed by x/forum, x/collect, and x/rep's own initiative/reputation systems.
+ * 
+ * GC is driven by `last_used_at + DefaultTagExpiration` (see x/rep ExpireTags
+ * in abci.go). IncrementTagUsage refreshes last_used_at on every reference,
+ * so actively used tags roll their deadline forward; stale tags hit their
+ * deadline and get reclaimed. Tags with last_used_at == 0 are permanent.
  * @name Tag
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.Tag
@@ -67,9 +79,6 @@ export const Tag = {
     }
     if (message.lastUsedAt !== BigInt(0)) {
       writer.uint32(32).int64(message.lastUsedAt);
-    }
-    if (message.expirationIndex !== BigInt(0)) {
-      writer.uint32(40).int64(message.expirationIndex);
     }
     return writer;
   },
@@ -92,9 +101,6 @@ export const Tag = {
         case 4:
           message.lastUsedAt = reader.int64();
           break;
-        case 5:
-          message.expirationIndex = reader.int64();
-          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -108,7 +114,6 @@ export const Tag = {
     message.usageCount = object.usageCount !== undefined && object.usageCount !== null ? BigInt(object.usageCount.toString()) : BigInt(0);
     message.createdAt = object.createdAt !== undefined && object.createdAt !== null ? BigInt(object.createdAt.toString()) : BigInt(0);
     message.lastUsedAt = object.lastUsedAt !== undefined && object.lastUsedAt !== null ? BigInt(object.lastUsedAt.toString()) : BigInt(0);
-    message.expirationIndex = object.expirationIndex !== undefined && object.expirationIndex !== null ? BigInt(object.expirationIndex.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: TagAmino): Tag {
@@ -125,9 +130,6 @@ export const Tag = {
     if (object.last_used_at !== undefined && object.last_used_at !== null) {
       message.lastUsedAt = BigInt(object.last_used_at);
     }
-    if (object.expiration_index !== undefined && object.expiration_index !== null) {
-      message.expirationIndex = BigInt(object.expiration_index);
-    }
     return message;
   },
   toAmino(message: Tag): TagAmino {
@@ -136,7 +138,6 @@ export const Tag = {
     obj.usage_count = message.usageCount !== BigInt(0) ? message.usageCount?.toString() : undefined;
     obj.created_at = message.createdAt !== BigInt(0) ? message.createdAt?.toString() : undefined;
     obj.last_used_at = message.lastUsedAt !== BigInt(0) ? message.lastUsedAt?.toString() : undefined;
-    obj.expiration_index = message.expirationIndex !== BigInt(0) ? message.expirationIndex?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: TagAminoMsg): Tag {
