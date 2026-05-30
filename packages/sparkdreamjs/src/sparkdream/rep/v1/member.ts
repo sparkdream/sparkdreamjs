@@ -166,6 +166,58 @@ export interface Member_ReputationGainedThisEpochEntryAminoMsg {
   value: Member_ReputationGainedThisEpochEntryAmino;
 }
 /**
+ * @name Member_ForumRepPerTagEntry
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.undefined
+ */
+export interface Member_ForumRepPerTagEntry {
+  key: string;
+  value: string;
+}
+export interface Member_ForumRepPerTagEntryProtoMsg {
+  typeUrl: string;
+  value: Uint8Array;
+}
+/**
+ * @name Member_ForumRepPerTagEntryAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.Member_ForumRepPerTagEntry
+ */
+export interface Member_ForumRepPerTagEntryAmino {
+  key?: string;
+  value?: string;
+}
+export interface Member_ForumRepPerTagEntryAminoMsg {
+  type: string;
+  value: Member_ForumRepPerTagEntryAmino;
+}
+/**
+ * @name Member_LifetimeForumRepPerTagEntry
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.undefined
+ */
+export interface Member_LifetimeForumRepPerTagEntry {
+  key: string;
+  value: string;
+}
+export interface Member_LifetimeForumRepPerTagEntryProtoMsg {
+  typeUrl: string;
+  value: Uint8Array;
+}
+/**
+ * @name Member_LifetimeForumRepPerTagEntryAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.Member_LifetimeForumRepPerTagEntry
+ */
+export interface Member_LifetimeForumRepPerTagEntryAmino {
+  key?: string;
+  value?: string;
+}
+export interface Member_LifetimeForumRepPerTagEntryAminoMsg {
+  type: string;
+  value: Member_LifetimeForumRepPerTagEntryAmino;
+}
+/**
  * Member defines the Member message.
  * @name Member
  * @package sparkdream.rep.v1
@@ -262,6 +314,32 @@ export interface Member {
    */
   epochSalvations: number;
   lastSalvationEpoch: bigint;
+  /**
+   * forum_rep_per_tag is per-tag reputation earned through forum activity
+   * (conviction-staked endorsements on posts and replies). Stored separately
+   * from reputation_scores so the trust-level ladder can include it for
+   * PROVISIONAL and ESTABLISHED tiers while excluding it from TRUSTED and
+   * CORE — forum participation is legitimate early-stage contribution but
+   * is cheaper to game than verified initiative output, so it must not gate
+   * the high-consequence council-adjacent tiers. Slashable on confirmed
+   * hide of the post that produced the rep (see x/forum
+   * PostConvictionStake.accrued_rep_per_tag). Map key is tag name, value is
+   * a decimal string (math.LegacyDec).
+   */
+  forumRepPerTag: {
+    [key: string]: string;
+  };
+  /**
+   * lifetime_forum_rep_per_tag accumulates forum_rep_per_tag across all
+   * completed seasons. Reset on season transition: forum_rep_per_tag is
+   * added to this map then cleared (mirroring lifetime_reputation /
+   * reputation_scores). Display-only — never read by the trust-level
+   * ladder. Keeps the historical signal visible on profiles without
+   * letting forum participation gate higher tiers across seasons.
+   */
+  lifetimeForumRepPerTag: {
+    [key: string]: string;
+  };
 }
 export interface MemberProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Member";
@@ -364,6 +442,32 @@ export interface MemberAmino {
    */
   epoch_salvations?: number;
   last_salvation_epoch?: string;
+  /**
+   * forum_rep_per_tag is per-tag reputation earned through forum activity
+   * (conviction-staked endorsements on posts and replies). Stored separately
+   * from reputation_scores so the trust-level ladder can include it for
+   * PROVISIONAL and ESTABLISHED tiers while excluding it from TRUSTED and
+   * CORE — forum participation is legitimate early-stage contribution but
+   * is cheaper to game than verified initiative output, so it must not gate
+   * the high-consequence council-adjacent tiers. Slashable on confirmed
+   * hide of the post that produced the rep (see x/forum
+   * PostConvictionStake.accrued_rep_per_tag). Map key is tag name, value is
+   * a decimal string (math.LegacyDec).
+   */
+  forum_rep_per_tag?: {
+    [key: string]: string;
+  };
+  /**
+   * lifetime_forum_rep_per_tag accumulates forum_rep_per_tag across all
+   * completed seasons. Reset on season transition: forum_rep_per_tag is
+   * added to this map then cleared (mirroring lifetime_reputation /
+   * reputation_scores). Display-only — never read by the trust-level
+   * ladder. Keeps the historical signal visible on profiles without
+   * letting forum participation gate higher tiers across seasons.
+   */
+  lifetime_forum_rep_per_tag?: {
+    [key: string]: string;
+  };
 }
 export interface MemberAminoMsg {
   type: "/sparkdream.rep.v1.Member";
@@ -626,6 +730,152 @@ export const Member_ReputationGainedThisEpochEntry = {
     return Member_ReputationGainedThisEpochEntry.encode(message).finish();
   }
 };
+function createBaseMember_ForumRepPerTagEntry(): Member_ForumRepPerTagEntry {
+  return {
+    key: "",
+    value: ""
+  };
+}
+/**
+ * @name Member_ForumRepPerTagEntry
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.undefined
+ */
+export const Member_ForumRepPerTagEntry = {
+  encode(message: Member_ForumRepPerTagEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.value !== "") {
+      writer.uint32(18).string(message.value);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): Member_ForumRepPerTagEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMember_ForumRepPerTagEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.key = reader.string();
+          break;
+        case 2:
+          message.value = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<Member_ForumRepPerTagEntry>): Member_ForumRepPerTagEntry {
+    const message = createBaseMember_ForumRepPerTagEntry();
+    message.key = object.key ?? "";
+    message.value = object.value ?? "";
+    return message;
+  },
+  fromAmino(object: Member_ForumRepPerTagEntryAmino): Member_ForumRepPerTagEntry {
+    const message = createBaseMember_ForumRepPerTagEntry();
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    }
+    if (object.value !== undefined && object.value !== null) {
+      message.value = object.value;
+    }
+    return message;
+  },
+  toAmino(message: Member_ForumRepPerTagEntry): Member_ForumRepPerTagEntryAmino {
+    const obj: any = {};
+    obj.key = message.key === "" ? undefined : message.key;
+    obj.value = message.value === "" ? undefined : message.value;
+    return obj;
+  },
+  fromAminoMsg(object: Member_ForumRepPerTagEntryAminoMsg): Member_ForumRepPerTagEntry {
+    return Member_ForumRepPerTagEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: Member_ForumRepPerTagEntryProtoMsg): Member_ForumRepPerTagEntry {
+    return Member_ForumRepPerTagEntry.decode(message.value);
+  },
+  toProto(message: Member_ForumRepPerTagEntry): Uint8Array {
+    return Member_ForumRepPerTagEntry.encode(message).finish();
+  }
+};
+function createBaseMember_LifetimeForumRepPerTagEntry(): Member_LifetimeForumRepPerTagEntry {
+  return {
+    key: "",
+    value: ""
+  };
+}
+/**
+ * @name Member_LifetimeForumRepPerTagEntry
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.undefined
+ */
+export const Member_LifetimeForumRepPerTagEntry = {
+  encode(message: Member_LifetimeForumRepPerTagEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.value !== "") {
+      writer.uint32(18).string(message.value);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): Member_LifetimeForumRepPerTagEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMember_LifetimeForumRepPerTagEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.key = reader.string();
+          break;
+        case 2:
+          message.value = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<Member_LifetimeForumRepPerTagEntry>): Member_LifetimeForumRepPerTagEntry {
+    const message = createBaseMember_LifetimeForumRepPerTagEntry();
+    message.key = object.key ?? "";
+    message.value = object.value ?? "";
+    return message;
+  },
+  fromAmino(object: Member_LifetimeForumRepPerTagEntryAmino): Member_LifetimeForumRepPerTagEntry {
+    const message = createBaseMember_LifetimeForumRepPerTagEntry();
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    }
+    if (object.value !== undefined && object.value !== null) {
+      message.value = object.value;
+    }
+    return message;
+  },
+  toAmino(message: Member_LifetimeForumRepPerTagEntry): Member_LifetimeForumRepPerTagEntryAmino {
+    const obj: any = {};
+    obj.key = message.key === "" ? undefined : message.key;
+    obj.value = message.value === "" ? undefined : message.value;
+    return obj;
+  },
+  fromAminoMsg(object: Member_LifetimeForumRepPerTagEntryAminoMsg): Member_LifetimeForumRepPerTagEntry {
+    return Member_LifetimeForumRepPerTagEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: Member_LifetimeForumRepPerTagEntryProtoMsg): Member_LifetimeForumRepPerTagEntry {
+    return Member_LifetimeForumRepPerTagEntry.decode(message.value);
+  },
+  toProto(message: Member_LifetimeForumRepPerTagEntry): Uint8Array {
+    return Member_LifetimeForumRepPerTagEntry.encode(message).finish();
+  }
+};
 function createBaseMember(): Member {
   return {
     address: "",
@@ -657,7 +907,9 @@ function createBaseMember(): Member {
     lastRepGainEpoch: BigInt(0),
     zkPublicKey: new Uint8Array(),
     epochSalvations: 0,
-    lastSalvationEpoch: BigInt(0)
+    lastSalvationEpoch: BigInt(0),
+    forumRepPerTag: {},
+    lifetimeForumRepPerTag: {}
   };
 }
 /**
@@ -768,6 +1020,18 @@ export const Member = {
     if (message.lastSalvationEpoch !== BigInt(0)) {
       writer.uint32(240).int64(message.lastSalvationEpoch);
     }
+    Object.entries(message.forumRepPerTag).forEach(([key, value]) => {
+      Member_ForumRepPerTagEntry.encode({
+        key: key as any,
+        value
+      }, writer.uint32(250).fork()).ldelim();
+    });
+    Object.entries(message.lifetimeForumRepPerTag).forEach(([key, value]) => {
+      Member_LifetimeForumRepPerTagEntry.encode({
+        key: key as any,
+        value
+      }, writer.uint32(258).fork()).ldelim();
+    });
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Member {
@@ -876,6 +1140,18 @@ export const Member = {
         case 30:
           message.lastSalvationEpoch = reader.int64();
           break;
+        case 31:
+          const entry31 = Member_ForumRepPerTagEntry.decode(reader, reader.uint32());
+          if (entry31.value !== undefined) {
+            message.forumRepPerTag[entry31.key] = entry31.value;
+          }
+          break;
+        case 32:
+          const entry32 = Member_LifetimeForumRepPerTagEntry.decode(reader, reader.uint32());
+          if (entry32.value !== undefined) {
+            message.lifetimeForumRepPerTag[entry32.key] = entry32.value;
+          }
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -936,6 +1212,22 @@ export const Member = {
     message.zkPublicKey = object.zkPublicKey ?? new Uint8Array();
     message.epochSalvations = object.epochSalvations ?? 0;
     message.lastSalvationEpoch = object.lastSalvationEpoch !== undefined && object.lastSalvationEpoch !== null ? BigInt(object.lastSalvationEpoch.toString()) : BigInt(0);
+    message.forumRepPerTag = Object.entries(object.forumRepPerTag ?? {}).reduce<{
+      [key: string]: string;
+    }>((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = String(value);
+      }
+      return acc;
+    }, {});
+    message.lifetimeForumRepPerTag = Object.entries(object.lifetimeForumRepPerTag ?? {}).reduce<{
+      [key: string]: string;
+    }>((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = String(value);
+      }
+      return acc;
+    }, {});
     return message;
   },
   fromAmino(object: MemberAmino): Member {
@@ -1043,6 +1335,22 @@ export const Member = {
     if (object.last_salvation_epoch !== undefined && object.last_salvation_epoch !== null) {
       message.lastSalvationEpoch = BigInt(object.last_salvation_epoch);
     }
+    message.forumRepPerTag = Object.entries(object.forum_rep_per_tag ?? {}).reduce<{
+      [key: string]: string;
+    }>((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = String(value);
+      }
+      return acc;
+    }, {});
+    message.lifetimeForumRepPerTag = Object.entries(object.lifetime_forum_rep_per_tag ?? {}).reduce<{
+      [key: string]: string;
+    }>((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = String(value);
+      }
+      return acc;
+    }, {});
     return message;
   },
   toAmino(message: Member): MemberAmino {
@@ -1096,6 +1404,18 @@ export const Member = {
     obj.zk_public_key = message.zkPublicKey ? base64FromBytes(message.zkPublicKey) : undefined;
     obj.epoch_salvations = message.epochSalvations === 0 ? undefined : message.epochSalvations;
     obj.last_salvation_epoch = message.lastSalvationEpoch !== BigInt(0) ? message.lastSalvationEpoch?.toString() : undefined;
+    obj.forum_rep_per_tag = {};
+    if (message.forumRepPerTag) {
+      Object.entries(message.forumRepPerTag).forEach(([k, v]) => {
+        obj.forum_rep_per_tag[k] = v;
+      });
+    }
+    obj.lifetime_forum_rep_per_tag = {};
+    if (message.lifetimeForumRepPerTag) {
+      Object.entries(message.lifetimeForumRepPerTag).forEach(([k, v]) => {
+        obj.lifetime_forum_rep_per_tag[k] = v;
+      });
+    }
     return obj;
   },
   fromAminoMsg(object: MemberAminoMsg): Member {

@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { TelescopeGeneratedType } from "../../../types";
 import { Registry } from "@cosmjs/proto-signing";
-import { MsgUpdateParams, MsgUpdateOperationalParams, MsgCreatePost, MsgEditPost, MsgDeletePost, MsgFreezeThread, MsgUnarchiveThread, MsgPinPost, MsgUnpinPost, MsgLockThread, MsgUnlockThread, MsgMoveThread, MsgFollowThread, MsgUnfollowThread, MsgUpvotePost, MsgDownvotePost, MsgFlagPost, MsgDismissFlags, MsgHidePost, MsgUnhidePost, MsgAppealPost, MsgAppealThreadLock, MsgAppealThreadMove, MsgCreateBounty, MsgAwardBounty, MsgIncreaseBounty, MsgCancelBounty, MsgAssignBountyToReply, MsgPinReply, MsgUnpinReply, MsgDisputePin, MsgMarkAcceptedReply, MsgConfirmProposedReply, MsgRejectProposedReply, MsgSetForumPaused, MsgSetModerationPaused } from "./tx";
-export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.forum.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.forum.v1.MsgUpdateOperationalParams", MsgUpdateOperationalParams], ["/sparkdream.forum.v1.MsgCreatePost", MsgCreatePost], ["/sparkdream.forum.v1.MsgEditPost", MsgEditPost], ["/sparkdream.forum.v1.MsgDeletePost", MsgDeletePost], ["/sparkdream.forum.v1.MsgFreezeThread", MsgFreezeThread], ["/sparkdream.forum.v1.MsgUnarchiveThread", MsgUnarchiveThread], ["/sparkdream.forum.v1.MsgPinPost", MsgPinPost], ["/sparkdream.forum.v1.MsgUnpinPost", MsgUnpinPost], ["/sparkdream.forum.v1.MsgLockThread", MsgLockThread], ["/sparkdream.forum.v1.MsgUnlockThread", MsgUnlockThread], ["/sparkdream.forum.v1.MsgMoveThread", MsgMoveThread], ["/sparkdream.forum.v1.MsgFollowThread", MsgFollowThread], ["/sparkdream.forum.v1.MsgUnfollowThread", MsgUnfollowThread], ["/sparkdream.forum.v1.MsgUpvotePost", MsgUpvotePost], ["/sparkdream.forum.v1.MsgDownvotePost", MsgDownvotePost], ["/sparkdream.forum.v1.MsgFlagPost", MsgFlagPost], ["/sparkdream.forum.v1.MsgDismissFlags", MsgDismissFlags], ["/sparkdream.forum.v1.MsgHidePost", MsgHidePost], ["/sparkdream.forum.v1.MsgUnhidePost", MsgUnhidePost], ["/sparkdream.forum.v1.MsgAppealPost", MsgAppealPost], ["/sparkdream.forum.v1.MsgAppealThreadLock", MsgAppealThreadLock], ["/sparkdream.forum.v1.MsgAppealThreadMove", MsgAppealThreadMove], ["/sparkdream.forum.v1.MsgCreateBounty", MsgCreateBounty], ["/sparkdream.forum.v1.MsgAwardBounty", MsgAwardBounty], ["/sparkdream.forum.v1.MsgIncreaseBounty", MsgIncreaseBounty], ["/sparkdream.forum.v1.MsgCancelBounty", MsgCancelBounty], ["/sparkdream.forum.v1.MsgAssignBountyToReply", MsgAssignBountyToReply], ["/sparkdream.forum.v1.MsgPinReply", MsgPinReply], ["/sparkdream.forum.v1.MsgUnpinReply", MsgUnpinReply], ["/sparkdream.forum.v1.MsgDisputePin", MsgDisputePin], ["/sparkdream.forum.v1.MsgMarkAcceptedReply", MsgMarkAcceptedReply], ["/sparkdream.forum.v1.MsgConfirmProposedReply", MsgConfirmProposedReply], ["/sparkdream.forum.v1.MsgRejectProposedReply", MsgRejectProposedReply], ["/sparkdream.forum.v1.MsgSetForumPaused", MsgSetForumPaused], ["/sparkdream.forum.v1.MsgSetModerationPaused", MsgSetModerationPaused]];
+import { MsgUpdateParams, MsgUpdateOperationalParams, MsgCreatePost, MsgEditPost, MsgDeletePost, MsgFreezeThread, MsgUnarchiveThread, MsgPinPost, MsgUnpinPost, MsgMakePostPermanent, MsgLockThread, MsgUnlockThread, MsgMoveThread, MsgFollowThread, MsgUnfollowThread, MsgUpvotePost, MsgDownvotePost, MsgStakePostConviction, MsgReleasePostConviction, MsgFlagPost, MsgDismissFlags, MsgHidePost, MsgUnhidePost, MsgAppealPost, MsgAppealThreadLock, MsgAppealThreadMove, MsgCreateBounty, MsgAwardBounty, MsgIncreaseBounty, MsgCancelBounty, MsgAssignBountyToReply, MsgPinReply, MsgUnpinReply, MsgDisputePin, MsgMarkAcceptedReply, MsgConfirmProposedReply, MsgRejectProposedReply, MsgSetForumPaused, MsgSetModerationPaused } from "./tx";
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.forum.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.forum.v1.MsgUpdateOperationalParams", MsgUpdateOperationalParams], ["/sparkdream.forum.v1.MsgCreatePost", MsgCreatePost], ["/sparkdream.forum.v1.MsgEditPost", MsgEditPost], ["/sparkdream.forum.v1.MsgDeletePost", MsgDeletePost], ["/sparkdream.forum.v1.MsgFreezeThread", MsgFreezeThread], ["/sparkdream.forum.v1.MsgUnarchiveThread", MsgUnarchiveThread], ["/sparkdream.forum.v1.MsgPinPost", MsgPinPost], ["/sparkdream.forum.v1.MsgUnpinPost", MsgUnpinPost], ["/sparkdream.forum.v1.MsgMakePostPermanent", MsgMakePostPermanent], ["/sparkdream.forum.v1.MsgLockThread", MsgLockThread], ["/sparkdream.forum.v1.MsgUnlockThread", MsgUnlockThread], ["/sparkdream.forum.v1.MsgMoveThread", MsgMoveThread], ["/sparkdream.forum.v1.MsgFollowThread", MsgFollowThread], ["/sparkdream.forum.v1.MsgUnfollowThread", MsgUnfollowThread], ["/sparkdream.forum.v1.MsgUpvotePost", MsgUpvotePost], ["/sparkdream.forum.v1.MsgDownvotePost", MsgDownvotePost], ["/sparkdream.forum.v1.MsgStakePostConviction", MsgStakePostConviction], ["/sparkdream.forum.v1.MsgReleasePostConviction", MsgReleasePostConviction], ["/sparkdream.forum.v1.MsgFlagPost", MsgFlagPost], ["/sparkdream.forum.v1.MsgDismissFlags", MsgDismissFlags], ["/sparkdream.forum.v1.MsgHidePost", MsgHidePost], ["/sparkdream.forum.v1.MsgUnhidePost", MsgUnhidePost], ["/sparkdream.forum.v1.MsgAppealPost", MsgAppealPost], ["/sparkdream.forum.v1.MsgAppealThreadLock", MsgAppealThreadLock], ["/sparkdream.forum.v1.MsgAppealThreadMove", MsgAppealThreadMove], ["/sparkdream.forum.v1.MsgCreateBounty", MsgCreateBounty], ["/sparkdream.forum.v1.MsgAwardBounty", MsgAwardBounty], ["/sparkdream.forum.v1.MsgIncreaseBounty", MsgIncreaseBounty], ["/sparkdream.forum.v1.MsgCancelBounty", MsgCancelBounty], ["/sparkdream.forum.v1.MsgAssignBountyToReply", MsgAssignBountyToReply], ["/sparkdream.forum.v1.MsgPinReply", MsgPinReply], ["/sparkdream.forum.v1.MsgUnpinReply", MsgUnpinReply], ["/sparkdream.forum.v1.MsgDisputePin", MsgDisputePin], ["/sparkdream.forum.v1.MsgMarkAcceptedReply", MsgMarkAcceptedReply], ["/sparkdream.forum.v1.MsgConfirmProposedReply", MsgConfirmProposedReply], ["/sparkdream.forum.v1.MsgRejectProposedReply", MsgRejectProposedReply], ["/sparkdream.forum.v1.MsgSetForumPaused", MsgSetForumPaused], ["/sparkdream.forum.v1.MsgSetModerationPaused", MsgSetModerationPaused]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -64,6 +64,12 @@ export const MessageComposer = {
         value: MsgUnpinPost.encode(value).finish()
       };
     },
+    makePostPermanent(value: MsgMakePostPermanent) {
+      return {
+        typeUrl: "/sparkdream.forum.v1.MsgMakePostPermanent",
+        value: MsgMakePostPermanent.encode(value).finish()
+      };
+    },
     lockThread(value: MsgLockThread) {
       return {
         typeUrl: "/sparkdream.forum.v1.MsgLockThread",
@@ -104,6 +110,18 @@ export const MessageComposer = {
       return {
         typeUrl: "/sparkdream.forum.v1.MsgDownvotePost",
         value: MsgDownvotePost.encode(value).finish()
+      };
+    },
+    stakePostConviction(value: MsgStakePostConviction) {
+      return {
+        typeUrl: "/sparkdream.forum.v1.MsgStakePostConviction",
+        value: MsgStakePostConviction.encode(value).finish()
+      };
+    },
+    releasePostConviction(value: MsgReleasePostConviction) {
+      return {
+        typeUrl: "/sparkdream.forum.v1.MsgReleasePostConviction",
+        value: MsgReleasePostConviction.encode(value).finish()
       };
     },
     flagPost(value: MsgFlagPost) {
@@ -282,6 +300,12 @@ export const MessageComposer = {
         value
       };
     },
+    makePostPermanent(value: MsgMakePostPermanent) {
+      return {
+        typeUrl: "/sparkdream.forum.v1.MsgMakePostPermanent",
+        value
+      };
+    },
     lockThread(value: MsgLockThread) {
       return {
         typeUrl: "/sparkdream.forum.v1.MsgLockThread",
@@ -321,6 +345,18 @@ export const MessageComposer = {
     downvotePost(value: MsgDownvotePost) {
       return {
         typeUrl: "/sparkdream.forum.v1.MsgDownvotePost",
+        value
+      };
+    },
+    stakePostConviction(value: MsgStakePostConviction) {
+      return {
+        typeUrl: "/sparkdream.forum.v1.MsgStakePostConviction",
+        value
+      };
+    },
+    releasePostConviction(value: MsgReleasePostConviction) {
+      return {
+        typeUrl: "/sparkdream.forum.v1.MsgReleasePostConviction",
         value
       };
     },
@@ -500,6 +536,12 @@ export const MessageComposer = {
         value: MsgUnpinPost.fromPartial(value)
       };
     },
+    makePostPermanent(value: MsgMakePostPermanent) {
+      return {
+        typeUrl: "/sparkdream.forum.v1.MsgMakePostPermanent",
+        value: MsgMakePostPermanent.fromPartial(value)
+      };
+    },
     lockThread(value: MsgLockThread) {
       return {
         typeUrl: "/sparkdream.forum.v1.MsgLockThread",
@@ -540,6 +582,18 @@ export const MessageComposer = {
       return {
         typeUrl: "/sparkdream.forum.v1.MsgDownvotePost",
         value: MsgDownvotePost.fromPartial(value)
+      };
+    },
+    stakePostConviction(value: MsgStakePostConviction) {
+      return {
+        typeUrl: "/sparkdream.forum.v1.MsgStakePostConviction",
+        value: MsgStakePostConviction.fromPartial(value)
+      };
+    },
+    releasePostConviction(value: MsgReleasePostConviction) {
+      return {
+        typeUrl: "/sparkdream.forum.v1.MsgReleasePostConviction",
+        value: MsgReleasePostConviction.fromPartial(value)
       };
     },
     flagPost(value: MsgFlagPost) {

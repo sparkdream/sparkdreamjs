@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgCreatePost, MsgCreatePostResponse, MsgUpdatePost, MsgUpdatePostResponse, MsgDeletePost, MsgDeletePostResponse, MsgHidePost, MsgHidePostResponse, MsgUnhidePost, MsgUnhidePostResponse, MsgCreateReply, MsgCreateReplyResponse, MsgUpdateReply, MsgUpdateReplyResponse, MsgDeleteReply, MsgDeleteReplyResponse, MsgHideReply, MsgHideReplyResponse, MsgUnhideReply, MsgUnhideReplyResponse, MsgReact, MsgReactResponse, MsgRemoveReaction, MsgRemoveReactionResponse, MsgPinPost, MsgPinPostResponse, MsgPinReply, MsgPinReplyResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgCreatePost, MsgCreatePostResponse, MsgUpdatePost, MsgUpdatePostResponse, MsgDeletePost, MsgDeletePostResponse, MsgHidePost, MsgHidePostResponse, MsgUnhidePost, MsgUnhidePostResponse, MsgCreateReply, MsgCreateReplyResponse, MsgUpdateReply, MsgUpdateReplyResponse, MsgDeleteReply, MsgDeleteReplyResponse, MsgHideReply, MsgHideReplyResponse, MsgUnhideReply, MsgUnhideReplyResponse, MsgReact, MsgReactResponse, MsgRemoveReaction, MsgRemoveReactionResponse, MsgMakePostPermanent, MsgMakePostPermanentResponse, MsgMakeReplyPermanent, MsgMakeReplyPermanentResponse, MsgPinPost, MsgPinPostResponse, MsgUnpinPost, MsgUnpinPostResponse, MsgPinReply, MsgPinReplyResponse, MsgUnpinReply, MsgUnpinReplyResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
@@ -38,10 +38,30 @@ export interface Msg {
   react(request: MsgReact): Promise<MsgReactResponse>;
   /** RemoveReaction removes your reaction from a post or reply. */
   removeReaction(request: MsgRemoveReaction): Promise<MsgRemoveReactionResponse>;
-  /** PinPost pins an ephemeral post, making it permanent. */
+  /**
+   * MakePostPermanent promotes an ephemeral post to permanent by clearing
+   * expires_at and removing the expiry-index entry. Idempotent on already-
+   * permanent posts. Display markers (pinned_by) are untouched. Gated on
+   * params.pin_min_trust_level and shares the per-day pin rate-limit counter.
+   */
+  makePostPermanent(request: MsgMakePostPermanent): Promise<MsgMakePostPermanentResponse>;
+  /** MakeReplyPermanent mirrors MakePostPermanent for replies. */
+  makeReplyPermanent(request: MsgMakeReplyPermanent): Promise<MsgMakeReplyPermanentResponse>;
+  /**
+   * PinPost sets the pinned marker on a post (curator "feature this"). The
+   * post must already be permanent — call MakePostPermanent first to promote
+   * ephemeral content. Gated on params.pin_min_trust_level.
+   */
   pinPost(request: MsgPinPost): Promise<MsgPinPostResponse>;
-  /** PinReply pins an ephemeral reply, making it permanent. */
+  /**
+   * UnpinPost clears the pinned marker on a post. The post stays permanent.
+   * Gated on the same trust level as Pin.
+   */
+  unpinPost(request: MsgUnpinPost): Promise<MsgUnpinPostResponse>;
+  /** PinReply mirrors PinPost. Requires the reply to already be permanent. */
   pinReply(request: MsgPinReply): Promise<MsgPinReplyResponse>;
+  /** UnpinReply clears the pinned marker on a reply. The reply stays permanent. */
+  unpinReply(request: MsgUnpinReply): Promise<MsgUnpinReplyResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -134,17 +154,47 @@ export class MsgClientImpl implements Msg {
     const promise = this.rpc.request("sparkdream.blog.v1.Msg", "RemoveReaction", data);
     return promise.then(data => MsgRemoveReactionResponse.decode(new BinaryReader(data)));
   };
-  /* PinPost pins an ephemeral post, making it permanent. */
+  /* MakePostPermanent promotes an ephemeral post to permanent by clearing
+   expires_at and removing the expiry-index entry. Idempotent on already-
+   permanent posts. Display markers (pinned_by) are untouched. Gated on
+   params.pin_min_trust_level and shares the per-day pin rate-limit counter. */
+  makePostPermanent = async (request: MsgMakePostPermanent): Promise<MsgMakePostPermanentResponse> => {
+    const data = MsgMakePostPermanent.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.blog.v1.Msg", "MakePostPermanent", data);
+    return promise.then(data => MsgMakePostPermanentResponse.decode(new BinaryReader(data)));
+  };
+  /* MakeReplyPermanent mirrors MakePostPermanent for replies. */
+  makeReplyPermanent = async (request: MsgMakeReplyPermanent): Promise<MsgMakeReplyPermanentResponse> => {
+    const data = MsgMakeReplyPermanent.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.blog.v1.Msg", "MakeReplyPermanent", data);
+    return promise.then(data => MsgMakeReplyPermanentResponse.decode(new BinaryReader(data)));
+  };
+  /* PinPost sets the pinned marker on a post (curator "feature this"). The
+   post must already be permanent — call MakePostPermanent first to promote
+   ephemeral content. Gated on params.pin_min_trust_level. */
   pinPost = async (request: MsgPinPost): Promise<MsgPinPostResponse> => {
     const data = MsgPinPost.encode(request).finish();
     const promise = this.rpc.request("sparkdream.blog.v1.Msg", "PinPost", data);
     return promise.then(data => MsgPinPostResponse.decode(new BinaryReader(data)));
   };
-  /* PinReply pins an ephemeral reply, making it permanent. */
+  /* UnpinPost clears the pinned marker on a post. The post stays permanent.
+   Gated on the same trust level as Pin. */
+  unpinPost = async (request: MsgUnpinPost): Promise<MsgUnpinPostResponse> => {
+    const data = MsgUnpinPost.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.blog.v1.Msg", "UnpinPost", data);
+    return promise.then(data => MsgUnpinPostResponse.decode(new BinaryReader(data)));
+  };
+  /* PinReply mirrors PinPost. Requires the reply to already be permanent. */
   pinReply = async (request: MsgPinReply): Promise<MsgPinReplyResponse> => {
     const data = MsgPinReply.encode(request).finish();
     const promise = this.rpc.request("sparkdream.blog.v1.Msg", "PinReply", data);
     return promise.then(data => MsgPinReplyResponse.decode(new BinaryReader(data)));
+  };
+  /* UnpinReply clears the pinned marker on a reply. The reply stays permanent. */
+  unpinReply = async (request: MsgUnpinReply): Promise<MsgUnpinReplyResponse> => {
+    const data = MsgUnpinReply.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.blog.v1.Msg", "UnpinReply", data);
+    return promise.then(data => MsgUnpinReplyResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

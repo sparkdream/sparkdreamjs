@@ -130,6 +130,68 @@ export interface Params {
    * Zero = immediate withdrawal (legacy behavior).
    */
   curatorUnbondCooldown: bigint;
+  /**
+   * make_permanent_min_trust_level is the minimum trust level a caller of
+   * MsgMakeCollectionPermanent must hold (0–4). Default PROVISIONAL (1) —
+   * lower than pin_min_trust_level because preservation (committing the
+   * deposit so the collection never expires) is a smaller curator action
+   * than featuring it on the pinned list.
+   */
+  makePermanentMinTrustLevel: number;
+  /**
+   * max_make_permanent_per_day caps MsgMakeCollectionPermanent calls per
+   * address per UTC day. Independent of max_pins_per_day — promoting an
+   * ephemeral to permanent is a distinct curator action with its own quota.
+   */
+  maxMakePermanentPerDay: number;
+  /**
+   * non_member_collab_dream_stake is the DREAM amount the inviter locks per
+   * non-member collaborator.
+   */
+  nonMemberCollabDreamStake: string;
+  /**
+   * non_member_collab_burn_fraction is the fraction of the inviter's locked
+   * DREAM that is burned when the collaborator exits while the collection is
+   * HIDDEN. Must be in [0, 1]. Default 0.5 — heavier than
+   * endorsement_deletion_burn_fraction because HIDDEN is an explicit
+   * misconduct signal, not just abandonment.
+   */
+  nonMemberCollabBurnFraction: string;
+  /**
+   * max_non_member_collaborators_per_collection caps how many slots within a
+   * single collection may be held by non-member collaborators. Must be
+   * <= max_collaborators_per_collection.
+   */
+  maxNonMemberCollaboratorsPerCollection: number;
+  /**
+   * max_promotions_per_block caps the membership-driven promotion-queue drain
+   * (Phase 0 in EndBlocker). Each unit of work — releasing an inviter's
+   * collaborator stake or flipping an owned ephemeral collection to permanent
+   * — counts against this cap. Zero disables the drain. Mirrors the matching
+   * forum/blog parameter.
+   */
+  maxPromotionsPerBlock: number;
+  /**
+   * endorser_rep_penalty is the per-tag rep deduction on an endorser when
+   * their endorsed collection is hidden and the hide stands (sentinel hide
+   * unappealed or appeal rejected). Fires alongside the BurnDREAM of the
+   * endorsement stake.
+   */
+  endorserRepPenalty: string;
+  /**
+   * collab_inviter_rep_penalty is the per-tag rep deduction on a
+   * collaborator-inviter when the collaborator exits a HIDDEN collection and
+   * the inviter's stake is fractionally burned. Lower than
+   * endorser_rep_penalty because vouching for a person's future contributions
+   * is a weaker claim than vouching for specific content quality.
+   */
+  collabInviterRepPenalty: string;
+  /**
+   * author_rep_penalty is the per-tag rep deduction on a collection creator
+   * when a sentinel hides their collection (fires alongside SlashAuthorBond).
+   * Highest of the three because the author authored the bad content.
+   */
+  authorRepPenalty: string;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.collect.v1.Params";
@@ -263,6 +325,68 @@ export interface ParamsAmino {
    * Zero = immediate withdrawal (legacy behavior).
    */
   curator_unbond_cooldown?: string;
+  /**
+   * make_permanent_min_trust_level is the minimum trust level a caller of
+   * MsgMakeCollectionPermanent must hold (0–4). Default PROVISIONAL (1) —
+   * lower than pin_min_trust_level because preservation (committing the
+   * deposit so the collection never expires) is a smaller curator action
+   * than featuring it on the pinned list.
+   */
+  make_permanent_min_trust_level?: number;
+  /**
+   * max_make_permanent_per_day caps MsgMakeCollectionPermanent calls per
+   * address per UTC day. Independent of max_pins_per_day — promoting an
+   * ephemeral to permanent is a distinct curator action with its own quota.
+   */
+  max_make_permanent_per_day?: number;
+  /**
+   * non_member_collab_dream_stake is the DREAM amount the inviter locks per
+   * non-member collaborator.
+   */
+  non_member_collab_dream_stake?: string;
+  /**
+   * non_member_collab_burn_fraction is the fraction of the inviter's locked
+   * DREAM that is burned when the collaborator exits while the collection is
+   * HIDDEN. Must be in [0, 1]. Default 0.5 — heavier than
+   * endorsement_deletion_burn_fraction because HIDDEN is an explicit
+   * misconduct signal, not just abandonment.
+   */
+  non_member_collab_burn_fraction?: string;
+  /**
+   * max_non_member_collaborators_per_collection caps how many slots within a
+   * single collection may be held by non-member collaborators. Must be
+   * <= max_collaborators_per_collection.
+   */
+  max_non_member_collaborators_per_collection?: number;
+  /**
+   * max_promotions_per_block caps the membership-driven promotion-queue drain
+   * (Phase 0 in EndBlocker). Each unit of work — releasing an inviter's
+   * collaborator stake or flipping an owned ephemeral collection to permanent
+   * — counts against this cap. Zero disables the drain. Mirrors the matching
+   * forum/blog parameter.
+   */
+  max_promotions_per_block?: number;
+  /**
+   * endorser_rep_penalty is the per-tag rep deduction on an endorser when
+   * their endorsed collection is hidden and the hide stands (sentinel hide
+   * unappealed or appeal rejected). Fires alongside the BurnDREAM of the
+   * endorsement stake.
+   */
+  endorser_rep_penalty?: string;
+  /**
+   * collab_inviter_rep_penalty is the per-tag rep deduction on a
+   * collaborator-inviter when the collaborator exits a HIDDEN collection and
+   * the inviter's stake is fractionally burned. Lower than
+   * endorser_rep_penalty because vouching for a person's future contributions
+   * is a weaker claim than vouching for specific content quality.
+   */
+  collab_inviter_rep_penalty?: string;
+  /**
+   * author_rep_penalty is the per-tag rep deduction on a collection creator
+   * when a sentinel hides their collection (fires alongside SlashAuthorBond).
+   * Highest of the three because the author authored the bad content.
+   */
+  author_rep_penalty?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/collect/Params";
@@ -331,7 +455,16 @@ function createBaseParams(): Params {
     curatorDemotionCooldown: BigInt(0),
     curatorDemotionThreshold: "",
     curatorOverturnDemotionStreak: BigInt(0),
-    curatorUnbondCooldown: BigInt(0)
+    curatorUnbondCooldown: BigInt(0),
+    makePermanentMinTrustLevel: 0,
+    maxMakePermanentPerDay: 0,
+    nonMemberCollabDreamStake: "",
+    nonMemberCollabBurnFraction: "",
+    maxNonMemberCollaboratorsPerCollection: 0,
+    maxPromotionsPerBlock: 0,
+    endorserRepPenalty: "",
+    collabInviterRepPenalty: "",
+    authorRepPenalty: ""
   };
 }
 /**
@@ -530,6 +663,33 @@ export const Params = {
     if (message.curatorUnbondCooldown !== BigInt(0)) {
       writer.uint32(528).int64(message.curatorUnbondCooldown);
     }
+    if (message.makePermanentMinTrustLevel !== 0) {
+      writer.uint32(536).uint32(message.makePermanentMinTrustLevel);
+    }
+    if (message.maxMakePermanentPerDay !== 0) {
+      writer.uint32(600).uint32(message.maxMakePermanentPerDay);
+    }
+    if (message.nonMemberCollabDreamStake !== "") {
+      writer.uint32(546).string(message.nonMemberCollabDreamStake);
+    }
+    if (message.nonMemberCollabBurnFraction !== "") {
+      writer.uint32(554).string(Decimal.fromUserInput(message.nonMemberCollabBurnFraction, 18).atomics);
+    }
+    if (message.maxNonMemberCollaboratorsPerCollection !== 0) {
+      writer.uint32(560).uint32(message.maxNonMemberCollaboratorsPerCollection);
+    }
+    if (message.maxPromotionsPerBlock !== 0) {
+      writer.uint32(568).uint32(message.maxPromotionsPerBlock);
+    }
+    if (message.endorserRepPenalty !== "") {
+      writer.uint32(578).string(Decimal.fromUserInput(message.endorserRepPenalty, 18).atomics);
+    }
+    if (message.collabInviterRepPenalty !== "") {
+      writer.uint32(586).string(Decimal.fromUserInput(message.collabInviterRepPenalty, 18).atomics);
+    }
+    if (message.authorRepPenalty !== "") {
+      writer.uint32(594).string(Decimal.fromUserInput(message.authorRepPenalty, 18).atomics);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -725,6 +885,33 @@ export const Params = {
         case 66:
           message.curatorUnbondCooldown = reader.int64();
           break;
+        case 67:
+          message.makePermanentMinTrustLevel = reader.uint32();
+          break;
+        case 75:
+          message.maxMakePermanentPerDay = reader.uint32();
+          break;
+        case 68:
+          message.nonMemberCollabDreamStake = reader.string();
+          break;
+        case 69:
+          message.nonMemberCollabBurnFraction = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 70:
+          message.maxNonMemberCollaboratorsPerCollection = reader.uint32();
+          break;
+        case 71:
+          message.maxPromotionsPerBlock = reader.uint32();
+          break;
+        case 72:
+          message.endorserRepPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 73:
+          message.collabInviterRepPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 74:
+          message.authorRepPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -796,6 +983,15 @@ export const Params = {
     message.curatorDemotionThreshold = object.curatorDemotionThreshold ?? "";
     message.curatorOverturnDemotionStreak = object.curatorOverturnDemotionStreak !== undefined && object.curatorOverturnDemotionStreak !== null ? BigInt(object.curatorOverturnDemotionStreak.toString()) : BigInt(0);
     message.curatorUnbondCooldown = object.curatorUnbondCooldown !== undefined && object.curatorUnbondCooldown !== null ? BigInt(object.curatorUnbondCooldown.toString()) : BigInt(0);
+    message.makePermanentMinTrustLevel = object.makePermanentMinTrustLevel ?? 0;
+    message.maxMakePermanentPerDay = object.maxMakePermanentPerDay ?? 0;
+    message.nonMemberCollabDreamStake = object.nonMemberCollabDreamStake ?? "";
+    message.nonMemberCollabBurnFraction = object.nonMemberCollabBurnFraction ?? "";
+    message.maxNonMemberCollaboratorsPerCollection = object.maxNonMemberCollaboratorsPerCollection ?? 0;
+    message.maxPromotionsPerBlock = object.maxPromotionsPerBlock ?? 0;
+    message.endorserRepPenalty = object.endorserRepPenalty ?? "";
+    message.collabInviterRepPenalty = object.collabInviterRepPenalty ?? "";
+    message.authorRepPenalty = object.authorRepPenalty ?? "";
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -986,6 +1182,33 @@ export const Params = {
     if (object.curator_unbond_cooldown !== undefined && object.curator_unbond_cooldown !== null) {
       message.curatorUnbondCooldown = BigInt(object.curator_unbond_cooldown);
     }
+    if (object.make_permanent_min_trust_level !== undefined && object.make_permanent_min_trust_level !== null) {
+      message.makePermanentMinTrustLevel = object.make_permanent_min_trust_level;
+    }
+    if (object.max_make_permanent_per_day !== undefined && object.max_make_permanent_per_day !== null) {
+      message.maxMakePermanentPerDay = object.max_make_permanent_per_day;
+    }
+    if (object.non_member_collab_dream_stake !== undefined && object.non_member_collab_dream_stake !== null) {
+      message.nonMemberCollabDreamStake = object.non_member_collab_dream_stake;
+    }
+    if (object.non_member_collab_burn_fraction !== undefined && object.non_member_collab_burn_fraction !== null) {
+      message.nonMemberCollabBurnFraction = object.non_member_collab_burn_fraction;
+    }
+    if (object.max_non_member_collaborators_per_collection !== undefined && object.max_non_member_collaborators_per_collection !== null) {
+      message.maxNonMemberCollaboratorsPerCollection = object.max_non_member_collaborators_per_collection;
+    }
+    if (object.max_promotions_per_block !== undefined && object.max_promotions_per_block !== null) {
+      message.maxPromotionsPerBlock = object.max_promotions_per_block;
+    }
+    if (object.endorser_rep_penalty !== undefined && object.endorser_rep_penalty !== null) {
+      message.endorserRepPenalty = object.endorser_rep_penalty;
+    }
+    if (object.collab_inviter_rep_penalty !== undefined && object.collab_inviter_rep_penalty !== null) {
+      message.collabInviterRepPenalty = object.collab_inviter_rep_penalty;
+    }
+    if (object.author_rep_penalty !== undefined && object.author_rep_penalty !== null) {
+      message.authorRepPenalty = object.author_rep_penalty;
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -1052,6 +1275,15 @@ export const Params = {
     obj.curator_demotion_threshold = message.curatorDemotionThreshold === "" ? undefined : message.curatorDemotionThreshold;
     obj.curator_overturn_demotion_streak = message.curatorOverturnDemotionStreak !== BigInt(0) ? message.curatorOverturnDemotionStreak?.toString() : undefined;
     obj.curator_unbond_cooldown = message.curatorUnbondCooldown !== BigInt(0) ? message.curatorUnbondCooldown?.toString() : undefined;
+    obj.make_permanent_min_trust_level = message.makePermanentMinTrustLevel === 0 ? undefined : message.makePermanentMinTrustLevel;
+    obj.max_make_permanent_per_day = message.maxMakePermanentPerDay === 0 ? undefined : message.maxMakePermanentPerDay;
+    obj.non_member_collab_dream_stake = message.nonMemberCollabDreamStake === "" ? undefined : message.nonMemberCollabDreamStake;
+    obj.non_member_collab_burn_fraction = message.nonMemberCollabBurnFraction === "" ? undefined : message.nonMemberCollabBurnFraction;
+    obj.max_non_member_collaborators_per_collection = message.maxNonMemberCollaboratorsPerCollection === 0 ? undefined : message.maxNonMemberCollaboratorsPerCollection;
+    obj.max_promotions_per_block = message.maxPromotionsPerBlock === 0 ? undefined : message.maxPromotionsPerBlock;
+    obj.endorser_rep_penalty = message.endorserRepPenalty === "" ? undefined : message.endorserRepPenalty;
+    obj.collab_inviter_rep_penalty = message.collabInviterRepPenalty === "" ? undefined : message.collabInviterRepPenalty;
+    obj.author_rep_penalty = message.authorRepPenalty === "" ? undefined : message.authorRepPenalty;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {

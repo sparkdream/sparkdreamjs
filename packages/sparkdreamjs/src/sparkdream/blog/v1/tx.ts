@@ -839,7 +839,61 @@ export interface MsgRemoveReactionResponseAminoMsg {
   value: MsgRemoveReactionResponseAmino;
 }
 /**
- * MsgPinPost defines the MsgPinPost message.
+ * MsgMakePostPermanent promotes an ephemeral post to permanent. No-op if
+ * the post is already permanent.
+ * @name MsgMakePostPermanent
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgMakePostPermanent
+ */
+export interface MsgMakePostPermanent {
+  creator: string;
+  id: bigint;
+}
+export interface MsgMakePostPermanentProtoMsg {
+  typeUrl: "/sparkdream.blog.v1.MsgMakePostPermanent";
+  value: Uint8Array;
+}
+/**
+ * MsgMakePostPermanent promotes an ephemeral post to permanent. No-op if
+ * the post is already permanent.
+ * @name MsgMakePostPermanentAmino
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgMakePostPermanent
+ */
+export interface MsgMakePostPermanentAmino {
+  creator?: string;
+  id?: string;
+}
+export interface MsgMakePostPermanentAminoMsg {
+  type: "sparkdream/x/blog/MsgMakePostPermanent";
+  value: MsgMakePostPermanentAmino;
+}
+/**
+ * MsgMakePostPermanentResponse defines the response.
+ * @name MsgMakePostPermanentResponse
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgMakePostPermanentResponse
+ */
+export interface MsgMakePostPermanentResponse {}
+export interface MsgMakePostPermanentResponseProtoMsg {
+  typeUrl: "/sparkdream.blog.v1.MsgMakePostPermanentResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgMakePostPermanentResponse defines the response.
+ * @name MsgMakePostPermanentResponseAmino
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgMakePostPermanentResponse
+ */
+export interface MsgMakePostPermanentResponseAmino {}
+export interface MsgMakePostPermanentResponseAminoMsg {
+  type: "/sparkdream.blog.v1.MsgMakePostPermanentResponse";
+  value: MsgMakePostPermanentResponseAmino;
+}
+/**
+ * MsgPinPost sets the pinned marker on a permanent post (display-only). The
+ * post must already be permanent; promote ephemeral content with
+ * MsgMakePostPermanent first.
  * @name MsgPinPost
  * @package sparkdream.blog.v1
  * @see proto type: sparkdream.blog.v1.MsgPinPost
@@ -853,7 +907,9 @@ export interface MsgPinPostProtoMsg {
   value: Uint8Array;
 }
 /**
- * MsgPinPost defines the MsgPinPost message.
+ * MsgPinPost sets the pinned marker on a permanent post (display-only). The
+ * post must already be permanent; promote ephemeral content with
+ * MsgMakePostPermanent first.
  * @name MsgPinPostAmino
  * @package sparkdream.blog.v1
  * @see proto type: sparkdream.blog.v1.MsgPinPost
@@ -889,7 +945,59 @@ export interface MsgPinPostResponseAminoMsg {
   value: MsgPinPostResponseAmino;
 }
 /**
- * MsgPinReply defines the MsgPinReply message.
+ * MsgMakeReplyPermanent promotes an ephemeral reply to permanent.
+ * @name MsgMakeReplyPermanent
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgMakeReplyPermanent
+ */
+export interface MsgMakeReplyPermanent {
+  creator: string;
+  id: bigint;
+}
+export interface MsgMakeReplyPermanentProtoMsg {
+  typeUrl: "/sparkdream.blog.v1.MsgMakeReplyPermanent";
+  value: Uint8Array;
+}
+/**
+ * MsgMakeReplyPermanent promotes an ephemeral reply to permanent.
+ * @name MsgMakeReplyPermanentAmino
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgMakeReplyPermanent
+ */
+export interface MsgMakeReplyPermanentAmino {
+  creator?: string;
+  id?: string;
+}
+export interface MsgMakeReplyPermanentAminoMsg {
+  type: "sparkdream/x/blog/MsgMakeReplyPermanent";
+  value: MsgMakeReplyPermanentAmino;
+}
+/**
+ * MsgMakeReplyPermanentResponse defines the response.
+ * @name MsgMakeReplyPermanentResponse
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgMakeReplyPermanentResponse
+ */
+export interface MsgMakeReplyPermanentResponse {}
+export interface MsgMakeReplyPermanentResponseProtoMsg {
+  typeUrl: "/sparkdream.blog.v1.MsgMakeReplyPermanentResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgMakeReplyPermanentResponse defines the response.
+ * @name MsgMakeReplyPermanentResponseAmino
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgMakeReplyPermanentResponse
+ */
+export interface MsgMakeReplyPermanentResponseAmino {}
+export interface MsgMakeReplyPermanentResponseAminoMsg {
+  type: "/sparkdream.blog.v1.MsgMakeReplyPermanentResponse";
+  value: MsgMakeReplyPermanentResponseAmino;
+}
+/**
+ * MsgPinReply sets the pinned marker on a permanent reply. The reply must
+ * already be permanent; promote ephemeral content with MsgMakeReplyPermanent
+ * first.
  * @name MsgPinReply
  * @package sparkdream.blog.v1
  * @see proto type: sparkdream.blog.v1.MsgPinReply
@@ -903,7 +1011,9 @@ export interface MsgPinReplyProtoMsg {
   value: Uint8Array;
 }
 /**
- * MsgPinReply defines the MsgPinReply message.
+ * MsgPinReply sets the pinned marker on a permanent reply. The reply must
+ * already be permanent; promote ephemeral content with MsgMakeReplyPermanent
+ * first.
  * @name MsgPinReplyAmino
  * @package sparkdream.blog.v1
  * @see proto type: sparkdream.blog.v1.MsgPinReply
@@ -937,6 +1047,106 @@ export interface MsgPinReplyResponseAmino {}
 export interface MsgPinReplyResponseAminoMsg {
   type: "/sparkdream.blog.v1.MsgPinReplyResponse";
   value: MsgPinReplyResponseAmino;
+}
+/**
+ * MsgUnpinPost defines the MsgUnpinPost message.
+ * @name MsgUnpinPost
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgUnpinPost
+ */
+export interface MsgUnpinPost {
+  creator: string;
+  id: bigint;
+}
+export interface MsgUnpinPostProtoMsg {
+  typeUrl: "/sparkdream.blog.v1.MsgUnpinPost";
+  value: Uint8Array;
+}
+/**
+ * MsgUnpinPost defines the MsgUnpinPost message.
+ * @name MsgUnpinPostAmino
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgUnpinPost
+ */
+export interface MsgUnpinPostAmino {
+  creator?: string;
+  id?: string;
+}
+export interface MsgUnpinPostAminoMsg {
+  type: "sparkdream/x/blog/MsgUnpinPost";
+  value: MsgUnpinPostAmino;
+}
+/**
+ * MsgUnpinPostResponse defines the MsgUnpinPostResponse message.
+ * @name MsgUnpinPostResponse
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgUnpinPostResponse
+ */
+export interface MsgUnpinPostResponse {}
+export interface MsgUnpinPostResponseProtoMsg {
+  typeUrl: "/sparkdream.blog.v1.MsgUnpinPostResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgUnpinPostResponse defines the MsgUnpinPostResponse message.
+ * @name MsgUnpinPostResponseAmino
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgUnpinPostResponse
+ */
+export interface MsgUnpinPostResponseAmino {}
+export interface MsgUnpinPostResponseAminoMsg {
+  type: "/sparkdream.blog.v1.MsgUnpinPostResponse";
+  value: MsgUnpinPostResponseAmino;
+}
+/**
+ * MsgUnpinReply defines the MsgUnpinReply message.
+ * @name MsgUnpinReply
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgUnpinReply
+ */
+export interface MsgUnpinReply {
+  creator: string;
+  id: bigint;
+}
+export interface MsgUnpinReplyProtoMsg {
+  typeUrl: "/sparkdream.blog.v1.MsgUnpinReply";
+  value: Uint8Array;
+}
+/**
+ * MsgUnpinReply defines the MsgUnpinReply message.
+ * @name MsgUnpinReplyAmino
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgUnpinReply
+ */
+export interface MsgUnpinReplyAmino {
+  creator?: string;
+  id?: string;
+}
+export interface MsgUnpinReplyAminoMsg {
+  type: "sparkdream/x/blog/MsgUnpinReply";
+  value: MsgUnpinReplyAmino;
+}
+/**
+ * MsgUnpinReplyResponse defines the MsgUnpinReplyResponse message.
+ * @name MsgUnpinReplyResponse
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgUnpinReplyResponse
+ */
+export interface MsgUnpinReplyResponse {}
+export interface MsgUnpinReplyResponseProtoMsg {
+  typeUrl: "/sparkdream.blog.v1.MsgUnpinReplyResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgUnpinReplyResponse defines the MsgUnpinReplyResponse message.
+ * @name MsgUnpinReplyResponseAmino
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgUnpinReplyResponse
+ */
+export interface MsgUnpinReplyResponseAmino {}
+export interface MsgUnpinReplyResponseAminoMsg {
+  type: "/sparkdream.blog.v1.MsgUnpinReplyResponse";
+  value: MsgUnpinReplyResponseAmino;
 }
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
@@ -3239,6 +3449,151 @@ export const MsgRemoveReactionResponse = {
     };
   }
 };
+function createBaseMsgMakePostPermanent(): MsgMakePostPermanent {
+  return {
+    creator: "",
+    id: BigInt(0)
+  };
+}
+/**
+ * MsgMakePostPermanent promotes an ephemeral post to permanent. No-op if
+ * the post is already permanent.
+ * @name MsgMakePostPermanent
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgMakePostPermanent
+ */
+export const MsgMakePostPermanent = {
+  typeUrl: "/sparkdream.blog.v1.MsgMakePostPermanent",
+  aminoType: "sparkdream/x/blog/MsgMakePostPermanent",
+  encode(message: MsgMakePostPermanent, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.id !== BigInt(0)) {
+      writer.uint32(16).uint64(message.id);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgMakePostPermanent {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgMakePostPermanent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.id = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgMakePostPermanent>): MsgMakePostPermanent {
+    const message = createBaseMsgMakePostPermanent();
+    message.creator = object.creator ?? "";
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgMakePostPermanentAmino): MsgMakePostPermanent {
+    const message = createBaseMsgMakePostPermanent();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    return message;
+  },
+  toAmino(message: MsgMakePostPermanent): MsgMakePostPermanentAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgMakePostPermanentAminoMsg): MsgMakePostPermanent {
+    return MsgMakePostPermanent.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgMakePostPermanent): MsgMakePostPermanentAminoMsg {
+    return {
+      type: "sparkdream/x/blog/MsgMakePostPermanent",
+      value: MsgMakePostPermanent.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgMakePostPermanentProtoMsg): MsgMakePostPermanent {
+    return MsgMakePostPermanent.decode(message.value);
+  },
+  toProto(message: MsgMakePostPermanent): Uint8Array {
+    return MsgMakePostPermanent.encode(message).finish();
+  },
+  toProtoMsg(message: MsgMakePostPermanent): MsgMakePostPermanentProtoMsg {
+    return {
+      typeUrl: "/sparkdream.blog.v1.MsgMakePostPermanent",
+      value: MsgMakePostPermanent.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgMakePostPermanentResponse(): MsgMakePostPermanentResponse {
+  return {};
+}
+/**
+ * MsgMakePostPermanentResponse defines the response.
+ * @name MsgMakePostPermanentResponse
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgMakePostPermanentResponse
+ */
+export const MsgMakePostPermanentResponse = {
+  typeUrl: "/sparkdream.blog.v1.MsgMakePostPermanentResponse",
+  encode(_: MsgMakePostPermanentResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgMakePostPermanentResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgMakePostPermanentResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgMakePostPermanentResponse>): MsgMakePostPermanentResponse {
+    const message = createBaseMsgMakePostPermanentResponse();
+    return message;
+  },
+  fromAmino(_: MsgMakePostPermanentResponseAmino): MsgMakePostPermanentResponse {
+    const message = createBaseMsgMakePostPermanentResponse();
+    return message;
+  },
+  toAmino(_: MsgMakePostPermanentResponse): MsgMakePostPermanentResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgMakePostPermanentResponseAminoMsg): MsgMakePostPermanentResponse {
+    return MsgMakePostPermanentResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgMakePostPermanentResponseProtoMsg): MsgMakePostPermanentResponse {
+    return MsgMakePostPermanentResponse.decode(message.value);
+  },
+  toProto(message: MsgMakePostPermanentResponse): Uint8Array {
+    return MsgMakePostPermanentResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgMakePostPermanentResponse): MsgMakePostPermanentResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.blog.v1.MsgMakePostPermanentResponse",
+      value: MsgMakePostPermanentResponse.encode(message).finish()
+    };
+  }
+};
 function createBaseMsgPinPost(): MsgPinPost {
   return {
     creator: "",
@@ -3246,7 +3601,9 @@ function createBaseMsgPinPost(): MsgPinPost {
   };
 }
 /**
- * MsgPinPost defines the MsgPinPost message.
+ * MsgPinPost sets the pinned marker on a permanent post (display-only). The
+ * post must already be permanent; promote ephemeral content with
+ * MsgMakePostPermanent first.
  * @name MsgPinPost
  * @package sparkdream.blog.v1
  * @see proto type: sparkdream.blog.v1.MsgPinPost
@@ -3383,6 +3740,150 @@ export const MsgPinPostResponse = {
     };
   }
 };
+function createBaseMsgMakeReplyPermanent(): MsgMakeReplyPermanent {
+  return {
+    creator: "",
+    id: BigInt(0)
+  };
+}
+/**
+ * MsgMakeReplyPermanent promotes an ephemeral reply to permanent.
+ * @name MsgMakeReplyPermanent
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgMakeReplyPermanent
+ */
+export const MsgMakeReplyPermanent = {
+  typeUrl: "/sparkdream.blog.v1.MsgMakeReplyPermanent",
+  aminoType: "sparkdream/x/blog/MsgMakeReplyPermanent",
+  encode(message: MsgMakeReplyPermanent, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.id !== BigInt(0)) {
+      writer.uint32(16).uint64(message.id);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgMakeReplyPermanent {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgMakeReplyPermanent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.id = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgMakeReplyPermanent>): MsgMakeReplyPermanent {
+    const message = createBaseMsgMakeReplyPermanent();
+    message.creator = object.creator ?? "";
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgMakeReplyPermanentAmino): MsgMakeReplyPermanent {
+    const message = createBaseMsgMakeReplyPermanent();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    return message;
+  },
+  toAmino(message: MsgMakeReplyPermanent): MsgMakeReplyPermanentAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgMakeReplyPermanentAminoMsg): MsgMakeReplyPermanent {
+    return MsgMakeReplyPermanent.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgMakeReplyPermanent): MsgMakeReplyPermanentAminoMsg {
+    return {
+      type: "sparkdream/x/blog/MsgMakeReplyPermanent",
+      value: MsgMakeReplyPermanent.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgMakeReplyPermanentProtoMsg): MsgMakeReplyPermanent {
+    return MsgMakeReplyPermanent.decode(message.value);
+  },
+  toProto(message: MsgMakeReplyPermanent): Uint8Array {
+    return MsgMakeReplyPermanent.encode(message).finish();
+  },
+  toProtoMsg(message: MsgMakeReplyPermanent): MsgMakeReplyPermanentProtoMsg {
+    return {
+      typeUrl: "/sparkdream.blog.v1.MsgMakeReplyPermanent",
+      value: MsgMakeReplyPermanent.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgMakeReplyPermanentResponse(): MsgMakeReplyPermanentResponse {
+  return {};
+}
+/**
+ * MsgMakeReplyPermanentResponse defines the response.
+ * @name MsgMakeReplyPermanentResponse
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgMakeReplyPermanentResponse
+ */
+export const MsgMakeReplyPermanentResponse = {
+  typeUrl: "/sparkdream.blog.v1.MsgMakeReplyPermanentResponse",
+  encode(_: MsgMakeReplyPermanentResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgMakeReplyPermanentResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgMakeReplyPermanentResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgMakeReplyPermanentResponse>): MsgMakeReplyPermanentResponse {
+    const message = createBaseMsgMakeReplyPermanentResponse();
+    return message;
+  },
+  fromAmino(_: MsgMakeReplyPermanentResponseAmino): MsgMakeReplyPermanentResponse {
+    const message = createBaseMsgMakeReplyPermanentResponse();
+    return message;
+  },
+  toAmino(_: MsgMakeReplyPermanentResponse): MsgMakeReplyPermanentResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgMakeReplyPermanentResponseAminoMsg): MsgMakeReplyPermanentResponse {
+    return MsgMakeReplyPermanentResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgMakeReplyPermanentResponseProtoMsg): MsgMakeReplyPermanentResponse {
+    return MsgMakeReplyPermanentResponse.decode(message.value);
+  },
+  toProto(message: MsgMakeReplyPermanentResponse): Uint8Array {
+    return MsgMakeReplyPermanentResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgMakeReplyPermanentResponse): MsgMakeReplyPermanentResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.blog.v1.MsgMakeReplyPermanentResponse",
+      value: MsgMakeReplyPermanentResponse.encode(message).finish()
+    };
+  }
+};
 function createBaseMsgPinReply(): MsgPinReply {
   return {
     creator: "",
@@ -3390,7 +3891,9 @@ function createBaseMsgPinReply(): MsgPinReply {
   };
 }
 /**
- * MsgPinReply defines the MsgPinReply message.
+ * MsgPinReply sets the pinned marker on a permanent reply. The reply must
+ * already be permanent; promote ephemeral content with MsgMakeReplyPermanent
+ * first.
  * @name MsgPinReply
  * @package sparkdream.blog.v1
  * @see proto type: sparkdream.blog.v1.MsgPinReply
@@ -3524,6 +4027,294 @@ export const MsgPinReplyResponse = {
     return {
       typeUrl: "/sparkdream.blog.v1.MsgPinReplyResponse",
       value: MsgPinReplyResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUnpinPost(): MsgUnpinPost {
+  return {
+    creator: "",
+    id: BigInt(0)
+  };
+}
+/**
+ * MsgUnpinPost defines the MsgUnpinPost message.
+ * @name MsgUnpinPost
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgUnpinPost
+ */
+export const MsgUnpinPost = {
+  typeUrl: "/sparkdream.blog.v1.MsgUnpinPost",
+  aminoType: "sparkdream/x/blog/MsgUnpinPost",
+  encode(message: MsgUnpinPost, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.id !== BigInt(0)) {
+      writer.uint32(16).uint64(message.id);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUnpinPost {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUnpinPost();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.id = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgUnpinPost>): MsgUnpinPost {
+    const message = createBaseMsgUnpinPost();
+    message.creator = object.creator ?? "";
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgUnpinPostAmino): MsgUnpinPost {
+    const message = createBaseMsgUnpinPost();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    return message;
+  },
+  toAmino(message: MsgUnpinPost): MsgUnpinPostAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgUnpinPostAminoMsg): MsgUnpinPost {
+    return MsgUnpinPost.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUnpinPost): MsgUnpinPostAminoMsg {
+    return {
+      type: "sparkdream/x/blog/MsgUnpinPost",
+      value: MsgUnpinPost.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgUnpinPostProtoMsg): MsgUnpinPost {
+    return MsgUnpinPost.decode(message.value);
+  },
+  toProto(message: MsgUnpinPost): Uint8Array {
+    return MsgUnpinPost.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUnpinPost): MsgUnpinPostProtoMsg {
+    return {
+      typeUrl: "/sparkdream.blog.v1.MsgUnpinPost",
+      value: MsgUnpinPost.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUnpinPostResponse(): MsgUnpinPostResponse {
+  return {};
+}
+/**
+ * MsgUnpinPostResponse defines the MsgUnpinPostResponse message.
+ * @name MsgUnpinPostResponse
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgUnpinPostResponse
+ */
+export const MsgUnpinPostResponse = {
+  typeUrl: "/sparkdream.blog.v1.MsgUnpinPostResponse",
+  encode(_: MsgUnpinPostResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUnpinPostResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUnpinPostResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgUnpinPostResponse>): MsgUnpinPostResponse {
+    const message = createBaseMsgUnpinPostResponse();
+    return message;
+  },
+  fromAmino(_: MsgUnpinPostResponseAmino): MsgUnpinPostResponse {
+    const message = createBaseMsgUnpinPostResponse();
+    return message;
+  },
+  toAmino(_: MsgUnpinPostResponse): MsgUnpinPostResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgUnpinPostResponseAminoMsg): MsgUnpinPostResponse {
+    return MsgUnpinPostResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgUnpinPostResponseProtoMsg): MsgUnpinPostResponse {
+    return MsgUnpinPostResponse.decode(message.value);
+  },
+  toProto(message: MsgUnpinPostResponse): Uint8Array {
+    return MsgUnpinPostResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUnpinPostResponse): MsgUnpinPostResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.blog.v1.MsgUnpinPostResponse",
+      value: MsgUnpinPostResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUnpinReply(): MsgUnpinReply {
+  return {
+    creator: "",
+    id: BigInt(0)
+  };
+}
+/**
+ * MsgUnpinReply defines the MsgUnpinReply message.
+ * @name MsgUnpinReply
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgUnpinReply
+ */
+export const MsgUnpinReply = {
+  typeUrl: "/sparkdream.blog.v1.MsgUnpinReply",
+  aminoType: "sparkdream/x/blog/MsgUnpinReply",
+  encode(message: MsgUnpinReply, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.id !== BigInt(0)) {
+      writer.uint32(16).uint64(message.id);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUnpinReply {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUnpinReply();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.id = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgUnpinReply>): MsgUnpinReply {
+    const message = createBaseMsgUnpinReply();
+    message.creator = object.creator ?? "";
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgUnpinReplyAmino): MsgUnpinReply {
+    const message = createBaseMsgUnpinReply();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    return message;
+  },
+  toAmino(message: MsgUnpinReply): MsgUnpinReplyAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgUnpinReplyAminoMsg): MsgUnpinReply {
+    return MsgUnpinReply.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUnpinReply): MsgUnpinReplyAminoMsg {
+    return {
+      type: "sparkdream/x/blog/MsgUnpinReply",
+      value: MsgUnpinReply.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgUnpinReplyProtoMsg): MsgUnpinReply {
+    return MsgUnpinReply.decode(message.value);
+  },
+  toProto(message: MsgUnpinReply): Uint8Array {
+    return MsgUnpinReply.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUnpinReply): MsgUnpinReplyProtoMsg {
+    return {
+      typeUrl: "/sparkdream.blog.v1.MsgUnpinReply",
+      value: MsgUnpinReply.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUnpinReplyResponse(): MsgUnpinReplyResponse {
+  return {};
+}
+/**
+ * MsgUnpinReplyResponse defines the MsgUnpinReplyResponse message.
+ * @name MsgUnpinReplyResponse
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.MsgUnpinReplyResponse
+ */
+export const MsgUnpinReplyResponse = {
+  typeUrl: "/sparkdream.blog.v1.MsgUnpinReplyResponse",
+  encode(_: MsgUnpinReplyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUnpinReplyResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUnpinReplyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgUnpinReplyResponse>): MsgUnpinReplyResponse {
+    const message = createBaseMsgUnpinReplyResponse();
+    return message;
+  },
+  fromAmino(_: MsgUnpinReplyResponseAmino): MsgUnpinReplyResponse {
+    const message = createBaseMsgUnpinReplyResponse();
+    return message;
+  },
+  toAmino(_: MsgUnpinReplyResponse): MsgUnpinReplyResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgUnpinReplyResponseAminoMsg): MsgUnpinReplyResponse {
+    return MsgUnpinReplyResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgUnpinReplyResponseProtoMsg): MsgUnpinReplyResponse {
+    return MsgUnpinReplyResponse.decode(message.value);
+  },
+  toProto(message: MsgUnpinReplyResponse): Uint8Array {
+    return MsgUnpinReplyResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUnpinReplyResponse): MsgUnpinReplyResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.blog.v1.MsgUnpinReplyResponse",
+      value: MsgUnpinReplyResponse.encode(message).finish()
     };
   }
 };

@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { TelescopeGeneratedType } from "../../../types";
 import { Registry } from "@cosmjs/proto-signing";
-import { MsgUpdateParams, MsgCreateCollection, MsgUpdateCollection, MsgDeleteCollection, MsgAddItem, MsgAddItems, MsgUpdateItem, MsgRemoveItem, MsgRemoveItems, MsgReorderItem, MsgAddCollaborator, MsgRemoveCollaborator, MsgUpdateCollaboratorRole, MsgRateCollection, MsgChallengeReview, MsgRequestSponsorship, MsgCancelSponsorshipRequest, MsgSponsorCollection, MsgUpdateOperationalParams, MsgUpvoteContent, MsgDownvoteContent, MsgFlagContent, MsgHideContent, MsgAppealHide, MsgEndorseCollection, MsgSetSeekingEndorsement, MsgPinCollection } from "./tx";
-export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.collect.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.collect.v1.MsgCreateCollection", MsgCreateCollection], ["/sparkdream.collect.v1.MsgUpdateCollection", MsgUpdateCollection], ["/sparkdream.collect.v1.MsgDeleteCollection", MsgDeleteCollection], ["/sparkdream.collect.v1.MsgAddItem", MsgAddItem], ["/sparkdream.collect.v1.MsgAddItems", MsgAddItems], ["/sparkdream.collect.v1.MsgUpdateItem", MsgUpdateItem], ["/sparkdream.collect.v1.MsgRemoveItem", MsgRemoveItem], ["/sparkdream.collect.v1.MsgRemoveItems", MsgRemoveItems], ["/sparkdream.collect.v1.MsgReorderItem", MsgReorderItem], ["/sparkdream.collect.v1.MsgAddCollaborator", MsgAddCollaborator], ["/sparkdream.collect.v1.MsgRemoveCollaborator", MsgRemoveCollaborator], ["/sparkdream.collect.v1.MsgUpdateCollaboratorRole", MsgUpdateCollaboratorRole], ["/sparkdream.collect.v1.MsgRateCollection", MsgRateCollection], ["/sparkdream.collect.v1.MsgChallengeReview", MsgChallengeReview], ["/sparkdream.collect.v1.MsgRequestSponsorship", MsgRequestSponsorship], ["/sparkdream.collect.v1.MsgCancelSponsorshipRequest", MsgCancelSponsorshipRequest], ["/sparkdream.collect.v1.MsgSponsorCollection", MsgSponsorCollection], ["/sparkdream.collect.v1.MsgUpdateOperationalParams", MsgUpdateOperationalParams], ["/sparkdream.collect.v1.MsgUpvoteContent", MsgUpvoteContent], ["/sparkdream.collect.v1.MsgDownvoteContent", MsgDownvoteContent], ["/sparkdream.collect.v1.MsgFlagContent", MsgFlagContent], ["/sparkdream.collect.v1.MsgHideContent", MsgHideContent], ["/sparkdream.collect.v1.MsgAppealHide", MsgAppealHide], ["/sparkdream.collect.v1.MsgEndorseCollection", MsgEndorseCollection], ["/sparkdream.collect.v1.MsgSetSeekingEndorsement", MsgSetSeekingEndorsement], ["/sparkdream.collect.v1.MsgPinCollection", MsgPinCollection]];
+import { MsgUpdateParams, MsgCreateCollection, MsgUpdateCollection, MsgDeleteCollection, MsgAddItem, MsgAddItems, MsgUpdateItem, MsgRemoveItem, MsgRemoveItems, MsgReorderItem, MsgAddCollaborator, MsgRemoveCollaborator, MsgUpdateCollaboratorRole, MsgRateCollection, MsgChallengeReview, MsgRequestSponsorship, MsgCancelSponsorshipRequest, MsgSponsorCollection, MsgUpdateOperationalParams, MsgUpvoteContent, MsgDownvoteContent, MsgFlagContent, MsgHideContent, MsgAppealHide, MsgEndorseCollection, MsgSetSeekingEndorsement, MsgPinCollection, MsgUnpinCollection, MsgMakeCollectionPermanent } from "./tx";
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.collect.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.collect.v1.MsgCreateCollection", MsgCreateCollection], ["/sparkdream.collect.v1.MsgUpdateCollection", MsgUpdateCollection], ["/sparkdream.collect.v1.MsgDeleteCollection", MsgDeleteCollection], ["/sparkdream.collect.v1.MsgAddItem", MsgAddItem], ["/sparkdream.collect.v1.MsgAddItems", MsgAddItems], ["/sparkdream.collect.v1.MsgUpdateItem", MsgUpdateItem], ["/sparkdream.collect.v1.MsgRemoveItem", MsgRemoveItem], ["/sparkdream.collect.v1.MsgRemoveItems", MsgRemoveItems], ["/sparkdream.collect.v1.MsgReorderItem", MsgReorderItem], ["/sparkdream.collect.v1.MsgAddCollaborator", MsgAddCollaborator], ["/sparkdream.collect.v1.MsgRemoveCollaborator", MsgRemoveCollaborator], ["/sparkdream.collect.v1.MsgUpdateCollaboratorRole", MsgUpdateCollaboratorRole], ["/sparkdream.collect.v1.MsgRateCollection", MsgRateCollection], ["/sparkdream.collect.v1.MsgChallengeReview", MsgChallengeReview], ["/sparkdream.collect.v1.MsgRequestSponsorship", MsgRequestSponsorship], ["/sparkdream.collect.v1.MsgCancelSponsorshipRequest", MsgCancelSponsorshipRequest], ["/sparkdream.collect.v1.MsgSponsorCollection", MsgSponsorCollection], ["/sparkdream.collect.v1.MsgUpdateOperationalParams", MsgUpdateOperationalParams], ["/sparkdream.collect.v1.MsgUpvoteContent", MsgUpvoteContent], ["/sparkdream.collect.v1.MsgDownvoteContent", MsgDownvoteContent], ["/sparkdream.collect.v1.MsgFlagContent", MsgFlagContent], ["/sparkdream.collect.v1.MsgHideContent", MsgHideContent], ["/sparkdream.collect.v1.MsgAppealHide", MsgAppealHide], ["/sparkdream.collect.v1.MsgEndorseCollection", MsgEndorseCollection], ["/sparkdream.collect.v1.MsgSetSeekingEndorsement", MsgSetSeekingEndorsement], ["/sparkdream.collect.v1.MsgPinCollection", MsgPinCollection], ["/sparkdream.collect.v1.MsgUnpinCollection", MsgUnpinCollection], ["/sparkdream.collect.v1.MsgMakeCollectionPermanent", MsgMakeCollectionPermanent]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -171,6 +171,18 @@ export const MessageComposer = {
         typeUrl: "/sparkdream.collect.v1.MsgPinCollection",
         value: MsgPinCollection.encode(value).finish()
       };
+    },
+    unpinCollection(value: MsgUnpinCollection) {
+      return {
+        typeUrl: "/sparkdream.collect.v1.MsgUnpinCollection",
+        value: MsgUnpinCollection.encode(value).finish()
+      };
+    },
+    makeCollectionPermanent(value: MsgMakeCollectionPermanent) {
+      return {
+        typeUrl: "/sparkdream.collect.v1.MsgMakeCollectionPermanent",
+        value: MsgMakeCollectionPermanent.encode(value).finish()
+      };
     }
   },
   withTypeUrl: {
@@ -333,6 +345,18 @@ export const MessageComposer = {
     pinCollection(value: MsgPinCollection) {
       return {
         typeUrl: "/sparkdream.collect.v1.MsgPinCollection",
+        value
+      };
+    },
+    unpinCollection(value: MsgUnpinCollection) {
+      return {
+        typeUrl: "/sparkdream.collect.v1.MsgUnpinCollection",
+        value
+      };
+    },
+    makeCollectionPermanent(value: MsgMakeCollectionPermanent) {
+      return {
+        typeUrl: "/sparkdream.collect.v1.MsgMakeCollectionPermanent",
         value
       };
     }
@@ -498,6 +522,18 @@ export const MessageComposer = {
       return {
         typeUrl: "/sparkdream.collect.v1.MsgPinCollection",
         value: MsgPinCollection.fromPartial(value)
+      };
+    },
+    unpinCollection(value: MsgUnpinCollection) {
+      return {
+        typeUrl: "/sparkdream.collect.v1.MsgUnpinCollection",
+        value: MsgUnpinCollection.fromPartial(value)
+      };
+    },
+    makeCollectionPermanent(value: MsgMakeCollectionPermanent) {
+      return {
+        typeUrl: "/sparkdream.collect.v1.MsgMakeCollectionPermanent",
+        value: MsgMakeCollectionPermanent.fromPartial(value)
       };
     }
   }

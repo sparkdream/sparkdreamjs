@@ -373,6 +373,20 @@ export interface Collection {
   immutable: boolean;
   convictionSustained: boolean;
   initiativeId: bigint;
+  /**
+   * pinned is a display-only marker set by MsgPinCollection and cleared by
+   * MsgUnpinCollection. Requires the collection to already be permanent
+   * (expires_at == 0); does not affect lifecycle. The lifecycle change
+   * (ephemeral → permanent + deposit burn) is owned by
+   * MsgMakeCollectionPermanent.
+   */
+  pinned: boolean;
+  /**
+   * non_member_collaborator_count counts how many of `collaborator_count` are
+   * non-members (stake-bearing collaborators). Maintained alongside the total
+   * count; bounded by Params.max_non_member_collaborators_per_collection.
+   */
+  nonMemberCollaboratorCount: number;
 }
 export interface CollectionProtoMsg {
   typeUrl: "/sparkdream.collect.v1.Collection";
@@ -413,6 +427,20 @@ export interface CollectionAmino {
   immutable?: boolean;
   conviction_sustained?: boolean;
   initiative_id?: string;
+  /**
+   * pinned is a display-only marker set by MsgPinCollection and cleared by
+   * MsgUnpinCollection. Requires the collection to already be permanent
+   * (expires_at == 0); does not affect lifecycle. The lifecycle change
+   * (ephemeral → permanent + deposit burn) is owned by
+   * MsgMakeCollectionPermanent.
+   */
+  pinned?: boolean;
+  /**
+   * non_member_collaborator_count counts how many of `collaborator_count` are
+   * non-members (stake-bearing collaborators). Maintained alongside the total
+   * count; bounded by Params.max_non_member_collaborators_per_collection.
+   */
+  non_member_collaborator_count?: number;
 }
 export interface CollectionAminoMsg {
   type: "/sparkdream.collect.v1.Collection";
@@ -649,6 +677,21 @@ export interface Collaborator {
   address: string;
   role: CollaboratorRole;
   addedAt: bigint;
+  /**
+   * inviter is the member who added this collaborator. Set only for non-member
+   * collaborators (members invite themselves implicitly via the trust-level
+   * gate). Used to identify the address whose DREAM stake is locked behind
+   * this collaboration.
+   */
+  inviter: string;
+  /**
+   * dream_stake is the DREAM amount the inviter locked when the collaborator
+   * was added. Zero for member collaborators. Released on RemoveCollaborator
+   * when the collection is ACTIVE; a fraction (non_member_collab_burn_fraction)
+   * is burned and the remainder refunded when the collection is HIDDEN at
+   * removal/deletion time.
+   */
+  dreamStake: string;
 }
 export interface CollaboratorProtoMsg {
   typeUrl: "/sparkdream.collect.v1.Collaborator";
@@ -665,6 +708,21 @@ export interface CollaboratorAmino {
   address?: string;
   role?: CollaboratorRole;
   added_at?: string;
+  /**
+   * inviter is the member who added this collaborator. Set only for non-member
+   * collaborators (members invite themselves implicitly via the trust-level
+   * gate). Used to identify the address whose DREAM stake is locked behind
+   * this collaboration.
+   */
+  inviter?: string;
+  /**
+   * dream_stake is the DREAM amount the inviter locked when the collaborator
+   * was added. Zero for member collaborators. Released on RemoveCollaborator
+   * when the collection is ACTIVE; a fraction (non_member_collab_burn_fraction)
+   * is burned and the remainder refunded when the collection is HIDDEN at
+   * removal/deletion time.
+   */
+  dream_stake?: string;
 }
 export interface CollaboratorAminoMsg {
   type: "/sparkdream.collect.v1.Collaborator";
@@ -930,6 +988,33 @@ export interface CollectOperationalParams {
   curatorDemotionThreshold: string;
   curatorOverturnDemotionStreak: bigint;
   curatorUnbondCooldown: bigint;
+  /**
+   * make_permanent_min_trust_level — see Params.make_permanent_min_trust_level.
+   */
+  makePermanentMinTrustLevel: number;
+  /**
+   * max_make_permanent_per_day — see Params.max_make_permanent_per_day.
+   */
+  maxMakePermanentPerDay: number;
+  /**
+   * non_member_collab_dream_stake is the DREAM amount the inviter locks when
+   * adding a non-member as an EDITOR collaborator. Mirrors the endorsement
+   * stake model but per-collaborator. See Params.non_member_collab_dream_stake.
+   */
+  nonMemberCollabDreamStake: string;
+  /**
+   * non_member_collab_burn_fraction is the fraction of the inviter's locked
+   * DREAM that is burned when the collaborator is removed (or the collection
+   * is deleted) while the collection's status is HIDDEN. See
+   * Params.non_member_collab_burn_fraction.
+   */
+  nonMemberCollabBurnFraction: string;
+  /**
+   * Slash rep-penalty parameters — see Params for rationale.
+   */
+  endorserRepPenalty: string;
+  collabInviterRepPenalty: string;
+  authorRepPenalty: string;
 }
 export interface CollectOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.collect.v1.CollectOperationalParams";
@@ -995,6 +1080,33 @@ export interface CollectOperationalParamsAmino {
   curator_demotion_threshold?: string;
   curator_overturn_demotion_streak?: string;
   curator_unbond_cooldown?: string;
+  /**
+   * make_permanent_min_trust_level — see Params.make_permanent_min_trust_level.
+   */
+  make_permanent_min_trust_level?: number;
+  /**
+   * max_make_permanent_per_day — see Params.max_make_permanent_per_day.
+   */
+  max_make_permanent_per_day?: number;
+  /**
+   * non_member_collab_dream_stake is the DREAM amount the inviter locks when
+   * adding a non-member as an EDITOR collaborator. Mirrors the endorsement
+   * stake model but per-collaborator. See Params.non_member_collab_dream_stake.
+   */
+  non_member_collab_dream_stake?: string;
+  /**
+   * non_member_collab_burn_fraction is the fraction of the inviter's locked
+   * DREAM that is burned when the collaborator is removed (or the collection
+   * is deleted) while the collection's status is HIDDEN. See
+   * Params.non_member_collab_burn_fraction.
+   */
+  non_member_collab_burn_fraction?: string;
+  /**
+   * Slash rep-penalty parameters — see Params for rationale.
+   */
+  endorser_rep_penalty?: string;
+  collab_inviter_rep_penalty?: string;
+  author_rep_penalty?: string;
 }
 export interface CollectOperationalParamsAminoMsg {
   type: "/sparkdream.collect.v1.CollectOperationalParams";
@@ -1149,7 +1261,9 @@ function createBaseCollection(): Collection {
     seekingEndorsement: false,
     immutable: false,
     convictionSustained: false,
-    initiativeId: BigInt(0)
+    initiativeId: BigInt(0),
+    pinned: false,
+    nonMemberCollaboratorCount: 0
   };
 }
 /**
@@ -1245,6 +1359,12 @@ export const Collection = {
     if (message.initiativeId !== BigInt(0)) {
       writer.uint32(224).uint64(message.initiativeId);
     }
+    if (message.pinned === true) {
+      writer.uint32(232).bool(message.pinned);
+    }
+    if (message.nonMemberCollaboratorCount !== 0) {
+      writer.uint32(240).uint32(message.nonMemberCollaboratorCount);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Collection {
@@ -1338,6 +1458,12 @@ export const Collection = {
         case 28:
           message.initiativeId = reader.uint64();
           break;
+        case 29:
+          message.pinned = reader.bool();
+          break;
+        case 30:
+          message.nonMemberCollaboratorCount = reader.uint32();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1375,6 +1501,8 @@ export const Collection = {
     message.immutable = object.immutable ?? false;
     message.convictionSustained = object.convictionSustained ?? false;
     message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
+    message.pinned = object.pinned ?? false;
+    message.nonMemberCollaboratorCount = object.nonMemberCollaboratorCount ?? 0;
     return message;
   },
   fromAmino(object: CollectionAmino): Collection {
@@ -1461,6 +1589,12 @@ export const Collection = {
     if (object.initiative_id !== undefined && object.initiative_id !== null) {
       message.initiativeId = BigInt(object.initiative_id);
     }
+    if (object.pinned !== undefined && object.pinned !== null) {
+      message.pinned = object.pinned;
+    }
+    if (object.non_member_collaborator_count !== undefined && object.non_member_collaborator_count !== null) {
+      message.nonMemberCollaboratorCount = object.non_member_collaborator_count;
+    }
     return message;
   },
   toAmino(message: Collection): CollectionAmino {
@@ -1497,6 +1631,8 @@ export const Collection = {
     obj.immutable = message.immutable === false ? undefined : message.immutable;
     obj.conviction_sustained = message.convictionSustained === false ? undefined : message.convictionSustained;
     obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
+    obj.pinned = message.pinned === false ? undefined : message.pinned;
+    obj.non_member_collaborator_count = message.nonMemberCollaboratorCount === 0 ? undefined : message.nonMemberCollaboratorCount;
     return obj;
   },
   fromAminoMsg(object: CollectionAminoMsg): Collection {
@@ -2274,7 +2410,9 @@ function createBaseCollaborator(): Collaborator {
     collectionId: BigInt(0),
     address: "",
     role: 0,
-    addedAt: BigInt(0)
+    addedAt: BigInt(0),
+    inviter: "",
+    dreamStake: ""
   };
 }
 /**
@@ -2298,6 +2436,12 @@ export const Collaborator = {
     if (message.addedAt !== BigInt(0)) {
       writer.uint32(32).int64(message.addedAt);
     }
+    if (message.inviter !== "") {
+      writer.uint32(42).string(message.inviter);
+    }
+    if (message.dreamStake !== "") {
+      writer.uint32(50).string(message.dreamStake);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Collaborator {
@@ -2319,6 +2463,12 @@ export const Collaborator = {
         case 4:
           message.addedAt = reader.int64();
           break;
+        case 5:
+          message.inviter = reader.string();
+          break;
+        case 6:
+          message.dreamStake = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2332,6 +2482,8 @@ export const Collaborator = {
     message.address = object.address ?? "";
     message.role = object.role ?? 0;
     message.addedAt = object.addedAt !== undefined && object.addedAt !== null ? BigInt(object.addedAt.toString()) : BigInt(0);
+    message.inviter = object.inviter ?? "";
+    message.dreamStake = object.dreamStake ?? "";
     return message;
   },
   fromAmino(object: CollaboratorAmino): Collaborator {
@@ -2348,6 +2500,12 @@ export const Collaborator = {
     if (object.added_at !== undefined && object.added_at !== null) {
       message.addedAt = BigInt(object.added_at);
     }
+    if (object.inviter !== undefined && object.inviter !== null) {
+      message.inviter = object.inviter;
+    }
+    if (object.dream_stake !== undefined && object.dream_stake !== null) {
+      message.dreamStake = object.dream_stake;
+    }
     return message;
   },
   toAmino(message: Collaborator): CollaboratorAmino {
@@ -2356,6 +2514,8 @@ export const Collaborator = {
     obj.address = message.address === "" ? undefined : message.address;
     obj.role = message.role === 0 ? undefined : message.role;
     obj.added_at = message.addedAt !== BigInt(0) ? message.addedAt?.toString() : undefined;
+    obj.inviter = message.inviter === "" ? undefined : message.inviter;
+    obj.dream_stake = message.dreamStake === "" ? undefined : message.dreamStake;
     return obj;
   },
   fromAminoMsg(object: CollaboratorAminoMsg): Collaborator {
@@ -3118,7 +3278,14 @@ function createBaseCollectOperationalParams(): CollectOperationalParams {
     curatorDemotionCooldown: BigInt(0),
     curatorDemotionThreshold: "",
     curatorOverturnDemotionStreak: BigInt(0),
-    curatorUnbondCooldown: BigInt(0)
+    curatorUnbondCooldown: BigInt(0),
+    makePermanentMinTrustLevel: 0,
+    maxMakePermanentPerDay: 0,
+    nonMemberCollabDreamStake: "",
+    nonMemberCollabBurnFraction: "",
+    endorserRepPenalty: "",
+    collabInviterRepPenalty: "",
+    authorRepPenalty: ""
   };
 }
 /**
@@ -3262,6 +3429,27 @@ export const CollectOperationalParams = {
     if (message.curatorUnbondCooldown !== BigInt(0)) {
       writer.uint32(384).int64(message.curatorUnbondCooldown);
     }
+    if (message.makePermanentMinTrustLevel !== 0) {
+      writer.uint32(392).uint32(message.makePermanentMinTrustLevel);
+    }
+    if (message.maxMakePermanentPerDay !== 0) {
+      writer.uint32(440).uint32(message.maxMakePermanentPerDay);
+    }
+    if (message.nonMemberCollabDreamStake !== "") {
+      writer.uint32(402).string(message.nonMemberCollabDreamStake);
+    }
+    if (message.nonMemberCollabBurnFraction !== "") {
+      writer.uint32(410).string(Decimal.fromUserInput(message.nonMemberCollabBurnFraction, 18).atomics);
+    }
+    if (message.endorserRepPenalty !== "") {
+      writer.uint32(418).string(Decimal.fromUserInput(message.endorserRepPenalty, 18).atomics);
+    }
+    if (message.collabInviterRepPenalty !== "") {
+      writer.uint32(426).string(Decimal.fromUserInput(message.collabInviterRepPenalty, 18).atomics);
+    }
+    if (message.authorRepPenalty !== "") {
+      writer.uint32(434).string(Decimal.fromUserInput(message.authorRepPenalty, 18).atomics);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): CollectOperationalParams {
@@ -3403,6 +3591,27 @@ export const CollectOperationalParams = {
         case 48:
           message.curatorUnbondCooldown = reader.int64();
           break;
+        case 49:
+          message.makePermanentMinTrustLevel = reader.uint32();
+          break;
+        case 55:
+          message.maxMakePermanentPerDay = reader.uint32();
+          break;
+        case 50:
+          message.nonMemberCollabDreamStake = reader.string();
+          break;
+        case 51:
+          message.nonMemberCollabBurnFraction = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 52:
+          message.endorserRepPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 53:
+          message.collabInviterRepPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 54:
+          message.authorRepPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3456,6 +3665,13 @@ export const CollectOperationalParams = {
     message.curatorDemotionThreshold = object.curatorDemotionThreshold ?? "";
     message.curatorOverturnDemotionStreak = object.curatorOverturnDemotionStreak !== undefined && object.curatorOverturnDemotionStreak !== null ? BigInt(object.curatorOverturnDemotionStreak.toString()) : BigInt(0);
     message.curatorUnbondCooldown = object.curatorUnbondCooldown !== undefined && object.curatorUnbondCooldown !== null ? BigInt(object.curatorUnbondCooldown.toString()) : BigInt(0);
+    message.makePermanentMinTrustLevel = object.makePermanentMinTrustLevel ?? 0;
+    message.maxMakePermanentPerDay = object.maxMakePermanentPerDay ?? 0;
+    message.nonMemberCollabDreamStake = object.nonMemberCollabDreamStake ?? "";
+    message.nonMemberCollabBurnFraction = object.nonMemberCollabBurnFraction ?? "";
+    message.endorserRepPenalty = object.endorserRepPenalty ?? "";
+    message.collabInviterRepPenalty = object.collabInviterRepPenalty ?? "";
+    message.authorRepPenalty = object.authorRepPenalty ?? "";
     return message;
   },
   fromAmino(object: CollectOperationalParamsAmino): CollectOperationalParams {
@@ -3592,6 +3808,27 @@ export const CollectOperationalParams = {
     if (object.curator_unbond_cooldown !== undefined && object.curator_unbond_cooldown !== null) {
       message.curatorUnbondCooldown = BigInt(object.curator_unbond_cooldown);
     }
+    if (object.make_permanent_min_trust_level !== undefined && object.make_permanent_min_trust_level !== null) {
+      message.makePermanentMinTrustLevel = object.make_permanent_min_trust_level;
+    }
+    if (object.max_make_permanent_per_day !== undefined && object.max_make_permanent_per_day !== null) {
+      message.maxMakePermanentPerDay = object.max_make_permanent_per_day;
+    }
+    if (object.non_member_collab_dream_stake !== undefined && object.non_member_collab_dream_stake !== null) {
+      message.nonMemberCollabDreamStake = object.non_member_collab_dream_stake;
+    }
+    if (object.non_member_collab_burn_fraction !== undefined && object.non_member_collab_burn_fraction !== null) {
+      message.nonMemberCollabBurnFraction = object.non_member_collab_burn_fraction;
+    }
+    if (object.endorser_rep_penalty !== undefined && object.endorser_rep_penalty !== null) {
+      message.endorserRepPenalty = object.endorser_rep_penalty;
+    }
+    if (object.collab_inviter_rep_penalty !== undefined && object.collab_inviter_rep_penalty !== null) {
+      message.collabInviterRepPenalty = object.collab_inviter_rep_penalty;
+    }
+    if (object.author_rep_penalty !== undefined && object.author_rep_penalty !== null) {
+      message.authorRepPenalty = object.author_rep_penalty;
+    }
     return message;
   },
   toAmino(message: CollectOperationalParams): CollectOperationalParamsAmino {
@@ -3640,6 +3877,13 @@ export const CollectOperationalParams = {
     obj.curator_demotion_threshold = message.curatorDemotionThreshold === "" ? undefined : message.curatorDemotionThreshold;
     obj.curator_overturn_demotion_streak = message.curatorOverturnDemotionStreak !== BigInt(0) ? message.curatorOverturnDemotionStreak?.toString() : undefined;
     obj.curator_unbond_cooldown = message.curatorUnbondCooldown !== BigInt(0) ? message.curatorUnbondCooldown?.toString() : undefined;
+    obj.make_permanent_min_trust_level = message.makePermanentMinTrustLevel === 0 ? undefined : message.makePermanentMinTrustLevel;
+    obj.max_make_permanent_per_day = message.maxMakePermanentPerDay === 0 ? undefined : message.maxMakePermanentPerDay;
+    obj.non_member_collab_dream_stake = message.nonMemberCollabDreamStake === "" ? undefined : message.nonMemberCollabDreamStake;
+    obj.non_member_collab_burn_fraction = message.nonMemberCollabBurnFraction === "" ? undefined : message.nonMemberCollabBurnFraction;
+    obj.endorser_rep_penalty = message.endorserRepPenalty === "" ? undefined : message.endorserRepPenalty;
+    obj.collab_inviter_rep_penalty = message.collabInviterRepPenalty === "" ? undefined : message.collabInviterRepPenalty;
+    obj.author_rep_penalty = message.authorRepPenalty === "" ? undefined : message.authorRepPenalty;
     return obj;
   },
   fromAminoMsg(object: CollectOperationalParamsAminoMsg): CollectOperationalParams {

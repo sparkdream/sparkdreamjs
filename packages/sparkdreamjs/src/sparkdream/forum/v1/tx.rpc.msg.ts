@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgCreatePost, MsgCreatePostResponse, MsgEditPost, MsgEditPostResponse, MsgDeletePost, MsgDeletePostResponse, MsgFreezeThread, MsgFreezeThreadResponse, MsgUnarchiveThread, MsgUnarchiveThreadResponse, MsgPinPost, MsgPinPostResponse, MsgUnpinPost, MsgUnpinPostResponse, MsgLockThread, MsgLockThreadResponse, MsgUnlockThread, MsgUnlockThreadResponse, MsgMoveThread, MsgMoveThreadResponse, MsgFollowThread, MsgFollowThreadResponse, MsgUnfollowThread, MsgUnfollowThreadResponse, MsgUpvotePost, MsgUpvotePostResponse, MsgDownvotePost, MsgDownvotePostResponse, MsgFlagPost, MsgFlagPostResponse, MsgDismissFlags, MsgDismissFlagsResponse, MsgHidePost, MsgHidePostResponse, MsgUnhidePost, MsgUnhidePostResponse, MsgAppealPost, MsgAppealPostResponse, MsgAppealThreadLock, MsgAppealThreadLockResponse, MsgAppealThreadMove, MsgAppealThreadMoveResponse, MsgCreateBounty, MsgCreateBountyResponse, MsgAwardBounty, MsgAwardBountyResponse, MsgIncreaseBounty, MsgIncreaseBountyResponse, MsgCancelBounty, MsgCancelBountyResponse, MsgAssignBountyToReply, MsgAssignBountyToReplyResponse, MsgPinReply, MsgPinReplyResponse, MsgUnpinReply, MsgUnpinReplyResponse, MsgDisputePin, MsgDisputePinResponse, MsgMarkAcceptedReply, MsgMarkAcceptedReplyResponse, MsgConfirmProposedReply, MsgConfirmProposedReplyResponse, MsgRejectProposedReply, MsgRejectProposedReplyResponse, MsgSetForumPaused, MsgSetForumPausedResponse, MsgSetModerationPaused, MsgSetModerationPausedResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgCreatePost, MsgCreatePostResponse, MsgEditPost, MsgEditPostResponse, MsgDeletePost, MsgDeletePostResponse, MsgFreezeThread, MsgFreezeThreadResponse, MsgUnarchiveThread, MsgUnarchiveThreadResponse, MsgPinPost, MsgPinPostResponse, MsgUnpinPost, MsgUnpinPostResponse, MsgMakePostPermanent, MsgMakePostPermanentResponse, MsgLockThread, MsgLockThreadResponse, MsgUnlockThread, MsgUnlockThreadResponse, MsgMoveThread, MsgMoveThreadResponse, MsgFollowThread, MsgFollowThreadResponse, MsgUnfollowThread, MsgUnfollowThreadResponse, MsgUpvotePost, MsgUpvotePostResponse, MsgDownvotePost, MsgDownvotePostResponse, MsgStakePostConviction, MsgStakePostConvictionResponse, MsgReleasePostConviction, MsgReleasePostConvictionResponse, MsgFlagPost, MsgFlagPostResponse, MsgDismissFlags, MsgDismissFlagsResponse, MsgHidePost, MsgHidePostResponse, MsgUnhidePost, MsgUnhidePostResponse, MsgAppealPost, MsgAppealPostResponse, MsgAppealThreadLock, MsgAppealThreadLockResponse, MsgAppealThreadMove, MsgAppealThreadMoveResponse, MsgCreateBounty, MsgCreateBountyResponse, MsgAwardBounty, MsgAwardBountyResponse, MsgIncreaseBounty, MsgIncreaseBountyResponse, MsgCancelBounty, MsgCancelBountyResponse, MsgAssignBountyToReply, MsgAssignBountyToReplyResponse, MsgPinReply, MsgPinReplyResponse, MsgUnpinReply, MsgUnpinReplyResponse, MsgDisputePin, MsgDisputePinResponse, MsgMarkAcceptedReply, MsgMarkAcceptedReplyResponse, MsgConfirmProposedReply, MsgConfirmProposedReplyResponse, MsgRejectProposedReply, MsgRejectProposedReplyResponse, MsgSetForumPaused, MsgSetForumPausedResponse, MsgSetModerationPaused, MsgSetModerationPausedResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
@@ -28,6 +28,15 @@ export interface Msg {
   pinPost(request: MsgPinPost): Promise<MsgPinPostResponse>;
   /** UnpinPost defines the UnpinPost RPC. */
   unpinPost(request: MsgUnpinPost): Promise<MsgUnpinPostResponse>;
+  /**
+   * MakePostPermanent promotes an ephemeral post (root post or reply) to
+   * permanent by clearing its expiration_time and dropping the matching
+   * ExpirationQueue / EphemeralByAuthor entries. Strict separation from pin:
+   * pin is display-only and now refuses ephemeral targets, MakePermanent is
+   * the lifecycle change. Gated on make_permanent_min_trust_level (default
+   * PROVISIONAL) and consumes one slot from the daily post-rate limit.
+   */
+  makePostPermanent(request: MsgMakePostPermanent): Promise<MsgMakePostPermanentResponse>;
   /** LockThread defines the LockThread RPC. */
   lockThread(request: MsgLockThread): Promise<MsgLockThreadResponse>;
   /** UnlockThread defines the UnlockThread RPC. */
@@ -42,6 +51,20 @@ export interface Msg {
   upvotePost(request: MsgUpvotePost): Promise<MsgUpvotePostResponse>;
   /** DownvotePost defines the DownvotePost RPC. */
   downvotePost(request: MsgDownvotePost): Promise<MsgDownvotePostResponse>;
+  /**
+   * StakePostConviction opens a PostConvictionStake: locks the staker's DREAM
+   * and starts EndBlocker-driven per-tag rep accrual for the post's author.
+   * Caller must be ESTABLISHED+, must not be the post's author, and must
+   * commit at least Params.min_post_conviction_stake DREAM.
+   */
+  stakePostConviction(request: MsgStakePostConviction): Promise<MsgStakePostConvictionResponse>;
+  /**
+   * ReleasePostConviction closes a previously-opened PostConvictionStake
+   * after post_conviction_lock_seconds has elapsed. The non-slashed portion
+   * of the staker's DREAM is unlocked; any rep credited to the author stays
+   * (subject to the slash path on confirmed hide).
+   */
+  releasePostConviction(request: MsgReleasePostConviction): Promise<MsgReleasePostConvictionResponse>;
   /** FlagPost defines the FlagPost RPC. */
   flagPost(request: MsgFlagPost): Promise<MsgFlagPostResponse>;
   /** DismissFlags defines the DismissFlags RPC. */
@@ -151,6 +174,17 @@ export class MsgClientImpl implements Msg {
     const promise = this.rpc.request("sparkdream.forum.v1.Msg", "UnpinPost", data);
     return promise.then(data => MsgUnpinPostResponse.decode(new BinaryReader(data)));
   };
+  /* MakePostPermanent promotes an ephemeral post (root post or reply) to
+   permanent by clearing its expiration_time and dropping the matching
+   ExpirationQueue / EphemeralByAuthor entries. Strict separation from pin:
+   pin is display-only and now refuses ephemeral targets, MakePermanent is
+   the lifecycle change. Gated on make_permanent_min_trust_level (default
+   PROVISIONAL) and consumes one slot from the daily post-rate limit. */
+  makePostPermanent = async (request: MsgMakePostPermanent): Promise<MsgMakePostPermanentResponse> => {
+    const data = MsgMakePostPermanent.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "MakePostPermanent", data);
+    return promise.then(data => MsgMakePostPermanentResponse.decode(new BinaryReader(data)));
+  };
   /* LockThread defines the LockThread RPC. */
   lockThread = async (request: MsgLockThread): Promise<MsgLockThreadResponse> => {
     const data = MsgLockThread.encode(request).finish();
@@ -192,6 +226,24 @@ export class MsgClientImpl implements Msg {
     const data = MsgDownvotePost.encode(request).finish();
     const promise = this.rpc.request("sparkdream.forum.v1.Msg", "DownvotePost", data);
     return promise.then(data => MsgDownvotePostResponse.decode(new BinaryReader(data)));
+  };
+  /* StakePostConviction opens a PostConvictionStake: locks the staker's DREAM
+   and starts EndBlocker-driven per-tag rep accrual for the post's author.
+   Caller must be ESTABLISHED+, must not be the post's author, and must
+   commit at least Params.min_post_conviction_stake DREAM. */
+  stakePostConviction = async (request: MsgStakePostConviction): Promise<MsgStakePostConvictionResponse> => {
+    const data = MsgStakePostConviction.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "StakePostConviction", data);
+    return promise.then(data => MsgStakePostConvictionResponse.decode(new BinaryReader(data)));
+  };
+  /* ReleasePostConviction closes a previously-opened PostConvictionStake
+   after post_conviction_lock_seconds has elapsed. The non-slashed portion
+   of the staker's DREAM is unlocked; any rep credited to the author stays
+   (subject to the slash path on confirmed hide). */
+  releasePostConviction = async (request: MsgReleasePostConviction): Promise<MsgReleasePostConvictionResponse> => {
+    const data = MsgReleasePostConviction.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "ReleasePostConviction", data);
+    return promise.then(data => MsgReleasePostConvictionResponse.decode(new BinaryReader(data)));
   };
   /* FlagPost defines the FlagPost RPC. */
   flagPost = async (request: MsgFlagPost): Promise<MsgFlagPostResponse> => {

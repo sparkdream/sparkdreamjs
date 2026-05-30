@@ -516,6 +516,58 @@ export interface MsgUnpinPostResponseAminoMsg {
   value: MsgUnpinPostResponseAmino;
 }
 /**
+ * MsgMakePostPermanent promotes an ephemeral post (root post or reply) to
+ * permanent.
+ * @name MsgMakePostPermanent
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgMakePostPermanent
+ */
+export interface MsgMakePostPermanent {
+  creator: string;
+  postId: bigint;
+}
+export interface MsgMakePostPermanentProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.MsgMakePostPermanent";
+  value: Uint8Array;
+}
+/**
+ * MsgMakePostPermanent promotes an ephemeral post (root post or reply) to
+ * permanent.
+ * @name MsgMakePostPermanentAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgMakePostPermanent
+ */
+export interface MsgMakePostPermanentAmino {
+  creator?: string;
+  post_id?: string;
+}
+export interface MsgMakePostPermanentAminoMsg {
+  type: "sparkdream/x/forum/MsgMakePostPermanent";
+  value: MsgMakePostPermanentAmino;
+}
+/**
+ * MsgMakePostPermanentResponse defines the MsgMakePostPermanent response.
+ * @name MsgMakePostPermanentResponse
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgMakePostPermanentResponse
+ */
+export interface MsgMakePostPermanentResponse {}
+export interface MsgMakePostPermanentResponseProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.MsgMakePostPermanentResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgMakePostPermanentResponse defines the MsgMakePostPermanent response.
+ * @name MsgMakePostPermanentResponseAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgMakePostPermanentResponse
+ */
+export interface MsgMakePostPermanentResponseAmino {}
+export interface MsgMakePostPermanentResponseAminoMsg {
+  type: "/sparkdream.forum.v1.MsgMakePostPermanentResponse";
+  value: MsgMakePostPermanentResponseAmino;
+}
+/**
  * MsgLockThread defines the MsgLockThread message.
  * @name MsgLockThread
  * @package sparkdream.forum.v1
@@ -870,6 +922,124 @@ export interface MsgDownvotePostResponseAmino {}
 export interface MsgDownvotePostResponseAminoMsg {
   type: "/sparkdream.forum.v1.MsgDownvotePostResponse";
   value: MsgDownvotePostResponseAmino;
+}
+/**
+ * MsgStakePostConviction opens a PostConvictionStake. The signer is the
+ * staker; the post's author cannot stake on their own post.
+ * @name MsgStakePostConviction
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgStakePostConviction
+ */
+export interface MsgStakePostConviction {
+  creator: string;
+  postId: bigint;
+  /**
+   * amount is the DREAM (uDREAM) to lock for this stake. Must be at least
+   * Params.min_post_conviction_stake.
+   */
+  amount: string;
+}
+export interface MsgStakePostConvictionProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.MsgStakePostConviction";
+  value: Uint8Array;
+}
+/**
+ * MsgStakePostConviction opens a PostConvictionStake. The signer is the
+ * staker; the post's author cannot stake on their own post.
+ * @name MsgStakePostConvictionAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgStakePostConviction
+ */
+export interface MsgStakePostConvictionAmino {
+  creator?: string;
+  post_id?: string;
+  /**
+   * amount is the DREAM (uDREAM) to lock for this stake. Must be at least
+   * Params.min_post_conviction_stake.
+   */
+  amount?: string;
+}
+export interface MsgStakePostConvictionAminoMsg {
+  type: "sparkdream/x/forum/MsgStakePostConviction";
+  value: MsgStakePostConvictionAmino;
+}
+/**
+ * MsgStakePostConvictionResponse returns the new stake's id.
+ * @name MsgStakePostConvictionResponse
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgStakePostConvictionResponse
+ */
+export interface MsgStakePostConvictionResponse {
+  stakeId: bigint;
+}
+export interface MsgStakePostConvictionResponseProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.MsgStakePostConvictionResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgStakePostConvictionResponse returns the new stake's id.
+ * @name MsgStakePostConvictionResponseAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgStakePostConvictionResponse
+ */
+export interface MsgStakePostConvictionResponseAmino {
+  stake_id?: string;
+}
+export interface MsgStakePostConvictionResponseAminoMsg {
+  type: "/sparkdream.forum.v1.MsgStakePostConvictionResponse";
+  value: MsgStakePostConvictionResponseAmino;
+}
+/**
+ * MsgReleasePostConviction closes a PostConvictionStake. Only the original
+ * staker may release; release before unlocks_at is rejected.
+ * @name MsgReleasePostConviction
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgReleasePostConviction
+ */
+export interface MsgReleasePostConviction {
+  creator: string;
+  stakeId: bigint;
+}
+export interface MsgReleasePostConvictionProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.MsgReleasePostConviction";
+  value: Uint8Array;
+}
+/**
+ * MsgReleasePostConviction closes a PostConvictionStake. Only the original
+ * staker may release; release before unlocks_at is rejected.
+ * @name MsgReleasePostConvictionAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgReleasePostConviction
+ */
+export interface MsgReleasePostConvictionAmino {
+  creator?: string;
+  stake_id?: string;
+}
+export interface MsgReleasePostConvictionAminoMsg {
+  type: "sparkdream/x/forum/MsgReleasePostConviction";
+  value: MsgReleasePostConvictionAmino;
+}
+/**
+ * MsgReleasePostConvictionResponse defines the MsgReleasePostConviction response.
+ * @name MsgReleasePostConvictionResponse
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgReleasePostConvictionResponse
+ */
+export interface MsgReleasePostConvictionResponse {}
+export interface MsgReleasePostConvictionResponseProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.MsgReleasePostConvictionResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgReleasePostConvictionResponse defines the MsgReleasePostConviction response.
+ * @name MsgReleasePostConvictionResponseAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgReleasePostConvictionResponse
+ */
+export interface MsgReleasePostConvictionResponseAmino {}
+export interface MsgReleasePostConvictionResponseAminoMsg {
+  type: "/sparkdream.forum.v1.MsgReleasePostConvictionResponse";
+  value: MsgReleasePostConvictionResponseAmino;
 }
 /**
  * MsgFlagPost defines the MsgFlagPost message.
@@ -3326,6 +3496,151 @@ export const MsgUnpinPostResponse = {
     };
   }
 };
+function createBaseMsgMakePostPermanent(): MsgMakePostPermanent {
+  return {
+    creator: "",
+    postId: BigInt(0)
+  };
+}
+/**
+ * MsgMakePostPermanent promotes an ephemeral post (root post or reply) to
+ * permanent.
+ * @name MsgMakePostPermanent
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgMakePostPermanent
+ */
+export const MsgMakePostPermanent = {
+  typeUrl: "/sparkdream.forum.v1.MsgMakePostPermanent",
+  aminoType: "sparkdream/x/forum/MsgMakePostPermanent",
+  encode(message: MsgMakePostPermanent, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.postId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.postId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgMakePostPermanent {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgMakePostPermanent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.postId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgMakePostPermanent>): MsgMakePostPermanent {
+    const message = createBaseMsgMakePostPermanent();
+    message.creator = object.creator ?? "";
+    message.postId = object.postId !== undefined && object.postId !== null ? BigInt(object.postId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgMakePostPermanentAmino): MsgMakePostPermanent {
+    const message = createBaseMsgMakePostPermanent();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.post_id !== undefined && object.post_id !== null) {
+      message.postId = BigInt(object.post_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgMakePostPermanent): MsgMakePostPermanentAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.post_id = message.postId !== BigInt(0) ? message.postId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgMakePostPermanentAminoMsg): MsgMakePostPermanent {
+    return MsgMakePostPermanent.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgMakePostPermanent): MsgMakePostPermanentAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgMakePostPermanent",
+      value: MsgMakePostPermanent.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgMakePostPermanentProtoMsg): MsgMakePostPermanent {
+    return MsgMakePostPermanent.decode(message.value);
+  },
+  toProto(message: MsgMakePostPermanent): Uint8Array {
+    return MsgMakePostPermanent.encode(message).finish();
+  },
+  toProtoMsg(message: MsgMakePostPermanent): MsgMakePostPermanentProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.MsgMakePostPermanent",
+      value: MsgMakePostPermanent.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgMakePostPermanentResponse(): MsgMakePostPermanentResponse {
+  return {};
+}
+/**
+ * MsgMakePostPermanentResponse defines the MsgMakePostPermanent response.
+ * @name MsgMakePostPermanentResponse
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgMakePostPermanentResponse
+ */
+export const MsgMakePostPermanentResponse = {
+  typeUrl: "/sparkdream.forum.v1.MsgMakePostPermanentResponse",
+  encode(_: MsgMakePostPermanentResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgMakePostPermanentResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgMakePostPermanentResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgMakePostPermanentResponse>): MsgMakePostPermanentResponse {
+    const message = createBaseMsgMakePostPermanentResponse();
+    return message;
+  },
+  fromAmino(_: MsgMakePostPermanentResponseAmino): MsgMakePostPermanentResponse {
+    const message = createBaseMsgMakePostPermanentResponse();
+    return message;
+  },
+  toAmino(_: MsgMakePostPermanentResponse): MsgMakePostPermanentResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgMakePostPermanentResponseAminoMsg): MsgMakePostPermanentResponse {
+    return MsgMakePostPermanentResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgMakePostPermanentResponseProtoMsg): MsgMakePostPermanentResponse {
+    return MsgMakePostPermanentResponse.decode(message.value);
+  },
+  toProto(message: MsgMakePostPermanentResponse): Uint8Array {
+    return MsgMakePostPermanentResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgMakePostPermanentResponse): MsgMakePostPermanentResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.MsgMakePostPermanentResponse",
+      value: MsgMakePostPermanentResponse.encode(message).finish()
+    };
+  }
+};
 function createBaseMsgLockThread(): MsgLockThread {
   return {
     creator: "",
@@ -4367,6 +4682,321 @@ export const MsgDownvotePostResponse = {
     return {
       typeUrl: "/sparkdream.forum.v1.MsgDownvotePostResponse",
       value: MsgDownvotePostResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgStakePostConviction(): MsgStakePostConviction {
+  return {
+    creator: "",
+    postId: BigInt(0),
+    amount: ""
+  };
+}
+/**
+ * MsgStakePostConviction opens a PostConvictionStake. The signer is the
+ * staker; the post's author cannot stake on their own post.
+ * @name MsgStakePostConviction
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgStakePostConviction
+ */
+export const MsgStakePostConviction = {
+  typeUrl: "/sparkdream.forum.v1.MsgStakePostConviction",
+  aminoType: "sparkdream/x/forum/MsgStakePostConviction",
+  encode(message: MsgStakePostConviction, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.postId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.postId);
+    }
+    if (message.amount !== "") {
+      writer.uint32(26).string(message.amount);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgStakePostConviction {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgStakePostConviction();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.postId = reader.uint64();
+          break;
+        case 3:
+          message.amount = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgStakePostConviction>): MsgStakePostConviction {
+    const message = createBaseMsgStakePostConviction();
+    message.creator = object.creator ?? "";
+    message.postId = object.postId !== undefined && object.postId !== null ? BigInt(object.postId.toString()) : BigInt(0);
+    message.amount = object.amount ?? "";
+    return message;
+  },
+  fromAmino(object: MsgStakePostConvictionAmino): MsgStakePostConviction {
+    const message = createBaseMsgStakePostConviction();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.post_id !== undefined && object.post_id !== null) {
+      message.postId = BigInt(object.post_id);
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = object.amount;
+    }
+    return message;
+  },
+  toAmino(message: MsgStakePostConviction): MsgStakePostConvictionAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.post_id = message.postId !== BigInt(0) ? message.postId?.toString() : undefined;
+    obj.amount = message.amount === "" ? undefined : message.amount;
+    return obj;
+  },
+  fromAminoMsg(object: MsgStakePostConvictionAminoMsg): MsgStakePostConviction {
+    return MsgStakePostConviction.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgStakePostConviction): MsgStakePostConvictionAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgStakePostConviction",
+      value: MsgStakePostConviction.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgStakePostConvictionProtoMsg): MsgStakePostConviction {
+    return MsgStakePostConviction.decode(message.value);
+  },
+  toProto(message: MsgStakePostConviction): Uint8Array {
+    return MsgStakePostConviction.encode(message).finish();
+  },
+  toProtoMsg(message: MsgStakePostConviction): MsgStakePostConvictionProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.MsgStakePostConviction",
+      value: MsgStakePostConviction.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgStakePostConvictionResponse(): MsgStakePostConvictionResponse {
+  return {
+    stakeId: BigInt(0)
+  };
+}
+/**
+ * MsgStakePostConvictionResponse returns the new stake's id.
+ * @name MsgStakePostConvictionResponse
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgStakePostConvictionResponse
+ */
+export const MsgStakePostConvictionResponse = {
+  typeUrl: "/sparkdream.forum.v1.MsgStakePostConvictionResponse",
+  encode(message: MsgStakePostConvictionResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.stakeId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.stakeId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgStakePostConvictionResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgStakePostConvictionResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.stakeId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgStakePostConvictionResponse>): MsgStakePostConvictionResponse {
+    const message = createBaseMsgStakePostConvictionResponse();
+    message.stakeId = object.stakeId !== undefined && object.stakeId !== null ? BigInt(object.stakeId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgStakePostConvictionResponseAmino): MsgStakePostConvictionResponse {
+    const message = createBaseMsgStakePostConvictionResponse();
+    if (object.stake_id !== undefined && object.stake_id !== null) {
+      message.stakeId = BigInt(object.stake_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgStakePostConvictionResponse): MsgStakePostConvictionResponseAmino {
+    const obj: any = {};
+    obj.stake_id = message.stakeId !== BigInt(0) ? message.stakeId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgStakePostConvictionResponseAminoMsg): MsgStakePostConvictionResponse {
+    return MsgStakePostConvictionResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgStakePostConvictionResponseProtoMsg): MsgStakePostConvictionResponse {
+    return MsgStakePostConvictionResponse.decode(message.value);
+  },
+  toProto(message: MsgStakePostConvictionResponse): Uint8Array {
+    return MsgStakePostConvictionResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgStakePostConvictionResponse): MsgStakePostConvictionResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.MsgStakePostConvictionResponse",
+      value: MsgStakePostConvictionResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgReleasePostConviction(): MsgReleasePostConviction {
+  return {
+    creator: "",
+    stakeId: BigInt(0)
+  };
+}
+/**
+ * MsgReleasePostConviction closes a PostConvictionStake. Only the original
+ * staker may release; release before unlocks_at is rejected.
+ * @name MsgReleasePostConviction
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgReleasePostConviction
+ */
+export const MsgReleasePostConviction = {
+  typeUrl: "/sparkdream.forum.v1.MsgReleasePostConviction",
+  aminoType: "sparkdream/x/forum/MsgReleasePostConviction",
+  encode(message: MsgReleasePostConviction, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.stakeId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.stakeId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgReleasePostConviction {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgReleasePostConviction();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.stakeId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgReleasePostConviction>): MsgReleasePostConviction {
+    const message = createBaseMsgReleasePostConviction();
+    message.creator = object.creator ?? "";
+    message.stakeId = object.stakeId !== undefined && object.stakeId !== null ? BigInt(object.stakeId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgReleasePostConvictionAmino): MsgReleasePostConviction {
+    const message = createBaseMsgReleasePostConviction();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.stake_id !== undefined && object.stake_id !== null) {
+      message.stakeId = BigInt(object.stake_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgReleasePostConviction): MsgReleasePostConvictionAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.stake_id = message.stakeId !== BigInt(0) ? message.stakeId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgReleasePostConvictionAminoMsg): MsgReleasePostConviction {
+    return MsgReleasePostConviction.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgReleasePostConviction): MsgReleasePostConvictionAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgReleasePostConviction",
+      value: MsgReleasePostConviction.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgReleasePostConvictionProtoMsg): MsgReleasePostConviction {
+    return MsgReleasePostConviction.decode(message.value);
+  },
+  toProto(message: MsgReleasePostConviction): Uint8Array {
+    return MsgReleasePostConviction.encode(message).finish();
+  },
+  toProtoMsg(message: MsgReleasePostConviction): MsgReleasePostConvictionProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.MsgReleasePostConviction",
+      value: MsgReleasePostConviction.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgReleasePostConvictionResponse(): MsgReleasePostConvictionResponse {
+  return {};
+}
+/**
+ * MsgReleasePostConvictionResponse defines the MsgReleasePostConviction response.
+ * @name MsgReleasePostConvictionResponse
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgReleasePostConvictionResponse
+ */
+export const MsgReleasePostConvictionResponse = {
+  typeUrl: "/sparkdream.forum.v1.MsgReleasePostConvictionResponse",
+  encode(_: MsgReleasePostConvictionResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgReleasePostConvictionResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgReleasePostConvictionResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgReleasePostConvictionResponse>): MsgReleasePostConvictionResponse {
+    const message = createBaseMsgReleasePostConvictionResponse();
+    return message;
+  },
+  fromAmino(_: MsgReleasePostConvictionResponseAmino): MsgReleasePostConvictionResponse {
+    const message = createBaseMsgReleasePostConvictionResponse();
+    return message;
+  },
+  toAmino(_: MsgReleasePostConvictionResponse): MsgReleasePostConvictionResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgReleasePostConvictionResponseAminoMsg): MsgReleasePostConvictionResponse {
+    return MsgReleasePostConvictionResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgReleasePostConvictionResponseProtoMsg): MsgReleasePostConvictionResponse {
+    return MsgReleasePostConvictionResponse.decode(message.value);
+  },
+  toProto(message: MsgReleasePostConvictionResponse): Uint8Array {
+    return MsgReleasePostConvictionResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgReleasePostConvictionResponse): MsgReleasePostConvictionResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.MsgReleasePostConvictionResponse",
+      value: MsgReleasePostConvictionResponse.encode(message).finish()
     };
   }
 };

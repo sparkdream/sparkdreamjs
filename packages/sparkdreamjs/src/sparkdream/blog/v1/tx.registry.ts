@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { TelescopeGeneratedType } from "../../../types";
 import { Registry } from "@cosmjs/proto-signing";
-import { MsgUpdateParams, MsgUpdateOperationalParams, MsgCreatePost, MsgUpdatePost, MsgDeletePost, MsgHidePost, MsgUnhidePost, MsgCreateReply, MsgUpdateReply, MsgDeleteReply, MsgHideReply, MsgUnhideReply, MsgReact, MsgRemoveReaction, MsgPinPost, MsgPinReply } from "./tx";
-export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.blog.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.blog.v1.MsgUpdateOperationalParams", MsgUpdateOperationalParams], ["/sparkdream.blog.v1.MsgCreatePost", MsgCreatePost], ["/sparkdream.blog.v1.MsgUpdatePost", MsgUpdatePost], ["/sparkdream.blog.v1.MsgDeletePost", MsgDeletePost], ["/sparkdream.blog.v1.MsgHidePost", MsgHidePost], ["/sparkdream.blog.v1.MsgUnhidePost", MsgUnhidePost], ["/sparkdream.blog.v1.MsgCreateReply", MsgCreateReply], ["/sparkdream.blog.v1.MsgUpdateReply", MsgUpdateReply], ["/sparkdream.blog.v1.MsgDeleteReply", MsgDeleteReply], ["/sparkdream.blog.v1.MsgHideReply", MsgHideReply], ["/sparkdream.blog.v1.MsgUnhideReply", MsgUnhideReply], ["/sparkdream.blog.v1.MsgReact", MsgReact], ["/sparkdream.blog.v1.MsgRemoveReaction", MsgRemoveReaction], ["/sparkdream.blog.v1.MsgPinPost", MsgPinPost], ["/sparkdream.blog.v1.MsgPinReply", MsgPinReply]];
+import { MsgUpdateParams, MsgUpdateOperationalParams, MsgCreatePost, MsgUpdatePost, MsgDeletePost, MsgHidePost, MsgUnhidePost, MsgCreateReply, MsgUpdateReply, MsgDeleteReply, MsgHideReply, MsgUnhideReply, MsgReact, MsgRemoveReaction, MsgMakePostPermanent, MsgMakeReplyPermanent, MsgPinPost, MsgUnpinPost, MsgPinReply, MsgUnpinReply } from "./tx";
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.blog.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.blog.v1.MsgUpdateOperationalParams", MsgUpdateOperationalParams], ["/sparkdream.blog.v1.MsgCreatePost", MsgCreatePost], ["/sparkdream.blog.v1.MsgUpdatePost", MsgUpdatePost], ["/sparkdream.blog.v1.MsgDeletePost", MsgDeletePost], ["/sparkdream.blog.v1.MsgHidePost", MsgHidePost], ["/sparkdream.blog.v1.MsgUnhidePost", MsgUnhidePost], ["/sparkdream.blog.v1.MsgCreateReply", MsgCreateReply], ["/sparkdream.blog.v1.MsgUpdateReply", MsgUpdateReply], ["/sparkdream.blog.v1.MsgDeleteReply", MsgDeleteReply], ["/sparkdream.blog.v1.MsgHideReply", MsgHideReply], ["/sparkdream.blog.v1.MsgUnhideReply", MsgUnhideReply], ["/sparkdream.blog.v1.MsgReact", MsgReact], ["/sparkdream.blog.v1.MsgRemoveReaction", MsgRemoveReaction], ["/sparkdream.blog.v1.MsgMakePostPermanent", MsgMakePostPermanent], ["/sparkdream.blog.v1.MsgMakeReplyPermanent", MsgMakeReplyPermanent], ["/sparkdream.blog.v1.MsgPinPost", MsgPinPost], ["/sparkdream.blog.v1.MsgUnpinPost", MsgUnpinPost], ["/sparkdream.blog.v1.MsgPinReply", MsgPinReply], ["/sparkdream.blog.v1.MsgUnpinReply", MsgUnpinReply]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -94,16 +94,40 @@ export const MessageComposer = {
         value: MsgRemoveReaction.encode(value).finish()
       };
     },
+    makePostPermanent(value: MsgMakePostPermanent) {
+      return {
+        typeUrl: "/sparkdream.blog.v1.MsgMakePostPermanent",
+        value: MsgMakePostPermanent.encode(value).finish()
+      };
+    },
+    makeReplyPermanent(value: MsgMakeReplyPermanent) {
+      return {
+        typeUrl: "/sparkdream.blog.v1.MsgMakeReplyPermanent",
+        value: MsgMakeReplyPermanent.encode(value).finish()
+      };
+    },
     pinPost(value: MsgPinPost) {
       return {
         typeUrl: "/sparkdream.blog.v1.MsgPinPost",
         value: MsgPinPost.encode(value).finish()
       };
     },
+    unpinPost(value: MsgUnpinPost) {
+      return {
+        typeUrl: "/sparkdream.blog.v1.MsgUnpinPost",
+        value: MsgUnpinPost.encode(value).finish()
+      };
+    },
     pinReply(value: MsgPinReply) {
       return {
         typeUrl: "/sparkdream.blog.v1.MsgPinReply",
         value: MsgPinReply.encode(value).finish()
+      };
+    },
+    unpinReply(value: MsgUnpinReply) {
+      return {
+        typeUrl: "/sparkdream.blog.v1.MsgUnpinReply",
+        value: MsgUnpinReply.encode(value).finish()
       };
     }
   },
@@ -192,15 +216,39 @@ export const MessageComposer = {
         value
       };
     },
+    makePostPermanent(value: MsgMakePostPermanent) {
+      return {
+        typeUrl: "/sparkdream.blog.v1.MsgMakePostPermanent",
+        value
+      };
+    },
+    makeReplyPermanent(value: MsgMakeReplyPermanent) {
+      return {
+        typeUrl: "/sparkdream.blog.v1.MsgMakeReplyPermanent",
+        value
+      };
+    },
     pinPost(value: MsgPinPost) {
       return {
         typeUrl: "/sparkdream.blog.v1.MsgPinPost",
         value
       };
     },
+    unpinPost(value: MsgUnpinPost) {
+      return {
+        typeUrl: "/sparkdream.blog.v1.MsgUnpinPost",
+        value
+      };
+    },
     pinReply(value: MsgPinReply) {
       return {
         typeUrl: "/sparkdream.blog.v1.MsgPinReply",
+        value
+      };
+    },
+    unpinReply(value: MsgUnpinReply) {
+      return {
+        typeUrl: "/sparkdream.blog.v1.MsgUnpinReply",
         value
       };
     }
@@ -290,16 +338,40 @@ export const MessageComposer = {
         value: MsgRemoveReaction.fromPartial(value)
       };
     },
+    makePostPermanent(value: MsgMakePostPermanent) {
+      return {
+        typeUrl: "/sparkdream.blog.v1.MsgMakePostPermanent",
+        value: MsgMakePostPermanent.fromPartial(value)
+      };
+    },
+    makeReplyPermanent(value: MsgMakeReplyPermanent) {
+      return {
+        typeUrl: "/sparkdream.blog.v1.MsgMakeReplyPermanent",
+        value: MsgMakeReplyPermanent.fromPartial(value)
+      };
+    },
     pinPost(value: MsgPinPost) {
       return {
         typeUrl: "/sparkdream.blog.v1.MsgPinPost",
         value: MsgPinPost.fromPartial(value)
       };
     },
+    unpinPost(value: MsgUnpinPost) {
+      return {
+        typeUrl: "/sparkdream.blog.v1.MsgUnpinPost",
+        value: MsgUnpinPost.fromPartial(value)
+      };
+    },
     pinReply(value: MsgPinReply) {
       return {
         typeUrl: "/sparkdream.blog.v1.MsgPinReply",
         value: MsgPinReply.fromPartial(value)
+      };
+    },
+    unpinReply(value: MsgUnpinReply) {
+      return {
+        typeUrl: "/sparkdream.blog.v1.MsgUnpinReply",
+        value: MsgUnpinReply.fromPartial(value)
       };
     }
   }

@@ -1,6 +1,7 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
+import { Decimal } from "@interchainjs/math";
 /** PostStatus represents the status of a post. */
 export enum PostStatus {
   POST_STATUS_UNSPECIFIED = 0,
@@ -351,6 +352,186 @@ export interface PinnedReplyRecordAminoMsg {
   type: "/sparkdream.forum.v1.PinnedReplyRecord";
   value: PinnedReplyRecordAmino;
 }
+/**
+ * ForumRepEpochCounter tracks how much forum reputation a single author has
+ * earned in a single tag during the current UTC-day epoch. Reset implicitly
+ * by comparing epoch_id to floor(block_time / 86400) on read — when the
+ * stored epoch_id is stale, the accumulated counter is treated as zero and
+ * overwritten on the next credit. Used by the post-conviction accrual loop
+ * to enforce Params.max_forum_rep_per_tag_per_epoch.
+ * @name ForumRepEpochCounter
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.ForumRepEpochCounter
+ */
+export interface ForumRepEpochCounter {
+  /**
+   * epoch_id is the UTC-day index: floor(block_time / 86400).
+   */
+  epochId: bigint;
+  /**
+   * accumulated is the dec-string of rep credited so far this epoch.
+   */
+  accumulated: string;
+}
+export interface ForumRepEpochCounterProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.ForumRepEpochCounter";
+  value: Uint8Array;
+}
+/**
+ * ForumRepEpochCounter tracks how much forum reputation a single author has
+ * earned in a single tag during the current UTC-day epoch. Reset implicitly
+ * by comparing epoch_id to floor(block_time / 86400) on read — when the
+ * stored epoch_id is stale, the accumulated counter is treated as zero and
+ * overwritten on the next credit. Used by the post-conviction accrual loop
+ * to enforce Params.max_forum_rep_per_tag_per_epoch.
+ * @name ForumRepEpochCounterAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.ForumRepEpochCounter
+ */
+export interface ForumRepEpochCounterAmino {
+  /**
+   * epoch_id is the UTC-day index: floor(block_time / 86400).
+   */
+  epoch_id?: string;
+  /**
+   * accumulated is the dec-string of rep credited so far this epoch.
+   */
+  accumulated?: string;
+}
+export interface ForumRepEpochCounterAminoMsg {
+  type: "/sparkdream.forum.v1.ForumRepEpochCounter";
+  value: ForumRepEpochCounterAmino;
+}
+/**
+ * @name PostConvictionStake_AccruedRepPerTagEntry
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.undefined
+ */
+export interface PostConvictionStake_AccruedRepPerTagEntry {
+  key: string;
+  value: string;
+}
+export interface PostConvictionStake_AccruedRepPerTagEntryProtoMsg {
+  typeUrl: string;
+  value: Uint8Array;
+}
+/**
+ * @name PostConvictionStake_AccruedRepPerTagEntryAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.PostConvictionStake_AccruedRepPerTagEntry
+ */
+export interface PostConvictionStake_AccruedRepPerTagEntryAmino {
+  key?: string;
+  value?: string;
+}
+export interface PostConvictionStake_AccruedRepPerTagEntryAminoMsg {
+  type: string;
+  value: PostConvictionStake_AccruedRepPerTagEntryAmino;
+}
+/**
+ * PostConvictionStake records an ESTABLISHED+ member's DREAM lock backing a
+ * post's author. While the stake is active, the EndBlocker streams per-tag
+ * reputation to the author proportional to the stake's share of total active
+ * stakes on the post (split evenly across the post's tags). On confirmed
+ * sentinel hide (ExpireHiddenPosts), the accrued rep is clawed back from the
+ * author per tag and a fraction of the staker's locked DREAM is slashed
+ * (staker_slash_bps) — both staker and author endorsed harm.
+ * 
+ * Stakers cannot stake on their own posts. Stakes are released after
+ * unlocks_at via MsgReleasePostConviction; LockDREAM/UnlockDREAM bypass the
+ * 3% transfer tax because it is internal member-balance rebalancing, not a
+ * transfer.
+ * @name PostConvictionStake
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.PostConvictionStake
+ */
+export interface PostConvictionStake {
+  id: bigint;
+  staker: string;
+  postId: bigint;
+  amount: string;
+  stakedAt: bigint;
+  unlocksAt: bigint;
+  /**
+   * accrued_rep_per_tag tracks how much rep this stake has minted to the
+   * author per tag, so a confirmed hide can claw back exactly the amount this
+   * stake produced (and no more). Map key is tag name, value is a decimal
+   * string (math.LegacyDec). Populated by the EndBlocker accrual loop.
+   */
+  accruedRepPerTag: {
+    [key: string]: string;
+  };
+  /**
+   * last_accrual_at is the last EndBlocker tick at which this stake credited
+   * rep to the author. Initialized to staked_at on creation; streaming is
+   * bounded by the per-(author,tag) epoch cap so multiple stakes can saturate
+   * a single tag without one stake monopolizing the budget.
+   */
+  lastAccrualAt: bigint;
+  /**
+   * released is set true once the staker has called MsgReleasePostConviction
+   * after unlocks_at. Released stakes are kept in state until the post's
+   * hide-appeal window has fully elapsed so any retroactive slash can still
+   * find them; after that they are GC'd by a pass in EndBlocker.
+   */
+  released: boolean;
+}
+export interface PostConvictionStakeProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.PostConvictionStake";
+  value: Uint8Array;
+}
+/**
+ * PostConvictionStake records an ESTABLISHED+ member's DREAM lock backing a
+ * post's author. While the stake is active, the EndBlocker streams per-tag
+ * reputation to the author proportional to the stake's share of total active
+ * stakes on the post (split evenly across the post's tags). On confirmed
+ * sentinel hide (ExpireHiddenPosts), the accrued rep is clawed back from the
+ * author per tag and a fraction of the staker's locked DREAM is slashed
+ * (staker_slash_bps) — both staker and author endorsed harm.
+ * 
+ * Stakers cannot stake on their own posts. Stakes are released after
+ * unlocks_at via MsgReleasePostConviction; LockDREAM/UnlockDREAM bypass the
+ * 3% transfer tax because it is internal member-balance rebalancing, not a
+ * transfer.
+ * @name PostConvictionStakeAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.PostConvictionStake
+ */
+export interface PostConvictionStakeAmino {
+  id?: string;
+  staker?: string;
+  post_id?: string;
+  amount?: string;
+  staked_at?: string;
+  unlocks_at?: string;
+  /**
+   * accrued_rep_per_tag tracks how much rep this stake has minted to the
+   * author per tag, so a confirmed hide can claw back exactly the amount this
+   * stake produced (and no more). Map key is tag name, value is a decimal
+   * string (math.LegacyDec). Populated by the EndBlocker accrual loop.
+   */
+  accrued_rep_per_tag?: {
+    [key: string]: string;
+  };
+  /**
+   * last_accrual_at is the last EndBlocker tick at which this stake credited
+   * rep to the author. Initialized to staked_at on creation; streaming is
+   * bounded by the per-(author,tag) epoch cap so multiple stakes can saturate
+   * a single tag without one stake monopolizing the budget.
+   */
+  last_accrual_at?: string;
+  /**
+   * released is set true once the staker has called MsgReleasePostConviction
+   * after unlocks_at. Released stakes are kept in state until the post's
+   * hide-appeal window has fully elapsed so any retroactive slash can still
+   * find them; after that they are GC'd by a pass in EndBlocker.
+   */
+  released?: boolean;
+}
+export interface PostConvictionStakeAminoMsg {
+  type: "/sparkdream.forum.v1.PostConvictionStake";
+  value: PostConvictionStakeAmino;
+}
 function createBaseBountyAward(): BountyAward {
   return {
     postId: BigInt(0),
@@ -606,6 +787,364 @@ export const PinnedReplyRecord = {
     return {
       typeUrl: "/sparkdream.forum.v1.PinnedReplyRecord",
       value: PinnedReplyRecord.encode(message).finish()
+    };
+  }
+};
+function createBaseForumRepEpochCounter(): ForumRepEpochCounter {
+  return {
+    epochId: BigInt(0),
+    accumulated: ""
+  };
+}
+/**
+ * ForumRepEpochCounter tracks how much forum reputation a single author has
+ * earned in a single tag during the current UTC-day epoch. Reset implicitly
+ * by comparing epoch_id to floor(block_time / 86400) on read — when the
+ * stored epoch_id is stale, the accumulated counter is treated as zero and
+ * overwritten on the next credit. Used by the post-conviction accrual loop
+ * to enforce Params.max_forum_rep_per_tag_per_epoch.
+ * @name ForumRepEpochCounter
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.ForumRepEpochCounter
+ */
+export const ForumRepEpochCounter = {
+  typeUrl: "/sparkdream.forum.v1.ForumRepEpochCounter",
+  encode(message: ForumRepEpochCounter, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.epochId !== BigInt(0)) {
+      writer.uint32(8).int64(message.epochId);
+    }
+    if (message.accumulated !== "") {
+      writer.uint32(18).string(Decimal.fromUserInput(message.accumulated, 18).atomics);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): ForumRepEpochCounter {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseForumRepEpochCounter();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.epochId = reader.int64();
+          break;
+        case 2:
+          message.accumulated = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<ForumRepEpochCounter>): ForumRepEpochCounter {
+    const message = createBaseForumRepEpochCounter();
+    message.epochId = object.epochId !== undefined && object.epochId !== null ? BigInt(object.epochId.toString()) : BigInt(0);
+    message.accumulated = object.accumulated ?? "";
+    return message;
+  },
+  fromAmino(object: ForumRepEpochCounterAmino): ForumRepEpochCounter {
+    const message = createBaseForumRepEpochCounter();
+    if (object.epoch_id !== undefined && object.epoch_id !== null) {
+      message.epochId = BigInt(object.epoch_id);
+    }
+    if (object.accumulated !== undefined && object.accumulated !== null) {
+      message.accumulated = object.accumulated;
+    }
+    return message;
+  },
+  toAmino(message: ForumRepEpochCounter): ForumRepEpochCounterAmino {
+    const obj: any = {};
+    obj.epoch_id = message.epochId !== BigInt(0) ? message.epochId?.toString() : undefined;
+    obj.accumulated = message.accumulated === "" ? undefined : message.accumulated;
+    return obj;
+  },
+  fromAminoMsg(object: ForumRepEpochCounterAminoMsg): ForumRepEpochCounter {
+    return ForumRepEpochCounter.fromAmino(object.value);
+  },
+  fromProtoMsg(message: ForumRepEpochCounterProtoMsg): ForumRepEpochCounter {
+    return ForumRepEpochCounter.decode(message.value);
+  },
+  toProto(message: ForumRepEpochCounter): Uint8Array {
+    return ForumRepEpochCounter.encode(message).finish();
+  },
+  toProtoMsg(message: ForumRepEpochCounter): ForumRepEpochCounterProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.ForumRepEpochCounter",
+      value: ForumRepEpochCounter.encode(message).finish()
+    };
+  }
+};
+function createBasePostConvictionStake_AccruedRepPerTagEntry(): PostConvictionStake_AccruedRepPerTagEntry {
+  return {
+    key: "",
+    value: ""
+  };
+}
+/**
+ * @name PostConvictionStake_AccruedRepPerTagEntry
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.undefined
+ */
+export const PostConvictionStake_AccruedRepPerTagEntry = {
+  encode(message: PostConvictionStake_AccruedRepPerTagEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.value !== "") {
+      writer.uint32(18).string(message.value);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): PostConvictionStake_AccruedRepPerTagEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePostConvictionStake_AccruedRepPerTagEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.key = reader.string();
+          break;
+        case 2:
+          message.value = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<PostConvictionStake_AccruedRepPerTagEntry>): PostConvictionStake_AccruedRepPerTagEntry {
+    const message = createBasePostConvictionStake_AccruedRepPerTagEntry();
+    message.key = object.key ?? "";
+    message.value = object.value ?? "";
+    return message;
+  },
+  fromAmino(object: PostConvictionStake_AccruedRepPerTagEntryAmino): PostConvictionStake_AccruedRepPerTagEntry {
+    const message = createBasePostConvictionStake_AccruedRepPerTagEntry();
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    }
+    if (object.value !== undefined && object.value !== null) {
+      message.value = object.value;
+    }
+    return message;
+  },
+  toAmino(message: PostConvictionStake_AccruedRepPerTagEntry): PostConvictionStake_AccruedRepPerTagEntryAmino {
+    const obj: any = {};
+    obj.key = message.key === "" ? undefined : message.key;
+    obj.value = message.value === "" ? undefined : message.value;
+    return obj;
+  },
+  fromAminoMsg(object: PostConvictionStake_AccruedRepPerTagEntryAminoMsg): PostConvictionStake_AccruedRepPerTagEntry {
+    return PostConvictionStake_AccruedRepPerTagEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: PostConvictionStake_AccruedRepPerTagEntryProtoMsg): PostConvictionStake_AccruedRepPerTagEntry {
+    return PostConvictionStake_AccruedRepPerTagEntry.decode(message.value);
+  },
+  toProto(message: PostConvictionStake_AccruedRepPerTagEntry): Uint8Array {
+    return PostConvictionStake_AccruedRepPerTagEntry.encode(message).finish();
+  }
+};
+function createBasePostConvictionStake(): PostConvictionStake {
+  return {
+    id: BigInt(0),
+    staker: "",
+    postId: BigInt(0),
+    amount: "",
+    stakedAt: BigInt(0),
+    unlocksAt: BigInt(0),
+    accruedRepPerTag: {},
+    lastAccrualAt: BigInt(0),
+    released: false
+  };
+}
+/**
+ * PostConvictionStake records an ESTABLISHED+ member's DREAM lock backing a
+ * post's author. While the stake is active, the EndBlocker streams per-tag
+ * reputation to the author proportional to the stake's share of total active
+ * stakes on the post (split evenly across the post's tags). On confirmed
+ * sentinel hide (ExpireHiddenPosts), the accrued rep is clawed back from the
+ * author per tag and a fraction of the staker's locked DREAM is slashed
+ * (staker_slash_bps) — both staker and author endorsed harm.
+ * 
+ * Stakers cannot stake on their own posts. Stakes are released after
+ * unlocks_at via MsgReleasePostConviction; LockDREAM/UnlockDREAM bypass the
+ * 3% transfer tax because it is internal member-balance rebalancing, not a
+ * transfer.
+ * @name PostConvictionStake
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.PostConvictionStake
+ */
+export const PostConvictionStake = {
+  typeUrl: "/sparkdream.forum.v1.PostConvictionStake",
+  encode(message: PostConvictionStake, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.id !== BigInt(0)) {
+      writer.uint32(8).uint64(message.id);
+    }
+    if (message.staker !== "") {
+      writer.uint32(18).string(message.staker);
+    }
+    if (message.postId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.postId);
+    }
+    if (message.amount !== "") {
+      writer.uint32(34).string(message.amount);
+    }
+    if (message.stakedAt !== BigInt(0)) {
+      writer.uint32(40).int64(message.stakedAt);
+    }
+    if (message.unlocksAt !== BigInt(0)) {
+      writer.uint32(48).int64(message.unlocksAt);
+    }
+    Object.entries(message.accruedRepPerTag).forEach(([key, value]) => {
+      PostConvictionStake_AccruedRepPerTagEntry.encode({
+        key: key as any,
+        value
+      }, writer.uint32(58).fork()).ldelim();
+    });
+    if (message.lastAccrualAt !== BigInt(0)) {
+      writer.uint32(64).int64(message.lastAccrualAt);
+    }
+    if (message.released === true) {
+      writer.uint32(72).bool(message.released);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): PostConvictionStake {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePostConvictionStake();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.uint64();
+          break;
+        case 2:
+          message.staker = reader.string();
+          break;
+        case 3:
+          message.postId = reader.uint64();
+          break;
+        case 4:
+          message.amount = reader.string();
+          break;
+        case 5:
+          message.stakedAt = reader.int64();
+          break;
+        case 6:
+          message.unlocksAt = reader.int64();
+          break;
+        case 7:
+          const entry7 = PostConvictionStake_AccruedRepPerTagEntry.decode(reader, reader.uint32());
+          if (entry7.value !== undefined) {
+            message.accruedRepPerTag[entry7.key] = entry7.value;
+          }
+          break;
+        case 8:
+          message.lastAccrualAt = reader.int64();
+          break;
+        case 9:
+          message.released = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<PostConvictionStake>): PostConvictionStake {
+    const message = createBasePostConvictionStake();
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    message.staker = object.staker ?? "";
+    message.postId = object.postId !== undefined && object.postId !== null ? BigInt(object.postId.toString()) : BigInt(0);
+    message.amount = object.amount ?? "";
+    message.stakedAt = object.stakedAt !== undefined && object.stakedAt !== null ? BigInt(object.stakedAt.toString()) : BigInt(0);
+    message.unlocksAt = object.unlocksAt !== undefined && object.unlocksAt !== null ? BigInt(object.unlocksAt.toString()) : BigInt(0);
+    message.accruedRepPerTag = Object.entries(object.accruedRepPerTag ?? {}).reduce<{
+      [key: string]: string;
+    }>((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = String(value);
+      }
+      return acc;
+    }, {});
+    message.lastAccrualAt = object.lastAccrualAt !== undefined && object.lastAccrualAt !== null ? BigInt(object.lastAccrualAt.toString()) : BigInt(0);
+    message.released = object.released ?? false;
+    return message;
+  },
+  fromAmino(object: PostConvictionStakeAmino): PostConvictionStake {
+    const message = createBasePostConvictionStake();
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    if (object.staker !== undefined && object.staker !== null) {
+      message.staker = object.staker;
+    }
+    if (object.post_id !== undefined && object.post_id !== null) {
+      message.postId = BigInt(object.post_id);
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = object.amount;
+    }
+    if (object.staked_at !== undefined && object.staked_at !== null) {
+      message.stakedAt = BigInt(object.staked_at);
+    }
+    if (object.unlocks_at !== undefined && object.unlocks_at !== null) {
+      message.unlocksAt = BigInt(object.unlocks_at);
+    }
+    message.accruedRepPerTag = Object.entries(object.accrued_rep_per_tag ?? {}).reduce<{
+      [key: string]: string;
+    }>((acc, [key, value]) => {
+      if (value !== undefined) {
+        acc[key] = String(value);
+      }
+      return acc;
+    }, {});
+    if (object.last_accrual_at !== undefined && object.last_accrual_at !== null) {
+      message.lastAccrualAt = BigInt(object.last_accrual_at);
+    }
+    if (object.released !== undefined && object.released !== null) {
+      message.released = object.released;
+    }
+    return message;
+  },
+  toAmino(message: PostConvictionStake): PostConvictionStakeAmino {
+    const obj: any = {};
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    obj.staker = message.staker === "" ? undefined : message.staker;
+    obj.post_id = message.postId !== BigInt(0) ? message.postId?.toString() : undefined;
+    obj.amount = message.amount === "" ? undefined : message.amount;
+    obj.staked_at = message.stakedAt !== BigInt(0) ? message.stakedAt?.toString() : undefined;
+    obj.unlocks_at = message.unlocksAt !== BigInt(0) ? message.unlocksAt?.toString() : undefined;
+    obj.accrued_rep_per_tag = {};
+    if (message.accruedRepPerTag) {
+      Object.entries(message.accruedRepPerTag).forEach(([k, v]) => {
+        obj.accrued_rep_per_tag[k] = v;
+      });
+    }
+    obj.last_accrual_at = message.lastAccrualAt !== BigInt(0) ? message.lastAccrualAt?.toString() : undefined;
+    obj.released = message.released === false ? undefined : message.released;
+    return obj;
+  },
+  fromAminoMsg(object: PostConvictionStakeAminoMsg): PostConvictionStake {
+    return PostConvictionStake.fromAmino(object.value);
+  },
+  fromProtoMsg(message: PostConvictionStakeProtoMsg): PostConvictionStake {
+    return PostConvictionStake.decode(message.value);
+  },
+  toProto(message: PostConvictionStake): Uint8Array {
+    return PostConvictionStake.encode(message).finish();
+  },
+  toProtoMsg(message: PostConvictionStake): PostConvictionStakeProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.PostConvictionStake",
+      value: PostConvictionStake.encode(message).finish()
     };
   }
 };

@@ -179,6 +179,75 @@ export interface Params {
    * Zero = immediate withdrawal (legacy behavior).
    */
   sentinelUnbondCooldown: bigint;
+  /**
+   * make_permanent_min_trust_level is the minimum trust level a caller of
+   * MsgMakePostPermanent must hold (0–4). Default PROVISIONAL (1) — lower
+   * than the sentinel-pin gate because preservation is a smaller curator
+   * action than featuring.
+   */
+  makePermanentMinTrustLevel: number;
+  /**
+   * max_promotions_per_block bounds how many ephemeral posts the EndBlocker
+   * membership-promotion drain may flip per block. Bounds block gas; the
+   * remaining queue is processed in subsequent blocks.
+   */
+  maxPromotionsPerBlock: number;
+  /**
+   * author_rep_slash is the per-tag reputation deduction applied to a post's
+   * author when ExpireHiddenPosts finalizes an unappealed sentinel hide.
+   * Deducted from the author's score in each tag the post carried.
+   * DeductReputation floors at zero, so authors with no rep in the tag take
+   * no harm — safe to ship before any forum-side rep-grant flow exists.
+   */
+  authorRepSlash: string;
+  /**
+   * max_make_permanent_per_day caps MsgMakePostPermanent calls per address per
+   * UTC day. Independent of daily_post_limit — promoting an ephemeral to
+   * permanent is a distinct curator action with its own quota.
+   */
+  maxMakePermanentPerDay: bigint;
+  /**
+   * min_post_conviction_stake is the minimum DREAM amount required to open a
+   * PostConvictionStake (math.Int string, e.g. "10000000" = 10 DREAM). Floors
+   * out sybil dust stakes that would otherwise farm the per-tag epoch cap with
+   * many tiny accounts.
+   */
+  minPostConvictionStake: string;
+  /**
+   * post_conviction_lock_seconds is the DREAM-lock duration in seconds. A
+   * staker cannot call MsgReleasePostConviction before staked_at + this many
+   * seconds. Longer lock = more skin-in-the-game per uDREAM committed.
+   */
+  postConvictionLockSeconds: bigint;
+  /**
+   * post_conviction_stream_rate_per_block is the per-DREAM-per-day rep
+   * accrual rate (math.LegacyDec). Despite the historical "per_block"
+   * suffix in the field name, the formula is unit-clean and time-based, not
+   * block-based:
+   *   amount_dream         = stake.amount_uDREAM / 1_000_000
+   *   elapsed_days         = (now - last_accrual_at) / 86400
+   *   rep_credited_total   = amount_dream * rate * elapsed_days
+   *   rep_credited_per_tag = rep_credited_total / len(post.tags)
+   * The author's per-tag credit is then capped by
+   * max_forum_rep_per_tag_per_epoch (one epoch = one UTC day).
+   */
+  postConvictionStreamRatePerBlock: string;
+  /**
+   * max_forum_rep_per_tag_per_epoch caps the per-tag forum rep an author may
+   * earn from conviction stakes in a single epoch (math.LegacyDec). Prevents
+   * a single tag from being flooded by many simultaneous stakes — excess
+   * accrual is silently dropped (no error, no refund) so honest stakers do not
+   * suffer from saturation they could not have foreseen.
+   */
+  maxForumRepPerTagPerEpoch: string;
+  /**
+   * post_conviction_staker_slash_bps is the basis-points slash applied to the
+   * staker's locked DREAM when ExpireHiddenPosts finalizes a hide on the post
+   * (0-10000; 2500 = 25%). The slashed DREAM is burned. The non-slashed
+   * portion is unlocked back to the staker on the next MsgReleasePostConviction
+   * and the stake is closed.
+   */
+  postConvictionStakerSlashBps: bigint;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.forum.v1.Params";
@@ -361,6 +430,75 @@ export interface ParamsAmino {
    * Zero = immediate withdrawal (legacy behavior).
    */
   sentinel_unbond_cooldown?: string;
+  /**
+   * make_permanent_min_trust_level is the minimum trust level a caller of
+   * MsgMakePostPermanent must hold (0–4). Default PROVISIONAL (1) — lower
+   * than the sentinel-pin gate because preservation is a smaller curator
+   * action than featuring.
+   */
+  make_permanent_min_trust_level?: number;
+  /**
+   * max_promotions_per_block bounds how many ephemeral posts the EndBlocker
+   * membership-promotion drain may flip per block. Bounds block gas; the
+   * remaining queue is processed in subsequent blocks.
+   */
+  max_promotions_per_block?: number;
+  /**
+   * author_rep_slash is the per-tag reputation deduction applied to a post's
+   * author when ExpireHiddenPosts finalizes an unappealed sentinel hide.
+   * Deducted from the author's score in each tag the post carried.
+   * DeductReputation floors at zero, so authors with no rep in the tag take
+   * no harm — safe to ship before any forum-side rep-grant flow exists.
+   */
+  author_rep_slash?: string;
+  /**
+   * max_make_permanent_per_day caps MsgMakePostPermanent calls per address per
+   * UTC day. Independent of daily_post_limit — promoting an ephemeral to
+   * permanent is a distinct curator action with its own quota.
+   */
+  max_make_permanent_per_day?: string;
+  /**
+   * min_post_conviction_stake is the minimum DREAM amount required to open a
+   * PostConvictionStake (math.Int string, e.g. "10000000" = 10 DREAM). Floors
+   * out sybil dust stakes that would otherwise farm the per-tag epoch cap with
+   * many tiny accounts.
+   */
+  min_post_conviction_stake?: string;
+  /**
+   * post_conviction_lock_seconds is the DREAM-lock duration in seconds. A
+   * staker cannot call MsgReleasePostConviction before staked_at + this many
+   * seconds. Longer lock = more skin-in-the-game per uDREAM committed.
+   */
+  post_conviction_lock_seconds?: string;
+  /**
+   * post_conviction_stream_rate_per_block is the per-DREAM-per-day rep
+   * accrual rate (math.LegacyDec). Despite the historical "per_block"
+   * suffix in the field name, the formula is unit-clean and time-based, not
+   * block-based:
+   *   amount_dream         = stake.amount_uDREAM / 1_000_000
+   *   elapsed_days         = (now - last_accrual_at) / 86400
+   *   rep_credited_total   = amount_dream * rate * elapsed_days
+   *   rep_credited_per_tag = rep_credited_total / len(post.tags)
+   * The author's per-tag credit is then capped by
+   * max_forum_rep_per_tag_per_epoch (one epoch = one UTC day).
+   */
+  post_conviction_stream_rate_per_block?: string;
+  /**
+   * max_forum_rep_per_tag_per_epoch caps the per-tag forum rep an author may
+   * earn from conviction stakes in a single epoch (math.LegacyDec). Prevents
+   * a single tag from being flooded by many simultaneous stakes — excess
+   * accrual is silently dropped (no error, no refund) so honest stakers do not
+   * suffer from saturation they could not have foreseen.
+   */
+  max_forum_rep_per_tag_per_epoch?: string;
+  /**
+   * post_conviction_staker_slash_bps is the basis-points slash applied to the
+   * staker's locked DREAM when ExpireHiddenPosts finalizes a hide on the post
+   * (0-10000; 2500 = 25%). The slashed DREAM is burned. The non-slashed
+   * portion is unlocked back to the staker on the next MsgReleasePostConviction
+   * and the stake is closed.
+   */
+  post_conviction_staker_slash_bps?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/forum/Params";
@@ -469,6 +607,42 @@ export interface ForumOperationalParams {
    * authority. Zero = immediate withdrawal.
    */
   sentinelUnbondCooldown: bigint;
+  /**
+   * make_permanent_min_trust_level — see Params.make_permanent_min_trust_level.
+   */
+  makePermanentMinTrustLevel: number;
+  /**
+   * max_promotions_per_block — see Params.max_promotions_per_block.
+   */
+  maxPromotionsPerBlock: number;
+  /**
+   * author_rep_slash — see Params.author_rep_slash.
+   */
+  authorRepSlash: string;
+  /**
+   * max_make_permanent_per_day — see Params.max_make_permanent_per_day.
+   */
+  maxMakePermanentPerDay: bigint;
+  /**
+   * min_post_conviction_stake — see Params.min_post_conviction_stake.
+   */
+  minPostConvictionStake: string;
+  /**
+   * post_conviction_lock_seconds — see Params.post_conviction_lock_seconds.
+   */
+  postConvictionLockSeconds: bigint;
+  /**
+   * post_conviction_stream_rate_per_block — see Params.post_conviction_stream_rate_per_block.
+   */
+  postConvictionStreamRatePerBlock: string;
+  /**
+   * max_forum_rep_per_tag_per_epoch — see Params.max_forum_rep_per_tag_per_epoch.
+   */
+  maxForumRepPerTagPerEpoch: string;
+  /**
+   * post_conviction_staker_slash_bps — see Params.post_conviction_staker_slash_bps.
+   */
+  postConvictionStakerSlashBps: bigint;
 }
 export interface ForumOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.forum.v1.ForumOperationalParams";
@@ -577,6 +751,42 @@ export interface ForumOperationalParamsAmino {
    * authority. Zero = immediate withdrawal.
    */
   sentinel_unbond_cooldown?: string;
+  /**
+   * make_permanent_min_trust_level — see Params.make_permanent_min_trust_level.
+   */
+  make_permanent_min_trust_level?: number;
+  /**
+   * max_promotions_per_block — see Params.max_promotions_per_block.
+   */
+  max_promotions_per_block?: number;
+  /**
+   * author_rep_slash — see Params.author_rep_slash.
+   */
+  author_rep_slash?: string;
+  /**
+   * max_make_permanent_per_day — see Params.max_make_permanent_per_day.
+   */
+  max_make_permanent_per_day?: string;
+  /**
+   * min_post_conviction_stake — see Params.min_post_conviction_stake.
+   */
+  min_post_conviction_stake?: string;
+  /**
+   * post_conviction_lock_seconds — see Params.post_conviction_lock_seconds.
+   */
+  post_conviction_lock_seconds?: string;
+  /**
+   * post_conviction_stream_rate_per_block — see Params.post_conviction_stream_rate_per_block.
+   */
+  post_conviction_stream_rate_per_block?: string;
+  /**
+   * max_forum_rep_per_tag_per_epoch — see Params.max_forum_rep_per_tag_per_epoch.
+   */
+  max_forum_rep_per_tag_per_epoch?: string;
+  /**
+   * post_conviction_staker_slash_bps — see Params.post_conviction_staker_slash_bps.
+   */
+  post_conviction_staker_slash_bps?: string;
 }
 export interface ForumOperationalParamsAminoMsg {
   type: "sparkdream/x/forum/ForumOperationalParams";
@@ -623,7 +833,16 @@ function createBaseParams(): Params {
     sentinelDemotionCooldown: BigInt(0),
     sentinelDemotionThreshold: "",
     sentinelUnhideWindow: BigInt(0),
-    sentinelUnbondCooldown: BigInt(0)
+    sentinelUnbondCooldown: BigInt(0),
+    makePermanentMinTrustLevel: 0,
+    maxPromotionsPerBlock: 0,
+    authorRepSlash: "",
+    maxMakePermanentPerDay: BigInt(0),
+    minPostConvictionStake: "",
+    postConvictionLockSeconds: BigInt(0),
+    postConvictionStreamRatePerBlock: "",
+    maxForumRepPerTagPerEpoch: "",
+    postConvictionStakerSlashBps: BigInt(0)
   };
 }
 /**
@@ -758,6 +977,33 @@ export const Params = {
     if (message.sentinelUnbondCooldown !== BigInt(0)) {
       writer.uint32(376).int64(message.sentinelUnbondCooldown);
     }
+    if (message.makePermanentMinTrustLevel !== 0) {
+      writer.uint32(384).uint32(message.makePermanentMinTrustLevel);
+    }
+    if (message.maxPromotionsPerBlock !== 0) {
+      writer.uint32(392).uint32(message.maxPromotionsPerBlock);
+    }
+    if (message.authorRepSlash !== "") {
+      writer.uint32(402).string(Decimal.fromUserInput(message.authorRepSlash, 18).atomics);
+    }
+    if (message.maxMakePermanentPerDay !== BigInt(0)) {
+      writer.uint32(408).uint64(message.maxMakePermanentPerDay);
+    }
+    if (message.minPostConvictionStake !== "") {
+      writer.uint32(482).string(message.minPostConvictionStake);
+    }
+    if (message.postConvictionLockSeconds !== BigInt(0)) {
+      writer.uint32(488).int64(message.postConvictionLockSeconds);
+    }
+    if (message.postConvictionStreamRatePerBlock !== "") {
+      writer.uint32(498).string(Decimal.fromUserInput(message.postConvictionStreamRatePerBlock, 18).atomics);
+    }
+    if (message.maxForumRepPerTagPerEpoch !== "") {
+      writer.uint32(506).string(Decimal.fromUserInput(message.maxForumRepPerTagPerEpoch, 18).atomics);
+    }
+    if (message.postConvictionStakerSlashBps !== BigInt(0)) {
+      writer.uint32(512).uint64(message.postConvictionStakerSlashBps);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -887,6 +1133,33 @@ export const Params = {
         case 47:
           message.sentinelUnbondCooldown = reader.int64();
           break;
+        case 48:
+          message.makePermanentMinTrustLevel = reader.uint32();
+          break;
+        case 49:
+          message.maxPromotionsPerBlock = reader.uint32();
+          break;
+        case 50:
+          message.authorRepSlash = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 51:
+          message.maxMakePermanentPerDay = reader.uint64();
+          break;
+        case 60:
+          message.minPostConvictionStake = reader.string();
+          break;
+        case 61:
+          message.postConvictionLockSeconds = reader.int64();
+          break;
+        case 62:
+          message.postConvictionStreamRatePerBlock = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 63:
+          message.maxForumRepPerTagPerEpoch = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 64:
+          message.postConvictionStakerSlashBps = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -936,6 +1209,15 @@ export const Params = {
     message.sentinelDemotionThreshold = object.sentinelDemotionThreshold ?? "";
     message.sentinelUnhideWindow = object.sentinelUnhideWindow !== undefined && object.sentinelUnhideWindow !== null ? BigInt(object.sentinelUnhideWindow.toString()) : BigInt(0);
     message.sentinelUnbondCooldown = object.sentinelUnbondCooldown !== undefined && object.sentinelUnbondCooldown !== null ? BigInt(object.sentinelUnbondCooldown.toString()) : BigInt(0);
+    message.makePermanentMinTrustLevel = object.makePermanentMinTrustLevel ?? 0;
+    message.maxPromotionsPerBlock = object.maxPromotionsPerBlock ?? 0;
+    message.authorRepSlash = object.authorRepSlash ?? "";
+    message.maxMakePermanentPerDay = object.maxMakePermanentPerDay !== undefined && object.maxMakePermanentPerDay !== null ? BigInt(object.maxMakePermanentPerDay.toString()) : BigInt(0);
+    message.minPostConvictionStake = object.minPostConvictionStake ?? "";
+    message.postConvictionLockSeconds = object.postConvictionLockSeconds !== undefined && object.postConvictionLockSeconds !== null ? BigInt(object.postConvictionLockSeconds.toString()) : BigInt(0);
+    message.postConvictionStreamRatePerBlock = object.postConvictionStreamRatePerBlock ?? "";
+    message.maxForumRepPerTagPerEpoch = object.maxForumRepPerTagPerEpoch ?? "";
+    message.postConvictionStakerSlashBps = object.postConvictionStakerSlashBps !== undefined && object.postConvictionStakerSlashBps !== null ? BigInt(object.postConvictionStakerSlashBps.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -1060,6 +1342,33 @@ export const Params = {
     if (object.sentinel_unbond_cooldown !== undefined && object.sentinel_unbond_cooldown !== null) {
       message.sentinelUnbondCooldown = BigInt(object.sentinel_unbond_cooldown);
     }
+    if (object.make_permanent_min_trust_level !== undefined && object.make_permanent_min_trust_level !== null) {
+      message.makePermanentMinTrustLevel = object.make_permanent_min_trust_level;
+    }
+    if (object.max_promotions_per_block !== undefined && object.max_promotions_per_block !== null) {
+      message.maxPromotionsPerBlock = object.max_promotions_per_block;
+    }
+    if (object.author_rep_slash !== undefined && object.author_rep_slash !== null) {
+      message.authorRepSlash = object.author_rep_slash;
+    }
+    if (object.max_make_permanent_per_day !== undefined && object.max_make_permanent_per_day !== null) {
+      message.maxMakePermanentPerDay = BigInt(object.max_make_permanent_per_day);
+    }
+    if (object.min_post_conviction_stake !== undefined && object.min_post_conviction_stake !== null) {
+      message.minPostConvictionStake = object.min_post_conviction_stake;
+    }
+    if (object.post_conviction_lock_seconds !== undefined && object.post_conviction_lock_seconds !== null) {
+      message.postConvictionLockSeconds = BigInt(object.post_conviction_lock_seconds);
+    }
+    if (object.post_conviction_stream_rate_per_block !== undefined && object.post_conviction_stream_rate_per_block !== null) {
+      message.postConvictionStreamRatePerBlock = object.post_conviction_stream_rate_per_block;
+    }
+    if (object.max_forum_rep_per_tag_per_epoch !== undefined && object.max_forum_rep_per_tag_per_epoch !== null) {
+      message.maxForumRepPerTagPerEpoch = object.max_forum_rep_per_tag_per_epoch;
+    }
+    if (object.post_conviction_staker_slash_bps !== undefined && object.post_conviction_staker_slash_bps !== null) {
+      message.postConvictionStakerSlashBps = BigInt(object.post_conviction_staker_slash_bps);
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -1104,6 +1413,15 @@ export const Params = {
     obj.sentinel_demotion_threshold = message.sentinelDemotionThreshold === "" ? undefined : message.sentinelDemotionThreshold;
     obj.sentinel_unhide_window = message.sentinelUnhideWindow !== BigInt(0) ? message.sentinelUnhideWindow?.toString() : undefined;
     obj.sentinel_unbond_cooldown = message.sentinelUnbondCooldown !== BigInt(0) ? message.sentinelUnbondCooldown?.toString() : undefined;
+    obj.make_permanent_min_trust_level = message.makePermanentMinTrustLevel === 0 ? undefined : message.makePermanentMinTrustLevel;
+    obj.max_promotions_per_block = message.maxPromotionsPerBlock === 0 ? undefined : message.maxPromotionsPerBlock;
+    obj.author_rep_slash = message.authorRepSlash === "" ? undefined : message.authorRepSlash;
+    obj.max_make_permanent_per_day = message.maxMakePermanentPerDay !== BigInt(0) ? message.maxMakePermanentPerDay?.toString() : undefined;
+    obj.min_post_conviction_stake = message.minPostConvictionStake === "" ? undefined : message.minPostConvictionStake;
+    obj.post_conviction_lock_seconds = message.postConvictionLockSeconds !== BigInt(0) ? message.postConvictionLockSeconds?.toString() : undefined;
+    obj.post_conviction_stream_rate_per_block = message.postConvictionStreamRatePerBlock === "" ? undefined : message.postConvictionStreamRatePerBlock;
+    obj.max_forum_rep_per_tag_per_epoch = message.maxForumRepPerTagPerEpoch === "" ? undefined : message.maxForumRepPerTagPerEpoch;
+    obj.post_conviction_staker_slash_bps = message.postConvictionStakerSlashBps !== BigInt(0) ? message.postConvictionStakerSlashBps?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {
@@ -1166,7 +1484,16 @@ function createBaseForumOperationalParams(): ForumOperationalParams {
     sentinelDemotionCooldown: BigInt(0),
     sentinelDemotionThreshold: "",
     sentinelUnhideWindow: BigInt(0),
-    sentinelUnbondCooldown: BigInt(0)
+    sentinelUnbondCooldown: BigInt(0),
+    makePermanentMinTrustLevel: 0,
+    maxPromotionsPerBlock: 0,
+    authorRepSlash: "",
+    maxMakePermanentPerDay: BigInt(0),
+    minPostConvictionStake: "",
+    postConvictionLockSeconds: BigInt(0),
+    postConvictionStreamRatePerBlock: "",
+    maxForumRepPerTagPerEpoch: "",
+    postConvictionStakerSlashBps: BigInt(0)
   };
 }
 /**
@@ -1293,6 +1620,33 @@ export const ForumOperationalParams = {
     if (message.sentinelUnbondCooldown !== BigInt(0)) {
       writer.uint32(376).int64(message.sentinelUnbondCooldown);
     }
+    if (message.makePermanentMinTrustLevel !== 0) {
+      writer.uint32(384).uint32(message.makePermanentMinTrustLevel);
+    }
+    if (message.maxPromotionsPerBlock !== 0) {
+      writer.uint32(392).uint32(message.maxPromotionsPerBlock);
+    }
+    if (message.authorRepSlash !== "") {
+      writer.uint32(402).string(Decimal.fromUserInput(message.authorRepSlash, 18).atomics);
+    }
+    if (message.maxMakePermanentPerDay !== BigInt(0)) {
+      writer.uint32(408).uint64(message.maxMakePermanentPerDay);
+    }
+    if (message.minPostConvictionStake !== "") {
+      writer.uint32(482).string(message.minPostConvictionStake);
+    }
+    if (message.postConvictionLockSeconds !== BigInt(0)) {
+      writer.uint32(488).int64(message.postConvictionLockSeconds);
+    }
+    if (message.postConvictionStreamRatePerBlock !== "") {
+      writer.uint32(498).string(Decimal.fromUserInput(message.postConvictionStreamRatePerBlock, 18).atomics);
+    }
+    if (message.maxForumRepPerTagPerEpoch !== "") {
+      writer.uint32(506).string(Decimal.fromUserInput(message.maxForumRepPerTagPerEpoch, 18).atomics);
+    }
+    if (message.postConvictionStakerSlashBps !== BigInt(0)) {
+      writer.uint32(512).uint64(message.postConvictionStakerSlashBps);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): ForumOperationalParams {
@@ -1413,6 +1767,33 @@ export const ForumOperationalParams = {
         case 47:
           message.sentinelUnbondCooldown = reader.int64();
           break;
+        case 48:
+          message.makePermanentMinTrustLevel = reader.uint32();
+          break;
+        case 49:
+          message.maxPromotionsPerBlock = reader.uint32();
+          break;
+        case 50:
+          message.authorRepSlash = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 51:
+          message.maxMakePermanentPerDay = reader.uint64();
+          break;
+        case 60:
+          message.minPostConvictionStake = reader.string();
+          break;
+        case 61:
+          message.postConvictionLockSeconds = reader.int64();
+          break;
+        case 62:
+          message.postConvictionStreamRatePerBlock = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 63:
+          message.maxForumRepPerTagPerEpoch = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 64:
+          message.postConvictionStakerSlashBps = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1459,6 +1840,15 @@ export const ForumOperationalParams = {
     message.sentinelDemotionThreshold = object.sentinelDemotionThreshold ?? "";
     message.sentinelUnhideWindow = object.sentinelUnhideWindow !== undefined && object.sentinelUnhideWindow !== null ? BigInt(object.sentinelUnhideWindow.toString()) : BigInt(0);
     message.sentinelUnbondCooldown = object.sentinelUnbondCooldown !== undefined && object.sentinelUnbondCooldown !== null ? BigInt(object.sentinelUnbondCooldown.toString()) : BigInt(0);
+    message.makePermanentMinTrustLevel = object.makePermanentMinTrustLevel ?? 0;
+    message.maxPromotionsPerBlock = object.maxPromotionsPerBlock ?? 0;
+    message.authorRepSlash = object.authorRepSlash ?? "";
+    message.maxMakePermanentPerDay = object.maxMakePermanentPerDay !== undefined && object.maxMakePermanentPerDay !== null ? BigInt(object.maxMakePermanentPerDay.toString()) : BigInt(0);
+    message.minPostConvictionStake = object.minPostConvictionStake ?? "";
+    message.postConvictionLockSeconds = object.postConvictionLockSeconds !== undefined && object.postConvictionLockSeconds !== null ? BigInt(object.postConvictionLockSeconds.toString()) : BigInt(0);
+    message.postConvictionStreamRatePerBlock = object.postConvictionStreamRatePerBlock ?? "";
+    message.maxForumRepPerTagPerEpoch = object.maxForumRepPerTagPerEpoch ?? "";
+    message.postConvictionStakerSlashBps = object.postConvictionStakerSlashBps !== undefined && object.postConvictionStakerSlashBps !== null ? BigInt(object.postConvictionStakerSlashBps.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ForumOperationalParamsAmino): ForumOperationalParams {
@@ -1574,6 +1964,33 @@ export const ForumOperationalParams = {
     if (object.sentinel_unbond_cooldown !== undefined && object.sentinel_unbond_cooldown !== null) {
       message.sentinelUnbondCooldown = BigInt(object.sentinel_unbond_cooldown);
     }
+    if (object.make_permanent_min_trust_level !== undefined && object.make_permanent_min_trust_level !== null) {
+      message.makePermanentMinTrustLevel = object.make_permanent_min_trust_level;
+    }
+    if (object.max_promotions_per_block !== undefined && object.max_promotions_per_block !== null) {
+      message.maxPromotionsPerBlock = object.max_promotions_per_block;
+    }
+    if (object.author_rep_slash !== undefined && object.author_rep_slash !== null) {
+      message.authorRepSlash = object.author_rep_slash;
+    }
+    if (object.max_make_permanent_per_day !== undefined && object.max_make_permanent_per_day !== null) {
+      message.maxMakePermanentPerDay = BigInt(object.max_make_permanent_per_day);
+    }
+    if (object.min_post_conviction_stake !== undefined && object.min_post_conviction_stake !== null) {
+      message.minPostConvictionStake = object.min_post_conviction_stake;
+    }
+    if (object.post_conviction_lock_seconds !== undefined && object.post_conviction_lock_seconds !== null) {
+      message.postConvictionLockSeconds = BigInt(object.post_conviction_lock_seconds);
+    }
+    if (object.post_conviction_stream_rate_per_block !== undefined && object.post_conviction_stream_rate_per_block !== null) {
+      message.postConvictionStreamRatePerBlock = object.post_conviction_stream_rate_per_block;
+    }
+    if (object.max_forum_rep_per_tag_per_epoch !== undefined && object.max_forum_rep_per_tag_per_epoch !== null) {
+      message.maxForumRepPerTagPerEpoch = object.max_forum_rep_per_tag_per_epoch;
+    }
+    if (object.post_conviction_staker_slash_bps !== undefined && object.post_conviction_staker_slash_bps !== null) {
+      message.postConvictionStakerSlashBps = BigInt(object.post_conviction_staker_slash_bps);
+    }
     return message;
   },
   toAmino(message: ForumOperationalParams): ForumOperationalParamsAmino {
@@ -1615,6 +2032,15 @@ export const ForumOperationalParams = {
     obj.sentinel_demotion_threshold = message.sentinelDemotionThreshold === "" ? undefined : message.sentinelDemotionThreshold;
     obj.sentinel_unhide_window = message.sentinelUnhideWindow !== BigInt(0) ? message.sentinelUnhideWindow?.toString() : undefined;
     obj.sentinel_unbond_cooldown = message.sentinelUnbondCooldown !== BigInt(0) ? message.sentinelUnbondCooldown?.toString() : undefined;
+    obj.make_permanent_min_trust_level = message.makePermanentMinTrustLevel === 0 ? undefined : message.makePermanentMinTrustLevel;
+    obj.max_promotions_per_block = message.maxPromotionsPerBlock === 0 ? undefined : message.maxPromotionsPerBlock;
+    obj.author_rep_slash = message.authorRepSlash === "" ? undefined : message.authorRepSlash;
+    obj.max_make_permanent_per_day = message.maxMakePermanentPerDay !== BigInt(0) ? message.maxMakePermanentPerDay?.toString() : undefined;
+    obj.min_post_conviction_stake = message.minPostConvictionStake === "" ? undefined : message.minPostConvictionStake;
+    obj.post_conviction_lock_seconds = message.postConvictionLockSeconds !== BigInt(0) ? message.postConvictionLockSeconds?.toString() : undefined;
+    obj.post_conviction_stream_rate_per_block = message.postConvictionStreamRatePerBlock === "" ? undefined : message.postConvictionStreamRatePerBlock;
+    obj.max_forum_rep_per_tag_per_epoch = message.maxForumRepPerTagPerEpoch === "" ? undefined : message.maxForumRepPerTagPerEpoch;
+    obj.post_conviction_staker_slash_bps = message.postConvictionStakerSlashBps !== BigInt(0) ? message.postConvictionStakerSlashBps?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ForumOperationalParamsAminoMsg): ForumOperationalParams {

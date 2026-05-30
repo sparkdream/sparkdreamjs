@@ -96,6 +96,24 @@ export interface Params {
    * Maximum length in bytes of any single tag name (default: 32)
    */
   maxTagLength: number;
+  /**
+   * Maximum number of ephemeral posts/replies promoted to permanent per block
+   * by the EndBlocker membership-promotion drain. 0 disables the drain
+   * (relies on lazy TTL-time promotion). Default: 50.
+   */
+  maxPromotionsPerBlock: number;
+  /**
+   * Minimum trust level to call MsgMakePostPermanent / MsgMakeReplyPermanent
+   * (default: 1 = PROVISIONAL). Separate gate from pin_min_trust_level — making
+   * content permanent is a lower-impact curator action than featuring it.
+   */
+  makePermanentMinTrustLevel: number;
+  /**
+   * Max MsgMakePostPermanent + MsgMakeReplyPermanent calls per address per day.
+   * Independent of max_pins_per_day and max_posts_per_day — promoting an
+   * ephemeral to permanent is a distinct curator action with its own quota.
+   */
+  maxMakePermanentPerDay: number;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.blog.v1.Params";
@@ -195,6 +213,24 @@ export interface ParamsAmino {
    * Maximum length in bytes of any single tag name (default: 32)
    */
   max_tag_length?: number;
+  /**
+   * Maximum number of ephemeral posts/replies promoted to permanent per block
+   * by the EndBlocker membership-promotion drain. 0 disables the drain
+   * (relies on lazy TTL-time promotion). Default: 50.
+   */
+  max_promotions_per_block?: number;
+  /**
+   * Minimum trust level to call MsgMakePostPermanent / MsgMakeReplyPermanent
+   * (default: 1 = PROVISIONAL). Separate gate from pin_min_trust_level — making
+   * content permanent is a lower-impact curator action than featuring it.
+   */
+  make_permanent_min_trust_level?: number;
+  /**
+   * Max MsgMakePostPermanent + MsgMakeReplyPermanent calls per address per day.
+   * Independent of max_pins_per_day and max_posts_per_day — promoting an
+   * ephemeral to permanent is a distinct curator action with its own quota.
+   */
+  max_make_permanent_per_day?: number;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/blog/Params";
@@ -253,6 +289,14 @@ export interface BlogOperationalParams {
    * Operations Committee can adjust conviction renewal period
    */
   convictionRenewalPeriod: bigint;
+  /**
+   * Per-block cap on EndBlocker membership-promotion drain (0 = disabled).
+   */
+  maxPromotionsPerBlock: number;
+  /**
+   * Max MsgMakePostPermanent + MsgMakeReplyPermanent calls per address per day.
+   */
+  maxMakePermanentPerDay: number;
 }
 export interface BlogOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.blog.v1.BlogOperationalParams";
@@ -311,6 +355,14 @@ export interface BlogOperationalParamsAmino {
    * Operations Committee can adjust conviction renewal period
    */
   conviction_renewal_period?: string;
+  /**
+   * Per-block cap on EndBlocker membership-promotion drain (0 = disabled).
+   */
+  max_promotions_per_block?: number;
+  /**
+   * Max MsgMakePostPermanent + MsgMakeReplyPermanent calls per address per day.
+   */
+  max_make_permanent_per_day?: number;
 }
 export interface BlogOperationalParamsAminoMsg {
   type: "sparkdream/x/blog/BlogOperationalParams";
@@ -338,7 +390,10 @@ function createBaseParams(): Params {
     convictionRenewalThreshold: "",
     convictionRenewalPeriod: BigInt(0),
     maxTagsPerPost: 0,
-    maxTagLength: 0
+    maxTagLength: 0,
+    maxPromotionsPerBlock: 0,
+    makePermanentMinTrustLevel: 0,
+    maxMakePermanentPerDay: 0
   };
 }
 /**
@@ -416,6 +471,15 @@ export const Params = {
     if (message.maxTagLength !== 0) {
       writer.uint32(208).uint32(message.maxTagLength);
     }
+    if (message.maxPromotionsPerBlock !== 0) {
+      writer.uint32(216).uint32(message.maxPromotionsPerBlock);
+    }
+    if (message.makePermanentMinTrustLevel !== 0) {
+      writer.uint32(224).uint32(message.makePermanentMinTrustLevel);
+    }
+    if (message.maxMakePermanentPerDay !== 0) {
+      writer.uint32(232).uint32(message.maxMakePermanentPerDay);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -488,6 +552,15 @@ export const Params = {
         case 26:
           message.maxTagLength = reader.uint32();
           break;
+        case 27:
+          message.maxPromotionsPerBlock = reader.uint32();
+          break;
+        case 28:
+          message.makePermanentMinTrustLevel = reader.uint32();
+          break;
+        case 29:
+          message.maxMakePermanentPerDay = reader.uint32();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -518,6 +591,9 @@ export const Params = {
     message.convictionRenewalPeriod = object.convictionRenewalPeriod !== undefined && object.convictionRenewalPeriod !== null ? BigInt(object.convictionRenewalPeriod.toString()) : BigInt(0);
     message.maxTagsPerPost = object.maxTagsPerPost ?? 0;
     message.maxTagLength = object.maxTagLength ?? 0;
+    message.maxPromotionsPerBlock = object.maxPromotionsPerBlock ?? 0;
+    message.makePermanentMinTrustLevel = object.makePermanentMinTrustLevel ?? 0;
+    message.maxMakePermanentPerDay = object.maxMakePermanentPerDay ?? 0;
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -585,6 +661,15 @@ export const Params = {
     if (object.max_tag_length !== undefined && object.max_tag_length !== null) {
       message.maxTagLength = object.max_tag_length;
     }
+    if (object.max_promotions_per_block !== undefined && object.max_promotions_per_block !== null) {
+      message.maxPromotionsPerBlock = object.max_promotions_per_block;
+    }
+    if (object.make_permanent_min_trust_level !== undefined && object.make_permanent_min_trust_level !== null) {
+      message.makePermanentMinTrustLevel = object.make_permanent_min_trust_level;
+    }
+    if (object.max_make_permanent_per_day !== undefined && object.max_make_permanent_per_day !== null) {
+      message.maxMakePermanentPerDay = object.max_make_permanent_per_day;
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -610,6 +695,9 @@ export const Params = {
     obj.conviction_renewal_period = message.convictionRenewalPeriod !== BigInt(0) ? message.convictionRenewalPeriod?.toString() : undefined;
     obj.max_tags_per_post = message.maxTagsPerPost === 0 ? undefined : message.maxTagsPerPost;
     obj.max_tag_length = message.maxTagLength === 0 ? undefined : message.maxTagLength;
+    obj.max_promotions_per_block = message.maxPromotionsPerBlock === 0 ? undefined : message.maxPromotionsPerBlock;
+    obj.make_permanent_min_trust_level = message.makePermanentMinTrustLevel === 0 ? undefined : message.makePermanentMinTrustLevel;
+    obj.max_make_permanent_per_day = message.maxMakePermanentPerDay === 0 ? undefined : message.maxMakePermanentPerDay;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {
@@ -646,7 +734,9 @@ function createBaseBlogOperationalParams(): BlogOperationalParams {
     ephemeralContentTtl: BigInt(0),
     maxPinsPerDay: 0,
     convictionRenewalThreshold: "",
-    convictionRenewalPeriod: BigInt(0)
+    convictionRenewalPeriod: BigInt(0),
+    maxPromotionsPerBlock: 0,
+    maxMakePermanentPerDay: 0
   };
 }
 /**
@@ -693,6 +783,12 @@ export const BlogOperationalParams = {
     if (message.convictionRenewalPeriod !== BigInt(0)) {
       writer.uint32(120).int64(message.convictionRenewalPeriod);
     }
+    if (message.maxPromotionsPerBlock !== 0) {
+      writer.uint32(128).uint32(message.maxPromotionsPerBlock);
+    }
+    if (message.maxMakePermanentPerDay !== 0) {
+      writer.uint32(136).uint32(message.maxMakePermanentPerDay);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): BlogOperationalParams {
@@ -735,6 +831,12 @@ export const BlogOperationalParams = {
         case 15:
           message.convictionRenewalPeriod = reader.int64();
           break;
+        case 16:
+          message.maxPromotionsPerBlock = reader.uint32();
+          break;
+        case 17:
+          message.maxMakePermanentPerDay = reader.uint32();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -755,6 +857,8 @@ export const BlogOperationalParams = {
     message.maxPinsPerDay = object.maxPinsPerDay ?? 0;
     message.convictionRenewalThreshold = object.convictionRenewalThreshold ?? "";
     message.convictionRenewalPeriod = object.convictionRenewalPeriod !== undefined && object.convictionRenewalPeriod !== null ? BigInt(object.convictionRenewalPeriod.toString()) : BigInt(0);
+    message.maxPromotionsPerBlock = object.maxPromotionsPerBlock ?? 0;
+    message.maxMakePermanentPerDay = object.maxMakePermanentPerDay ?? 0;
     return message;
   },
   fromAmino(object: BlogOperationalParamsAmino): BlogOperationalParams {
@@ -792,6 +896,12 @@ export const BlogOperationalParams = {
     if (object.conviction_renewal_period !== undefined && object.conviction_renewal_period !== null) {
       message.convictionRenewalPeriod = BigInt(object.conviction_renewal_period);
     }
+    if (object.max_promotions_per_block !== undefined && object.max_promotions_per_block !== null) {
+      message.maxPromotionsPerBlock = object.max_promotions_per_block;
+    }
+    if (object.max_make_permanent_per_day !== undefined && object.max_make_permanent_per_day !== null) {
+      message.maxMakePermanentPerDay = object.max_make_permanent_per_day;
+    }
     return message;
   },
   toAmino(message: BlogOperationalParams): BlogOperationalParamsAmino {
@@ -807,6 +917,8 @@ export const BlogOperationalParams = {
     obj.max_pins_per_day = message.maxPinsPerDay === 0 ? undefined : message.maxPinsPerDay;
     obj.conviction_renewal_threshold = message.convictionRenewalThreshold === "" ? undefined : message.convictionRenewalThreshold;
     obj.conviction_renewal_period = message.convictionRenewalPeriod !== BigInt(0) ? message.convictionRenewalPeriod?.toString() : undefined;
+    obj.max_promotions_per_block = message.maxPromotionsPerBlock === 0 ? undefined : message.maxPromotionsPerBlock;
+    obj.max_make_permanent_per_day = message.maxMakePermanentPerDay === 0 ? undefined : message.maxMakePermanentPerDay;
     return obj;
   },
   fromAminoMsg(object: BlogOperationalParamsAminoMsg): BlogOperationalParams {

@@ -91,6 +91,21 @@ message Params {
 
   // Maximum length in bytes of any single tag name (default: 32)
   uint32 max_tag_length = 26;
+
+  // Maximum number of ephemeral posts/replies promoted to permanent per block
+  // by the EndBlocker membership-promotion drain. 0 disables the drain
+  // (relies on lazy TTL-time promotion). Default: 50.
+  uint32 max_promotions_per_block = 27;
+
+  // Minimum trust level to call MsgMakePostPermanent / MsgMakeReplyPermanent
+  // (default: 1 = PROVISIONAL). Separate gate from pin_min_trust_level — making
+  // content permanent is a lower-impact curator action than featuring it.
+  uint32 make_permanent_min_trust_level = 28;
+
+  // Max MsgMakePostPermanent + MsgMakeReplyPermanent calls per address per day.
+  // Independent of max_pins_per_day and max_posts_per_day — promoting an
+  // ephemeral to permanent is a distinct curator action with its own quota.
+  uint32 max_make_permanent_per_day = 29;
 }
 
 // BlogOperationalParams defines the operational parameters that can be updated
@@ -141,4 +156,10 @@ message BlogOperationalParams {
 
   // Operations Committee can adjust conviction renewal period
   int64 conviction_renewal_period = 15;
+
+  // Per-block cap on EndBlocker membership-promotion drain (0 = disabled).
+  uint32 max_promotions_per_block = 16;
+
+  // Max MsgMakePostPermanent + MsgMakeReplyPermanent calls per address per day.
+  uint32 max_make_permanent_per_day = 17;
 }

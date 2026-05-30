@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgCreateCollection, MsgCreateCollectionResponse, MsgUpdateCollection, MsgUpdateCollectionResponse, MsgDeleteCollection, MsgDeleteCollectionResponse, MsgAddItem, MsgAddItemResponse, MsgAddItems, MsgAddItemsResponse, MsgUpdateItem, MsgUpdateItemResponse, MsgRemoveItem, MsgRemoveItemResponse, MsgRemoveItems, MsgRemoveItemsResponse, MsgReorderItem, MsgReorderItemResponse, MsgAddCollaborator, MsgAddCollaboratorResponse, MsgRemoveCollaborator, MsgRemoveCollaboratorResponse, MsgUpdateCollaboratorRole, MsgUpdateCollaboratorRoleResponse, MsgRateCollection, MsgRateCollectionResponse, MsgChallengeReview, MsgChallengeReviewResponse, MsgRequestSponsorship, MsgRequestSponsorshipResponse, MsgCancelSponsorshipRequest, MsgCancelSponsorshipRequestResponse, MsgSponsorCollection, MsgSponsorCollectionResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgUpvoteContent, MsgUpvoteContentResponse, MsgDownvoteContent, MsgDownvoteContentResponse, MsgFlagContent, MsgFlagContentResponse, MsgHideContent, MsgHideContentResponse, MsgAppealHide, MsgAppealHideResponse, MsgEndorseCollection, MsgEndorseCollectionResponse, MsgSetSeekingEndorsement, MsgSetSeekingEndorsementResponse, MsgPinCollection, MsgPinCollectionResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgCreateCollection, MsgCreateCollectionResponse, MsgUpdateCollection, MsgUpdateCollectionResponse, MsgDeleteCollection, MsgDeleteCollectionResponse, MsgAddItem, MsgAddItemResponse, MsgAddItems, MsgAddItemsResponse, MsgUpdateItem, MsgUpdateItemResponse, MsgRemoveItem, MsgRemoveItemResponse, MsgRemoveItems, MsgRemoveItemsResponse, MsgReorderItem, MsgReorderItemResponse, MsgAddCollaborator, MsgAddCollaboratorResponse, MsgRemoveCollaborator, MsgRemoveCollaboratorResponse, MsgUpdateCollaboratorRole, MsgUpdateCollaboratorRoleResponse, MsgRateCollection, MsgRateCollectionResponse, MsgChallengeReview, MsgChallengeReviewResponse, MsgRequestSponsorship, MsgRequestSponsorshipResponse, MsgCancelSponsorshipRequest, MsgCancelSponsorshipRequestResponse, MsgSponsorCollection, MsgSponsorCollectionResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgUpvoteContent, MsgUpvoteContentResponse, MsgDownvoteContent, MsgDownvoteContentResponse, MsgFlagContent, MsgFlagContentResponse, MsgHideContent, MsgHideContentResponse, MsgAppealHide, MsgAppealHideResponse, MsgEndorseCollection, MsgEndorseCollectionResponse, MsgSetSeekingEndorsement, MsgSetSeekingEndorsementResponse, MsgPinCollection, MsgPinCollectionResponse, MsgUnpinCollection, MsgUnpinCollectionResponse, MsgMakeCollectionPermanent, MsgMakeCollectionPermanentResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   updateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
@@ -41,8 +41,19 @@ export interface Msg {
   endorseCollection(request: MsgEndorseCollection): Promise<MsgEndorseCollectionResponse>;
   /** SetSeekingEndorsement defines the SetSeekingEndorsement RPC. */
   setSeekingEndorsement(request: MsgSetSeekingEndorsement): Promise<MsgSetSeekingEndorsementResponse>;
-  /** PinCollection makes an ephemeral collection permanent by burning its deposits. */
+  /**
+   * PinCollection sets the display-only pinned marker on a permanent collection.
+   * Rejects ephemeral targets; lifecycle promotion is owned by MsgMakeCollectionPermanent.
+   */
   pinCollection(request: MsgPinCollection): Promise<MsgPinCollectionResponse>;
+  /** UnpinCollection clears the display-only pinned marker. */
+  unpinCollection(request: MsgUnpinCollection): Promise<MsgUnpinCollectionResponse>;
+  /**
+   * MakeCollectionPermanent flips an ephemeral collection to permanent,
+   * burning its escrowed collection + item deposits. Gated on
+   * params.make_permanent_min_trust_level. Idempotent on permanent collections.
+   */
+  makeCollectionPermanent(request: MsgMakeCollectionPermanent): Promise<MsgMakeCollectionPermanentResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -206,11 +217,26 @@ export class MsgClientImpl implements Msg {
     const promise = this.rpc.request("sparkdream.collect.v1.Msg", "SetSeekingEndorsement", data);
     return promise.then(data => MsgSetSeekingEndorsementResponse.decode(new BinaryReader(data)));
   };
-  /* PinCollection makes an ephemeral collection permanent by burning its deposits. */
+  /* PinCollection sets the display-only pinned marker on a permanent collection.
+   Rejects ephemeral targets; lifecycle promotion is owned by MsgMakeCollectionPermanent. */
   pinCollection = async (request: MsgPinCollection): Promise<MsgPinCollectionResponse> => {
     const data = MsgPinCollection.encode(request).finish();
     const promise = this.rpc.request("sparkdream.collect.v1.Msg", "PinCollection", data);
     return promise.then(data => MsgPinCollectionResponse.decode(new BinaryReader(data)));
+  };
+  /* UnpinCollection clears the display-only pinned marker. */
+  unpinCollection = async (request: MsgUnpinCollection): Promise<MsgUnpinCollectionResponse> => {
+    const data = MsgUnpinCollection.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.collect.v1.Msg", "UnpinCollection", data);
+    return promise.then(data => MsgUnpinCollectionResponse.decode(new BinaryReader(data)));
+  };
+  /* MakeCollectionPermanent flips an ephemeral collection to permanent,
+   burning its escrowed collection + item deposits. Gated on
+   params.make_permanent_min_trust_level. Idempotent on permanent collections. */
+  makeCollectionPermanent = async (request: MsgMakeCollectionPermanent): Promise<MsgMakeCollectionPermanentResponse> => {
+    const data = MsgMakeCollectionPermanent.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.collect.v1.Msg", "MakeCollectionPermanent", data);
+    return promise.then(data => MsgMakeCollectionPermanentResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

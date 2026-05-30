@@ -1389,7 +1389,9 @@ export interface MsgSetSeekingEndorsementResponseAminoMsg {
   value: MsgSetSeekingEndorsementResponseAmino;
 }
 /**
- * MsgPinCollection makes an ephemeral collection permanent by burning its deposits.
+ * MsgPinCollection sets the display-only pinned marker on a permanent
+ * collection. Rejects ephemeral targets with ErrCannotPinEphemeral —
+ * callers must promote via MsgMakeCollectionPermanent first.
  * @name MsgPinCollection
  * @package sparkdream.collect.v1
  * @see proto type: sparkdream.collect.v1.MsgPinCollection
@@ -1403,7 +1405,9 @@ export interface MsgPinCollectionProtoMsg {
   value: Uint8Array;
 }
 /**
- * MsgPinCollection makes an ephemeral collection permanent by burning its deposits.
+ * MsgPinCollection sets the display-only pinned marker on a permanent
+ * collection. Rejects ephemeral targets with ErrCannotPinEphemeral —
+ * callers must promote via MsgMakeCollectionPermanent first.
  * @name MsgPinCollectionAmino
  * @package sparkdream.collect.v1
  * @see proto type: sparkdream.collect.v1.MsgPinCollection
@@ -1435,6 +1439,110 @@ export interface MsgPinCollectionResponseAmino {}
 export interface MsgPinCollectionResponseAminoMsg {
   type: "/sparkdream.collect.v1.MsgPinCollectionResponse";
   value: MsgPinCollectionResponseAmino;
+}
+/**
+ * MsgUnpinCollection clears the display-only pinned marker. Idempotent on
+ * already-unpinned collections.
+ * @name MsgUnpinCollection
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgUnpinCollection
+ */
+export interface MsgUnpinCollection {
+  creator: string;
+  collectionId: bigint;
+}
+export interface MsgUnpinCollectionProtoMsg {
+  typeUrl: "/sparkdream.collect.v1.MsgUnpinCollection";
+  value: Uint8Array;
+}
+/**
+ * MsgUnpinCollection clears the display-only pinned marker. Idempotent on
+ * already-unpinned collections.
+ * @name MsgUnpinCollectionAmino
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgUnpinCollection
+ */
+export interface MsgUnpinCollectionAmino {
+  creator?: string;
+  collection_id?: string;
+}
+export interface MsgUnpinCollectionAminoMsg {
+  type: "sparkdream/x/collect/MsgUnpinCollection";
+  value: MsgUnpinCollectionAmino;
+}
+/**
+ * @name MsgUnpinCollectionResponse
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgUnpinCollectionResponse
+ */
+export interface MsgUnpinCollectionResponse {}
+export interface MsgUnpinCollectionResponseProtoMsg {
+  typeUrl: "/sparkdream.collect.v1.MsgUnpinCollectionResponse";
+  value: Uint8Array;
+}
+/**
+ * @name MsgUnpinCollectionResponseAmino
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgUnpinCollectionResponse
+ */
+export interface MsgUnpinCollectionResponseAmino {}
+export interface MsgUnpinCollectionResponseAminoMsg {
+  type: "/sparkdream.collect.v1.MsgUnpinCollectionResponse";
+  value: MsgUnpinCollectionResponseAmino;
+}
+/**
+ * MsgMakeCollectionPermanent promotes an ephemeral collection to permanent
+ * by burning the escrowed collection + item deposits. Gated on
+ * params.make_permanent_min_trust_level. Idempotent on already-permanent
+ * collections.
+ * @name MsgMakeCollectionPermanent
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgMakeCollectionPermanent
+ */
+export interface MsgMakeCollectionPermanent {
+  creator: string;
+  collectionId: bigint;
+}
+export interface MsgMakeCollectionPermanentProtoMsg {
+  typeUrl: "/sparkdream.collect.v1.MsgMakeCollectionPermanent";
+  value: Uint8Array;
+}
+/**
+ * MsgMakeCollectionPermanent promotes an ephemeral collection to permanent
+ * by burning the escrowed collection + item deposits. Gated on
+ * params.make_permanent_min_trust_level. Idempotent on already-permanent
+ * collections.
+ * @name MsgMakeCollectionPermanentAmino
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgMakeCollectionPermanent
+ */
+export interface MsgMakeCollectionPermanentAmino {
+  creator?: string;
+  collection_id?: string;
+}
+export interface MsgMakeCollectionPermanentAminoMsg {
+  type: "sparkdream/x/collect/MsgMakeCollectionPermanent";
+  value: MsgMakeCollectionPermanentAmino;
+}
+/**
+ * @name MsgMakeCollectionPermanentResponse
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgMakeCollectionPermanentResponse
+ */
+export interface MsgMakeCollectionPermanentResponse {}
+export interface MsgMakeCollectionPermanentResponseProtoMsg {
+  typeUrl: "/sparkdream.collect.v1.MsgMakeCollectionPermanentResponse";
+  value: Uint8Array;
+}
+/**
+ * @name MsgMakeCollectionPermanentResponseAmino
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgMakeCollectionPermanentResponse
+ */
+export interface MsgMakeCollectionPermanentResponseAmino {}
+export interface MsgMakeCollectionPermanentResponseAminoMsg {
+  type: "/sparkdream.collect.v1.MsgMakeCollectionPermanentResponse";
+  value: MsgMakeCollectionPermanentResponseAmino;
 }
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
@@ -5969,7 +6077,9 @@ function createBaseMsgPinCollection(): MsgPinCollection {
   };
 }
 /**
- * MsgPinCollection makes an ephemeral collection permanent by burning its deposits.
+ * MsgPinCollection sets the display-only pinned marker on a permanent
+ * collection. Rejects ephemeral targets with ErrCannotPinEphemeral —
+ * callers must promote via MsgMakeCollectionPermanent first.
  * @name MsgPinCollection
  * @package sparkdream.collect.v1
  * @see proto type: sparkdream.collect.v1.MsgPinCollection
@@ -6102,6 +6212,296 @@ export const MsgPinCollectionResponse = {
     return {
       typeUrl: "/sparkdream.collect.v1.MsgPinCollectionResponse",
       value: MsgPinCollectionResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUnpinCollection(): MsgUnpinCollection {
+  return {
+    creator: "",
+    collectionId: BigInt(0)
+  };
+}
+/**
+ * MsgUnpinCollection clears the display-only pinned marker. Idempotent on
+ * already-unpinned collections.
+ * @name MsgUnpinCollection
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgUnpinCollection
+ */
+export const MsgUnpinCollection = {
+  typeUrl: "/sparkdream.collect.v1.MsgUnpinCollection",
+  aminoType: "sparkdream/x/collect/MsgUnpinCollection",
+  encode(message: MsgUnpinCollection, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.collectionId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.collectionId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUnpinCollection {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUnpinCollection();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.collectionId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgUnpinCollection>): MsgUnpinCollection {
+    const message = createBaseMsgUnpinCollection();
+    message.creator = object.creator ?? "";
+    message.collectionId = object.collectionId !== undefined && object.collectionId !== null ? BigInt(object.collectionId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgUnpinCollectionAmino): MsgUnpinCollection {
+    const message = createBaseMsgUnpinCollection();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.collection_id !== undefined && object.collection_id !== null) {
+      message.collectionId = BigInt(object.collection_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgUnpinCollection): MsgUnpinCollectionAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.collection_id = message.collectionId !== BigInt(0) ? message.collectionId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgUnpinCollectionAminoMsg): MsgUnpinCollection {
+    return MsgUnpinCollection.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUnpinCollection): MsgUnpinCollectionAminoMsg {
+    return {
+      type: "sparkdream/x/collect/MsgUnpinCollection",
+      value: MsgUnpinCollection.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgUnpinCollectionProtoMsg): MsgUnpinCollection {
+    return MsgUnpinCollection.decode(message.value);
+  },
+  toProto(message: MsgUnpinCollection): Uint8Array {
+    return MsgUnpinCollection.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUnpinCollection): MsgUnpinCollectionProtoMsg {
+    return {
+      typeUrl: "/sparkdream.collect.v1.MsgUnpinCollection",
+      value: MsgUnpinCollection.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUnpinCollectionResponse(): MsgUnpinCollectionResponse {
+  return {};
+}
+/**
+ * @name MsgUnpinCollectionResponse
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgUnpinCollectionResponse
+ */
+export const MsgUnpinCollectionResponse = {
+  typeUrl: "/sparkdream.collect.v1.MsgUnpinCollectionResponse",
+  encode(_: MsgUnpinCollectionResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUnpinCollectionResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUnpinCollectionResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgUnpinCollectionResponse>): MsgUnpinCollectionResponse {
+    const message = createBaseMsgUnpinCollectionResponse();
+    return message;
+  },
+  fromAmino(_: MsgUnpinCollectionResponseAmino): MsgUnpinCollectionResponse {
+    const message = createBaseMsgUnpinCollectionResponse();
+    return message;
+  },
+  toAmino(_: MsgUnpinCollectionResponse): MsgUnpinCollectionResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgUnpinCollectionResponseAminoMsg): MsgUnpinCollectionResponse {
+    return MsgUnpinCollectionResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgUnpinCollectionResponseProtoMsg): MsgUnpinCollectionResponse {
+    return MsgUnpinCollectionResponse.decode(message.value);
+  },
+  toProto(message: MsgUnpinCollectionResponse): Uint8Array {
+    return MsgUnpinCollectionResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUnpinCollectionResponse): MsgUnpinCollectionResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.collect.v1.MsgUnpinCollectionResponse",
+      value: MsgUnpinCollectionResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgMakeCollectionPermanent(): MsgMakeCollectionPermanent {
+  return {
+    creator: "",
+    collectionId: BigInt(0)
+  };
+}
+/**
+ * MsgMakeCollectionPermanent promotes an ephemeral collection to permanent
+ * by burning the escrowed collection + item deposits. Gated on
+ * params.make_permanent_min_trust_level. Idempotent on already-permanent
+ * collections.
+ * @name MsgMakeCollectionPermanent
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgMakeCollectionPermanent
+ */
+export const MsgMakeCollectionPermanent = {
+  typeUrl: "/sparkdream.collect.v1.MsgMakeCollectionPermanent",
+  aminoType: "sparkdream/x/collect/MsgMakeCollectionPermanent",
+  encode(message: MsgMakeCollectionPermanent, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.collectionId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.collectionId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgMakeCollectionPermanent {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgMakeCollectionPermanent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.collectionId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgMakeCollectionPermanent>): MsgMakeCollectionPermanent {
+    const message = createBaseMsgMakeCollectionPermanent();
+    message.creator = object.creator ?? "";
+    message.collectionId = object.collectionId !== undefined && object.collectionId !== null ? BigInt(object.collectionId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgMakeCollectionPermanentAmino): MsgMakeCollectionPermanent {
+    const message = createBaseMsgMakeCollectionPermanent();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.collection_id !== undefined && object.collection_id !== null) {
+      message.collectionId = BigInt(object.collection_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgMakeCollectionPermanent): MsgMakeCollectionPermanentAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.collection_id = message.collectionId !== BigInt(0) ? message.collectionId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgMakeCollectionPermanentAminoMsg): MsgMakeCollectionPermanent {
+    return MsgMakeCollectionPermanent.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgMakeCollectionPermanent): MsgMakeCollectionPermanentAminoMsg {
+    return {
+      type: "sparkdream/x/collect/MsgMakeCollectionPermanent",
+      value: MsgMakeCollectionPermanent.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgMakeCollectionPermanentProtoMsg): MsgMakeCollectionPermanent {
+    return MsgMakeCollectionPermanent.decode(message.value);
+  },
+  toProto(message: MsgMakeCollectionPermanent): Uint8Array {
+    return MsgMakeCollectionPermanent.encode(message).finish();
+  },
+  toProtoMsg(message: MsgMakeCollectionPermanent): MsgMakeCollectionPermanentProtoMsg {
+    return {
+      typeUrl: "/sparkdream.collect.v1.MsgMakeCollectionPermanent",
+      value: MsgMakeCollectionPermanent.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgMakeCollectionPermanentResponse(): MsgMakeCollectionPermanentResponse {
+  return {};
+}
+/**
+ * @name MsgMakeCollectionPermanentResponse
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgMakeCollectionPermanentResponse
+ */
+export const MsgMakeCollectionPermanentResponse = {
+  typeUrl: "/sparkdream.collect.v1.MsgMakeCollectionPermanentResponse",
+  encode(_: MsgMakeCollectionPermanentResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgMakeCollectionPermanentResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgMakeCollectionPermanentResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgMakeCollectionPermanentResponse>): MsgMakeCollectionPermanentResponse {
+    const message = createBaseMsgMakeCollectionPermanentResponse();
+    return message;
+  },
+  fromAmino(_: MsgMakeCollectionPermanentResponseAmino): MsgMakeCollectionPermanentResponse {
+    const message = createBaseMsgMakeCollectionPermanentResponse();
+    return message;
+  },
+  toAmino(_: MsgMakeCollectionPermanentResponse): MsgMakeCollectionPermanentResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgMakeCollectionPermanentResponseAminoMsg): MsgMakeCollectionPermanentResponse {
+    return MsgMakeCollectionPermanentResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgMakeCollectionPermanentResponseProtoMsg): MsgMakeCollectionPermanentResponse {
+    return MsgMakeCollectionPermanentResponse.decode(message.value);
+  },
+  toProto(message: MsgMakeCollectionPermanentResponse): Uint8Array {
+    return MsgMakeCollectionPermanentResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgMakeCollectionPermanentResponse): MsgMakeCollectionPermanentResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.collect.v1.MsgMakeCollectionPermanentResponse",
+      value: MsgMakeCollectionPermanentResponse.encode(message).finish()
     };
   }
 };

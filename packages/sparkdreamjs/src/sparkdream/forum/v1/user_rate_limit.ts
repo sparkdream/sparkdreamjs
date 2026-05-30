@@ -2,7 +2,10 @@
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
- * UserRateLimit defines the UserRateLimit message.
+ * UserRateLimit defines the UserRateLimit message. Counters are split by
+ * action class — the post counter (fields 2-5) bounds CreatePost, the
+ * make-permanent counter (fields 6-8) bounds MakePostPermanent. They are
+ * kept on the same record to avoid an extra collection lookup per call.
  * @name UserRateLimit
  * @package sparkdream.forum.v1
  * @see proto type: sparkdream.forum.v1.UserRateLimit
@@ -13,13 +16,22 @@ export interface UserRateLimit {
   previousEpochCount: bigint;
   currentEpochStart: bigint;
   lastPostTime: bigint;
+  /**
+   * MakePostPermanent sliding-window counters, mirrored from the post counter.
+   */
+  makePermanentCurrentEpochCount: bigint;
+  makePermanentPreviousEpochCount: bigint;
+  makePermanentCurrentEpochStart: bigint;
 }
 export interface UserRateLimitProtoMsg {
   typeUrl: "/sparkdream.forum.v1.UserRateLimit";
   value: Uint8Array;
 }
 /**
- * UserRateLimit defines the UserRateLimit message.
+ * UserRateLimit defines the UserRateLimit message. Counters are split by
+ * action class — the post counter (fields 2-5) bounds CreatePost, the
+ * make-permanent counter (fields 6-8) bounds MakePostPermanent. They are
+ * kept on the same record to avoid an extra collection lookup per call.
  * @name UserRateLimitAmino
  * @package sparkdream.forum.v1
  * @see proto type: sparkdream.forum.v1.UserRateLimit
@@ -30,6 +42,12 @@ export interface UserRateLimitAmino {
   previous_epoch_count?: string;
   current_epoch_start?: string;
   last_post_time?: string;
+  /**
+   * MakePostPermanent sliding-window counters, mirrored from the post counter.
+   */
+  make_permanent_current_epoch_count?: string;
+  make_permanent_previous_epoch_count?: string;
+  make_permanent_current_epoch_start?: string;
 }
 export interface UserRateLimitAminoMsg {
   type: "/sparkdream.forum.v1.UserRateLimit";
@@ -41,11 +59,17 @@ function createBaseUserRateLimit(): UserRateLimit {
     currentEpochCount: BigInt(0),
     previousEpochCount: BigInt(0),
     currentEpochStart: BigInt(0),
-    lastPostTime: BigInt(0)
+    lastPostTime: BigInt(0),
+    makePermanentCurrentEpochCount: BigInt(0),
+    makePermanentPreviousEpochCount: BigInt(0),
+    makePermanentCurrentEpochStart: BigInt(0)
   };
 }
 /**
- * UserRateLimit defines the UserRateLimit message.
+ * UserRateLimit defines the UserRateLimit message. Counters are split by
+ * action class — the post counter (fields 2-5) bounds CreatePost, the
+ * make-permanent counter (fields 6-8) bounds MakePostPermanent. They are
+ * kept on the same record to avoid an extra collection lookup per call.
  * @name UserRateLimit
  * @package sparkdream.forum.v1
  * @see proto type: sparkdream.forum.v1.UserRateLimit
@@ -67,6 +91,15 @@ export const UserRateLimit = {
     }
     if (message.lastPostTime !== BigInt(0)) {
       writer.uint32(40).int64(message.lastPostTime);
+    }
+    if (message.makePermanentCurrentEpochCount !== BigInt(0)) {
+      writer.uint32(48).uint64(message.makePermanentCurrentEpochCount);
+    }
+    if (message.makePermanentPreviousEpochCount !== BigInt(0)) {
+      writer.uint32(56).uint64(message.makePermanentPreviousEpochCount);
+    }
+    if (message.makePermanentCurrentEpochStart !== BigInt(0)) {
+      writer.uint32(64).int64(message.makePermanentCurrentEpochStart);
     }
     return writer;
   },
@@ -92,6 +125,15 @@ export const UserRateLimit = {
         case 5:
           message.lastPostTime = reader.int64();
           break;
+        case 6:
+          message.makePermanentCurrentEpochCount = reader.uint64();
+          break;
+        case 7:
+          message.makePermanentPreviousEpochCount = reader.uint64();
+          break;
+        case 8:
+          message.makePermanentCurrentEpochStart = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -106,6 +148,9 @@ export const UserRateLimit = {
     message.previousEpochCount = object.previousEpochCount !== undefined && object.previousEpochCount !== null ? BigInt(object.previousEpochCount.toString()) : BigInt(0);
     message.currentEpochStart = object.currentEpochStart !== undefined && object.currentEpochStart !== null ? BigInt(object.currentEpochStart.toString()) : BigInt(0);
     message.lastPostTime = object.lastPostTime !== undefined && object.lastPostTime !== null ? BigInt(object.lastPostTime.toString()) : BigInt(0);
+    message.makePermanentCurrentEpochCount = object.makePermanentCurrentEpochCount !== undefined && object.makePermanentCurrentEpochCount !== null ? BigInt(object.makePermanentCurrentEpochCount.toString()) : BigInt(0);
+    message.makePermanentPreviousEpochCount = object.makePermanentPreviousEpochCount !== undefined && object.makePermanentPreviousEpochCount !== null ? BigInt(object.makePermanentPreviousEpochCount.toString()) : BigInt(0);
+    message.makePermanentCurrentEpochStart = object.makePermanentCurrentEpochStart !== undefined && object.makePermanentCurrentEpochStart !== null ? BigInt(object.makePermanentCurrentEpochStart.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: UserRateLimitAmino): UserRateLimit {
@@ -125,6 +170,15 @@ export const UserRateLimit = {
     if (object.last_post_time !== undefined && object.last_post_time !== null) {
       message.lastPostTime = BigInt(object.last_post_time);
     }
+    if (object.make_permanent_current_epoch_count !== undefined && object.make_permanent_current_epoch_count !== null) {
+      message.makePermanentCurrentEpochCount = BigInt(object.make_permanent_current_epoch_count);
+    }
+    if (object.make_permanent_previous_epoch_count !== undefined && object.make_permanent_previous_epoch_count !== null) {
+      message.makePermanentPreviousEpochCount = BigInt(object.make_permanent_previous_epoch_count);
+    }
+    if (object.make_permanent_current_epoch_start !== undefined && object.make_permanent_current_epoch_start !== null) {
+      message.makePermanentCurrentEpochStart = BigInt(object.make_permanent_current_epoch_start);
+    }
     return message;
   },
   toAmino(message: UserRateLimit): UserRateLimitAmino {
@@ -134,6 +188,9 @@ export const UserRateLimit = {
     obj.previous_epoch_count = message.previousEpochCount !== BigInt(0) ? message.previousEpochCount?.toString() : undefined;
     obj.current_epoch_start = message.currentEpochStart !== BigInt(0) ? message.currentEpochStart?.toString() : undefined;
     obj.last_post_time = message.lastPostTime !== BigInt(0) ? message.lastPostTime?.toString() : undefined;
+    obj.make_permanent_current_epoch_count = message.makePermanentCurrentEpochCount !== BigInt(0) ? message.makePermanentCurrentEpochCount?.toString() : undefined;
+    obj.make_permanent_previous_epoch_count = message.makePermanentPreviousEpochCount !== BigInt(0) ? message.makePermanentPreviousEpochCount?.toString() : undefined;
+    obj.make_permanent_current_epoch_start = message.makePermanentCurrentEpochStart !== BigInt(0) ? message.makePermanentCurrentEpochStart?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: UserRateLimitAminoMsg): UserRateLimit {

@@ -38,6 +38,20 @@ export interface Post {
   contentType: ContentType;
   initiativeId: bigint;
   convictionSustained: boolean;
+  /**
+   * promoted_by is the member who called MsgMakePostPermanent on this post
+   * (or reply). Empty if still ephemeral, or if it became permanent via
+   * author-admission auto-promotion / explicit author self-promotion. Used by
+   * ExpireHiddenPosts to issue a MemberWarning against the promoter on
+   * unappealed sentinel hide — they vouched for content the community
+   * rejected.
+   */
+  promotedBy: string;
+  /**
+   * promoted_at is the block-time (unix seconds) at which promoted_by called
+   * MsgMakePostPermanent. Zero when promoted_by is empty.
+   */
+  promotedAt: bigint;
 }
 export interface PostProtoMsg {
   typeUrl: "/sparkdream.forum.v1.Post";
@@ -78,6 +92,20 @@ export interface PostAmino {
   content_type?: ContentType;
   initiative_id?: string;
   conviction_sustained?: boolean;
+  /**
+   * promoted_by is the member who called MsgMakePostPermanent on this post
+   * (or reply). Empty if still ephemeral, or if it became permanent via
+   * author-admission auto-promotion / explicit author self-promotion. Used by
+   * ExpireHiddenPosts to issue a MemberWarning against the promoter on
+   * unappealed sentinel hide — they vouched for content the community
+   * rejected.
+   */
+  promoted_by?: string;
+  /**
+   * promoted_at is the block-time (unix seconds) at which promoted_by called
+   * MsgMakePostPermanent. Zero when promoted_by is empty.
+   */
+  promoted_at?: string;
 }
 export interface PostAminoMsg {
   type: "/sparkdream.forum.v1.Post";
@@ -112,7 +140,9 @@ function createBasePost(): Post {
     tags: [],
     contentType: 0,
     initiativeId: BigInt(0),
-    convictionSustained: false
+    convictionSustained: false,
+    promotedBy: "",
+    promotedAt: BigInt(0)
   };
 }
 /**
@@ -208,6 +238,12 @@ export const Post = {
     if (message.convictionSustained === true) {
       writer.uint32(264).bool(message.convictionSustained);
     }
+    if (message.promotedBy !== "") {
+      writer.uint32(274).string(message.promotedBy);
+    }
+    if (message.promotedAt !== BigInt(0)) {
+      writer.uint32(280).int64(message.promotedAt);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Post {
@@ -301,6 +337,12 @@ export const Post = {
         case 33:
           message.convictionSustained = reader.bool();
           break;
+        case 34:
+          message.promotedBy = reader.string();
+          break;
+        case 35:
+          message.promotedAt = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -338,6 +380,8 @@ export const Post = {
     message.contentType = object.contentType ?? 0;
     message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
     message.convictionSustained = object.convictionSustained ?? false;
+    message.promotedBy = object.promotedBy ?? "";
+    message.promotedAt = object.promotedAt !== undefined && object.promotedAt !== null ? BigInt(object.promotedAt.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: PostAmino): Post {
@@ -424,6 +468,12 @@ export const Post = {
     if (object.conviction_sustained !== undefined && object.conviction_sustained !== null) {
       message.convictionSustained = object.conviction_sustained;
     }
+    if (object.promoted_by !== undefined && object.promoted_by !== null) {
+      message.promotedBy = object.promoted_by;
+    }
+    if (object.promoted_at !== undefined && object.promoted_at !== null) {
+      message.promotedAt = BigInt(object.promoted_at);
+    }
     return message;
   },
   toAmino(message: Post): PostAmino {
@@ -460,6 +510,8 @@ export const Post = {
     obj.content_type = message.contentType === 0 ? undefined : message.contentType;
     obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
     obj.conviction_sustained = message.convictionSustained === false ? undefined : message.convictionSustained;
+    obj.promoted_by = message.promotedBy === "" ? undefined : message.promotedBy;
+    obj.promoted_at = message.promotedAt !== BigInt(0) ? message.promotedAt?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: PostAminoMsg): Post {
