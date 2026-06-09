@@ -14,6 +14,7 @@ import { ThreadMetadata, ThreadMetadataAmino } from "./thread_metadata";
 import { ThreadFollow, ThreadFollowAmino } from "./thread_follow";
 import { ThreadFollowCount, ThreadFollowCountAmino } from "./thread_follow_count";
 import { ArchiveMetadata, ArchiveMetadataAmino } from "./archive_metadata";
+import { PostConvictionStake, PostConvictionStakeAmino } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -2535,6 +2536,170 @@ export interface QueryFlagReviewQueueResponseAmino {
 export interface QueryFlagReviewQueueResponseAminoMsg {
   type: "/sparkdream.forum.v1.QueryFlagReviewQueueResponse";
   value: QueryFlagReviewQueueResponseAmino;
+}
+/**
+ * QueryGetPostConvictionStakeRequest defines the QueryGetPostConvictionStakeRequest message.
+ * @name QueryGetPostConvictionStakeRequest
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryGetPostConvictionStakeRequest
+ */
+export interface QueryGetPostConvictionStakeRequest {
+  id: bigint;
+}
+export interface QueryGetPostConvictionStakeRequestProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.QueryGetPostConvictionStakeRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryGetPostConvictionStakeRequest defines the QueryGetPostConvictionStakeRequest message.
+ * @name QueryGetPostConvictionStakeRequestAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryGetPostConvictionStakeRequest
+ */
+export interface QueryGetPostConvictionStakeRequestAmino {
+  id?: string;
+}
+export interface QueryGetPostConvictionStakeRequestAminoMsg {
+  type: "/sparkdream.forum.v1.QueryGetPostConvictionStakeRequest";
+  value: QueryGetPostConvictionStakeRequestAmino;
+}
+/**
+ * QueryGetPostConvictionStakeResponse defines the QueryGetPostConvictionStakeResponse message.
+ * @name QueryGetPostConvictionStakeResponse
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryGetPostConvictionStakeResponse
+ */
+export interface QueryGetPostConvictionStakeResponse {
+  stake: PostConvictionStake;
+}
+export interface QueryGetPostConvictionStakeResponseProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.QueryGetPostConvictionStakeResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryGetPostConvictionStakeResponse defines the QueryGetPostConvictionStakeResponse message.
+ * @name QueryGetPostConvictionStakeResponseAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryGetPostConvictionStakeResponse
+ */
+export interface QueryGetPostConvictionStakeResponseAmino {
+  stake?: PostConvictionStakeAmino;
+}
+export interface QueryGetPostConvictionStakeResponseAminoMsg {
+  type: "/sparkdream.forum.v1.QueryGetPostConvictionStakeResponse";
+  value: QueryGetPostConvictionStakeResponseAmino;
+}
+/**
+ * QueryPostConvictionStakesByStakerRequest defines the QueryPostConvictionStakesByStakerRequest message.
+ * @name QueryPostConvictionStakesByStakerRequest
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryPostConvictionStakesByStakerRequest
+ */
+export interface QueryPostConvictionStakesByStakerRequest {
+  staker: string;
+  pagination?: PageRequest;
+}
+export interface QueryPostConvictionStakesByStakerRequestProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.QueryPostConvictionStakesByStakerRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryPostConvictionStakesByStakerRequest defines the QueryPostConvictionStakesByStakerRequest message.
+ * @name QueryPostConvictionStakesByStakerRequestAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryPostConvictionStakesByStakerRequest
+ */
+export interface QueryPostConvictionStakesByStakerRequestAmino {
+  staker?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryPostConvictionStakesByStakerRequestAminoMsg {
+  type: "/sparkdream.forum.v1.QueryPostConvictionStakesByStakerRequest";
+  value: QueryPostConvictionStakesByStakerRequestAmino;
+}
+/**
+ * QueryPostConvictionStakesByStakerResponse defines the QueryPostConvictionStakesByStakerResponse message.
+ * @name QueryPostConvictionStakesByStakerResponse
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryPostConvictionStakesByStakerResponse
+ */
+export interface QueryPostConvictionStakesByStakerResponse {
+  stakes: PostConvictionStake[];
+  pagination?: PageResponse;
+}
+export interface QueryPostConvictionStakesByStakerResponseProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.QueryPostConvictionStakesByStakerResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryPostConvictionStakesByStakerResponse defines the QueryPostConvictionStakesByStakerResponse message.
+ * @name QueryPostConvictionStakesByStakerResponseAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryPostConvictionStakesByStakerResponse
+ */
+export interface QueryPostConvictionStakesByStakerResponseAmino {
+  stakes?: PostConvictionStakeAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryPostConvictionStakesByStakerResponseAminoMsg {
+  type: "/sparkdream.forum.v1.QueryPostConvictionStakesByStakerResponse";
+  value: QueryPostConvictionStakesByStakerResponseAmino;
+}
+/**
+ * QueryPostConvictionStakesByPostRequest defines the QueryPostConvictionStakesByPostRequest message.
+ * @name QueryPostConvictionStakesByPostRequest
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryPostConvictionStakesByPostRequest
+ */
+export interface QueryPostConvictionStakesByPostRequest {
+  postId: bigint;
+  pagination?: PageRequest;
+}
+export interface QueryPostConvictionStakesByPostRequestProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.QueryPostConvictionStakesByPostRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryPostConvictionStakesByPostRequest defines the QueryPostConvictionStakesByPostRequest message.
+ * @name QueryPostConvictionStakesByPostRequestAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryPostConvictionStakesByPostRequest
+ */
+export interface QueryPostConvictionStakesByPostRequestAmino {
+  post_id?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryPostConvictionStakesByPostRequestAminoMsg {
+  type: "/sparkdream.forum.v1.QueryPostConvictionStakesByPostRequest";
+  value: QueryPostConvictionStakesByPostRequestAmino;
+}
+/**
+ * QueryPostConvictionStakesByPostResponse defines the QueryPostConvictionStakesByPostResponse message.
+ * @name QueryPostConvictionStakesByPostResponse
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryPostConvictionStakesByPostResponse
+ */
+export interface QueryPostConvictionStakesByPostResponse {
+  stakes: PostConvictionStake[];
+  pagination?: PageResponse;
+}
+export interface QueryPostConvictionStakesByPostResponseProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.QueryPostConvictionStakesByPostResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryPostConvictionStakesByPostResponse defines the QueryPostConvictionStakesByPostResponse message.
+ * @name QueryPostConvictionStakesByPostResponseAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryPostConvictionStakesByPostResponse
+ */
+export interface QueryPostConvictionStakesByPostResponseAmino {
+  stakes?: PostConvictionStakeAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryPostConvictionStakesByPostResponseAminoMsg {
+  type: "/sparkdream.forum.v1.QueryPostConvictionStakesByPostResponse";
+  value: QueryPostConvictionStakesByPostResponseAmino;
 }
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
@@ -9667,6 +9832,472 @@ export const QueryFlagReviewQueueResponse = {
     return {
       typeUrl: "/sparkdream.forum.v1.QueryFlagReviewQueueResponse",
       value: QueryFlagReviewQueueResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetPostConvictionStakeRequest(): QueryGetPostConvictionStakeRequest {
+  return {
+    id: BigInt(0)
+  };
+}
+/**
+ * QueryGetPostConvictionStakeRequest defines the QueryGetPostConvictionStakeRequest message.
+ * @name QueryGetPostConvictionStakeRequest
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryGetPostConvictionStakeRequest
+ */
+export const QueryGetPostConvictionStakeRequest = {
+  typeUrl: "/sparkdream.forum.v1.QueryGetPostConvictionStakeRequest",
+  encode(message: QueryGetPostConvictionStakeRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.id !== BigInt(0)) {
+      writer.uint32(8).uint64(message.id);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetPostConvictionStakeRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetPostConvictionStakeRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetPostConvictionStakeRequest>): QueryGetPostConvictionStakeRequest {
+    const message = createBaseQueryGetPostConvictionStakeRequest();
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryGetPostConvictionStakeRequestAmino): QueryGetPostConvictionStakeRequest {
+    const message = createBaseQueryGetPostConvictionStakeRequest();
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetPostConvictionStakeRequest): QueryGetPostConvictionStakeRequestAmino {
+    const obj: any = {};
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetPostConvictionStakeRequestAminoMsg): QueryGetPostConvictionStakeRequest {
+    return QueryGetPostConvictionStakeRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetPostConvictionStakeRequestProtoMsg): QueryGetPostConvictionStakeRequest {
+    return QueryGetPostConvictionStakeRequest.decode(message.value);
+  },
+  toProto(message: QueryGetPostConvictionStakeRequest): Uint8Array {
+    return QueryGetPostConvictionStakeRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetPostConvictionStakeRequest): QueryGetPostConvictionStakeRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.QueryGetPostConvictionStakeRequest",
+      value: QueryGetPostConvictionStakeRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetPostConvictionStakeResponse(): QueryGetPostConvictionStakeResponse {
+  return {
+    stake: PostConvictionStake.fromPartial({})
+  };
+}
+/**
+ * QueryGetPostConvictionStakeResponse defines the QueryGetPostConvictionStakeResponse message.
+ * @name QueryGetPostConvictionStakeResponse
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryGetPostConvictionStakeResponse
+ */
+export const QueryGetPostConvictionStakeResponse = {
+  typeUrl: "/sparkdream.forum.v1.QueryGetPostConvictionStakeResponse",
+  encode(message: QueryGetPostConvictionStakeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.stake !== undefined) {
+      PostConvictionStake.encode(message.stake, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetPostConvictionStakeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetPostConvictionStakeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.stake = PostConvictionStake.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetPostConvictionStakeResponse>): QueryGetPostConvictionStakeResponse {
+    const message = createBaseQueryGetPostConvictionStakeResponse();
+    message.stake = object.stake !== undefined && object.stake !== null ? PostConvictionStake.fromPartial(object.stake) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetPostConvictionStakeResponseAmino): QueryGetPostConvictionStakeResponse {
+    const message = createBaseQueryGetPostConvictionStakeResponse();
+    if (object.stake !== undefined && object.stake !== null) {
+      message.stake = PostConvictionStake.fromAmino(object.stake);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetPostConvictionStakeResponse): QueryGetPostConvictionStakeResponseAmino {
+    const obj: any = {};
+    obj.stake = message.stake ? PostConvictionStake.toAmino(message.stake) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetPostConvictionStakeResponseAminoMsg): QueryGetPostConvictionStakeResponse {
+    return QueryGetPostConvictionStakeResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetPostConvictionStakeResponseProtoMsg): QueryGetPostConvictionStakeResponse {
+    return QueryGetPostConvictionStakeResponse.decode(message.value);
+  },
+  toProto(message: QueryGetPostConvictionStakeResponse): Uint8Array {
+    return QueryGetPostConvictionStakeResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetPostConvictionStakeResponse): QueryGetPostConvictionStakeResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.QueryGetPostConvictionStakeResponse",
+      value: QueryGetPostConvictionStakeResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryPostConvictionStakesByStakerRequest(): QueryPostConvictionStakesByStakerRequest {
+  return {
+    staker: "",
+    pagination: undefined
+  };
+}
+/**
+ * QueryPostConvictionStakesByStakerRequest defines the QueryPostConvictionStakesByStakerRequest message.
+ * @name QueryPostConvictionStakesByStakerRequest
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryPostConvictionStakesByStakerRequest
+ */
+export const QueryPostConvictionStakesByStakerRequest = {
+  typeUrl: "/sparkdream.forum.v1.QueryPostConvictionStakesByStakerRequest",
+  encode(message: QueryPostConvictionStakesByStakerRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.staker !== "") {
+      writer.uint32(10).string(message.staker);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryPostConvictionStakesByStakerRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryPostConvictionStakesByStakerRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.staker = reader.string();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryPostConvictionStakesByStakerRequest>): QueryPostConvictionStakesByStakerRequest {
+    const message = createBaseQueryPostConvictionStakesByStakerRequest();
+    message.staker = object.staker ?? "";
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryPostConvictionStakesByStakerRequestAmino): QueryPostConvictionStakesByStakerRequest {
+    const message = createBaseQueryPostConvictionStakesByStakerRequest();
+    if (object.staker !== undefined && object.staker !== null) {
+      message.staker = object.staker;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryPostConvictionStakesByStakerRequest): QueryPostConvictionStakesByStakerRequestAmino {
+    const obj: any = {};
+    obj.staker = message.staker === "" ? undefined : message.staker;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryPostConvictionStakesByStakerRequestAminoMsg): QueryPostConvictionStakesByStakerRequest {
+    return QueryPostConvictionStakesByStakerRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryPostConvictionStakesByStakerRequestProtoMsg): QueryPostConvictionStakesByStakerRequest {
+    return QueryPostConvictionStakesByStakerRequest.decode(message.value);
+  },
+  toProto(message: QueryPostConvictionStakesByStakerRequest): Uint8Array {
+    return QueryPostConvictionStakesByStakerRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryPostConvictionStakesByStakerRequest): QueryPostConvictionStakesByStakerRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.QueryPostConvictionStakesByStakerRequest",
+      value: QueryPostConvictionStakesByStakerRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryPostConvictionStakesByStakerResponse(): QueryPostConvictionStakesByStakerResponse {
+  return {
+    stakes: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryPostConvictionStakesByStakerResponse defines the QueryPostConvictionStakesByStakerResponse message.
+ * @name QueryPostConvictionStakesByStakerResponse
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryPostConvictionStakesByStakerResponse
+ */
+export const QueryPostConvictionStakesByStakerResponse = {
+  typeUrl: "/sparkdream.forum.v1.QueryPostConvictionStakesByStakerResponse",
+  encode(message: QueryPostConvictionStakesByStakerResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.stakes) {
+      PostConvictionStake.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryPostConvictionStakesByStakerResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryPostConvictionStakesByStakerResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.stakes.push(PostConvictionStake.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryPostConvictionStakesByStakerResponse>): QueryPostConvictionStakesByStakerResponse {
+    const message = createBaseQueryPostConvictionStakesByStakerResponse();
+    message.stakes = object.stakes?.map(e => PostConvictionStake.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryPostConvictionStakesByStakerResponseAmino): QueryPostConvictionStakesByStakerResponse {
+    const message = createBaseQueryPostConvictionStakesByStakerResponse();
+    message.stakes = object.stakes?.map(e => PostConvictionStake.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryPostConvictionStakesByStakerResponse): QueryPostConvictionStakesByStakerResponseAmino {
+    const obj: any = {};
+    if (message.stakes) {
+      obj.stakes = message.stakes.map(e => e ? PostConvictionStake.toAmino(e) : undefined);
+    } else {
+      obj.stakes = message.stakes;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryPostConvictionStakesByStakerResponseAminoMsg): QueryPostConvictionStakesByStakerResponse {
+    return QueryPostConvictionStakesByStakerResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryPostConvictionStakesByStakerResponseProtoMsg): QueryPostConvictionStakesByStakerResponse {
+    return QueryPostConvictionStakesByStakerResponse.decode(message.value);
+  },
+  toProto(message: QueryPostConvictionStakesByStakerResponse): Uint8Array {
+    return QueryPostConvictionStakesByStakerResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryPostConvictionStakesByStakerResponse): QueryPostConvictionStakesByStakerResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.QueryPostConvictionStakesByStakerResponse",
+      value: QueryPostConvictionStakesByStakerResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryPostConvictionStakesByPostRequest(): QueryPostConvictionStakesByPostRequest {
+  return {
+    postId: BigInt(0),
+    pagination: undefined
+  };
+}
+/**
+ * QueryPostConvictionStakesByPostRequest defines the QueryPostConvictionStakesByPostRequest message.
+ * @name QueryPostConvictionStakesByPostRequest
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryPostConvictionStakesByPostRequest
+ */
+export const QueryPostConvictionStakesByPostRequest = {
+  typeUrl: "/sparkdream.forum.v1.QueryPostConvictionStakesByPostRequest",
+  encode(message: QueryPostConvictionStakesByPostRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.postId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.postId);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryPostConvictionStakesByPostRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryPostConvictionStakesByPostRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.postId = reader.uint64();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryPostConvictionStakesByPostRequest>): QueryPostConvictionStakesByPostRequest {
+    const message = createBaseQueryPostConvictionStakesByPostRequest();
+    message.postId = object.postId !== undefined && object.postId !== null ? BigInt(object.postId.toString()) : BigInt(0);
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryPostConvictionStakesByPostRequestAmino): QueryPostConvictionStakesByPostRequest {
+    const message = createBaseQueryPostConvictionStakesByPostRequest();
+    if (object.post_id !== undefined && object.post_id !== null) {
+      message.postId = BigInt(object.post_id);
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryPostConvictionStakesByPostRequest): QueryPostConvictionStakesByPostRequestAmino {
+    const obj: any = {};
+    obj.post_id = message.postId !== BigInt(0) ? message.postId?.toString() : undefined;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryPostConvictionStakesByPostRequestAminoMsg): QueryPostConvictionStakesByPostRequest {
+    return QueryPostConvictionStakesByPostRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryPostConvictionStakesByPostRequestProtoMsg): QueryPostConvictionStakesByPostRequest {
+    return QueryPostConvictionStakesByPostRequest.decode(message.value);
+  },
+  toProto(message: QueryPostConvictionStakesByPostRequest): Uint8Array {
+    return QueryPostConvictionStakesByPostRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryPostConvictionStakesByPostRequest): QueryPostConvictionStakesByPostRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.QueryPostConvictionStakesByPostRequest",
+      value: QueryPostConvictionStakesByPostRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryPostConvictionStakesByPostResponse(): QueryPostConvictionStakesByPostResponse {
+  return {
+    stakes: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryPostConvictionStakesByPostResponse defines the QueryPostConvictionStakesByPostResponse message.
+ * @name QueryPostConvictionStakesByPostResponse
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryPostConvictionStakesByPostResponse
+ */
+export const QueryPostConvictionStakesByPostResponse = {
+  typeUrl: "/sparkdream.forum.v1.QueryPostConvictionStakesByPostResponse",
+  encode(message: QueryPostConvictionStakesByPostResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.stakes) {
+      PostConvictionStake.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryPostConvictionStakesByPostResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryPostConvictionStakesByPostResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.stakes.push(PostConvictionStake.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryPostConvictionStakesByPostResponse>): QueryPostConvictionStakesByPostResponse {
+    const message = createBaseQueryPostConvictionStakesByPostResponse();
+    message.stakes = object.stakes?.map(e => PostConvictionStake.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryPostConvictionStakesByPostResponseAmino): QueryPostConvictionStakesByPostResponse {
+    const message = createBaseQueryPostConvictionStakesByPostResponse();
+    message.stakes = object.stakes?.map(e => PostConvictionStake.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryPostConvictionStakesByPostResponse): QueryPostConvictionStakesByPostResponseAmino {
+    const obj: any = {};
+    if (message.stakes) {
+      obj.stakes = message.stakes.map(e => e ? PostConvictionStake.toAmino(e) : undefined);
+    } else {
+      obj.stakes = message.stakes;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryPostConvictionStakesByPostResponseAminoMsg): QueryPostConvictionStakesByPostResponse {
+    return QueryPostConvictionStakesByPostResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryPostConvictionStakesByPostResponseProtoMsg): QueryPostConvictionStakesByPostResponse {
+    return QueryPostConvictionStakesByPostResponse.decode(message.value);
+  },
+  toProto(message: QueryPostConvictionStakesByPostResponse): Uint8Array {
+    return QueryPostConvictionStakesByPostResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryPostConvictionStakesByPostResponse): QueryPostConvictionStakesByPostResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.QueryPostConvictionStakesByPostResponse",
+      value: QueryPostConvictionStakesByPostResponse.encode(message).finish()
     };
   }
 };

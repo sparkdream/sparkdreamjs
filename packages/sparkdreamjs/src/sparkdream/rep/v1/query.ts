@@ -1067,8 +1067,7 @@ export interface QueryMembersByTrustLevelRequestAminoMsg {
  * @see proto type: sparkdream.rep.v1.QueryMembersByTrustLevelResponse
  */
 export interface QueryMembersByTrustLevelResponse {
-  address: string;
-  dreamBalance: string;
+  members: Member[];
   pagination?: PageResponse;
 }
 export interface QueryMembersByTrustLevelResponseProtoMsg {
@@ -1082,8 +1081,7 @@ export interface QueryMembersByTrustLevelResponseProtoMsg {
  * @see proto type: sparkdream.rep.v1.QueryMembersByTrustLevelResponse
  */
 export interface QueryMembersByTrustLevelResponseAmino {
-  address?: string;
-  dream_balance?: string;
+  members?: MemberAmino[];
   pagination?: PageResponseAmino;
 }
 export interface QueryMembersByTrustLevelResponseAminoMsg {
@@ -7232,8 +7230,7 @@ export const QueryMembersByTrustLevelRequest = {
 };
 function createBaseQueryMembersByTrustLevelResponse(): QueryMembersByTrustLevelResponse {
   return {
-    address: "",
-    dreamBalance: "",
+    members: [],
     pagination: undefined
   };
 }
@@ -7246,14 +7243,11 @@ function createBaseQueryMembersByTrustLevelResponse(): QueryMembersByTrustLevelR
 export const QueryMembersByTrustLevelResponse = {
   typeUrl: "/sparkdream.rep.v1.QueryMembersByTrustLevelResponse",
   encode(message: QueryMembersByTrustLevelResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.address !== "") {
-      writer.uint32(10).string(message.address);
-    }
-    if (message.dreamBalance !== "") {
-      writer.uint32(18).string(message.dreamBalance);
+    for (const v of message.members) {
+      Member.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.pagination !== undefined) {
-      PageResponse.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -7265,12 +7259,9 @@ export const QueryMembersByTrustLevelResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.address = reader.string();
+          message.members.push(Member.decode(reader, reader.uint32()));
           break;
         case 2:
-          message.dreamBalance = reader.string();
-          break;
-        case 3:
           message.pagination = PageResponse.decode(reader, reader.uint32());
           break;
         default:
@@ -7282,19 +7273,13 @@ export const QueryMembersByTrustLevelResponse = {
   },
   fromPartial(object: DeepPartial<QueryMembersByTrustLevelResponse>): QueryMembersByTrustLevelResponse {
     const message = createBaseQueryMembersByTrustLevelResponse();
-    message.address = object.address ?? "";
-    message.dreamBalance = object.dreamBalance ?? "";
+    message.members = object.members?.map(e => Member.fromPartial(e)) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
     return message;
   },
   fromAmino(object: QueryMembersByTrustLevelResponseAmino): QueryMembersByTrustLevelResponse {
     const message = createBaseQueryMembersByTrustLevelResponse();
-    if (object.address !== undefined && object.address !== null) {
-      message.address = object.address;
-    }
-    if (object.dream_balance !== undefined && object.dream_balance !== null) {
-      message.dreamBalance = object.dream_balance;
-    }
+    message.members = object.members?.map(e => Member.fromAmino(e)) || [];
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageResponse.fromAmino(object.pagination);
     }
@@ -7302,8 +7287,11 @@ export const QueryMembersByTrustLevelResponse = {
   },
   toAmino(message: QueryMembersByTrustLevelResponse): QueryMembersByTrustLevelResponseAmino {
     const obj: any = {};
-    obj.address = message.address === "" ? undefined : message.address;
-    obj.dream_balance = message.dreamBalance === "" ? undefined : message.dreamBalance;
+    if (message.members) {
+      obj.members = message.members.map(e => e ? Member.toAmino(e) : undefined);
+    } else {
+      obj.members = message.members;
+    }
     obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
     return obj;
   },
