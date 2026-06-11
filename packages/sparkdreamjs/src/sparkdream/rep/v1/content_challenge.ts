@@ -57,7 +57,7 @@ export function contentChallengeStatusToJSON(object: ContentChallengeStatus): st
 export interface ContentChallenge {
   id: bigint;
   /**
-   * Target content identification (author bond type: 7=BLOG, 8=FORUM, 9=COLLECTION)
+   * Target content identification (author bond type: 7=BLOG, 8=FORUM, 9=COLLECTION, 10=BLOG_REPLY)
    */
   targetType: StakeTargetType;
   targetId: bigint;
@@ -117,7 +117,7 @@ export interface ContentChallengeProtoMsg {
 export interface ContentChallengeAmino {
   id?: string;
   /**
-   * Target content identification (author bond type: 7=BLOG, 8=FORUM, 9=COLLECTION)
+   * Target content identification (author bond type: 7=BLOG, 8=FORUM, 9=COLLECTION, 10=BLOG_REPLY)
    */
   target_type?: StakeTargetType;
   target_id?: string;

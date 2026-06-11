@@ -2206,7 +2206,7 @@ export interface QueryContentConvictionResponseAminoMsg {
  */
 export interface QueryAuthorBondRequest {
   /**
-   * StakeTargetType (7=BLOG_AUTHOR_BOND, 8=FORUM_AUTHOR_BOND, 9=COLLECTION_AUTHOR_BOND)
+   * StakeTargetType (7=BLOG_AUTHOR_BOND, 8=FORUM_AUTHOR_BOND, 9=COLLECTION_AUTHOR_BOND, 10=BLOG_REPLY_AUTHOR_BOND)
    */
   targetType: bigint;
   /**
@@ -2226,7 +2226,7 @@ export interface QueryAuthorBondRequestProtoMsg {
  */
 export interface QueryAuthorBondRequestAmino {
   /**
-   * StakeTargetType (7=BLOG_AUTHOR_BOND, 8=FORUM_AUTHOR_BOND, 9=COLLECTION_AUTHOR_BOND)
+   * StakeTargetType (7=BLOG_AUTHOR_BOND, 8=FORUM_AUTHOR_BOND, 9=COLLECTION_AUTHOR_BOND, 10=BLOG_REPLY_AUTHOR_BOND)
    */
   target_type?: string;
   /**
@@ -4411,6 +4411,62 @@ export interface QueryRequiredInvitationStakeResponseAmino {
 export interface QueryRequiredInvitationStakeResponseAminoMsg {
   type: "/sparkdream.rep.v1.QueryRequiredInvitationStakeResponse";
   value: QueryRequiredInvitationStakeResponseAmino;
+}
+/**
+ * QueryAuthorBondsByTypeRequest defines the QueryAuthorBondsByTypeRequest message.
+ * @name QueryAuthorBondsByTypeRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAuthorBondsByTypeRequest
+ */
+export interface QueryAuthorBondsByTypeRequest {
+  targetType: bigint;
+  pagination?: PageRequest;
+}
+export interface QueryAuthorBondsByTypeRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAuthorBondsByTypeRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryAuthorBondsByTypeRequest defines the QueryAuthorBondsByTypeRequest message.
+ * @name QueryAuthorBondsByTypeRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAuthorBondsByTypeRequest
+ */
+export interface QueryAuthorBondsByTypeRequestAmino {
+  target_type?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryAuthorBondsByTypeRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAuthorBondsByTypeRequest";
+  value: QueryAuthorBondsByTypeRequestAmino;
+}
+/**
+ * QueryAuthorBondsByTypeResponse defines the QueryAuthorBondsByTypeResponse message.
+ * @name QueryAuthorBondsByTypeResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAuthorBondsByTypeResponse
+ */
+export interface QueryAuthorBondsByTypeResponse {
+  bonds: Stake[];
+  pagination?: PageResponse;
+}
+export interface QueryAuthorBondsByTypeResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAuthorBondsByTypeResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryAuthorBondsByTypeResponse defines the QueryAuthorBondsByTypeResponse message.
+ * @name QueryAuthorBondsByTypeResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAuthorBondsByTypeResponse
+ */
+export interface QueryAuthorBondsByTypeResponseAmino {
+  bonds?: StakeAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryAuthorBondsByTypeResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAuthorBondsByTypeResponse";
+  value: QueryAuthorBondsByTypeResponseAmino;
 }
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
@@ -16701,6 +16757,170 @@ export const QueryRequiredInvitationStakeResponse = {
     return {
       typeUrl: "/sparkdream.rep.v1.QueryRequiredInvitationStakeResponse",
       value: QueryRequiredInvitationStakeResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAuthorBondsByTypeRequest(): QueryAuthorBondsByTypeRequest {
+  return {
+    targetType: BigInt(0),
+    pagination: undefined
+  };
+}
+/**
+ * QueryAuthorBondsByTypeRequest defines the QueryAuthorBondsByTypeRequest message.
+ * @name QueryAuthorBondsByTypeRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAuthorBondsByTypeRequest
+ */
+export const QueryAuthorBondsByTypeRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryAuthorBondsByTypeRequest",
+  encode(message: QueryAuthorBondsByTypeRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.targetType !== BigInt(0)) {
+      writer.uint32(8).uint64(message.targetType);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAuthorBondsByTypeRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAuthorBondsByTypeRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.targetType = reader.uint64();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAuthorBondsByTypeRequest>): QueryAuthorBondsByTypeRequest {
+    const message = createBaseQueryAuthorBondsByTypeRequest();
+    message.targetType = object.targetType !== undefined && object.targetType !== null ? BigInt(object.targetType.toString()) : BigInt(0);
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAuthorBondsByTypeRequestAmino): QueryAuthorBondsByTypeRequest {
+    const message = createBaseQueryAuthorBondsByTypeRequest();
+    if (object.target_type !== undefined && object.target_type !== null) {
+      message.targetType = BigInt(object.target_type);
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAuthorBondsByTypeRequest): QueryAuthorBondsByTypeRequestAmino {
+    const obj: any = {};
+    obj.target_type = message.targetType !== BigInt(0) ? message.targetType?.toString() : undefined;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAuthorBondsByTypeRequestAminoMsg): QueryAuthorBondsByTypeRequest {
+    return QueryAuthorBondsByTypeRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAuthorBondsByTypeRequestProtoMsg): QueryAuthorBondsByTypeRequest {
+    return QueryAuthorBondsByTypeRequest.decode(message.value);
+  },
+  toProto(message: QueryAuthorBondsByTypeRequest): Uint8Array {
+    return QueryAuthorBondsByTypeRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAuthorBondsByTypeRequest): QueryAuthorBondsByTypeRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAuthorBondsByTypeRequest",
+      value: QueryAuthorBondsByTypeRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAuthorBondsByTypeResponse(): QueryAuthorBondsByTypeResponse {
+  return {
+    bonds: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryAuthorBondsByTypeResponse defines the QueryAuthorBondsByTypeResponse message.
+ * @name QueryAuthorBondsByTypeResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAuthorBondsByTypeResponse
+ */
+export const QueryAuthorBondsByTypeResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryAuthorBondsByTypeResponse",
+  encode(message: QueryAuthorBondsByTypeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.bonds) {
+      Stake.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAuthorBondsByTypeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAuthorBondsByTypeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.bonds.push(Stake.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAuthorBondsByTypeResponse>): QueryAuthorBondsByTypeResponse {
+    const message = createBaseQueryAuthorBondsByTypeResponse();
+    message.bonds = object.bonds?.map(e => Stake.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAuthorBondsByTypeResponseAmino): QueryAuthorBondsByTypeResponse {
+    const message = createBaseQueryAuthorBondsByTypeResponse();
+    message.bonds = object.bonds?.map(e => Stake.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAuthorBondsByTypeResponse): QueryAuthorBondsByTypeResponseAmino {
+    const obj: any = {};
+    if (message.bonds) {
+      obj.bonds = message.bonds.map(e => e ? Stake.toAmino(e) : undefined);
+    } else {
+      obj.bonds = message.bonds;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAuthorBondsByTypeResponseAminoMsg): QueryAuthorBondsByTypeResponse {
+    return QueryAuthorBondsByTypeResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAuthorBondsByTypeResponseProtoMsg): QueryAuthorBondsByTypeResponse {
+    return QueryAuthorBondsByTypeResponse.decode(message.value);
+  },
+  toProto(message: QueryAuthorBondsByTypeResponse): Uint8Array {
+    return QueryAuthorBondsByTypeResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAuthorBondsByTypeResponse): QueryAuthorBondsByTypeResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAuthorBondsByTypeResponse",
+      value: QueryAuthorBondsByTypeResponse.encode(message).finish()
     };
   }
 };

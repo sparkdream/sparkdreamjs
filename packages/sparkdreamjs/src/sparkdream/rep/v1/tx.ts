@@ -1635,7 +1635,7 @@ export interface MsgSubmitExpertTestimonyResponseAminoMsg {
 export interface MsgChallengeContent {
   challenger: string;
   /**
-   * StakeTargetType (7=BLOG_AUTHOR_BOND, 8=FORUM_AUTHOR_BOND, 9=COLLECTION_AUTHOR_BOND)
+   * StakeTargetType (7=BLOG_AUTHOR_BOND, 8=FORUM_AUTHOR_BOND, 9=COLLECTION_AUTHOR_BOND, 10=BLOG_REPLY_AUTHOR_BOND)
    */
   targetType: bigint;
   targetId: bigint;
@@ -1656,7 +1656,7 @@ export interface MsgChallengeContentProtoMsg {
 export interface MsgChallengeContentAmino {
   challenger?: string;
   /**
-   * StakeTargetType (7=BLOG_AUTHOR_BOND, 8=FORUM_AUTHOR_BOND, 9=COLLECTION_AUTHOR_BOND)
+   * StakeTargetType (7=BLOG_AUTHOR_BOND, 8=FORUM_AUTHOR_BOND, 9=COLLECTION_AUTHOR_BOND, 10=BLOG_REPLY_AUTHOR_BOND)
    */
   target_type?: string;
   target_id?: string;

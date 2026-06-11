@@ -20,10 +20,16 @@ export enum StakeTargetType {
   STAKE_TARGET_COLLECTION_CONTENT = 6,
   /** STAKE_TARGET_BLOG_AUTHOR_BOND - Author bonds (no DREAM rewards, slashable on moderation) */
   STAKE_TARGET_BLOG_AUTHOR_BOND = 7,
-  /** STAKE_TARGET_FORUM_AUTHOR_BOND - Author bond on x/forum content */
+  /** STAKE_TARGET_FORUM_AUTHOR_BOND - Author bond on x/forum content (posts and replies share one id space) */
   STAKE_TARGET_FORUM_AUTHOR_BOND = 8,
   /** STAKE_TARGET_COLLECTION_AUTHOR_BOND - Author bond on x/collect content */
   STAKE_TARGET_COLLECTION_AUTHOR_BOND = 9,
+  /**
+   * STAKE_TARGET_BLOG_REPLY_AUTHOR_BOND - Blog replies have their own id sequence independent of blog posts, so
+   * reply bonds need a distinct target type: sharing BLOG_AUTHOR_BOND would
+   * make post N and reply N collide (one-bond-per-target, queries, challenges).
+   */
+  STAKE_TARGET_BLOG_REPLY_AUTHOR_BOND = 10,
   UNRECOGNIZED = -1,
 }
 export const StakeTargetTypeAmino = StakeTargetType;
@@ -59,6 +65,9 @@ export function stakeTargetTypeFromJSON(object: any): StakeTargetType {
     case 9:
     case "STAKE_TARGET_COLLECTION_AUTHOR_BOND":
       return StakeTargetType.STAKE_TARGET_COLLECTION_AUTHOR_BOND;
+    case 10:
+    case "STAKE_TARGET_BLOG_REPLY_AUTHOR_BOND":
+      return StakeTargetType.STAKE_TARGET_BLOG_REPLY_AUTHOR_BOND;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -87,6 +96,8 @@ export function stakeTargetTypeToJSON(object: StakeTargetType): string {
       return "STAKE_TARGET_FORUM_AUTHOR_BOND";
     case StakeTargetType.STAKE_TARGET_COLLECTION_AUTHOR_BOND:
       return "STAKE_TARGET_COLLECTION_AUTHOR_BOND";
+    case StakeTargetType.STAKE_TARGET_BLOG_REPLY_AUTHOR_BOND:
+      return "STAKE_TARGET_BLOG_REPLY_AUTHOR_BOND";
     case StakeTargetType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";

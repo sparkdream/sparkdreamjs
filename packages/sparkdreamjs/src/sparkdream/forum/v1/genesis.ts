@@ -40,6 +40,13 @@ export interface GenesisState {
   threadFollowMap: ThreadFollow[];
   threadFollowCountMap: ThreadFollowCount[];
   archiveMetadataMap: ArchiveMetadata[];
+  /**
+   * post_count persists the PostSeq counter (next post ID) across
+   * export/import. Post IDs start at 1; 0 is reserved (parent_id=0 means
+   * "no parent"). InitGenesis floors the restored value above every
+   * imported post ID, so legacy exports without this field stay safe.
+   */
+  postCount: bigint;
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.forum.v1.GenesisState";
@@ -70,6 +77,13 @@ export interface GenesisStateAmino {
   thread_follow_map?: ThreadFollowAmino[];
   thread_follow_count_map?: ThreadFollowCountAmino[];
   archive_metadata_map?: ArchiveMetadataAmino[];
+  /**
+   * post_count persists the PostSeq counter (next post ID) across
+   * export/import. Post IDs start at 1; 0 is reserved (parent_id=0 means
+   * "no parent"). InitGenesis floors the restored value above every
+   * imported post ID, so legacy exports without this field stay safe.
+   */
+  post_count?: string;
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.forum.v1.GenesisState";
@@ -91,7 +105,8 @@ function createBaseGenesisState(): GenesisState {
     threadMetadataMap: [],
     threadFollowMap: [],
     threadFollowCountMap: [],
-    archiveMetadataMap: []
+    archiveMetadataMap: [],
+    postCount: BigInt(0)
   };
 }
 /**
@@ -148,6 +163,9 @@ export const GenesisState = {
     for (const v of message.archiveMetadataMap) {
       ArchiveMetadata.encode(v!, writer.uint32(122).fork()).ldelim();
     }
+    if (message.postCount !== BigInt(0)) {
+      writer.uint32(128).uint64(message.postCount);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -202,6 +220,9 @@ export const GenesisState = {
         case 15:
           message.archiveMetadataMap.push(ArchiveMetadata.decode(reader, reader.uint32()));
           break;
+        case 16:
+          message.postCount = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -226,6 +247,7 @@ export const GenesisState = {
     message.threadFollowMap = object.threadFollowMap?.map(e => ThreadFollow.fromPartial(e)) || [];
     message.threadFollowCountMap = object.threadFollowCountMap?.map(e => ThreadFollowCount.fromPartial(e)) || [];
     message.archiveMetadataMap = object.archiveMetadataMap?.map(e => ArchiveMetadata.fromPartial(e)) || [];
+    message.postCount = object.postCount !== undefined && object.postCount !== null ? BigInt(object.postCount.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -249,6 +271,9 @@ export const GenesisState = {
     message.threadFollowMap = object.thread_follow_map?.map(e => ThreadFollow.fromAmino(e)) || [];
     message.threadFollowCountMap = object.thread_follow_count_map?.map(e => ThreadFollowCount.fromAmino(e)) || [];
     message.archiveMetadataMap = object.archive_metadata_map?.map(e => ArchiveMetadata.fromAmino(e)) || [];
+    if (object.post_count !== undefined && object.post_count !== null) {
+      message.postCount = BigInt(object.post_count);
+    }
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -320,6 +345,7 @@ export const GenesisState = {
     } else {
       obj.archive_metadata_map = message.archiveMetadataMap;
     }
+    obj.post_count = message.postCount !== BigInt(0) ? message.postCount?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {
