@@ -4,6 +4,65 @@ import { ContentType } from "../../common/v1/content_type";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
+ * HideAuthority selects which authority the caller of MsgHidePost is invoking.
+ * It disambiguates the case where an account is BOTH a bonded forum sentinel
+ * and a Commons Operations Committee member: without it the handler would
+ * silently pick the council (gov) path — a strictly more powerful, less
+ * accountable action chosen by accident. See
+ * docs/HANDOFF_HIDE_AUTHORITY_DISAMBIGUATION.md.
+ */
+export enum HideAuthority {
+  /**
+   * HIDE_AUTHORITY_AUTO - AUTO (default, back-compat): resolve to the sentinel path whenever the
+   * account holds an eligible sentinel bond (NORMAL/RECOVERY), else fall
+   * through to the council path if council-authorized, else error. AUTO
+   * prefers the accountable (bonded + author-appealable) sentinel path.
+   */
+  HIDE_AUTHORITY_AUTO = 0,
+  /**
+   * HIDE_AUTHORITY_SENTINEL - SENTINEL: force the sentinel path; error if the account is not an
+   * eligible sentinel (no silent fallback to council).
+   */
+  HIDE_AUTHORITY_SENTINEL = 1,
+  /**
+   * HIDE_AUTHORITY_COUNCIL - COUNCIL: force the council (gov-authority) path; error if the account is
+   * not council-authorized. The deliberate "act as committee" choice.
+   */
+  HIDE_AUTHORITY_COUNCIL = 2,
+  UNRECOGNIZED = -1,
+}
+export const HideAuthorityAmino = HideAuthority;
+export function hideAuthorityFromJSON(object: any): HideAuthority {
+  switch (object) {
+    case 0:
+    case "HIDE_AUTHORITY_AUTO":
+      return HideAuthority.HIDE_AUTHORITY_AUTO;
+    case 1:
+    case "HIDE_AUTHORITY_SENTINEL":
+      return HideAuthority.HIDE_AUTHORITY_SENTINEL;
+    case 2:
+    case "HIDE_AUTHORITY_COUNCIL":
+      return HideAuthority.HIDE_AUTHORITY_COUNCIL;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return HideAuthority.UNRECOGNIZED;
+  }
+}
+export function hideAuthorityToJSON(object: HideAuthority): string {
+  switch (object) {
+    case HideAuthority.HIDE_AUTHORITY_AUTO:
+      return "HIDE_AUTHORITY_AUTO";
+    case HideAuthority.HIDE_AUTHORITY_SENTINEL:
+      return "HIDE_AUTHORITY_SENTINEL";
+    case HideAuthority.HIDE_AUTHORITY_COUNCIL:
+      return "HIDE_AUTHORITY_COUNCIL";
+    case HideAuthority.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+/**
  * MsgUpdateParams is the Msg/UpdateParams request type.
  * @name MsgUpdateParams
  * @package sparkdream.forum.v1
@@ -1158,6 +1217,11 @@ export interface MsgHidePost {
   postId: bigint;
   reasonCode: bigint;
   reasonText: string;
+  /**
+   * authority selects which moderation authority the caller is invoking.
+   * Defaults to AUTO for backward compatibility.
+   */
+  authority: HideAuthority;
 }
 export interface MsgHidePostProtoMsg {
   typeUrl: "/sparkdream.forum.v1.MsgHidePost";
@@ -1174,6 +1238,11 @@ export interface MsgHidePostAmino {
   post_id?: string;
   reason_code?: string;
   reason_text?: string;
+  /**
+   * authority selects which moderation authority the caller is invoking.
+   * Defaults to AUTO for backward compatibility.
+   */
+  authority?: HideAuthority;
 }
 export interface MsgHidePostAminoMsg {
   type: "sparkdream/x/forum/MsgHidePost";
@@ -5329,7 +5398,8 @@ function createBaseMsgHidePost(): MsgHidePost {
     creator: "",
     postId: BigInt(0),
     reasonCode: BigInt(0),
-    reasonText: ""
+    reasonText: "",
+    authority: 0
   };
 }
 /**
@@ -5354,6 +5424,9 @@ export const MsgHidePost = {
     if (message.reasonText !== "") {
       writer.uint32(34).string(message.reasonText);
     }
+    if (message.authority !== 0) {
+      writer.uint32(40).int32(message.authority);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgHidePost {
@@ -5375,6 +5448,9 @@ export const MsgHidePost = {
         case 4:
           message.reasonText = reader.string();
           break;
+        case 5:
+          message.authority = reader.int32() as any;
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -5388,6 +5464,7 @@ export const MsgHidePost = {
     message.postId = object.postId !== undefined && object.postId !== null ? BigInt(object.postId.toString()) : BigInt(0);
     message.reasonCode = object.reasonCode !== undefined && object.reasonCode !== null ? BigInt(object.reasonCode.toString()) : BigInt(0);
     message.reasonText = object.reasonText ?? "";
+    message.authority = object.authority ?? 0;
     return message;
   },
   fromAmino(object: MsgHidePostAmino): MsgHidePost {
@@ -5404,6 +5481,9 @@ export const MsgHidePost = {
     if (object.reason_text !== undefined && object.reason_text !== null) {
       message.reasonText = object.reason_text;
     }
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
     return message;
   },
   toAmino(message: MsgHidePost): MsgHidePostAmino {
@@ -5412,6 +5492,7 @@ export const MsgHidePost = {
     obj.post_id = message.postId !== BigInt(0) ? message.postId?.toString() : undefined;
     obj.reason_code = message.reasonCode !== BigInt(0) ? message.reasonCode?.toString() : undefined;
     obj.reason_text = message.reasonText === "" ? undefined : message.reasonText;
+    obj.authority = message.authority === 0 ? undefined : message.authority;
     return obj;
   },
   fromAminoMsg(object: MsgHidePostAminoMsg): MsgHidePost {
