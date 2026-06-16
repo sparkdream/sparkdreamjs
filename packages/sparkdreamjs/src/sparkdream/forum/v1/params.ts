@@ -207,6 +207,44 @@ export interface Params {
    */
   maxMakePermanentPerDay: bigint;
   /**
+   * max_hides_per_epoch caps sentinel MsgHidePost actions per address per UTC
+   * day. 0 = use the default (50).
+   */
+  maxHidesPerEpoch: bigint;
+  /**
+   * max_sentinel_locks_per_epoch caps sentinel MsgLockThread actions per
+   * address per UTC day. 0 = use the default (5).
+   */
+  maxSentinelLocksPerEpoch: bigint;
+  /**
+   * max_sentinel_moves_per_epoch caps sentinel MsgMoveThread actions per
+   * address per UTC day. 0 = use the default (10).
+   */
+  maxSentinelMovesPerEpoch: bigint;
+  /**
+   * sentinel_slash_amount is the DREAM reserved-then-slashed per moderation
+   * action that is later overturned on appeal (math.Int string, udream).
+   * Bounded to (0, min_sentinel_bond]. Empty/"0" = use the default (100 DREAM).
+   */
+  sentinelSlashAmount: string;
+  /**
+   * lock_bond_multiplier: a sentinel must have bonded at least
+   * lock_bond_multiplier × min_sentinel_bond to lock a thread. Bounded >= 1
+   * (lock can never be weaker than the base bond). 0 = use the default (4).
+   */
+  lockBondMultiplier: bigint;
+  /**
+   * lock_backing_amount is the minimum DREAM backing (total balance) a sentinel
+   * must hold to lock a thread (math.Int string, udream). Bounded >= the
+   * derived lock bond. Empty/"0" = use the default (20000 DREAM).
+   */
+  lockBackingAmount: string;
+  /**
+   * lock_min_rep_tier is the minimum reputation tier required to lock a thread.
+   * Bounded to [min_sentinel_rep_tier, 5]. 0 = use the default (4).
+   */
+  lockMinRepTier: bigint;
+  /**
    * min_post_conviction_stake is the minimum DREAM amount required to open a
    * PostConvictionStake (math.Int string, e.g. "10000000" = 10 DREAM). Floors
    * out sybil dust stakes that would otherwise farm the per-tag epoch cap with
@@ -458,6 +496,44 @@ export interface ParamsAmino {
    */
   max_make_permanent_per_day?: string;
   /**
+   * max_hides_per_epoch caps sentinel MsgHidePost actions per address per UTC
+   * day. 0 = use the default (50).
+   */
+  max_hides_per_epoch?: string;
+  /**
+   * max_sentinel_locks_per_epoch caps sentinel MsgLockThread actions per
+   * address per UTC day. 0 = use the default (5).
+   */
+  max_sentinel_locks_per_epoch?: string;
+  /**
+   * max_sentinel_moves_per_epoch caps sentinel MsgMoveThread actions per
+   * address per UTC day. 0 = use the default (10).
+   */
+  max_sentinel_moves_per_epoch?: string;
+  /**
+   * sentinel_slash_amount is the DREAM reserved-then-slashed per moderation
+   * action that is later overturned on appeal (math.Int string, udream).
+   * Bounded to (0, min_sentinel_bond]. Empty/"0" = use the default (100 DREAM).
+   */
+  sentinel_slash_amount?: string;
+  /**
+   * lock_bond_multiplier: a sentinel must have bonded at least
+   * lock_bond_multiplier × min_sentinel_bond to lock a thread. Bounded >= 1
+   * (lock can never be weaker than the base bond). 0 = use the default (4).
+   */
+  lock_bond_multiplier?: string;
+  /**
+   * lock_backing_amount is the minimum DREAM backing (total balance) a sentinel
+   * must hold to lock a thread (math.Int string, udream). Bounded >= the
+   * derived lock bond. Empty/"0" = use the default (20000 DREAM).
+   */
+  lock_backing_amount?: string;
+  /**
+   * lock_min_rep_tier is the minimum reputation tier required to lock a thread.
+   * Bounded to [min_sentinel_rep_tier, 5]. 0 = use the default (4).
+   */
+  lock_min_rep_tier?: string;
+  /**
    * min_post_conviction_stake is the minimum DREAM amount required to open a
    * PostConvictionStake (math.Int string, e.g. "10000000" = 10 DREAM). Floors
    * out sybil dust stakes that would otherwise farm the per-tag epoch cap with
@@ -624,6 +700,22 @@ export interface ForumOperationalParams {
    */
   maxMakePermanentPerDay: bigint;
   /**
+   * max_hides_per_epoch — see Params.max_hides_per_epoch.
+   */
+  maxHidesPerEpoch: bigint;
+  /**
+   * max_sentinel_locks_per_epoch — see Params.max_sentinel_locks_per_epoch.
+   */
+  maxSentinelLocksPerEpoch: bigint;
+  /**
+   * max_sentinel_moves_per_epoch — see Params.max_sentinel_moves_per_epoch.
+   */
+  maxSentinelMovesPerEpoch: bigint;
+  /**
+   * sentinel_slash_amount — see Params.sentinel_slash_amount.
+   */
+  sentinelSlashAmount: string;
+  /**
    * min_post_conviction_stake — see Params.min_post_conviction_stake.
    */
   minPostConvictionStake: string;
@@ -768,6 +860,22 @@ export interface ForumOperationalParamsAmino {
    */
   max_make_permanent_per_day?: string;
   /**
+   * max_hides_per_epoch — see Params.max_hides_per_epoch.
+   */
+  max_hides_per_epoch?: string;
+  /**
+   * max_sentinel_locks_per_epoch — see Params.max_sentinel_locks_per_epoch.
+   */
+  max_sentinel_locks_per_epoch?: string;
+  /**
+   * max_sentinel_moves_per_epoch — see Params.max_sentinel_moves_per_epoch.
+   */
+  max_sentinel_moves_per_epoch?: string;
+  /**
+   * sentinel_slash_amount — see Params.sentinel_slash_amount.
+   */
+  sentinel_slash_amount?: string;
+  /**
    * min_post_conviction_stake — see Params.min_post_conviction_stake.
    */
   min_post_conviction_stake?: string;
@@ -838,6 +946,13 @@ function createBaseParams(): Params {
     maxPromotionsPerBlock: 0,
     authorRepSlash: "",
     maxMakePermanentPerDay: BigInt(0),
+    maxHidesPerEpoch: BigInt(0),
+    maxSentinelLocksPerEpoch: BigInt(0),
+    maxSentinelMovesPerEpoch: BigInt(0),
+    sentinelSlashAmount: "",
+    lockBondMultiplier: BigInt(0),
+    lockBackingAmount: "",
+    lockMinRepTier: BigInt(0),
     minPostConvictionStake: "",
     postConvictionLockSeconds: BigInt(0),
     postConvictionStreamRatePerBlock: "",
@@ -988,6 +1103,27 @@ export const Params = {
     }
     if (message.maxMakePermanentPerDay !== BigInt(0)) {
       writer.uint32(408).uint64(message.maxMakePermanentPerDay);
+    }
+    if (message.maxHidesPerEpoch !== BigInt(0)) {
+      writer.uint32(416).uint64(message.maxHidesPerEpoch);
+    }
+    if (message.maxSentinelLocksPerEpoch !== BigInt(0)) {
+      writer.uint32(424).uint64(message.maxSentinelLocksPerEpoch);
+    }
+    if (message.maxSentinelMovesPerEpoch !== BigInt(0)) {
+      writer.uint32(432).uint64(message.maxSentinelMovesPerEpoch);
+    }
+    if (message.sentinelSlashAmount !== "") {
+      writer.uint32(442).string(message.sentinelSlashAmount);
+    }
+    if (message.lockBondMultiplier !== BigInt(0)) {
+      writer.uint32(448).uint64(message.lockBondMultiplier);
+    }
+    if (message.lockBackingAmount !== "") {
+      writer.uint32(458).string(message.lockBackingAmount);
+    }
+    if (message.lockMinRepTier !== BigInt(0)) {
+      writer.uint32(464).uint64(message.lockMinRepTier);
     }
     if (message.minPostConvictionStake !== "") {
       writer.uint32(482).string(message.minPostConvictionStake);
@@ -1145,6 +1281,27 @@ export const Params = {
         case 51:
           message.maxMakePermanentPerDay = reader.uint64();
           break;
+        case 52:
+          message.maxHidesPerEpoch = reader.uint64();
+          break;
+        case 53:
+          message.maxSentinelLocksPerEpoch = reader.uint64();
+          break;
+        case 54:
+          message.maxSentinelMovesPerEpoch = reader.uint64();
+          break;
+        case 55:
+          message.sentinelSlashAmount = reader.string();
+          break;
+        case 56:
+          message.lockBondMultiplier = reader.uint64();
+          break;
+        case 57:
+          message.lockBackingAmount = reader.string();
+          break;
+        case 58:
+          message.lockMinRepTier = reader.uint64();
+          break;
         case 60:
           message.minPostConvictionStake = reader.string();
           break;
@@ -1213,6 +1370,13 @@ export const Params = {
     message.maxPromotionsPerBlock = object.maxPromotionsPerBlock ?? 0;
     message.authorRepSlash = object.authorRepSlash ?? "";
     message.maxMakePermanentPerDay = object.maxMakePermanentPerDay !== undefined && object.maxMakePermanentPerDay !== null ? BigInt(object.maxMakePermanentPerDay.toString()) : BigInt(0);
+    message.maxHidesPerEpoch = object.maxHidesPerEpoch !== undefined && object.maxHidesPerEpoch !== null ? BigInt(object.maxHidesPerEpoch.toString()) : BigInt(0);
+    message.maxSentinelLocksPerEpoch = object.maxSentinelLocksPerEpoch !== undefined && object.maxSentinelLocksPerEpoch !== null ? BigInt(object.maxSentinelLocksPerEpoch.toString()) : BigInt(0);
+    message.maxSentinelMovesPerEpoch = object.maxSentinelMovesPerEpoch !== undefined && object.maxSentinelMovesPerEpoch !== null ? BigInt(object.maxSentinelMovesPerEpoch.toString()) : BigInt(0);
+    message.sentinelSlashAmount = object.sentinelSlashAmount ?? "";
+    message.lockBondMultiplier = object.lockBondMultiplier !== undefined && object.lockBondMultiplier !== null ? BigInt(object.lockBondMultiplier.toString()) : BigInt(0);
+    message.lockBackingAmount = object.lockBackingAmount ?? "";
+    message.lockMinRepTier = object.lockMinRepTier !== undefined && object.lockMinRepTier !== null ? BigInt(object.lockMinRepTier.toString()) : BigInt(0);
     message.minPostConvictionStake = object.minPostConvictionStake ?? "";
     message.postConvictionLockSeconds = object.postConvictionLockSeconds !== undefined && object.postConvictionLockSeconds !== null ? BigInt(object.postConvictionLockSeconds.toString()) : BigInt(0);
     message.postConvictionStreamRatePerBlock = object.postConvictionStreamRatePerBlock ?? "";
@@ -1354,6 +1518,27 @@ export const Params = {
     if (object.max_make_permanent_per_day !== undefined && object.max_make_permanent_per_day !== null) {
       message.maxMakePermanentPerDay = BigInt(object.max_make_permanent_per_day);
     }
+    if (object.max_hides_per_epoch !== undefined && object.max_hides_per_epoch !== null) {
+      message.maxHidesPerEpoch = BigInt(object.max_hides_per_epoch);
+    }
+    if (object.max_sentinel_locks_per_epoch !== undefined && object.max_sentinel_locks_per_epoch !== null) {
+      message.maxSentinelLocksPerEpoch = BigInt(object.max_sentinel_locks_per_epoch);
+    }
+    if (object.max_sentinel_moves_per_epoch !== undefined && object.max_sentinel_moves_per_epoch !== null) {
+      message.maxSentinelMovesPerEpoch = BigInt(object.max_sentinel_moves_per_epoch);
+    }
+    if (object.sentinel_slash_amount !== undefined && object.sentinel_slash_amount !== null) {
+      message.sentinelSlashAmount = object.sentinel_slash_amount;
+    }
+    if (object.lock_bond_multiplier !== undefined && object.lock_bond_multiplier !== null) {
+      message.lockBondMultiplier = BigInt(object.lock_bond_multiplier);
+    }
+    if (object.lock_backing_amount !== undefined && object.lock_backing_amount !== null) {
+      message.lockBackingAmount = object.lock_backing_amount;
+    }
+    if (object.lock_min_rep_tier !== undefined && object.lock_min_rep_tier !== null) {
+      message.lockMinRepTier = BigInt(object.lock_min_rep_tier);
+    }
     if (object.min_post_conviction_stake !== undefined && object.min_post_conviction_stake !== null) {
       message.minPostConvictionStake = object.min_post_conviction_stake;
     }
@@ -1417,6 +1602,13 @@ export const Params = {
     obj.max_promotions_per_block = message.maxPromotionsPerBlock === 0 ? undefined : message.maxPromotionsPerBlock;
     obj.author_rep_slash = message.authorRepSlash === "" ? undefined : message.authorRepSlash;
     obj.max_make_permanent_per_day = message.maxMakePermanentPerDay !== BigInt(0) ? message.maxMakePermanentPerDay?.toString() : undefined;
+    obj.max_hides_per_epoch = message.maxHidesPerEpoch !== BigInt(0) ? message.maxHidesPerEpoch?.toString() : undefined;
+    obj.max_sentinel_locks_per_epoch = message.maxSentinelLocksPerEpoch !== BigInt(0) ? message.maxSentinelLocksPerEpoch?.toString() : undefined;
+    obj.max_sentinel_moves_per_epoch = message.maxSentinelMovesPerEpoch !== BigInt(0) ? message.maxSentinelMovesPerEpoch?.toString() : undefined;
+    obj.sentinel_slash_amount = message.sentinelSlashAmount === "" ? undefined : message.sentinelSlashAmount;
+    obj.lock_bond_multiplier = message.lockBondMultiplier !== BigInt(0) ? message.lockBondMultiplier?.toString() : undefined;
+    obj.lock_backing_amount = message.lockBackingAmount === "" ? undefined : message.lockBackingAmount;
+    obj.lock_min_rep_tier = message.lockMinRepTier !== BigInt(0) ? message.lockMinRepTier?.toString() : undefined;
     obj.min_post_conviction_stake = message.minPostConvictionStake === "" ? undefined : message.minPostConvictionStake;
     obj.post_conviction_lock_seconds = message.postConvictionLockSeconds !== BigInt(0) ? message.postConvictionLockSeconds?.toString() : undefined;
     obj.post_conviction_stream_rate_per_block = message.postConvictionStreamRatePerBlock === "" ? undefined : message.postConvictionStreamRatePerBlock;
@@ -1489,6 +1681,10 @@ function createBaseForumOperationalParams(): ForumOperationalParams {
     maxPromotionsPerBlock: 0,
     authorRepSlash: "",
     maxMakePermanentPerDay: BigInt(0),
+    maxHidesPerEpoch: BigInt(0),
+    maxSentinelLocksPerEpoch: BigInt(0),
+    maxSentinelMovesPerEpoch: BigInt(0),
+    sentinelSlashAmount: "",
     minPostConvictionStake: "",
     postConvictionLockSeconds: BigInt(0),
     postConvictionStreamRatePerBlock: "",
@@ -1631,6 +1827,18 @@ export const ForumOperationalParams = {
     }
     if (message.maxMakePermanentPerDay !== BigInt(0)) {
       writer.uint32(408).uint64(message.maxMakePermanentPerDay);
+    }
+    if (message.maxHidesPerEpoch !== BigInt(0)) {
+      writer.uint32(416).uint64(message.maxHidesPerEpoch);
+    }
+    if (message.maxSentinelLocksPerEpoch !== BigInt(0)) {
+      writer.uint32(424).uint64(message.maxSentinelLocksPerEpoch);
+    }
+    if (message.maxSentinelMovesPerEpoch !== BigInt(0)) {
+      writer.uint32(432).uint64(message.maxSentinelMovesPerEpoch);
+    }
+    if (message.sentinelSlashAmount !== "") {
+      writer.uint32(442).string(message.sentinelSlashAmount);
     }
     if (message.minPostConvictionStake !== "") {
       writer.uint32(482).string(message.minPostConvictionStake);
@@ -1779,6 +1987,18 @@ export const ForumOperationalParams = {
         case 51:
           message.maxMakePermanentPerDay = reader.uint64();
           break;
+        case 52:
+          message.maxHidesPerEpoch = reader.uint64();
+          break;
+        case 53:
+          message.maxSentinelLocksPerEpoch = reader.uint64();
+          break;
+        case 54:
+          message.maxSentinelMovesPerEpoch = reader.uint64();
+          break;
+        case 55:
+          message.sentinelSlashAmount = reader.string();
+          break;
         case 60:
           message.minPostConvictionStake = reader.string();
           break;
@@ -1844,6 +2064,10 @@ export const ForumOperationalParams = {
     message.maxPromotionsPerBlock = object.maxPromotionsPerBlock ?? 0;
     message.authorRepSlash = object.authorRepSlash ?? "";
     message.maxMakePermanentPerDay = object.maxMakePermanentPerDay !== undefined && object.maxMakePermanentPerDay !== null ? BigInt(object.maxMakePermanentPerDay.toString()) : BigInt(0);
+    message.maxHidesPerEpoch = object.maxHidesPerEpoch !== undefined && object.maxHidesPerEpoch !== null ? BigInt(object.maxHidesPerEpoch.toString()) : BigInt(0);
+    message.maxSentinelLocksPerEpoch = object.maxSentinelLocksPerEpoch !== undefined && object.maxSentinelLocksPerEpoch !== null ? BigInt(object.maxSentinelLocksPerEpoch.toString()) : BigInt(0);
+    message.maxSentinelMovesPerEpoch = object.maxSentinelMovesPerEpoch !== undefined && object.maxSentinelMovesPerEpoch !== null ? BigInt(object.maxSentinelMovesPerEpoch.toString()) : BigInt(0);
+    message.sentinelSlashAmount = object.sentinelSlashAmount ?? "";
     message.minPostConvictionStake = object.minPostConvictionStake ?? "";
     message.postConvictionLockSeconds = object.postConvictionLockSeconds !== undefined && object.postConvictionLockSeconds !== null ? BigInt(object.postConvictionLockSeconds.toString()) : BigInt(0);
     message.postConvictionStreamRatePerBlock = object.postConvictionStreamRatePerBlock ?? "";
@@ -1976,6 +2200,18 @@ export const ForumOperationalParams = {
     if (object.max_make_permanent_per_day !== undefined && object.max_make_permanent_per_day !== null) {
       message.maxMakePermanentPerDay = BigInt(object.max_make_permanent_per_day);
     }
+    if (object.max_hides_per_epoch !== undefined && object.max_hides_per_epoch !== null) {
+      message.maxHidesPerEpoch = BigInt(object.max_hides_per_epoch);
+    }
+    if (object.max_sentinel_locks_per_epoch !== undefined && object.max_sentinel_locks_per_epoch !== null) {
+      message.maxSentinelLocksPerEpoch = BigInt(object.max_sentinel_locks_per_epoch);
+    }
+    if (object.max_sentinel_moves_per_epoch !== undefined && object.max_sentinel_moves_per_epoch !== null) {
+      message.maxSentinelMovesPerEpoch = BigInt(object.max_sentinel_moves_per_epoch);
+    }
+    if (object.sentinel_slash_amount !== undefined && object.sentinel_slash_amount !== null) {
+      message.sentinelSlashAmount = object.sentinel_slash_amount;
+    }
     if (object.min_post_conviction_stake !== undefined && object.min_post_conviction_stake !== null) {
       message.minPostConvictionStake = object.min_post_conviction_stake;
     }
@@ -2036,6 +2272,10 @@ export const ForumOperationalParams = {
     obj.max_promotions_per_block = message.maxPromotionsPerBlock === 0 ? undefined : message.maxPromotionsPerBlock;
     obj.author_rep_slash = message.authorRepSlash === "" ? undefined : message.authorRepSlash;
     obj.max_make_permanent_per_day = message.maxMakePermanentPerDay !== BigInt(0) ? message.maxMakePermanentPerDay?.toString() : undefined;
+    obj.max_hides_per_epoch = message.maxHidesPerEpoch !== BigInt(0) ? message.maxHidesPerEpoch?.toString() : undefined;
+    obj.max_sentinel_locks_per_epoch = message.maxSentinelLocksPerEpoch !== BigInt(0) ? message.maxSentinelLocksPerEpoch?.toString() : undefined;
+    obj.max_sentinel_moves_per_epoch = message.maxSentinelMovesPerEpoch !== BigInt(0) ? message.maxSentinelMovesPerEpoch?.toString() : undefined;
+    obj.sentinel_slash_amount = message.sentinelSlashAmount === "" ? undefined : message.sentinelSlashAmount;
     obj.min_post_conviction_stake = message.minPostConvictionStake === "" ? undefined : message.minPostConvictionStake;
     obj.post_conviction_lock_seconds = message.postConvictionLockSeconds !== BigInt(0) ? message.postConvictionLockSeconds?.toString() : undefined;
     obj.post_conviction_stream_rate_per_block = message.postConvictionStreamRatePerBlock === "" ? undefined : message.postConvictionStreamRatePerBlock;

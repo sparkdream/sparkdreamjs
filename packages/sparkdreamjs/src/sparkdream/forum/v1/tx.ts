@@ -4,60 +4,61 @@ import { ContentType } from "../../common/v1/content_type";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
- * HideAuthority selects which authority the caller of MsgHidePost is invoking.
- * It disambiguates the case where an account is BOTH a bonded forum sentinel
- * and a Commons Operations Committee member: without it the handler would
- * silently pick the council (gov) path — a strictly more powerful, less
- * accountable action chosen by accident. See
- * docs/HANDOFF_HIDE_AUTHORITY_DISAMBIGUATION.md.
+ * ModerationAuthority selects which authority the caller of a sentinel/council
+ * moderation message (hide, lock, move) is invoking. It disambiguates the case
+ * where an account is BOTH a bonded forum sentinel and a Commons Operations
+ * Committee member: without it the handler would silently pick the council
+ * (gov) path — a strictly more powerful, less accountable action chosen by
+ * accident. See docs/HANDOFF_HIDE_AUTHORITY_DISAMBIGUATION.md.
  */
-export enum HideAuthority {
+export enum ModerationAuthority {
   /**
-   * HIDE_AUTHORITY_AUTO - AUTO (default, back-compat): resolve to the sentinel path whenever the
-   * account holds an eligible sentinel bond (NORMAL/RECOVERY), else fall
-   * through to the council path if council-authorized, else error. AUTO
-   * prefers the accountable (bonded + author-appealable) sentinel path.
+   * MODERATION_AUTHORITY_AUTO - AUTO (default, back-compat): resolve to the sentinel path whenever the
+   * account is eligible for that specific action (bonded sentinel in
+   * NORMAL/RECOVERY plus the action's own requirements), else fall through to
+   * the council path if council-authorized, else error. AUTO prefers the
+   * accountable (bonded + author-appealable) sentinel path.
    */
-  HIDE_AUTHORITY_AUTO = 0,
+  MODERATION_AUTHORITY_AUTO = 0,
   /**
-   * HIDE_AUTHORITY_SENTINEL - SENTINEL: force the sentinel path; error if the account is not an
-   * eligible sentinel (no silent fallback to council).
+   * MODERATION_AUTHORITY_SENTINEL - SENTINEL: force the sentinel path; error if the account is not eligible
+   * for the action (no silent fallback to council).
    */
-  HIDE_AUTHORITY_SENTINEL = 1,
+  MODERATION_AUTHORITY_SENTINEL = 1,
   /**
-   * HIDE_AUTHORITY_COUNCIL - COUNCIL: force the council (gov-authority) path; error if the account is
+   * MODERATION_AUTHORITY_COUNCIL - COUNCIL: force the council (gov-authority) path; error if the account is
    * not council-authorized. The deliberate "act as committee" choice.
    */
-  HIDE_AUTHORITY_COUNCIL = 2,
+  MODERATION_AUTHORITY_COUNCIL = 2,
   UNRECOGNIZED = -1,
 }
-export const HideAuthorityAmino = HideAuthority;
-export function hideAuthorityFromJSON(object: any): HideAuthority {
+export const ModerationAuthorityAmino = ModerationAuthority;
+export function moderationAuthorityFromJSON(object: any): ModerationAuthority {
   switch (object) {
     case 0:
-    case "HIDE_AUTHORITY_AUTO":
-      return HideAuthority.HIDE_AUTHORITY_AUTO;
+    case "MODERATION_AUTHORITY_AUTO":
+      return ModerationAuthority.MODERATION_AUTHORITY_AUTO;
     case 1:
-    case "HIDE_AUTHORITY_SENTINEL":
-      return HideAuthority.HIDE_AUTHORITY_SENTINEL;
+    case "MODERATION_AUTHORITY_SENTINEL":
+      return ModerationAuthority.MODERATION_AUTHORITY_SENTINEL;
     case 2:
-    case "HIDE_AUTHORITY_COUNCIL":
-      return HideAuthority.HIDE_AUTHORITY_COUNCIL;
+    case "MODERATION_AUTHORITY_COUNCIL":
+      return ModerationAuthority.MODERATION_AUTHORITY_COUNCIL;
     case -1:
     case "UNRECOGNIZED":
     default:
-      return HideAuthority.UNRECOGNIZED;
+      return ModerationAuthority.UNRECOGNIZED;
   }
 }
-export function hideAuthorityToJSON(object: HideAuthority): string {
+export function moderationAuthorityToJSON(object: ModerationAuthority): string {
   switch (object) {
-    case HideAuthority.HIDE_AUTHORITY_AUTO:
-      return "HIDE_AUTHORITY_AUTO";
-    case HideAuthority.HIDE_AUTHORITY_SENTINEL:
-      return "HIDE_AUTHORITY_SENTINEL";
-    case HideAuthority.HIDE_AUTHORITY_COUNCIL:
-      return "HIDE_AUTHORITY_COUNCIL";
-    case HideAuthority.UNRECOGNIZED:
+    case ModerationAuthority.MODERATION_AUTHORITY_AUTO:
+      return "MODERATION_AUTHORITY_AUTO";
+    case ModerationAuthority.MODERATION_AUTHORITY_SENTINEL:
+      return "MODERATION_AUTHORITY_SENTINEL";
+    case ModerationAuthority.MODERATION_AUTHORITY_COUNCIL:
+      return "MODERATION_AUTHORITY_COUNCIL";
+    case ModerationAuthority.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
   }
@@ -636,6 +637,11 @@ export interface MsgLockThread {
   creator: string;
   rootId: bigint;
   reason: string;
+  /**
+   * authority selects which moderation authority the caller is invoking.
+   * Defaults to AUTO for backward compatibility.
+   */
+  authority: ModerationAuthority;
 }
 export interface MsgLockThreadProtoMsg {
   typeUrl: "/sparkdream.forum.v1.MsgLockThread";
@@ -651,6 +657,11 @@ export interface MsgLockThreadAmino {
   creator?: string;
   root_id?: string;
   reason?: string;
+  /**
+   * authority selects which moderation authority the caller is invoking.
+   * Defaults to AUTO for backward compatibility.
+   */
+  authority?: ModerationAuthority;
 }
 export interface MsgLockThreadAminoMsg {
   type: "sparkdream/x/forum/MsgLockThread";
@@ -739,6 +750,11 @@ export interface MsgMoveThread {
   rootId: bigint;
   newCategoryId: bigint;
   reason: string;
+  /**
+   * authority selects which moderation authority the caller is invoking.
+   * Defaults to AUTO for backward compatibility.
+   */
+  authority: ModerationAuthority;
 }
 export interface MsgMoveThreadProtoMsg {
   typeUrl: "/sparkdream.forum.v1.MsgMoveThread";
@@ -755,6 +771,11 @@ export interface MsgMoveThreadAmino {
   root_id?: string;
   new_category_id?: string;
   reason?: string;
+  /**
+   * authority selects which moderation authority the caller is invoking.
+   * Defaults to AUTO for backward compatibility.
+   */
+  authority?: ModerationAuthority;
 }
 export interface MsgMoveThreadAminoMsg {
   type: "sparkdream/x/forum/MsgMoveThread";
@@ -1221,7 +1242,7 @@ export interface MsgHidePost {
    * authority selects which moderation authority the caller is invoking.
    * Defaults to AUTO for backward compatibility.
    */
-  authority: HideAuthority;
+  authority: ModerationAuthority;
 }
 export interface MsgHidePostProtoMsg {
   typeUrl: "/sparkdream.forum.v1.MsgHidePost";
@@ -1242,7 +1263,7 @@ export interface MsgHidePostAmino {
    * authority selects which moderation authority the caller is invoking.
    * Defaults to AUTO for backward compatibility.
    */
-  authority?: HideAuthority;
+  authority?: ModerationAuthority;
 }
 export interface MsgHidePostAminoMsg {
   type: "sparkdream/x/forum/MsgHidePost";
@@ -3714,7 +3735,8 @@ function createBaseMsgLockThread(): MsgLockThread {
   return {
     creator: "",
     rootId: BigInt(0),
-    reason: ""
+    reason: "",
+    authority: 0
   };
 }
 /**
@@ -3736,6 +3758,9 @@ export const MsgLockThread = {
     if (message.reason !== "") {
       writer.uint32(26).string(message.reason);
     }
+    if (message.authority !== 0) {
+      writer.uint32(32).int32(message.authority);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgLockThread {
@@ -3754,6 +3779,9 @@ export const MsgLockThread = {
         case 3:
           message.reason = reader.string();
           break;
+        case 4:
+          message.authority = reader.int32() as any;
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3766,6 +3794,7 @@ export const MsgLockThread = {
     message.creator = object.creator ?? "";
     message.rootId = object.rootId !== undefined && object.rootId !== null ? BigInt(object.rootId.toString()) : BigInt(0);
     message.reason = object.reason ?? "";
+    message.authority = object.authority ?? 0;
     return message;
   },
   fromAmino(object: MsgLockThreadAmino): MsgLockThread {
@@ -3779,6 +3808,9 @@ export const MsgLockThread = {
     if (object.reason !== undefined && object.reason !== null) {
       message.reason = object.reason;
     }
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
     return message;
   },
   toAmino(message: MsgLockThread): MsgLockThreadAmino {
@@ -3786,6 +3818,7 @@ export const MsgLockThread = {
     obj.creator = message.creator === "" ? undefined : message.creator;
     obj.root_id = message.rootId !== BigInt(0) ? message.rootId?.toString() : undefined;
     obj.reason = message.reason === "" ? undefined : message.reason;
+    obj.authority = message.authority === 0 ? undefined : message.authority;
     return obj;
   },
   fromAminoMsg(object: MsgLockThreadAminoMsg): MsgLockThread {
@@ -4015,7 +4048,8 @@ function createBaseMsgMoveThread(): MsgMoveThread {
     creator: "",
     rootId: BigInt(0),
     newCategoryId: BigInt(0),
-    reason: ""
+    reason: "",
+    authority: 0
   };
 }
 /**
@@ -4040,6 +4074,9 @@ export const MsgMoveThread = {
     if (message.reason !== "") {
       writer.uint32(34).string(message.reason);
     }
+    if (message.authority !== 0) {
+      writer.uint32(40).int32(message.authority);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgMoveThread {
@@ -4061,6 +4098,9 @@ export const MsgMoveThread = {
         case 4:
           message.reason = reader.string();
           break;
+        case 5:
+          message.authority = reader.int32() as any;
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4074,6 +4114,7 @@ export const MsgMoveThread = {
     message.rootId = object.rootId !== undefined && object.rootId !== null ? BigInt(object.rootId.toString()) : BigInt(0);
     message.newCategoryId = object.newCategoryId !== undefined && object.newCategoryId !== null ? BigInt(object.newCategoryId.toString()) : BigInt(0);
     message.reason = object.reason ?? "";
+    message.authority = object.authority ?? 0;
     return message;
   },
   fromAmino(object: MsgMoveThreadAmino): MsgMoveThread {
@@ -4090,6 +4131,9 @@ export const MsgMoveThread = {
     if (object.reason !== undefined && object.reason !== null) {
       message.reason = object.reason;
     }
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
     return message;
   },
   toAmino(message: MsgMoveThread): MsgMoveThreadAmino {
@@ -4098,6 +4142,7 @@ export const MsgMoveThread = {
     obj.root_id = message.rootId !== BigInt(0) ? message.rootId?.toString() : undefined;
     obj.new_category_id = message.newCategoryId !== BigInt(0) ? message.newCategoryId?.toString() : undefined;
     obj.reason = message.reason === "" ? undefined : message.reason;
+    obj.authority = message.authority === 0 ? undefined : message.authority;
     return obj;
   },
   fromAminoMsg(object: MsgMoveThreadAminoMsg): MsgMoveThread {
