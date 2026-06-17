@@ -14,6 +14,12 @@ export interface SentinelActivity {
   totalHides: bigint;
   upheldHides: bigint;
   overturnedHides: bigint;
+  /**
+   * unchallenged_hides counts hides that expired without ever being appealed
+   * (the hide stood by default). Written by the hide-expiry EndBlocker. Excluded
+   * from accuracy/reward math by design — it is a display/audit metric only, so
+   * a sentinel cannot game rewards by spam-hiding low-visibility content.
+   */
   unchallengedHides: bigint;
   epochHides: bigint;
   epochAppealsResolved: bigint;
@@ -34,10 +40,6 @@ export interface SentinelActivity {
   upheldPins: bigint;
   overturnedPins: bigint;
   epochPins: bigint;
-  totalProposals: bigint;
-  confirmedProposals: bigint;
-  rejectedProposals: bigint;
-  epochCurations: bigint;
 }
 export interface SentinelActivityProtoMsg {
   typeUrl: "/sparkdream.forum.v1.SentinelActivity";
@@ -56,6 +58,12 @@ export interface SentinelActivityAmino {
   total_hides?: string;
   upheld_hides?: string;
   overturned_hides?: string;
+  /**
+   * unchallenged_hides counts hides that expired without ever being appealed
+   * (the hide stood by default). Written by the hide-expiry EndBlocker. Excluded
+   * from accuracy/reward math by design — it is a display/audit metric only, so
+   * a sentinel cannot game rewards by spam-hiding low-visibility content.
+   */
   unchallenged_hides?: string;
   epoch_hides?: string;
   epoch_appeals_resolved?: string;
@@ -76,10 +84,6 @@ export interface SentinelActivityAmino {
   upheld_pins?: string;
   overturned_pins?: string;
   epoch_pins?: string;
-  total_proposals?: string;
-  confirmed_proposals?: string;
-  rejected_proposals?: string;
-  epoch_curations?: string;
 }
 export interface SentinelActivityAminoMsg {
   type: "/sparkdream.forum.v1.SentinelActivity";
@@ -110,11 +114,7 @@ function createBaseSentinelActivity(): SentinelActivity {
     totalPins: BigInt(0),
     upheldPins: BigInt(0),
     overturnedPins: BigInt(0),
-    epochPins: BigInt(0),
-    totalProposals: BigInt(0),
-    confirmedProposals: BigInt(0),
-    rejectedProposals: BigInt(0),
-    epochCurations: BigInt(0)
+    epochPins: BigInt(0)
   };
 }
 /**
@@ -200,18 +200,6 @@ export const SentinelActivity = {
     if (message.epochPins !== BigInt(0)) {
       writer.uint32(192).uint64(message.epochPins);
     }
-    if (message.totalProposals !== BigInt(0)) {
-      writer.uint32(200).uint64(message.totalProposals);
-    }
-    if (message.confirmedProposals !== BigInt(0)) {
-      writer.uint32(208).uint64(message.confirmedProposals);
-    }
-    if (message.rejectedProposals !== BigInt(0)) {
-      writer.uint32(216).uint64(message.rejectedProposals);
-    }
-    if (message.epochCurations !== BigInt(0)) {
-      writer.uint32(224).uint64(message.epochCurations);
-    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): SentinelActivity {
@@ -293,18 +281,6 @@ export const SentinelActivity = {
         case 24:
           message.epochPins = reader.uint64();
           break;
-        case 25:
-          message.totalProposals = reader.uint64();
-          break;
-        case 26:
-          message.confirmedProposals = reader.uint64();
-          break;
-        case 27:
-          message.rejectedProposals = reader.uint64();
-          break;
-        case 28:
-          message.epochCurations = reader.uint64();
-          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -338,10 +314,6 @@ export const SentinelActivity = {
     message.upheldPins = object.upheldPins !== undefined && object.upheldPins !== null ? BigInt(object.upheldPins.toString()) : BigInt(0);
     message.overturnedPins = object.overturnedPins !== undefined && object.overturnedPins !== null ? BigInt(object.overturnedPins.toString()) : BigInt(0);
     message.epochPins = object.epochPins !== undefined && object.epochPins !== null ? BigInt(object.epochPins.toString()) : BigInt(0);
-    message.totalProposals = object.totalProposals !== undefined && object.totalProposals !== null ? BigInt(object.totalProposals.toString()) : BigInt(0);
-    message.confirmedProposals = object.confirmedProposals !== undefined && object.confirmedProposals !== null ? BigInt(object.confirmedProposals.toString()) : BigInt(0);
-    message.rejectedProposals = object.rejectedProposals !== undefined && object.rejectedProposals !== null ? BigInt(object.rejectedProposals.toString()) : BigInt(0);
-    message.epochCurations = object.epochCurations !== undefined && object.epochCurations !== null ? BigInt(object.epochCurations.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: SentinelActivityAmino): SentinelActivity {
@@ -418,18 +390,6 @@ export const SentinelActivity = {
     if (object.epoch_pins !== undefined && object.epoch_pins !== null) {
       message.epochPins = BigInt(object.epoch_pins);
     }
-    if (object.total_proposals !== undefined && object.total_proposals !== null) {
-      message.totalProposals = BigInt(object.total_proposals);
-    }
-    if (object.confirmed_proposals !== undefined && object.confirmed_proposals !== null) {
-      message.confirmedProposals = BigInt(object.confirmed_proposals);
-    }
-    if (object.rejected_proposals !== undefined && object.rejected_proposals !== null) {
-      message.rejectedProposals = BigInt(object.rejected_proposals);
-    }
-    if (object.epoch_curations !== undefined && object.epoch_curations !== null) {
-      message.epochCurations = BigInt(object.epoch_curations);
-    }
     return message;
   },
   toAmino(message: SentinelActivity): SentinelActivityAmino {
@@ -458,10 +418,6 @@ export const SentinelActivity = {
     obj.upheld_pins = message.upheldPins !== BigInt(0) ? message.upheldPins?.toString() : undefined;
     obj.overturned_pins = message.overturnedPins !== BigInt(0) ? message.overturnedPins?.toString() : undefined;
     obj.epoch_pins = message.epochPins !== BigInt(0) ? message.epochPins?.toString() : undefined;
-    obj.total_proposals = message.totalProposals !== BigInt(0) ? message.totalProposals?.toString() : undefined;
-    obj.confirmed_proposals = message.confirmedProposals !== BigInt(0) ? message.confirmedProposals?.toString() : undefined;
-    obj.rejected_proposals = message.rejectedProposals !== BigInt(0) ? message.rejectedProposals?.toString() : undefined;
-    obj.epoch_curations = message.epochCurations !== BigInt(0) ? message.epochCurations?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: SentinelActivityAminoMsg): SentinelActivity {

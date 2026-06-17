@@ -39,6 +39,13 @@ export interface HideRecord {
    * hide flavors are distinguished.
    */
   authorBondAmount: string;
+  /**
+   * appealed is set true when an appeal is filed against this hide (via
+   * MsgAppealPost). The hide-expiry EndBlocker reads it to avoid double-counting:
+   * an appealed hide was already tallied as upheld/overturned, so only an
+   * un-appealed hide that expires increments unchallenged_hides.
+   */
+  appealed: boolean;
 }
 export interface HideRecordProtoMsg {
   typeUrl: "/sparkdream.forum.v1.HideRecord";
@@ -81,6 +88,13 @@ export interface HideRecordAmino {
    * hide flavors are distinguished.
    */
   author_bond_amount?: string;
+  /**
+   * appealed is set true when an appeal is filed against this hide (via
+   * MsgAppealPost). The hide-expiry EndBlocker reads it to avoid double-counting:
+   * an appealed hide was already tallied as upheld/overturned, so only an
+   * un-appealed hide that expires increments unchallenged_hides.
+   */
+  appealed?: boolean;
 }
 export interface HideRecordAminoMsg {
   type: "/sparkdream.forum.v1.HideRecord";
@@ -96,7 +110,8 @@ function createBaseHideRecord(): HideRecord {
     committedAmount: "",
     reasonCode: 0,
     reasonText: "",
-    authorBondAmount: ""
+    authorBondAmount: "",
+    appealed: false
   };
 }
 /**
@@ -141,6 +156,9 @@ export const HideRecord = {
     if (message.authorBondAmount !== "") {
       writer.uint32(74).string(message.authorBondAmount);
     }
+    if (message.appealed === true) {
+      writer.uint32(80).bool(message.appealed);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): HideRecord {
@@ -177,6 +195,9 @@ export const HideRecord = {
         case 9:
           message.authorBondAmount = reader.string();
           break;
+        case 10:
+          message.appealed = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -195,6 +216,7 @@ export const HideRecord = {
     message.reasonCode = object.reasonCode ?? 0;
     message.reasonText = object.reasonText ?? "";
     message.authorBondAmount = object.authorBondAmount ?? "";
+    message.appealed = object.appealed ?? false;
     return message;
   },
   fromAmino(object: HideRecordAmino): HideRecord {
@@ -226,6 +248,9 @@ export const HideRecord = {
     if (object.author_bond_amount !== undefined && object.author_bond_amount !== null) {
       message.authorBondAmount = object.author_bond_amount;
     }
+    if (object.appealed !== undefined && object.appealed !== null) {
+      message.appealed = object.appealed;
+    }
     return message;
   },
   toAmino(message: HideRecord): HideRecordAmino {
@@ -239,6 +264,7 @@ export const HideRecord = {
     obj.reason_code = message.reasonCode === 0 ? undefined : message.reasonCode;
     obj.reason_text = message.reasonText === "" ? undefined : message.reasonText;
     obj.author_bond_amount = message.authorBondAmount === "" ? undefined : message.authorBondAmount;
+    obj.appealed = message.appealed === false ? undefined : message.appealed;
     return obj;
   },
   fromAminoMsg(object: HideRecordAminoMsg): HideRecord {

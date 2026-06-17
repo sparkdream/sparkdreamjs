@@ -9,6 +9,8 @@ export enum GovActionType {
   GOV_ACTION_TYPE_FORUM_PAUSE = 5,
   GOV_ACTION_TYPE_THREAD_LOCK = 6,
   GOV_ACTION_TYPE_THREAD_MOVE = 7,
+  GOV_ACTION_TYPE_REPLY_PIN = 8,
+  GOV_ACTION_TYPE_POST_HIDE = 9,
   UNRECOGNIZED = -1,
 }
 export const GovActionTypeAmino = GovActionType;
@@ -38,6 +40,12 @@ export function govActionTypeFromJSON(object: any): GovActionType {
     case 7:
     case "GOV_ACTION_TYPE_THREAD_MOVE":
       return GovActionType.GOV_ACTION_TYPE_THREAD_MOVE;
+    case 8:
+    case "GOV_ACTION_TYPE_REPLY_PIN":
+      return GovActionType.GOV_ACTION_TYPE_REPLY_PIN;
+    case 9:
+    case "GOV_ACTION_TYPE_POST_HIDE":
+      return GovActionType.GOV_ACTION_TYPE_POST_HIDE;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -62,6 +70,10 @@ export function govActionTypeToJSON(object: GovActionType): string {
       return "GOV_ACTION_TYPE_THREAD_LOCK";
     case GovActionType.GOV_ACTION_TYPE_THREAD_MOVE:
       return "GOV_ACTION_TYPE_THREAD_MOVE";
+    case GovActionType.GOV_ACTION_TYPE_REPLY_PIN:
+      return "GOV_ACTION_TYPE_REPLY_PIN";
+    case GovActionType.GOV_ACTION_TYPE_POST_HIDE:
+      return "GOV_ACTION_TYPE_POST_HIDE";
     case GovActionType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";

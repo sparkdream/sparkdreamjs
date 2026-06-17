@@ -16,6 +16,12 @@ export interface ThreadLockRecord {
   lockReason: string;
   appealPending: boolean;
   initiativeId: bigint;
+  /**
+   * committed_amount is the sentinel bond (udream, as a string) reserved at lock
+   * time. Released on self-unlock or an upheld appeal, and the amount slashed
+   * basis on an overturn. Empty for governance-authority locks (no bond).
+   */
+  committedAmount: string;
 }
 export interface ThreadLockRecordProtoMsg {
   typeUrl: "/sparkdream.forum.v1.ThreadLockRecord";
@@ -36,6 +42,12 @@ export interface ThreadLockRecordAmino {
   lock_reason?: string;
   appeal_pending?: boolean;
   initiative_id?: string;
+  /**
+   * committed_amount is the sentinel bond (udream, as a string) reserved at lock
+   * time. Released on self-unlock or an upheld appeal, and the amount slashed
+   * basis on an overturn. Empty for governance-authority locks (no bond).
+   */
+  committed_amount?: string;
 }
 export interface ThreadLockRecordAminoMsg {
   type: "/sparkdream.forum.v1.ThreadLockRecord";
@@ -50,7 +62,8 @@ function createBaseThreadLockRecord(): ThreadLockRecord {
     sentinelBackingSnapshot: "",
     lockReason: "",
     appealPending: false,
-    initiativeId: BigInt(0)
+    initiativeId: BigInt(0),
+    committedAmount: ""
   };
 }
 /**
@@ -86,6 +99,9 @@ export const ThreadLockRecord = {
     if (message.initiativeId !== BigInt(0)) {
       writer.uint32(64).uint64(message.initiativeId);
     }
+    if (message.committedAmount !== "") {
+      writer.uint32(74).string(message.committedAmount);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): ThreadLockRecord {
@@ -119,6 +135,9 @@ export const ThreadLockRecord = {
         case 8:
           message.initiativeId = reader.uint64();
           break;
+        case 9:
+          message.committedAmount = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -136,6 +155,7 @@ export const ThreadLockRecord = {
     message.lockReason = object.lockReason ?? "";
     message.appealPending = object.appealPending ?? false;
     message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
+    message.committedAmount = object.committedAmount ?? "";
     return message;
   },
   fromAmino(object: ThreadLockRecordAmino): ThreadLockRecord {
@@ -164,6 +184,9 @@ export const ThreadLockRecord = {
     if (object.initiative_id !== undefined && object.initiative_id !== null) {
       message.initiativeId = BigInt(object.initiative_id);
     }
+    if (object.committed_amount !== undefined && object.committed_amount !== null) {
+      message.committedAmount = object.committed_amount;
+    }
     return message;
   },
   toAmino(message: ThreadLockRecord): ThreadLockRecordAmino {
@@ -176,6 +199,7 @@ export const ThreadLockRecord = {
     obj.lock_reason = message.lockReason === "" ? undefined : message.lockReason;
     obj.appeal_pending = message.appealPending === false ? undefined : message.appealPending;
     obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
+    obj.committed_amount = message.committedAmount === "" ? undefined : message.committedAmount;
     return obj;
   },
   fromAminoMsg(object: ThreadLockRecordAminoMsg): ThreadLockRecord {

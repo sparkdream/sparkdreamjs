@@ -329,6 +329,12 @@ export interface PinnedReplyRecord {
   isSentinelPin: boolean;
   disputed: boolean;
   initiativeId: bigint;
+  /**
+   * committed_amount is the sentinel bond (in udream, as a string) reserved at
+   * pin time, released on an upheld dispute and available to slash on an
+   * overturn. Empty for governance-authority pins (no bond reserved).
+   */
+  committedAmount: string;
 }
 export interface PinnedReplyRecordProtoMsg {
   typeUrl: "/sparkdream.forum.v1.PinnedReplyRecord";
@@ -347,6 +353,12 @@ export interface PinnedReplyRecordAmino {
   is_sentinel_pin?: boolean;
   disputed?: boolean;
   initiative_id?: string;
+  /**
+   * committed_amount is the sentinel bond (in udream, as a string) reserved at
+   * pin time, released on an upheld dispute and available to slash on an
+   * overturn. Empty for governance-authority pins (no bond reserved).
+   */
+  committed_amount?: string;
 }
 export interface PinnedReplyRecordAminoMsg {
   type: "/sparkdream.forum.v1.PinnedReplyRecord";
@@ -668,7 +680,8 @@ function createBasePinnedReplyRecord(): PinnedReplyRecord {
     pinnedAt: BigInt(0),
     isSentinelPin: false,
     disputed: false,
-    initiativeId: BigInt(0)
+    initiativeId: BigInt(0),
+    committedAmount: ""
   };
 }
 /**
@@ -698,6 +711,9 @@ export const PinnedReplyRecord = {
     if (message.initiativeId !== BigInt(0)) {
       writer.uint32(48).uint64(message.initiativeId);
     }
+    if (message.committedAmount !== "") {
+      writer.uint32(58).string(message.committedAmount);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): PinnedReplyRecord {
@@ -725,6 +741,9 @@ export const PinnedReplyRecord = {
         case 6:
           message.initiativeId = reader.uint64();
           break;
+        case 7:
+          message.committedAmount = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -740,6 +759,7 @@ export const PinnedReplyRecord = {
     message.isSentinelPin = object.isSentinelPin ?? false;
     message.disputed = object.disputed ?? false;
     message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
+    message.committedAmount = object.committedAmount ?? "";
     return message;
   },
   fromAmino(object: PinnedReplyRecordAmino): PinnedReplyRecord {
@@ -762,6 +782,9 @@ export const PinnedReplyRecord = {
     if (object.initiative_id !== undefined && object.initiative_id !== null) {
       message.initiativeId = BigInt(object.initiative_id);
     }
+    if (object.committed_amount !== undefined && object.committed_amount !== null) {
+      message.committedAmount = object.committed_amount;
+    }
     return message;
   },
   toAmino(message: PinnedReplyRecord): PinnedReplyRecordAmino {
@@ -772,6 +795,7 @@ export const PinnedReplyRecord = {
     obj.is_sentinel_pin = message.isSentinelPin === false ? undefined : message.isSentinelPin;
     obj.disputed = message.disputed === false ? undefined : message.disputed;
     obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
+    obj.committed_amount = message.committedAmount === "" ? undefined : message.committedAmount;
     return obj;
   },
   fromAminoMsg(object: PinnedReplyRecordAminoMsg): PinnedReplyRecord {

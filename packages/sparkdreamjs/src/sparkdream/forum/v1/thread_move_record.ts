@@ -18,6 +18,12 @@ export interface ThreadMoveRecord {
   moveReason: string;
   appealPending: boolean;
   initiativeId: bigint;
+  /**
+   * committed_amount is the sentinel bond (udream, as a string) reserved at move
+   * time. Released on an upheld appeal; the slash basis on an overturn. Empty
+   * for governance-authority moves (no bond).
+   */
+  committedAmount: string;
 }
 export interface ThreadMoveRecordProtoMsg {
   typeUrl: "/sparkdream.forum.v1.ThreadMoveRecord";
@@ -40,6 +46,12 @@ export interface ThreadMoveRecordAmino {
   move_reason?: string;
   appeal_pending?: boolean;
   initiative_id?: string;
+  /**
+   * committed_amount is the sentinel bond (udream, as a string) reserved at move
+   * time. Released on an upheld appeal; the slash basis on an overturn. Empty
+   * for governance-authority moves (no bond).
+   */
+  committed_amount?: string;
 }
 export interface ThreadMoveRecordAminoMsg {
   type: "/sparkdream.forum.v1.ThreadMoveRecord";
@@ -56,7 +68,8 @@ function createBaseThreadMoveRecord(): ThreadMoveRecord {
     sentinelBackingSnapshot: "",
     moveReason: "",
     appealPending: false,
-    initiativeId: BigInt(0)
+    initiativeId: BigInt(0),
+    committedAmount: ""
   };
 }
 /**
@@ -98,6 +111,9 @@ export const ThreadMoveRecord = {
     if (message.initiativeId !== BigInt(0)) {
       writer.uint32(80).uint64(message.initiativeId);
     }
+    if (message.committedAmount !== "") {
+      writer.uint32(90).string(message.committedAmount);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): ThreadMoveRecord {
@@ -137,6 +153,9 @@ export const ThreadMoveRecord = {
         case 10:
           message.initiativeId = reader.uint64();
           break;
+        case 11:
+          message.committedAmount = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -156,6 +175,7 @@ export const ThreadMoveRecord = {
     message.moveReason = object.moveReason ?? "";
     message.appealPending = object.appealPending ?? false;
     message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
+    message.committedAmount = object.committedAmount ?? "";
     return message;
   },
   fromAmino(object: ThreadMoveRecordAmino): ThreadMoveRecord {
@@ -190,6 +210,9 @@ export const ThreadMoveRecord = {
     if (object.initiative_id !== undefined && object.initiative_id !== null) {
       message.initiativeId = BigInt(object.initiative_id);
     }
+    if (object.committed_amount !== undefined && object.committed_amount !== null) {
+      message.committedAmount = object.committed_amount;
+    }
     return message;
   },
   toAmino(message: ThreadMoveRecord): ThreadMoveRecordAmino {
@@ -204,6 +227,7 @@ export const ThreadMoveRecord = {
     obj.move_reason = message.moveReason === "" ? undefined : message.moveReason;
     obj.appeal_pending = message.appealPending === false ? undefined : message.appealPending;
     obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
+    obj.committed_amount = message.committedAmount === "" ? undefined : message.committedAmount;
     return obj;
   },
   fromAminoMsg(object: ThreadMoveRecordAminoMsg): ThreadMoveRecord {
