@@ -286,6 +286,22 @@ export interface Params {
    * and the stake is closed.
    */
   postConvictionStakerSlashBps: bigint;
+  /**
+   * curation_dream_reward is the DREAM minted to a sentinel when their accepted-
+   * reply proposal is confirmed (by the author or via auto-confirm), in
+   * micro-DREAM (math.Int string). Read directly (no unset/default fallback):
+   * a non-positive value disables the reward, matching the IsPositive fee guards
+   * in x/rep / x/blog. Seeded by the genesis defaults.
+   */
+  curationDreamReward: string;
+  /**
+   * accept_proposal_timeout is the number of seconds after which a pending
+   * sentinel accepted-reply proposal auto-confirms if the author has not acted.
+   * Must be positive (Validate rejects 0/negative — a 0 timeout would
+   * auto-confirm on the next block, never an intended config). Seeded by the
+   * genesis defaults (48h).
+   */
+  acceptProposalTimeout: bigint;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.forum.v1.Params";
@@ -575,6 +591,22 @@ export interface ParamsAmino {
    * and the stake is closed.
    */
   post_conviction_staker_slash_bps?: string;
+  /**
+   * curation_dream_reward is the DREAM minted to a sentinel when their accepted-
+   * reply proposal is confirmed (by the author or via auto-confirm), in
+   * micro-DREAM (math.Int string). Read directly (no unset/default fallback):
+   * a non-positive value disables the reward, matching the IsPositive fee guards
+   * in x/rep / x/blog. Seeded by the genesis defaults.
+   */
+  curation_dream_reward?: string;
+  /**
+   * accept_proposal_timeout is the number of seconds after which a pending
+   * sentinel accepted-reply proposal auto-confirms if the author has not acted.
+   * Must be positive (Validate rejects 0/negative — a 0 timeout would
+   * auto-confirm on the next block, never an intended config). Seeded by the
+   * genesis defaults (48h).
+   */
+  accept_proposal_timeout?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/forum/Params";
@@ -735,6 +767,14 @@ export interface ForumOperationalParams {
    * post_conviction_staker_slash_bps — see Params.post_conviction_staker_slash_bps.
    */
   postConvictionStakerSlashBps: bigint;
+  /**
+   * curation_dream_reward — see Params.curation_dream_reward.
+   */
+  curationDreamReward: string;
+  /**
+   * accept_proposal_timeout — see Params.accept_proposal_timeout.
+   */
+  acceptProposalTimeout: bigint;
 }
 export interface ForumOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.forum.v1.ForumOperationalParams";
@@ -895,6 +935,14 @@ export interface ForumOperationalParamsAmino {
    * post_conviction_staker_slash_bps — see Params.post_conviction_staker_slash_bps.
    */
   post_conviction_staker_slash_bps?: string;
+  /**
+   * curation_dream_reward — see Params.curation_dream_reward.
+   */
+  curation_dream_reward?: string;
+  /**
+   * accept_proposal_timeout — see Params.accept_proposal_timeout.
+   */
+  accept_proposal_timeout?: string;
 }
 export interface ForumOperationalParamsAminoMsg {
   type: "sparkdream/x/forum/ForumOperationalParams";
@@ -957,7 +1005,9 @@ function createBaseParams(): Params {
     postConvictionLockSeconds: BigInt(0),
     postConvictionStreamRatePerBlock: "",
     maxForumRepPerTagPerEpoch: "",
-    postConvictionStakerSlashBps: BigInt(0)
+    postConvictionStakerSlashBps: BigInt(0),
+    curationDreamReward: "",
+    acceptProposalTimeout: BigInt(0)
   };
 }
 /**
@@ -1140,6 +1190,12 @@ export const Params = {
     if (message.postConvictionStakerSlashBps !== BigInt(0)) {
       writer.uint32(512).uint64(message.postConvictionStakerSlashBps);
     }
+    if (message.curationDreamReward !== "") {
+      writer.uint32(522).string(message.curationDreamReward);
+    }
+    if (message.acceptProposalTimeout !== BigInt(0)) {
+      writer.uint32(528).int64(message.acceptProposalTimeout);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -1317,6 +1373,12 @@ export const Params = {
         case 64:
           message.postConvictionStakerSlashBps = reader.uint64();
           break;
+        case 65:
+          message.curationDreamReward = reader.string();
+          break;
+        case 66:
+          message.acceptProposalTimeout = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1382,6 +1444,8 @@ export const Params = {
     message.postConvictionStreamRatePerBlock = object.postConvictionStreamRatePerBlock ?? "";
     message.maxForumRepPerTagPerEpoch = object.maxForumRepPerTagPerEpoch ?? "";
     message.postConvictionStakerSlashBps = object.postConvictionStakerSlashBps !== undefined && object.postConvictionStakerSlashBps !== null ? BigInt(object.postConvictionStakerSlashBps.toString()) : BigInt(0);
+    message.curationDreamReward = object.curationDreamReward ?? "";
+    message.acceptProposalTimeout = object.acceptProposalTimeout !== undefined && object.acceptProposalTimeout !== null ? BigInt(object.acceptProposalTimeout.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -1554,6 +1618,12 @@ export const Params = {
     if (object.post_conviction_staker_slash_bps !== undefined && object.post_conviction_staker_slash_bps !== null) {
       message.postConvictionStakerSlashBps = BigInt(object.post_conviction_staker_slash_bps);
     }
+    if (object.curation_dream_reward !== undefined && object.curation_dream_reward !== null) {
+      message.curationDreamReward = object.curation_dream_reward;
+    }
+    if (object.accept_proposal_timeout !== undefined && object.accept_proposal_timeout !== null) {
+      message.acceptProposalTimeout = BigInt(object.accept_proposal_timeout);
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -1614,6 +1684,8 @@ export const Params = {
     obj.post_conviction_stream_rate_per_block = message.postConvictionStreamRatePerBlock === "" ? undefined : message.postConvictionStreamRatePerBlock;
     obj.max_forum_rep_per_tag_per_epoch = message.maxForumRepPerTagPerEpoch === "" ? undefined : message.maxForumRepPerTagPerEpoch;
     obj.post_conviction_staker_slash_bps = message.postConvictionStakerSlashBps !== BigInt(0) ? message.postConvictionStakerSlashBps?.toString() : undefined;
+    obj.curation_dream_reward = message.curationDreamReward === "" ? undefined : message.curationDreamReward;
+    obj.accept_proposal_timeout = message.acceptProposalTimeout !== BigInt(0) ? message.acceptProposalTimeout?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {
@@ -1689,7 +1761,9 @@ function createBaseForumOperationalParams(): ForumOperationalParams {
     postConvictionLockSeconds: BigInt(0),
     postConvictionStreamRatePerBlock: "",
     maxForumRepPerTagPerEpoch: "",
-    postConvictionStakerSlashBps: BigInt(0)
+    postConvictionStakerSlashBps: BigInt(0),
+    curationDreamReward: "",
+    acceptProposalTimeout: BigInt(0)
   };
 }
 /**
@@ -1855,6 +1929,12 @@ export const ForumOperationalParams = {
     if (message.postConvictionStakerSlashBps !== BigInt(0)) {
       writer.uint32(512).uint64(message.postConvictionStakerSlashBps);
     }
+    if (message.curationDreamReward !== "") {
+      writer.uint32(522).string(message.curationDreamReward);
+    }
+    if (message.acceptProposalTimeout !== BigInt(0)) {
+      writer.uint32(528).int64(message.acceptProposalTimeout);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): ForumOperationalParams {
@@ -2014,6 +2094,12 @@ export const ForumOperationalParams = {
         case 64:
           message.postConvictionStakerSlashBps = reader.uint64();
           break;
+        case 65:
+          message.curationDreamReward = reader.string();
+          break;
+        case 66:
+          message.acceptProposalTimeout = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2073,6 +2159,8 @@ export const ForumOperationalParams = {
     message.postConvictionStreamRatePerBlock = object.postConvictionStreamRatePerBlock ?? "";
     message.maxForumRepPerTagPerEpoch = object.maxForumRepPerTagPerEpoch ?? "";
     message.postConvictionStakerSlashBps = object.postConvictionStakerSlashBps !== undefined && object.postConvictionStakerSlashBps !== null ? BigInt(object.postConvictionStakerSlashBps.toString()) : BigInt(0);
+    message.curationDreamReward = object.curationDreamReward ?? "";
+    message.acceptProposalTimeout = object.acceptProposalTimeout !== undefined && object.acceptProposalTimeout !== null ? BigInt(object.acceptProposalTimeout.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ForumOperationalParamsAmino): ForumOperationalParams {
@@ -2227,6 +2315,12 @@ export const ForumOperationalParams = {
     if (object.post_conviction_staker_slash_bps !== undefined && object.post_conviction_staker_slash_bps !== null) {
       message.postConvictionStakerSlashBps = BigInt(object.post_conviction_staker_slash_bps);
     }
+    if (object.curation_dream_reward !== undefined && object.curation_dream_reward !== null) {
+      message.curationDreamReward = object.curation_dream_reward;
+    }
+    if (object.accept_proposal_timeout !== undefined && object.accept_proposal_timeout !== null) {
+      message.acceptProposalTimeout = BigInt(object.accept_proposal_timeout);
+    }
     return message;
   },
   toAmino(message: ForumOperationalParams): ForumOperationalParamsAmino {
@@ -2281,6 +2375,8 @@ export const ForumOperationalParams = {
     obj.post_conviction_stream_rate_per_block = message.postConvictionStreamRatePerBlock === "" ? undefined : message.postConvictionStreamRatePerBlock;
     obj.max_forum_rep_per_tag_per_epoch = message.maxForumRepPerTagPerEpoch === "" ? undefined : message.maxForumRepPerTagPerEpoch;
     obj.post_conviction_staker_slash_bps = message.postConvictionStakerSlashBps !== BigInt(0) ? message.postConvictionStakerSlashBps?.toString() : undefined;
+    obj.curation_dream_reward = message.curationDreamReward === "" ? undefined : message.curationDreamReward;
+    obj.accept_proposal_timeout = message.acceptProposalTimeout !== BigInt(0) ? message.acceptProposalTimeout?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ForumOperationalParamsAminoMsg): ForumOperationalParams {

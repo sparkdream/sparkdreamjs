@@ -338,6 +338,13 @@ export interface Params {
    */
   minAppealRate: string;
   /**
+   * Rolling window (in reward epochs) over which sentinel reward accuracy is
+   * measured. Recent overturns move the ratio; inactivity ages a sentinel out.
+   * Bounded 1 <= W <= MaxSentinelAccuracyWindowEpochs (== the forum
+   * SentinelAccuracyRingSize). Default 6.
+   */
+  sentinelAccuracyWindowEpochs: bigint;
+  /**
    * Per-member active work caps (anti-monopolization). 0 = unbounded.
    */
   maxActiveInitiativesPerMember: number;
@@ -621,6 +628,13 @@ export interface ParamsAmino {
    */
   min_appeal_rate?: string;
   /**
+   * Rolling window (in reward epochs) over which sentinel reward accuracy is
+   * measured. Recent overturns move the ratio; inactivity ages a sentinel out.
+   * Bounded 1 <= W <= MaxSentinelAccuracyWindowEpochs (== the forum
+   * SentinelAccuracyRingSize). Default 6.
+   */
+  sentinel_accuracy_window_epochs?: string;
+  /**
    * Per-member active work caps (anti-monopolization). 0 = unbounded.
    */
   max_active_initiatives_per_member?: number;
@@ -833,6 +847,11 @@ export interface RepOperationalParams {
    */
   minAppealRate: string;
   /**
+   * Rolling window (in reward epochs) for sentinel reward accuracy (mirrors
+   * Params.sentinel_accuracy_window_epochs). Default 6.
+   */
+  sentinelAccuracyWindowEpochs: bigint;
+  /**
    * Per-member active work caps (mirrors Params.max_active_{initiatives,interims}_per_member). 0 = unbounded.
    */
   maxActiveInitiativesPerMember: number;
@@ -1027,6 +1046,11 @@ export interface RepOperationalParamsAmino {
    * Minimum appeal rate (appeals / actions) to qualify for a reward (default 0.05).
    */
   min_appeal_rate?: string;
+  /**
+   * Rolling window (in reward epochs) for sentinel reward accuracy (mirrors
+   * Params.sentinel_accuracy_window_epochs). Default 6.
+   */
+  sentinel_accuracy_window_epochs?: string;
   /**
    * Per-member active work caps (mirrors Params.max_active_{initiatives,interims}_per_member). 0 = unbounded.
    */
@@ -1452,6 +1476,7 @@ function createBaseParams(): Params {
     minAppealsForAccuracy: BigInt(0),
     minEpochActivityForReward: BigInt(0),
     minAppealRate: "",
+    sentinelAccuracyWindowEpochs: BigInt(0),
     maxActiveInitiativesPerMember: 0,
     maxActiveInterimsPerMember: 0,
     maxDreamMintPerEpoch: "",
@@ -1721,6 +1746,9 @@ export const Params = {
     }
     if (message.minAppealRate !== "") {
       writer.uint32(674).string(Decimal.fromUserInput(message.minAppealRate, 18).atomics);
+    }
+    if (message.sentinelAccuracyWindowEpochs !== BigInt(0)) {
+      writer.uint32(728).uint64(message.sentinelAccuracyWindowEpochs);
     }
     if (message.maxActiveInitiativesPerMember !== 0) {
       writer.uint32(680).uint32(message.maxActiveInitiativesPerMember);
@@ -2001,6 +2029,9 @@ export const Params = {
         case 84:
           message.minAppealRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
+        case 91:
+          message.sentinelAccuracyWindowEpochs = reader.uint64();
+          break;
         case 85:
           message.maxActiveInitiativesPerMember = reader.uint32();
           break;
@@ -2112,6 +2143,7 @@ export const Params = {
     message.minAppealsForAccuracy = object.minAppealsForAccuracy !== undefined && object.minAppealsForAccuracy !== null ? BigInt(object.minAppealsForAccuracy.toString()) : BigInt(0);
     message.minEpochActivityForReward = object.minEpochActivityForReward !== undefined && object.minEpochActivityForReward !== null ? BigInt(object.minEpochActivityForReward.toString()) : BigInt(0);
     message.minAppealRate = object.minAppealRate ?? "";
+    message.sentinelAccuracyWindowEpochs = object.sentinelAccuracyWindowEpochs !== undefined && object.sentinelAccuracyWindowEpochs !== null ? BigInt(object.sentinelAccuracyWindowEpochs.toString()) : BigInt(0);
     message.maxActiveInitiativesPerMember = object.maxActiveInitiativesPerMember ?? 0;
     message.maxActiveInterimsPerMember = object.maxActiveInterimsPerMember ?? 0;
     message.maxDreamMintPerEpoch = object.maxDreamMintPerEpoch ?? "";
@@ -2374,6 +2406,9 @@ export const Params = {
     if (object.min_appeal_rate !== undefined && object.min_appeal_rate !== null) {
       message.minAppealRate = object.min_appeal_rate;
     }
+    if (object.sentinel_accuracy_window_epochs !== undefined && object.sentinel_accuracy_window_epochs !== null) {
+      message.sentinelAccuracyWindowEpochs = BigInt(object.sentinel_accuracy_window_epochs);
+    }
     if (object.max_active_initiatives_per_member !== undefined && object.max_active_initiatives_per_member !== null) {
       message.maxActiveInitiativesPerMember = object.max_active_initiatives_per_member;
     }
@@ -2480,6 +2515,7 @@ export const Params = {
     obj.min_appeals_for_accuracy = message.minAppealsForAccuracy !== BigInt(0) ? message.minAppealsForAccuracy?.toString() : undefined;
     obj.min_epoch_activity_for_reward = message.minEpochActivityForReward !== BigInt(0) ? message.minEpochActivityForReward?.toString() : undefined;
     obj.min_appeal_rate = message.minAppealRate === "" ? undefined : message.minAppealRate;
+    obj.sentinel_accuracy_window_epochs = message.sentinelAccuracyWindowEpochs !== BigInt(0) ? message.sentinelAccuracyWindowEpochs?.toString() : undefined;
     obj.max_active_initiatives_per_member = message.maxActiveInitiativesPerMember === 0 ? undefined : message.maxActiveInitiativesPerMember;
     obj.max_active_interims_per_member = message.maxActiveInterimsPerMember === 0 ? undefined : message.maxActiveInterimsPerMember;
     obj.max_dream_mint_per_epoch = message.maxDreamMintPerEpoch === "" ? undefined : message.maxDreamMintPerEpoch;
@@ -2580,6 +2616,7 @@ function createBaseRepOperationalParams(): RepOperationalParams {
     minAppealsForAccuracy: BigInt(0),
     minEpochActivityForReward: BigInt(0),
     minAppealRate: "",
+    sentinelAccuracyWindowEpochs: BigInt(0),
     maxActiveInitiativesPerMember: 0,
     maxActiveInterimsPerMember: 0,
     maxDreamMintPerEpoch: "",
@@ -2803,6 +2840,9 @@ export const RepOperationalParams = {
     }
     if (message.minAppealRate !== "") {
       writer.uint32(546).string(Decimal.fromUserInput(message.minAppealRate, 18).atomics);
+    }
+    if (message.sentinelAccuracyWindowEpochs !== BigInt(0)) {
+      writer.uint32(600).uint64(message.sentinelAccuracyWindowEpochs);
     }
     if (message.maxActiveInitiativesPerMember !== 0) {
       writer.uint32(552).uint32(message.maxActiveInitiativesPerMember);
@@ -3035,6 +3075,9 @@ export const RepOperationalParams = {
         case 68:
           message.minAppealRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
+        case 75:
+          message.sentinelAccuracyWindowEpochs = reader.uint64();
+          break;
         case 69:
           message.maxActiveInitiativesPerMember = reader.uint32();
           break;
@@ -3130,6 +3173,7 @@ export const RepOperationalParams = {
     message.minAppealsForAccuracy = object.minAppealsForAccuracy !== undefined && object.minAppealsForAccuracy !== null ? BigInt(object.minAppealsForAccuracy.toString()) : BigInt(0);
     message.minEpochActivityForReward = object.minEpochActivityForReward !== undefined && object.minEpochActivityForReward !== null ? BigInt(object.minEpochActivityForReward.toString()) : BigInt(0);
     message.minAppealRate = object.minAppealRate ?? "";
+    message.sentinelAccuracyWindowEpochs = object.sentinelAccuracyWindowEpochs !== undefined && object.sentinelAccuracyWindowEpochs !== null ? BigInt(object.sentinelAccuracyWindowEpochs.toString()) : BigInt(0);
     message.maxActiveInitiativesPerMember = object.maxActiveInitiativesPerMember ?? 0;
     message.maxActiveInterimsPerMember = object.maxActiveInterimsPerMember ?? 0;
     message.maxDreamMintPerEpoch = object.maxDreamMintPerEpoch ?? "";
@@ -3344,6 +3388,9 @@ export const RepOperationalParams = {
     if (object.min_appeal_rate !== undefined && object.min_appeal_rate !== null) {
       message.minAppealRate = object.min_appeal_rate;
     }
+    if (object.sentinel_accuracy_window_epochs !== undefined && object.sentinel_accuracy_window_epochs !== null) {
+      message.sentinelAccuracyWindowEpochs = BigInt(object.sentinel_accuracy_window_epochs);
+    }
     if (object.max_active_initiatives_per_member !== undefined && object.max_active_initiatives_per_member !== null) {
       message.maxActiveInitiativesPerMember = object.max_active_initiatives_per_member;
     }
@@ -3434,6 +3481,7 @@ export const RepOperationalParams = {
     obj.min_appeals_for_accuracy = message.minAppealsForAccuracy !== BigInt(0) ? message.minAppealsForAccuracy?.toString() : undefined;
     obj.min_epoch_activity_for_reward = message.minEpochActivityForReward !== BigInt(0) ? message.minEpochActivityForReward?.toString() : undefined;
     obj.min_appeal_rate = message.minAppealRate === "" ? undefined : message.minAppealRate;
+    obj.sentinel_accuracy_window_epochs = message.sentinelAccuracyWindowEpochs !== BigInt(0) ? message.sentinelAccuracyWindowEpochs?.toString() : undefined;
     obj.max_active_initiatives_per_member = message.maxActiveInitiativesPerMember === 0 ? undefined : message.maxActiveInitiativesPerMember;
     obj.max_active_interims_per_member = message.maxActiveInterimsPerMember === 0 ? undefined : message.maxActiveInterimsPerMember;
     obj.max_dream_mint_per_epoch = message.maxDreamMintPerEpoch === "" ? undefined : message.maxDreamMintPerEpoch;

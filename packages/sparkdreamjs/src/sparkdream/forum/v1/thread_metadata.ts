@@ -16,6 +16,22 @@ export interface ThreadMetadata {
   proposedReplyId: bigint;
   proposedBy: string;
   proposedAt: bigint;
+  /**
+   * proposal_extended is set true once the auto-confirm EndBlocker has granted
+   * the one-time inactivity extension to a pending proposal (author appeared
+   * inactive when the timeout first elapsed). Prevents an indefinite extension
+   * loop — the next timeout auto-confirms regardless. Cleared when the proposal
+   * resolves (confirm/reject/auto-confirm).
+   */
+  proposalExtended: boolean;
+  /**
+   * proposal_fire_at is the exact ProposalAutoConfirmQueue key (unix seconds)
+   * under which the current pending proposal is enqueued. Stored so the manual
+   * confirm/reject paths can remove the precise queue entry, and so the
+   * EndBlocker can detect-and-drop stale entries (a key whose fire_at no longer
+   * matches the live proposal). 0 = no pending proposal.
+   */
+  proposalFireAt: bigint;
   pinnedReplyIds: bigint[];
   pinnedRecords: PinnedReplyRecord[];
 }
@@ -37,6 +53,22 @@ export interface ThreadMetadataAmino {
   proposed_reply_id?: string;
   proposed_by?: string;
   proposed_at?: string;
+  /**
+   * proposal_extended is set true once the auto-confirm EndBlocker has granted
+   * the one-time inactivity extension to a pending proposal (author appeared
+   * inactive when the timeout first elapsed). Prevents an indefinite extension
+   * loop — the next timeout auto-confirms regardless. Cleared when the proposal
+   * resolves (confirm/reject/auto-confirm).
+   */
+  proposal_extended?: boolean;
+  /**
+   * proposal_fire_at is the exact ProposalAutoConfirmQueue key (unix seconds)
+   * under which the current pending proposal is enqueued. Stored so the manual
+   * confirm/reject paths can remove the precise queue entry, and so the
+   * EndBlocker can detect-and-drop stale entries (a key whose fire_at no longer
+   * matches the live proposal). 0 = no pending proposal.
+   */
+  proposal_fire_at?: string;
   pinned_reply_ids?: string[];
   pinned_records?: PinnedReplyRecordAmino[];
 }
@@ -53,6 +85,8 @@ function createBaseThreadMetadata(): ThreadMetadata {
     proposedReplyId: BigInt(0),
     proposedBy: "",
     proposedAt: BigInt(0),
+    proposalExtended: false,
+    proposalFireAt: BigInt(0),
     pinnedReplyIds: [],
     pinnedRecords: []
   };
@@ -86,6 +120,12 @@ export const ThreadMetadata = {
     }
     if (message.proposedAt !== BigInt(0)) {
       writer.uint32(56).int64(message.proposedAt);
+    }
+    if (message.proposalExtended === true) {
+      writer.uint32(64).bool(message.proposalExtended);
+    }
+    if (message.proposalFireAt !== BigInt(0)) {
+      writer.uint32(72).int64(message.proposalFireAt);
     }
     writer.uint32(82).fork();
     for (const v of message.pinnedReplyIds) {
@@ -125,6 +165,12 @@ export const ThreadMetadata = {
         case 7:
           message.proposedAt = reader.int64();
           break;
+        case 8:
+          message.proposalExtended = reader.bool();
+          break;
+        case 9:
+          message.proposalFireAt = reader.int64();
+          break;
         case 10:
           if ((tag & 7) === 2) {
             const end2 = reader.uint32() + reader.pos;
@@ -154,6 +200,8 @@ export const ThreadMetadata = {
     message.proposedReplyId = object.proposedReplyId !== undefined && object.proposedReplyId !== null ? BigInt(object.proposedReplyId.toString()) : BigInt(0);
     message.proposedBy = object.proposedBy ?? "";
     message.proposedAt = object.proposedAt !== undefined && object.proposedAt !== null ? BigInt(object.proposedAt.toString()) : BigInt(0);
+    message.proposalExtended = object.proposalExtended ?? false;
+    message.proposalFireAt = object.proposalFireAt !== undefined && object.proposalFireAt !== null ? BigInt(object.proposalFireAt.toString()) : BigInt(0);
     message.pinnedReplyIds = object.pinnedReplyIds?.map(e => BigInt(e.toString())) || [];
     message.pinnedRecords = object.pinnedRecords?.map(e => PinnedReplyRecord.fromPartial(e)) || [];
     return message;
@@ -181,6 +229,12 @@ export const ThreadMetadata = {
     if (object.proposed_at !== undefined && object.proposed_at !== null) {
       message.proposedAt = BigInt(object.proposed_at);
     }
+    if (object.proposal_extended !== undefined && object.proposal_extended !== null) {
+      message.proposalExtended = object.proposal_extended;
+    }
+    if (object.proposal_fire_at !== undefined && object.proposal_fire_at !== null) {
+      message.proposalFireAt = BigInt(object.proposal_fire_at);
+    }
     message.pinnedReplyIds = object.pinned_reply_ids?.map(e => BigInt(e)) || [];
     message.pinnedRecords = object.pinned_records?.map(e => PinnedReplyRecord.fromAmino(e)) || [];
     return message;
@@ -194,6 +248,8 @@ export const ThreadMetadata = {
     obj.proposed_reply_id = message.proposedReplyId !== BigInt(0) ? message.proposedReplyId?.toString() : undefined;
     obj.proposed_by = message.proposedBy === "" ? undefined : message.proposedBy;
     obj.proposed_at = message.proposedAt !== BigInt(0) ? message.proposedAt?.toString() : undefined;
+    obj.proposal_extended = message.proposalExtended === false ? undefined : message.proposalExtended;
+    obj.proposal_fire_at = message.proposalFireAt !== BigInt(0) ? message.proposalFireAt?.toString() : undefined;
     if (message.pinnedReplyIds) {
       obj.pinned_reply_ids = message.pinnedReplyIds.map(e => e.toString());
     } else {

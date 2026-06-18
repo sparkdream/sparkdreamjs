@@ -2,6 +2,54 @@
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
+ * AccuracyEpochBucket holds one reward-epoch's resolved-appeal tally for a
+ * sentinel. Stored in a fixed-size ring on SentinelActivity (slot index =
+ * epoch % SentinelAccuracyRingSize); the `epoch` stamp disambiguates a live
+ * slot from a stale one left behind by an inactive epoch.
+ * @name AccuracyEpochBucket
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.AccuracyEpochBucket
+ */
+export interface AccuracyEpochBucket {
+  epoch: bigint;
+  /**
+   * upheld_hides + upheld_locks + upheld_moves resolved this epoch
+   */
+  upheld: bigint;
+  /**
+   * overturned_* resolved this epoch
+   */
+  overturned: bigint;
+}
+export interface AccuracyEpochBucketProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.AccuracyEpochBucket";
+  value: Uint8Array;
+}
+/**
+ * AccuracyEpochBucket holds one reward-epoch's resolved-appeal tally for a
+ * sentinel. Stored in a fixed-size ring on SentinelActivity (slot index =
+ * epoch % SentinelAccuracyRingSize); the `epoch` stamp disambiguates a live
+ * slot from a stale one left behind by an inactive epoch.
+ * @name AccuracyEpochBucketAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.AccuracyEpochBucket
+ */
+export interface AccuracyEpochBucketAmino {
+  epoch?: string;
+  /**
+   * upheld_hides + upheld_locks + upheld_moves resolved this epoch
+   */
+  upheld?: string;
+  /**
+   * overturned_* resolved this epoch
+   */
+  overturned?: string;
+}
+export interface AccuracyEpochBucketAminoMsg {
+  type: "/sparkdream.forum.v1.AccuracyEpochBucket";
+  value: AccuracyEpochBucketAmino;
+}
+/**
  * SentinelActivity holds forum-specific action counters and local cooldowns
  * for a sentinel. The accountability record (bond, bond status, activity
  * stamps) lives in sparkdream.rep.v1.SentinelActivity.
@@ -40,6 +88,34 @@ export interface SentinelActivity {
   upheldPins: bigint;
   overturnedPins: bigint;
   epochPins: bigint;
+  /**
+   * Curation-proposal tracking. A sentinel may propose a reply as a thread's
+   * accepted answer (MsgMarkAcceptedReply on someone else's thread); the author
+   * confirms/rejects or it auto-confirms after a timeout.
+   *   total_proposals     — lifetime proposals created (incremented at propose).
+   *   confirmed_proposals — lifetime proposals confirmed (author confirm or
+   *                         auto-confirm); credited to the proposing sentinel.
+   *   rejected_proposals  — lifetime proposals rejected by the author.
+   *   epoch_curations     — confirmed proposals in the current reward epoch.
+   *                         Feeds the sentinel reward score; reset each epoch.
+   *                         Incremented on CONFIRM (success), not on propose, so
+   *                         it cannot be farmed by spamming unconfirmed proposals.
+   */
+  totalProposals: bigint;
+  confirmedProposals: bigint;
+  rejectedProposals: bigint;
+  epochCurations: bigint;
+  /**
+   * Rolling-window accuracy ring. Fixed length SentinelAccuracyRingSize once
+   * first written; slot e % C holds reward-epoch e's resolved-appeal tally.
+   * x/rep's reward distribution computes accuracy over the last
+   * SentinelAccuracyWindowEpochs slots from this ring. The lifetime
+   * upheld_*\/overturned_* counters above are retained for display/audit and are
+   * NO LONGER used for reward accuracy. Append-only field — empty on records
+   * written before this field existed (no migration needed; an empty ring reads
+   * as zero decided appeals).
+   */
+  accuracyWindow: AccuracyEpochBucket[];
 }
 export interface SentinelActivityProtoMsg {
   typeUrl: "/sparkdream.forum.v1.SentinelActivity";
@@ -84,11 +160,135 @@ export interface SentinelActivityAmino {
   upheld_pins?: string;
   overturned_pins?: string;
   epoch_pins?: string;
+  /**
+   * Curation-proposal tracking. A sentinel may propose a reply as a thread's
+   * accepted answer (MsgMarkAcceptedReply on someone else's thread); the author
+   * confirms/rejects or it auto-confirms after a timeout.
+   *   total_proposals     — lifetime proposals created (incremented at propose).
+   *   confirmed_proposals — lifetime proposals confirmed (author confirm or
+   *                         auto-confirm); credited to the proposing sentinel.
+   *   rejected_proposals  — lifetime proposals rejected by the author.
+   *   epoch_curations     — confirmed proposals in the current reward epoch.
+   *                         Feeds the sentinel reward score; reset each epoch.
+   *                         Incremented on CONFIRM (success), not on propose, so
+   *                         it cannot be farmed by spamming unconfirmed proposals.
+   */
+  total_proposals?: string;
+  confirmed_proposals?: string;
+  rejected_proposals?: string;
+  epoch_curations?: string;
+  /**
+   * Rolling-window accuracy ring. Fixed length SentinelAccuracyRingSize once
+   * first written; slot e % C holds reward-epoch e's resolved-appeal tally.
+   * x/rep's reward distribution computes accuracy over the last
+   * SentinelAccuracyWindowEpochs slots from this ring. The lifetime
+   * upheld_*\/overturned_* counters above are retained for display/audit and are
+   * NO LONGER used for reward accuracy. Append-only field — empty on records
+   * written before this field existed (no migration needed; an empty ring reads
+   * as zero decided appeals).
+   */
+  accuracy_window?: AccuracyEpochBucketAmino[];
 }
 export interface SentinelActivityAminoMsg {
   type: "/sparkdream.forum.v1.SentinelActivity";
   value: SentinelActivityAmino;
 }
+function createBaseAccuracyEpochBucket(): AccuracyEpochBucket {
+  return {
+    epoch: BigInt(0),
+    upheld: BigInt(0),
+    overturned: BigInt(0)
+  };
+}
+/**
+ * AccuracyEpochBucket holds one reward-epoch's resolved-appeal tally for a
+ * sentinel. Stored in a fixed-size ring on SentinelActivity (slot index =
+ * epoch % SentinelAccuracyRingSize); the `epoch` stamp disambiguates a live
+ * slot from a stale one left behind by an inactive epoch.
+ * @name AccuracyEpochBucket
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.AccuracyEpochBucket
+ */
+export const AccuracyEpochBucket = {
+  typeUrl: "/sparkdream.forum.v1.AccuracyEpochBucket",
+  encode(message: AccuracyEpochBucket, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.epoch !== BigInt(0)) {
+      writer.uint32(8).uint64(message.epoch);
+    }
+    if (message.upheld !== BigInt(0)) {
+      writer.uint32(16).uint64(message.upheld);
+    }
+    if (message.overturned !== BigInt(0)) {
+      writer.uint32(24).uint64(message.overturned);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): AccuracyEpochBucket {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAccuracyEpochBucket();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.epoch = reader.uint64();
+          break;
+        case 2:
+          message.upheld = reader.uint64();
+          break;
+        case 3:
+          message.overturned = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<AccuracyEpochBucket>): AccuracyEpochBucket {
+    const message = createBaseAccuracyEpochBucket();
+    message.epoch = object.epoch !== undefined && object.epoch !== null ? BigInt(object.epoch.toString()) : BigInt(0);
+    message.upheld = object.upheld !== undefined && object.upheld !== null ? BigInt(object.upheld.toString()) : BigInt(0);
+    message.overturned = object.overturned !== undefined && object.overturned !== null ? BigInt(object.overturned.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: AccuracyEpochBucketAmino): AccuracyEpochBucket {
+    const message = createBaseAccuracyEpochBucket();
+    if (object.epoch !== undefined && object.epoch !== null) {
+      message.epoch = BigInt(object.epoch);
+    }
+    if (object.upheld !== undefined && object.upheld !== null) {
+      message.upheld = BigInt(object.upheld);
+    }
+    if (object.overturned !== undefined && object.overturned !== null) {
+      message.overturned = BigInt(object.overturned);
+    }
+    return message;
+  },
+  toAmino(message: AccuracyEpochBucket): AccuracyEpochBucketAmino {
+    const obj: any = {};
+    obj.epoch = message.epoch !== BigInt(0) ? message.epoch?.toString() : undefined;
+    obj.upheld = message.upheld !== BigInt(0) ? message.upheld?.toString() : undefined;
+    obj.overturned = message.overturned !== BigInt(0) ? message.overturned?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: AccuracyEpochBucketAminoMsg): AccuracyEpochBucket {
+    return AccuracyEpochBucket.fromAmino(object.value);
+  },
+  fromProtoMsg(message: AccuracyEpochBucketProtoMsg): AccuracyEpochBucket {
+    return AccuracyEpochBucket.decode(message.value);
+  },
+  toProto(message: AccuracyEpochBucket): Uint8Array {
+    return AccuracyEpochBucket.encode(message).finish();
+  },
+  toProtoMsg(message: AccuracyEpochBucket): AccuracyEpochBucketProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.AccuracyEpochBucket",
+      value: AccuracyEpochBucket.encode(message).finish()
+    };
+  }
+};
 function createBaseSentinelActivity(): SentinelActivity {
   return {
     address: "",
@@ -114,7 +314,12 @@ function createBaseSentinelActivity(): SentinelActivity {
     totalPins: BigInt(0),
     upheldPins: BigInt(0),
     overturnedPins: BigInt(0),
-    epochPins: BigInt(0)
+    epochPins: BigInt(0),
+    totalProposals: BigInt(0),
+    confirmedProposals: BigInt(0),
+    rejectedProposals: BigInt(0),
+    epochCurations: BigInt(0),
+    accuracyWindow: []
   };
 }
 /**
@@ -200,6 +405,21 @@ export const SentinelActivity = {
     if (message.epochPins !== BigInt(0)) {
       writer.uint32(192).uint64(message.epochPins);
     }
+    if (message.totalProposals !== BigInt(0)) {
+      writer.uint32(200).uint64(message.totalProposals);
+    }
+    if (message.confirmedProposals !== BigInt(0)) {
+      writer.uint32(208).uint64(message.confirmedProposals);
+    }
+    if (message.rejectedProposals !== BigInt(0)) {
+      writer.uint32(216).uint64(message.rejectedProposals);
+    }
+    if (message.epochCurations !== BigInt(0)) {
+      writer.uint32(224).uint64(message.epochCurations);
+    }
+    for (const v of message.accuracyWindow) {
+      AccuracyEpochBucket.encode(v!, writer.uint32(234).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): SentinelActivity {
@@ -281,6 +501,21 @@ export const SentinelActivity = {
         case 24:
           message.epochPins = reader.uint64();
           break;
+        case 25:
+          message.totalProposals = reader.uint64();
+          break;
+        case 26:
+          message.confirmedProposals = reader.uint64();
+          break;
+        case 27:
+          message.rejectedProposals = reader.uint64();
+          break;
+        case 28:
+          message.epochCurations = reader.uint64();
+          break;
+        case 29:
+          message.accuracyWindow.push(AccuracyEpochBucket.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -314,6 +549,11 @@ export const SentinelActivity = {
     message.upheldPins = object.upheldPins !== undefined && object.upheldPins !== null ? BigInt(object.upheldPins.toString()) : BigInt(0);
     message.overturnedPins = object.overturnedPins !== undefined && object.overturnedPins !== null ? BigInt(object.overturnedPins.toString()) : BigInt(0);
     message.epochPins = object.epochPins !== undefined && object.epochPins !== null ? BigInt(object.epochPins.toString()) : BigInt(0);
+    message.totalProposals = object.totalProposals !== undefined && object.totalProposals !== null ? BigInt(object.totalProposals.toString()) : BigInt(0);
+    message.confirmedProposals = object.confirmedProposals !== undefined && object.confirmedProposals !== null ? BigInt(object.confirmedProposals.toString()) : BigInt(0);
+    message.rejectedProposals = object.rejectedProposals !== undefined && object.rejectedProposals !== null ? BigInt(object.rejectedProposals.toString()) : BigInt(0);
+    message.epochCurations = object.epochCurations !== undefined && object.epochCurations !== null ? BigInt(object.epochCurations.toString()) : BigInt(0);
+    message.accuracyWindow = object.accuracyWindow?.map(e => AccuracyEpochBucket.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: SentinelActivityAmino): SentinelActivity {
@@ -390,6 +630,19 @@ export const SentinelActivity = {
     if (object.epoch_pins !== undefined && object.epoch_pins !== null) {
       message.epochPins = BigInt(object.epoch_pins);
     }
+    if (object.total_proposals !== undefined && object.total_proposals !== null) {
+      message.totalProposals = BigInt(object.total_proposals);
+    }
+    if (object.confirmed_proposals !== undefined && object.confirmed_proposals !== null) {
+      message.confirmedProposals = BigInt(object.confirmed_proposals);
+    }
+    if (object.rejected_proposals !== undefined && object.rejected_proposals !== null) {
+      message.rejectedProposals = BigInt(object.rejected_proposals);
+    }
+    if (object.epoch_curations !== undefined && object.epoch_curations !== null) {
+      message.epochCurations = BigInt(object.epoch_curations);
+    }
+    message.accuracyWindow = object.accuracy_window?.map(e => AccuracyEpochBucket.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: SentinelActivity): SentinelActivityAmino {
@@ -418,6 +671,15 @@ export const SentinelActivity = {
     obj.upheld_pins = message.upheldPins !== BigInt(0) ? message.upheldPins?.toString() : undefined;
     obj.overturned_pins = message.overturnedPins !== BigInt(0) ? message.overturnedPins?.toString() : undefined;
     obj.epoch_pins = message.epochPins !== BigInt(0) ? message.epochPins?.toString() : undefined;
+    obj.total_proposals = message.totalProposals !== BigInt(0) ? message.totalProposals?.toString() : undefined;
+    obj.confirmed_proposals = message.confirmedProposals !== BigInt(0) ? message.confirmedProposals?.toString() : undefined;
+    obj.rejected_proposals = message.rejectedProposals !== BigInt(0) ? message.rejectedProposals?.toString() : undefined;
+    obj.epoch_curations = message.epochCurations !== BigInt(0) ? message.epochCurations?.toString() : undefined;
+    if (message.accuracyWindow) {
+      obj.accuracy_window = message.accuracyWindow.map(e => e ? AccuracyEpochBucket.toAmino(e) : undefined);
+    } else {
+      obj.accuracy_window = message.accuracyWindow;
+    }
     return obj;
   },
   fromAminoMsg(object: SentinelActivityAminoMsg): SentinelActivity {
