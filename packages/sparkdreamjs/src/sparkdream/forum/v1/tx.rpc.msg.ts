@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgCreatePost, MsgCreatePostResponse, MsgEditPost, MsgEditPostResponse, MsgDeletePost, MsgDeletePostResponse, MsgFreezeThread, MsgFreezeThreadResponse, MsgUnarchiveThread, MsgUnarchiveThreadResponse, MsgPinPost, MsgPinPostResponse, MsgUnpinPost, MsgUnpinPostResponse, MsgMakePostPermanent, MsgMakePostPermanentResponse, MsgLockThread, MsgLockThreadResponse, MsgUnlockThread, MsgUnlockThreadResponse, MsgMoveThread, MsgMoveThreadResponse, MsgFollowThread, MsgFollowThreadResponse, MsgUnfollowThread, MsgUnfollowThreadResponse, MsgUpvotePost, MsgUpvotePostResponse, MsgDownvotePost, MsgDownvotePostResponse, MsgStakePostConviction, MsgStakePostConvictionResponse, MsgReleasePostConviction, MsgReleasePostConvictionResponse, MsgFlagPost, MsgFlagPostResponse, MsgDismissFlags, MsgDismissFlagsResponse, MsgHidePost, MsgHidePostResponse, MsgUnhidePost, MsgUnhidePostResponse, MsgAppealPost, MsgAppealPostResponse, MsgAppealThreadLock, MsgAppealThreadLockResponse, MsgAppealThreadMove, MsgAppealThreadMoveResponse, MsgCreateBounty, MsgCreateBountyResponse, MsgAwardBounty, MsgAwardBountyResponse, MsgIncreaseBounty, MsgIncreaseBountyResponse, MsgCancelBounty, MsgCancelBountyResponse, MsgAssignBountyToReply, MsgAssignBountyToReplyResponse, MsgPinReply, MsgPinReplyResponse, MsgUnpinReply, MsgUnpinReplyResponse, MsgDisputePin, MsgDisputePinResponse, MsgMarkAcceptedReply, MsgMarkAcceptedReplyResponse, MsgConfirmProposedReply, MsgConfirmProposedReplyResponse, MsgRejectProposedReply, MsgRejectProposedReplyResponse, MsgSetForumPaused, MsgSetForumPausedResponse, MsgSetModerationPaused, MsgSetModerationPausedResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgCreatePost, MsgCreatePostResponse, MsgEditPost, MsgEditPostResponse, MsgDeletePost, MsgDeletePostResponse, MsgFreezeThread, MsgFreezeThreadResponse, MsgUnarchiveThread, MsgUnarchiveThreadResponse, MsgPinPost, MsgPinPostResponse, MsgUnpinPost, MsgUnpinPostResponse, MsgMakePostPermanent, MsgMakePostPermanentResponse, MsgLockThread, MsgLockThreadResponse, MsgUnlockThread, MsgUnlockThreadResponse, MsgMoveThread, MsgMoveThreadResponse, MsgFollowThread, MsgFollowThreadResponse, MsgUnfollowThread, MsgUnfollowThreadResponse, MsgUpvotePost, MsgUpvotePostResponse, MsgDownvotePost, MsgDownvotePostResponse, MsgStakePostConviction, MsgStakePostConvictionResponse, MsgReleasePostConviction, MsgReleasePostConvictionResponse, MsgFlagPost, MsgFlagPostResponse, MsgDismissFlags, MsgDismissFlagsResponse, MsgHidePost, MsgHidePostResponse, MsgUnhidePost, MsgUnhidePostResponse, MsgAppealPost, MsgAppealPostResponse, MsgAppealThreadLock, MsgAppealThreadLockResponse, MsgAppealThreadMove, MsgAppealThreadMoveResponse, MsgCreateBounty, MsgCreateBountyResponse, MsgAwardBounty, MsgAwardBountyResponse, MsgIncreaseBounty, MsgIncreaseBountyResponse, MsgCancelBounty, MsgCancelBountyResponse, MsgAssignBountyToReply, MsgAssignBountyToReplyResponse, MsgPinReply, MsgPinReplyResponse, MsgUnpinReply, MsgUnpinReplyResponse, MsgDisputePin, MsgDisputePinResponse, MsgMarkAcceptedReply, MsgMarkAcceptedReplyResponse, MsgConfirmProposedReply, MsgConfirmProposedReplyResponse, MsgRejectProposedReply, MsgRejectProposedReplyResponse, MsgSetForumPaused, MsgSetForumPausedResponse, MsgSetModerationPaused, MsgSetModerationPausedResponse, MsgSetThreadProposalsLock, MsgSetThreadProposalsLockResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
@@ -112,6 +112,8 @@ export interface Msg {
   setForumPaused(request: MsgSetForumPaused): Promise<MsgSetForumPausedResponse>;
   /** SetModerationPaused defines the SetModerationPaused RPC. */
   setModerationPaused(request: MsgSetModerationPaused): Promise<MsgSetModerationPausedResponse>;
+  /** SetThreadProposalsLock defines the SetThreadProposalsLock RPC. */
+  setThreadProposalsLock(request: MsgSetThreadProposalsLock): Promise<MsgSetThreadProposalsLockResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -369,6 +371,12 @@ export class MsgClientImpl implements Msg {
     const data = MsgSetModerationPaused.encode(request).finish();
     const promise = this.rpc.request("sparkdream.forum.v1.Msg", "SetModerationPaused", data);
     return promise.then(data => MsgSetModerationPausedResponse.decode(new BinaryReader(data)));
+  };
+  /* SetThreadProposalsLock defines the SetThreadProposalsLock RPC. */
+  setThreadProposalsLock = async (request: MsgSetThreadProposalsLock): Promise<MsgSetThreadProposalsLockResponse> => {
+    const data = MsgSetThreadProposalsLock.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.forum.v1.Msg", "SetThreadProposalsLock", data);
+    return promise.then(data => MsgSetThreadProposalsLockResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

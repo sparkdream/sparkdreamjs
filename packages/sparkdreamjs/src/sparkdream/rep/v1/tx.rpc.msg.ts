@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgInviteMember, MsgInviteMemberResponse, MsgAcceptInvitation, MsgAcceptInvitationResponse, MsgTransferDream, MsgTransferDreamResponse, MsgCreateInterim, MsgCreateInterimResponse, MsgAssignInterim, MsgAssignInterimResponse, MsgSubmitInterimWork, MsgSubmitInterimWorkResponse, MsgApproveInterim, MsgApproveInterimResponse, MsgAbandonInterim, MsgAbandonInterimResponse, MsgCompleteInterim, MsgCompleteInterimResponse, MsgProposeProject, MsgProposeProjectResponse, MsgApproveProjectBudget, MsgApproveProjectBudgetResponse, MsgCancelProject, MsgCancelProjectResponse, MsgCreateInitiative, MsgCreateInitiativeResponse, MsgAssignInitiative, MsgAssignInitiativeResponse, MsgSubmitInitiativeWork, MsgSubmitInitiativeWorkResponse, MsgApproveInitiative, MsgApproveInitiativeResponse, MsgAbandonInitiative, MsgAbandonInitiativeResponse, MsgCompleteInitiative, MsgCompleteInitiativeResponse, MsgStake, MsgStakeResponse, MsgUnstake, MsgUnstakeResponse, MsgClaimStakingRewards, MsgClaimStakingRewardsResponse, MsgCompoundStakingRewards, MsgCompoundStakingRewardsResponse, MsgCreateChallenge, MsgCreateChallengeResponse, MsgRespondToChallenge, MsgRespondToChallengeResponse, MsgSubmitJurorVote, MsgSubmitJurorVoteResponse, MsgSubmitExpertTestimony, MsgSubmitExpertTestimonyResponse, MsgChallengeContent, MsgChallengeContentResponse, MsgRespondToContentChallenge, MsgRespondToContentChallengeResponse, MsgRegisterZkPublicKey, MsgRegisterZkPublicKeyResponse, MsgCreateTag, MsgCreateTagResponse, MsgReportTag, MsgReportTagResponse, MsgResolveTagReport, MsgResolveTagReportResponse, MsgCreateTagBudget, MsgCreateTagBudgetResponse, MsgAwardFromTagBudget, MsgAwardFromTagBudgetResponse, MsgTopUpTagBudget, MsgTopUpTagBudgetResponse, MsgToggleTagBudget, MsgToggleTagBudgetResponse, MsgWithdrawTagBudget, MsgWithdrawTagBudgetResponse, MsgBondRole, MsgBondRoleResponse, MsgUnbondRole, MsgUnbondRoleResponse, MsgReportMember, MsgReportMemberResponse, MsgCosignMemberReport, MsgCosignMemberReportResponse, MsgResolveMemberReport, MsgResolveMemberReportResponse, MsgDefendMemberReport, MsgDefendMemberReportResponse, MsgAppealGovAction, MsgAppealGovActionResponse, MsgResolveGovActionAppeal, MsgResolveGovActionAppealResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgInviteMember, MsgInviteMemberResponse, MsgAcceptInvitation, MsgAcceptInvitationResponse, MsgTransferDream, MsgTransferDreamResponse, MsgCreateInterim, MsgCreateInterimResponse, MsgAssignInterim, MsgAssignInterimResponse, MsgSubmitInterimWork, MsgSubmitInterimWorkResponse, MsgApproveInterim, MsgApproveInterimResponse, MsgAbandonInterim, MsgAbandonInterimResponse, MsgCompleteInterim, MsgCompleteInterimResponse, MsgProposeProject, MsgProposeProjectResponse, MsgApproveProjectBudget, MsgApproveProjectBudgetResponse, MsgCancelProject, MsgCancelProjectResponse, MsgCreateInitiative, MsgCreateInitiativeResponse, MsgAssignInitiative, MsgAssignInitiativeResponse, MsgSubmitInitiativeWork, MsgSubmitInitiativeWorkResponse, MsgApproveInitiative, MsgApproveInitiativeResponse, MsgAbandonInitiative, MsgAbandonInitiativeResponse, MsgCompleteInitiative, MsgCompleteInitiativeResponse, MsgStake, MsgStakeResponse, MsgUnstake, MsgUnstakeResponse, MsgClaimStakingRewards, MsgClaimStakingRewardsResponse, MsgCompoundStakingRewards, MsgCompoundStakingRewardsResponse, MsgCreateChallenge, MsgCreateChallengeResponse, MsgRespondToChallenge, MsgRespondToChallengeResponse, MsgSubmitJurorVote, MsgSubmitJurorVoteResponse, MsgSubmitExpertTestimony, MsgSubmitExpertTestimonyResponse, MsgChallengeContent, MsgChallengeContentResponse, MsgRespondToContentChallenge, MsgRespondToContentChallengeResponse, MsgRegisterZkPublicKey, MsgRegisterZkPublicKeyResponse, MsgCreateTag, MsgCreateTagResponse, MsgReportTag, MsgReportTagResponse, MsgResolveTagReport, MsgResolveTagReportResponse, MsgCreateTagBudget, MsgCreateTagBudgetResponse, MsgAwardFromTagBudget, MsgAwardFromTagBudgetResponse, MsgTopUpTagBudget, MsgTopUpTagBudgetResponse, MsgToggleTagBudget, MsgToggleTagBudgetResponse, MsgWithdrawTagBudget, MsgWithdrawTagBudgetResponse, MsgBondRole, MsgBondRoleResponse, MsgUnbondRole, MsgUnbondRoleResponse, MsgCancelUnbondRole, MsgCancelUnbondRoleResponse, MsgReportMember, MsgReportMemberResponse, MsgCosignMemberReport, MsgCosignMemberReportResponse, MsgResolveMemberReport, MsgResolveMemberReportResponse, MsgDefendMemberReport, MsgDefendMemberReportResponse, MsgAppealGovAction, MsgAppealGovActionResponse, MsgResolveGovActionAppeal, MsgResolveGovActionAppealResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
@@ -104,6 +104,11 @@ export interface Msg {
    * role_type (subject to committed-bond constraints).
    */
   unbondRole(request: MsgUnbondRole): Promise<MsgUnbondRoleResponse>;
+  /**
+   * CancelUnbondRole cancels (reduces) an in-flight unbond, returning the
+   * cancelled amount to active bond without waiting out the cooldown.
+   */
+  cancelUnbondRole(request: MsgCancelUnbondRole): Promise<MsgCancelUnbondRoleResponse>;
   /** ReportMember defines the ReportMember RPC. */
   reportMember(request: MsgReportMember): Promise<MsgReportMemberResponse>;
   /** CosignMemberReport defines the CosignMemberReport RPC. */
@@ -378,6 +383,13 @@ export class MsgClientImpl implements Msg {
     const data = MsgUnbondRole.encode(request).finish();
     const promise = this.rpc.request("sparkdream.rep.v1.Msg", "UnbondRole", data);
     return promise.then(data => MsgUnbondRoleResponse.decode(new BinaryReader(data)));
+  };
+  /* CancelUnbondRole cancels (reduces) an in-flight unbond, returning the
+   cancelled amount to active bond without waiting out the cooldown. */
+  cancelUnbondRole = async (request: MsgCancelUnbondRole): Promise<MsgCancelUnbondRoleResponse> => {
+    const data = MsgCancelUnbondRole.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "CancelUnbondRole", data);
+    return promise.then(data => MsgCancelUnbondRoleResponse.decode(new BinaryReader(data)));
   };
   /* ReportMember defines the ReportMember RPC. */
   reportMember = async (request: MsgReportMember): Promise<MsgReportMemberResponse> => {

@@ -47,6 +47,13 @@ export interface GenesisState {
    * imported post ID, so legacy exports without this field stay safe.
    */
   postCount: bigint;
+  /**
+   * proposal_count_map persists the per-(thread, sentinel) accepted-reply
+   * proposal counter that backs the per-sentinel-per-thread proposal cap. Not
+   * derivable from other state (it is a historical tally), so it must round-trip
+   * through genesis like sentinel_activity_map.
+   */
+  proposalCountMap: ProposalCountEntry[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.forum.v1.GenesisState";
@@ -84,10 +91,49 @@ export interface GenesisStateAmino {
    * imported post ID, so legacy exports without this field stay safe.
    */
   post_count?: string;
+  /**
+   * proposal_count_map persists the per-(thread, sentinel) accepted-reply
+   * proposal counter that backs the per-sentinel-per-thread proposal cap. Not
+   * derivable from other state (it is a historical tally), so it must round-trip
+   * through genesis like sentinel_activity_map.
+   */
+  proposal_count_map?: ProposalCountEntryAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.forum.v1.GenesisState";
   value: GenesisStateAmino;
+}
+/**
+ * ProposalCountEntry is one (thread_id, sentinel) -> count tuple of the
+ * accepted-reply proposal cap counter, flattened for genesis import/export.
+ * @name ProposalCountEntry
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.ProposalCountEntry
+ */
+export interface ProposalCountEntry {
+  threadId: bigint;
+  sentinel: string;
+  count: bigint;
+}
+export interface ProposalCountEntryProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.ProposalCountEntry";
+  value: Uint8Array;
+}
+/**
+ * ProposalCountEntry is one (thread_id, sentinel) -> count tuple of the
+ * accepted-reply proposal cap counter, flattened for genesis import/export.
+ * @name ProposalCountEntryAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.ProposalCountEntry
+ */
+export interface ProposalCountEntryAmino {
+  thread_id?: string;
+  sentinel?: string;
+  count?: string;
+}
+export interface ProposalCountEntryAminoMsg {
+  type: "/sparkdream.forum.v1.ProposalCountEntry";
+  value: ProposalCountEntryAmino;
 }
 function createBaseGenesisState(): GenesisState {
   return {
@@ -106,7 +152,8 @@ function createBaseGenesisState(): GenesisState {
     threadFollowMap: [],
     threadFollowCountMap: [],
     archiveMetadataMap: [],
-    postCount: BigInt(0)
+    postCount: BigInt(0),
+    proposalCountMap: []
   };
 }
 /**
@@ -166,6 +213,9 @@ export const GenesisState = {
     if (message.postCount !== BigInt(0)) {
       writer.uint32(128).uint64(message.postCount);
     }
+    for (const v of message.proposalCountMap) {
+      ProposalCountEntry.encode(v!, writer.uint32(138).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -223,6 +273,9 @@ export const GenesisState = {
         case 16:
           message.postCount = reader.uint64();
           break;
+        case 17:
+          message.proposalCountMap.push(ProposalCountEntry.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -248,6 +301,7 @@ export const GenesisState = {
     message.threadFollowCountMap = object.threadFollowCountMap?.map(e => ThreadFollowCount.fromPartial(e)) || [];
     message.archiveMetadataMap = object.archiveMetadataMap?.map(e => ArchiveMetadata.fromPartial(e)) || [];
     message.postCount = object.postCount !== undefined && object.postCount !== null ? BigInt(object.postCount.toString()) : BigInt(0);
+    message.proposalCountMap = object.proposalCountMap?.map(e => ProposalCountEntry.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -274,6 +328,7 @@ export const GenesisState = {
     if (object.post_count !== undefined && object.post_count !== null) {
       message.postCount = BigInt(object.post_count);
     }
+    message.proposalCountMap = object.proposal_count_map?.map(e => ProposalCountEntry.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -346,6 +401,11 @@ export const GenesisState = {
       obj.archive_metadata_map = message.archiveMetadataMap;
     }
     obj.post_count = message.postCount !== BigInt(0) ? message.postCount?.toString() : undefined;
+    if (message.proposalCountMap) {
+      obj.proposal_count_map = message.proposalCountMap.map(e => e ? ProposalCountEntry.toAmino(e) : undefined);
+    } else {
+      obj.proposal_count_map = message.proposalCountMap;
+    }
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {
@@ -361,6 +421,100 @@ export const GenesisState = {
     return {
       typeUrl: "/sparkdream.forum.v1.GenesisState",
       value: GenesisState.encode(message).finish()
+    };
+  }
+};
+function createBaseProposalCountEntry(): ProposalCountEntry {
+  return {
+    threadId: BigInt(0),
+    sentinel: "",
+    count: BigInt(0)
+  };
+}
+/**
+ * ProposalCountEntry is one (thread_id, sentinel) -> count tuple of the
+ * accepted-reply proposal cap counter, flattened for genesis import/export.
+ * @name ProposalCountEntry
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.ProposalCountEntry
+ */
+export const ProposalCountEntry = {
+  typeUrl: "/sparkdream.forum.v1.ProposalCountEntry",
+  encode(message: ProposalCountEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.threadId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.threadId);
+    }
+    if (message.sentinel !== "") {
+      writer.uint32(18).string(message.sentinel);
+    }
+    if (message.count !== BigInt(0)) {
+      writer.uint32(24).uint64(message.count);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): ProposalCountEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProposalCountEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.threadId = reader.uint64();
+          break;
+        case 2:
+          message.sentinel = reader.string();
+          break;
+        case 3:
+          message.count = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<ProposalCountEntry>): ProposalCountEntry {
+    const message = createBaseProposalCountEntry();
+    message.threadId = object.threadId !== undefined && object.threadId !== null ? BigInt(object.threadId.toString()) : BigInt(0);
+    message.sentinel = object.sentinel ?? "";
+    message.count = object.count !== undefined && object.count !== null ? BigInt(object.count.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: ProposalCountEntryAmino): ProposalCountEntry {
+    const message = createBaseProposalCountEntry();
+    if (object.thread_id !== undefined && object.thread_id !== null) {
+      message.threadId = BigInt(object.thread_id);
+    }
+    if (object.sentinel !== undefined && object.sentinel !== null) {
+      message.sentinel = object.sentinel;
+    }
+    if (object.count !== undefined && object.count !== null) {
+      message.count = BigInt(object.count);
+    }
+    return message;
+  },
+  toAmino(message: ProposalCountEntry): ProposalCountEntryAmino {
+    const obj: any = {};
+    obj.thread_id = message.threadId !== BigInt(0) ? message.threadId?.toString() : undefined;
+    obj.sentinel = message.sentinel === "" ? undefined : message.sentinel;
+    obj.count = message.count !== BigInt(0) ? message.count?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: ProposalCountEntryAminoMsg): ProposalCountEntry {
+    return ProposalCountEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: ProposalCountEntryProtoMsg): ProposalCountEntry {
+    return ProposalCountEntry.decode(message.value);
+  },
+  toProto(message: ProposalCountEntry): Uint8Array {
+    return ProposalCountEntry.encode(message).finish();
+  },
+  toProtoMsg(message: ProposalCountEntry): ProposalCountEntryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.ProposalCountEntry",
+      value: ProposalCountEntry.encode(message).finish()
     };
   }
 };

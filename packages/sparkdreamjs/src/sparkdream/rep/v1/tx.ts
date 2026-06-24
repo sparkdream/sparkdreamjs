@@ -2341,6 +2341,64 @@ export interface MsgUnbondRoleResponseAminoMsg {
   value: MsgUnbondRoleResponseAmino;
 }
 /**
+ * MsgCancelUnbondRole cancels part or all of an in-flight unbond for the given
+ * role_type. The cancelled amount returns to active bond immediately (the DREAM
+ * was never unlocked — pending is only an earmark), without waiting out the
+ * cooldown. amount must be <= the role's pending_unbond_amount.
+ * @name MsgCancelUnbondRole
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCancelUnbondRole
+ */
+export interface MsgCancelUnbondRole {
+  creator: string;
+  roleType: RoleType;
+  amount: string;
+}
+export interface MsgCancelUnbondRoleProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgCancelUnbondRole";
+  value: Uint8Array;
+}
+/**
+ * MsgCancelUnbondRole cancels part or all of an in-flight unbond for the given
+ * role_type. The cancelled amount returns to active bond immediately (the DREAM
+ * was never unlocked — pending is only an earmark), without waiting out the
+ * cooldown. amount must be <= the role's pending_unbond_amount.
+ * @name MsgCancelUnbondRoleAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCancelUnbondRole
+ */
+export interface MsgCancelUnbondRoleAmino {
+  creator?: string;
+  role_type?: RoleType;
+  amount?: string;
+}
+export interface MsgCancelUnbondRoleAminoMsg {
+  type: "sparkdream/x/rep/MsgCancelUnbondRole";
+  value: MsgCancelUnbondRoleAmino;
+}
+/**
+ * MsgCancelUnbondRoleResponse defines the MsgCancelUnbondRoleResponse message.
+ * @name MsgCancelUnbondRoleResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCancelUnbondRoleResponse
+ */
+export interface MsgCancelUnbondRoleResponse {}
+export interface MsgCancelUnbondRoleResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgCancelUnbondRoleResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgCancelUnbondRoleResponse defines the MsgCancelUnbondRoleResponse message.
+ * @name MsgCancelUnbondRoleResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCancelUnbondRoleResponse
+ */
+export interface MsgCancelUnbondRoleResponseAmino {}
+export interface MsgCancelUnbondRoleResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgCancelUnbondRoleResponse";
+  value: MsgCancelUnbondRoleResponseAmino;
+}
+/**
  * MsgReportMember defines the MsgReportMember message.
  * @name MsgReportMember
  * @package sparkdream.rep.v1
@@ -9622,6 +9680,165 @@ export const MsgUnbondRoleResponse = {
     return {
       typeUrl: "/sparkdream.rep.v1.MsgUnbondRoleResponse",
       value: MsgUnbondRoleResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCancelUnbondRole(): MsgCancelUnbondRole {
+  return {
+    creator: "",
+    roleType: 0,
+    amount: ""
+  };
+}
+/**
+ * MsgCancelUnbondRole cancels part or all of an in-flight unbond for the given
+ * role_type. The cancelled amount returns to active bond immediately (the DREAM
+ * was never unlocked — pending is only an earmark), without waiting out the
+ * cooldown. amount must be <= the role's pending_unbond_amount.
+ * @name MsgCancelUnbondRole
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCancelUnbondRole
+ */
+export const MsgCancelUnbondRole = {
+  typeUrl: "/sparkdream.rep.v1.MsgCancelUnbondRole",
+  aminoType: "sparkdream/x/rep/MsgCancelUnbondRole",
+  encode(message: MsgCancelUnbondRole, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.roleType !== 0) {
+      writer.uint32(16).int32(message.roleType);
+    }
+    if (message.amount !== "") {
+      writer.uint32(26).string(message.amount);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCancelUnbondRole {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCancelUnbondRole();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.roleType = reader.int32() as any;
+          break;
+        case 3:
+          message.amount = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCancelUnbondRole>): MsgCancelUnbondRole {
+    const message = createBaseMsgCancelUnbondRole();
+    message.creator = object.creator ?? "";
+    message.roleType = object.roleType ?? 0;
+    message.amount = object.amount ?? "";
+    return message;
+  },
+  fromAmino(object: MsgCancelUnbondRoleAmino): MsgCancelUnbondRole {
+    const message = createBaseMsgCancelUnbondRole();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.role_type !== undefined && object.role_type !== null) {
+      message.roleType = object.role_type;
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = object.amount;
+    }
+    return message;
+  },
+  toAmino(message: MsgCancelUnbondRole): MsgCancelUnbondRoleAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.role_type = message.roleType === 0 ? undefined : message.roleType;
+    obj.amount = message.amount === "" ? undefined : message.amount;
+    return obj;
+  },
+  fromAminoMsg(object: MsgCancelUnbondRoleAminoMsg): MsgCancelUnbondRole {
+    return MsgCancelUnbondRole.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCancelUnbondRole): MsgCancelUnbondRoleAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgCancelUnbondRole",
+      value: MsgCancelUnbondRole.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgCancelUnbondRoleProtoMsg): MsgCancelUnbondRole {
+    return MsgCancelUnbondRole.decode(message.value);
+  },
+  toProto(message: MsgCancelUnbondRole): Uint8Array {
+    return MsgCancelUnbondRole.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCancelUnbondRole): MsgCancelUnbondRoleProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgCancelUnbondRole",
+      value: MsgCancelUnbondRole.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCancelUnbondRoleResponse(): MsgCancelUnbondRoleResponse {
+  return {};
+}
+/**
+ * MsgCancelUnbondRoleResponse defines the MsgCancelUnbondRoleResponse message.
+ * @name MsgCancelUnbondRoleResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCancelUnbondRoleResponse
+ */
+export const MsgCancelUnbondRoleResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgCancelUnbondRoleResponse",
+  encode(_: MsgCancelUnbondRoleResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCancelUnbondRoleResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCancelUnbondRoleResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgCancelUnbondRoleResponse>): MsgCancelUnbondRoleResponse {
+    const message = createBaseMsgCancelUnbondRoleResponse();
+    return message;
+  },
+  fromAmino(_: MsgCancelUnbondRoleResponseAmino): MsgCancelUnbondRoleResponse {
+    const message = createBaseMsgCancelUnbondRoleResponse();
+    return message;
+  },
+  toAmino(_: MsgCancelUnbondRoleResponse): MsgCancelUnbondRoleResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgCancelUnbondRoleResponseAminoMsg): MsgCancelUnbondRoleResponse {
+    return MsgCancelUnbondRoleResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgCancelUnbondRoleResponseProtoMsg): MsgCancelUnbondRoleResponse {
+    return MsgCancelUnbondRoleResponse.decode(message.value);
+  },
+  toProto(message: MsgCancelUnbondRoleResponse): Uint8Array {
+    return MsgCancelUnbondRoleResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCancelUnbondRoleResponse): MsgCancelUnbondRoleResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgCancelUnbondRoleResponse",
+      value: MsgCancelUnbondRoleResponse.encode(message).finish()
     };
   }
 };

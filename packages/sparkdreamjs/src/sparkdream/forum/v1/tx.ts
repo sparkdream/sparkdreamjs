@@ -212,9 +212,6 @@ export interface MsgCreatePost {
   content: string;
   tags: string[];
   contentType: ContentType;
-  /**
-   * Optional DREAM amount to lock as author bond
-   */
   authorBond?: string;
   initiativeId: bigint;
 }
@@ -235,9 +232,6 @@ export interface MsgCreatePostAmino {
   content?: string;
   tags?: string[];
   content_type?: ContentType;
-  /**
-   * Optional DREAM amount to lock as author bond
-   */
   author_bond?: string;
   initiative_id?: string;
 }
@@ -2162,6 +2156,58 @@ export interface MsgSetModerationPausedResponseAmino {}
 export interface MsgSetModerationPausedResponseAminoMsg {
   type: "/sparkdream.forum.v1.MsgSetModerationPausedResponse";
   value: MsgSetModerationPausedResponseAmino;
+}
+/**
+ * MsgSetThreadProposalsLock defines the MsgSetThreadProposalsLock message.
+ * @name MsgSetThreadProposalsLock
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgSetThreadProposalsLock
+ */
+export interface MsgSetThreadProposalsLock {
+  creator: string;
+  threadId: bigint;
+  locked: boolean;
+}
+export interface MsgSetThreadProposalsLockProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.MsgSetThreadProposalsLock";
+  value: Uint8Array;
+}
+/**
+ * MsgSetThreadProposalsLock defines the MsgSetThreadProposalsLock message.
+ * @name MsgSetThreadProposalsLockAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgSetThreadProposalsLock
+ */
+export interface MsgSetThreadProposalsLockAmino {
+  creator?: string;
+  thread_id?: string;
+  locked?: boolean;
+}
+export interface MsgSetThreadProposalsLockAminoMsg {
+  type: "sparkdream/x/forum/MsgSetThreadProposalsLock";
+  value: MsgSetThreadProposalsLockAmino;
+}
+/**
+ * MsgSetThreadProposalsLockResponse defines the MsgSetThreadProposalsLockResponse message.
+ * @name MsgSetThreadProposalsLockResponse
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgSetThreadProposalsLockResponse
+ */
+export interface MsgSetThreadProposalsLockResponse {}
+export interface MsgSetThreadProposalsLockResponseProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.MsgSetThreadProposalsLockResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgSetThreadProposalsLockResponse defines the MsgSetThreadProposalsLockResponse message.
+ * @name MsgSetThreadProposalsLockResponseAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgSetThreadProposalsLockResponse
+ */
+export interface MsgSetThreadProposalsLockResponseAmino {}
+export interface MsgSetThreadProposalsLockResponseAminoMsg {
+  type: "/sparkdream.forum.v1.MsgSetThreadProposalsLockResponse";
+  value: MsgSetThreadProposalsLockResponseAmino;
 }
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
@@ -8195,6 +8241,162 @@ export const MsgSetModerationPausedResponse = {
     return {
       typeUrl: "/sparkdream.forum.v1.MsgSetModerationPausedResponse",
       value: MsgSetModerationPausedResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSetThreadProposalsLock(): MsgSetThreadProposalsLock {
+  return {
+    creator: "",
+    threadId: BigInt(0),
+    locked: false
+  };
+}
+/**
+ * MsgSetThreadProposalsLock defines the MsgSetThreadProposalsLock message.
+ * @name MsgSetThreadProposalsLock
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgSetThreadProposalsLock
+ */
+export const MsgSetThreadProposalsLock = {
+  typeUrl: "/sparkdream.forum.v1.MsgSetThreadProposalsLock",
+  aminoType: "sparkdream/x/forum/MsgSetThreadProposalsLock",
+  encode(message: MsgSetThreadProposalsLock, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.threadId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.threadId);
+    }
+    if (message.locked === true) {
+      writer.uint32(24).bool(message.locked);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSetThreadProposalsLock {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSetThreadProposalsLock();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.threadId = reader.uint64();
+          break;
+        case 3:
+          message.locked = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgSetThreadProposalsLock>): MsgSetThreadProposalsLock {
+    const message = createBaseMsgSetThreadProposalsLock();
+    message.creator = object.creator ?? "";
+    message.threadId = object.threadId !== undefined && object.threadId !== null ? BigInt(object.threadId.toString()) : BigInt(0);
+    message.locked = object.locked ?? false;
+    return message;
+  },
+  fromAmino(object: MsgSetThreadProposalsLockAmino): MsgSetThreadProposalsLock {
+    const message = createBaseMsgSetThreadProposalsLock();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.thread_id !== undefined && object.thread_id !== null) {
+      message.threadId = BigInt(object.thread_id);
+    }
+    if (object.locked !== undefined && object.locked !== null) {
+      message.locked = object.locked;
+    }
+    return message;
+  },
+  toAmino(message: MsgSetThreadProposalsLock): MsgSetThreadProposalsLockAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.thread_id = message.threadId !== BigInt(0) ? message.threadId?.toString() : undefined;
+    obj.locked = message.locked === false ? undefined : message.locked;
+    return obj;
+  },
+  fromAminoMsg(object: MsgSetThreadProposalsLockAminoMsg): MsgSetThreadProposalsLock {
+    return MsgSetThreadProposalsLock.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSetThreadProposalsLock): MsgSetThreadProposalsLockAminoMsg {
+    return {
+      type: "sparkdream/x/forum/MsgSetThreadProposalsLock",
+      value: MsgSetThreadProposalsLock.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgSetThreadProposalsLockProtoMsg): MsgSetThreadProposalsLock {
+    return MsgSetThreadProposalsLock.decode(message.value);
+  },
+  toProto(message: MsgSetThreadProposalsLock): Uint8Array {
+    return MsgSetThreadProposalsLock.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSetThreadProposalsLock): MsgSetThreadProposalsLockProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.MsgSetThreadProposalsLock",
+      value: MsgSetThreadProposalsLock.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSetThreadProposalsLockResponse(): MsgSetThreadProposalsLockResponse {
+  return {};
+}
+/**
+ * MsgSetThreadProposalsLockResponse defines the MsgSetThreadProposalsLockResponse message.
+ * @name MsgSetThreadProposalsLockResponse
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.MsgSetThreadProposalsLockResponse
+ */
+export const MsgSetThreadProposalsLockResponse = {
+  typeUrl: "/sparkdream.forum.v1.MsgSetThreadProposalsLockResponse",
+  encode(_: MsgSetThreadProposalsLockResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSetThreadProposalsLockResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSetThreadProposalsLockResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgSetThreadProposalsLockResponse>): MsgSetThreadProposalsLockResponse {
+    const message = createBaseMsgSetThreadProposalsLockResponse();
+    return message;
+  },
+  fromAmino(_: MsgSetThreadProposalsLockResponseAmino): MsgSetThreadProposalsLockResponse {
+    const message = createBaseMsgSetThreadProposalsLockResponse();
+    return message;
+  },
+  toAmino(_: MsgSetThreadProposalsLockResponse): MsgSetThreadProposalsLockResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgSetThreadProposalsLockResponseAminoMsg): MsgSetThreadProposalsLockResponse {
+    return MsgSetThreadProposalsLockResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgSetThreadProposalsLockResponseProtoMsg): MsgSetThreadProposalsLockResponse {
+    return MsgSetThreadProposalsLockResponse.decode(message.value);
+  },
+  toProto(message: MsgSetThreadProposalsLockResponse): Uint8Array {
+    return MsgSetThreadProposalsLockResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSetThreadProposalsLockResponse): MsgSetThreadProposalsLockResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.MsgSetThreadProposalsLockResponse",
+      value: MsgSetThreadProposalsLockResponse.encode(message).finish()
     };
   }
 };

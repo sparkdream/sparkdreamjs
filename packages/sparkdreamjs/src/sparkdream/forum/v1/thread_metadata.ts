@@ -34,6 +34,14 @@ export interface ThreadMetadata {
   proposalFireAt: bigint;
   pinnedReplyIds: bigint[];
   pinnedRecords: PinnedReplyRecord[];
+  /**
+   * proposals_locked, when true, closes the thread to sentinel accepted-reply
+   * proposals: proposeAcceptedReply rejects with ErrThreadProposalsLocked. Set
+   * by the thread author via MsgSetThreadProposalsLock so a discussion thread (or
+   * a thread with no good answer) can be definitively closed to curation without
+   * being forced into an irreversible acceptance. Author-only to set/clear.
+   */
+  proposalsLocked: boolean;
 }
 export interface ThreadMetadataProtoMsg {
   typeUrl: "/sparkdream.forum.v1.ThreadMetadata";
@@ -71,6 +79,14 @@ export interface ThreadMetadataAmino {
   proposal_fire_at?: string;
   pinned_reply_ids?: string[];
   pinned_records?: PinnedReplyRecordAmino[];
+  /**
+   * proposals_locked, when true, closes the thread to sentinel accepted-reply
+   * proposals: proposeAcceptedReply rejects with ErrThreadProposalsLocked. Set
+   * by the thread author via MsgSetThreadProposalsLock so a discussion thread (or
+   * a thread with no good answer) can be definitively closed to curation without
+   * being forced into an irreversible acceptance. Author-only to set/clear.
+   */
+  proposals_locked?: boolean;
 }
 export interface ThreadMetadataAminoMsg {
   type: "/sparkdream.forum.v1.ThreadMetadata";
@@ -88,7 +104,8 @@ function createBaseThreadMetadata(): ThreadMetadata {
     proposalExtended: false,
     proposalFireAt: BigInt(0),
     pinnedReplyIds: [],
-    pinnedRecords: []
+    pinnedRecords: [],
+    proposalsLocked: false
   };
 }
 /**
@@ -134,6 +151,9 @@ export const ThreadMetadata = {
     writer.ldelim();
     for (const v of message.pinnedRecords) {
       PinnedReplyRecord.encode(v!, writer.uint32(90).fork()).ldelim();
+    }
+    if (message.proposalsLocked === true) {
+      writer.uint32(96).bool(message.proposalsLocked);
     }
     return writer;
   },
@@ -184,6 +204,9 @@ export const ThreadMetadata = {
         case 11:
           message.pinnedRecords.push(PinnedReplyRecord.decode(reader, reader.uint32()));
           break;
+        case 12:
+          message.proposalsLocked = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -204,6 +227,7 @@ export const ThreadMetadata = {
     message.proposalFireAt = object.proposalFireAt !== undefined && object.proposalFireAt !== null ? BigInt(object.proposalFireAt.toString()) : BigInt(0);
     message.pinnedReplyIds = object.pinnedReplyIds?.map(e => BigInt(e.toString())) || [];
     message.pinnedRecords = object.pinnedRecords?.map(e => PinnedReplyRecord.fromPartial(e)) || [];
+    message.proposalsLocked = object.proposalsLocked ?? false;
     return message;
   },
   fromAmino(object: ThreadMetadataAmino): ThreadMetadata {
@@ -237,6 +261,9 @@ export const ThreadMetadata = {
     }
     message.pinnedReplyIds = object.pinned_reply_ids?.map(e => BigInt(e)) || [];
     message.pinnedRecords = object.pinned_records?.map(e => PinnedReplyRecord.fromAmino(e)) || [];
+    if (object.proposals_locked !== undefined && object.proposals_locked !== null) {
+      message.proposalsLocked = object.proposals_locked;
+    }
     return message;
   },
   toAmino(message: ThreadMetadata): ThreadMetadataAmino {
@@ -260,6 +287,7 @@ export const ThreadMetadata = {
     } else {
       obj.pinned_records = message.pinnedRecords;
     }
+    obj.proposals_locked = message.proposalsLocked === false ? undefined : message.proposalsLocked;
     return obj;
   },
   fromAminoMsg(object: ThreadMetadataAminoMsg): ThreadMetadata {
