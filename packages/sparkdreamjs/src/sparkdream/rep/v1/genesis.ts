@@ -20,6 +20,7 @@ import { MemberReport, MemberReportAmino } from "./member_report";
 import { MemberWarning, MemberWarningAmino } from "./member_warning";
 import { GovActionAppeal, GovActionAppealAmino } from "./gov_action_appeal";
 import { BondedRole, BondedRoleAmino, BondedRoleConfig, BondedRoleConfigAmino } from "./bonded_role";
+import { RoleActivity, RoleActivityAmino } from "./role_activity";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -94,6 +95,7 @@ export interface GenesisState {
    */
   bondedRoleList: BondedRole[];
   bondedRoleConfigList: BondedRoleConfig[];
+  roleActivityList: RoleActivity[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.rep.v1.GenesisState";
@@ -171,6 +173,7 @@ export interface GenesisStateAmino {
    */
   bonded_role_list?: BondedRoleAmino[];
   bonded_role_config_list?: BondedRoleConfigAmino[];
+  role_activity_list?: RoleActivityAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.rep.v1.GenesisState";
@@ -257,7 +260,8 @@ function createBaseGenesisState(): GenesisState {
     govActionAppealList: [],
     govActionAppealCount: BigInt(0),
     bondedRoleList: [],
-    bondedRoleConfigList: []
+    bondedRoleConfigList: [],
+    roleActivityList: []
   };
 }
 /**
@@ -383,6 +387,9 @@ export const GenesisState = {
     for (const v of message.bondedRoleConfigList) {
       BondedRoleConfig.encode(v!, writer.uint32(314).fork()).ldelim();
     }
+    for (const v of message.roleActivityList) {
+      RoleActivity.encode(v!, writer.uint32(322).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -506,6 +513,9 @@ export const GenesisState = {
         case 39:
           message.bondedRoleConfigList.push(BondedRoleConfig.decode(reader, reader.uint32()));
           break;
+        case 40:
+          message.roleActivityList.push(RoleActivity.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -553,6 +563,7 @@ export const GenesisState = {
     message.govActionAppealCount = object.govActionAppealCount !== undefined && object.govActionAppealCount !== null ? BigInt(object.govActionAppealCount.toString()) : BigInt(0);
     message.bondedRoleList = object.bondedRoleList?.map(e => BondedRole.fromPartial(e)) || [];
     message.bondedRoleConfigList = object.bondedRoleConfigList?.map(e => BondedRoleConfig.fromPartial(e)) || [];
+    message.roleActivityList = object.roleActivityList?.map(e => RoleActivity.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -621,6 +632,7 @@ export const GenesisState = {
     }
     message.bondedRoleList = object.bonded_role_list?.map(e => BondedRole.fromAmino(e)) || [];
     message.bondedRoleConfigList = object.bonded_role_config_list?.map(e => BondedRoleConfig.fromAmino(e)) || [];
+    message.roleActivityList = object.role_activity_list?.map(e => RoleActivity.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -762,6 +774,11 @@ export const GenesisState = {
       obj.bonded_role_config_list = message.bondedRoleConfigList.map(e => e ? BondedRoleConfig.toAmino(e) : undefined);
     } else {
       obj.bonded_role_config_list = message.bondedRoleConfigList;
+    }
+    if (message.roleActivityList) {
+      obj.role_activity_list = message.roleActivityList.map(e => e ? RoleActivity.toAmino(e) : undefined);
+    } else {
+      obj.role_activity_list = message.roleActivityList;
     }
     return obj;
   },

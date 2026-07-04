@@ -85,6 +85,20 @@ export interface Params {
   appealCooldownBlocks: bigint;
   appealDeadlineBlocks: bigint;
   /**
+   * Blocks after HiddenAt during which the hiding sentinel may
+   * self-correct via MsgUnhideContent. Must be < hide_expiry_blocks.
+   * Default 14400 (~24h at 6s blocks).
+   */
+  sentinelUnhideWindowBlocks: bigint;
+  /**
+   * Max MsgHideContent actions per sentinel per day (block-height day,
+   * BlocksPerDay = 14400). Collect's other hide throttle is the per-hide
+   * bond reservation; this caps outright hide spam by a well-funded
+   * sentinel. Default 50 (parity with forum's max_hides_per_epoch).
+   * A self-correct unhide does NOT refund the day's slot.
+   */
+  maxHidesPerSentinelPerDay: number;
+  /**
    * --- Endorsement parameters — OPERATIONAL ---
    */
   endorsementCreationFee: string;
@@ -280,6 +294,20 @@ export interface ParamsAmino {
   appeal_cooldown_blocks?: string;
   appeal_deadline_blocks?: string;
   /**
+   * Blocks after HiddenAt during which the hiding sentinel may
+   * self-correct via MsgUnhideContent. Must be < hide_expiry_blocks.
+   * Default 14400 (~24h at 6s blocks).
+   */
+  sentinel_unhide_window_blocks?: string;
+  /**
+   * Max MsgHideContent actions per sentinel per day (block-height day,
+   * BlocksPerDay = 14400). Collect's other hide throttle is the per-hide
+   * bond reservation; this caps outright hide spam by a well-funded
+   * sentinel. Default 50 (parity with forum's max_hides_per_epoch).
+   * A self-correct unhide does NOT refund the day's slot.
+   */
+  max_hides_per_sentinel_per_day?: number;
+  /**
    * --- Endorsement parameters — OPERATIONAL ---
    */
   endorsement_creation_fee?: string;
@@ -442,6 +470,8 @@ function createBaseParams(): Params {
     appealFee: "",
     appealCooldownBlocks: BigInt(0),
     appealDeadlineBlocks: BigInt(0),
+    sentinelUnhideWindowBlocks: BigInt(0),
+    maxHidesPerSentinelPerDay: 0,
     endorsementCreationFee: "",
     endorsementDreamStake: "",
     endorsementStakeDuration: BigInt(0),
@@ -620,6 +650,12 @@ export const Params = {
     }
     if (message.appealDeadlineBlocks !== BigInt(0)) {
       writer.uint32(392).int64(message.appealDeadlineBlocks);
+    }
+    if (message.sentinelUnhideWindowBlocks !== BigInt(0)) {
+      writer.uint32(608).int64(message.sentinelUnhideWindowBlocks);
+    }
+    if (message.maxHidesPerSentinelPerDay !== 0) {
+      writer.uint32(616).uint32(message.maxHidesPerSentinelPerDay);
     }
     if (message.endorsementCreationFee !== "") {
       writer.uint32(402).string(message.endorsementCreationFee);
@@ -843,6 +879,12 @@ export const Params = {
         case 49:
           message.appealDeadlineBlocks = reader.int64();
           break;
+        case 76:
+          message.sentinelUnhideWindowBlocks = reader.int64();
+          break;
+        case 77:
+          message.maxHidesPerSentinelPerDay = reader.uint32();
+          break;
         case 50:
           message.endorsementCreationFee = reader.string();
           break;
@@ -969,6 +1011,8 @@ export const Params = {
     message.appealFee = object.appealFee ?? "";
     message.appealCooldownBlocks = object.appealCooldownBlocks !== undefined && object.appealCooldownBlocks !== null ? BigInt(object.appealCooldownBlocks.toString()) : BigInt(0);
     message.appealDeadlineBlocks = object.appealDeadlineBlocks !== undefined && object.appealDeadlineBlocks !== null ? BigInt(object.appealDeadlineBlocks.toString()) : BigInt(0);
+    message.sentinelUnhideWindowBlocks = object.sentinelUnhideWindowBlocks !== undefined && object.sentinelUnhideWindowBlocks !== null ? BigInt(object.sentinelUnhideWindowBlocks.toString()) : BigInt(0);
+    message.maxHidesPerSentinelPerDay = object.maxHidesPerSentinelPerDay ?? 0;
     message.endorsementCreationFee = object.endorsementCreationFee ?? "";
     message.endorsementDreamStake = object.endorsementDreamStake ?? "";
     message.endorsementStakeDuration = object.endorsementStakeDuration !== undefined && object.endorsementStakeDuration !== null ? BigInt(object.endorsementStakeDuration.toString()) : BigInt(0);
@@ -1140,6 +1184,12 @@ export const Params = {
     if (object.appeal_deadline_blocks !== undefined && object.appeal_deadline_blocks !== null) {
       message.appealDeadlineBlocks = BigInt(object.appeal_deadline_blocks);
     }
+    if (object.sentinel_unhide_window_blocks !== undefined && object.sentinel_unhide_window_blocks !== null) {
+      message.sentinelUnhideWindowBlocks = BigInt(object.sentinel_unhide_window_blocks);
+    }
+    if (object.max_hides_per_sentinel_per_day !== undefined && object.max_hides_per_sentinel_per_day !== null) {
+      message.maxHidesPerSentinelPerDay = object.max_hides_per_sentinel_per_day;
+    }
     if (object.endorsement_creation_fee !== undefined && object.endorsement_creation_fee !== null) {
       message.endorsementCreationFee = object.endorsement_creation_fee;
     }
@@ -1261,6 +1311,8 @@ export const Params = {
     obj.appeal_fee = message.appealFee === "" ? undefined : message.appealFee;
     obj.appeal_cooldown_blocks = message.appealCooldownBlocks !== BigInt(0) ? message.appealCooldownBlocks?.toString() : undefined;
     obj.appeal_deadline_blocks = message.appealDeadlineBlocks !== BigInt(0) ? message.appealDeadlineBlocks?.toString() : undefined;
+    obj.sentinel_unhide_window_blocks = message.sentinelUnhideWindowBlocks !== BigInt(0) ? message.sentinelUnhideWindowBlocks?.toString() : undefined;
+    obj.max_hides_per_sentinel_per_day = message.maxHidesPerSentinelPerDay === 0 ? undefined : message.maxHidesPerSentinelPerDay;
     obj.endorsement_creation_fee = message.endorsementCreationFee === "" ? undefined : message.endorsementCreationFee;
     obj.endorsement_dream_stake = message.endorsementDreamStake === "" ? undefined : message.endorsementDreamStake;
     obj.endorsement_stake_duration = message.endorsementStakeDuration !== BigInt(0) ? message.endorsementStakeDuration?.toString() : undefined;

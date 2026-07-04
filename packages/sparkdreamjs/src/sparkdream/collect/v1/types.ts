@@ -1015,6 +1015,14 @@ export interface CollectOperationalParams {
   endorserRepPenalty: string;
   collabInviterRepPenalty: string;
   authorRepPenalty: string;
+  /**
+   * sentinel_unhide_window_blocks — see Params.sentinel_unhide_window_blocks.
+   */
+  sentinelUnhideWindowBlocks: bigint;
+  /**
+   * max_hides_per_sentinel_per_day — see Params.max_hides_per_sentinel_per_day.
+   */
+  maxHidesPerSentinelPerDay: number;
 }
 export interface CollectOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.collect.v1.CollectOperationalParams";
@@ -1107,6 +1115,14 @@ export interface CollectOperationalParamsAmino {
   endorser_rep_penalty?: string;
   collab_inviter_rep_penalty?: string;
   author_rep_penalty?: string;
+  /**
+   * sentinel_unhide_window_blocks — see Params.sentinel_unhide_window_blocks.
+   */
+  sentinel_unhide_window_blocks?: string;
+  /**
+   * max_hides_per_sentinel_per_day — see Params.max_hides_per_sentinel_per_day.
+   */
+  max_hides_per_sentinel_per_day?: number;
 }
 export interface CollectOperationalParamsAminoMsg {
   type: "/sparkdream.collect.v1.CollectOperationalParams";
@@ -1168,6 +1184,34 @@ export interface HideRecord {
   appealDeadline: bigint;
   appealed: boolean;
   resolved: boolean;
+  /**
+   * Set true when the hiding sentinel self-corrected via MsgUnhideContent.
+   * The record is Resolved at that point, but the HideRecordExpiry entry
+   * is retained so the EndBlocker releases the committed bond at the
+   * original appeal_deadline (anti hide/unhide cycling).
+   */
+  selfCorrected: boolean;
+  /**
+   * Snapshot of the author bond amount slashed by MsgHideContent
+   * (SlashAuthorBond), so a self-correct can mint it back. Zero if no
+   * bond existed or the target is an item.
+   */
+  authorBondAmount: string;
+  /**
+   * Snapshot of the per-tag rep penalty PARAM at hide time (params may
+   * change before unhide) and the tags it was applied to (collection tags
+   * are owner-editable). Zero/empty when no deduction ran.
+   */
+  authorRepPenalty: string;
+  repPenaltyTags: string[];
+  /**
+   * Per-tag ACTUAL deducted amounts (LegacyDec strings), aligned with
+   * rep_penalty_tags. DeductReputation floors at zero, so the actual
+   * deduction is min(current_score, author_rep_penalty) — restoring the
+   * raw param instead would mint reputation from nothing on every
+   * hide/reversal cycle for authors with less rep than the penalty.
+   */
+  repPenaltyAmounts: string[];
 }
 export interface HideRecordProtoMsg {
   typeUrl: "/sparkdream.collect.v1.HideRecord";
@@ -1191,6 +1235,34 @@ export interface HideRecordAmino {
   appeal_deadline?: string;
   appealed?: boolean;
   resolved?: boolean;
+  /**
+   * Set true when the hiding sentinel self-corrected via MsgUnhideContent.
+   * The record is Resolved at that point, but the HideRecordExpiry entry
+   * is retained so the EndBlocker releases the committed bond at the
+   * original appeal_deadline (anti hide/unhide cycling).
+   */
+  self_corrected?: boolean;
+  /**
+   * Snapshot of the author bond amount slashed by MsgHideContent
+   * (SlashAuthorBond), so a self-correct can mint it back. Zero if no
+   * bond existed or the target is an item.
+   */
+  author_bond_amount?: string;
+  /**
+   * Snapshot of the per-tag rep penalty PARAM at hide time (params may
+   * change before unhide) and the tags it was applied to (collection tags
+   * are owner-editable). Zero/empty when no deduction ran.
+   */
+  author_rep_penalty?: string;
+  rep_penalty_tags?: string[];
+  /**
+   * Per-tag ACTUAL deducted amounts (LegacyDec strings), aligned with
+   * rep_penalty_tags. DeductReputation floors at zero, so the actual
+   * deduction is min(current_score, author_rep_penalty) — restoring the
+   * raw param instead would mint reputation from nothing on every
+   * hide/reversal cycle for authors with less rep than the penalty.
+   */
+  rep_penalty_amounts?: string[];
 }
 export interface HideRecordAminoMsg {
   type: "/sparkdream.collect.v1.HideRecord";
@@ -3285,7 +3357,9 @@ function createBaseCollectOperationalParams(): CollectOperationalParams {
     nonMemberCollabBurnFraction: "",
     endorserRepPenalty: "",
     collabInviterRepPenalty: "",
-    authorRepPenalty: ""
+    authorRepPenalty: "",
+    sentinelUnhideWindowBlocks: BigInt(0),
+    maxHidesPerSentinelPerDay: 0
   };
 }
 /**
@@ -3450,6 +3524,12 @@ export const CollectOperationalParams = {
     if (message.authorRepPenalty !== "") {
       writer.uint32(434).string(Decimal.fromUserInput(message.authorRepPenalty, 18).atomics);
     }
+    if (message.sentinelUnhideWindowBlocks !== BigInt(0)) {
+      writer.uint32(448).int64(message.sentinelUnhideWindowBlocks);
+    }
+    if (message.maxHidesPerSentinelPerDay !== 0) {
+      writer.uint32(456).uint32(message.maxHidesPerSentinelPerDay);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): CollectOperationalParams {
@@ -3612,6 +3692,12 @@ export const CollectOperationalParams = {
         case 54:
           message.authorRepPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
+        case 56:
+          message.sentinelUnhideWindowBlocks = reader.int64();
+          break;
+        case 57:
+          message.maxHidesPerSentinelPerDay = reader.uint32();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3672,6 +3758,8 @@ export const CollectOperationalParams = {
     message.endorserRepPenalty = object.endorserRepPenalty ?? "";
     message.collabInviterRepPenalty = object.collabInviterRepPenalty ?? "";
     message.authorRepPenalty = object.authorRepPenalty ?? "";
+    message.sentinelUnhideWindowBlocks = object.sentinelUnhideWindowBlocks !== undefined && object.sentinelUnhideWindowBlocks !== null ? BigInt(object.sentinelUnhideWindowBlocks.toString()) : BigInt(0);
+    message.maxHidesPerSentinelPerDay = object.maxHidesPerSentinelPerDay ?? 0;
     return message;
   },
   fromAmino(object: CollectOperationalParamsAmino): CollectOperationalParams {
@@ -3829,6 +3917,12 @@ export const CollectOperationalParams = {
     if (object.author_rep_penalty !== undefined && object.author_rep_penalty !== null) {
       message.authorRepPenalty = object.author_rep_penalty;
     }
+    if (object.sentinel_unhide_window_blocks !== undefined && object.sentinel_unhide_window_blocks !== null) {
+      message.sentinelUnhideWindowBlocks = BigInt(object.sentinel_unhide_window_blocks);
+    }
+    if (object.max_hides_per_sentinel_per_day !== undefined && object.max_hides_per_sentinel_per_day !== null) {
+      message.maxHidesPerSentinelPerDay = object.max_hides_per_sentinel_per_day;
+    }
     return message;
   },
   toAmino(message: CollectOperationalParams): CollectOperationalParamsAmino {
@@ -3884,6 +3978,8 @@ export const CollectOperationalParams = {
     obj.endorser_rep_penalty = message.endorserRepPenalty === "" ? undefined : message.endorserRepPenalty;
     obj.collab_inviter_rep_penalty = message.collabInviterRepPenalty === "" ? undefined : message.collabInviterRepPenalty;
     obj.author_rep_penalty = message.authorRepPenalty === "" ? undefined : message.authorRepPenalty;
+    obj.sentinel_unhide_window_blocks = message.sentinelUnhideWindowBlocks !== BigInt(0) ? message.sentinelUnhideWindowBlocks?.toString() : undefined;
+    obj.max_hides_per_sentinel_per_day = message.maxHidesPerSentinelPerDay === 0 ? undefined : message.maxHidesPerSentinelPerDay;
     return obj;
   },
   fromAminoMsg(object: CollectOperationalParamsAminoMsg): CollectOperationalParams {
@@ -4057,7 +4153,12 @@ function createBaseHideRecord(): HideRecord {
     reasonText: "",
     appealDeadline: BigInt(0),
     appealed: false,
-    resolved: false
+    resolved: false,
+    selfCorrected: false,
+    authorBondAmount: "",
+    authorRepPenalty: "",
+    repPenaltyTags: [],
+    repPenaltyAmounts: []
   };
 }
 /**
@@ -4102,6 +4203,21 @@ export const HideRecord = {
     if (message.resolved === true) {
       writer.uint32(88).bool(message.resolved);
     }
+    if (message.selfCorrected === true) {
+      writer.uint32(96).bool(message.selfCorrected);
+    }
+    if (message.authorBondAmount !== "") {
+      writer.uint32(106).string(message.authorBondAmount);
+    }
+    if (message.authorRepPenalty !== "") {
+      writer.uint32(114).string(Decimal.fromUserInput(message.authorRepPenalty, 18).atomics);
+    }
+    for (const v of message.repPenaltyTags) {
+      writer.uint32(122).string(v!);
+    }
+    for (const v of message.repPenaltyAmounts) {
+      writer.uint32(130).string(v!);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): HideRecord {
@@ -4144,6 +4260,21 @@ export const HideRecord = {
         case 11:
           message.resolved = reader.bool();
           break;
+        case 12:
+          message.selfCorrected = reader.bool();
+          break;
+        case 13:
+          message.authorBondAmount = reader.string();
+          break;
+        case 14:
+          message.authorRepPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 15:
+          message.repPenaltyTags.push(reader.string());
+          break;
+        case 16:
+          message.repPenaltyAmounts.push(reader.string());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4164,6 +4295,11 @@ export const HideRecord = {
     message.appealDeadline = object.appealDeadline !== undefined && object.appealDeadline !== null ? BigInt(object.appealDeadline.toString()) : BigInt(0);
     message.appealed = object.appealed ?? false;
     message.resolved = object.resolved ?? false;
+    message.selfCorrected = object.selfCorrected ?? false;
+    message.authorBondAmount = object.authorBondAmount ?? "";
+    message.authorRepPenalty = object.authorRepPenalty ?? "";
+    message.repPenaltyTags = object.repPenaltyTags?.map(e => e) || [];
+    message.repPenaltyAmounts = object.repPenaltyAmounts?.map(e => e) || [];
     return message;
   },
   fromAmino(object: HideRecordAmino): HideRecord {
@@ -4201,6 +4337,17 @@ export const HideRecord = {
     if (object.resolved !== undefined && object.resolved !== null) {
       message.resolved = object.resolved;
     }
+    if (object.self_corrected !== undefined && object.self_corrected !== null) {
+      message.selfCorrected = object.self_corrected;
+    }
+    if (object.author_bond_amount !== undefined && object.author_bond_amount !== null) {
+      message.authorBondAmount = object.author_bond_amount;
+    }
+    if (object.author_rep_penalty !== undefined && object.author_rep_penalty !== null) {
+      message.authorRepPenalty = object.author_rep_penalty;
+    }
+    message.repPenaltyTags = object.rep_penalty_tags?.map(e => e) || [];
+    message.repPenaltyAmounts = object.rep_penalty_amounts?.map(e => e) || [];
     return message;
   },
   toAmino(message: HideRecord): HideRecordAmino {
@@ -4216,6 +4363,19 @@ export const HideRecord = {
     obj.appeal_deadline = message.appealDeadline !== BigInt(0) ? message.appealDeadline?.toString() : undefined;
     obj.appealed = message.appealed === false ? undefined : message.appealed;
     obj.resolved = message.resolved === false ? undefined : message.resolved;
+    obj.self_corrected = message.selfCorrected === false ? undefined : message.selfCorrected;
+    obj.author_bond_amount = message.authorBondAmount === "" ? undefined : message.authorBondAmount;
+    obj.author_rep_penalty = message.authorRepPenalty === "" ? undefined : message.authorRepPenalty;
+    if (message.repPenaltyTags) {
+      obj.rep_penalty_tags = message.repPenaltyTags.map(e => e);
+    } else {
+      obj.rep_penalty_tags = message.repPenaltyTags;
+    }
+    if (message.repPenaltyAmounts) {
+      obj.rep_penalty_amounts = message.repPenaltyAmounts.map(e => e);
+    } else {
+      obj.rep_penalty_amounts = message.repPenaltyAmounts;
+    }
     return obj;
   },
   fromAminoMsg(object: HideRecordAminoMsg): HideRecord {

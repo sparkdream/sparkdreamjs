@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgCreateCollection, MsgCreateCollectionResponse, MsgUpdateCollection, MsgUpdateCollectionResponse, MsgDeleteCollection, MsgDeleteCollectionResponse, MsgAddItem, MsgAddItemResponse, MsgAddItems, MsgAddItemsResponse, MsgUpdateItem, MsgUpdateItemResponse, MsgRemoveItem, MsgRemoveItemResponse, MsgRemoveItems, MsgRemoveItemsResponse, MsgReorderItem, MsgReorderItemResponse, MsgAddCollaborator, MsgAddCollaboratorResponse, MsgRemoveCollaborator, MsgRemoveCollaboratorResponse, MsgUpdateCollaboratorRole, MsgUpdateCollaboratorRoleResponse, MsgRateCollection, MsgRateCollectionResponse, MsgChallengeReview, MsgChallengeReviewResponse, MsgRequestSponsorship, MsgRequestSponsorshipResponse, MsgCancelSponsorshipRequest, MsgCancelSponsorshipRequestResponse, MsgSponsorCollection, MsgSponsorCollectionResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgUpvoteContent, MsgUpvoteContentResponse, MsgDownvoteContent, MsgDownvoteContentResponse, MsgFlagContent, MsgFlagContentResponse, MsgHideContent, MsgHideContentResponse, MsgAppealHide, MsgAppealHideResponse, MsgEndorseCollection, MsgEndorseCollectionResponse, MsgSetSeekingEndorsement, MsgSetSeekingEndorsementResponse, MsgPinCollection, MsgPinCollectionResponse, MsgUnpinCollection, MsgUnpinCollectionResponse, MsgMakeCollectionPermanent, MsgMakeCollectionPermanentResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgCreateCollection, MsgCreateCollectionResponse, MsgUpdateCollection, MsgUpdateCollectionResponse, MsgDeleteCollection, MsgDeleteCollectionResponse, MsgAddItem, MsgAddItemResponse, MsgAddItems, MsgAddItemsResponse, MsgUpdateItem, MsgUpdateItemResponse, MsgRemoveItem, MsgRemoveItemResponse, MsgRemoveItems, MsgRemoveItemsResponse, MsgReorderItem, MsgReorderItemResponse, MsgAddCollaborator, MsgAddCollaboratorResponse, MsgRemoveCollaborator, MsgRemoveCollaboratorResponse, MsgUpdateCollaboratorRole, MsgUpdateCollaboratorRoleResponse, MsgRateCollection, MsgRateCollectionResponse, MsgChallengeReview, MsgChallengeReviewResponse, MsgRequestSponsorship, MsgRequestSponsorshipResponse, MsgCancelSponsorshipRequest, MsgCancelSponsorshipRequestResponse, MsgSponsorCollection, MsgSponsorCollectionResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgUpvoteContent, MsgUpvoteContentResponse, MsgDownvoteContent, MsgDownvoteContentResponse, MsgFlagContent, MsgFlagContentResponse, MsgHideContent, MsgHideContentResponse, MsgAppealHide, MsgAppealHideResponse, MsgEndorseCollection, MsgEndorseCollectionResponse, MsgSetSeekingEndorsement, MsgSetSeekingEndorsementResponse, MsgPinCollection, MsgPinCollectionResponse, MsgUnpinCollection, MsgUnpinCollectionResponse, MsgMakeCollectionPermanent, MsgMakeCollectionPermanentResponse, MsgUnhideContent, MsgUnhideContentResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   updateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
@@ -54,6 +54,14 @@ export interface Msg {
    * params.make_permanent_min_trust_level. Idempotent on permanent collections.
    */
   makeCollectionPermanent(request: MsgMakeCollectionPermanent): Promise<MsgMakeCollectionPermanentResponse>;
+  /**
+   * UnhideContent reverses MsgHideContent. Original sentinel only, within
+   * params.sentinel_unhide_window_blocks, and only before an appeal is
+   * filed. Restores the author bond and rep penalty slashed at hide time.
+   * The sentinel's committed bond stays reserved until the original
+   * appeal_deadline (anti hide/unhide cycling).
+   */
+  unhideContent(request: MsgUnhideContent): Promise<MsgUnhideContentResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -237,6 +245,16 @@ export class MsgClientImpl implements Msg {
     const data = MsgMakeCollectionPermanent.encode(request).finish();
     const promise = this.rpc.request("sparkdream.collect.v1.Msg", "MakeCollectionPermanent", data);
     return promise.then(data => MsgMakeCollectionPermanentResponse.decode(new BinaryReader(data)));
+  };
+  /* UnhideContent reverses MsgHideContent. Original sentinel only, within
+   params.sentinel_unhide_window_blocks, and only before an appeal is
+   filed. Restores the author bond and rep penalty slashed at hide time.
+   The sentinel's committed bond stays reserved until the original
+   appeal_deadline (anti hide/unhide cycling). */
+  unhideContent = async (request: MsgUnhideContent): Promise<MsgUnhideContentResponse> => {
+    const data = MsgUnhideContent.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.collect.v1.Msg", "UnhideContent", data);
+    return promise.then(data => MsgUnhideContentResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

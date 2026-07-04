@@ -9,7 +9,7 @@ import { DeepPartial } from "../../../helpers";
  * where an account is BOTH a bonded forum sentinel and a Commons Operations
  * Committee member: without it the handler would silently pick the council
  * (gov) path — a strictly more powerful, less accountable action chosen by
- * accident. See docs/HANDOFF_HIDE_AUTHORITY_DISAMBIGUATION.md.
+ * accident. See docs/x-forum-spec.md (Shared ModerationAuthority).
  */
 export enum ModerationAuthority {
   /**

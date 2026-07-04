@@ -5,6 +5,64 @@ import { ModerationReason } from "../../common/v1/moderation_reason";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /**
+ * ModerationAuthority selects which authority the caller of MsgHideContent
+ * is invoking. Mirrors x/forum's enum: it disambiguates the case where an
+ * account is BOTH a bonded content sentinel and a Commons Operations
+ * Committee member — without it the handler would have to silently pick one
+ * path. See the authority-selection notes in docs/x-collect-spec.md
+ * (MsgHideContent).
+ */
+export enum ModerationAuthority {
+  /**
+   * MODERATION_AUTHORITY_AUTO - AUTO (default, back-compat): sentinel path whenever the account is an
+   * eligible bonded sentinel, else the council path if council-authorized,
+   * else error. Prefers the accountable (bonded) sentinel path.
+   */
+  MODERATION_AUTHORITY_AUTO = 0,
+  /**
+   * MODERATION_AUTHORITY_SENTINEL - SENTINEL: force the sentinel path; error if not an eligible sentinel
+   * (no silent fallback to council).
+   */
+  MODERATION_AUTHORITY_SENTINEL = 1,
+  /**
+   * MODERATION_AUTHORITY_COUNCIL - COUNCIL: force the council (gov-authority) path; error if not
+   * council-authorized. The deliberate "act as committee" choice.
+   */
+  MODERATION_AUTHORITY_COUNCIL = 2,
+  UNRECOGNIZED = -1,
+}
+export const ModerationAuthorityAmino = ModerationAuthority;
+export function moderationAuthorityFromJSON(object: any): ModerationAuthority {
+  switch (object) {
+    case 0:
+    case "MODERATION_AUTHORITY_AUTO":
+      return ModerationAuthority.MODERATION_AUTHORITY_AUTO;
+    case 1:
+    case "MODERATION_AUTHORITY_SENTINEL":
+      return ModerationAuthority.MODERATION_AUTHORITY_SENTINEL;
+    case 2:
+    case "MODERATION_AUTHORITY_COUNCIL":
+      return ModerationAuthority.MODERATION_AUTHORITY_COUNCIL;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return ModerationAuthority.UNRECOGNIZED;
+  }
+}
+export function moderationAuthorityToJSON(object: ModerationAuthority): string {
+  switch (object) {
+    case ModerationAuthority.MODERATION_AUTHORITY_AUTO:
+      return "MODERATION_AUTHORITY_AUTO";
+    case ModerationAuthority.MODERATION_AUTHORITY_SENTINEL:
+      return "MODERATION_AUTHORITY_SENTINEL";
+    case ModerationAuthority.MODERATION_AUTHORITY_COUNCIL:
+      return "MODERATION_AUTHORITY_COUNCIL";
+    case ModerationAuthority.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+/**
  * MsgUpdateParams is the Msg/UpdateParams request type.
  * @name MsgUpdateParams
  * @package sparkdream.collect.v1
@@ -68,9 +126,6 @@ export interface MsgCreateCollection {
   coverUri: string;
   tags: string[];
   encryptedData: Uint8Array;
-  /**
-   * Optional DREAM amount to lock as author bond
-   */
   authorBond?: string;
   /**
    * Optional x/rep initiative to link for conviction propagation
@@ -97,9 +152,6 @@ export interface MsgCreateCollectionAmino {
   cover_uri?: string;
   tags?: string[];
   encrypted_data?: string;
-  /**
-   * Optional DREAM amount to lock as author bond
-   */
   author_bond?: string;
   /**
    * Optional x/rep initiative to link for conviction propagation
@@ -1188,6 +1240,11 @@ export interface MsgHideContent {
   targetType: FlagTargetType;
   reasonCode: ModerationReason;
   reasonText: string;
+  /**
+   * Which authority the caller is invoking — see the enum docs. AUTO
+   * (zero value) preserves pre-council wire behavior for sentinels.
+   */
+  authority: ModerationAuthority;
 }
 export interface MsgHideContentProtoMsg {
   typeUrl: "/sparkdream.collect.v1.MsgHideContent";
@@ -1205,6 +1262,11 @@ export interface MsgHideContentAmino {
   target_type?: FlagTargetType;
   reason_code?: ModerationReason;
   reason_text?: string;
+  /**
+   * Which authority the caller is invoking — see the enum docs. AUTO
+   * (zero value) preserves pre-council wire behavior for sentinels.
+   */
+  authority?: ModerationAuthority;
 }
 export interface MsgHideContentAminoMsg {
   type: "sparkdream/x/collect/MsgHideContent";
@@ -1543,6 +1605,56 @@ export interface MsgMakeCollectionPermanentResponseAmino {}
 export interface MsgMakeCollectionPermanentResponseAminoMsg {
   type: "/sparkdream.collect.v1.MsgMakeCollectionPermanentResponse";
   value: MsgMakeCollectionPermanentResponseAmino;
+}
+/**
+ * MsgUnhideContent defines the MsgUnhideContent message.
+ * @name MsgUnhideContent
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgUnhideContent
+ */
+export interface MsgUnhideContent {
+  creator: string;
+  hideRecordId: bigint;
+}
+export interface MsgUnhideContentProtoMsg {
+  typeUrl: "/sparkdream.collect.v1.MsgUnhideContent";
+  value: Uint8Array;
+}
+/**
+ * MsgUnhideContent defines the MsgUnhideContent message.
+ * @name MsgUnhideContentAmino
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgUnhideContent
+ */
+export interface MsgUnhideContentAmino {
+  creator?: string;
+  hide_record_id?: string;
+}
+export interface MsgUnhideContentAminoMsg {
+  type: "sparkdream/x/collect/MsgUnhideContent";
+  value: MsgUnhideContentAmino;
+}
+/**
+ * MsgUnhideContentResponse defines the MsgUnhideContentResponse message.
+ * @name MsgUnhideContentResponse
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgUnhideContentResponse
+ */
+export interface MsgUnhideContentResponse {}
+export interface MsgUnhideContentResponseProtoMsg {
+  typeUrl: "/sparkdream.collect.v1.MsgUnhideContentResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgUnhideContentResponse defines the MsgUnhideContentResponse message.
+ * @name MsgUnhideContentResponseAmino
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgUnhideContentResponse
+ */
+export interface MsgUnhideContentResponseAmino {}
+export interface MsgUnhideContentResponseAminoMsg {
+  type: "/sparkdream.collect.v1.MsgUnhideContentResponse";
+  value: MsgUnhideContentResponseAmino;
 }
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
@@ -5439,7 +5551,8 @@ function createBaseMsgHideContent(): MsgHideContent {
     targetId: BigInt(0),
     targetType: 0,
     reasonCode: 0,
-    reasonText: ""
+    reasonText: "",
+    authority: 0
   };
 }
 /**
@@ -5467,6 +5580,9 @@ export const MsgHideContent = {
     if (message.reasonText !== "") {
       writer.uint32(42).string(message.reasonText);
     }
+    if (message.authority !== 0) {
+      writer.uint32(48).int32(message.authority);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgHideContent {
@@ -5491,6 +5607,9 @@ export const MsgHideContent = {
         case 5:
           message.reasonText = reader.string();
           break;
+        case 6:
+          message.authority = reader.int32() as any;
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -5505,6 +5624,7 @@ export const MsgHideContent = {
     message.targetType = object.targetType ?? 0;
     message.reasonCode = object.reasonCode ?? 0;
     message.reasonText = object.reasonText ?? "";
+    message.authority = object.authority ?? 0;
     return message;
   },
   fromAmino(object: MsgHideContentAmino): MsgHideContent {
@@ -5524,6 +5644,9 @@ export const MsgHideContent = {
     if (object.reason_text !== undefined && object.reason_text !== null) {
       message.reasonText = object.reason_text;
     }
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
     return message;
   },
   toAmino(message: MsgHideContent): MsgHideContentAmino {
@@ -5533,6 +5656,7 @@ export const MsgHideContent = {
     obj.target_type = message.targetType === 0 ? undefined : message.targetType;
     obj.reason_code = message.reasonCode === 0 ? undefined : message.reasonCode;
     obj.reason_text = message.reasonText === "" ? undefined : message.reasonText;
+    obj.authority = message.authority === 0 ? undefined : message.authority;
     return obj;
   },
   fromAminoMsg(object: MsgHideContentAminoMsg): MsgHideContent {
@@ -6502,6 +6626,150 @@ export const MsgMakeCollectionPermanentResponse = {
     return {
       typeUrl: "/sparkdream.collect.v1.MsgMakeCollectionPermanentResponse",
       value: MsgMakeCollectionPermanentResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUnhideContent(): MsgUnhideContent {
+  return {
+    creator: "",
+    hideRecordId: BigInt(0)
+  };
+}
+/**
+ * MsgUnhideContent defines the MsgUnhideContent message.
+ * @name MsgUnhideContent
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgUnhideContent
+ */
+export const MsgUnhideContent = {
+  typeUrl: "/sparkdream.collect.v1.MsgUnhideContent",
+  aminoType: "sparkdream/x/collect/MsgUnhideContent",
+  encode(message: MsgUnhideContent, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.hideRecordId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.hideRecordId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUnhideContent {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUnhideContent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.hideRecordId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgUnhideContent>): MsgUnhideContent {
+    const message = createBaseMsgUnhideContent();
+    message.creator = object.creator ?? "";
+    message.hideRecordId = object.hideRecordId !== undefined && object.hideRecordId !== null ? BigInt(object.hideRecordId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgUnhideContentAmino): MsgUnhideContent {
+    const message = createBaseMsgUnhideContent();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.hide_record_id !== undefined && object.hide_record_id !== null) {
+      message.hideRecordId = BigInt(object.hide_record_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgUnhideContent): MsgUnhideContentAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.hide_record_id = message.hideRecordId !== BigInt(0) ? message.hideRecordId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgUnhideContentAminoMsg): MsgUnhideContent {
+    return MsgUnhideContent.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUnhideContent): MsgUnhideContentAminoMsg {
+    return {
+      type: "sparkdream/x/collect/MsgUnhideContent",
+      value: MsgUnhideContent.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgUnhideContentProtoMsg): MsgUnhideContent {
+    return MsgUnhideContent.decode(message.value);
+  },
+  toProto(message: MsgUnhideContent): Uint8Array {
+    return MsgUnhideContent.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUnhideContent): MsgUnhideContentProtoMsg {
+    return {
+      typeUrl: "/sparkdream.collect.v1.MsgUnhideContent",
+      value: MsgUnhideContent.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUnhideContentResponse(): MsgUnhideContentResponse {
+  return {};
+}
+/**
+ * MsgUnhideContentResponse defines the MsgUnhideContentResponse message.
+ * @name MsgUnhideContentResponse
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgUnhideContentResponse
+ */
+export const MsgUnhideContentResponse = {
+  typeUrl: "/sparkdream.collect.v1.MsgUnhideContentResponse",
+  encode(_: MsgUnhideContentResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUnhideContentResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUnhideContentResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgUnhideContentResponse>): MsgUnhideContentResponse {
+    const message = createBaseMsgUnhideContentResponse();
+    return message;
+  },
+  fromAmino(_: MsgUnhideContentResponseAmino): MsgUnhideContentResponse {
+    const message = createBaseMsgUnhideContentResponse();
+    return message;
+  },
+  toAmino(_: MsgUnhideContentResponse): MsgUnhideContentResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgUnhideContentResponseAminoMsg): MsgUnhideContentResponse {
+    return MsgUnhideContentResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgUnhideContentResponseProtoMsg): MsgUnhideContentResponse {
+    return MsgUnhideContentResponse.decode(message.value);
+  },
+  toProto(message: MsgUnhideContentResponse): Uint8Array {
+    return MsgUnhideContentResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUnhideContentResponse): MsgUnhideContentResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.collect.v1.MsgUnhideContentResponse",
+      value: MsgUnhideContentResponse.encode(message).finish()
     };
   }
 };

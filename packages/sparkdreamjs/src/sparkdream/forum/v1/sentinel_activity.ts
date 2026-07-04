@@ -53,6 +53,15 @@ export interface AccuracyEpochBucketAminoMsg {
  * SentinelActivity holds forum-specific action counters and local cooldowns
  * for a sentinel. The accountability record (bond, bond status, activity
  * stamps) lives in sparkdream.rep.v1.SentinelActivity.
+ * STORAGE vs PROJECTION: the shared accountability record lives on
+ * x/rep's RoleActivity (see docs/x-rep-spec.md); forum PERSISTS only the
+ * forum-local fields — pending_hide_count, unchallenged_hides, and the
+ * curation-proposal lifecycle counters (total/confirmed/rejected_proposals).
+ * Every other field (per-action totals/upheld/overturned/epoch counters,
+ * streaks, overturn_cooldown_until, accuracy_window, collect counters) is
+ * PROJECTION-ONLY: sourced from x/rep's shared RoleActivity record at query
+ * time by get-sentinel-activity so client field paths stay stable. Those
+ * fields are zero in stored records and must not be written.
  * @name SentinelActivity
  * @package sparkdream.forum.v1
  * @see proto type: sparkdream.forum.v1.SentinelActivity
@@ -116,6 +125,19 @@ export interface SentinelActivity {
    * as zero decided appeals).
    */
   accuracyWindow: AccuracyEpochBucket[];
+  /**
+   * Cross-module (x/collect) hide counters. Collect moderation is performed
+   * by the same shared CONTENT_SENTINEL corps; collect reports hide actions
+   * and jury outcomes into this record so streak demotion, the overturn
+   * cooldown, the accuracy ring (outcomes land in accuracy_window like forum
+   * ones), and reward-epoch activity all see collect behavior. Kept as
+   * separate counters (not folded into total/epoch_hides) so forum's own
+   * max_hides_per_epoch budget is not consumed by collect actions.
+   */
+  totalCollectHides: bigint;
+  upheldCollectHides: bigint;
+  overturnedCollectHides: bigint;
+  epochCollectHides: bigint;
 }
 export interface SentinelActivityProtoMsg {
   typeUrl: "/sparkdream.forum.v1.SentinelActivity";
@@ -125,6 +147,15 @@ export interface SentinelActivityProtoMsg {
  * SentinelActivity holds forum-specific action counters and local cooldowns
  * for a sentinel. The accountability record (bond, bond status, activity
  * stamps) lives in sparkdream.rep.v1.SentinelActivity.
+ * STORAGE vs PROJECTION: the shared accountability record lives on
+ * x/rep's RoleActivity (see docs/x-rep-spec.md); forum PERSISTS only the
+ * forum-local fields — pending_hide_count, unchallenged_hides, and the
+ * curation-proposal lifecycle counters (total/confirmed/rejected_proposals).
+ * Every other field (per-action totals/upheld/overturned/epoch counters,
+ * streaks, overturn_cooldown_until, accuracy_window, collect counters) is
+ * PROJECTION-ONLY: sourced from x/rep's shared RoleActivity record at query
+ * time by get-sentinel-activity so client field paths stay stable. Those
+ * fields are zero in stored records and must not be written.
  * @name SentinelActivityAmino
  * @package sparkdream.forum.v1
  * @see proto type: sparkdream.forum.v1.SentinelActivity
@@ -188,6 +219,19 @@ export interface SentinelActivityAmino {
    * as zero decided appeals).
    */
   accuracy_window?: AccuracyEpochBucketAmino[];
+  /**
+   * Cross-module (x/collect) hide counters. Collect moderation is performed
+   * by the same shared CONTENT_SENTINEL corps; collect reports hide actions
+   * and jury outcomes into this record so streak demotion, the overturn
+   * cooldown, the accuracy ring (outcomes land in accuracy_window like forum
+   * ones), and reward-epoch activity all see collect behavior. Kept as
+   * separate counters (not folded into total/epoch_hides) so forum's own
+   * max_hides_per_epoch budget is not consumed by collect actions.
+   */
+  total_collect_hides?: string;
+  upheld_collect_hides?: string;
+  overturned_collect_hides?: string;
+  epoch_collect_hides?: string;
 }
 export interface SentinelActivityAminoMsg {
   type: "/sparkdream.forum.v1.SentinelActivity";
@@ -319,13 +363,26 @@ function createBaseSentinelActivity(): SentinelActivity {
     confirmedProposals: BigInt(0),
     rejectedProposals: BigInt(0),
     epochCurations: BigInt(0),
-    accuracyWindow: []
+    accuracyWindow: [],
+    totalCollectHides: BigInt(0),
+    upheldCollectHides: BigInt(0),
+    overturnedCollectHides: BigInt(0),
+    epochCollectHides: BigInt(0)
   };
 }
 /**
  * SentinelActivity holds forum-specific action counters and local cooldowns
  * for a sentinel. The accountability record (bond, bond status, activity
  * stamps) lives in sparkdream.rep.v1.SentinelActivity.
+ * STORAGE vs PROJECTION: the shared accountability record lives on
+ * x/rep's RoleActivity (see docs/x-rep-spec.md); forum PERSISTS only the
+ * forum-local fields — pending_hide_count, unchallenged_hides, and the
+ * curation-proposal lifecycle counters (total/confirmed/rejected_proposals).
+ * Every other field (per-action totals/upheld/overturned/epoch counters,
+ * streaks, overturn_cooldown_until, accuracy_window, collect counters) is
+ * PROJECTION-ONLY: sourced from x/rep's shared RoleActivity record at query
+ * time by get-sentinel-activity so client field paths stay stable. Those
+ * fields are zero in stored records and must not be written.
  * @name SentinelActivity
  * @package sparkdream.forum.v1
  * @see proto type: sparkdream.forum.v1.SentinelActivity
@@ -419,6 +476,18 @@ export const SentinelActivity = {
     }
     for (const v of message.accuracyWindow) {
       AccuracyEpochBucket.encode(v!, writer.uint32(234).fork()).ldelim();
+    }
+    if (message.totalCollectHides !== BigInt(0)) {
+      writer.uint32(240).uint64(message.totalCollectHides);
+    }
+    if (message.upheldCollectHides !== BigInt(0)) {
+      writer.uint32(248).uint64(message.upheldCollectHides);
+    }
+    if (message.overturnedCollectHides !== BigInt(0)) {
+      writer.uint32(256).uint64(message.overturnedCollectHides);
+    }
+    if (message.epochCollectHides !== BigInt(0)) {
+      writer.uint32(264).uint64(message.epochCollectHides);
     }
     return writer;
   },
@@ -516,6 +585,18 @@ export const SentinelActivity = {
         case 29:
           message.accuracyWindow.push(AccuracyEpochBucket.decode(reader, reader.uint32()));
           break;
+        case 30:
+          message.totalCollectHides = reader.uint64();
+          break;
+        case 31:
+          message.upheldCollectHides = reader.uint64();
+          break;
+        case 32:
+          message.overturnedCollectHides = reader.uint64();
+          break;
+        case 33:
+          message.epochCollectHides = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -554,6 +635,10 @@ export const SentinelActivity = {
     message.rejectedProposals = object.rejectedProposals !== undefined && object.rejectedProposals !== null ? BigInt(object.rejectedProposals.toString()) : BigInt(0);
     message.epochCurations = object.epochCurations !== undefined && object.epochCurations !== null ? BigInt(object.epochCurations.toString()) : BigInt(0);
     message.accuracyWindow = object.accuracyWindow?.map(e => AccuracyEpochBucket.fromPartial(e)) || [];
+    message.totalCollectHides = object.totalCollectHides !== undefined && object.totalCollectHides !== null ? BigInt(object.totalCollectHides.toString()) : BigInt(0);
+    message.upheldCollectHides = object.upheldCollectHides !== undefined && object.upheldCollectHides !== null ? BigInt(object.upheldCollectHides.toString()) : BigInt(0);
+    message.overturnedCollectHides = object.overturnedCollectHides !== undefined && object.overturnedCollectHides !== null ? BigInt(object.overturnedCollectHides.toString()) : BigInt(0);
+    message.epochCollectHides = object.epochCollectHides !== undefined && object.epochCollectHides !== null ? BigInt(object.epochCollectHides.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: SentinelActivityAmino): SentinelActivity {
@@ -643,6 +728,18 @@ export const SentinelActivity = {
       message.epochCurations = BigInt(object.epoch_curations);
     }
     message.accuracyWindow = object.accuracy_window?.map(e => AccuracyEpochBucket.fromAmino(e)) || [];
+    if (object.total_collect_hides !== undefined && object.total_collect_hides !== null) {
+      message.totalCollectHides = BigInt(object.total_collect_hides);
+    }
+    if (object.upheld_collect_hides !== undefined && object.upheld_collect_hides !== null) {
+      message.upheldCollectHides = BigInt(object.upheld_collect_hides);
+    }
+    if (object.overturned_collect_hides !== undefined && object.overturned_collect_hides !== null) {
+      message.overturnedCollectHides = BigInt(object.overturned_collect_hides);
+    }
+    if (object.epoch_collect_hides !== undefined && object.epoch_collect_hides !== null) {
+      message.epochCollectHides = BigInt(object.epoch_collect_hides);
+    }
     return message;
   },
   toAmino(message: SentinelActivity): SentinelActivityAmino {
@@ -680,6 +777,10 @@ export const SentinelActivity = {
     } else {
       obj.accuracy_window = message.accuracyWindow;
     }
+    obj.total_collect_hides = message.totalCollectHides !== BigInt(0) ? message.totalCollectHides?.toString() : undefined;
+    obj.upheld_collect_hides = message.upheldCollectHides !== BigInt(0) ? message.upheldCollectHides?.toString() : undefined;
+    obj.overturned_collect_hides = message.overturnedCollectHides !== BigInt(0) ? message.overturnedCollectHides?.toString() : undefined;
+    obj.epoch_collect_hides = message.epochCollectHides !== BigInt(0) ? message.epochCollectHides?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: SentinelActivityAminoMsg): SentinelActivity {
