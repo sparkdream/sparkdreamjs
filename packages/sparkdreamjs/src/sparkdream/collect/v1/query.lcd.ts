@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponse, QueryCollectionRequest, QueryCollectionResponse, QueryCollectionsByOwnerRequest, QueryCollectionsByOwnerResponse, QueryPublicCollectionsRequest, QueryPublicCollectionsResponse, QueryPublicCollectionsByTypeRequest, QueryPublicCollectionsByTypeResponse, QueryCollectionsByCollaboratorRequest, QueryCollectionsByCollaboratorResponse, QueryItemRequest, QueryItemResponse, QueryItemsRequest, QueryItemsResponse, QueryItemsByOwnerRequest, QueryItemsByOwnerResponse, QueryCollaboratorsRequest, QueryCollaboratorsResponse, QueryCuratorActivityRequest, QueryCuratorActivityResponse, QueryCurationSummaryRequest, QueryCurationSummaryResponse, QueryCurationReviewsRequest, QueryCurationReviewsResponse, QueryCurationReviewsByCuratorRequest, QueryCurationReviewsByCuratorResponse, QuerySponsorshipRequestRequest, QuerySponsorshipRequestResponse, QuerySponsorshipRequestsRequest, QuerySponsorshipRequestsResponse, QueryContentFlagRequest, QueryContentFlagResponse, QueryFlaggedContentRequest, QueryFlaggedContentResponse, QueryHideRecordRequest, QueryHideRecordResponse, QueryHideRecordsByTargetRequest, QueryHideRecordsByTargetResponse, QueryPendingCollectionsRequest, QueryPendingCollectionsResponse, QueryEndorsementRequest, QueryEndorsementResponse, QueryCollectionsByContentRequest, QueryCollectionsByContentResponse, QueryCollectionConvictionRequest, QueryCollectionConvictionResponse, QueryListCollectionsByTagRequest, QueryListCollectionsByTagResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryCollectionRequest, QueryCollectionResponse, QueryCollectionsByOwnerRequest, QueryCollectionsByOwnerResponse, QueryPublicCollectionsRequest, QueryPublicCollectionsResponse, QueryPublicCollectionsByTypeRequest, QueryPublicCollectionsByTypeResponse, QueryCollectionsByCollaboratorRequest, QueryCollectionsByCollaboratorResponse, QueryItemRequest, QueryItemResponse, QueryItemsRequest, QueryItemsResponse, QueryItemsByOwnerRequest, QueryItemsByOwnerResponse, QueryCollaboratorsRequest, QueryCollaboratorsResponse, QueryCuratorActivityRequest, QueryCuratorActivityResponse, QueryCurationSummaryRequest, QueryCurationSummaryResponse, QueryCurationReviewsRequest, QueryCurationReviewsResponse, QueryCurationReviewsByCuratorRequest, QueryCurationReviewsByCuratorResponse, QuerySponsorshipRequestRequest, QuerySponsorshipRequestResponse, QuerySponsorshipRequestsRequest, QuerySponsorshipRequestsResponse, QueryContentFlagRequest, QueryContentFlagResponse, QueryFlaggedContentRequest, QueryFlaggedContentResponse, QueryHideRecordRequest, QueryHideRecordResponse, QueryHideRecordsByTargetRequest, QueryHideRecordsByTargetResponse, QueryHideRecordsBySentinelRequest, QueryHideRecordsBySentinelResponse, QueryPendingCollectionsRequest, QueryPendingCollectionsResponse, QueryEndorsementRequest, QueryEndorsementResponse, QueryCollectionsByContentRequest, QueryCollectionsByContentResponse, QueryCollectionConvictionRequest, QueryCollectionConvictionResponse, QueryListCollectionsByTagRequest, QueryListCollectionsByTagResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -178,6 +178,17 @@ export class LCDQueryClient {
   hideRecordsByTarget = async (params: QueryHideRecordsByTargetRequest): Promise<QueryHideRecordsByTargetResponse> => {
     const endpoint = `sparkdream/collect/v1/hide_records_by_target/${params.targetId}/${params.targetType}`;
     return await this.req.get<QueryHideRecordsByTargetResponse>(endpoint);
+  };
+  /* HideRecordsBySentinel Queries hide records created by a given sentinel. */
+  hideRecordsBySentinel = async (params: QueryHideRecordsBySentinelRequest): Promise<QueryHideRecordsBySentinelResponse> => {
+    const options: any = {
+      params: {}
+    };
+    if (typeof params?.pagination !== "undefined") {
+      setPaginationParams(options, params.pagination);
+    }
+    const endpoint = `sparkdream/collect/v1/hide_records_by_sentinel/${params.sentinel}`;
+    return await this.req.get<QueryHideRecordsBySentinelResponse>(endpoint, options);
   };
   /* PendingCollections Queries a list of PendingCollections items. */
   pendingCollections = async (params: QueryPendingCollectionsRequest = {

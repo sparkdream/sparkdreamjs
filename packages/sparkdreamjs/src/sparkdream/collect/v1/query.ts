@@ -1017,6 +1017,62 @@ export interface QueryHideRecordsByTargetResponseAminoMsg {
   value: QueryHideRecordsByTargetResponseAmino;
 }
 /**
+ * QueryHideRecordsBySentinelRequest defines the QueryHideRecordsBySentinelRequest message.
+ * @name QueryHideRecordsBySentinelRequest
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.QueryHideRecordsBySentinelRequest
+ */
+export interface QueryHideRecordsBySentinelRequest {
+  sentinel: string;
+  pagination?: PageRequest;
+}
+export interface QueryHideRecordsBySentinelRequestProtoMsg {
+  typeUrl: "/sparkdream.collect.v1.QueryHideRecordsBySentinelRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryHideRecordsBySentinelRequest defines the QueryHideRecordsBySentinelRequest message.
+ * @name QueryHideRecordsBySentinelRequestAmino
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.QueryHideRecordsBySentinelRequest
+ */
+export interface QueryHideRecordsBySentinelRequestAmino {
+  sentinel?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryHideRecordsBySentinelRequestAminoMsg {
+  type: "/sparkdream.collect.v1.QueryHideRecordsBySentinelRequest";
+  value: QueryHideRecordsBySentinelRequestAmino;
+}
+/**
+ * QueryHideRecordsBySentinelResponse defines the QueryHideRecordsBySentinelResponse message.
+ * @name QueryHideRecordsBySentinelResponse
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.QueryHideRecordsBySentinelResponse
+ */
+export interface QueryHideRecordsBySentinelResponse {
+  hideRecords: HideRecord[];
+  pagination?: PageResponse;
+}
+export interface QueryHideRecordsBySentinelResponseProtoMsg {
+  typeUrl: "/sparkdream.collect.v1.QueryHideRecordsBySentinelResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryHideRecordsBySentinelResponse defines the QueryHideRecordsBySentinelResponse message.
+ * @name QueryHideRecordsBySentinelResponseAmino
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.QueryHideRecordsBySentinelResponse
+ */
+export interface QueryHideRecordsBySentinelResponseAmino {
+  hide_records?: HideRecordAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryHideRecordsBySentinelResponseAminoMsg {
+  type: "/sparkdream.collect.v1.QueryHideRecordsBySentinelResponse";
+  value: QueryHideRecordsBySentinelResponseAmino;
+}
+/**
  * QueryPendingCollectionsRequest defines the QueryPendingCollectionsRequest message.
  * @name QueryPendingCollectionsRequest
  * @package sparkdream.collect.v1
@@ -4260,6 +4316,170 @@ export const QueryHideRecordsByTargetResponse = {
     return {
       typeUrl: "/sparkdream.collect.v1.QueryHideRecordsByTargetResponse",
       value: QueryHideRecordsByTargetResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryHideRecordsBySentinelRequest(): QueryHideRecordsBySentinelRequest {
+  return {
+    sentinel: "",
+    pagination: undefined
+  };
+}
+/**
+ * QueryHideRecordsBySentinelRequest defines the QueryHideRecordsBySentinelRequest message.
+ * @name QueryHideRecordsBySentinelRequest
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.QueryHideRecordsBySentinelRequest
+ */
+export const QueryHideRecordsBySentinelRequest = {
+  typeUrl: "/sparkdream.collect.v1.QueryHideRecordsBySentinelRequest",
+  encode(message: QueryHideRecordsBySentinelRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.sentinel !== "") {
+      writer.uint32(10).string(message.sentinel);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryHideRecordsBySentinelRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryHideRecordsBySentinelRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.sentinel = reader.string();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryHideRecordsBySentinelRequest>): QueryHideRecordsBySentinelRequest {
+    const message = createBaseQueryHideRecordsBySentinelRequest();
+    message.sentinel = object.sentinel ?? "";
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryHideRecordsBySentinelRequestAmino): QueryHideRecordsBySentinelRequest {
+    const message = createBaseQueryHideRecordsBySentinelRequest();
+    if (object.sentinel !== undefined && object.sentinel !== null) {
+      message.sentinel = object.sentinel;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryHideRecordsBySentinelRequest): QueryHideRecordsBySentinelRequestAmino {
+    const obj: any = {};
+    obj.sentinel = message.sentinel === "" ? undefined : message.sentinel;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryHideRecordsBySentinelRequestAminoMsg): QueryHideRecordsBySentinelRequest {
+    return QueryHideRecordsBySentinelRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryHideRecordsBySentinelRequestProtoMsg): QueryHideRecordsBySentinelRequest {
+    return QueryHideRecordsBySentinelRequest.decode(message.value);
+  },
+  toProto(message: QueryHideRecordsBySentinelRequest): Uint8Array {
+    return QueryHideRecordsBySentinelRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryHideRecordsBySentinelRequest): QueryHideRecordsBySentinelRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.collect.v1.QueryHideRecordsBySentinelRequest",
+      value: QueryHideRecordsBySentinelRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryHideRecordsBySentinelResponse(): QueryHideRecordsBySentinelResponse {
+  return {
+    hideRecords: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryHideRecordsBySentinelResponse defines the QueryHideRecordsBySentinelResponse message.
+ * @name QueryHideRecordsBySentinelResponse
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.QueryHideRecordsBySentinelResponse
+ */
+export const QueryHideRecordsBySentinelResponse = {
+  typeUrl: "/sparkdream.collect.v1.QueryHideRecordsBySentinelResponse",
+  encode(message: QueryHideRecordsBySentinelResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.hideRecords) {
+      HideRecord.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryHideRecordsBySentinelResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryHideRecordsBySentinelResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.hideRecords.push(HideRecord.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryHideRecordsBySentinelResponse>): QueryHideRecordsBySentinelResponse {
+    const message = createBaseQueryHideRecordsBySentinelResponse();
+    message.hideRecords = object.hideRecords?.map(e => HideRecord.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryHideRecordsBySentinelResponseAmino): QueryHideRecordsBySentinelResponse {
+    const message = createBaseQueryHideRecordsBySentinelResponse();
+    message.hideRecords = object.hide_records?.map(e => HideRecord.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryHideRecordsBySentinelResponse): QueryHideRecordsBySentinelResponseAmino {
+    const obj: any = {};
+    if (message.hideRecords) {
+      obj.hide_records = message.hideRecords.map(e => e ? HideRecord.toAmino(e) : undefined);
+    } else {
+      obj.hide_records = message.hideRecords;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryHideRecordsBySentinelResponseAminoMsg): QueryHideRecordsBySentinelResponse {
+    return QueryHideRecordsBySentinelResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryHideRecordsBySentinelResponseProtoMsg): QueryHideRecordsBySentinelResponse {
+    return QueryHideRecordsBySentinelResponse.decode(message.value);
+  },
+  toProto(message: QueryHideRecordsBySentinelResponse): Uint8Array {
+    return QueryHideRecordsBySentinelResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryHideRecordsBySentinelResponse): QueryHideRecordsBySentinelResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.collect.v1.QueryHideRecordsBySentinelResponse",
+      value: QueryHideRecordsBySentinelResponse.encode(message).finish()
     };
   }
 };

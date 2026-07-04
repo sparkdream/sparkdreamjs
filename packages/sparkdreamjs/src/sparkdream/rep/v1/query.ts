@@ -1123,9 +1123,7 @@ export interface QueryInvitationsByInviterRequestAminoMsg {
  * @see proto type: sparkdream.rep.v1.QueryInvitationsByInviterResponse
  */
 export interface QueryInvitationsByInviterResponse {
-  invitationId: bigint;
-  inviteeAddress: string;
-  status: bigint;
+  invitation: Invitation[];
   pagination?: PageResponse;
 }
 export interface QueryInvitationsByInviterResponseProtoMsg {
@@ -1139,9 +1137,7 @@ export interface QueryInvitationsByInviterResponseProtoMsg {
  * @see proto type: sparkdream.rep.v1.QueryInvitationsByInviterResponse
  */
 export interface QueryInvitationsByInviterResponseAmino {
-  invitation_id?: string;
-  invitee_address?: string;
-  status?: string;
+  invitation?: InvitationAmino[];
   pagination?: PageResponseAmino;
 }
 export interface QueryInvitationsByInviterResponseAminoMsg {
@@ -7450,9 +7446,7 @@ export const QueryInvitationsByInviterRequest = {
 };
 function createBaseQueryInvitationsByInviterResponse(): QueryInvitationsByInviterResponse {
   return {
-    invitationId: BigInt(0),
-    inviteeAddress: "",
-    status: BigInt(0),
+    invitation: [],
     pagination: undefined
   };
 }
@@ -7465,17 +7459,11 @@ function createBaseQueryInvitationsByInviterResponse(): QueryInvitationsByInvite
 export const QueryInvitationsByInviterResponse = {
   typeUrl: "/sparkdream.rep.v1.QueryInvitationsByInviterResponse",
   encode(message: QueryInvitationsByInviterResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.invitationId !== BigInt(0)) {
-      writer.uint32(8).uint64(message.invitationId);
-    }
-    if (message.inviteeAddress !== "") {
-      writer.uint32(18).string(message.inviteeAddress);
-    }
-    if (message.status !== BigInt(0)) {
-      writer.uint32(24).uint64(message.status);
+    for (const v of message.invitation) {
+      Invitation.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.pagination !== undefined) {
-      PageResponse.encode(message.pagination, writer.uint32(34).fork()).ldelim();
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -7487,15 +7475,9 @@ export const QueryInvitationsByInviterResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.invitationId = reader.uint64();
+          message.invitation.push(Invitation.decode(reader, reader.uint32()));
           break;
         case 2:
-          message.inviteeAddress = reader.string();
-          break;
-        case 3:
-          message.status = reader.uint64();
-          break;
-        case 4:
           message.pagination = PageResponse.decode(reader, reader.uint32());
           break;
         default:
@@ -7507,23 +7489,13 @@ export const QueryInvitationsByInviterResponse = {
   },
   fromPartial(object: DeepPartial<QueryInvitationsByInviterResponse>): QueryInvitationsByInviterResponse {
     const message = createBaseQueryInvitationsByInviterResponse();
-    message.invitationId = object.invitationId !== undefined && object.invitationId !== null ? BigInt(object.invitationId.toString()) : BigInt(0);
-    message.inviteeAddress = object.inviteeAddress ?? "";
-    message.status = object.status !== undefined && object.status !== null ? BigInt(object.status.toString()) : BigInt(0);
+    message.invitation = object.invitation?.map(e => Invitation.fromPartial(e)) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
     return message;
   },
   fromAmino(object: QueryInvitationsByInviterResponseAmino): QueryInvitationsByInviterResponse {
     const message = createBaseQueryInvitationsByInviterResponse();
-    if (object.invitation_id !== undefined && object.invitation_id !== null) {
-      message.invitationId = BigInt(object.invitation_id);
-    }
-    if (object.invitee_address !== undefined && object.invitee_address !== null) {
-      message.inviteeAddress = object.invitee_address;
-    }
-    if (object.status !== undefined && object.status !== null) {
-      message.status = BigInt(object.status);
-    }
+    message.invitation = object.invitation?.map(e => Invitation.fromAmino(e)) || [];
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageResponse.fromAmino(object.pagination);
     }
@@ -7531,9 +7503,11 @@ export const QueryInvitationsByInviterResponse = {
   },
   toAmino(message: QueryInvitationsByInviterResponse): QueryInvitationsByInviterResponseAmino {
     const obj: any = {};
-    obj.invitation_id = message.invitationId !== BigInt(0) ? message.invitationId?.toString() : undefined;
-    obj.invitee_address = message.inviteeAddress === "" ? undefined : message.inviteeAddress;
-    obj.status = message.status !== BigInt(0) ? message.status?.toString() : undefined;
+    if (message.invitation) {
+      obj.invitation = message.invitation.map(e => e ? Invitation.toAmino(e) : undefined);
+    } else {
+      obj.invitation = message.invitation;
+    }
     obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
     return obj;
   },

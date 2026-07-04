@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryCollectionRequest, QueryCollectionResponse, QueryCollectionsByOwnerRequest, QueryCollectionsByOwnerResponse, QueryPublicCollectionsRequest, QueryPublicCollectionsResponse, QueryPublicCollectionsByTypeRequest, QueryPublicCollectionsByTypeResponse, QueryCollectionsByCollaboratorRequest, QueryCollectionsByCollaboratorResponse, QueryItemRequest, QueryItemResponse, QueryItemsRequest, QueryItemsResponse, QueryItemsByOwnerRequest, QueryItemsByOwnerResponse, QueryCollaboratorsRequest, QueryCollaboratorsResponse, QueryCuratorActivityRequest, QueryCuratorActivityResponse, QueryCurationSummaryRequest, QueryCurationSummaryResponse, QueryCurationReviewsRequest, QueryCurationReviewsResponse, QueryCurationReviewsByCuratorRequest, QueryCurationReviewsByCuratorResponse, QuerySponsorshipRequestRequest, QuerySponsorshipRequestResponse, QuerySponsorshipRequestsRequest, QuerySponsorshipRequestsResponse, QueryContentFlagRequest, QueryContentFlagResponse, QueryFlaggedContentRequest, QueryFlaggedContentResponse, QueryHideRecordRequest, QueryHideRecordResponse, QueryHideRecordsByTargetRequest, QueryHideRecordsByTargetResponse, QueryPendingCollectionsRequest, QueryPendingCollectionsResponse, QueryEndorsementRequest, QueryEndorsementResponse, QueryCollectionsByContentRequest, QueryCollectionsByContentResponse, QueryCollectionConvictionRequest, QueryCollectionConvictionResponse, QueryListCollectionsByTagRequest, QueryListCollectionsByTagResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryCollectionRequest, QueryCollectionResponse, QueryCollectionsByOwnerRequest, QueryCollectionsByOwnerResponse, QueryPublicCollectionsRequest, QueryPublicCollectionsResponse, QueryPublicCollectionsByTypeRequest, QueryPublicCollectionsByTypeResponse, QueryCollectionsByCollaboratorRequest, QueryCollectionsByCollaboratorResponse, QueryItemRequest, QueryItemResponse, QueryItemsRequest, QueryItemsResponse, QueryItemsByOwnerRequest, QueryItemsByOwnerResponse, QueryCollaboratorsRequest, QueryCollaboratorsResponse, QueryCuratorActivityRequest, QueryCuratorActivityResponse, QueryCurationSummaryRequest, QueryCurationSummaryResponse, QueryCurationReviewsRequest, QueryCurationReviewsResponse, QueryCurationReviewsByCuratorRequest, QueryCurationReviewsByCuratorResponse, QuerySponsorshipRequestRequest, QuerySponsorshipRequestResponse, QuerySponsorshipRequestsRequest, QuerySponsorshipRequestsResponse, QueryContentFlagRequest, QueryContentFlagResponse, QueryFlaggedContentRequest, QueryFlaggedContentResponse, QueryHideRecordRequest, QueryHideRecordResponse, QueryHideRecordsByTargetRequest, QueryHideRecordsByTargetResponse, QueryHideRecordsBySentinelRequest, QueryHideRecordsBySentinelResponse, QueryPendingCollectionsRequest, QueryPendingCollectionsResponse, QueryEndorsementRequest, QueryEndorsementResponse, QueryCollectionsByContentRequest, QueryCollectionsByContentResponse, QueryCollectionConvictionRequest, QueryCollectionConvictionResponse, QueryListCollectionsByTagRequest, QueryListCollectionsByTagResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   params(request?: QueryParamsRequest): Promise<QueryParamsResponse>;
@@ -34,6 +34,8 @@ export interface Query {
   hideRecord(request: QueryHideRecordRequest): Promise<QueryHideRecordResponse>;
   /** HideRecordsByTarget Queries a list of HideRecordsByTarget items. */
   hideRecordsByTarget(request: QueryHideRecordsByTargetRequest): Promise<QueryHideRecordsByTargetResponse>;
+  /** HideRecordsBySentinel Queries hide records created by a given sentinel. */
+  hideRecordsBySentinel(request: QueryHideRecordsBySentinelRequest): Promise<QueryHideRecordsBySentinelResponse>;
   /** PendingCollections Queries a list of PendingCollections items. */
   pendingCollections(request?: QueryPendingCollectionsRequest): Promise<QueryPendingCollectionsResponse>;
   /** Endorsement Queries a list of Endorsement items. */
@@ -184,6 +186,12 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.collect.v1.Query", "HideRecordsByTarget", data);
     return promise.then(data => QueryHideRecordsByTargetResponse.decode(new BinaryReader(data)));
   };
+  /* HideRecordsBySentinel Queries hide records created by a given sentinel. */
+  hideRecordsBySentinel = async (request: QueryHideRecordsBySentinelRequest): Promise<QueryHideRecordsBySentinelResponse> => {
+    const data = QueryHideRecordsBySentinelRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.collect.v1.Query", "HideRecordsBySentinel", data);
+    return promise.then(data => QueryHideRecordsBySentinelResponse.decode(new BinaryReader(data)));
+  };
   /* PendingCollections Queries a list of PendingCollections items. */
   pendingCollections = async (request: QueryPendingCollectionsRequest = {
     pagination: undefined
@@ -282,6 +290,9 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     hideRecordsByTarget(request: QueryHideRecordsByTargetRequest): Promise<QueryHideRecordsByTargetResponse> {
       return queryService.hideRecordsByTarget(request);
+    },
+    hideRecordsBySentinel(request: QueryHideRecordsBySentinelRequest): Promise<QueryHideRecordsBySentinelResponse> {
+      return queryService.hideRecordsBySentinel(request);
     },
     pendingCollections(request?: QueryPendingCollectionsRequest): Promise<QueryPendingCollectionsResponse> {
       return queryService.pendingCollections(request);
