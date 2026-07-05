@@ -14,6 +14,7 @@ export interface GenesisState {
   blacklistedDenoms: string[];
   pendingSendPacketSequenceNumbers: string[];
   hourEpoch: HourEpoch;
+  pendingRecvPacketSequenceNumbers: string[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/ibc.applications.rate_limiting.v1.GenesisState";
@@ -31,6 +32,7 @@ export interface GenesisStateAmino {
   blacklisted_denoms?: string[];
   pending_send_packet_sequence_numbers?: string[];
   hour_epoch?: HourEpochAmino;
+  pending_recv_packet_sequence_numbers?: string[];
 }
 export interface GenesisStateAminoMsg {
   type: "cosmos-sdk/GenesisState";
@@ -42,7 +44,8 @@ function createBaseGenesisState(): GenesisState {
     whitelistedAddressPairs: [],
     blacklistedDenoms: [],
     pendingSendPacketSequenceNumbers: [],
-    hourEpoch: HourEpoch.fromPartial({})
+    hourEpoch: HourEpoch.fromPartial({}),
+    pendingRecvPacketSequenceNumbers: []
   };
 }
 /**
@@ -70,6 +73,9 @@ export const GenesisState = {
     if (message.hourEpoch !== undefined) {
       HourEpoch.encode(message.hourEpoch, writer.uint32(42).fork()).ldelim();
     }
+    for (const v of message.pendingRecvPacketSequenceNumbers) {
+      writer.uint32(50).string(v!);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -94,6 +100,9 @@ export const GenesisState = {
         case 5:
           message.hourEpoch = HourEpoch.decode(reader, reader.uint32());
           break;
+        case 6:
+          message.pendingRecvPacketSequenceNumbers.push(reader.string());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -108,6 +117,7 @@ export const GenesisState = {
     message.blacklistedDenoms = object.blacklistedDenoms?.map(e => e) || [];
     message.pendingSendPacketSequenceNumbers = object.pendingSendPacketSequenceNumbers?.map(e => e) || [];
     message.hourEpoch = object.hourEpoch !== undefined && object.hourEpoch !== null ? HourEpoch.fromPartial(object.hourEpoch) : undefined;
+    message.pendingRecvPacketSequenceNumbers = object.pendingRecvPacketSequenceNumbers?.map(e => e) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -119,6 +129,7 @@ export const GenesisState = {
     if (object.hour_epoch !== undefined && object.hour_epoch !== null) {
       message.hourEpoch = HourEpoch.fromAmino(object.hour_epoch);
     }
+    message.pendingRecvPacketSequenceNumbers = object.pending_recv_packet_sequence_numbers?.map(e => e) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -144,6 +155,11 @@ export const GenesisState = {
       obj.pending_send_packet_sequence_numbers = message.pendingSendPacketSequenceNumbers;
     }
     obj.hour_epoch = message.hourEpoch ? HourEpoch.toAmino(message.hourEpoch) : undefined;
+    if (message.pendingRecvPacketSequenceNumbers) {
+      obj.pending_recv_packet_sequence_numbers = message.pendingRecvPacketSequenceNumbers.map(e => e);
+    } else {
+      obj.pending_recv_packet_sequence_numbers = message.pendingRecvPacketSequenceNumbers;
+    }
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {

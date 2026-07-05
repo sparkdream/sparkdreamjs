@@ -2,12 +2,14 @@
   "repos": [
     { "owner": "cosmos", "repo": "cosmos-sdk", "branch": "release/v0.53.x" },
     { "owner": "cosmos", "repo": "ibc-go" },
-    { "owner": "injectivelabs", "repo": "sdk-go" }
+    { "owner": "injectivelabs", "repo": "sdk-go" },
+    { "owner": "akash-network", "repo": "akash-api", "branch": "sdk-50" }
   ],
   "protoDirMapping": {
     "gogo/protobuf/master": ".",
     "googleapis/googleapis/master": ".",
-    "protocolbuffers/protobuf/main": "src"
+    "protocolbuffers/protobuf/main": "src",
+    "akash-network/akash-api/sdk-50": "proto/node"
   },
   "outDir": "protos",
   "ssh": false,
@@ -16,6 +18,7 @@
     "cosmos/**/*.proto",
     "cosmwasm/**/*.proto",
     "ibc/**/*.proto",
-    "injective/types/v1beta1/account.proto"
+    "injective/types/v1beta1/account.proto",
+    "akash/**/*.proto"
   ]
 }

@@ -58,6 +58,9 @@ export const createRPCMsgClient = async ({
   },
   ibc: {
     applications: {
+      gmp: {
+        v1: new (await import("./applications/gmp/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+      },
       interchain_accounts: {
         controller: {
           v1: new (await import("./applications/interchain_accounts/controller/v1/tx.rpc.msg")).MsgClientImpl(rpc)

@@ -175,7 +175,7 @@ WARNING: NOT RECOMMENDED TO USE PLAIN-TEXT MNEMONICS. Please take care of your s
 import { chains } from 'chain-registry';
 
 const mnemonic =
-  'unfold client turtle either pilot stock floor glow toward bullet car science';
+  '<your 12- or 24-word mnemonic — load it from a secure source, never hardcode it>';
   const chain = chains.find(({ chain_name }) => chain_name === 'sparkdream');
   const signer = await getOfflineSigner({
     mnemonic,

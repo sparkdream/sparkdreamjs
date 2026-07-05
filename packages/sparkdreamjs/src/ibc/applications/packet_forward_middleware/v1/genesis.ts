@@ -88,7 +88,6 @@ export interface InFlightPacket {
   refundSequence: bigint;
   retriesRemaining: number;
   timeout: bigint;
-  nonrefundable: boolean;
 }
 export interface InFlightPacketProtoMsg {
   typeUrl: "/ibc.applications.packet_forward_middleware.v1.InFlightPacket";
@@ -113,7 +112,6 @@ export interface InFlightPacketAmino {
   refund_sequence?: string;
   retries_remaining?: number;
   timeout?: string;
-  nonrefundable?: boolean;
 }
 export interface InFlightPacketAminoMsg {
   type: "cosmos-sdk/InFlightPacket";
@@ -303,8 +301,7 @@ function createBaseInFlightPacket(): InFlightPacket {
     packetData: new Uint8Array(),
     refundSequence: BigInt(0),
     retriesRemaining: 0,
-    timeout: BigInt(0),
-    nonrefundable: false
+    timeout: BigInt(0)
   };
 }
 /**
@@ -351,9 +348,6 @@ export const InFlightPacket = {
     if (message.timeout !== BigInt(0)) {
       writer.uint32(88).uint64(message.timeout);
     }
-    if (message.nonrefundable === true) {
-      writer.uint32(96).bool(message.nonrefundable);
-    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): InFlightPacket {
@@ -396,9 +390,6 @@ export const InFlightPacket = {
         case 11:
           message.timeout = reader.uint64();
           break;
-        case 12:
-          message.nonrefundable = reader.bool();
-          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -419,7 +410,6 @@ export const InFlightPacket = {
     message.refundSequence = object.refundSequence !== undefined && object.refundSequence !== null ? BigInt(object.refundSequence.toString()) : BigInt(0);
     message.retriesRemaining = object.retriesRemaining ?? 0;
     message.timeout = object.timeout !== undefined && object.timeout !== null ? BigInt(object.timeout.toString()) : BigInt(0);
-    message.nonrefundable = object.nonrefundable ?? false;
     return message;
   },
   fromAmino(object: InFlightPacketAmino): InFlightPacket {
@@ -457,9 +447,6 @@ export const InFlightPacket = {
     if (object.timeout !== undefined && object.timeout !== null) {
       message.timeout = BigInt(object.timeout);
     }
-    if (object.nonrefundable !== undefined && object.nonrefundable !== null) {
-      message.nonrefundable = object.nonrefundable;
-    }
     return message;
   },
   toAmino(message: InFlightPacket): InFlightPacketAmino {
@@ -475,7 +462,6 @@ export const InFlightPacket = {
     obj.refund_sequence = message.refundSequence !== BigInt(0) ? message.refundSequence?.toString() : undefined;
     obj.retries_remaining = message.retriesRemaining === 0 ? undefined : message.retriesRemaining;
     obj.timeout = message.timeout !== BigInt(0) ? message.timeout?.toString() : undefined;
-    obj.nonrefundable = message.nonrefundable === false ? undefined : message.nonrefundable;
     return obj;
   },
   fromAminoMsg(object: InFlightPacketAminoMsg): InFlightPacket {

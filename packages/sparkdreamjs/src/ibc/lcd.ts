@@ -103,6 +103,11 @@ export const createLCDClient = async ({
     },
     ibc: {
       applications: {
+        gmp: {
+          v1: new (await import("./applications/gmp/v1/query.lcd")).LCDQueryClient({
+            requestClient
+          })
+        },
         interchain_accounts: {
           controller: {
             v1: new (await import("./applications/interchain_accounts/controller/v1/query.lcd")).LCDQueryClient({

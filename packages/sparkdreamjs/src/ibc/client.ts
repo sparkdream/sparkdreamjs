@@ -2,6 +2,7 @@
 import { GeneratedType, Registry, OfflineSigner } from "@cosmjs/proto-signing";
 import { defaultRegistryTypes, AminoTypes, SigningStargateClient } from "@cosmjs/stargate";
 import { HttpEndpoint } from "@cosmjs/tendermint-rpc";
+import * as ibcApplicationsGmpV1TxRegistry from "./applications/gmp/v1/tx.registry";
 import * as ibcApplicationsInterchainAccountsControllerV1TxRegistry from "./applications/interchain_accounts/controller/v1/tx.registry";
 import * as ibcApplicationsInterchainAccountsHostV1TxRegistry from "./applications/interchain_accounts/host/v1/tx.registry";
 import * as ibcApplicationsRateLimitingV1TxRegistry from "./applications/rate_limiting/v1/tx.registry";
@@ -12,6 +13,7 @@ import * as ibcCoreClientV1TxRegistry from "./core/client/v1/tx.registry";
 import * as ibcCoreClientV2TxRegistry from "./core/client/v2/tx.registry";
 import * as ibcCoreConnectionV1TxRegistry from "./core/connection/v1/tx.registry";
 import * as ibcLightclientsWasmV1TxRegistry from "./lightclients/wasm/v1/tx.registry";
+import * as ibcApplicationsGmpV1TxAmino from "./applications/gmp/v1/tx.amino";
 import * as ibcApplicationsInterchainAccountsControllerV1TxAmino from "./applications/interchain_accounts/controller/v1/tx.amino";
 import * as ibcApplicationsInterchainAccountsHostV1TxAmino from "./applications/interchain_accounts/host/v1/tx.amino";
 import * as ibcApplicationsRateLimitingV1TxAmino from "./applications/rate_limiting/v1/tx.amino";
@@ -23,6 +25,7 @@ import * as ibcCoreClientV2TxAmino from "./core/client/v2/tx.amino";
 import * as ibcCoreConnectionV1TxAmino from "./core/connection/v1/tx.amino";
 import * as ibcLightclientsWasmV1TxAmino from "./lightclients/wasm/v1/tx.amino";
 export const ibcAminoConverters = {
+  ...ibcApplicationsGmpV1TxAmino.AminoConverter,
   ...ibcApplicationsInterchainAccountsControllerV1TxAmino.AminoConverter,
   ...ibcApplicationsInterchainAccountsHostV1TxAmino.AminoConverter,
   ...ibcApplicationsRateLimitingV1TxAmino.AminoConverter,
@@ -34,7 +37,7 @@ export const ibcAminoConverters = {
   ...ibcCoreConnectionV1TxAmino.AminoConverter,
   ...ibcLightclientsWasmV1TxAmino.AminoConverter
 };
-export const ibcProtoRegistry: ReadonlyArray<[string, GeneratedType]> = [...ibcApplicationsInterchainAccountsControllerV1TxRegistry.registry, ...ibcApplicationsInterchainAccountsHostV1TxRegistry.registry, ...ibcApplicationsRateLimitingV1TxRegistry.registry, ...ibcApplicationsTransferV1TxRegistry.registry, ...ibcCoreChannelV1TxRegistry.registry, ...ibcCoreChannelV2TxRegistry.registry, ...ibcCoreClientV1TxRegistry.registry, ...ibcCoreClientV2TxRegistry.registry, ...ibcCoreConnectionV1TxRegistry.registry, ...ibcLightclientsWasmV1TxRegistry.registry];
+export const ibcProtoRegistry: ReadonlyArray<[string, GeneratedType]> = [...ibcApplicationsGmpV1TxRegistry.registry, ...ibcApplicationsInterchainAccountsControllerV1TxRegistry.registry, ...ibcApplicationsInterchainAccountsHostV1TxRegistry.registry, ...ibcApplicationsRateLimitingV1TxRegistry.registry, ...ibcApplicationsTransferV1TxRegistry.registry, ...ibcCoreChannelV1TxRegistry.registry, ...ibcCoreChannelV2TxRegistry.registry, ...ibcCoreClientV1TxRegistry.registry, ...ibcCoreClientV2TxRegistry.registry, ...ibcCoreConnectionV1TxRegistry.registry, ...ibcLightclientsWasmV1TxRegistry.registry];
 export const getSigningIbcClientOptions = ({
   defaultTypes = defaultRegistryTypes
 }: {

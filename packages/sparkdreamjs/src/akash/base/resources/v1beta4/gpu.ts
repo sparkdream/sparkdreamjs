@@ -1,0 +1,124 @@
+//@ts-nocheck
+import { ResourceValue, ResourceValueAmino } from "./resourcevalue";
+import { Attribute, AttributeAmino } from "../../attributes/v1/attribute";
+import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
+/**
+ * GPU stores resource units and gpu configuration attributes.
+ * @name GPU
+ * @package akash.base.resources.v1beta4
+ * @see proto type: akash.base.resources.v1beta4.GPU
+ */
+export interface GPU {
+  /**
+   * The resource value of the GPU, which represents the number of GPUs available.
+   * This field is required and must be a non-negative integer.
+   */
+  units: ResourceValue;
+  attributes: Attribute[];
+}
+export interface GPUProtoMsg {
+  typeUrl: "/akash.base.resources.v1beta4.GPU";
+  value: Uint8Array;
+}
+/**
+ * GPU stores resource units and gpu configuration attributes.
+ * @name GPUAmino
+ * @package akash.base.resources.v1beta4
+ * @see proto type: akash.base.resources.v1beta4.GPU
+ */
+export interface GPUAmino {
+  /**
+   * The resource value of the GPU, which represents the number of GPUs available.
+   * This field is required and must be a non-negative integer.
+   */
+  units?: ResourceValueAmino;
+  attributes?: AttributeAmino[];
+}
+export interface GPUAminoMsg {
+  type: "/akash.base.resources.v1beta4.GPU";
+  value: GPUAmino;
+}
+function createBaseGPU(): GPU {
+  return {
+    units: ResourceValue.fromPartial({}),
+    attributes: []
+  };
+}
+/**
+ * GPU stores resource units and gpu configuration attributes.
+ * @name GPU
+ * @package akash.base.resources.v1beta4
+ * @see proto type: akash.base.resources.v1beta4.GPU
+ */
+export const GPU = {
+  typeUrl: "/akash.base.resources.v1beta4.GPU",
+  encode(message: GPU, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.units !== undefined) {
+      ResourceValue.encode(message.units, writer.uint32(10).fork()).ldelim();
+    }
+    for (const v of message.attributes) {
+      Attribute.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): GPU {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGPU();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.units = ResourceValue.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.attributes.push(Attribute.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<GPU>): GPU {
+    const message = createBaseGPU();
+    message.units = object.units !== undefined && object.units !== null ? ResourceValue.fromPartial(object.units) : undefined;
+    message.attributes = object.attributes?.map(e => Attribute.fromPartial(e)) || [];
+    return message;
+  },
+  fromAmino(object: GPUAmino): GPU {
+    const message = createBaseGPU();
+    if (object.units !== undefined && object.units !== null) {
+      message.units = ResourceValue.fromAmino(object.units);
+    }
+    message.attributes = object.attributes?.map(e => Attribute.fromAmino(e)) || [];
+    return message;
+  },
+  toAmino(message: GPU): GPUAmino {
+    const obj: any = {};
+    obj.units = message.units ? ResourceValue.toAmino(message.units) : undefined;
+    if (message.attributes) {
+      obj.attributes = message.attributes.map(e => e ? Attribute.toAmino(e) : undefined);
+    } else {
+      obj.attributes = message.attributes;
+    }
+    return obj;
+  },
+  fromAminoMsg(object: GPUAminoMsg): GPU {
+    return GPU.fromAmino(object.value);
+  },
+  fromProtoMsg(message: GPUProtoMsg): GPU {
+    return GPU.decode(message.value);
+  },
+  toProto(message: GPU): Uint8Array {
+    return GPU.encode(message).finish();
+  },
+  toProtoMsg(message: GPU): GPUProtoMsg {
+    return {
+      typeUrl: "/akash.base.resources.v1beta4.GPU",
+      value: GPU.encode(message).finish()
+    };
+  }
+};
