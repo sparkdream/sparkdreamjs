@@ -14,6 +14,9 @@ export const createRPCQueryClient = async ({
         v1: (await import("./audit/v1/query.rpc.Query")).createRpcQueryExtension(client),
         v1beta3: (await import("./audit/v1beta3/query.rpc.Query")).createRpcQueryExtension(client)
       },
+      bme: {
+        v1: (await import("./bme/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
       cert: {
         v1: (await import("./cert/v1/query.rpc.Query")).createRpcQueryExtension(client),
         v1beta3: (await import("./cert/v1beta3/query.rpc.Query")).createRpcQueryExtension(client)

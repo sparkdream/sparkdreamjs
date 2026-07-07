@@ -3,11 +3,18 @@ import downloadProtos from '@cosmology/telescope/main/commands/download'
 import { cpSync, existsSync, rmSync } from 'fs'
 import { join } from 'path'
 
-// The downloader cleans outDir, which would delete the in-repo sparkdream
-// protos (they are maintained here, not downloaded). Stash and restore them
-// around the download.
-const SPARKDREAM_PROTOS = join(__dirname, '..', 'protos', 'sparkdream')
-const STASH = join(__dirname, '..', '.sparkdream-protos-stash')
+// The downloader cleans outDir, which would delete the protos that are
+// maintained in-repo rather than downloaded. Stash and restore them around
+// the download:
+// - protos/sparkdream: our own chain's protos
+// - protos/akash/bme: vendored from akash-network/chain-sdk main
+//   (proto/node/akash/bme/v1 @ dae3bbc, 2026-04-14) — the BME burn-mint
+//   module (MsgMintACT etc.) postdates the akash-api sdk-50 branch pinned
+//   below, and akash-api itself is deprecated in favor of chain-sdk.
+const VENDORED = [
+  { dir: join(__dirname, '..', 'protos', 'sparkdream'), stash: join(__dirname, '..', '.sparkdream-protos-stash') },
+  { dir: join(__dirname, '..', 'protos', 'akash', 'bme'), stash: join(__dirname, '..', '.akash-bme-protos-stash') },
+]
 
 const config = {
   repos: [
@@ -35,17 +42,21 @@ const config = {
   ]
 };
 
-if (existsSync(SPARKDREAM_PROTOS)) {
-  rmSync(STASH, { recursive: true, force: true });
-  cpSync(SPARKDREAM_PROTOS, STASH, { recursive: true });
+for (const { dir, stash } of VENDORED) {
+  if (existsSync(dir)) {
+    rmSync(stash, { recursive: true, force: true });
+    cpSync(dir, stash, { recursive: true });
+  }
 }
 
 downloadProtos(config)
   .then(() => {
-    if (existsSync(STASH)) {
-      cpSync(STASH, SPARKDREAM_PROTOS, { recursive: true });
-      rmSync(STASH, { recursive: true, force: true });
-      console.log('♻️  restored in-repo sparkdream protos');
+    for (const { dir, stash } of VENDORED) {
+      if (existsSync(stash)) {
+        cpSync(stash, dir, { recursive: true });
+        rmSync(stash, { recursive: true, force: true });
+        console.log(`♻️  restored in-repo protos: ${dir}`);
+      }
     }
     console.log('✅ Proto download completed');
   })

@@ -1,5 +1,5 @@
 //@ts-nocheck
-import * as _112 from "./amino";
+import * as _120 from "./amino";
 export const amino = {
-  ..._112
+  ..._120
 };

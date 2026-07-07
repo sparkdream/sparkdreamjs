@@ -18,6 +18,11 @@ export const createLCDClient = async ({
           requestClient
         })
       },
+      bme: {
+        v1: new (await import("./bme/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
       cert: {
         v1: new (await import("./cert/v1/query.lcd")).LCDQueryClient({
           requestClient

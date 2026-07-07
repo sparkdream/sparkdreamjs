@@ -4,6 +4,7 @@ import { defaultRegistryTypes, AminoTypes, SigningStargateClient } from "@cosmjs
 import { HttpEndpoint } from "@cosmjs/tendermint-rpc";
 import * as akashAuditV1ServiceRegistry from "./audit/v1/service.registry";
 import * as akashAuditV1beta3AuditRegistry from "./audit/v1beta3/audit.registry";
+import * as akashBmeV1ServiceRegistry from "./bme/v1/service.registry";
 import * as akashCertV1ServiceRegistry from "./cert/v1/service.registry";
 import * as akashCertV1beta3CertRegistry from "./cert/v1beta3/cert.registry";
 import * as akashDeploymentV1beta3ServiceRegistry from "./deployment/v1beta3/service.registry";
@@ -15,6 +16,7 @@ import * as akashProviderV1beta4ServiceRegistry from "./provider/v1beta4/service
 import * as akashTakeV1ServiceRegistry from "./take/v1/service.registry";
 import * as akashAuditV1ServiceAmino from "./audit/v1/service.amino";
 import * as akashAuditV1beta3AuditAmino from "./audit/v1beta3/audit.amino";
+import * as akashBmeV1ServiceAmino from "./bme/v1/service.amino";
 import * as akashCertV1ServiceAmino from "./cert/v1/service.amino";
 import * as akashCertV1beta3CertAmino from "./cert/v1beta3/cert.amino";
 import * as akashDeploymentV1beta3ServiceAmino from "./deployment/v1beta3/service.amino";
@@ -27,6 +29,7 @@ import * as akashTakeV1ServiceAmino from "./take/v1/service.amino";
 export const akashAminoConverters = {
   ...akashAuditV1ServiceAmino.AminoConverter,
   ...akashAuditV1beta3AuditAmino.AminoConverter,
+  ...akashBmeV1ServiceAmino.AminoConverter,
   ...akashCertV1ServiceAmino.AminoConverter,
   ...akashCertV1beta3CertAmino.AminoConverter,
   ...akashDeploymentV1beta3ServiceAmino.AminoConverter,
@@ -37,7 +40,7 @@ export const akashAminoConverters = {
   ...akashProviderV1beta4ServiceAmino.AminoConverter,
   ...akashTakeV1ServiceAmino.AminoConverter
 };
-export const akashProtoRegistry: ReadonlyArray<[string, GeneratedType]> = [...akashAuditV1ServiceRegistry.registry, ...akashAuditV1beta3AuditRegistry.registry, ...akashCertV1ServiceRegistry.registry, ...akashCertV1beta3CertRegistry.registry, ...akashDeploymentV1beta3ServiceRegistry.registry, ...akashDeploymentV1beta4ServiceRegistry.registry, ...akashMarketV1beta4ServiceRegistry.registry, ...akashMarketV1beta5ServiceRegistry.registry, ...akashProviderV1beta3ProviderRegistry.registry, ...akashProviderV1beta4ServiceRegistry.registry, ...akashTakeV1ServiceRegistry.registry];
+export const akashProtoRegistry: ReadonlyArray<[string, GeneratedType]> = [...akashAuditV1ServiceRegistry.registry, ...akashAuditV1beta3AuditRegistry.registry, ...akashBmeV1ServiceRegistry.registry, ...akashCertV1ServiceRegistry.registry, ...akashCertV1beta3CertRegistry.registry, ...akashDeploymentV1beta3ServiceRegistry.registry, ...akashDeploymentV1beta4ServiceRegistry.registry, ...akashMarketV1beta4ServiceRegistry.registry, ...akashMarketV1beta5ServiceRegistry.registry, ...akashProviderV1beta3ProviderRegistry.registry, ...akashProviderV1beta4ServiceRegistry.registry, ...akashTakeV1ServiceRegistry.registry];
 export const getSigningAkashClientOptions = ({
   defaultTypes = defaultRegistryTypes
 }: {

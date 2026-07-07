@@ -10,6 +10,9 @@ export const createRPCMsgClient = async ({
       v1: new (await import("./audit/v1/service.rpc.msg")).MsgClientImpl(rpc),
       v1beta3: new (await import("./audit/v1beta3/audit.rpc.msg")).MsgClientImpl(rpc)
     },
+    bme: {
+      v1: new (await import("./bme/v1/service.rpc.msg")).MsgClientImpl(rpc)
+    },
     cert: {
       v1: new (await import("./cert/v1/service.rpc.msg")).MsgClientImpl(rpc),
       v1beta3: new (await import("./cert/v1beta3/cert.rpc.msg")).MsgClientImpl(rpc)
