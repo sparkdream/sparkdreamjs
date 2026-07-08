@@ -86,7 +86,7 @@ export class LCDQueryClient {
     const endpoint = `akash/market/v1beta5/leases/info`;
     return await this.req.get<QueryLeaseResponse>(endpoint, options);
   };
-  /* Params returns the total set of minting parameters. */
+  /* Params returns the total set of market parameters. */
   params = async (_params: QueryParamsRequest = {}): Promise<QueryParamsResponse> => {
     const endpoint = `akash/market/v1beta5/params`;
     return await this.req.get<QueryParamsResponse>(endpoint);

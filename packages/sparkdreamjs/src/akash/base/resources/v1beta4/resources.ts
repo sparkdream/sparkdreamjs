@@ -82,7 +82,7 @@ export interface ResourcesAmino {
   /**
    * Endpoint resources available
    */
-  endpoints?: EndpointAmino[];
+  endpoints: EndpointAmino[];
 }
 export interface ResourcesAminoMsg {
   type: "/akash.base.resources.v1beta4.Resources";

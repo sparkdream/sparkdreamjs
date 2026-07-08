@@ -7,8 +7,8 @@ import { LeaseFilters, LeaseFiltersAmino } from "../v1/filters";
 import { LeaseID, LeaseIDAmino, Lease, LeaseAmino } from "../v1/lease";
 import { Order, OrderAmino } from "./order";
 import { Bid, BidAmino } from "./bid";
-import { Account, AccountAmino } from "../../escrow/v1/account";
-import { FractionalPayment, FractionalPaymentAmino } from "../../escrow/v1/fractional_payment";
+import { Account, AccountAmino } from "../../escrow/types/v1/account";
+import { Payment, PaymentAmino } from "../../escrow/types/v1/payment";
 import { Params, ParamsAmino } from "./params";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
@@ -24,7 +24,7 @@ export interface QueryOrdersRequest {
    */
   filters: OrderFilters;
   /**
-   * Pagination is used to paginate request.
+   * Pagination is used to paginate the request.
    */
   pagination?: PageRequest;
 }
@@ -44,7 +44,7 @@ export interface QueryOrdersRequestAmino {
    */
   filters?: OrderFiltersAmino;
   /**
-   * Pagination is used to paginate request.
+   * Pagination is used to paginate the request.
    */
   pagination?: PageRequestAmino;
 }
@@ -168,7 +168,7 @@ export interface QueryBidsRequest {
    */
   filters: BidFilters;
   /**
-   * Pagination is used to paginate request.
+   * Pagination is used to paginate the request.
    */
   pagination?: PageRequest;
 }
@@ -188,7 +188,7 @@ export interface QueryBidsRequestAmino {
    */
   filters?: BidFiltersAmino;
   /**
-   * Pagination is used to paginate request.
+   * Pagination is used to paginate the request.
    */
   pagination?: PageRequestAmino;
 }
@@ -320,7 +320,7 @@ export interface QueryLeasesRequest {
    */
   filters: LeaseFilters;
   /**
-   * Pagination is used to paginate request.
+   * Pagination is used to paginate the request.
    */
   pagination?: PageRequest;
 }
@@ -340,7 +340,7 @@ export interface QueryLeasesRequestAmino {
    */
   filters?: LeaseFiltersAmino;
   /**
-   * Pagination is used to paginate request.
+   * Pagination is used to paginate the request.
    */
   pagination?: PageRequestAmino;
 }
@@ -434,7 +434,7 @@ export interface QueryLeaseResponse {
   /**
    * EscrowPayment holds information about the Lease's fractional payment.
    */
-  escrowPayment: FractionalPayment;
+  escrowPayment: Payment;
 }
 export interface QueryLeaseResponseProtoMsg {
   typeUrl: "/akash.market.v1beta5.QueryLeaseResponse";
@@ -454,7 +454,7 @@ export interface QueryLeaseResponseAmino {
   /**
    * EscrowPayment holds information about the Lease's fractional payment.
    */
-  escrow_payment?: FractionalPaymentAmino;
+  escrow_payment?: PaymentAmino;
 }
 export interface QueryLeaseResponseAminoMsg {
   type: "/akash.market.v1beta5.QueryLeaseResponse";
@@ -1366,7 +1366,7 @@ export const QueryLeaseRequest = {
 function createBaseQueryLeaseResponse(): QueryLeaseResponse {
   return {
     lease: Lease.fromPartial({}),
-    escrowPayment: FractionalPayment.fromPartial({})
+    escrowPayment: Payment.fromPartial({})
   };
 }
 /**
@@ -1382,7 +1382,7 @@ export const QueryLeaseResponse = {
       Lease.encode(message.lease, writer.uint32(10).fork()).ldelim();
     }
     if (message.escrowPayment !== undefined) {
-      FractionalPayment.encode(message.escrowPayment, writer.uint32(18).fork()).ldelim();
+      Payment.encode(message.escrowPayment, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -1397,7 +1397,7 @@ export const QueryLeaseResponse = {
           message.lease = Lease.decode(reader, reader.uint32());
           break;
         case 2:
-          message.escrowPayment = FractionalPayment.decode(reader, reader.uint32());
+          message.escrowPayment = Payment.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -1409,7 +1409,7 @@ export const QueryLeaseResponse = {
   fromPartial(object: DeepPartial<QueryLeaseResponse>): QueryLeaseResponse {
     const message = createBaseQueryLeaseResponse();
     message.lease = object.lease !== undefined && object.lease !== null ? Lease.fromPartial(object.lease) : undefined;
-    message.escrowPayment = object.escrowPayment !== undefined && object.escrowPayment !== null ? FractionalPayment.fromPartial(object.escrowPayment) : undefined;
+    message.escrowPayment = object.escrowPayment !== undefined && object.escrowPayment !== null ? Payment.fromPartial(object.escrowPayment) : undefined;
     return message;
   },
   fromAmino(object: QueryLeaseResponseAmino): QueryLeaseResponse {
@@ -1418,14 +1418,14 @@ export const QueryLeaseResponse = {
       message.lease = Lease.fromAmino(object.lease);
     }
     if (object.escrow_payment !== undefined && object.escrow_payment !== null) {
-      message.escrowPayment = FractionalPayment.fromAmino(object.escrow_payment);
+      message.escrowPayment = Payment.fromAmino(object.escrow_payment);
     }
     return message;
   },
   toAmino(message: QueryLeaseResponse): QueryLeaseResponseAmino {
     const obj: any = {};
     obj.lease = message.lease ? Lease.toAmino(message.lease) : undefined;
-    obj.escrow_payment = message.escrowPayment ? FractionalPayment.toAmino(message.escrowPayment) : undefined;
+    obj.escrow_payment = message.escrowPayment ? Payment.toAmino(message.escrowPayment) : undefined;
     return obj;
   },
   fromAminoMsg(object: QueryLeaseResponseAminoMsg): QueryLeaseResponse {

@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { MsgUpdateParams, MsgUpdateParamsResponse } from "./paramsmsg";
-/** Msg defines the market Msg service */
+/** Msg defines the take Msg service */
 export interface Msg {
   /**
    * UpdateParams defines a governance operation for updating the x/market module

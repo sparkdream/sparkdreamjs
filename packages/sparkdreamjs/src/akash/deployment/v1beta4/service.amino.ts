@@ -1,6 +1,5 @@
 //@ts-nocheck
 import { MsgCreateDeployment, MsgUpdateDeployment, MsgCloseDeployment } from "./deploymentmsg";
-import { MsgDepositDeployment } from "../v1/msg";
 import { MsgCloseGroup, MsgPauseGroup, MsgStartGroup } from "./groupmsg";
 import { MsgUpdateParams } from "./paramsmsg";
 export const AminoConverter = {
@@ -8,11 +7,6 @@ export const AminoConverter = {
     aminoType: "/akash.deployment.v1beta4.MsgCreateDeployment",
     toAmino: MsgCreateDeployment.toAmino,
     fromAmino: MsgCreateDeployment.fromAmino
-  },
-  "/akash.deployment.v1beta4.MsgDepositDeployment": {
-    aminoType: "/akash.deployment.v1beta4.MsgDepositDeployment",
-    toAmino: MsgDepositDeployment.toAmino,
-    fromAmino: MsgDepositDeployment.fromAmino
   },
   "/akash.deployment.v1beta4.MsgUpdateDeployment": {
     aminoType: "/akash.deployment.v1beta4.MsgUpdateDeployment",

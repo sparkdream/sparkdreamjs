@@ -3,14 +3,15 @@ package akash.market.v1;
 
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
-
 import "cosmos/base/v1beta1/coin.proto";
+import "akash/market/v1/types.proto";
+import "akash/market/v1/reclamation.proto";
 
 option go_package = "pkg.akt.dev/go/node/market/v1";
 
 // LeaseID stores bid details of lease.
 message LeaseID {
-  option (gogoproto.equal)            = false;
+  option (gogoproto.equal)            = true;
   option (gogoproto.goproto_stringer) = false;
 
   // Owner is the account bech32 address of the user who owns the deployment.
@@ -58,6 +59,13 @@ message LeaseID {
     (gogoproto.jsontag)   = "provider",
     (gogoproto.moretags)  = "yaml:\"provider\""
   ];
+
+  // BSeq (bid sequence) distinguishes multiple bids associated with a single deployment from same provider.
+  uint32 bseq = 6 [
+    (gogoproto.customname) = "BSeq",
+    (gogoproto.jsontag)    = "bseq",
+    (gogoproto.moretags)   = "yaml:\"bseq\""
+  ];
 }
 
 // Lease stores LeaseID, state of lease and price.
@@ -87,6 +95,10 @@ message Lease {
     // LeaseClosed denotes state for lease closed.
     closed = 3 [
         (gogoproto.enumvalue_customname) = "LeaseClosed"
+    ];
+    // LeaseReclaiming denotes a lease in reclamation (grace period before closure).
+    reclaiming = 4 [
+        (gogoproto.enumvalue_customname) = "LeaseReclaiming"
     ];
   }
 
@@ -120,5 +132,18 @@ message Lease {
   int64 closed_on  = 5 [
     (gogoproto.jsontag)  = "closed_on",
     (gogoproto.moretags) = "yaml:\"closed_on\""
+  ];
+
+  LeaseClosedReason reason = 6 [
+    (gogoproto.jsontag)  = "reason",
+    (gogoproto.moretags) = "yaml:\"reason\""
+  ];
+
+  // Reclamation holds reclamation configuration and state, if applicable.
+  // Nil if reclamation is not configured for this lease.
+  Reclamation reclamation = 7 [
+    (gogoproto.nullable) = true,
+    (gogoproto.jsontag)  = "reclamation,omitempty",
+    (gogoproto.moretags) = "yaml:\"reclamation,omitempty\""
   ];
 }

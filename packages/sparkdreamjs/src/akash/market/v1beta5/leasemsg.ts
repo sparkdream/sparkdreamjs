@@ -1,6 +1,7 @@
 //@ts-nocheck
 import { BidID, BidIDAmino } from "../v1/bid";
 import { LeaseID, LeaseIDAmino } from "../v1/lease";
+import { LeaseClosedReason } from "../v1/types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -67,7 +68,7 @@ export interface MsgWithdrawLease {
   /**
    * BidId is the unique identifier of the Bid.
    */
-  bidId: LeaseID;
+  id: LeaseID;
 }
 export interface MsgWithdrawLeaseProtoMsg {
   typeUrl: "/akash.market.v1beta5.MsgWithdrawLease";
@@ -83,7 +84,7 @@ export interface MsgWithdrawLeaseAmino {
   /**
    * BidId is the unique identifier of the Bid.
    */
-  bid_id: LeaseIDAmino;
+  id: LeaseIDAmino;
 }
 export interface MsgWithdrawLeaseAminoMsg {
   type: "/akash.market.v1beta5.MsgWithdrawLease";
@@ -119,9 +120,10 @@ export interface MsgWithdrawLeaseResponseAminoMsg {
  */
 export interface MsgCloseLease {
   /**
-   * BidId is the unique identifier of the Bid.
+   * LeaseID is the unique identifier of the Lease.
    */
-  leaseId: LeaseID;
+  id: LeaseID;
+  reason: LeaseClosedReason;
 }
 export interface MsgCloseLeaseProtoMsg {
   typeUrl: "/akash.market.v1beta5.MsgCloseLease";
@@ -135,9 +137,10 @@ export interface MsgCloseLeaseProtoMsg {
  */
 export interface MsgCloseLeaseAmino {
   /**
-   * BidId is the unique identifier of the Bid.
+   * LeaseID is the unique identifier of the Lease.
    */
-  lease_id: LeaseIDAmino;
+  id: LeaseIDAmino;
+  reason: LeaseClosedReason;
 }
 export interface MsgCloseLeaseAminoMsg {
   type: "/akash.market.v1beta5.MsgCloseLease";
@@ -164,6 +167,68 @@ export interface MsgCloseLeaseResponseAmino {}
 export interface MsgCloseLeaseResponseAminoMsg {
   type: "/akash.market.v1beta5.MsgCloseLeaseResponse";
   value: MsgCloseLeaseResponseAmino;
+}
+/**
+ * MsgLeaseStartReclaim is sent by the provider to initiate reclamation on an active lease.
+ * @name MsgLeaseStartReclaim
+ * @package akash.market.v1beta5
+ * @see proto type: akash.market.v1beta5.MsgLeaseStartReclaim
+ */
+export interface MsgLeaseStartReclaim {
+  /**
+   * Id is the unique identifier of the Lease.
+   */
+  id: LeaseID;
+  /**
+   * reason is the provider's stated reason for initiating reclamation.
+   */
+  reason: LeaseClosedReason;
+}
+export interface MsgLeaseStartReclaimProtoMsg {
+  typeUrl: "/akash.market.v1beta5.MsgLeaseStartReclaim";
+  value: Uint8Array;
+}
+/**
+ * MsgLeaseStartReclaim is sent by the provider to initiate reclamation on an active lease.
+ * @name MsgLeaseStartReclaimAmino
+ * @package akash.market.v1beta5
+ * @see proto type: akash.market.v1beta5.MsgLeaseStartReclaim
+ */
+export interface MsgLeaseStartReclaimAmino {
+  /**
+   * Id is the unique identifier of the Lease.
+   */
+  id: LeaseIDAmino;
+  /**
+   * reason is the provider's stated reason for initiating reclamation.
+   */
+  reason: LeaseClosedReason;
+}
+export interface MsgLeaseStartReclaimAminoMsg {
+  type: "/akash.market.v1beta5.MsgLeaseStartReclaim";
+  value: MsgLeaseStartReclaimAmino;
+}
+/**
+ * MsgLeaseStartReclaimResponse is the response from starting lease reclamation.
+ * @name MsgLeaseStartReclaimResponse
+ * @package akash.market.v1beta5
+ * @see proto type: akash.market.v1beta5.MsgLeaseStartReclaimResponse
+ */
+export interface MsgLeaseStartReclaimResponse {}
+export interface MsgLeaseStartReclaimResponseProtoMsg {
+  typeUrl: "/akash.market.v1beta5.MsgLeaseStartReclaimResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgLeaseStartReclaimResponse is the response from starting lease reclamation.
+ * @name MsgLeaseStartReclaimResponseAmino
+ * @package akash.market.v1beta5
+ * @see proto type: akash.market.v1beta5.MsgLeaseStartReclaimResponse
+ */
+export interface MsgLeaseStartReclaimResponseAmino {}
+export interface MsgLeaseStartReclaimResponseAminoMsg {
+  type: "/akash.market.v1beta5.MsgLeaseStartReclaimResponse";
+  value: MsgLeaseStartReclaimResponseAmino;
 }
 function createBaseMsgCreateLease(): MsgCreateLease {
   return {
@@ -292,7 +357,7 @@ export const MsgCreateLeaseResponse = {
 };
 function createBaseMsgWithdrawLease(): MsgWithdrawLease {
   return {
-    bidId: LeaseID.fromPartial({})
+    id: LeaseID.fromPartial({})
   };
 }
 /**
@@ -304,8 +369,8 @@ function createBaseMsgWithdrawLease(): MsgWithdrawLease {
 export const MsgWithdrawLease = {
   typeUrl: "/akash.market.v1beta5.MsgWithdrawLease",
   encode(message: MsgWithdrawLease, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.bidId !== undefined) {
-      LeaseID.encode(message.bidId, writer.uint32(10).fork()).ldelim();
+    if (message.id !== undefined) {
+      LeaseID.encode(message.id, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -317,7 +382,7 @@ export const MsgWithdrawLease = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.bidId = LeaseID.decode(reader, reader.uint32());
+          message.id = LeaseID.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -328,19 +393,19 @@ export const MsgWithdrawLease = {
   },
   fromPartial(object: DeepPartial<MsgWithdrawLease>): MsgWithdrawLease {
     const message = createBaseMsgWithdrawLease();
-    message.bidId = object.bidId !== undefined && object.bidId !== null ? LeaseID.fromPartial(object.bidId) : undefined;
+    message.id = object.id !== undefined && object.id !== null ? LeaseID.fromPartial(object.id) : undefined;
     return message;
   },
   fromAmino(object: MsgWithdrawLeaseAmino): MsgWithdrawLease {
     const message = createBaseMsgWithdrawLease();
-    if (object.bid_id !== undefined && object.bid_id !== null) {
-      message.bidId = LeaseID.fromAmino(object.bid_id);
+    if (object.id !== undefined && object.id !== null) {
+      message.id = LeaseID.fromAmino(object.id);
     }
     return message;
   },
   toAmino(message: MsgWithdrawLease): MsgWithdrawLeaseAmino {
     const obj: any = {};
-    obj.bid_id = message.bidId ? LeaseID.toAmino(message.bidId) : LeaseID.toAmino(LeaseID.fromPartial({}));
+    obj.id = message.id ? LeaseID.toAmino(message.id) : LeaseID.toAmino(LeaseID.fromPartial({}));
     return obj;
   },
   fromAminoMsg(object: MsgWithdrawLeaseAminoMsg): MsgWithdrawLease {
@@ -417,7 +482,8 @@ export const MsgWithdrawLeaseResponse = {
 };
 function createBaseMsgCloseLease(): MsgCloseLease {
   return {
-    leaseId: LeaseID.fromPartial({})
+    id: LeaseID.fromPartial({}),
+    reason: 0
   };
 }
 /**
@@ -429,8 +495,11 @@ function createBaseMsgCloseLease(): MsgCloseLease {
 export const MsgCloseLease = {
   typeUrl: "/akash.market.v1beta5.MsgCloseLease",
   encode(message: MsgCloseLease, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.leaseId !== undefined) {
-      LeaseID.encode(message.leaseId, writer.uint32(10).fork()).ldelim();
+    if (message.id !== undefined) {
+      LeaseID.encode(message.id, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.reason !== 0) {
+      writer.uint32(16).int32(message.reason);
     }
     return writer;
   },
@@ -442,7 +511,10 @@ export const MsgCloseLease = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.leaseId = LeaseID.decode(reader, reader.uint32());
+          message.id = LeaseID.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.reason = reader.int32() as any;
           break;
         default:
           reader.skipType(tag & 7);
@@ -453,19 +525,24 @@ export const MsgCloseLease = {
   },
   fromPartial(object: DeepPartial<MsgCloseLease>): MsgCloseLease {
     const message = createBaseMsgCloseLease();
-    message.leaseId = object.leaseId !== undefined && object.leaseId !== null ? LeaseID.fromPartial(object.leaseId) : undefined;
+    message.id = object.id !== undefined && object.id !== null ? LeaseID.fromPartial(object.id) : undefined;
+    message.reason = object.reason ?? 0;
     return message;
   },
   fromAmino(object: MsgCloseLeaseAmino): MsgCloseLease {
     const message = createBaseMsgCloseLease();
-    if (object.lease_id !== undefined && object.lease_id !== null) {
-      message.leaseId = LeaseID.fromAmino(object.lease_id);
+    if (object.id !== undefined && object.id !== null) {
+      message.id = LeaseID.fromAmino(object.id);
+    }
+    if (object.reason !== undefined && object.reason !== null) {
+      message.reason = object.reason;
     }
     return message;
   },
   toAmino(message: MsgCloseLease): MsgCloseLeaseAmino {
     const obj: any = {};
-    obj.lease_id = message.leaseId ? LeaseID.toAmino(message.leaseId) : LeaseID.toAmino(LeaseID.fromPartial({}));
+    obj.id = message.id ? LeaseID.toAmino(message.id) : LeaseID.toAmino(LeaseID.fromPartial({}));
+    obj.reason = message.reason ?? 0;
     return obj;
   },
   fromAminoMsg(object: MsgCloseLeaseAminoMsg): MsgCloseLease {
@@ -537,6 +614,143 @@ export const MsgCloseLeaseResponse = {
     return {
       typeUrl: "/akash.market.v1beta5.MsgCloseLeaseResponse",
       value: MsgCloseLeaseResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgLeaseStartReclaim(): MsgLeaseStartReclaim {
+  return {
+    id: LeaseID.fromPartial({}),
+    reason: 0
+  };
+}
+/**
+ * MsgLeaseStartReclaim is sent by the provider to initiate reclamation on an active lease.
+ * @name MsgLeaseStartReclaim
+ * @package akash.market.v1beta5
+ * @see proto type: akash.market.v1beta5.MsgLeaseStartReclaim
+ */
+export const MsgLeaseStartReclaim = {
+  typeUrl: "/akash.market.v1beta5.MsgLeaseStartReclaim",
+  encode(message: MsgLeaseStartReclaim, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.id !== undefined) {
+      LeaseID.encode(message.id, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.reason !== 0) {
+      writer.uint32(16).int32(message.reason);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgLeaseStartReclaim {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgLeaseStartReclaim();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = LeaseID.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.reason = reader.int32() as any;
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgLeaseStartReclaim>): MsgLeaseStartReclaim {
+    const message = createBaseMsgLeaseStartReclaim();
+    message.id = object.id !== undefined && object.id !== null ? LeaseID.fromPartial(object.id) : undefined;
+    message.reason = object.reason ?? 0;
+    return message;
+  },
+  fromAmino(object: MsgLeaseStartReclaimAmino): MsgLeaseStartReclaim {
+    const message = createBaseMsgLeaseStartReclaim();
+    if (object.id !== undefined && object.id !== null) {
+      message.id = LeaseID.fromAmino(object.id);
+    }
+    if (object.reason !== undefined && object.reason !== null) {
+      message.reason = object.reason;
+    }
+    return message;
+  },
+  toAmino(message: MsgLeaseStartReclaim): MsgLeaseStartReclaimAmino {
+    const obj: any = {};
+    obj.id = message.id ? LeaseID.toAmino(message.id) : LeaseID.toAmino(LeaseID.fromPartial({}));
+    obj.reason = message.reason ?? 0;
+    return obj;
+  },
+  fromAminoMsg(object: MsgLeaseStartReclaimAminoMsg): MsgLeaseStartReclaim {
+    return MsgLeaseStartReclaim.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgLeaseStartReclaimProtoMsg): MsgLeaseStartReclaim {
+    return MsgLeaseStartReclaim.decode(message.value);
+  },
+  toProto(message: MsgLeaseStartReclaim): Uint8Array {
+    return MsgLeaseStartReclaim.encode(message).finish();
+  },
+  toProtoMsg(message: MsgLeaseStartReclaim): MsgLeaseStartReclaimProtoMsg {
+    return {
+      typeUrl: "/akash.market.v1beta5.MsgLeaseStartReclaim",
+      value: MsgLeaseStartReclaim.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgLeaseStartReclaimResponse(): MsgLeaseStartReclaimResponse {
+  return {};
+}
+/**
+ * MsgLeaseStartReclaimResponse is the response from starting lease reclamation.
+ * @name MsgLeaseStartReclaimResponse
+ * @package akash.market.v1beta5
+ * @see proto type: akash.market.v1beta5.MsgLeaseStartReclaimResponse
+ */
+export const MsgLeaseStartReclaimResponse = {
+  typeUrl: "/akash.market.v1beta5.MsgLeaseStartReclaimResponse",
+  encode(_: MsgLeaseStartReclaimResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgLeaseStartReclaimResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgLeaseStartReclaimResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgLeaseStartReclaimResponse>): MsgLeaseStartReclaimResponse {
+    const message = createBaseMsgLeaseStartReclaimResponse();
+    return message;
+  },
+  fromAmino(_: MsgLeaseStartReclaimResponseAmino): MsgLeaseStartReclaimResponse {
+    const message = createBaseMsgLeaseStartReclaimResponse();
+    return message;
+  },
+  toAmino(_: MsgLeaseStartReclaimResponse): MsgLeaseStartReclaimResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgLeaseStartReclaimResponseAminoMsg): MsgLeaseStartReclaimResponse {
+    return MsgLeaseStartReclaimResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgLeaseStartReclaimResponseProtoMsg): MsgLeaseStartReclaimResponse {
+    return MsgLeaseStartReclaimResponse.decode(message.value);
+  },
+  toProto(message: MsgLeaseStartReclaimResponse): Uint8Array {
+    return MsgLeaseStartReclaimResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgLeaseStartReclaimResponse): MsgLeaseStartReclaimResponseProtoMsg {
+    return {
+      typeUrl: "/akash.market.v1beta5.MsgLeaseStartReclaimResponse",
+      value: MsgLeaseStartReclaimResponse.encode(message).finish()
     };
   }
 };

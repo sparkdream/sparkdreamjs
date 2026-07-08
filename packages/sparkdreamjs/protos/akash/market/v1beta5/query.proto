@@ -7,8 +7,8 @@ import "google/api/annotations.proto";
 
 import "cosmos/base/query/v1beta1/pagination.proto";
 
-import "akash/escrow/v1/account.proto";
-import "akash/escrow/v1/fractional_payment.proto";
+import "akash/escrow/types/v1/account.proto";
+import "akash/escrow/types/v1/payment.proto";
 
 import "akash/market/v1/order.proto";
 import "akash/market/v1/bid.proto";
@@ -54,7 +54,7 @@ service Query {
     option (google.api.http).get = "/akash/market/v1beta5/leases/info";
   }
 
-  // Params returns the total set of minting parameters.
+  // Params returns the total set of market parameters.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
       option (google.api.http).get = "/akash/market/v1beta5/params";
   }
@@ -67,7 +67,7 @@ message QueryOrdersRequest {
     (gogoproto.nullable) = false
   ];
 
-  // Pagination is used to paginate request.
+  // Pagination is used to paginate the request.
   cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
@@ -107,7 +107,7 @@ message QueryBidsRequest {
     (gogoproto.nullable) = false
   ];
 
-  // Pagination is used to paginate request.
+  // Pagination is used to paginate the request.
   cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
@@ -138,7 +138,7 @@ message QueryBidResponse {
     (gogoproto.nullable) = false
   ];
   // EscrowAccount represents the escrow account created for the Bid.
-  akash.escrow.v1.Account escrow_account = 2 [
+  akash.escrow.types.v1.Account escrow_account = 2 [
     (gogoproto.nullable) = false
   ];
 }
@@ -150,7 +150,7 @@ message QueryLeasesRequest {
     (gogoproto.nullable) = false
   ];
 
-  // Pagination is used to paginate request.
+  // Pagination is used to paginate the request.
   cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
@@ -181,7 +181,7 @@ message QueryLeaseResponse {
     (gogoproto.nullable) = false
   ];
   // EscrowPayment holds information about the Lease's fractional payment.
-  akash.escrow.v1.FractionalPayment escrow_payment = 2 [
+  akash.escrow.types.v1.Payment escrow_payment = 2 [
     (gogoproto.nullable) = false
   ];
 }

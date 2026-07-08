@@ -5,14 +5,19 @@ import { MsgCreateCertificate } from "../src/akash/cert/v1/msg";
 import { MsgCreateDeployment } from "../src/akash/deployment/v1beta4/deploymentmsg";
 import { MsgCreateLease } from "../src/akash/market/v1beta5/leasemsg";
 
-/** The message set the chain launcher signs (launcher design §9). */
+/**
+ * The message set the chain launcher signs (launcher design §9) — the same
+ * set console-air uses: escrow-v1 MsgAccountDeposit replaced the removed
+ * deployment.v1.MsgDepositDeployment, and bme MsgMintACT funds deployments.
+ */
 const LAUNCHER_TYPE_URLS = [
   "/akash.cert.v1.MsgCreateCertificate",
   "/akash.deployment.v1beta4.MsgCreateDeployment",
   "/akash.deployment.v1beta4.MsgUpdateDeployment",
   "/akash.deployment.v1beta4.MsgCloseDeployment",
-  "/akash.deployment.v1.MsgDepositDeployment",
+  "/akash.escrow.v1.MsgAccountDeposit",
   "/akash.market.v1beta5.MsgCreateLease",
+  "/akash.bme.v1.MsgMintACT",
 ];
 
 it("registers every launcher message type", () => {

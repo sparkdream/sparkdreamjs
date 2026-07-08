@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "../../../cosmos/base/query/v1beta1/pagination";
-import { Account, AccountAmino } from "./account";
-import { FractionalPayment, FractionalPaymentAmino } from "./fractional_payment";
+import { Account, AccountAmino } from "../types/v1/account";
+import { Payment, PaymentAmino } from "../types/v1/payment";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -12,27 +12,15 @@ import { DeepPartial } from "../../../helpers";
  */
 export interface QueryAccountsRequest {
   /**
-   * Scope holds the scope of the account.
-   */
-  scope: string;
-  /**
-   * Xid TODO: What is this?
-   */
-  xid: string;
-  /**
-   * Owner is the bech32 address of the account.
-   * It is a string representing a valid account address.
-   * 
-   * Example:
-   *   "akash1..."
-   */
-  owner: string;
-  /**
    * State represents the current state of an Account.
    */
   state: string;
   /**
-   * Pagination is used to paginate request.
+   * Scope holds the scope of the account.
+   */
+  xid: string;
+  /**
+   * Pagination is used to paginate the request.
    */
   pagination?: PageRequest;
 }
@@ -48,27 +36,15 @@ export interface QueryAccountsRequestProtoMsg {
  */
 export interface QueryAccountsRequestAmino {
   /**
-   * Scope holds the scope of the account.
-   */
-  scope?: string;
-  /**
-   * Xid TODO: What is this?
-   */
-  xid?: string;
-  /**
-   * Owner is the bech32 address of the account.
-   * It is a string representing a valid account address.
-   * 
-   * Example:
-   *   "akash1..."
-   */
-  owner?: string;
-  /**
    * State represents the current state of an Account.
    */
   state?: string;
   /**
-   * Pagination is used to paginate request.
+   * Scope holds the scope of the account.
+   */
+  xid: string;
+  /**
+   * Pagination is used to paginate the request.
    */
   pagination?: PageRequestAmino;
 }
@@ -124,31 +100,12 @@ export interface QueryAccountsResponseAminoMsg {
  */
 export interface QueryPaymentsRequest {
   /**
-   * Scope holds the scope of the payment.
-   */
-  scope: string;
-  /**
-   * Xid TODO: What is this?
-   */
-  xid: string;
-  /**
-   * Id is the unique identifier of the payment.
-   */
-  id: string;
-  /**
-   * Owner is the bech32 address of the account.
-   * It is a string representing a valid account address.
-   * 
-   * Example:
-   *   "akash1..."
-   */
-  owner: string;
-  /**
-   * State represents the current state of an Account.
+   * State represents the current state of a Payment.
    */
   state: string;
+  xid: string;
   /**
-   * Pagination is used to paginate request.
+   * Pagination is used to paginate the request.
    */
   pagination?: PageRequest;
 }
@@ -164,31 +121,12 @@ export interface QueryPaymentsRequestProtoMsg {
  */
 export interface QueryPaymentsRequestAmino {
   /**
-   * Scope holds the scope of the payment.
-   */
-  scope?: string;
-  /**
-   * Xid TODO: What is this?
-   */
-  xid?: string;
-  /**
-   * Id is the unique identifier of the payment.
-   */
-  id?: string;
-  /**
-   * Owner is the bech32 address of the account.
-   * It is a string representing a valid account address.
-   * 
-   * Example:
-   *   "akash1..."
-   */
-  owner?: string;
-  /**
-   * State represents the current state of an Account.
+   * State represents the current state of a Payment.
    */
   state?: string;
+  xid: string;
   /**
-   * Pagination is used to paginate request.
+   * Pagination is used to paginate the request.
    */
   pagination?: PageRequestAmino;
 }
@@ -204,9 +142,9 @@ export interface QueryPaymentsRequestAminoMsg {
  */
 export interface QueryPaymentsResponse {
   /**
-   * Payments is a list of fractional payments.
+   * Payments is a list of payments.
    */
-  payments: FractionalPayment[];
+  payments: Payment[];
   /**
    * Pagination contains the information about response pagination.
    */
@@ -224,9 +162,9 @@ export interface QueryPaymentsResponseProtoMsg {
  */
 export interface QueryPaymentsResponseAmino {
   /**
-   * Payments is a list of fractional payments.
+   * Payments is a list of payments.
    */
-  payments?: FractionalPaymentAmino[];
+  payments?: PaymentAmino[];
   /**
    * Pagination contains the information about response pagination.
    */
@@ -238,10 +176,8 @@ export interface QueryPaymentsResponseAminoMsg {
 }
 function createBaseQueryAccountsRequest(): QueryAccountsRequest {
   return {
-    scope: "",
-    xid: "",
-    owner: "",
     state: "",
+    xid: "",
     pagination: undefined
   };
 }
@@ -254,17 +190,11 @@ function createBaseQueryAccountsRequest(): QueryAccountsRequest {
 export const QueryAccountsRequest = {
   typeUrl: "/akash.escrow.v1.QueryAccountsRequest",
   encode(message: QueryAccountsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.scope !== "") {
-      writer.uint32(10).string(message.scope);
+    if (message.state !== "") {
+      writer.uint32(10).string(message.state);
     }
     if (message.xid !== "") {
       writer.uint32(18).string(message.xid);
-    }
-    if (message.owner !== "") {
-      writer.uint32(26).string(message.owner);
-    }
-    if (message.state !== "") {
-      writer.uint32(34).string(message.state);
     }
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(42).fork()).ldelim();
@@ -279,16 +209,10 @@ export const QueryAccountsRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.scope = reader.string();
+          message.state = reader.string();
           break;
         case 2:
           message.xid = reader.string();
-          break;
-        case 3:
-          message.owner = reader.string();
-          break;
-        case 4:
-          message.state = reader.string();
           break;
         case 5:
           message.pagination = PageRequest.decode(reader, reader.uint32());
@@ -302,26 +226,18 @@ export const QueryAccountsRequest = {
   },
   fromPartial(object: DeepPartial<QueryAccountsRequest>): QueryAccountsRequest {
     const message = createBaseQueryAccountsRequest();
-    message.scope = object.scope ?? "";
-    message.xid = object.xid ?? "";
-    message.owner = object.owner ?? "";
     message.state = object.state ?? "";
+    message.xid = object.xid ?? "";
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
     return message;
   },
   fromAmino(object: QueryAccountsRequestAmino): QueryAccountsRequest {
     const message = createBaseQueryAccountsRequest();
-    if (object.scope !== undefined && object.scope !== null) {
-      message.scope = object.scope;
+    if (object.state !== undefined && object.state !== null) {
+      message.state = object.state;
     }
     if (object.xid !== undefined && object.xid !== null) {
       message.xid = object.xid;
-    }
-    if (object.owner !== undefined && object.owner !== null) {
-      message.owner = object.owner;
-    }
-    if (object.state !== undefined && object.state !== null) {
-      message.state = object.state;
     }
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromAmino(object.pagination);
@@ -330,10 +246,8 @@ export const QueryAccountsRequest = {
   },
   toAmino(message: QueryAccountsRequest): QueryAccountsRequestAmino {
     const obj: any = {};
-    obj.scope = message.scope === "" ? undefined : message.scope;
-    obj.xid = message.xid === "" ? undefined : message.xid;
-    obj.owner = message.owner === "" ? undefined : message.owner;
     obj.state = message.state === "" ? undefined : message.state;
+    obj.xid = message.xid ?? "";
     obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
     return obj;
   },
@@ -438,11 +352,8 @@ export const QueryAccountsResponse = {
 };
 function createBaseQueryPaymentsRequest(): QueryPaymentsRequest {
   return {
-    scope: "",
-    xid: "",
-    id: "",
-    owner: "",
     state: "",
+    xid: "",
     pagination: undefined
   };
 }
@@ -455,20 +366,11 @@ function createBaseQueryPaymentsRequest(): QueryPaymentsRequest {
 export const QueryPaymentsRequest = {
   typeUrl: "/akash.escrow.v1.QueryPaymentsRequest",
   encode(message: QueryPaymentsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.scope !== "") {
-      writer.uint32(10).string(message.scope);
+    if (message.state !== "") {
+      writer.uint32(10).string(message.state);
     }
     if (message.xid !== "") {
       writer.uint32(18).string(message.xid);
-    }
-    if (message.id !== "") {
-      writer.uint32(26).string(message.id);
-    }
-    if (message.owner !== "") {
-      writer.uint32(34).string(message.owner);
-    }
-    if (message.state !== "") {
-      writer.uint32(42).string(message.state);
     }
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(50).fork()).ldelim();
@@ -483,19 +385,10 @@ export const QueryPaymentsRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.scope = reader.string();
+          message.state = reader.string();
           break;
         case 2:
           message.xid = reader.string();
-          break;
-        case 3:
-          message.id = reader.string();
-          break;
-        case 4:
-          message.owner = reader.string();
-          break;
-        case 5:
-          message.state = reader.string();
           break;
         case 6:
           message.pagination = PageRequest.decode(reader, reader.uint32());
@@ -509,30 +402,18 @@ export const QueryPaymentsRequest = {
   },
   fromPartial(object: DeepPartial<QueryPaymentsRequest>): QueryPaymentsRequest {
     const message = createBaseQueryPaymentsRequest();
-    message.scope = object.scope ?? "";
-    message.xid = object.xid ?? "";
-    message.id = object.id ?? "";
-    message.owner = object.owner ?? "";
     message.state = object.state ?? "";
+    message.xid = object.xid ?? "";
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
     return message;
   },
   fromAmino(object: QueryPaymentsRequestAmino): QueryPaymentsRequest {
     const message = createBaseQueryPaymentsRequest();
-    if (object.scope !== undefined && object.scope !== null) {
-      message.scope = object.scope;
+    if (object.state !== undefined && object.state !== null) {
+      message.state = object.state;
     }
     if (object.xid !== undefined && object.xid !== null) {
       message.xid = object.xid;
-    }
-    if (object.id !== undefined && object.id !== null) {
-      message.id = object.id;
-    }
-    if (object.owner !== undefined && object.owner !== null) {
-      message.owner = object.owner;
-    }
-    if (object.state !== undefined && object.state !== null) {
-      message.state = object.state;
     }
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromAmino(object.pagination);
@@ -541,11 +422,8 @@ export const QueryPaymentsRequest = {
   },
   toAmino(message: QueryPaymentsRequest): QueryPaymentsRequestAmino {
     const obj: any = {};
-    obj.scope = message.scope === "" ? undefined : message.scope;
-    obj.xid = message.xid === "" ? undefined : message.xid;
-    obj.id = message.id === "" ? undefined : message.id;
-    obj.owner = message.owner === "" ? undefined : message.owner;
     obj.state = message.state === "" ? undefined : message.state;
+    obj.xid = message.xid ?? "";
     obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
     return obj;
   },
@@ -581,7 +459,7 @@ export const QueryPaymentsResponse = {
   typeUrl: "/akash.escrow.v1.QueryPaymentsResponse",
   encode(message: QueryPaymentsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.payments) {
-      FractionalPayment.encode(v!, writer.uint32(10).fork()).ldelim();
+      Payment.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.pagination !== undefined) {
       PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
@@ -596,7 +474,7 @@ export const QueryPaymentsResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.payments.push(FractionalPayment.decode(reader, reader.uint32()));
+          message.payments.push(Payment.decode(reader, reader.uint32()));
           break;
         case 2:
           message.pagination = PageResponse.decode(reader, reader.uint32());
@@ -610,13 +488,13 @@ export const QueryPaymentsResponse = {
   },
   fromPartial(object: DeepPartial<QueryPaymentsResponse>): QueryPaymentsResponse {
     const message = createBaseQueryPaymentsResponse();
-    message.payments = object.payments?.map(e => FractionalPayment.fromPartial(e)) || [];
+    message.payments = object.payments?.map(e => Payment.fromPartial(e)) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
     return message;
   },
   fromAmino(object: QueryPaymentsResponseAmino): QueryPaymentsResponse {
     const message = createBaseQueryPaymentsResponse();
-    message.payments = object.payments?.map(e => FractionalPayment.fromAmino(e)) || [];
+    message.payments = object.payments?.map(e => Payment.fromAmino(e)) || [];
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageResponse.fromAmino(object.pagination);
     }
@@ -625,7 +503,7 @@ export const QueryPaymentsResponse = {
   toAmino(message: QueryPaymentsResponse): QueryPaymentsResponseAmino {
     const obj: any = {};
     if (message.payments) {
-      obj.payments = message.payments.map(e => e ? FractionalPayment.toAmino(e) : undefined);
+      obj.payments = message.payments.map(e => e ? Payment.toAmino(e) : undefined);
     } else {
       obj.payments = message.payments;
     }

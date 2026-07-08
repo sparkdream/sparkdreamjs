@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { ClientInfo, ClientInfoAmino } from "./client_info";
+import { ClientInfo, ClientInfoAmino, VersionInfo, VersionInfoAmino } from "./client_info";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -11,8 +11,26 @@ import { DeepPartial } from "../../../helpers";
 export interface Akash {
   /**
    * ClientInfo holds information about the client.
+   * Kept for backward compatibility. New clients should use supported_versions.
    */
-  clientInfo?: ClientInfo;
+  clientInfo: ClientInfo;
+  /**
+   * SupportedVersions lists all API versions the node supports.
+   * Clients should pick the best match from this list.
+   */
+  supportedVersions: VersionInfo[];
+  /**
+   * ChainID is the identifier of the blockchain network.
+   */
+  chainId: string;
+  /**
+   * NodeVersion is the software version of the node.
+   */
+  nodeVersion: string;
+  /**
+   * MinClientVersion is the minimum client version the node accepts.
+   */
+  minClientVersion: string;
 }
 export interface AkashProtoMsg {
   typeUrl: "/akash.discovery.v1.Akash";
@@ -27,8 +45,26 @@ export interface AkashProtoMsg {
 export interface AkashAmino {
   /**
    * ClientInfo holds information about the client.
+   * Kept for backward compatibility. New clients should use supported_versions.
    */
   client_info: ClientInfoAmino;
+  /**
+   * SupportedVersions lists all API versions the node supports.
+   * Clients should pick the best match from this list.
+   */
+  supported_versions: VersionInfoAmino[];
+  /**
+   * ChainID is the identifier of the blockchain network.
+   */
+  chain_id: string;
+  /**
+   * NodeVersion is the software version of the node.
+   */
+  node_version: string;
+  /**
+   * MinClientVersion is the minimum client version the node accepts.
+   */
+  min_client_version: string;
 }
 export interface AkashAminoMsg {
   type: "/akash.discovery.v1.Akash";
@@ -36,7 +72,11 @@ export interface AkashAminoMsg {
 }
 function createBaseAkash(): Akash {
   return {
-    clientInfo: undefined
+    clientInfo: ClientInfo.fromPartial({}),
+    supportedVersions: [],
+    chainId: "",
+    nodeVersion: "",
+    minClientVersion: ""
   };
 }
 /**
@@ -51,6 +91,18 @@ export const Akash = {
     if (message.clientInfo !== undefined) {
       ClientInfo.encode(message.clientInfo, writer.uint32(10).fork()).ldelim();
     }
+    for (const v of message.supportedVersions) {
+      VersionInfo.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.chainId !== "") {
+      writer.uint32(26).string(message.chainId);
+    }
+    if (message.nodeVersion !== "") {
+      writer.uint32(34).string(message.nodeVersion);
+    }
+    if (message.minClientVersion !== "") {
+      writer.uint32(42).string(message.minClientVersion);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Akash {
@@ -63,6 +115,18 @@ export const Akash = {
         case 1:
           message.clientInfo = ClientInfo.decode(reader, reader.uint32());
           break;
+        case 2:
+          message.supportedVersions.push(VersionInfo.decode(reader, reader.uint32()));
+          break;
+        case 3:
+          message.chainId = reader.string();
+          break;
+        case 4:
+          message.nodeVersion = reader.string();
+          break;
+        case 5:
+          message.minClientVersion = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -73,6 +137,10 @@ export const Akash = {
   fromPartial(object: DeepPartial<Akash>): Akash {
     const message = createBaseAkash();
     message.clientInfo = object.clientInfo !== undefined && object.clientInfo !== null ? ClientInfo.fromPartial(object.clientInfo) : undefined;
+    message.supportedVersions = object.supportedVersions?.map(e => VersionInfo.fromPartial(e)) || [];
+    message.chainId = object.chainId ?? "";
+    message.nodeVersion = object.nodeVersion ?? "";
+    message.minClientVersion = object.minClientVersion ?? "";
     return message;
   },
   fromAmino(object: AkashAmino): Akash {
@@ -80,11 +148,29 @@ export const Akash = {
     if (object.client_info !== undefined && object.client_info !== null) {
       message.clientInfo = ClientInfo.fromAmino(object.client_info);
     }
+    message.supportedVersions = object.supported_versions?.map(e => VersionInfo.fromAmino(e)) || [];
+    if (object.chain_id !== undefined && object.chain_id !== null) {
+      message.chainId = object.chain_id;
+    }
+    if (object.node_version !== undefined && object.node_version !== null) {
+      message.nodeVersion = object.node_version;
+    }
+    if (object.min_client_version !== undefined && object.min_client_version !== null) {
+      message.minClientVersion = object.min_client_version;
+    }
     return message;
   },
   toAmino(message: Akash): AkashAmino {
     const obj: any = {};
     obj.client_info = message.clientInfo ? ClientInfo.toAmino(message.clientInfo) : ClientInfo.toAmino(ClientInfo.fromPartial({}));
+    if (message.supportedVersions) {
+      obj.supported_versions = message.supportedVersions.map(e => e ? VersionInfo.toAmino(e) : undefined);
+    } else {
+      obj.supported_versions = message.supportedVersions;
+    }
+    obj.chain_id = message.chainId ?? "";
+    obj.node_version = message.nodeVersion ?? "";
+    obj.min_client_version = message.minClientVersion ?? "";
     return obj;
   },
   fromAminoMsg(object: AkashAminoMsg): Akash {

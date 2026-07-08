@@ -10,7 +10,7 @@ import { DeepPartial } from "../../../helpers";
  */
 export interface GenesisState {
   /**
-   * Providers contains a list of audited provided account addresses.
+   * Providers contains a list of audited providers account addresses.
    */
   providers: AuditedProvider[];
 }
@@ -26,7 +26,7 @@ export interface GenesisStateProtoMsg {
  */
 export interface GenesisStateAmino {
   /**
-   * Providers contains a list of audited provided account addresses.
+   * Providers contains a list of audited providers account addresses.
    */
   providers: AuditedProviderAmino[];
 }

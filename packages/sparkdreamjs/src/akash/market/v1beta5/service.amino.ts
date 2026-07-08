@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { MsgCreateBid, MsgCloseBid } from "./bidmsg";
-import { MsgWithdrawLease, MsgCreateLease, MsgCloseLease } from "./leasemsg";
+import { MsgWithdrawLease, MsgCreateLease, MsgCloseLease, MsgLeaseStartReclaim } from "./leasemsg";
 import { MsgUpdateParams } from "./paramsmsg";
 export const AminoConverter = {
   "/akash.market.v1beta5.MsgCreateBid": {
@@ -27,6 +27,11 @@ export const AminoConverter = {
     aminoType: "/akash.market.v1beta5.MsgCloseLease",
     toAmino: MsgCloseLease.toAmino,
     fromAmino: MsgCloseLease.fromAmino
+  },
+  "/akash.market.v1beta5.MsgLeaseStartReclaim": {
+    aminoType: "/akash.market.v1beta5.MsgLeaseStartReclaim",
+    toAmino: MsgLeaseStartReclaim.toAmino,
+    fromAmino: MsgLeaseStartReclaim.fromAmino
   },
   "/akash.market.v1beta5.MsgUpdateParams": {
     aminoType: "/akash.market.v1beta5.MsgUpdateParams",

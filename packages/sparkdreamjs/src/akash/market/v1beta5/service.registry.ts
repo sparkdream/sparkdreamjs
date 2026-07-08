@@ -2,9 +2,9 @@
 import { TelescopeGeneratedType } from "../../../types";
 import { Registry } from "@cosmjs/proto-signing";
 import { MsgCreateBid, MsgCloseBid } from "./bidmsg";
-import { MsgWithdrawLease, MsgCreateLease, MsgCloseLease } from "./leasemsg";
+import { MsgWithdrawLease, MsgCreateLease, MsgCloseLease, MsgLeaseStartReclaim } from "./leasemsg";
 import { MsgUpdateParams } from "./paramsmsg";
-export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/akash.market.v1beta5.MsgCreateBid", MsgCreateBid], ["/akash.market.v1beta5.MsgCloseBid", MsgCloseBid], ["/akash.market.v1beta5.MsgWithdrawLease", MsgWithdrawLease], ["/akash.market.v1beta5.MsgCreateLease", MsgCreateLease], ["/akash.market.v1beta5.MsgCloseLease", MsgCloseLease], ["/akash.market.v1beta5.MsgUpdateParams", MsgUpdateParams]];
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/akash.market.v1beta5.MsgCreateBid", MsgCreateBid], ["/akash.market.v1beta5.MsgCloseBid", MsgCloseBid], ["/akash.market.v1beta5.MsgWithdrawLease", MsgWithdrawLease], ["/akash.market.v1beta5.MsgCreateLease", MsgCreateLease], ["/akash.market.v1beta5.MsgCloseLease", MsgCloseLease], ["/akash.market.v1beta5.MsgLeaseStartReclaim", MsgLeaseStartReclaim], ["/akash.market.v1beta5.MsgUpdateParams", MsgUpdateParams]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -40,6 +40,12 @@ export const MessageComposer = {
       return {
         typeUrl: "/akash.market.v1beta5.MsgCloseLease",
         value: MsgCloseLease.encode(value).finish()
+      };
+    },
+    leaseStartReclaim(value: MsgLeaseStartReclaim) {
+      return {
+        typeUrl: "/akash.market.v1beta5.MsgLeaseStartReclaim",
+        value: MsgLeaseStartReclaim.encode(value).finish()
       };
     },
     updateParams(value: MsgUpdateParams) {
@@ -80,6 +86,12 @@ export const MessageComposer = {
         value
       };
     },
+    leaseStartReclaim(value: MsgLeaseStartReclaim) {
+      return {
+        typeUrl: "/akash.market.v1beta5.MsgLeaseStartReclaim",
+        value
+      };
+    },
     updateParams(value: MsgUpdateParams) {
       return {
         typeUrl: "/akash.market.v1beta5.MsgUpdateParams",
@@ -116,6 +128,12 @@ export const MessageComposer = {
       return {
         typeUrl: "/akash.market.v1beta5.MsgCloseLease",
         value: MsgCloseLease.fromPartial(value)
+      };
+    },
+    leaseStartReclaim(value: MsgLeaseStartReclaim) {
+      return {
+        typeUrl: "/akash.market.v1beta5.MsgLeaseStartReclaim",
+        value: MsgLeaseStartReclaim.fromPartial(value)
       };
     },
     updateParams(value: MsgUpdateParams) {

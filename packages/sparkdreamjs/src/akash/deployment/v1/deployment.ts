@@ -1,4 +1,5 @@
 //@ts-nocheck
+import { Duration, DurationAmino } from "../../../google/protobuf/duration";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /** State is an enum which refers to state of deployment. */
@@ -118,6 +119,11 @@ export interface Deployment {
    * CreatedAt indicates when the deployment was created as a block height value.
    */
   createdAt: bigint;
+  /**
+   * reclamation stores the deployment's reclamation requirements for persistence.
+   * Needed so that StartGroup can propagate reclamation to newly created orders.
+   */
+  reclamation?: DeploymentReclamation;
 }
 export interface DeploymentProtoMsg {
   typeUrl: "/akash.deployment.v1.Deployment";
@@ -147,10 +153,49 @@ export interface DeploymentAmino {
    * CreatedAt indicates when the deployment was created as a block height value.
    */
   created_at?: string;
+  /**
+   * reclamation stores the deployment's reclamation requirements for persistence.
+   * Needed so that StartGroup can propagate reclamation to newly created orders.
+   */
+  reclamation?: DeploymentReclamationAmino;
 }
 export interface DeploymentAminoMsg {
   type: "/akash.deployment.v1.Deployment";
   value: DeploymentAmino;
+}
+/**
+ * DeploymentReclamation defines the tenant's reclamation requirements.
+ * Stored on the Deployment and propagated to Orders.
+ * @name DeploymentReclamation
+ * @package akash.deployment.v1
+ * @see proto type: akash.deployment.v1.DeploymentReclamation
+ */
+export interface DeploymentReclamation {
+  /**
+   * min_window is the minimum reclamation window the tenant requires.
+   */
+  minWindow: Duration;
+}
+export interface DeploymentReclamationProtoMsg {
+  typeUrl: "/akash.deployment.v1.DeploymentReclamation";
+  value: Uint8Array;
+}
+/**
+ * DeploymentReclamation defines the tenant's reclamation requirements.
+ * Stored on the Deployment and propagated to Orders.
+ * @name DeploymentReclamationAmino
+ * @package akash.deployment.v1
+ * @see proto type: akash.deployment.v1.DeploymentReclamation
+ */
+export interface DeploymentReclamationAmino {
+  /**
+   * min_window is the minimum reclamation window the tenant requires.
+   */
+  min_window: DurationAmino;
+}
+export interface DeploymentReclamationAminoMsg {
+  type: "/akash.deployment.v1.DeploymentReclamation";
+  value: DeploymentReclamationAmino;
 }
 function createBaseDeploymentID(): DeploymentID {
   return {
@@ -239,7 +284,8 @@ function createBaseDeployment(): Deployment {
     id: DeploymentID.fromPartial({}),
     state: 0,
     hash: new Uint8Array(),
-    createdAt: BigInt(0)
+    createdAt: BigInt(0),
+    reclamation: undefined
   };
 }
 /**
@@ -263,6 +309,9 @@ export const Deployment = {
     if (message.createdAt !== BigInt(0)) {
       writer.uint32(32).int64(message.createdAt);
     }
+    if (message.reclamation !== undefined) {
+      DeploymentReclamation.encode(message.reclamation, writer.uint32(42).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Deployment {
@@ -284,6 +333,9 @@ export const Deployment = {
         case 4:
           message.createdAt = reader.int64();
           break;
+        case 5:
+          message.reclamation = DeploymentReclamation.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -297,6 +349,7 @@ export const Deployment = {
     message.state = object.state ?? 0;
     message.hash = object.hash ?? new Uint8Array();
     message.createdAt = object.createdAt !== undefined && object.createdAt !== null ? BigInt(object.createdAt.toString()) : BigInt(0);
+    message.reclamation = object.reclamation !== undefined && object.reclamation !== null ? DeploymentReclamation.fromPartial(object.reclamation) : undefined;
     return message;
   },
   fromAmino(object: DeploymentAmino): Deployment {
@@ -313,6 +366,9 @@ export const Deployment = {
     if (object.created_at !== undefined && object.created_at !== null) {
       message.createdAt = BigInt(object.created_at);
     }
+    if (object.reclamation !== undefined && object.reclamation !== null) {
+      message.reclamation = DeploymentReclamation.fromAmino(object.reclamation);
+    }
     return message;
   },
   toAmino(message: Deployment): DeploymentAmino {
@@ -321,6 +377,7 @@ export const Deployment = {
     obj.state = message.state ?? 0;
     obj.hash = message.hash ? base64FromBytes(message.hash) : "";
     obj.created_at = message.createdAt !== BigInt(0) ? message.createdAt?.toString() : undefined;
+    obj.reclamation = message.reclamation ? DeploymentReclamation.toAmino(message.reclamation) : undefined;
     return obj;
   },
   fromAminoMsg(object: DeploymentAminoMsg): Deployment {
@@ -336,6 +393,76 @@ export const Deployment = {
     return {
       typeUrl: "/akash.deployment.v1.Deployment",
       value: Deployment.encode(message).finish()
+    };
+  }
+};
+function createBaseDeploymentReclamation(): DeploymentReclamation {
+  return {
+    minWindow: Duration.fromPartial({})
+  };
+}
+/**
+ * DeploymentReclamation defines the tenant's reclamation requirements.
+ * Stored on the Deployment and propagated to Orders.
+ * @name DeploymentReclamation
+ * @package akash.deployment.v1
+ * @see proto type: akash.deployment.v1.DeploymentReclamation
+ */
+export const DeploymentReclamation = {
+  typeUrl: "/akash.deployment.v1.DeploymentReclamation",
+  encode(message: DeploymentReclamation, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.minWindow !== undefined) {
+      Duration.encode(message.minWindow, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): DeploymentReclamation {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeploymentReclamation();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.minWindow = Duration.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<DeploymentReclamation>): DeploymentReclamation {
+    const message = createBaseDeploymentReclamation();
+    message.minWindow = object.minWindow !== undefined && object.minWindow !== null ? Duration.fromPartial(object.minWindow) : undefined;
+    return message;
+  },
+  fromAmino(object: DeploymentReclamationAmino): DeploymentReclamation {
+    const message = createBaseDeploymentReclamation();
+    if (object.min_window !== undefined && object.min_window !== null) {
+      message.minWindow = Duration.fromAmino(object.min_window);
+    }
+    return message;
+  },
+  toAmino(message: DeploymentReclamation): DeploymentReclamationAmino {
+    const obj: any = {};
+    obj.min_window = message.minWindow ? Duration.toAmino(message.minWindow) : Duration.toAmino(Duration.fromPartial({}));
+    return obj;
+  },
+  fromAminoMsg(object: DeploymentReclamationAminoMsg): DeploymentReclamation {
+    return DeploymentReclamation.fromAmino(object.value);
+  },
+  fromProtoMsg(message: DeploymentReclamationProtoMsg): DeploymentReclamation {
+    return DeploymentReclamation.decode(message.value);
+  },
+  toProto(message: DeploymentReclamation): Uint8Array {
+    return DeploymentReclamation.encode(message).finish();
+  },
+  toProtoMsg(message: DeploymentReclamation): DeploymentReclamationProtoMsg {
+    return {
+      typeUrl: "/akash.deployment.v1.DeploymentReclamation",
+      value: DeploymentReclamation.encode(message).finish()
     };
   }
 };

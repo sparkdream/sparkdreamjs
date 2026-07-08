@@ -1,7 +1,7 @@
 //@ts-nocheck
-import { DeploymentID, DeploymentIDAmino } from "../v1/deployment";
+import { DeploymentID, DeploymentIDAmino, DeploymentReclamation, DeploymentReclamationAmino } from "../v1/deployment";
 import { GroupSpec, GroupSpecAmino } from "./groupspec";
-import { Coin, CoinAmino } from "../../../cosmos/base/v1beta1/coin";
+import { Deposit, DepositAmino } from "../../base/deposit/v1/deposit";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /**
@@ -27,16 +27,12 @@ export interface MsgCreateDeployment {
   /**
    * Deposit specifies the amount of coins to include in the deployment's first deposit.
    */
-  deposit: Coin;
+  deposit: Deposit;
   /**
-   * Depositor is the account address of the user who will deposit funds to the deployment.
-   * This value can be different than the owner of the deployment if there is authorized spend grants applied.
-   * It is a string representing a valid account address.
-   * 
-   * Example:
-   *   "akash1..."
+   * reclamation specifies the deployment-level reclamation requirements.
+   * Nil means the tenant does not require reclamation.
    */
-  depositor: string;
+  reclamation?: DeploymentReclamation;
 }
 export interface MsgCreateDeploymentProtoMsg {
   typeUrl: "/akash.deployment.v1beta4.MsgCreateDeployment";
@@ -65,16 +61,12 @@ export interface MsgCreateDeploymentAmino {
   /**
    * Deposit specifies the amount of coins to include in the deployment's first deposit.
    */
-  deposit?: CoinAmino;
+  deposit: DepositAmino;
   /**
-   * Depositor is the account address of the user who will deposit funds to the deployment.
-   * This value can be different than the owner of the deployment if there is authorized spend grants applied.
-   * It is a string representing a valid account address.
-   * 
-   * Example:
-   *   "akash1..."
+   * reclamation specifies the deployment-level reclamation requirements.
+   * Nil means the tenant does not require reclamation.
    */
-  depositor: string;
+  reclamation?: DeploymentReclamationAmino;
 }
 export interface MsgCreateDeploymentAminoMsg {
   type: "/akash.deployment.v1beta4.MsgCreateDeployment";
@@ -223,8 +215,8 @@ function createBaseMsgCreateDeployment(): MsgCreateDeployment {
     id: DeploymentID.fromPartial({}),
     groups: [],
     hash: new Uint8Array(),
-    deposit: Coin.fromPartial({}),
-    depositor: ""
+    deposit: Deposit.fromPartial({}),
+    reclamation: undefined
   };
 }
 /**
@@ -246,10 +238,10 @@ export const MsgCreateDeployment = {
       writer.uint32(26).bytes(message.hash);
     }
     if (message.deposit !== undefined) {
-      Coin.encode(message.deposit, writer.uint32(34).fork()).ldelim();
+      Deposit.encode(message.deposit, writer.uint32(34).fork()).ldelim();
     }
-    if (message.depositor !== "") {
-      writer.uint32(42).string(message.depositor);
+    if (message.reclamation !== undefined) {
+      DeploymentReclamation.encode(message.reclamation, writer.uint32(42).fork()).ldelim();
     }
     return writer;
   },
@@ -270,10 +262,10 @@ export const MsgCreateDeployment = {
           message.hash = reader.bytes();
           break;
         case 4:
-          message.deposit = Coin.decode(reader, reader.uint32());
+          message.deposit = Deposit.decode(reader, reader.uint32());
           break;
         case 5:
-          message.depositor = reader.string();
+          message.reclamation = DeploymentReclamation.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -287,8 +279,8 @@ export const MsgCreateDeployment = {
     message.id = object.id !== undefined && object.id !== null ? DeploymentID.fromPartial(object.id) : undefined;
     message.groups = object.groups?.map(e => GroupSpec.fromPartial(e)) || [];
     message.hash = object.hash ?? new Uint8Array();
-    message.deposit = object.deposit !== undefined && object.deposit !== null ? Coin.fromPartial(object.deposit) : undefined;
-    message.depositor = object.depositor ?? "";
+    message.deposit = object.deposit !== undefined && object.deposit !== null ? Deposit.fromPartial(object.deposit) : undefined;
+    message.reclamation = object.reclamation !== undefined && object.reclamation !== null ? DeploymentReclamation.fromPartial(object.reclamation) : undefined;
     return message;
   },
   fromAmino(object: MsgCreateDeploymentAmino): MsgCreateDeployment {
@@ -301,10 +293,10 @@ export const MsgCreateDeployment = {
       message.hash = bytesFromBase64(object.hash);
     }
     if (object.deposit !== undefined && object.deposit !== null) {
-      message.deposit = Coin.fromAmino(object.deposit);
+      message.deposit = Deposit.fromAmino(object.deposit);
     }
-    if (object.depositor !== undefined && object.depositor !== null) {
-      message.depositor = object.depositor;
+    if (object.reclamation !== undefined && object.reclamation !== null) {
+      message.reclamation = DeploymentReclamation.fromAmino(object.reclamation);
     }
     return message;
   },
@@ -317,8 +309,8 @@ export const MsgCreateDeployment = {
       obj.groups = message.groups;
     }
     obj.hash = message.hash ? base64FromBytes(message.hash) : "";
-    obj.deposit = message.deposit ? Coin.toAmino(message.deposit) : undefined;
-    obj.depositor = message.depositor ?? "";
+    obj.deposit = message.deposit ? Deposit.toAmino(message.deposit) : Deposit.toAmino(Deposit.fromPartial({}));
+    obj.reclamation = message.reclamation ? DeploymentReclamation.toAmino(message.reclamation) : undefined;
     return obj;
   },
   fromAminoMsg(object: MsgCreateDeploymentAminoMsg): MsgCreateDeployment {

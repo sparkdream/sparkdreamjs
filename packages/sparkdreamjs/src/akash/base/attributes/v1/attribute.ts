@@ -55,7 +55,7 @@ export interface SignedBy {
    */
   allOf: string[];
   /**
-   * AnyOf means that at least of of the keys from the list must have signed attributes.
+   * AnyOf means that at least one of the keys from the list must have signed attributes.
    */
   anyOf: string[];
 }
@@ -77,7 +77,7 @@ export interface SignedByAmino {
    */
   all_of: string[];
   /**
-   * AnyOf means that at least of of the keys from the list must have signed attributes.
+   * AnyOf means that at least one of the keys from the list must have signed attributes.
    */
   any_of: string[];
 }

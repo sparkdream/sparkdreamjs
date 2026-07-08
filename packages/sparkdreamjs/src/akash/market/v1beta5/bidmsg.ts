@@ -1,8 +1,10 @@
 //@ts-nocheck
-import { OrderID, OrderIDAmino } from "../v1/order";
-import { DecCoin, DecCoinAmino, Coin, CoinAmino } from "../../../cosmos/base/v1beta1/coin";
-import { ResourceOffer, ResourceOfferAmino } from "./resourcesoffer";
 import { BidID, BidIDAmino } from "../v1/bid";
+import { DecCoin, DecCoinAmino } from "../../../cosmos/base/v1beta1/coin";
+import { Deposit, DepositAmino } from "../../base/deposit/v1/deposit";
+import { ResourceOffer, ResourceOfferAmino } from "./resourcesoffer";
+import { Duration, DurationAmino } from "../../../google/protobuf/duration";
+import { LeaseClosedReason } from "../v1/types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -12,18 +14,7 @@ import { DeepPartial } from "../../../helpers";
  * @see proto type: akash.market.v1beta5.MsgCreateBid
  */
 export interface MsgCreateBid {
-  /**
-   * OrderId is the unique identifier for the order.
-   */
-  orderId: OrderID;
-  /**
-   * Provider is the account bech32 address of the provider making the bid.
-   * It is a string representing a valid account bech32 address.
-   * 
-   * Example:
-   *   "akash1..."
-   */
-  provider: string;
+  id: BidID;
   /**
    * Price holds the pricing stated on the Bid.
    */
@@ -31,11 +22,17 @@ export interface MsgCreateBid {
   /**
    * Deposit holds the amount of coins to deposit.
    */
-  deposit: Coin;
+  deposit: Deposit;
   /**
    * ResourceOffer is a list of resource offers.
    */
   resourcesOffer: ResourceOffer[];
+  /**
+   * reclamation_window is the reclamation window duration the provider offers.
+   * If the order requires reclamation, this must be >= the order's min_window.
+   * Nil means the provider does not offer reclamation on this bid.
+   */
+  reclamationWindow?: Duration;
 }
 export interface MsgCreateBidProtoMsg {
   typeUrl: "/akash.market.v1beta5.MsgCreateBid";
@@ -48,18 +45,7 @@ export interface MsgCreateBidProtoMsg {
  * @see proto type: akash.market.v1beta5.MsgCreateBid
  */
 export interface MsgCreateBidAmino {
-  /**
-   * OrderId is the unique identifier for the order.
-   */
-  order_id: OrderIDAmino;
-  /**
-   * Provider is the account bech32 address of the provider making the bid.
-   * It is a string representing a valid account bech32 address.
-   * 
-   * Example:
-   *   "akash1..."
-   */
-  provider: string;
+  id: BidIDAmino;
   /**
    * Price holds the pricing stated on the Bid.
    */
@@ -67,11 +53,17 @@ export interface MsgCreateBidAmino {
   /**
    * Deposit holds the amount of coins to deposit.
    */
-  deposit: CoinAmino;
+  deposit: DepositAmino;
   /**
    * ResourceOffer is a list of resource offers.
    */
   resources_offer: ResourceOfferAmino[];
+  /**
+   * reclamation_window is the reclamation window duration the provider offers.
+   * If the order requires reclamation, this must be >= the order's min_window.
+   * Nil means the provider does not offer reclamation on this bid.
+   */
+  reclamation_window?: DurationAmino;
 }
 export interface MsgCreateBidAminoMsg {
   type: "/akash.market.v1beta5.MsgCreateBid";
@@ -110,6 +102,7 @@ export interface MsgCloseBid {
    * Id is the unique identifier of the Bid.
    */
   id: BidID;
+  reason: LeaseClosedReason;
 }
 export interface MsgCloseBidProtoMsg {
   typeUrl: "/akash.market.v1beta5.MsgCloseBid";
@@ -126,6 +119,7 @@ export interface MsgCloseBidAmino {
    * Id is the unique identifier of the Bid.
    */
   id: BidIDAmino;
+  reason: LeaseClosedReason;
 }
 export interface MsgCloseBidAminoMsg {
   type: "/akash.market.v1beta5.MsgCloseBid";
@@ -155,11 +149,11 @@ export interface MsgCloseBidResponseAminoMsg {
 }
 function createBaseMsgCreateBid(): MsgCreateBid {
   return {
-    orderId: OrderID.fromPartial({}),
-    provider: "",
+    id: BidID.fromPartial({}),
     price: DecCoin.fromPartial({}),
-    deposit: Coin.fromPartial({}),
-    resourcesOffer: []
+    deposit: Deposit.fromPartial({}),
+    resourcesOffer: [],
+    reclamationWindow: undefined
   };
 }
 /**
@@ -171,20 +165,20 @@ function createBaseMsgCreateBid(): MsgCreateBid {
 export const MsgCreateBid = {
   typeUrl: "/akash.market.v1beta5.MsgCreateBid",
   encode(message: MsgCreateBid, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.orderId !== undefined) {
-      OrderID.encode(message.orderId, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.provider !== "") {
-      writer.uint32(18).string(message.provider);
+    if (message.id !== undefined) {
+      BidID.encode(message.id, writer.uint32(10).fork()).ldelim();
     }
     if (message.price !== undefined) {
-      DecCoin.encode(message.price, writer.uint32(26).fork()).ldelim();
+      DecCoin.encode(message.price, writer.uint32(18).fork()).ldelim();
     }
     if (message.deposit !== undefined) {
-      Coin.encode(message.deposit, writer.uint32(34).fork()).ldelim();
+      Deposit.encode(message.deposit, writer.uint32(26).fork()).ldelim();
     }
     for (const v of message.resourcesOffer) {
-      ResourceOffer.encode(v!, writer.uint32(42).fork()).ldelim();
+      ResourceOffer.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.reclamationWindow !== undefined) {
+      Duration.encode(message.reclamationWindow, writer.uint32(42).fork()).ldelim();
     }
     return writer;
   },
@@ -196,19 +190,19 @@ export const MsgCreateBid = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.orderId = OrderID.decode(reader, reader.uint32());
+          message.id = BidID.decode(reader, reader.uint32());
           break;
         case 2:
-          message.provider = reader.string();
-          break;
-        case 3:
           message.price = DecCoin.decode(reader, reader.uint32());
           break;
+        case 3:
+          message.deposit = Deposit.decode(reader, reader.uint32());
+          break;
         case 4:
-          message.deposit = Coin.decode(reader, reader.uint32());
+          message.resourcesOffer.push(ResourceOffer.decode(reader, reader.uint32()));
           break;
         case 5:
-          message.resourcesOffer.push(ResourceOffer.decode(reader, reader.uint32()));
+          message.reclamationWindow = Duration.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -219,41 +213,41 @@ export const MsgCreateBid = {
   },
   fromPartial(object: DeepPartial<MsgCreateBid>): MsgCreateBid {
     const message = createBaseMsgCreateBid();
-    message.orderId = object.orderId !== undefined && object.orderId !== null ? OrderID.fromPartial(object.orderId) : undefined;
-    message.provider = object.provider ?? "";
+    message.id = object.id !== undefined && object.id !== null ? BidID.fromPartial(object.id) : undefined;
     message.price = object.price !== undefined && object.price !== null ? DecCoin.fromPartial(object.price) : undefined;
-    message.deposit = object.deposit !== undefined && object.deposit !== null ? Coin.fromPartial(object.deposit) : undefined;
+    message.deposit = object.deposit !== undefined && object.deposit !== null ? Deposit.fromPartial(object.deposit) : undefined;
     message.resourcesOffer = object.resourcesOffer?.map(e => ResourceOffer.fromPartial(e)) || [];
+    message.reclamationWindow = object.reclamationWindow !== undefined && object.reclamationWindow !== null ? Duration.fromPartial(object.reclamationWindow) : undefined;
     return message;
   },
   fromAmino(object: MsgCreateBidAmino): MsgCreateBid {
     const message = createBaseMsgCreateBid();
-    if (object.order_id !== undefined && object.order_id !== null) {
-      message.orderId = OrderID.fromAmino(object.order_id);
-    }
-    if (object.provider !== undefined && object.provider !== null) {
-      message.provider = object.provider;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BidID.fromAmino(object.id);
     }
     if (object.price !== undefined && object.price !== null) {
       message.price = DecCoin.fromAmino(object.price);
     }
     if (object.deposit !== undefined && object.deposit !== null) {
-      message.deposit = Coin.fromAmino(object.deposit);
+      message.deposit = Deposit.fromAmino(object.deposit);
     }
     message.resourcesOffer = object.resources_offer?.map(e => ResourceOffer.fromAmino(e)) || [];
+    if (object.reclamation_window !== undefined && object.reclamation_window !== null) {
+      message.reclamationWindow = Duration.fromAmino(object.reclamation_window);
+    }
     return message;
   },
   toAmino(message: MsgCreateBid): MsgCreateBidAmino {
     const obj: any = {};
-    obj.order_id = message.orderId ? OrderID.toAmino(message.orderId) : OrderID.toAmino(OrderID.fromPartial({}));
-    obj.provider = message.provider ?? "";
+    obj.id = message.id ? BidID.toAmino(message.id) : BidID.toAmino(BidID.fromPartial({}));
     obj.price = message.price ? DecCoin.toAmino(message.price) : DecCoin.toAmino(DecCoin.fromPartial({}));
-    obj.deposit = message.deposit ? Coin.toAmino(message.deposit) : Coin.toAmino(Coin.fromPartial({}));
+    obj.deposit = message.deposit ? Deposit.toAmino(message.deposit) : Deposit.toAmino(Deposit.fromPartial({}));
     if (message.resourcesOffer) {
       obj.resources_offer = message.resourcesOffer.map(e => e ? ResourceOffer.toAmino(e) : undefined);
     } else {
       obj.resources_offer = message.resourcesOffer;
     }
+    obj.reclamation_window = message.reclamationWindow ? Duration.toAmino(message.reclamationWindow) : undefined;
     return obj;
   },
   fromAminoMsg(object: MsgCreateBidAminoMsg): MsgCreateBid {
@@ -330,7 +324,8 @@ export const MsgCreateBidResponse = {
 };
 function createBaseMsgCloseBid(): MsgCloseBid {
   return {
-    id: BidID.fromPartial({})
+    id: BidID.fromPartial({}),
+    reason: 0
   };
 }
 /**
@@ -345,6 +340,9 @@ export const MsgCloseBid = {
     if (message.id !== undefined) {
       BidID.encode(message.id, writer.uint32(10).fork()).ldelim();
     }
+    if (message.reason !== 0) {
+      writer.uint32(16).int32(message.reason);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgCloseBid {
@@ -357,6 +355,9 @@ export const MsgCloseBid = {
         case 1:
           message.id = BidID.decode(reader, reader.uint32());
           break;
+        case 2:
+          message.reason = reader.int32() as any;
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -367,6 +368,7 @@ export const MsgCloseBid = {
   fromPartial(object: DeepPartial<MsgCloseBid>): MsgCloseBid {
     const message = createBaseMsgCloseBid();
     message.id = object.id !== undefined && object.id !== null ? BidID.fromPartial(object.id) : undefined;
+    message.reason = object.reason ?? 0;
     return message;
   },
   fromAmino(object: MsgCloseBidAmino): MsgCloseBid {
@@ -374,11 +376,15 @@ export const MsgCloseBid = {
     if (object.id !== undefined && object.id !== null) {
       message.id = BidID.fromAmino(object.id);
     }
+    if (object.reason !== undefined && object.reason !== null) {
+      message.reason = object.reason;
+    }
     return message;
   },
   toAmino(message: MsgCloseBid): MsgCloseBidAmino {
     const obj: any = {};
     obj.id = message.id ? BidID.toAmino(message.id) : BidID.toAmino(BidID.fromPartial({}));
+    obj.reason = message.reason ?? 0;
     return obj;
   },
   fromAminoMsg(object: MsgCloseBidAminoMsg): MsgCloseBid {

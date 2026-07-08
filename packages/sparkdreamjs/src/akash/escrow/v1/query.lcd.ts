@@ -18,22 +18,16 @@ export class LCDQueryClient {
     const options: any = {
       params: {}
     };
-    if (typeof params?.scope !== "undefined") {
-      options.params.scope = params.scope;
+    if (typeof params?.state !== "undefined") {
+      options.params.state = params.state;
     }
     if (typeof params?.xid !== "undefined") {
       options.params.xid = params.xid;
     }
-    if (typeof params?.owner !== "undefined") {
-      options.params.owner = params.owner;
-    }
-    if (typeof params?.state !== "undefined") {
-      options.params.state = params.state;
-    }
     if (typeof params?.pagination !== "undefined") {
       setPaginationParams(options, params.pagination);
     }
-    const endpoint = `akash/escrow/v1/types/accounts/list`;
+    const endpoint = `akash/escrow/v1/types/accounts`;
     return await this.req.get<QueryAccountsResponse>(endpoint, options);
   };
   /* buf:lint:ignore RPC_REQUEST_RESPONSE_UNIQUE
@@ -43,25 +37,16 @@ export class LCDQueryClient {
     const options: any = {
       params: {}
     };
-    if (typeof params?.scope !== "undefined") {
-      options.params.scope = params.scope;
+    if (typeof params?.state !== "undefined") {
+      options.params.state = params.state;
     }
     if (typeof params?.xid !== "undefined") {
       options.params.xid = params.xid;
     }
-    if (typeof params?.id !== "undefined") {
-      options.params.id = params.id;
-    }
-    if (typeof params?.owner !== "undefined") {
-      options.params.owner = params.owner;
-    }
-    if (typeof params?.state !== "undefined") {
-      options.params.state = params.state;
-    }
     if (typeof params?.pagination !== "undefined") {
       setPaginationParams(options, params.pagination);
     }
-    const endpoint = `akash/escrow/v1/types/payments/list`;
+    const endpoint = `akash/escrow/v1/types/payments`;
     return await this.req.get<QueryPaymentsResponse>(endpoint, options);
   };
 }

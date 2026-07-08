@@ -11,7 +11,7 @@ import { DeepPartial } from "../../../helpers";
  */
 export interface QueryProvidersRequest {
   /**
-   * Pagination is used to paginate request.
+   * Pagination is used to paginate the request.
    */
   pagination?: PageRequest;
 }
@@ -27,7 +27,7 @@ export interface QueryProvidersRequestProtoMsg {
  */
 export interface QueryProvidersRequestAmino {
   /**
-   * Pagination is used to paginate request.
+   * Pagination is used to paginate the request.
    */
   pagination?: PageRequestAmino;
 }

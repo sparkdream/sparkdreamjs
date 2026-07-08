@@ -2,24 +2,21 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { MsgCreateDeployment, MsgCreateDeploymentResponse, MsgUpdateDeployment, MsgUpdateDeploymentResponse, MsgCloseDeployment, MsgCloseDeploymentResponse } from "./deploymentmsg";
-import { MsgDepositDeployment, MsgDepositDeploymentResponse } from "../v1/msg";
 import { MsgCloseGroup, MsgCloseGroupResponse, MsgPauseGroup, MsgPauseGroupResponse, MsgStartGroup, MsgStartGroupResponse } from "./groupmsg";
 import { MsgUpdateParams, MsgUpdateParamsResponse } from "./paramsmsg";
 /** Msg defines the x/deployment Msg service. */
 export interface Msg {
   /** CreateDeployment defines a method to create new deployment given proper inputs. */
   createDeployment(request: MsgCreateDeployment): Promise<MsgCreateDeploymentResponse>;
-  /** DepositDeployment deposits more funds into the deployment account. */
-  depositDeployment(request: MsgDepositDeployment): Promise<MsgDepositDeploymentResponse>;
   /** UpdateDeployment defines a method to update a deployment given proper inputs. */
   updateDeployment(request: MsgUpdateDeployment): Promise<MsgUpdateDeploymentResponse>;
   /** CloseDeployment defines a method to close a deployment given proper inputs. */
   closeDeployment(request: MsgCloseDeployment): Promise<MsgCloseDeploymentResponse>;
   /** CloseGroup defines a method to close a group of a deployment given proper inputs. */
   closeGroup(request: MsgCloseGroup): Promise<MsgCloseGroupResponse>;
-  /** PauseGroup defines a method to close a group of a deployment given proper inputs. */
+  /** PauseGroup defines a method to pause a group of a deployment given proper inputs. */
   pauseGroup(request: MsgPauseGroup): Promise<MsgPauseGroupResponse>;
-  /** StartGroup defines a method to close a group of a deployment given proper inputs. */
+  /** StartGroup defines a method to start a group of a deployment given proper inputs. */
   startGroup(request: MsgStartGroup): Promise<MsgStartGroupResponse>;
   /**
    * UpdateParams defines a governance operation for updating the x/deployment module
@@ -40,12 +37,6 @@ export class MsgClientImpl implements Msg {
     const promise = this.rpc.request("akash.deployment.v1beta4.Msg", "CreateDeployment", data);
     return promise.then(data => MsgCreateDeploymentResponse.decode(new BinaryReader(data)));
   };
-  /* DepositDeployment deposits more funds into the deployment account. */
-  depositDeployment = async (request: MsgDepositDeployment): Promise<MsgDepositDeploymentResponse> => {
-    const data = MsgDepositDeployment.encode(request).finish();
-    const promise = this.rpc.request("akash.deployment.v1beta4.Msg", "DepositDeployment", data);
-    return promise.then(data => MsgDepositDeploymentResponse.decode(new BinaryReader(data)));
-  };
   /* UpdateDeployment defines a method to update a deployment given proper inputs. */
   updateDeployment = async (request: MsgUpdateDeployment): Promise<MsgUpdateDeploymentResponse> => {
     const data = MsgUpdateDeployment.encode(request).finish();
@@ -64,13 +55,13 @@ export class MsgClientImpl implements Msg {
     const promise = this.rpc.request("akash.deployment.v1beta4.Msg", "CloseGroup", data);
     return promise.then(data => MsgCloseGroupResponse.decode(new BinaryReader(data)));
   };
-  /* PauseGroup defines a method to close a group of a deployment given proper inputs. */
+  /* PauseGroup defines a method to pause a group of a deployment given proper inputs. */
   pauseGroup = async (request: MsgPauseGroup): Promise<MsgPauseGroupResponse> => {
     const data = MsgPauseGroup.encode(request).finish();
     const promise = this.rpc.request("akash.deployment.v1beta4.Msg", "PauseGroup", data);
     return promise.then(data => MsgPauseGroupResponse.decode(new BinaryReader(data)));
   };
-  /* StartGroup defines a method to close a group of a deployment given proper inputs. */
+  /* StartGroup defines a method to start a group of a deployment given proper inputs. */
   startGroup = async (request: MsgStartGroup): Promise<MsgStartGroupResponse> => {
     const data = MsgStartGroup.encode(request).finish();
     const promise = this.rpc.request("akash.deployment.v1beta4.Msg", "StartGroup", data);

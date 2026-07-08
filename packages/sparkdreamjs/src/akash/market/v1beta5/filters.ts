@@ -43,6 +43,10 @@ export interface BidFilters {
    * State represents the state of the lease.
    */
   state: string;
+  /**
+   * BSeq (bid sequence) distinguishes multiple bids associated with a single deployment from same provider.
+   */
+  bseq: number;
 }
 export interface BidFiltersProtoMsg {
   typeUrl: "/akash.market.v1beta5.BidFilters";
@@ -90,6 +94,10 @@ export interface BidFiltersAmino {
    * State represents the state of the lease.
    */
   state: string;
+  /**
+   * BSeq (bid sequence) distinguishes multiple bids associated with a single deployment from same provider.
+   */
+  bseq: number;
 }
 export interface BidFiltersAminoMsg {
   type: "/akash.market.v1beta5.BidFilters";
@@ -180,7 +188,8 @@ function createBaseBidFilters(): BidFilters {
     gseq: 0,
     oseq: 0,
     provider: "",
-    state: ""
+    state: "",
+    bseq: 0
   };
 }
 /**
@@ -210,6 +219,9 @@ export const BidFilters = {
     if (message.state !== "") {
       writer.uint32(50).string(message.state);
     }
+    if (message.bseq !== 0) {
+      writer.uint32(56).uint32(message.bseq);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): BidFilters {
@@ -237,6 +249,9 @@ export const BidFilters = {
         case 6:
           message.state = reader.string();
           break;
+        case 7:
+          message.bseq = reader.uint32();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -252,6 +267,7 @@ export const BidFilters = {
     message.oseq = object.oseq ?? 0;
     message.provider = object.provider ?? "";
     message.state = object.state ?? "";
+    message.bseq = object.bseq ?? 0;
     return message;
   },
   fromAmino(object: BidFiltersAmino): BidFilters {
@@ -274,6 +290,9 @@ export const BidFilters = {
     if (object.state !== undefined && object.state !== null) {
       message.state = object.state;
     }
+    if (object.bseq !== undefined && object.bseq !== null) {
+      message.bseq = object.bseq;
+    }
     return message;
   },
   toAmino(message: BidFilters): BidFiltersAmino {
@@ -284,6 +303,7 @@ export const BidFilters = {
     obj.oseq = message.oseq ?? 0;
     obj.provider = message.provider ?? "";
     obj.state = message.state ?? "";
+    obj.bseq = message.bseq ?? 0;
     return obj;
   },
   fromAminoMsg(object: BidFiltersAminoMsg): BidFilters {

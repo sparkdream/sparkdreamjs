@@ -10,7 +10,7 @@ export class LCDQueryClient {
   }) {
     this.req = requestClient;
   }
-  /* Params returns the total set of minting parameters. */
+  /* Params returns the total set of take parameters. */
   params = async (_params: QueryParamsRequest = {}): Promise<QueryParamsResponse> => {
     const endpoint = `akash/take/v1/params`;
     return await this.req.get<QueryParamsResponse>(endpoint);

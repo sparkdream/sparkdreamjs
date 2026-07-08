@@ -40,6 +40,10 @@ export interface BidID {
    *   "akash1..."
    */
   provider: string;
+  /**
+   * BSeq (bid sequence) distinguishes multiple bids associated with a single deployment from same provider.
+   */
+  bseq: number;
 }
 export interface BidIDProtoMsg {
   typeUrl: "/akash.market.v1.BidID";
@@ -84,6 +88,10 @@ export interface BidIDAmino {
    *   "akash1..."
    */
   provider: string;
+  /**
+   * BSeq (bid sequence) distinguishes multiple bids associated with a single deployment from same provider.
+   */
+  bseq: number;
 }
 export interface BidIDAminoMsg {
   type: "/akash.market.v1.BidID";
@@ -95,7 +103,8 @@ function createBaseBidID(): BidID {
     dseq: BigInt(0),
     gseq: 0,
     oseq: 0,
-    provider: ""
+    provider: "",
+    bseq: 0
   };
 }
 /**
@@ -123,6 +132,9 @@ export const BidID = {
     if (message.provider !== "") {
       writer.uint32(42).string(message.provider);
     }
+    if (message.bseq !== 0) {
+      writer.uint32(48).uint32(message.bseq);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): BidID {
@@ -147,6 +159,9 @@ export const BidID = {
         case 5:
           message.provider = reader.string();
           break;
+        case 6:
+          message.bseq = reader.uint32();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -161,6 +176,7 @@ export const BidID = {
     message.gseq = object.gseq ?? 0;
     message.oseq = object.oseq ?? 0;
     message.provider = object.provider ?? "";
+    message.bseq = object.bseq ?? 0;
     return message;
   },
   fromAmino(object: BidIDAmino): BidID {
@@ -180,6 +196,9 @@ export const BidID = {
     if (object.provider !== undefined && object.provider !== null) {
       message.provider = object.provider;
     }
+    if (object.bseq !== undefined && object.bseq !== null) {
+      message.bseq = object.bseq;
+    }
     return message;
   },
   toAmino(message: BidID): BidIDAmino {
@@ -189,6 +208,7 @@ export const BidID = {
     obj.gseq = message.gseq ?? 0;
     obj.oseq = message.oseq ?? 0;
     obj.provider = message.provider ?? "";
+    obj.bseq = message.bseq ?? 0;
     return obj;
   },
   fromAminoMsg(object: BidIDAminoMsg): BidID {

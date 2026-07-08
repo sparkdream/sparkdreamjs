@@ -47,7 +47,7 @@ export class LCDQueryClient {
     const endpoint = `akash/deployment/v1beta4/groups/info`;
     return await this.req.get<QueryGroupResponse>(endpoint, options);
   };
-  /* Params returns the total set of minting parameters. */
+  /* Params returns the total set of deployment parameters. */
   params = async (_params: QueryParamsRequest = {}): Promise<QueryParamsResponse> => {
     const endpoint = `akash/deployment/v1beta4/params`;
     return await this.req.get<QueryParamsResponse>(endpoint);

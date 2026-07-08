@@ -1,6 +1,7 @@
 //@ts-nocheck
 import { OrderID, OrderIDAmino } from "../v1/order";
 import { GroupSpec, GroupSpecAmino } from "../../deployment/v1beta4/groupspec";
+import { DeploymentReclamation, DeploymentReclamationAmino } from "../../deployment/v1/deployment";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /** State is an enum which refers to state of order. */
@@ -65,6 +66,11 @@ export interface Order {
   state: Order_State;
   spec: GroupSpec;
   createdAt: bigint;
+  /**
+   * reclamation is the deployment-level reclamation requirement, propagated to the order.
+   * Nil means the deployment does not require reclamation.
+   */
+  reclamation?: DeploymentReclamation;
 }
 export interface OrderProtoMsg {
   typeUrl: "/akash.market.v1beta5.Order";
@@ -84,6 +90,11 @@ export interface OrderAmino {
   state: Order_State;
   spec: GroupSpecAmino;
   created_at?: string;
+  /**
+   * reclamation is the deployment-level reclamation requirement, propagated to the order.
+   * Nil means the deployment does not require reclamation.
+   */
+  reclamation?: DeploymentReclamationAmino;
 }
 export interface OrderAminoMsg {
   type: "/akash.market.v1beta5.Order";
@@ -94,7 +105,8 @@ function createBaseOrder(): Order {
     id: OrderID.fromPartial({}),
     state: 0,
     spec: GroupSpec.fromPartial({}),
-    createdAt: BigInt(0)
+    createdAt: BigInt(0),
+    reclamation: undefined
   };
 }
 /**
@@ -118,6 +130,9 @@ export const Order = {
     if (message.createdAt !== BigInt(0)) {
       writer.uint32(32).int64(message.createdAt);
     }
+    if (message.reclamation !== undefined) {
+      DeploymentReclamation.encode(message.reclamation, writer.uint32(42).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Order {
@@ -139,6 +154,9 @@ export const Order = {
         case 4:
           message.createdAt = reader.int64();
           break;
+        case 5:
+          message.reclamation = DeploymentReclamation.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -152,6 +170,7 @@ export const Order = {
     message.state = object.state ?? 0;
     message.spec = object.spec !== undefined && object.spec !== null ? GroupSpec.fromPartial(object.spec) : undefined;
     message.createdAt = object.createdAt !== undefined && object.createdAt !== null ? BigInt(object.createdAt.toString()) : BigInt(0);
+    message.reclamation = object.reclamation !== undefined && object.reclamation !== null ? DeploymentReclamation.fromPartial(object.reclamation) : undefined;
     return message;
   },
   fromAmino(object: OrderAmino): Order {
@@ -168,6 +187,9 @@ export const Order = {
     if (object.created_at !== undefined && object.created_at !== null) {
       message.createdAt = BigInt(object.created_at);
     }
+    if (object.reclamation !== undefined && object.reclamation !== null) {
+      message.reclamation = DeploymentReclamation.fromAmino(object.reclamation);
+    }
     return message;
   },
   toAmino(message: Order): OrderAmino {
@@ -176,6 +198,7 @@ export const Order = {
     obj.state = message.state ?? 0;
     obj.spec = message.spec ? GroupSpec.toAmino(message.spec) : GroupSpec.toAmino(GroupSpec.fromPartial({}));
     obj.created_at = message.createdAt !== BigInt(0) ? message.createdAt?.toString() : undefined;
+    obj.reclamation = message.reclamation ? DeploymentReclamation.toAmino(message.reclamation) : undefined;
     return obj;
   },
   fromAminoMsg(object: OrderAminoMsg): Order {

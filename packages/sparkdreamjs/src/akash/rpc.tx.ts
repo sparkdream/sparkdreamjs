@@ -7,30 +7,37 @@ export const createRPCMsgClient = async ({
 }) => ({
   akash: {
     audit: {
-      v1: new (await import("./audit/v1/service.rpc.msg")).MsgClientImpl(rpc),
-      v1beta3: new (await import("./audit/v1beta3/audit.rpc.msg")).MsgClientImpl(rpc)
+      v1: new (await import("./audit/v1/service.rpc.msg")).MsgClientImpl(rpc)
     },
     bme: {
       v1: new (await import("./bme/v1/service.rpc.msg")).MsgClientImpl(rpc)
     },
     cert: {
-      v1: new (await import("./cert/v1/service.rpc.msg")).MsgClientImpl(rpc),
-      v1beta3: new (await import("./cert/v1beta3/cert.rpc.msg")).MsgClientImpl(rpc)
+      v1: new (await import("./cert/v1/service.rpc.msg")).MsgClientImpl(rpc)
     },
     deployment: {
-      v1beta3: new (await import("./deployment/v1beta3/service.rpc.msg")).MsgClientImpl(rpc),
-      v1beta4: new (await import("./deployment/v1beta4/service.rpc.msg")).MsgClientImpl(rpc)
+      v1beta4: new (await import("./deployment/v1beta4/service.rpc.msg")).MsgClientImpl(rpc),
+      v1beta5: new (await import("./deployment/v1beta5/service.rpc.msg")).MsgClientImpl(rpc)
+    },
+    escrow: {
+      v1: new (await import("./escrow/v1/service.rpc.msg")).MsgClientImpl(rpc)
     },
     market: {
-      v1beta4: new (await import("./market/v1beta4/service.rpc.msg")).MsgClientImpl(rpc),
-      v1beta5: new (await import("./market/v1beta5/service.rpc.msg")).MsgClientImpl(rpc)
+      v1beta5: new (await import("./market/v1beta5/service.rpc.msg")).MsgClientImpl(rpc),
+      v2beta1: new (await import("./market/v2beta1/service.rpc.msg")).MsgClientImpl(rpc)
+    },
+    oracle: {
+      v1: new (await import("./oracle/v1/service.rpc.msg")).MsgClientImpl(rpc),
+      v2: new (await import("./oracle/v2/service.rpc.msg")).MsgClientImpl(rpc)
     },
     provider: {
-      v1beta3: new (await import("./provider/v1beta3/provider.rpc.msg")).MsgClientImpl(rpc),
       v1beta4: new (await import("./provider/v1beta4/service.rpc.msg")).MsgClientImpl(rpc)
     },
     take: {
       v1: new (await import("./take/v1/service.rpc.msg")).MsgClientImpl(rpc)
+    },
+    wasm: {
+      v1: new (await import("./wasm/v1/service.rpc.msg")).MsgClientImpl(rpc)
     }
   },
   cosmos: {

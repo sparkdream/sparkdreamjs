@@ -11,7 +11,7 @@ export interface Query {
   deployment(request: QueryDeploymentRequest): Promise<QueryDeploymentResponse>;
   /** Group queries group details. */
   group(request: QueryGroupRequest): Promise<QueryGroupResponse>;
-  /** Params returns the total set of minting parameters. */
+  /** Params returns the total set of deployment parameters. */
   params(request?: QueryParamsRequest): Promise<QueryParamsResponse>;
 }
 export class QueryClientImpl implements Query {
@@ -37,7 +37,7 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("akash.deployment.v1beta4.Query", "Group", data);
     return promise.then(data => QueryGroupResponse.decode(new BinaryReader(data)));
   };
-  /* Params returns the total set of minting parameters. */
+  /* Params returns the total set of deployment parameters. */
   params = async (request: QueryParamsRequest = {}): Promise<QueryParamsResponse> => {
     const data = QueryParamsRequest.encode(request).finish();
     const promise = this.rpc.request("akash.deployment.v1beta4.Query", "Params", data);

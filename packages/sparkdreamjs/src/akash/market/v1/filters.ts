@@ -43,6 +43,10 @@ export interface LeaseFilters {
    * State represents the state of the lease.
    */
   state: string;
+  /**
+   * BSeq (bid sequence) distinguishes multiple bids associated with a single deployment from same provider.
+   */
+  bseq: number;
 }
 export interface LeaseFiltersProtoMsg {
   typeUrl: "/akash.market.v1.LeaseFilters";
@@ -90,6 +94,10 @@ export interface LeaseFiltersAmino {
    * State represents the state of the lease.
    */
   state: string;
+  /**
+   * BSeq (bid sequence) distinguishes multiple bids associated with a single deployment from same provider.
+   */
+  bseq: number;
 }
 export interface LeaseFiltersAminoMsg {
   type: "/akash.market.v1.LeaseFilters";
@@ -102,7 +110,8 @@ function createBaseLeaseFilters(): LeaseFilters {
     gseq: 0,
     oseq: 0,
     provider: "",
-    state: ""
+    state: "",
+    bseq: 0
   };
 }
 /**
@@ -132,6 +141,9 @@ export const LeaseFilters = {
     if (message.state !== "") {
       writer.uint32(50).string(message.state);
     }
+    if (message.bseq !== 0) {
+      writer.uint32(56).uint32(message.bseq);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): LeaseFilters {
@@ -159,6 +171,9 @@ export const LeaseFilters = {
         case 6:
           message.state = reader.string();
           break;
+        case 7:
+          message.bseq = reader.uint32();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -174,6 +189,7 @@ export const LeaseFilters = {
     message.oseq = object.oseq ?? 0;
     message.provider = object.provider ?? "";
     message.state = object.state ?? "";
+    message.bseq = object.bseq ?? 0;
     return message;
   },
   fromAmino(object: LeaseFiltersAmino): LeaseFilters {
@@ -196,6 +212,9 @@ export const LeaseFilters = {
     if (object.state !== undefined && object.state !== null) {
       message.state = object.state;
     }
+    if (object.bseq !== undefined && object.bseq !== null) {
+      message.bseq = object.bseq;
+    }
     return message;
   },
   toAmino(message: LeaseFilters): LeaseFiltersAmino {
@@ -206,6 +225,7 @@ export const LeaseFilters = {
     obj.oseq = message.oseq ?? 0;
     obj.provider = message.provider ?? "";
     obj.state = message.state ?? "";
+    obj.bseq = message.bseq ?? 0;
     return obj;
   },
   fromAminoMsg(object: LeaseFiltersAminoMsg): LeaseFilters {

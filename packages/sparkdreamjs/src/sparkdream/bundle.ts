@@ -1,471 +1,330 @@
 //@ts-nocheck
-import * as _303 from "./blog/module/v1/module";
-import * as _304 from "./blog/v1/genesis";
-import * as _305 from "./blog/v1/params";
-import * as _306 from "./blog/v1/post";
-import * as _307 from "./blog/v1/query";
-import * as _308 from "./blog/v1/tx";
-import * as _309 from "./blog/v1/types";
-import * as _310 from "./collect/module/v1/module";
-import * as _311 from "./collect/v1/curator_activity";
-import * as _312 from "./collect/v1/genesis";
-import * as _313 from "./collect/v1/params";
-import * as _314 from "./collect/v1/query";
-import * as _315 from "./collect/v1/tx";
-import * as _316 from "./collect/v1/types";
-import * as _317 from "./common/v1/content_type";
-import * as _318 from "./common/v1/flag_record";
-import * as _319 from "./common/v1/moderation_reason";
-import * as _320 from "./commons/module/v1/module";
-import * as _321 from "./commons/v1/category";
-import * as _322 from "./commons/v1/genesis";
-import * as _323 from "./commons/v1/group";
-import * as _324 from "./commons/v1/params";
-import * as _325 from "./commons/v1/policy_permissions";
-import * as _326 from "./commons/v1/query";
-import * as _327 from "./commons/v1/recurring_spend";
-import * as _328 from "./commons/v1/tx";
-import * as _329 from "./ecosystem/module/v1/module";
-import * as _330 from "./ecosystem/v1/genesis";
-import * as _331 from "./ecosystem/v1/params";
-import * as _332 from "./ecosystem/v1/query";
-import * as _333 from "./ecosystem/v1/tx";
-import * as _334 from "./federation/module/v1/module";
-import * as _335 from "./federation/v1/genesis";
-import * as _336 from "./federation/v1/packet";
-import * as _337 from "./federation/v1/params";
-import * as _338 from "./federation/v1/query";
-import * as _339 from "./federation/v1/tx";
-import * as _340 from "./federation/v1/types";
-import * as _341 from "./federation/v1/verifier_activity";
-import * as _342 from "./forum/module/v1/module";
-import * as _343 from "./forum/v1/archive_metadata";
-import * as _344 from "./forum/v1/bounty";
-import * as _345 from "./forum/v1/genesis";
-import * as _346 from "./forum/v1/hide_record";
-import * as _347 from "./forum/v1/params";
-import * as _348 from "./forum/v1/post_flag";
-import * as _349 from "./forum/v1/post";
-import * as _350 from "./forum/v1/query";
-import * as _351 from "./forum/v1/sentinel_activity";
-import * as _352 from "./forum/v1/thread_follow_count";
-import * as _353 from "./forum/v1/thread_follow";
-import * as _354 from "./forum/v1/thread_lock_record";
-import * as _355 from "./forum/v1/thread_metadata";
-import * as _356 from "./forum/v1/thread_move_record";
-import * as _357 from "./forum/v1/tx";
-import * as _358 from "./forum/v1/types";
-import * as _359 from "./forum/v1/user_rate_limit";
-import * as _360 from "./forum/v1/user_reaction_limit";
-import * as _361 from "./futarchy/module/v1/module";
-import * as _362 from "./futarchy/v1/genesis";
-import * as _363 from "./futarchy/v1/market";
-import * as _364 from "./futarchy/v1/params";
-import * as _365 from "./futarchy/v1/query";
-import * as _366 from "./futarchy/v1/tx";
-import * as _367 from "./guardian/module/v1/module";
-import * as _368 from "./guardian/v1/query";
-import * as _369 from "./guardian/v1/tx";
-import * as _370 from "./identity/module/v1/module";
-import * as _371 from "./identity/v1/chain_identity";
-import * as _372 from "./identity/v1/genesis";
-import * as _373 from "./identity/v1/query";
-import * as _374 from "./name/module/v1/module";
-import * as _375 from "./name/v1/dispute";
-import * as _376 from "./name/v1/genesis";
-import * as _377 from "./name/v1/name_record";
-import * as _378 from "./name/v1/owner_info";
-import * as _379 from "./name/v1/params";
-import * as _380 from "./name/v1/query";
-import * as _381 from "./name/v1/tx";
-import * as _382 from "./rep/module/v1/module";
-import * as _383 from "./rep/v1/accountability";
-import * as _384 from "./rep/v1/bonded_role";
-import * as _385 from "./rep/v1/challenge";
-import * as _386 from "./rep/v1/content_challenge";
-import * as _387 from "./rep/v1/genesis";
-import * as _388 from "./rep/v1/gov_action_appeal";
-import * as _389 from "./rep/v1/initiative";
-import * as _390 from "./rep/v1/interim_template";
-import * as _391 from "./rep/v1/interim";
-import * as _392 from "./rep/v1/invitation";
-import * as _393 from "./rep/v1/jury_participation";
-import * as _394 from "./rep/v1/jury_review";
-import * as _395 from "./rep/v1/member_report";
-import * as _396 from "./rep/v1/member_warning";
-import * as _397 from "./rep/v1/member";
-import * as _398 from "./rep/v1/params";
-import * as _399 from "./rep/v1/project";
-import * as _400 from "./rep/v1/query";
-import * as _401 from "./rep/v1/reserved_tag";
-import * as _402 from "./rep/v1/role_activity";
-import * as _403 from "./rep/v1/stake";
-import * as _404 from "./rep/v1/tag_budget_award";
-import * as _405 from "./rep/v1/tag_budget";
-import * as _406 from "./rep/v1/tag_report";
-import * as _407 from "./rep/v1/tag";
-import * as _408 from "./rep/v1/tx";
-import * as _409 from "./reveal/module/v1/module";
-import * as _410 from "./reveal/v1/genesis";
-import * as _411 from "./reveal/v1/params";
-import * as _412 from "./reveal/v1/query";
-import * as _413 from "./reveal/v1/tx";
-import * as _414 from "./reveal/v1/types";
-import * as _415 from "./season/module/v1/module";
-import * as _416 from "./season/v1/achievement";
-import * as _417 from "./season/v1/display_name_appeal_stake";
-import * as _418 from "./season/v1/display_name_moderation";
-import * as _419 from "./season/v1/display_name_report_stake";
-import * as _420 from "./season/v1/enums";
-import * as _421 from "./season/v1/epoch_xp_tracker";
-import * as _422 from "./season/v1/forum_xp_cooldown";
-import * as _423 from "./season/v1/genesis";
-import * as _424 from "./season/v1/guild_invite";
-import * as _425 from "./season/v1/guild_membership";
-import * as _426 from "./season/v1/guild";
-import * as _427 from "./season/v1/member_profile";
-import * as _428 from "./season/v1/member_quest_progress";
-import * as _429 from "./season/v1/member_registration";
-import * as _430 from "./season/v1/member_season_snapshot";
-import * as _431 from "./season/v1/next_season_info";
-import * as _432 from "./season/v1/nomination";
-import * as _433 from "./season/v1/params";
-import * as _434 from "./season/v1/query";
-import * as _435 from "./season/v1/quest";
-import * as _436 from "./season/v1/season_snapshot";
-import * as _437 from "./season/v1/season_title_eligibility";
-import * as _438 from "./season/v1/season_transition_state";
-import * as _439 from "./season/v1/season";
-import * as _440 from "./season/v1/title";
-import * as _441 from "./season/v1/transition_recovery_state";
-import * as _442 from "./season/v1/tx";
-import * as _443 from "./season/v1/vote_xp_record";
-import * as _444 from "./service/module/v1/module";
-import * as _445 from "./service/v1/controller_transfer_case";
-import * as _446 from "./service/v1/genesis";
-import * as _447 from "./service/v1/operator";
-import * as _448 from "./service/v1/params";
-import * as _449 from "./service/v1/query";
-import * as _450 from "./service/v1/refile_cooldown";
-import * as _451 from "./service/v1/report";
-import * as _452 from "./service/v1/reporter_rate_limit";
-import * as _453 from "./service/v1/service_type_config";
-import * as _454 from "./service/v1/system_report_rate_limit";
-import * as _455 from "./service/v1/tier1_escrow_entry";
-import * as _456 from "./service/v1/tier1_last_slash";
-import * as _457 from "./service/v1/tx";
-import * as _458 from "./service/v1/types";
-import * as _459 from "./session/module/v1/module";
-import * as _460 from "./session/v1/genesis";
-import * as _461 from "./session/v1/grant";
-import * as _462 from "./session/v1/params";
-import * as _463 from "./session/v1/query";
-import * as _464 from "./session/v1/session";
-import * as _465 from "./session/v1/tx";
-import * as _466 from "./shield/module/v1/module";
-import * as _467 from "./shield/v1/genesis";
-import * as _468 from "./shield/v1/params";
-import * as _469 from "./shield/v1/query";
-import * as _470 from "./shield/v1/tx";
-import * as _471 from "./shield/v1/types";
-import * as _472 from "./sparkdream/module/v1/module";
-import * as _473 from "./sparkdream/v1/genesis";
-import * as _474 from "./sparkdream/v1/params";
-import * as _475 from "./sparkdream/v1/query";
-import * as _476 from "./sparkdream/v1/tx";
-import * as _477 from "./split/module/v1/module";
-import * as _478 from "./split/v1/genesis";
-import * as _479 from "./split/v1/params";
-import * as _480 from "./split/v1/query";
-import * as _481 from "./split/v1/share";
-import * as _482 from "./split/v1/tx";
-import * as _701 from "./blog/v1/tx.amino";
-import * as _702 from "./collect/v1/tx.amino";
-import * as _703 from "./commons/v1/tx.amino";
-import * as _704 from "./ecosystem/v1/tx.amino";
-import * as _705 from "./federation/v1/tx.amino";
-import * as _706 from "./forum/v1/tx.amino";
-import * as _707 from "./futarchy/v1/tx.amino";
-import * as _708 from "./guardian/v1/tx.amino";
-import * as _709 from "./name/v1/tx.amino";
-import * as _710 from "./rep/v1/tx.amino";
-import * as _711 from "./reveal/v1/tx.amino";
-import * as _712 from "./season/v1/tx.amino";
-import * as _713 from "./service/v1/tx.amino";
-import * as _714 from "./session/v1/tx.amino";
-import * as _715 from "./shield/v1/tx.amino";
-import * as _716 from "./sparkdream/v1/tx.amino";
-import * as _717 from "./split/v1/tx.amino";
-import * as _718 from "./blog/v1/tx.registry";
-import * as _719 from "./collect/v1/tx.registry";
-import * as _720 from "./commons/v1/tx.registry";
-import * as _721 from "./ecosystem/v1/tx.registry";
-import * as _722 from "./federation/v1/tx.registry";
-import * as _723 from "./forum/v1/tx.registry";
-import * as _724 from "./futarchy/v1/tx.registry";
-import * as _725 from "./guardian/v1/tx.registry";
-import * as _726 from "./name/v1/tx.registry";
-import * as _727 from "./rep/v1/tx.registry";
-import * as _728 from "./reveal/v1/tx.registry";
-import * as _729 from "./season/v1/tx.registry";
-import * as _730 from "./service/v1/tx.registry";
-import * as _731 from "./session/v1/tx.registry";
-import * as _732 from "./shield/v1/tx.registry";
-import * as _733 from "./sparkdream/v1/tx.registry";
-import * as _734 from "./split/v1/tx.registry";
-import * as _735 from "./blog/v1/query.lcd";
-import * as _736 from "./collect/v1/query.lcd";
-import * as _737 from "./commons/v1/query.lcd";
-import * as _738 from "./ecosystem/v1/query.lcd";
-import * as _739 from "./federation/v1/query.lcd";
-import * as _740 from "./forum/v1/query.lcd";
-import * as _741 from "./futarchy/v1/query.lcd";
-import * as _742 from "./guardian/v1/query.lcd";
-import * as _743 from "./identity/v1/query.lcd";
-import * as _744 from "./name/v1/query.lcd";
-import * as _745 from "./rep/v1/query.lcd";
-import * as _746 from "./reveal/v1/query.lcd";
-import * as _747 from "./season/v1/query.lcd";
-import * as _748 from "./service/v1/query.lcd";
-import * as _749 from "./session/v1/query.lcd";
-import * as _750 from "./shield/v1/query.lcd";
-import * as _751 from "./sparkdream/v1/query.lcd";
-import * as _752 from "./split/v1/query.lcd";
-import * as _753 from "./blog/v1/query.rpc.Query";
-import * as _754 from "./collect/v1/query.rpc.Query";
-import * as _755 from "./commons/v1/query.rpc.Query";
-import * as _756 from "./ecosystem/v1/query.rpc.Query";
-import * as _757 from "./federation/v1/query.rpc.Query";
-import * as _758 from "./forum/v1/query.rpc.Query";
-import * as _759 from "./futarchy/v1/query.rpc.Query";
-import * as _760 from "./guardian/v1/query.rpc.Query";
-import * as _761 from "./identity/v1/query.rpc.Query";
-import * as _762 from "./name/v1/query.rpc.Query";
-import * as _763 from "./rep/v1/query.rpc.Query";
-import * as _764 from "./reveal/v1/query.rpc.Query";
-import * as _765 from "./season/v1/query.rpc.Query";
-import * as _766 from "./service/v1/query.rpc.Query";
-import * as _767 from "./session/v1/query.rpc.Query";
-import * as _768 from "./shield/v1/query.rpc.Query";
-import * as _769 from "./sparkdream/v1/query.rpc.Query";
-import * as _770 from "./split/v1/query.rpc.Query";
-import * as _771 from "./blog/v1/tx.rpc.msg";
-import * as _772 from "./collect/v1/tx.rpc.msg";
-import * as _773 from "./commons/v1/tx.rpc.msg";
-import * as _774 from "./ecosystem/v1/tx.rpc.msg";
-import * as _775 from "./federation/v1/tx.rpc.msg";
-import * as _776 from "./forum/v1/tx.rpc.msg";
-import * as _777 from "./futarchy/v1/tx.rpc.msg";
-import * as _778 from "./guardian/v1/tx.rpc.msg";
-import * as _779 from "./name/v1/tx.rpc.msg";
-import * as _780 from "./rep/v1/tx.rpc.msg";
-import * as _781 from "./reveal/v1/tx.rpc.msg";
-import * as _782 from "./season/v1/tx.rpc.msg";
-import * as _783 from "./service/v1/tx.rpc.msg";
-import * as _784 from "./session/v1/tx.rpc.msg";
-import * as _785 from "./shield/v1/tx.rpc.msg";
-import * as _786 from "./sparkdream/v1/tx.rpc.msg";
-import * as _787 from "./split/v1/tx.rpc.msg";
-import * as _797 from "./lcd";
-import * as _798 from "./rpc.query";
-import * as _799 from "./rpc.tx";
+import * as _356 from "./blog/module/v1/module";
+import * as _357 from "./blog/v1/genesis";
+import * as _358 from "./blog/v1/params";
+import * as _359 from "./blog/v1/post";
+import * as _360 from "./blog/v1/query";
+import * as _361 from "./blog/v1/tx";
+import * as _362 from "./blog/v1/types";
+import * as _363 from "./collect/module/v1/module";
+import * as _364 from "./collect/v1/curator_activity";
+import * as _365 from "./collect/v1/genesis";
+import * as _366 from "./collect/v1/params";
+import * as _367 from "./collect/v1/query";
+import * as _368 from "./collect/v1/tx";
+import * as _369 from "./collect/v1/types";
+import * as _370 from "./common/v1/content_type";
+import * as _371 from "./common/v1/flag_record";
+import * as _372 from "./common/v1/moderation_reason";
+import * as _373 from "./commons/module/v1/module";
+import * as _374 from "./commons/v1/category";
+import * as _375 from "./commons/v1/genesis";
+import * as _376 from "./commons/v1/group";
+import * as _377 from "./commons/v1/params";
+import * as _378 from "./commons/v1/policy_permissions";
+import * as _379 from "./commons/v1/query";
+import * as _380 from "./commons/v1/recurring_spend";
+import * as _381 from "./commons/v1/tx";
+import * as _382 from "./ecosystem/module/v1/module";
+import * as _383 from "./ecosystem/v1/genesis";
+import * as _384 from "./ecosystem/v1/params";
+import * as _385 from "./ecosystem/v1/query";
+import * as _386 from "./ecosystem/v1/tx";
+import * as _387 from "./federation/module/v1/module";
+import * as _388 from "./federation/v1/genesis";
+import * as _389 from "./federation/v1/packet";
+import * as _390 from "./federation/v1/params";
+import * as _391 from "./federation/v1/query";
+import * as _392 from "./federation/v1/tx";
+import * as _393 from "./federation/v1/types";
+import * as _394 from "./federation/v1/verifier_activity";
+import * as _395 from "./forum/module/v1/module";
+import * as _396 from "./forum/v1/archive_metadata";
+import * as _397 from "./forum/v1/bounty";
+import * as _398 from "./forum/v1/genesis";
+import * as _399 from "./forum/v1/hide_record";
+import * as _400 from "./forum/v1/params";
+import * as _401 from "./forum/v1/post_flag";
+import * as _402 from "./forum/v1/post";
+import * as _403 from "./forum/v1/query";
+import * as _404 from "./forum/v1/sentinel_activity";
+import * as _405 from "./forum/v1/thread_follow_count";
+import * as _406 from "./forum/v1/thread_follow";
+import * as _407 from "./forum/v1/thread_lock_record";
+import * as _408 from "./forum/v1/thread_metadata";
+import * as _409 from "./forum/v1/thread_move_record";
+import * as _410 from "./forum/v1/tx";
+import * as _411 from "./forum/v1/types";
+import * as _412 from "./forum/v1/user_rate_limit";
+import * as _413 from "./forum/v1/user_reaction_limit";
+import * as _414 from "./futarchy/module/v1/module";
+import * as _415 from "./futarchy/v1/genesis";
+import * as _416 from "./futarchy/v1/market";
+import * as _417 from "./futarchy/v1/params";
+import * as _418 from "./futarchy/v1/query";
+import * as _419 from "./futarchy/v1/tx";
+import * as _420 from "./guardian/module/v1/module";
+import * as _421 from "./guardian/v1/query";
+import * as _422 from "./guardian/v1/tx";
+import * as _423 from "./identity/module/v1/module";
+import * as _424 from "./identity/v1/chain_identity";
+import * as _425 from "./identity/v1/genesis";
+import * as _426 from "./identity/v1/query";
+import * as _427 from "./name/module/v1/module";
+import * as _428 from "./name/v1/dispute";
+import * as _429 from "./name/v1/genesis";
+import * as _430 from "./name/v1/name_record";
+import * as _431 from "./name/v1/owner_info";
+import * as _432 from "./name/v1/params";
+import * as _433 from "./name/v1/query";
+import * as _434 from "./name/v1/tx";
+import * as _435 from "./rep/module/v1/module";
+import * as _436 from "./rep/v1/accountability";
+import * as _437 from "./rep/v1/bonded_role";
+import * as _438 from "./rep/v1/challenge";
+import * as _439 from "./rep/v1/content_challenge";
+import * as _440 from "./rep/v1/genesis";
+import * as _441 from "./rep/v1/gov_action_appeal";
+import * as _442 from "./rep/v1/initiative";
+import * as _443 from "./rep/v1/interim_template";
+import * as _444 from "./rep/v1/interim";
+import * as _445 from "./rep/v1/invitation";
+import * as _446 from "./rep/v1/jury_participation";
+import * as _447 from "./rep/v1/jury_review";
+import * as _448 from "./rep/v1/member_report";
+import * as _449 from "./rep/v1/member_warning";
+import * as _450 from "./rep/v1/member";
+import * as _451 from "./rep/v1/params";
+import * as _452 from "./rep/v1/project";
+import * as _453 from "./rep/v1/query";
+import * as _454 from "./rep/v1/reserved_tag";
+import * as _455 from "./rep/v1/role_activity";
+import * as _456 from "./rep/v1/stake";
+import * as _457 from "./rep/v1/tag_budget_award";
+import * as _458 from "./rep/v1/tag_budget";
+import * as _459 from "./rep/v1/tag_report";
+import * as _460 from "./rep/v1/tag";
+import * as _461 from "./rep/v1/tx";
+import * as _462 from "./reveal/module/v1/module";
+import * as _463 from "./reveal/v1/genesis";
+import * as _464 from "./reveal/v1/params";
+import * as _465 from "./reveal/v1/query";
+import * as _466 from "./reveal/v1/tx";
+import * as _467 from "./reveal/v1/types";
+import * as _468 from "./season/module/v1/module";
+import * as _469 from "./season/v1/achievement";
+import * as _470 from "./season/v1/display_name_appeal_stake";
+import * as _471 from "./season/v1/display_name_moderation";
+import * as _472 from "./season/v1/display_name_report_stake";
+import * as _473 from "./season/v1/enums";
+import * as _474 from "./season/v1/epoch_xp_tracker";
+import * as _475 from "./season/v1/forum_xp_cooldown";
+import * as _476 from "./season/v1/genesis";
+import * as _477 from "./season/v1/guild_invite";
+import * as _478 from "./season/v1/guild_membership";
+import * as _479 from "./season/v1/guild";
+import * as _480 from "./season/v1/member_profile";
+import * as _481 from "./season/v1/member_quest_progress";
+import * as _482 from "./season/v1/member_registration";
+import * as _483 from "./season/v1/member_season_snapshot";
+import * as _484 from "./season/v1/next_season_info";
+import * as _485 from "./season/v1/nomination";
+import * as _486 from "./season/v1/params";
+import * as _487 from "./season/v1/query";
+import * as _488 from "./season/v1/quest";
+import * as _489 from "./season/v1/season_snapshot";
+import * as _490 from "./season/v1/season_title_eligibility";
+import * as _491 from "./season/v1/season_transition_state";
+import * as _492 from "./season/v1/season";
+import * as _493 from "./season/v1/title";
+import * as _494 from "./season/v1/transition_recovery_state";
+import * as _495 from "./season/v1/tx";
+import * as _496 from "./season/v1/vote_xp_record";
+import * as _497 from "./service/module/v1/module";
+import * as _498 from "./service/v1/controller_transfer_case";
+import * as _499 from "./service/v1/genesis";
+import * as _500 from "./service/v1/operator";
+import * as _501 from "./service/v1/params";
+import * as _502 from "./service/v1/query";
+import * as _503 from "./service/v1/refile_cooldown";
+import * as _504 from "./service/v1/report";
+import * as _505 from "./service/v1/reporter_rate_limit";
+import * as _506 from "./service/v1/service_type_config";
+import * as _507 from "./service/v1/system_report_rate_limit";
+import * as _508 from "./service/v1/tier1_escrow_entry";
+import * as _509 from "./service/v1/tier1_last_slash";
+import * as _510 from "./service/v1/tx";
+import * as _511 from "./service/v1/types";
+import * as _512 from "./session/module/v1/module";
+import * as _513 from "./session/v1/genesis";
+import * as _514 from "./session/v1/grant";
+import * as _515 from "./session/v1/params";
+import * as _516 from "./session/v1/query";
+import * as _517 from "./session/v1/session";
+import * as _518 from "./session/v1/tx";
+import * as _519 from "./shield/module/v1/module";
+import * as _520 from "./shield/v1/genesis";
+import * as _521 from "./shield/v1/params";
+import * as _522 from "./shield/v1/query";
+import * as _523 from "./shield/v1/tx";
+import * as _524 from "./shield/v1/types";
+import * as _525 from "./sparkdream/module/v1/module";
+import * as _526 from "./sparkdream/v1/genesis";
+import * as _527 from "./sparkdream/v1/params";
+import * as _528 from "./sparkdream/v1/query";
+import * as _529 from "./sparkdream/v1/tx";
+import * as _530 from "./split/module/v1/module";
+import * as _531 from "./split/v1/genesis";
+import * as _532 from "./split/v1/params";
+import * as _533 from "./split/v1/query";
+import * as _534 from "./split/v1/share";
+import * as _535 from "./split/v1/tx";
+import * as _761 from "./blog/v1/tx.amino";
+import * as _762 from "./collect/v1/tx.amino";
+import * as _763 from "./commons/v1/tx.amino";
+import * as _764 from "./ecosystem/v1/tx.amino";
+import * as _765 from "./federation/v1/tx.amino";
+import * as _766 from "./forum/v1/tx.amino";
+import * as _767 from "./futarchy/v1/tx.amino";
+import * as _768 from "./guardian/v1/tx.amino";
+import * as _769 from "./name/v1/tx.amino";
+import * as _770 from "./rep/v1/tx.amino";
+import * as _771 from "./reveal/v1/tx.amino";
+import * as _772 from "./season/v1/tx.amino";
+import * as _773 from "./service/v1/tx.amino";
+import * as _774 from "./session/v1/tx.amino";
+import * as _775 from "./shield/v1/tx.amino";
+import * as _776 from "./sparkdream/v1/tx.amino";
+import * as _777 from "./split/v1/tx.amino";
+import * as _778 from "./blog/v1/tx.registry";
+import * as _779 from "./collect/v1/tx.registry";
+import * as _780 from "./commons/v1/tx.registry";
+import * as _781 from "./ecosystem/v1/tx.registry";
+import * as _782 from "./federation/v1/tx.registry";
+import * as _783 from "./forum/v1/tx.registry";
+import * as _784 from "./futarchy/v1/tx.registry";
+import * as _785 from "./guardian/v1/tx.registry";
+import * as _786 from "./name/v1/tx.registry";
+import * as _787 from "./rep/v1/tx.registry";
+import * as _788 from "./reveal/v1/tx.registry";
+import * as _789 from "./season/v1/tx.registry";
+import * as _790 from "./service/v1/tx.registry";
+import * as _791 from "./session/v1/tx.registry";
+import * as _792 from "./shield/v1/tx.registry";
+import * as _793 from "./sparkdream/v1/tx.registry";
+import * as _794 from "./split/v1/tx.registry";
+import * as _795 from "./blog/v1/query.lcd";
+import * as _796 from "./collect/v1/query.lcd";
+import * as _797 from "./commons/v1/query.lcd";
+import * as _798 from "./ecosystem/v1/query.lcd";
+import * as _799 from "./federation/v1/query.lcd";
+import * as _800 from "./forum/v1/query.lcd";
+import * as _801 from "./futarchy/v1/query.lcd";
+import * as _802 from "./guardian/v1/query.lcd";
+import * as _803 from "./identity/v1/query.lcd";
+import * as _804 from "./name/v1/query.lcd";
+import * as _805 from "./rep/v1/query.lcd";
+import * as _806 from "./reveal/v1/query.lcd";
+import * as _807 from "./season/v1/query.lcd";
+import * as _808 from "./service/v1/query.lcd";
+import * as _809 from "./session/v1/query.lcd";
+import * as _810 from "./shield/v1/query.lcd";
+import * as _811 from "./sparkdream/v1/query.lcd";
+import * as _812 from "./split/v1/query.lcd";
+import * as _813 from "./blog/v1/query.rpc.Query";
+import * as _814 from "./collect/v1/query.rpc.Query";
+import * as _815 from "./commons/v1/query.rpc.Query";
+import * as _816 from "./ecosystem/v1/query.rpc.Query";
+import * as _817 from "./federation/v1/query.rpc.Query";
+import * as _818 from "./forum/v1/query.rpc.Query";
+import * as _819 from "./futarchy/v1/query.rpc.Query";
+import * as _820 from "./guardian/v1/query.rpc.Query";
+import * as _821 from "./identity/v1/query.rpc.Query";
+import * as _822 from "./name/v1/query.rpc.Query";
+import * as _823 from "./rep/v1/query.rpc.Query";
+import * as _824 from "./reveal/v1/query.rpc.Query";
+import * as _825 from "./season/v1/query.rpc.Query";
+import * as _826 from "./service/v1/query.rpc.Query";
+import * as _827 from "./session/v1/query.rpc.Query";
+import * as _828 from "./shield/v1/query.rpc.Query";
+import * as _829 from "./sparkdream/v1/query.rpc.Query";
+import * as _830 from "./split/v1/query.rpc.Query";
+import * as _831 from "./blog/v1/tx.rpc.msg";
+import * as _832 from "./collect/v1/tx.rpc.msg";
+import * as _833 from "./commons/v1/tx.rpc.msg";
+import * as _834 from "./ecosystem/v1/tx.rpc.msg";
+import * as _835 from "./federation/v1/tx.rpc.msg";
+import * as _836 from "./forum/v1/tx.rpc.msg";
+import * as _837 from "./futarchy/v1/tx.rpc.msg";
+import * as _838 from "./guardian/v1/tx.rpc.msg";
+import * as _839 from "./name/v1/tx.rpc.msg";
+import * as _840 from "./rep/v1/tx.rpc.msg";
+import * as _841 from "./reveal/v1/tx.rpc.msg";
+import * as _842 from "./season/v1/tx.rpc.msg";
+import * as _843 from "./service/v1/tx.rpc.msg";
+import * as _844 from "./session/v1/tx.rpc.msg";
+import * as _845 from "./shield/v1/tx.rpc.msg";
+import * as _846 from "./sparkdream/v1/tx.rpc.msg";
+import * as _847 from "./split/v1/tx.rpc.msg";
+import * as _857 from "./lcd";
+import * as _858 from "./rpc.query";
+import * as _859 from "./rpc.tx";
 export namespace sparkdream {
   export namespace blog {
     export namespace module {
       export const v1 = {
-        ..._303
+        ..._356
       };
     }
     export const v1 = {
-      ..._304,
-      ..._305,
-      ..._306,
-      ..._307,
-      ..._308,
-      ..._309,
-      ..._701,
-      ..._718,
-      ..._735,
-      ..._753,
-      ..._771
+      ..._357,
+      ..._358,
+      ..._359,
+      ..._360,
+      ..._361,
+      ..._362,
+      ..._761,
+      ..._778,
+      ..._795,
+      ..._813,
+      ..._831
     };
   }
   export namespace collect {
     export namespace module {
       export const v1 = {
-        ..._310
+        ..._363
       };
     }
     export const v1 = {
-      ..._311,
-      ..._312,
-      ..._313,
-      ..._314,
-      ..._315,
-      ..._316,
-      ..._702,
-      ..._719,
-      ..._736,
-      ..._754,
-      ..._772
+      ..._364,
+      ..._365,
+      ..._366,
+      ..._367,
+      ..._368,
+      ..._369,
+      ..._762,
+      ..._779,
+      ..._796,
+      ..._814,
+      ..._832
     };
   }
   export namespace common {
     export const v1 = {
-      ..._317,
-      ..._318,
-      ..._319
+      ..._370,
+      ..._371,
+      ..._372
     };
   }
   export namespace commons {
     export namespace module {
       export const v1 = {
-        ..._320
+        ..._373
       };
     }
     export const v1 = {
-      ..._321,
-      ..._322,
-      ..._323,
-      ..._324,
-      ..._325,
-      ..._326,
-      ..._327,
-      ..._328,
-      ..._703,
-      ..._720,
-      ..._737,
-      ..._755,
-      ..._773
-    };
-  }
-  export namespace ecosystem {
-    export namespace module {
-      export const v1 = {
-        ..._329
-      };
-    }
-    export const v1 = {
-      ..._330,
-      ..._331,
-      ..._332,
-      ..._333,
-      ..._704,
-      ..._721,
-      ..._738,
-      ..._756,
-      ..._774
-    };
-  }
-  export namespace federation {
-    export namespace module {
-      export const v1 = {
-        ..._334
-      };
-    }
-    export const v1 = {
-      ..._335,
-      ..._336,
-      ..._337,
-      ..._338,
-      ..._339,
-      ..._340,
-      ..._341,
-      ..._705,
-      ..._722,
-      ..._739,
-      ..._757,
-      ..._775
-    };
-  }
-  export namespace forum {
-    export namespace module {
-      export const v1 = {
-        ..._342
-      };
-    }
-    export const v1 = {
-      ..._343,
-      ..._344,
-      ..._345,
-      ..._346,
-      ..._347,
-      ..._348,
-      ..._349,
-      ..._350,
-      ..._351,
-      ..._352,
-      ..._353,
-      ..._354,
-      ..._355,
-      ..._356,
-      ..._357,
-      ..._358,
-      ..._359,
-      ..._360,
-      ..._706,
-      ..._723,
-      ..._740,
-      ..._758,
-      ..._776
-    };
-  }
-  export namespace futarchy {
-    export namespace module {
-      export const v1 = {
-        ..._361
-      };
-    }
-    export const v1 = {
-      ..._362,
-      ..._363,
-      ..._364,
-      ..._365,
-      ..._366,
-      ..._707,
-      ..._724,
-      ..._741,
-      ..._759,
-      ..._777
-    };
-  }
-  export namespace guardian {
-    export namespace module {
-      export const v1 = {
-        ..._367
-      };
-    }
-    export const v1 = {
-      ..._368,
-      ..._369,
-      ..._708,
-      ..._725,
-      ..._742,
-      ..._760,
-      ..._778
-    };
-  }
-  export namespace identity {
-    export namespace module {
-      export const v1 = {
-        ..._370
-      };
-    }
-    export const v1 = {
-      ..._371,
-      ..._372,
-      ..._373,
-      ..._743,
-      ..._761
-    };
-  }
-  export namespace name {
-    export namespace module {
-      export const v1 = {
-        ..._374
-      };
-    }
-    export const v1 = {
+      ..._374,
       ..._375,
       ..._376,
       ..._377,
@@ -473,14 +332,14 @@ export namespace sparkdream {
       ..._379,
       ..._380,
       ..._381,
-      ..._709,
-      ..._726,
-      ..._744,
-      ..._762,
-      ..._779
+      ..._763,
+      ..._780,
+      ..._797,
+      ..._815,
+      ..._833
     };
   }
-  export namespace rep {
+  export namespace ecosystem {
     export namespace module {
       export const v1 = {
         ..._382
@@ -491,7 +350,20 @@ export namespace sparkdream {
       ..._384,
       ..._385,
       ..._386,
-      ..._387,
+      ..._764,
+      ..._781,
+      ..._798,
+      ..._816,
+      ..._834
+    };
+  }
+  export namespace federation {
+    export namespace module {
+      export const v1 = {
+        ..._387
+      };
+    }
+    export const v1 = {
       ..._388,
       ..._389,
       ..._390,
@@ -499,7 +371,20 @@ export namespace sparkdream {
       ..._392,
       ..._393,
       ..._394,
-      ..._395,
+      ..._765,
+      ..._782,
+      ..._799,
+      ..._817,
+      ..._835
+    };
+  }
+  export namespace forum {
+    export namespace module {
+      export const v1 = {
+        ..._395
+      };
+    }
+    export const v1 = {
       ..._396,
       ..._397,
       ..._398,
@@ -513,51 +398,74 @@ export namespace sparkdream {
       ..._406,
       ..._407,
       ..._408,
-      ..._710,
-      ..._727,
-      ..._745,
-      ..._763,
-      ..._780
-    };
-  }
-  export namespace reveal {
-    export namespace module {
-      export const v1 = {
-        ..._409
-      };
-    }
-    export const v1 = {
+      ..._409,
       ..._410,
       ..._411,
       ..._412,
       ..._413,
-      ..._414,
-      ..._711,
-      ..._728,
-      ..._746,
-      ..._764,
-      ..._781
+      ..._766,
+      ..._783,
+      ..._800,
+      ..._818,
+      ..._836
     };
   }
-  export namespace season {
+  export namespace futarchy {
     export namespace module {
       export const v1 = {
-        ..._415
+        ..._414
       };
     }
     export const v1 = {
+      ..._415,
       ..._416,
       ..._417,
       ..._418,
       ..._419,
-      ..._420,
+      ..._767,
+      ..._784,
+      ..._801,
+      ..._819,
+      ..._837
+    };
+  }
+  export namespace guardian {
+    export namespace module {
+      export const v1 = {
+        ..._420
+      };
+    }
+    export const v1 = {
       ..._421,
       ..._422,
-      ..._423,
+      ..._768,
+      ..._785,
+      ..._802,
+      ..._820,
+      ..._838
+    };
+  }
+  export namespace identity {
+    export namespace module {
+      export const v1 = {
+        ..._423
+      };
+    }
+    export const v1 = {
       ..._424,
       ..._425,
       ..._426,
-      ..._427,
+      ..._803,
+      ..._821
+    };
+  }
+  export namespace name {
+    export namespace module {
+      export const v1 = {
+        ..._427
+      };
+    }
+    export const v1 = {
       ..._428,
       ..._429,
       ..._430,
@@ -565,7 +473,20 @@ export namespace sparkdream {
       ..._432,
       ..._433,
       ..._434,
-      ..._435,
+      ..._769,
+      ..._786,
+      ..._804,
+      ..._822,
+      ..._839
+    };
+  }
+  export namespace rep {
+    export namespace module {
+      export const v1 = {
+        ..._435
+      };
+    }
+    export const v1 = {
       ..._436,
       ..._437,
       ..._438,
@@ -574,20 +495,7 @@ export namespace sparkdream {
       ..._441,
       ..._442,
       ..._443,
-      ..._712,
-      ..._729,
-      ..._747,
-      ..._765,
-      ..._782
-    };
-  }
-  export namespace service {
-    export namespace module {
-      export const v1 = {
-        ..._444
-      };
-    }
-    export const v1 = {
+      ..._444,
       ..._445,
       ..._446,
       ..._447,
@@ -602,92 +510,184 @@ export namespace sparkdream {
       ..._456,
       ..._457,
       ..._458,
-      ..._713,
-      ..._730,
-      ..._748,
-      ..._766,
-      ..._783
+      ..._459,
+      ..._460,
+      ..._461,
+      ..._770,
+      ..._787,
+      ..._805,
+      ..._823,
+      ..._840
     };
   }
-  export namespace session {
+  export namespace reveal {
     export namespace module {
       export const v1 = {
-        ..._459
+        ..._462
       };
     }
     export const v1 = {
-      ..._460,
-      ..._461,
-      ..._462,
       ..._463,
       ..._464,
       ..._465,
-      ..._714,
-      ..._731,
-      ..._749,
-      ..._767,
-      ..._784
+      ..._466,
+      ..._467,
+      ..._771,
+      ..._788,
+      ..._806,
+      ..._824,
+      ..._841
     };
   }
-  export namespace shield {
+  export namespace season {
     export namespace module {
       export const v1 = {
-        ..._466
+        ..._468
       };
     }
     export const v1 = {
-      ..._467,
-      ..._468,
       ..._469,
       ..._470,
       ..._471,
-      ..._715,
-      ..._732,
-      ..._750,
-      ..._768,
-      ..._785
-    };
-  }
-  export namespace sparkdream {
-    export namespace module {
-      export const v1 = {
-        ..._472
-      };
-    }
-    export const v1 = {
+      ..._472,
       ..._473,
       ..._474,
       ..._475,
       ..._476,
-      ..._716,
-      ..._733,
-      ..._751,
-      ..._769,
-      ..._786
-    };
-  }
-  export namespace split {
-    export namespace module {
-      export const v1 = {
-        ..._477
-      };
-    }
-    export const v1 = {
+      ..._477,
       ..._478,
       ..._479,
       ..._480,
       ..._481,
       ..._482,
-      ..._717,
-      ..._734,
-      ..._752,
-      ..._770,
-      ..._787
+      ..._483,
+      ..._484,
+      ..._485,
+      ..._486,
+      ..._487,
+      ..._488,
+      ..._489,
+      ..._490,
+      ..._491,
+      ..._492,
+      ..._493,
+      ..._494,
+      ..._495,
+      ..._496,
+      ..._772,
+      ..._789,
+      ..._807,
+      ..._825,
+      ..._842
+    };
+  }
+  export namespace service {
+    export namespace module {
+      export const v1 = {
+        ..._497
+      };
+    }
+    export const v1 = {
+      ..._498,
+      ..._499,
+      ..._500,
+      ..._501,
+      ..._502,
+      ..._503,
+      ..._504,
+      ..._505,
+      ..._506,
+      ..._507,
+      ..._508,
+      ..._509,
+      ..._510,
+      ..._511,
+      ..._773,
+      ..._790,
+      ..._808,
+      ..._826,
+      ..._843
+    };
+  }
+  export namespace session {
+    export namespace module {
+      export const v1 = {
+        ..._512
+      };
+    }
+    export const v1 = {
+      ..._513,
+      ..._514,
+      ..._515,
+      ..._516,
+      ..._517,
+      ..._518,
+      ..._774,
+      ..._791,
+      ..._809,
+      ..._827,
+      ..._844
+    };
+  }
+  export namespace shield {
+    export namespace module {
+      export const v1 = {
+        ..._519
+      };
+    }
+    export const v1 = {
+      ..._520,
+      ..._521,
+      ..._522,
+      ..._523,
+      ..._524,
+      ..._775,
+      ..._792,
+      ..._810,
+      ..._828,
+      ..._845
+    };
+  }
+  export namespace sparkdream {
+    export namespace module {
+      export const v1 = {
+        ..._525
+      };
+    }
+    export const v1 = {
+      ..._526,
+      ..._527,
+      ..._528,
+      ..._529,
+      ..._776,
+      ..._793,
+      ..._811,
+      ..._829,
+      ..._846
+    };
+  }
+  export namespace split {
+    export namespace module {
+      export const v1 = {
+        ..._530
+      };
+    }
+    export const v1 = {
+      ..._531,
+      ..._532,
+      ..._533,
+      ..._534,
+      ..._535,
+      ..._777,
+      ..._794,
+      ..._812,
+      ..._830,
+      ..._847
     };
   }
   export const ClientFactory = {
-    ..._797,
-    ..._798,
-    ..._799
+    ..._857,
+    ..._858,
+    ..._859
   };
 }

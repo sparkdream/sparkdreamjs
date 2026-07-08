@@ -56,7 +56,7 @@ export interface QueryCertificatesRequest {
    */
   filter: CertificateFilter;
   /**
-   * Pagination is used to paginate request.
+   * Pagination is used to paginate the request.
    */
   pagination?: PageRequest;
 }
@@ -76,7 +76,7 @@ export interface QueryCertificatesRequestAmino {
    */
   filter?: CertificateFilterAmino;
   /**
-   * Pagination is used to paginate request.
+   * Pagination is used to paginate the request.
    */
   pagination?: PageRequestAmino;
 }

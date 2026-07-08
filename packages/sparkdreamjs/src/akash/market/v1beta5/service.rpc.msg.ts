@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { MsgCreateBid, MsgCreateBidResponse, MsgCloseBid, MsgCloseBidResponse } from "./bidmsg";
-import { MsgWithdrawLease, MsgWithdrawLeaseResponse, MsgCreateLease, MsgCreateLeaseResponse, MsgCloseLease, MsgCloseLeaseResponse } from "./leasemsg";
+import { MsgWithdrawLease, MsgWithdrawLeaseResponse, MsgCreateLease, MsgCreateLeaseResponse, MsgCloseLease, MsgCloseLeaseResponse, MsgLeaseStartReclaim, MsgLeaseStartReclaimResponse } from "./leasemsg";
 import { MsgUpdateParams, MsgUpdateParamsResponse } from "./paramsmsg";
 /** Msg defines the market Msg service. */
 export interface Msg {
@@ -16,6 +16,8 @@ export interface Msg {
   createLease(request: MsgCreateLease): Promise<MsgCreateLeaseResponse>;
   /** CloseLease defines a method to close an order given proper inputs. */
   closeLease(request: MsgCloseLease): Promise<MsgCloseLeaseResponse>;
+  /** LeaseStartReclaim initiates the reclamation window on an active lease. */
+  leaseStartReclaim(request: MsgLeaseStartReclaim): Promise<MsgLeaseStartReclaimResponse>;
   /**
    * UpdateParams defines a governance operation for updating the x/market module
    * parameters. The authority is hard-coded to the x/gov module account.
@@ -58,6 +60,12 @@ export class MsgClientImpl implements Msg {
     const data = MsgCloseLease.encode(request).finish();
     const promise = this.rpc.request("akash.market.v1beta5.Msg", "CloseLease", data);
     return promise.then(data => MsgCloseLeaseResponse.decode(new BinaryReader(data)));
+  };
+  /* LeaseStartReclaim initiates the reclamation window on an active lease. */
+  leaseStartReclaim = async (request: MsgLeaseStartReclaim): Promise<MsgLeaseStartReclaimResponse> => {
+    const data = MsgLeaseStartReclaim.encode(request).finish();
+    const promise = this.rpc.request("akash.market.v1beta5.Msg", "LeaseStartReclaim", data);
+    return promise.then(data => MsgLeaseStartReclaimResponse.decode(new BinaryReader(data)));
   };
   /* UpdateParams defines a governance operation for updating the x/market module
    parameters. The authority is hard-coded to the x/gov module account.

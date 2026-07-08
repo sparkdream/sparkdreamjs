@@ -1,5 +1,7 @@
 //@ts-nocheck
 import { DecCoin, DecCoinAmino } from "../../../cosmos/base/v1beta1/coin";
+import { LeaseClosedReason } from "./types";
+import { Reclamation, ReclamationAmino } from "./reclamation";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /** State is an enum which refers to state of lease. */
@@ -12,6 +14,8 @@ export enum Lease_State {
   insufficient_funds = 2,
   /** closed - LeaseClosed denotes state for lease closed. */
   closed = 3,
+  /** reclaiming - LeaseReclaiming denotes a lease in reclamation (grace period before closure). */
+  reclaiming = 4,
   UNRECOGNIZED = -1,
 }
 export const Lease_StateAmino = Lease_State;
@@ -29,6 +33,9 @@ export function lease_StateFromJSON(object: any): Lease_State {
     case 3:
     case "closed":
       return Lease_State.closed;
+    case 4:
+    case "reclaiming":
+      return Lease_State.reclaiming;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -45,6 +52,8 @@ export function lease_StateToJSON(object: Lease_State): string {
       return "insufficient_funds";
     case Lease_State.closed:
       return "closed";
+    case Lease_State.reclaiming:
+      return "reclaiming";
     case Lease_State.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -88,6 +97,10 @@ export interface LeaseID {
    *   "akash1..."
    */
   provider: string;
+  /**
+   * BSeq (bid sequence) distinguishes multiple bids associated with a single deployment from same provider.
+   */
+  bseq: number;
 }
 export interface LeaseIDProtoMsg {
   typeUrl: "/akash.market.v1.LeaseID";
@@ -131,6 +144,10 @@ export interface LeaseIDAmino {
    *   "akash1..."
    */
   provider: string;
+  /**
+   * BSeq (bid sequence) distinguishes multiple bids associated with a single deployment from same provider.
+   */
+  bseq: number;
 }
 export interface LeaseIDAminoMsg {
   type: "/akash.market.v1.LeaseID";
@@ -166,6 +183,12 @@ export interface Lease {
    * ClosedOn is the block height at which the Lease was closed.
    */
   closedOn: bigint;
+  reason: LeaseClosedReason;
+  /**
+   * Reclamation holds reclamation configuration and state, if applicable.
+   * Nil if reclamation is not configured for this lease.
+   */
+  reclamation?: Reclamation;
 }
 export interface LeaseProtoMsg {
   typeUrl: "/akash.market.v1.Lease";
@@ -201,6 +224,12 @@ export interface LeaseAmino {
    * ClosedOn is the block height at which the Lease was closed.
    */
   closed_on: string;
+  reason: LeaseClosedReason;
+  /**
+   * Reclamation holds reclamation configuration and state, if applicable.
+   * Nil if reclamation is not configured for this lease.
+   */
+  reclamation?: ReclamationAmino;
 }
 export interface LeaseAminoMsg {
   type: "/akash.market.v1.Lease";
@@ -212,7 +241,8 @@ function createBaseLeaseID(): LeaseID {
     dseq: BigInt(0),
     gseq: 0,
     oseq: 0,
-    provider: ""
+    provider: "",
+    bseq: 0
   };
 }
 /**
@@ -239,6 +269,9 @@ export const LeaseID = {
     if (message.provider !== "") {
       writer.uint32(42).string(message.provider);
     }
+    if (message.bseq !== 0) {
+      writer.uint32(48).uint32(message.bseq);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): LeaseID {
@@ -263,6 +296,9 @@ export const LeaseID = {
         case 5:
           message.provider = reader.string();
           break;
+        case 6:
+          message.bseq = reader.uint32();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -277,6 +313,7 @@ export const LeaseID = {
     message.gseq = object.gseq ?? 0;
     message.oseq = object.oseq ?? 0;
     message.provider = object.provider ?? "";
+    message.bseq = object.bseq ?? 0;
     return message;
   },
   fromAmino(object: LeaseIDAmino): LeaseID {
@@ -296,6 +333,9 @@ export const LeaseID = {
     if (object.provider !== undefined && object.provider !== null) {
       message.provider = object.provider;
     }
+    if (object.bseq !== undefined && object.bseq !== null) {
+      message.bseq = object.bseq;
+    }
     return message;
   },
   toAmino(message: LeaseID): LeaseIDAmino {
@@ -305,6 +345,7 @@ export const LeaseID = {
     obj.gseq = message.gseq ?? 0;
     obj.oseq = message.oseq ?? 0;
     obj.provider = message.provider ?? "";
+    obj.bseq = message.bseq ?? 0;
     return obj;
   },
   fromAminoMsg(object: LeaseIDAminoMsg): LeaseID {
@@ -329,7 +370,9 @@ function createBaseLease(): Lease {
     state: 0,
     price: DecCoin.fromPartial({}),
     createdAt: BigInt(0),
-    closedOn: BigInt(0)
+    closedOn: BigInt(0),
+    reason: 0,
+    reclamation: undefined
   };
 }
 /**
@@ -359,6 +402,12 @@ export const Lease = {
     if (message.closedOn !== BigInt(0)) {
       writer.uint32(40).int64(message.closedOn);
     }
+    if (message.reason !== 0) {
+      writer.uint32(48).int32(message.reason);
+    }
+    if (message.reclamation !== undefined) {
+      Reclamation.encode(message.reclamation, writer.uint32(58).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Lease {
@@ -383,6 +432,12 @@ export const Lease = {
         case 5:
           message.closedOn = reader.int64();
           break;
+        case 6:
+          message.reason = reader.int32() as any;
+          break;
+        case 7:
+          message.reclamation = Reclamation.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -397,6 +452,8 @@ export const Lease = {
     message.price = object.price !== undefined && object.price !== null ? DecCoin.fromPartial(object.price) : undefined;
     message.createdAt = object.createdAt !== undefined && object.createdAt !== null ? BigInt(object.createdAt.toString()) : BigInt(0);
     message.closedOn = object.closedOn !== undefined && object.closedOn !== null ? BigInt(object.closedOn.toString()) : BigInt(0);
+    message.reason = object.reason ?? 0;
+    message.reclamation = object.reclamation !== undefined && object.reclamation !== null ? Reclamation.fromPartial(object.reclamation) : undefined;
     return message;
   },
   fromAmino(object: LeaseAmino): Lease {
@@ -416,6 +473,12 @@ export const Lease = {
     if (object.closed_on !== undefined && object.closed_on !== null) {
       message.closedOn = BigInt(object.closed_on);
     }
+    if (object.reason !== undefined && object.reason !== null) {
+      message.reason = object.reason;
+    }
+    if (object.reclamation !== undefined && object.reclamation !== null) {
+      message.reclamation = Reclamation.fromAmino(object.reclamation);
+    }
     return message;
   },
   toAmino(message: Lease): LeaseAmino {
@@ -425,6 +488,8 @@ export const Lease = {
     obj.price = message.price ? DecCoin.toAmino(message.price) : DecCoin.toAmino(DecCoin.fromPartial({}));
     obj.created_at = message.createdAt ? message.createdAt?.toString() : "0";
     obj.closed_on = message.closedOn ? message.closedOn?.toString() : "0";
+    obj.reason = message.reason ?? 0;
+    obj.reclamation = message.reclamation ? Reclamation.toAmino(message.reclamation) : undefined;
     return obj;
   },
   fromAminoMsg(object: LeaseAminoMsg): Lease {

@@ -3,6 +3,7 @@ import { OrderID, OrderIDAmino } from "./order";
 import { BidID, BidIDAmino } from "./bid";
 import { DecCoin, DecCoinAmino } from "../../../cosmos/base/v1beta1/coin";
 import { LeaseID, LeaseIDAmino } from "./lease";
+import { LeaseClosedReason } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -203,6 +204,7 @@ export interface EventLeaseClosed {
    * Id is the unique identifier of the Lease.
    */
   id: LeaseID;
+  reason: LeaseClosedReason;
 }
 export interface EventLeaseClosedProtoMsg {
   typeUrl: "/akash.market.v1.EventLeaseClosed";
@@ -220,10 +222,59 @@ export interface EventLeaseClosedAmino {
    * Id is the unique identifier of the Lease.
    */
   id: LeaseIDAmino;
+  reason: LeaseClosedReason;
 }
 export interface EventLeaseClosedAminoMsg {
   type: "/akash.market.v1.EventLeaseClosed";
   value: EventLeaseClosedAmino;
+}
+/**
+ * EventLeaseReclaimStarted is triggered when a provider initiates reclamation on a lease.
+ * @name EventLeaseReclaimStarted
+ * @package akash.market.v1
+ * @see proto type: akash.market.v1.EventLeaseReclaimStarted
+ */
+export interface EventLeaseReclaimStarted {
+  /**
+   * Id is the unique identifier of the Lease.
+   */
+  id: LeaseID;
+  /**
+   * reason is the provider's stated reason for reclamation.
+   */
+  reason: LeaseClosedReason;
+  /**
+   * deadline is the unix timestamp when the reclamation window expires.
+   */
+  deadline: bigint;
+}
+export interface EventLeaseReclaimStartedProtoMsg {
+  typeUrl: "/akash.market.v1.EventLeaseReclaimStarted";
+  value: Uint8Array;
+}
+/**
+ * EventLeaseReclaimStarted is triggered when a provider initiates reclamation on a lease.
+ * @name EventLeaseReclaimStartedAmino
+ * @package akash.market.v1
+ * @see proto type: akash.market.v1.EventLeaseReclaimStarted
+ */
+export interface EventLeaseReclaimStartedAmino {
+  /**
+   * Id is the unique identifier of the Lease.
+   */
+  id: LeaseIDAmino;
+  /**
+   * reason is the provider's stated reason for reclamation.
+   */
+  reason: LeaseClosedReason;
+  /**
+   * deadline is the unix timestamp when the reclamation window expires.
+   */
+  deadline: string;
+}
+export interface EventLeaseReclaimStartedAminoMsg {
+  type: "/akash.market.v1.EventLeaseReclaimStarted";
+  value: EventLeaseReclaimStartedAmino;
 }
 function createBaseEventOrderCreated(): EventOrderCreated {
   return {
@@ -601,7 +652,8 @@ export const EventLeaseCreated = {
 };
 function createBaseEventLeaseClosed(): EventLeaseClosed {
   return {
-    id: LeaseID.fromPartial({})
+    id: LeaseID.fromPartial({}),
+    reason: 0
   };
 }
 /**
@@ -617,6 +669,9 @@ export const EventLeaseClosed = {
     if (message.id !== undefined) {
       LeaseID.encode(message.id, writer.uint32(10).fork()).ldelim();
     }
+    if (message.reason !== 0) {
+      writer.uint32(16).int32(message.reason);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): EventLeaseClosed {
@@ -629,6 +684,9 @@ export const EventLeaseClosed = {
         case 1:
           message.id = LeaseID.decode(reader, reader.uint32());
           break;
+        case 2:
+          message.reason = reader.int32() as any;
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -639,6 +697,7 @@ export const EventLeaseClosed = {
   fromPartial(object: DeepPartial<EventLeaseClosed>): EventLeaseClosed {
     const message = createBaseEventLeaseClosed();
     message.id = object.id !== undefined && object.id !== null ? LeaseID.fromPartial(object.id) : undefined;
+    message.reason = object.reason ?? 0;
     return message;
   },
   fromAmino(object: EventLeaseClosedAmino): EventLeaseClosed {
@@ -646,11 +705,15 @@ export const EventLeaseClosed = {
     if (object.id !== undefined && object.id !== null) {
       message.id = LeaseID.fromAmino(object.id);
     }
+    if (object.reason !== undefined && object.reason !== null) {
+      message.reason = object.reason;
+    }
     return message;
   },
   toAmino(message: EventLeaseClosed): EventLeaseClosedAmino {
     const obj: any = {};
     obj.id = message.id ? LeaseID.toAmino(message.id) : LeaseID.toAmino(LeaseID.fromPartial({}));
+    obj.reason = message.reason ?? 0;
     return obj;
   },
   fromAminoMsg(object: EventLeaseClosedAminoMsg): EventLeaseClosed {
@@ -666,6 +729,99 @@ export const EventLeaseClosed = {
     return {
       typeUrl: "/akash.market.v1.EventLeaseClosed",
       value: EventLeaseClosed.encode(message).finish()
+    };
+  }
+};
+function createBaseEventLeaseReclaimStarted(): EventLeaseReclaimStarted {
+  return {
+    id: LeaseID.fromPartial({}),
+    reason: 0,
+    deadline: BigInt(0)
+  };
+}
+/**
+ * EventLeaseReclaimStarted is triggered when a provider initiates reclamation on a lease.
+ * @name EventLeaseReclaimStarted
+ * @package akash.market.v1
+ * @see proto type: akash.market.v1.EventLeaseReclaimStarted
+ */
+export const EventLeaseReclaimStarted = {
+  typeUrl: "/akash.market.v1.EventLeaseReclaimStarted",
+  encode(message: EventLeaseReclaimStarted, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.id !== undefined) {
+      LeaseID.encode(message.id, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.reason !== 0) {
+      writer.uint32(16).int32(message.reason);
+    }
+    if (message.deadline !== BigInt(0)) {
+      writer.uint32(24).int64(message.deadline);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): EventLeaseReclaimStarted {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEventLeaseReclaimStarted();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = LeaseID.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.reason = reader.int32() as any;
+          break;
+        case 3:
+          message.deadline = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<EventLeaseReclaimStarted>): EventLeaseReclaimStarted {
+    const message = createBaseEventLeaseReclaimStarted();
+    message.id = object.id !== undefined && object.id !== null ? LeaseID.fromPartial(object.id) : undefined;
+    message.reason = object.reason ?? 0;
+    message.deadline = object.deadline !== undefined && object.deadline !== null ? BigInt(object.deadline.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: EventLeaseReclaimStartedAmino): EventLeaseReclaimStarted {
+    const message = createBaseEventLeaseReclaimStarted();
+    if (object.id !== undefined && object.id !== null) {
+      message.id = LeaseID.fromAmino(object.id);
+    }
+    if (object.reason !== undefined && object.reason !== null) {
+      message.reason = object.reason;
+    }
+    if (object.deadline !== undefined && object.deadline !== null) {
+      message.deadline = BigInt(object.deadline);
+    }
+    return message;
+  },
+  toAmino(message: EventLeaseReclaimStarted): EventLeaseReclaimStartedAmino {
+    const obj: any = {};
+    obj.id = message.id ? LeaseID.toAmino(message.id) : LeaseID.toAmino(LeaseID.fromPartial({}));
+    obj.reason = message.reason ?? 0;
+    obj.deadline = message.deadline ? message.deadline?.toString() : "0";
+    return obj;
+  },
+  fromAminoMsg(object: EventLeaseReclaimStartedAminoMsg): EventLeaseReclaimStarted {
+    return EventLeaseReclaimStarted.fromAmino(object.value);
+  },
+  fromProtoMsg(message: EventLeaseReclaimStartedProtoMsg): EventLeaseReclaimStarted {
+    return EventLeaseReclaimStarted.decode(message.value);
+  },
+  toProto(message: EventLeaseReclaimStarted): Uint8Array {
+    return EventLeaseReclaimStarted.encode(message).finish();
+  },
+  toProtoMsg(message: EventLeaseReclaimStarted): EventLeaseReclaimStartedProtoMsg {
+    return {
+      typeUrl: "/akash.market.v1.EventLeaseReclaimStarted",
+      value: EventLeaseReclaimStarted.encode(message).finish()
     };
   }
 };

@@ -2,10 +2,9 @@
 import { TelescopeGeneratedType } from "../../../types";
 import { Registry } from "@cosmjs/proto-signing";
 import { MsgCreateDeployment, MsgUpdateDeployment, MsgCloseDeployment } from "./deploymentmsg";
-import { MsgDepositDeployment } from "../v1/msg";
 import { MsgCloseGroup, MsgPauseGroup, MsgStartGroup } from "./groupmsg";
 import { MsgUpdateParams } from "./paramsmsg";
-export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/akash.deployment.v1beta4.MsgCreateDeployment", MsgCreateDeployment], ["/akash.deployment.v1.MsgDepositDeployment", MsgDepositDeployment], ["/akash.deployment.v1beta4.MsgUpdateDeployment", MsgUpdateDeployment], ["/akash.deployment.v1beta4.MsgCloseDeployment", MsgCloseDeployment], ["/akash.deployment.v1beta4.MsgCloseGroup", MsgCloseGroup], ["/akash.deployment.v1beta4.MsgPauseGroup", MsgPauseGroup], ["/akash.deployment.v1beta4.MsgStartGroup", MsgStartGroup], ["/akash.deployment.v1beta4.MsgUpdateParams", MsgUpdateParams]];
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/akash.deployment.v1beta4.MsgCreateDeployment", MsgCreateDeployment], ["/akash.deployment.v1beta4.MsgUpdateDeployment", MsgUpdateDeployment], ["/akash.deployment.v1beta4.MsgCloseDeployment", MsgCloseDeployment], ["/akash.deployment.v1beta4.MsgCloseGroup", MsgCloseGroup], ["/akash.deployment.v1beta4.MsgPauseGroup", MsgPauseGroup], ["/akash.deployment.v1beta4.MsgStartGroup", MsgStartGroup], ["/akash.deployment.v1beta4.MsgUpdateParams", MsgUpdateParams]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -17,12 +16,6 @@ export const MessageComposer = {
       return {
         typeUrl: "/akash.deployment.v1beta4.MsgCreateDeployment",
         value: MsgCreateDeployment.encode(value).finish()
-      };
-    },
-    depositDeployment(value: MsgDepositDeployment) {
-      return {
-        typeUrl: "/akash.deployment.v1.MsgDepositDeployment",
-        value: MsgDepositDeployment.encode(value).finish()
       };
     },
     updateDeployment(value: MsgUpdateDeployment) {
@@ -69,12 +62,6 @@ export const MessageComposer = {
         value
       };
     },
-    depositDeployment(value: MsgDepositDeployment) {
-      return {
-        typeUrl: "/akash.deployment.v1.MsgDepositDeployment",
-        value
-      };
-    },
     updateDeployment(value: MsgUpdateDeployment) {
       return {
         typeUrl: "/akash.deployment.v1beta4.MsgUpdateDeployment",
@@ -117,12 +104,6 @@ export const MessageComposer = {
       return {
         typeUrl: "/akash.deployment.v1beta4.MsgCreateDeployment",
         value: MsgCreateDeployment.fromPartial(value)
-      };
-    },
-    depositDeployment(value: MsgDepositDeployment) {
-      return {
-        typeUrl: "/akash.deployment.v1.MsgDepositDeployment",
-        value: MsgDepositDeployment.fromPartial(value)
       };
     },
     updateDeployment(value: MsgUpdateDeployment) {

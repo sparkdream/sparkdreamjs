@@ -5,7 +5,7 @@ import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
 import { QueryParamsRequest, QueryParamsResponse } from "./query";
 /** Query defines the gRPC querier service of the take package. */
 export interface Query {
-  /** Params returns the total set of minting parameters. */
+  /** Params returns the total set of take parameters. */
   params(request?: QueryParamsRequest): Promise<QueryParamsResponse>;
 }
 export class QueryClientImpl implements Query {
@@ -13,7 +13,7 @@ export class QueryClientImpl implements Query {
   constructor(rpc: TxRpc) {
     this.rpc = rpc;
   }
-  /* Params returns the total set of minting parameters. */
+  /* Params returns the total set of take parameters. */
   params = async (request: QueryParamsRequest = {}): Promise<QueryParamsResponse> => {
     const data = QueryParamsRequest.encode(request).finish();
     const promise = this.rpc.request("akash.take.v1.Query", "Params", data);

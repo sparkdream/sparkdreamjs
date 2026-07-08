@@ -4,7 +4,7 @@ import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "
 import { DeploymentID, DeploymentIDAmino, Deployment, DeploymentAmino } from "../v1/deployment";
 import { GroupID, GroupIDAmino } from "../v1/group";
 import { Group, GroupAmino } from "./group";
-import { Account, AccountAmino } from "../../escrow/v1/account";
+import { Account, AccountAmino } from "../../escrow/types/v1/account";
 import { Params, ParamsAmino } from "./params";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
@@ -180,7 +180,7 @@ export interface QueryDeploymentResponseAminoMsg {
  */
 export interface QueryGroupRequest {
   /**
-   * Id is the unique identifer of the Group.
+   * Id is the unique identifier of the Group.
    */
   id: GroupID;
 }
@@ -196,7 +196,7 @@ export interface QueryGroupRequestProtoMsg {
  */
 export interface QueryGroupRequestAmino {
   /**
-   * Id is the unique identifer of the Group.
+   * Id is the unique identifier of the Group.
    */
   id?: GroupIDAmino;
 }

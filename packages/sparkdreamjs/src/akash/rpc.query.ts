@@ -11,35 +11,45 @@ export const createRPCQueryClient = async ({
   return {
     akash: {
       audit: {
-        v1: (await import("./audit/v1/query.rpc.Query")).createRpcQueryExtension(client),
-        v1beta3: (await import("./audit/v1beta3/query.rpc.Query")).createRpcQueryExtension(client)
+        v1: (await import("./audit/v1/query.rpc.Query")).createRpcQueryExtension(client)
       },
       bme: {
         v1: (await import("./bme/v1/query.rpc.Query")).createRpcQueryExtension(client)
       },
       cert: {
-        v1: (await import("./cert/v1/query.rpc.Query")).createRpcQueryExtension(client),
-        v1beta3: (await import("./cert/v1beta3/query.rpc.Query")).createRpcQueryExtension(client)
+        v1: (await import("./cert/v1/query.rpc.Query")).createRpcQueryExtension(client)
       },
       deployment: {
-        v1beta3: (await import("./deployment/v1beta3/query.rpc.Query")).createRpcQueryExtension(client),
-        v1beta4: (await import("./deployment/v1beta4/query.rpc.Query")).createRpcQueryExtension(client)
+        v1beta4: (await import("./deployment/v1beta4/query.rpc.Query")).createRpcQueryExtension(client),
+        v1beta5: (await import("./deployment/v1beta5/query.rpc.Query")).createRpcQueryExtension(client)
+      },
+      downtimedetector: {
+        v1beta1: (await import("./downtimedetector/v1beta1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
+      epochs: {
+        v1beta1: (await import("./epochs/v1beta1/query.rpc.Query")).createRpcQueryExtension(client)
       },
       escrow: {
         v1: (await import("./escrow/v1/query.rpc.Query")).createRpcQueryExtension(client),
         v1beta3: (await import("./escrow/v1beta3/query.rpc.Query")).createRpcQueryExtension(client)
       },
       market: {
-        v1beta4: (await import("./market/v1beta4/query.rpc.Query")).createRpcQueryExtension(client),
-        v1beta5: (await import("./market/v1beta5/query.rpc.Query")).createRpcQueryExtension(client)
+        v1beta5: (await import("./market/v1beta5/query.rpc.Query")).createRpcQueryExtension(client),
+        v2beta1: (await import("./market/v2beta1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
+      oracle: {
+        v1: (await import("./oracle/v1/query.rpc.Query")).createRpcQueryExtension(client),
+        v2: (await import("./oracle/v2/query.rpc.Query")).createRpcQueryExtension(client)
       },
       provider: {
-        v1beta3: (await import("./provider/v1beta3/query.rpc.Query")).createRpcQueryExtension(client),
         v1beta4: (await import("./provider/v1beta4/query.rpc.Query")).createRpcQueryExtension(client)
       },
       take: {
         v1: (await import("./take/v1/query.rpc.Query")).createRpcQueryExtension(client),
         v1beta3: (await import("./take/v1beta3/query.rpc.Query")).createRpcQueryExtension(client)
+      },
+      wasm: {
+        v1: (await import("./wasm/v1/query.rpc.Query")).createRpcQueryExtension(client)
       }
     },
     cosmos: {

@@ -13,9 +13,6 @@ export const createLCDClient = async ({
       audit: {
         v1: new (await import("./audit/v1/query.lcd")).LCDQueryClient({
           requestClient
-        }),
-        v1beta3: new (await import("./audit/v1beta3/query.lcd")).LCDQueryClient({
-          requestClient
         })
       },
       bme: {
@@ -26,16 +23,23 @@ export const createLCDClient = async ({
       cert: {
         v1: new (await import("./cert/v1/query.lcd")).LCDQueryClient({
           requestClient
-        }),
-        v1beta3: new (await import("./cert/v1beta3/query.lcd")).LCDQueryClient({
-          requestClient
         })
       },
       deployment: {
-        v1beta3: new (await import("./deployment/v1beta3/query.lcd")).LCDQueryClient({
+        v1beta4: new (await import("./deployment/v1beta4/query.lcd")).LCDQueryClient({
           requestClient
         }),
-        v1beta4: new (await import("./deployment/v1beta4/query.lcd")).LCDQueryClient({
+        v1beta5: new (await import("./deployment/v1beta5/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
+      downtimedetector: {
+        v1beta1: new (await import("./downtimedetector/v1beta1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
+      epochs: {
+        v1beta1: new (await import("./epochs/v1beta1/query.lcd")).LCDQueryClient({
           requestClient
         })
       },
@@ -48,23 +52,33 @@ export const createLCDClient = async ({
         })
       },
       market: {
-        v1beta4: new (await import("./market/v1beta4/query.lcd")).LCDQueryClient({
+        v1beta5: new (await import("./market/v1beta5/query.lcd")).LCDQueryClient({
           requestClient
         }),
-        v1beta5: new (await import("./market/v1beta5/query.lcd")).LCDQueryClient({
+        v2beta1: new (await import("./market/v2beta1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
+      oracle: {
+        v1: new (await import("./oracle/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        }),
+        v2: new (await import("./oracle/v2/query.lcd")).LCDQueryClient({
           requestClient
         })
       },
       provider: {
-        v1beta3: new (await import("./provider/v1beta3/query.lcd")).LCDQueryClient({
-          requestClient
-        }),
         v1beta4: new (await import("./provider/v1beta4/query.lcd")).LCDQueryClient({
           requestClient
         })
       },
       take: {
         v1: new (await import("./take/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
+      wasm: {
+        v1: new (await import("./wasm/v1/query.lcd")).LCDQueryClient({
           requestClient
         })
       }

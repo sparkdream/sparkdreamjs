@@ -1,6 +1,6 @@
 //@ts-nocheck
-import { Account, AccountAmino } from "./account";
-import { FractionalPayment, FractionalPaymentAmino } from "./fractional_payment";
+import { Account, AccountAmino } from "../types/v1/account";
+import { Payment, PaymentAmino } from "../types/v1/payment";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -17,7 +17,7 @@ export interface GenesisState {
   /**
    * Payments is a list of fractional payments on the genesis state..
    */
-  payments: FractionalPayment[];
+  payments: Payment[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/akash.escrow.v1.GenesisState";
@@ -37,7 +37,7 @@ export interface GenesisStateAmino {
   /**
    * Payments is a list of fractional payments on the genesis state..
    */
-  payments: FractionalPaymentAmino[];
+  payments: PaymentAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/akash.escrow.v1.GenesisState";
@@ -62,7 +62,7 @@ export const GenesisState = {
       Account.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     for (const v of message.payments) {
-      FractionalPayment.encode(v!, writer.uint32(18).fork()).ldelim();
+      Payment.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -77,7 +77,7 @@ export const GenesisState = {
           message.accounts.push(Account.decode(reader, reader.uint32()));
           break;
         case 2:
-          message.payments.push(FractionalPayment.decode(reader, reader.uint32()));
+          message.payments.push(Payment.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -89,13 +89,13 @@ export const GenesisState = {
   fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = createBaseGenesisState();
     message.accounts = object.accounts?.map(e => Account.fromPartial(e)) || [];
-    message.payments = object.payments?.map(e => FractionalPayment.fromPartial(e)) || [];
+    message.payments = object.payments?.map(e => Payment.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
     const message = createBaseGenesisState();
     message.accounts = object.accounts?.map(e => Account.fromAmino(e)) || [];
-    message.payments = object.payments?.map(e => FractionalPayment.fromAmino(e)) || [];
+    message.payments = object.payments?.map(e => Payment.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -106,7 +106,7 @@ export const GenesisState = {
       obj.accounts = message.accounts;
     }
     if (message.payments) {
-      obj.payments = message.payments.map(e => e ? FractionalPayment.toAmino(e) : undefined);
+      obj.payments = message.payments.map(e => e ? Payment.toAmino(e) : undefined);
     } else {
       obj.payments = message.payments;
     }

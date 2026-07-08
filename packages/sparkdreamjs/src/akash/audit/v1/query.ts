@@ -11,7 +11,7 @@ import { DeepPartial } from "../../../helpers";
  */
 export interface QueryProvidersResponse {
   /**
-   * Providers contains a list of audited provided account addresses.
+   * Providers contains a list of audited providers account addresses.
    */
   providers: AuditedProvider[];
   /**
@@ -31,7 +31,7 @@ export interface QueryProvidersResponseProtoMsg {
  */
 export interface QueryProvidersResponseAmino {
   /**
-   * Providers contains a list of audited provided account addresses.
+   * Providers contains a list of audited providers account addresses.
    */
   providers?: AuditedProviderAmino[];
   /**
@@ -147,7 +147,7 @@ export interface QueryProviderAttributesRequest {
    */
   owner: string;
   /**
-   * Pagination is used to paginate request.
+   * Pagination is used to paginate the request.
    */
   pagination?: PageRequest;
 }
@@ -171,7 +171,7 @@ export interface QueryProviderAttributesRequestAmino {
    */
   owner?: string;
   /**
-   * Pagination is used to paginate request.
+   * Pagination is used to paginate the request.
    */
   pagination?: PageRequestAmino;
 }
@@ -251,7 +251,7 @@ export interface QueryAuditorAttributesRequest {
    */
   auditor: string;
   /**
-   * Pagination is used to paginate request.
+   * Pagination is used to paginate the request.
    */
   pagination?: PageRequest;
 }
@@ -275,7 +275,7 @@ export interface QueryAuditorAttributesRequestAmino {
    */
   auditor?: string;
   /**
-   * Pagination is used to paginate request.
+   * Pagination is used to paginate the request.
    */
   pagination?: PageRequestAmino;
 }

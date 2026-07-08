@@ -17,7 +17,7 @@ export interface Query {
   leases(request: QueryLeasesRequest): Promise<QueryLeasesResponse>;
   /** Lease queries lease details. */
   lease(request: QueryLeaseRequest): Promise<QueryLeaseResponse>;
-  /** Params returns the total set of minting parameters. */
+  /** Params returns the total set of market parameters. */
   params(request?: QueryParamsRequest): Promise<QueryParamsResponse>;
 }
 export class QueryClientImpl implements Query {
@@ -61,7 +61,7 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("akash.market.v1beta5.Query", "Lease", data);
     return promise.then(data => QueryLeaseResponse.decode(new BinaryReader(data)));
   };
-  /* Params returns the total set of minting parameters. */
+  /* Params returns the total set of market parameters. */
   params = async (request: QueryParamsRequest = {}): Promise<QueryParamsResponse> => {
     const data = QueryParamsRequest.encode(request).finish();
     const promise = this.rpc.request("akash.market.v1beta5.Query", "Params", data);

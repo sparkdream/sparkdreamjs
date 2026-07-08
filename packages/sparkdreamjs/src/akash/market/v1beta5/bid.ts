@@ -2,6 +2,7 @@
 import { BidID, BidIDAmino } from "../v1/bid";
 import { DecCoin, DecCoinAmino } from "../../../cosmos/base/v1beta1/coin";
 import { ResourceOffer, ResourceOfferAmino } from "./resourcesoffer";
+import { Duration, DurationAmino } from "../../../google/protobuf/duration";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /** BidState is an enum which refers to state of bid. */
@@ -87,6 +88,10 @@ export interface Bid {
    * ResourceOffer is a list of offers.
    */
   resourcesOffer: ResourceOffer[];
+  /**
+   * reclamation_window is the reclamation window offered by this provider.
+   */
+  reclamationWindow?: Duration;
 }
 export interface BidProtoMsg {
   typeUrl: "/akash.market.v1beta5.Bid";
@@ -120,6 +125,10 @@ export interface BidAmino {
    * ResourceOffer is a list of offers.
    */
   resources_offer: ResourceOfferAmino[];
+  /**
+   * reclamation_window is the reclamation window offered by this provider.
+   */
+  reclamation_window?: DurationAmino;
 }
 export interface BidAminoMsg {
   type: "/akash.market.v1beta5.Bid";
@@ -131,7 +140,8 @@ function createBaseBid(): Bid {
     state: 0,
     price: DecCoin.fromPartial({}),
     createdAt: BigInt(0),
-    resourcesOffer: []
+    resourcesOffer: [],
+    reclamationWindow: undefined
   };
 }
 /**
@@ -158,6 +168,9 @@ export const Bid = {
     for (const v of message.resourcesOffer) {
       ResourceOffer.encode(v!, writer.uint32(42).fork()).ldelim();
     }
+    if (message.reclamationWindow !== undefined) {
+      Duration.encode(message.reclamationWindow, writer.uint32(50).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Bid {
@@ -182,6 +195,9 @@ export const Bid = {
         case 5:
           message.resourcesOffer.push(ResourceOffer.decode(reader, reader.uint32()));
           break;
+        case 6:
+          message.reclamationWindow = Duration.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -196,6 +212,7 @@ export const Bid = {
     message.price = object.price !== undefined && object.price !== null ? DecCoin.fromPartial(object.price) : undefined;
     message.createdAt = object.createdAt !== undefined && object.createdAt !== null ? BigInt(object.createdAt.toString()) : BigInt(0);
     message.resourcesOffer = object.resourcesOffer?.map(e => ResourceOffer.fromPartial(e)) || [];
+    message.reclamationWindow = object.reclamationWindow !== undefined && object.reclamationWindow !== null ? Duration.fromPartial(object.reclamationWindow) : undefined;
     return message;
   },
   fromAmino(object: BidAmino): Bid {
@@ -213,6 +230,9 @@ export const Bid = {
       message.createdAt = BigInt(object.created_at);
     }
     message.resourcesOffer = object.resources_offer?.map(e => ResourceOffer.fromAmino(e)) || [];
+    if (object.reclamation_window !== undefined && object.reclamation_window !== null) {
+      message.reclamationWindow = Duration.fromAmino(object.reclamation_window);
+    }
     return message;
   },
   toAmino(message: Bid): BidAmino {
@@ -226,6 +246,7 @@ export const Bid = {
     } else {
       obj.resources_offer = message.resourcesOffer;
     }
+    obj.reclamation_window = message.reclamationWindow ? Duration.toAmino(message.reclamationWindow) : undefined;
     return obj;
   },
   fromAminoMsg(object: BidAminoMsg): Bid {

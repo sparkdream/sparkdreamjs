@@ -3,6 +3,7 @@ package akash.market.v1beta5;
 
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "google/protobuf/duration.proto";
 
 import "akash/market/v1beta5/resourcesoffer.proto";
 import "akash/market/v1/bid.proto";
@@ -11,7 +12,7 @@ option go_package = "pkg.akt.dev/go/node/market/v1beta5";
 
 // Bid stores BidID, state of bid and price.
 message Bid {
-  option (gogoproto.equal)            = false;
+  option (gogoproto.equal)            = true;
   option (gogoproto.goproto_stringer) = false;
 
   // BidState is an enum which refers to state of bid.
@@ -75,5 +76,13 @@ message Bid {
     (gogoproto.customname)   = "ResourcesOffer",
     (gogoproto.jsontag)      = "resources_offer",
     (gogoproto.moretags)     = "yaml:\"resources_offer\""
+  ];
+
+  // reclamation_window is the reclamation window offered by this provider.
+  google.protobuf.Duration reclamation_window = 6 [
+    (gogoproto.nullable)    = true,
+    (gogoproto.stdduration) = true,
+    (gogoproto.jsontag)     = "reclamation_window,omitempty",
+    (gogoproto.moretags)    = "yaml:\"reclamation_window,omitempty\""
   ];
 }
