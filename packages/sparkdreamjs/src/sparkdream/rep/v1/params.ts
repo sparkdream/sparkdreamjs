@@ -377,6 +377,24 @@ export interface Params {
    * pollution by stale unapproved proposals. Must be positive.
    */
   proposedProjectExpiryBlocks: bigint;
+  /**
+   * Fraction of the initiative budget locked as a DREAM bond when the project
+   * creator self-assigns on a budget-backed project (permissionless projects
+   * are exempt — no treasury exposure). Bond is returned on completion or
+   * abandonment and burned when a challenge is upheld. Range [0, 1]; 0 disables.
+   */
+  selfAssignedBondRate: string;
+  /**
+   * External-conviction ratio applied instead of external_conviction_ratio when
+   * the assignee is the project creator. Must be >= external_conviction_ratio
+   * and <= 1. Default 1.0: the community alone vouches for self-assigned work.
+   */
+  selfAssignedExternalConvictionRatio: string;
+  /**
+   * Multiplier applied to the challenge window for creator-assigned
+   * initiatives. Must be >= 1. Default 2.
+   */
+  selfAssignedChallengeMultiplier: bigint;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Params";
@@ -667,6 +685,24 @@ export interface ParamsAmino {
    * pollution by stale unapproved proposals. Must be positive.
    */
   proposed_project_expiry_blocks?: string;
+  /**
+   * Fraction of the initiative budget locked as a DREAM bond when the project
+   * creator self-assigns on a budget-backed project (permissionless projects
+   * are exempt — no treasury exposure). Bond is returned on completion or
+   * abandonment and burned when a challenge is upheld. Range [0, 1]; 0 disables.
+   */
+  self_assigned_bond_rate?: string;
+  /**
+   * External-conviction ratio applied instead of external_conviction_ratio when
+   * the assignee is the project creator. Must be >= external_conviction_ratio
+   * and <= 1. Default 1.0: the community alone vouches for self-assigned work.
+   */
+  self_assigned_external_conviction_ratio?: string;
+  /**
+   * Multiplier applied to the challenge window for creator-assigned
+   * initiatives. Must be >= 1. Default 2.
+   */
+  self_assigned_challenge_multiplier?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/rep/Params";
@@ -1482,7 +1518,10 @@ function createBaseParams(): Params {
     maxDreamMintPerEpoch: "",
     maxProjectRequestedBudget: "",
     maxProjectRequestedSpark: "",
-    proposedProjectExpiryBlocks: BigInt(0)
+    proposedProjectExpiryBlocks: BigInt(0),
+    selfAssignedBondRate: "",
+    selfAssignedExternalConvictionRatio: "",
+    selfAssignedChallengeMultiplier: BigInt(0)
   };
 }
 /**
@@ -1768,6 +1807,15 @@ export const Params = {
     if (message.proposedProjectExpiryBlocks !== BigInt(0)) {
       writer.uint32(720).int64(message.proposedProjectExpiryBlocks);
     }
+    if (message.selfAssignedBondRate !== "") {
+      writer.uint32(738).string(Decimal.fromUserInput(message.selfAssignedBondRate, 18).atomics);
+    }
+    if (message.selfAssignedExternalConvictionRatio !== "") {
+      writer.uint32(746).string(Decimal.fromUserInput(message.selfAssignedExternalConvictionRatio, 18).atomics);
+    }
+    if (message.selfAssignedChallengeMultiplier !== BigInt(0)) {
+      writer.uint32(752).int64(message.selfAssignedChallengeMultiplier);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -2050,6 +2098,15 @@ export const Params = {
         case 90:
           message.proposedProjectExpiryBlocks = reader.int64();
           break;
+        case 92:
+          message.selfAssignedBondRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 93:
+          message.selfAssignedExternalConvictionRatio = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 94:
+          message.selfAssignedChallengeMultiplier = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2150,6 +2207,9 @@ export const Params = {
     message.maxProjectRequestedBudget = object.maxProjectRequestedBudget ?? "";
     message.maxProjectRequestedSpark = object.maxProjectRequestedSpark ?? "";
     message.proposedProjectExpiryBlocks = object.proposedProjectExpiryBlocks !== undefined && object.proposedProjectExpiryBlocks !== null ? BigInt(object.proposedProjectExpiryBlocks.toString()) : BigInt(0);
+    message.selfAssignedBondRate = object.selfAssignedBondRate ?? "";
+    message.selfAssignedExternalConvictionRatio = object.selfAssignedExternalConvictionRatio ?? "";
+    message.selfAssignedChallengeMultiplier = object.selfAssignedChallengeMultiplier !== undefined && object.selfAssignedChallengeMultiplier !== null ? BigInt(object.selfAssignedChallengeMultiplier.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -2427,6 +2487,15 @@ export const Params = {
     if (object.proposed_project_expiry_blocks !== undefined && object.proposed_project_expiry_blocks !== null) {
       message.proposedProjectExpiryBlocks = BigInt(object.proposed_project_expiry_blocks);
     }
+    if (object.self_assigned_bond_rate !== undefined && object.self_assigned_bond_rate !== null) {
+      message.selfAssignedBondRate = object.self_assigned_bond_rate;
+    }
+    if (object.self_assigned_external_conviction_ratio !== undefined && object.self_assigned_external_conviction_ratio !== null) {
+      message.selfAssignedExternalConvictionRatio = object.self_assigned_external_conviction_ratio;
+    }
+    if (object.self_assigned_challenge_multiplier !== undefined && object.self_assigned_challenge_multiplier !== null) {
+      message.selfAssignedChallengeMultiplier = BigInt(object.self_assigned_challenge_multiplier);
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -2522,6 +2591,9 @@ export const Params = {
     obj.max_project_requested_budget = message.maxProjectRequestedBudget === "" ? undefined : message.maxProjectRequestedBudget;
     obj.max_project_requested_spark = message.maxProjectRequestedSpark === "" ? undefined : message.maxProjectRequestedSpark;
     obj.proposed_project_expiry_blocks = message.proposedProjectExpiryBlocks !== BigInt(0) ? message.proposedProjectExpiryBlocks?.toString() : undefined;
+    obj.self_assigned_bond_rate = message.selfAssignedBondRate === "" ? undefined : message.selfAssignedBondRate;
+    obj.self_assigned_external_conviction_ratio = message.selfAssignedExternalConvictionRatio === "" ? undefined : message.selfAssignedExternalConvictionRatio;
+    obj.self_assigned_challenge_multiplier = message.selfAssignedChallengeMultiplier !== BigInt(0) ? message.selfAssignedChallengeMultiplier?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {

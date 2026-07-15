@@ -63,6 +63,17 @@ export interface GenesisState {
    * next_recurring_spend_id is the next auto-increment recurring spend ID.
    */
   nextRecurringSpendId: bigint;
+  /**
+   * founding_members overrides the build's compiled-in genesis founders
+   * (GenesisNames / GenesisHandles / FounderName) when non-empty, so a chain
+   * launched from a shared build can bootstrap governance around its own
+   * accounts. Empty means: use the build's founders. Consumed by the
+   * governance bootstrap at InitGenesis and intentionally not exported: an
+   * exported chain already carries its bootstrapped councils in group_map /
+   * council_members, and the bootstrap's early return (no founder accounts
+   * in the auth store) keeps a re-import from re-running it.
+   */
+  foundingMembers: FoundingMember[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.commons.v1.GenesisState";
@@ -125,10 +136,91 @@ export interface GenesisStateAmino {
    * next_recurring_spend_id is the next auto-increment recurring spend ID.
    */
   next_recurring_spend_id?: string;
+  /**
+   * founding_members overrides the build's compiled-in genesis founders
+   * (GenesisNames / GenesisHandles / FounderName) when non-empty, so a chain
+   * launched from a shared build can bootstrap governance around its own
+   * accounts. Empty means: use the build's founders. Consumed by the
+   * governance bootstrap at InitGenesis and intentionally not exported: an
+   * exported chain already carries its bootstrapped councils in group_map /
+   * council_members, and the bootstrap's early return (no founder accounts
+   * in the auth store) keeps a re-import from re-running it.
+   */
+  founding_members?: FoundingMemberAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.commons.v1.GenesisState";
   value: GenesisStateAmino;
+}
+/**
+ * FoundingMember is one governance founding member for the InitGenesis
+ * bootstrap: a seat on the founding councils, a seeded x/name display name,
+ * and optionally pre-claimed x/name handles (first handle becomes primary).
+ * Exactly one entry must set founder=true; that account additionally anchors
+ * the Technical and Ecosystem councils and their committees.
+ * @name FoundingMember
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.FoundingMember
+ */
+export interface FoundingMember {
+  /**
+   * address is the member's bech32 account address. The account must exist
+   * in the auth genesis state or the bootstrap skips it.
+   */
+  address: string;
+  /**
+   * display_name is seeded as the x/name OwnerInfo display name and recorded
+   * as membership metadata.
+   */
+  displayName: string;
+  /**
+   * handles are x/name handles claimed for this address at genesis; the
+   * first one becomes the primary handle.
+   */
+  handles: string[];
+  /**
+   * founder marks the single founder account.
+   */
+  founder: boolean;
+}
+export interface FoundingMemberProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.FoundingMember";
+  value: Uint8Array;
+}
+/**
+ * FoundingMember is one governance founding member for the InitGenesis
+ * bootstrap: a seat on the founding councils, a seeded x/name display name,
+ * and optionally pre-claimed x/name handles (first handle becomes primary).
+ * Exactly one entry must set founder=true; that account additionally anchors
+ * the Technical and Ecosystem councils and their committees.
+ * @name FoundingMemberAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.FoundingMember
+ */
+export interface FoundingMemberAmino {
+  /**
+   * address is the member's bech32 account address. The account must exist
+   * in the auth genesis state or the bootstrap skips it.
+   */
+  address?: string;
+  /**
+   * display_name is seeded as the x/name OwnerInfo display name and recorded
+   * as membership metadata.
+   */
+  display_name?: string;
+  /**
+   * handles are x/name handles claimed for this address at genesis; the
+   * first one becomes the primary handle.
+   */
+  handles?: string[];
+  /**
+   * founder marks the single founder account.
+   */
+  founder?: boolean;
+}
+export interface FoundingMemberAminoMsg {
+  type: "/sparkdream.commons.v1.FoundingMember";
+  value: FoundingMemberAmino;
 }
 /**
  * CouncilMembers groups members by council name for genesis export.
@@ -257,7 +349,8 @@ function createBaseGenesisState(): GenesisState {
     categoryMap: [],
     nextCategoryId: BigInt(0),
     recurringSpends: [],
-    nextRecurringSpendId: BigInt(0)
+    nextRecurringSpendId: BigInt(0),
+    foundingMembers: []
   };
 }
 /**
@@ -311,6 +404,9 @@ export const GenesisState = {
     if (message.nextRecurringSpendId !== BigInt(0)) {
       writer.uint32(112).uint64(message.nextRecurringSpendId);
     }
+    for (const v of message.foundingMembers) {
+      FoundingMember.encode(v!, writer.uint32(122).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -362,6 +458,9 @@ export const GenesisState = {
         case 14:
           message.nextRecurringSpendId = reader.uint64();
           break;
+        case 15:
+          message.foundingMembers.push(FoundingMember.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -385,6 +484,7 @@ export const GenesisState = {
     message.nextCategoryId = object.nextCategoryId !== undefined && object.nextCategoryId !== null ? BigInt(object.nextCategoryId.toString()) : BigInt(0);
     message.recurringSpends = object.recurringSpends?.map(e => RecurringSpend.fromPartial(e)) || [];
     message.nextRecurringSpendId = object.nextRecurringSpendId !== undefined && object.nextRecurringSpendId !== null ? BigInt(object.nextRecurringSpendId.toString()) : BigInt(0);
+    message.foundingMembers = object.foundingMembers?.map(e => FoundingMember.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -413,6 +513,7 @@ export const GenesisState = {
     if (object.next_recurring_spend_id !== undefined && object.next_recurring_spend_id !== null) {
       message.nextRecurringSpendId = BigInt(object.next_recurring_spend_id);
     }
+    message.foundingMembers = object.founding_members?.map(e => FoundingMember.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -467,6 +568,11 @@ export const GenesisState = {
       obj.recurring_spends = message.recurringSpends;
     }
     obj.next_recurring_spend_id = message.nextRecurringSpendId !== BigInt(0) ? message.nextRecurringSpendId?.toString() : undefined;
+    if (message.foundingMembers) {
+      obj.founding_members = message.foundingMembers.map(e => e ? FoundingMember.toAmino(e) : undefined);
+    } else {
+      obj.founding_members = message.foundingMembers;
+    }
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {
@@ -482,6 +588,117 @@ export const GenesisState = {
     return {
       typeUrl: "/sparkdream.commons.v1.GenesisState",
       value: GenesisState.encode(message).finish()
+    };
+  }
+};
+function createBaseFoundingMember(): FoundingMember {
+  return {
+    address: "",
+    displayName: "",
+    handles: [],
+    founder: false
+  };
+}
+/**
+ * FoundingMember is one governance founding member for the InitGenesis
+ * bootstrap: a seat on the founding councils, a seeded x/name display name,
+ * and optionally pre-claimed x/name handles (first handle becomes primary).
+ * Exactly one entry must set founder=true; that account additionally anchors
+ * the Technical and Ecosystem councils and their committees.
+ * @name FoundingMember
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.FoundingMember
+ */
+export const FoundingMember = {
+  typeUrl: "/sparkdream.commons.v1.FoundingMember",
+  encode(message: FoundingMember, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.address !== "") {
+      writer.uint32(10).string(message.address);
+    }
+    if (message.displayName !== "") {
+      writer.uint32(18).string(message.displayName);
+    }
+    for (const v of message.handles) {
+      writer.uint32(26).string(v!);
+    }
+    if (message.founder === true) {
+      writer.uint32(32).bool(message.founder);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): FoundingMember {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFoundingMember();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.address = reader.string();
+          break;
+        case 2:
+          message.displayName = reader.string();
+          break;
+        case 3:
+          message.handles.push(reader.string());
+          break;
+        case 4:
+          message.founder = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<FoundingMember>): FoundingMember {
+    const message = createBaseFoundingMember();
+    message.address = object.address ?? "";
+    message.displayName = object.displayName ?? "";
+    message.handles = object.handles?.map(e => e) || [];
+    message.founder = object.founder ?? false;
+    return message;
+  },
+  fromAmino(object: FoundingMemberAmino): FoundingMember {
+    const message = createBaseFoundingMember();
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    }
+    if (object.display_name !== undefined && object.display_name !== null) {
+      message.displayName = object.display_name;
+    }
+    message.handles = object.handles?.map(e => e) || [];
+    if (object.founder !== undefined && object.founder !== null) {
+      message.founder = object.founder;
+    }
+    return message;
+  },
+  toAmino(message: FoundingMember): FoundingMemberAmino {
+    const obj: any = {};
+    obj.address = message.address === "" ? undefined : message.address;
+    obj.display_name = message.displayName === "" ? undefined : message.displayName;
+    if (message.handles) {
+      obj.handles = message.handles.map(e => e);
+    } else {
+      obj.handles = message.handles;
+    }
+    obj.founder = message.founder === false ? undefined : message.founder;
+    return obj;
+  },
+  fromAminoMsg(object: FoundingMemberAminoMsg): FoundingMember {
+    return FoundingMember.fromAmino(object.value);
+  },
+  fromProtoMsg(message: FoundingMemberProtoMsg): FoundingMember {
+    return FoundingMember.decode(message.value);
+  },
+  toProto(message: FoundingMember): Uint8Array {
+    return FoundingMember.encode(message).finish();
+  },
+  toProtoMsg(message: FoundingMember): FoundingMemberProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.FoundingMember",
+      value: FoundingMember.encode(message).finish()
     };
   }
 };

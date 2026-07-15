@@ -226,6 +226,11 @@ export interface Initiative {
    * Conviction propagated from linked content
    */
   propagatedConviction: string;
+  /**
+   * DREAM locked by a self-assigning project creator (budget-backed projects
+   * only). Returned on completion/abandonment, burned on upheld challenge.
+   */
+  selfAssignBond: string;
 }
 export interface InitiativeProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Initiative";
@@ -266,6 +271,11 @@ export interface InitiativeAmino {
    * Conviction propagated from linked content
    */
   propagated_conviction?: string;
+  /**
+   * DREAM locked by a self-assigning project creator (budget-backed projects
+   * only). Returned on completion/abandonment, burned on upheld challenge.
+   */
+  self_assign_bond?: string;
 }
 export interface InitiativeAminoMsg {
   type: "/sparkdream.rep.v1.Initiative";
@@ -297,7 +307,8 @@ function createBaseInitiative(): Initiative {
     status: 0,
     createdAt: BigInt(0),
     completedAt: BigInt(0),
-    propagatedConviction: ""
+    propagatedConviction: "",
+    selfAssignBond: ""
   };
 }
 /**
@@ -384,6 +395,9 @@ export const Initiative = {
     if (message.propagatedConviction !== "") {
       writer.uint32(202).string(Decimal.fromUserInput(message.propagatedConviction, 18).atomics);
     }
+    if (message.selfAssignBond !== "") {
+      writer.uint32(210).string(message.selfAssignBond);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Initiative {
@@ -468,6 +482,9 @@ export const Initiative = {
         case 25:
           message.propagatedConviction = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
+        case 26:
+          message.selfAssignBond = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -502,6 +519,7 @@ export const Initiative = {
     message.createdAt = object.createdAt !== undefined && object.createdAt !== null ? BigInt(object.createdAt.toString()) : BigInt(0);
     message.completedAt = object.completedAt !== undefined && object.completedAt !== null ? BigInt(object.completedAt.toString()) : BigInt(0);
     message.propagatedConviction = object.propagatedConviction ?? "";
+    message.selfAssignBond = object.selfAssignBond ?? "";
     return message;
   },
   fromAmino(object: InitiativeAmino): Initiative {
@@ -577,6 +595,9 @@ export const Initiative = {
     if (object.propagated_conviction !== undefined && object.propagated_conviction !== null) {
       message.propagatedConviction = object.propagated_conviction;
     }
+    if (object.self_assign_bond !== undefined && object.self_assign_bond !== null) {
+      message.selfAssignBond = object.self_assign_bond;
+    }
     return message;
   },
   toAmino(message: Initiative): InitiativeAmino {
@@ -614,6 +635,7 @@ export const Initiative = {
     obj.created_at = message.createdAt !== BigInt(0) ? message.createdAt?.toString() : undefined;
     obj.completed_at = message.completedAt !== BigInt(0) ? message.completedAt?.toString() : undefined;
     obj.propagated_conviction = message.propagatedConviction === "" ? undefined : message.propagatedConviction;
+    obj.self_assign_bond = message.selfAssignBond === "" ? undefined : message.selfAssignBond;
     return obj;
   },
   fromAminoMsg(object: InitiativeAminoMsg): Initiative {
