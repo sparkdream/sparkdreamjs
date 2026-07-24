@@ -6,6 +6,14 @@ export enum ChallengeStatus {
   CHALLENGE_STATUS_IN_JURY_REVIEW = 1,
   CHALLENGE_STATUS_UPHELD = 2,
   CHALLENGE_STATUS_REJECTED = 3,
+  /**
+   * CHALLENGE_STATUS_VOIDED - VOIDED terminates a challenge without a verdict when the underlying
+   * initiative is discarded out from under it — specifically when the parent
+   * project is cancelled. The challenger's stake is refunded in full (no burn,
+   * no reward) because the dispute was never adjudicated; any pending jury
+   * review is closed INCONCLUSIVE.
+   */
+  CHALLENGE_STATUS_VOIDED = 4,
   UNRECOGNIZED = -1,
 }
 export const ChallengeStatusAmino = ChallengeStatus;
@@ -23,6 +31,9 @@ export function challengeStatusFromJSON(object: any): ChallengeStatus {
     case 3:
     case "CHALLENGE_STATUS_REJECTED":
       return ChallengeStatus.CHALLENGE_STATUS_REJECTED;
+    case 4:
+    case "CHALLENGE_STATUS_VOIDED":
+      return ChallengeStatus.CHALLENGE_STATUS_VOIDED;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -39,6 +50,8 @@ export function challengeStatusToJSON(object: ChallengeStatus): string {
       return "CHALLENGE_STATUS_UPHELD";
     case ChallengeStatus.CHALLENGE_STATUS_REJECTED:
       return "CHALLENGE_STATUS_REJECTED";
+    case ChallengeStatus.CHALLENGE_STATUS_VOIDED:
+      return "CHALLENGE_STATUS_VOIDED";
     case ChallengeStatus.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";

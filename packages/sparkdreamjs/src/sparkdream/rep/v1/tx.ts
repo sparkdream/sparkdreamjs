@@ -2722,6 +2722,60 @@ export interface MsgResolveGovActionAppealResponseAminoMsg {
   type: "/sparkdream.rep.v1.MsgResolveGovActionAppealResponse";
   value: MsgResolveGovActionAppealResponseAmino;
 }
+/**
+ * MsgCancelInitiative retires an OPEN, unassigned initiative. Callable by the
+ * parent project's creator or the Operations Committee.
+ * @name MsgCancelInitiative
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCancelInitiative
+ */
+export interface MsgCancelInitiative {
+  creator: string;
+  initiativeId: bigint;
+  reason: string;
+}
+export interface MsgCancelInitiativeProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgCancelInitiative";
+  value: Uint8Array;
+}
+/**
+ * MsgCancelInitiative retires an OPEN, unassigned initiative. Callable by the
+ * parent project's creator or the Operations Committee.
+ * @name MsgCancelInitiativeAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCancelInitiative
+ */
+export interface MsgCancelInitiativeAmino {
+  creator?: string;
+  initiative_id?: string;
+  reason?: string;
+}
+export interface MsgCancelInitiativeAminoMsg {
+  type: "sparkdream/x/rep/MsgCancelInitiative";
+  value: MsgCancelInitiativeAmino;
+}
+/**
+ * MsgCancelInitiativeResponse defines the MsgCancelInitiativeResponse message.
+ * @name MsgCancelInitiativeResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCancelInitiativeResponse
+ */
+export interface MsgCancelInitiativeResponse {}
+export interface MsgCancelInitiativeResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgCancelInitiativeResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgCancelInitiativeResponse defines the MsgCancelInitiativeResponse message.
+ * @name MsgCancelInitiativeResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCancelInitiativeResponse
+ */
+export interface MsgCancelInitiativeResponseAmino {}
+export interface MsgCancelInitiativeResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgCancelInitiativeResponse";
+  value: MsgCancelInitiativeResponseAmino;
+}
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
     authority: "",
@@ -10803,6 +10857,163 @@ export const MsgResolveGovActionAppealResponse = {
     return {
       typeUrl: "/sparkdream.rep.v1.MsgResolveGovActionAppealResponse",
       value: MsgResolveGovActionAppealResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCancelInitiative(): MsgCancelInitiative {
+  return {
+    creator: "",
+    initiativeId: BigInt(0),
+    reason: ""
+  };
+}
+/**
+ * MsgCancelInitiative retires an OPEN, unassigned initiative. Callable by the
+ * parent project's creator or the Operations Committee.
+ * @name MsgCancelInitiative
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCancelInitiative
+ */
+export const MsgCancelInitiative = {
+  typeUrl: "/sparkdream.rep.v1.MsgCancelInitiative",
+  aminoType: "sparkdream/x/rep/MsgCancelInitiative",
+  encode(message: MsgCancelInitiative, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.initiativeId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.initiativeId);
+    }
+    if (message.reason !== "") {
+      writer.uint32(26).string(message.reason);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCancelInitiative {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCancelInitiative();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.initiativeId = reader.uint64();
+          break;
+        case 3:
+          message.reason = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCancelInitiative>): MsgCancelInitiative {
+    const message = createBaseMsgCancelInitiative();
+    message.creator = object.creator ?? "";
+    message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
+    message.reason = object.reason ?? "";
+    return message;
+  },
+  fromAmino(object: MsgCancelInitiativeAmino): MsgCancelInitiative {
+    const message = createBaseMsgCancelInitiative();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.initiative_id !== undefined && object.initiative_id !== null) {
+      message.initiativeId = BigInt(object.initiative_id);
+    }
+    if (object.reason !== undefined && object.reason !== null) {
+      message.reason = object.reason;
+    }
+    return message;
+  },
+  toAmino(message: MsgCancelInitiative): MsgCancelInitiativeAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
+    obj.reason = message.reason === "" ? undefined : message.reason;
+    return obj;
+  },
+  fromAminoMsg(object: MsgCancelInitiativeAminoMsg): MsgCancelInitiative {
+    return MsgCancelInitiative.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCancelInitiative): MsgCancelInitiativeAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgCancelInitiative",
+      value: MsgCancelInitiative.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgCancelInitiativeProtoMsg): MsgCancelInitiative {
+    return MsgCancelInitiative.decode(message.value);
+  },
+  toProto(message: MsgCancelInitiative): Uint8Array {
+    return MsgCancelInitiative.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCancelInitiative): MsgCancelInitiativeProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgCancelInitiative",
+      value: MsgCancelInitiative.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCancelInitiativeResponse(): MsgCancelInitiativeResponse {
+  return {};
+}
+/**
+ * MsgCancelInitiativeResponse defines the MsgCancelInitiativeResponse message.
+ * @name MsgCancelInitiativeResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCancelInitiativeResponse
+ */
+export const MsgCancelInitiativeResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgCancelInitiativeResponse",
+  encode(_: MsgCancelInitiativeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCancelInitiativeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCancelInitiativeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgCancelInitiativeResponse>): MsgCancelInitiativeResponse {
+    const message = createBaseMsgCancelInitiativeResponse();
+    return message;
+  },
+  fromAmino(_: MsgCancelInitiativeResponseAmino): MsgCancelInitiativeResponse {
+    const message = createBaseMsgCancelInitiativeResponse();
+    return message;
+  },
+  toAmino(_: MsgCancelInitiativeResponse): MsgCancelInitiativeResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgCancelInitiativeResponseAminoMsg): MsgCancelInitiativeResponse {
+    return MsgCancelInitiativeResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgCancelInitiativeResponseProtoMsg): MsgCancelInitiativeResponse {
+    return MsgCancelInitiativeResponse.decode(message.value);
+  },
+  toProto(message: MsgCancelInitiativeResponse): Uint8Array {
+    return MsgCancelInitiativeResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCancelInitiativeResponse): MsgCancelInitiativeResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgCancelInitiativeResponse",
+      value: MsgCancelInitiativeResponse.encode(message).finish()
     };
   }
 };

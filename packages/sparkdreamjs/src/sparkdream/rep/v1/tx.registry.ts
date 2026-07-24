@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { TelescopeGeneratedType } from "../../../types";
 import { Registry } from "@cosmjs/proto-signing";
-import { MsgUpdateParams, MsgUpdateOperationalParams, MsgInviteMember, MsgAcceptInvitation, MsgTransferDream, MsgCreateInterim, MsgAssignInterim, MsgSubmitInterimWork, MsgApproveInterim, MsgAbandonInterim, MsgCompleteInterim, MsgProposeProject, MsgApproveProjectBudget, MsgCancelProject, MsgCreateInitiative, MsgAssignInitiative, MsgSubmitInitiativeWork, MsgApproveInitiative, MsgAbandonInitiative, MsgCompleteInitiative, MsgStake, MsgUnstake, MsgClaimStakingRewards, MsgCompoundStakingRewards, MsgCreateChallenge, MsgRespondToChallenge, MsgSubmitJurorVote, MsgSubmitExpertTestimony, MsgChallengeContent, MsgRespondToContentChallenge, MsgRegisterZkPublicKey, MsgCreateTag, MsgReportTag, MsgResolveTagReport, MsgCreateTagBudget, MsgAwardFromTagBudget, MsgTopUpTagBudget, MsgToggleTagBudget, MsgWithdrawTagBudget, MsgBondRole, MsgUnbondRole, MsgCancelUnbondRole, MsgReportMember, MsgCosignMemberReport, MsgResolveMemberReport, MsgDefendMemberReport, MsgAppealGovAction, MsgResolveGovActionAppeal } from "./tx";
-export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.rep.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.rep.v1.MsgUpdateOperationalParams", MsgUpdateOperationalParams], ["/sparkdream.rep.v1.MsgInviteMember", MsgInviteMember], ["/sparkdream.rep.v1.MsgAcceptInvitation", MsgAcceptInvitation], ["/sparkdream.rep.v1.MsgTransferDream", MsgTransferDream], ["/sparkdream.rep.v1.MsgCreateInterim", MsgCreateInterim], ["/sparkdream.rep.v1.MsgAssignInterim", MsgAssignInterim], ["/sparkdream.rep.v1.MsgSubmitInterimWork", MsgSubmitInterimWork], ["/sparkdream.rep.v1.MsgApproveInterim", MsgApproveInterim], ["/sparkdream.rep.v1.MsgAbandonInterim", MsgAbandonInterim], ["/sparkdream.rep.v1.MsgCompleteInterim", MsgCompleteInterim], ["/sparkdream.rep.v1.MsgProposeProject", MsgProposeProject], ["/sparkdream.rep.v1.MsgApproveProjectBudget", MsgApproveProjectBudget], ["/sparkdream.rep.v1.MsgCancelProject", MsgCancelProject], ["/sparkdream.rep.v1.MsgCreateInitiative", MsgCreateInitiative], ["/sparkdream.rep.v1.MsgAssignInitiative", MsgAssignInitiative], ["/sparkdream.rep.v1.MsgSubmitInitiativeWork", MsgSubmitInitiativeWork], ["/sparkdream.rep.v1.MsgApproveInitiative", MsgApproveInitiative], ["/sparkdream.rep.v1.MsgAbandonInitiative", MsgAbandonInitiative], ["/sparkdream.rep.v1.MsgCompleteInitiative", MsgCompleteInitiative], ["/sparkdream.rep.v1.MsgStake", MsgStake], ["/sparkdream.rep.v1.MsgUnstake", MsgUnstake], ["/sparkdream.rep.v1.MsgClaimStakingRewards", MsgClaimStakingRewards], ["/sparkdream.rep.v1.MsgCompoundStakingRewards", MsgCompoundStakingRewards], ["/sparkdream.rep.v1.MsgCreateChallenge", MsgCreateChallenge], ["/sparkdream.rep.v1.MsgRespondToChallenge", MsgRespondToChallenge], ["/sparkdream.rep.v1.MsgSubmitJurorVote", MsgSubmitJurorVote], ["/sparkdream.rep.v1.MsgSubmitExpertTestimony", MsgSubmitExpertTestimony], ["/sparkdream.rep.v1.MsgChallengeContent", MsgChallengeContent], ["/sparkdream.rep.v1.MsgRespondToContentChallenge", MsgRespondToContentChallenge], ["/sparkdream.rep.v1.MsgRegisterZkPublicKey", MsgRegisterZkPublicKey], ["/sparkdream.rep.v1.MsgCreateTag", MsgCreateTag], ["/sparkdream.rep.v1.MsgReportTag", MsgReportTag], ["/sparkdream.rep.v1.MsgResolveTagReport", MsgResolveTagReport], ["/sparkdream.rep.v1.MsgCreateTagBudget", MsgCreateTagBudget], ["/sparkdream.rep.v1.MsgAwardFromTagBudget", MsgAwardFromTagBudget], ["/sparkdream.rep.v1.MsgTopUpTagBudget", MsgTopUpTagBudget], ["/sparkdream.rep.v1.MsgToggleTagBudget", MsgToggleTagBudget], ["/sparkdream.rep.v1.MsgWithdrawTagBudget", MsgWithdrawTagBudget], ["/sparkdream.rep.v1.MsgBondRole", MsgBondRole], ["/sparkdream.rep.v1.MsgUnbondRole", MsgUnbondRole], ["/sparkdream.rep.v1.MsgCancelUnbondRole", MsgCancelUnbondRole], ["/sparkdream.rep.v1.MsgReportMember", MsgReportMember], ["/sparkdream.rep.v1.MsgCosignMemberReport", MsgCosignMemberReport], ["/sparkdream.rep.v1.MsgResolveMemberReport", MsgResolveMemberReport], ["/sparkdream.rep.v1.MsgDefendMemberReport", MsgDefendMemberReport], ["/sparkdream.rep.v1.MsgAppealGovAction", MsgAppealGovAction], ["/sparkdream.rep.v1.MsgResolveGovActionAppeal", MsgResolveGovActionAppeal]];
+import { MsgUpdateParams, MsgUpdateOperationalParams, MsgInviteMember, MsgAcceptInvitation, MsgTransferDream, MsgCreateInterim, MsgAssignInterim, MsgSubmitInterimWork, MsgApproveInterim, MsgAbandonInterim, MsgCompleteInterim, MsgProposeProject, MsgApproveProjectBudget, MsgCancelProject, MsgCreateInitiative, MsgAssignInitiative, MsgSubmitInitiativeWork, MsgApproveInitiative, MsgAbandonInitiative, MsgCompleteInitiative, MsgStake, MsgUnstake, MsgClaimStakingRewards, MsgCompoundStakingRewards, MsgCreateChallenge, MsgRespondToChallenge, MsgSubmitJurorVote, MsgSubmitExpertTestimony, MsgChallengeContent, MsgRespondToContentChallenge, MsgRegisterZkPublicKey, MsgCreateTag, MsgReportTag, MsgResolveTagReport, MsgCreateTagBudget, MsgAwardFromTagBudget, MsgTopUpTagBudget, MsgToggleTagBudget, MsgWithdrawTagBudget, MsgBondRole, MsgUnbondRole, MsgCancelUnbondRole, MsgReportMember, MsgCosignMemberReport, MsgResolveMemberReport, MsgDefendMemberReport, MsgAppealGovAction, MsgResolveGovActionAppeal, MsgCancelInitiative } from "./tx";
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.rep.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.rep.v1.MsgUpdateOperationalParams", MsgUpdateOperationalParams], ["/sparkdream.rep.v1.MsgInviteMember", MsgInviteMember], ["/sparkdream.rep.v1.MsgAcceptInvitation", MsgAcceptInvitation], ["/sparkdream.rep.v1.MsgTransferDream", MsgTransferDream], ["/sparkdream.rep.v1.MsgCreateInterim", MsgCreateInterim], ["/sparkdream.rep.v1.MsgAssignInterim", MsgAssignInterim], ["/sparkdream.rep.v1.MsgSubmitInterimWork", MsgSubmitInterimWork], ["/sparkdream.rep.v1.MsgApproveInterim", MsgApproveInterim], ["/sparkdream.rep.v1.MsgAbandonInterim", MsgAbandonInterim], ["/sparkdream.rep.v1.MsgCompleteInterim", MsgCompleteInterim], ["/sparkdream.rep.v1.MsgProposeProject", MsgProposeProject], ["/sparkdream.rep.v1.MsgApproveProjectBudget", MsgApproveProjectBudget], ["/sparkdream.rep.v1.MsgCancelProject", MsgCancelProject], ["/sparkdream.rep.v1.MsgCreateInitiative", MsgCreateInitiative], ["/sparkdream.rep.v1.MsgAssignInitiative", MsgAssignInitiative], ["/sparkdream.rep.v1.MsgSubmitInitiativeWork", MsgSubmitInitiativeWork], ["/sparkdream.rep.v1.MsgApproveInitiative", MsgApproveInitiative], ["/sparkdream.rep.v1.MsgAbandonInitiative", MsgAbandonInitiative], ["/sparkdream.rep.v1.MsgCompleteInitiative", MsgCompleteInitiative], ["/sparkdream.rep.v1.MsgStake", MsgStake], ["/sparkdream.rep.v1.MsgUnstake", MsgUnstake], ["/sparkdream.rep.v1.MsgClaimStakingRewards", MsgClaimStakingRewards], ["/sparkdream.rep.v1.MsgCompoundStakingRewards", MsgCompoundStakingRewards], ["/sparkdream.rep.v1.MsgCreateChallenge", MsgCreateChallenge], ["/sparkdream.rep.v1.MsgRespondToChallenge", MsgRespondToChallenge], ["/sparkdream.rep.v1.MsgSubmitJurorVote", MsgSubmitJurorVote], ["/sparkdream.rep.v1.MsgSubmitExpertTestimony", MsgSubmitExpertTestimony], ["/sparkdream.rep.v1.MsgChallengeContent", MsgChallengeContent], ["/sparkdream.rep.v1.MsgRespondToContentChallenge", MsgRespondToContentChallenge], ["/sparkdream.rep.v1.MsgRegisterZkPublicKey", MsgRegisterZkPublicKey], ["/sparkdream.rep.v1.MsgCreateTag", MsgCreateTag], ["/sparkdream.rep.v1.MsgReportTag", MsgReportTag], ["/sparkdream.rep.v1.MsgResolveTagReport", MsgResolveTagReport], ["/sparkdream.rep.v1.MsgCreateTagBudget", MsgCreateTagBudget], ["/sparkdream.rep.v1.MsgAwardFromTagBudget", MsgAwardFromTagBudget], ["/sparkdream.rep.v1.MsgTopUpTagBudget", MsgTopUpTagBudget], ["/sparkdream.rep.v1.MsgToggleTagBudget", MsgToggleTagBudget], ["/sparkdream.rep.v1.MsgWithdrawTagBudget", MsgWithdrawTagBudget], ["/sparkdream.rep.v1.MsgBondRole", MsgBondRole], ["/sparkdream.rep.v1.MsgUnbondRole", MsgUnbondRole], ["/sparkdream.rep.v1.MsgCancelUnbondRole", MsgCancelUnbondRole], ["/sparkdream.rep.v1.MsgReportMember", MsgReportMember], ["/sparkdream.rep.v1.MsgCosignMemberReport", MsgCosignMemberReport], ["/sparkdream.rep.v1.MsgResolveMemberReport", MsgResolveMemberReport], ["/sparkdream.rep.v1.MsgDefendMemberReport", MsgDefendMemberReport], ["/sparkdream.rep.v1.MsgAppealGovAction", MsgAppealGovAction], ["/sparkdream.rep.v1.MsgResolveGovActionAppeal", MsgResolveGovActionAppeal], ["/sparkdream.rep.v1.MsgCancelInitiative", MsgCancelInitiative]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -297,6 +297,12 @@ export const MessageComposer = {
         typeUrl: "/sparkdream.rep.v1.MsgResolveGovActionAppeal",
         value: MsgResolveGovActionAppeal.encode(value).finish()
       };
+    },
+    cancelInitiative(value: MsgCancelInitiative) {
+      return {
+        typeUrl: "/sparkdream.rep.v1.MsgCancelInitiative",
+        value: MsgCancelInitiative.encode(value).finish()
+      };
     }
   },
   withTypeUrl: {
@@ -585,6 +591,12 @@ export const MessageComposer = {
     resolveGovActionAppeal(value: MsgResolveGovActionAppeal) {
       return {
         typeUrl: "/sparkdream.rep.v1.MsgResolveGovActionAppeal",
+        value
+      };
+    },
+    cancelInitiative(value: MsgCancelInitiative) {
+      return {
+        typeUrl: "/sparkdream.rep.v1.MsgCancelInitiative",
         value
       };
     }
@@ -876,6 +888,12 @@ export const MessageComposer = {
       return {
         typeUrl: "/sparkdream.rep.v1.MsgResolveGovActionAppeal",
         value: MsgResolveGovActionAppeal.fromPartial(value)
+      };
+    },
+    cancelInitiative(value: MsgCancelInitiative) {
+      return {
+        typeUrl: "/sparkdream.rep.v1.MsgCancelInitiative",
+        value: MsgCancelInitiative.fromPartial(value)
       };
     }
   }

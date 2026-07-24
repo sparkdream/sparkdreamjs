@@ -18,11 +18,11 @@ export interface Query {
   /** ListProject Queries a list of Project items. */
   getProject(request: QueryGetProjectRequest): Promise<QueryGetProjectResponse>;
   /** ListProject defines the ListProject RPC. */
-  listProject(request?: QueryAllProjectRequest): Promise<QueryAllProjectResponse>;
+  listProject(request: QueryAllProjectRequest): Promise<QueryAllProjectResponse>;
   /** ListInitiative Queries a list of Initiative items. */
   getInitiative(request: QueryGetInitiativeRequest): Promise<QueryGetInitiativeResponse>;
   /** ListInitiative defines the ListInitiative RPC. */
-  listInitiative(request?: QueryAllInitiativeRequest): Promise<QueryAllInitiativeResponse>;
+  listInitiative(request: QueryAllInitiativeRequest): Promise<QueryAllInitiativeResponse>;
   /** ListStake Queries a list of Stake items. */
   getStake(request: QueryGetStakeRequest): Promise<QueryGetStakeResponse>;
   /** ListStake defines the ListStake RPC. */
@@ -60,7 +60,7 @@ export interface Query {
   /** InitiativesByAssignee Queries a list of InitiativesByAssignee items. */
   initiativesByAssignee(request: QueryInitiativesByAssigneeRequest): Promise<QueryInitiativesByAssigneeResponse>;
   /** AvailableInitiatives Queries a list of AvailableInitiatives items. */
-  availableInitiatives(request?: QueryAvailableInitiativesRequest): Promise<QueryAvailableInitiativesResponse>;
+  availableInitiatives(request: QueryAvailableInitiativesRequest): Promise<QueryAvailableInitiativesResponse>;
   /** StakesByStaker Queries a list of StakesByStaker items. */
   stakesByStaker(request: QueryStakesByStakerRequest): Promise<QueryStakesByStakerResponse>;
   /** StakesByTarget Queries a list of StakesByTarget items. */
@@ -213,9 +213,7 @@ export class QueryClientImpl implements Query {
     return promise.then(data => QueryGetProjectResponse.decode(new BinaryReader(data)));
   };
   /* ListProject defines the ListProject RPC. */
-  listProject = async (request: QueryAllProjectRequest = {
-    pagination: undefined
-  }): Promise<QueryAllProjectResponse> => {
+  listProject = async (request: QueryAllProjectRequest): Promise<QueryAllProjectResponse> => {
     const data = QueryAllProjectRequest.encode(request).finish();
     const promise = this.rpc.request("sparkdream.rep.v1.Query", "ListProject", data);
     return promise.then(data => QueryAllProjectResponse.decode(new BinaryReader(data)));
@@ -227,9 +225,7 @@ export class QueryClientImpl implements Query {
     return promise.then(data => QueryGetInitiativeResponse.decode(new BinaryReader(data)));
   };
   /* ListInitiative defines the ListInitiative RPC. */
-  listInitiative = async (request: QueryAllInitiativeRequest = {
-    pagination: undefined
-  }): Promise<QueryAllInitiativeResponse> => {
+  listInitiative = async (request: QueryAllInitiativeRequest): Promise<QueryAllInitiativeResponse> => {
     const data = QueryAllInitiativeRequest.encode(request).finish();
     const promise = this.rpc.request("sparkdream.rep.v1.Query", "ListInitiative", data);
     return promise.then(data => QueryAllInitiativeResponse.decode(new BinaryReader(data)));
@@ -353,9 +349,7 @@ export class QueryClientImpl implements Query {
     return promise.then(data => QueryInitiativesByAssigneeResponse.decode(new BinaryReader(data)));
   };
   /* AvailableInitiatives Queries a list of AvailableInitiatives items. */
-  availableInitiatives = async (request: QueryAvailableInitiativesRequest = {
-    pagination: undefined
-  }): Promise<QueryAvailableInitiativesResponse> => {
+  availableInitiatives = async (request: QueryAvailableInitiativesRequest): Promise<QueryAvailableInitiativesResponse> => {
     const data = QueryAvailableInitiativesRequest.encode(request).finish();
     const promise = this.rpc.request("sparkdream.rep.v1.Query", "AvailableInitiatives", data);
     return promise.then(data => QueryAvailableInitiativesResponse.decode(new BinaryReader(data)));
@@ -718,13 +712,13 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     getProject(request: QueryGetProjectRequest): Promise<QueryGetProjectResponse> {
       return queryService.getProject(request);
     },
-    listProject(request?: QueryAllProjectRequest): Promise<QueryAllProjectResponse> {
+    listProject(request: QueryAllProjectRequest): Promise<QueryAllProjectResponse> {
       return queryService.listProject(request);
     },
     getInitiative(request: QueryGetInitiativeRequest): Promise<QueryGetInitiativeResponse> {
       return queryService.getInitiative(request);
     },
-    listInitiative(request?: QueryAllInitiativeRequest): Promise<QueryAllInitiativeResponse> {
+    listInitiative(request: QueryAllInitiativeRequest): Promise<QueryAllInitiativeResponse> {
       return queryService.listInitiative(request);
     },
     getStake(request: QueryGetStakeRequest): Promise<QueryGetStakeResponse> {
@@ -781,7 +775,7 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     initiativesByAssignee(request: QueryInitiativesByAssigneeRequest): Promise<QueryInitiativesByAssigneeResponse> {
       return queryService.initiativesByAssignee(request);
     },
-    availableInitiatives(request?: QueryAvailableInitiativesRequest): Promise<QueryAvailableInitiativesResponse> {
+    availableInitiatives(request: QueryAvailableInitiativesRequest): Promise<QueryAvailableInitiativesResponse> {
       return queryService.availableInitiatives(request);
     },
     stakesByStaker(request: QueryStakesByStakerRequest): Promise<QueryStakesByStakerResponse> {

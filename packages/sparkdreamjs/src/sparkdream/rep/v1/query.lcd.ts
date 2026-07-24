@@ -58,14 +58,15 @@ export class LCDQueryClient {
     return await this.req.get<QueryGetProjectResponse>(endpoint);
   };
   /* ListProject defines the ListProject RPC. */
-  listProject = async (params: QueryAllProjectRequest = {
-    pagination: undefined
-  }): Promise<QueryAllProjectResponse> => {
+  listProject = async (params: QueryAllProjectRequest): Promise<QueryAllProjectResponse> => {
     const options: any = {
       params: {}
     };
     if (typeof params?.pagination !== "undefined") {
       setPaginationParams(options, params.pagination);
+    }
+    if (typeof params?.sortBy !== "undefined") {
+      options.params.sort_by = params.sortBy;
     }
     const endpoint = `sparkdream/rep/v1/project`;
     return await this.req.get<QueryAllProjectResponse>(endpoint, options);
@@ -76,14 +77,15 @@ export class LCDQueryClient {
     return await this.req.get<QueryGetInitiativeResponse>(endpoint);
   };
   /* ListInitiative defines the ListInitiative RPC. */
-  listInitiative = async (params: QueryAllInitiativeRequest = {
-    pagination: undefined
-  }): Promise<QueryAllInitiativeResponse> => {
+  listInitiative = async (params: QueryAllInitiativeRequest): Promise<QueryAllInitiativeResponse> => {
     const options: any = {
       params: {}
     };
     if (typeof params?.pagination !== "undefined") {
       setPaginationParams(options, params.pagination);
+    }
+    if (typeof params?.sortBy !== "undefined") {
+      options.params.sort_by = params.sortBy;
     }
     const endpoint = `sparkdream/rep/v1/initiative`;
     return await this.req.get<QueryAllInitiativeResponse>(endpoint, options);
@@ -241,6 +243,9 @@ export class LCDQueryClient {
     if (typeof params?.pagination !== "undefined") {
       setPaginationParams(options, params.pagination);
     }
+    if (typeof params?.sortBy !== "undefined") {
+      options.params.sort_by = params.sortBy;
+    }
     const endpoint = `sparkdream/rep/v1/projects_by_council/${params.council}`;
     return await this.req.get<QueryProjectsByCouncilResponse>(endpoint, options);
   };
@@ -251,6 +256,9 @@ export class LCDQueryClient {
     };
     if (typeof params?.pagination !== "undefined") {
       setPaginationParams(options, params.pagination);
+    }
+    if (typeof params?.sortBy !== "undefined") {
+      options.params.sort_by = params.sortBy;
     }
     const endpoint = `sparkdream/rep/v1/initiatives_by_project/${params.projectId}`;
     return await this.req.get<QueryInitiativesByProjectResponse>(endpoint, options);
@@ -263,18 +271,22 @@ export class LCDQueryClient {
     if (typeof params?.pagination !== "undefined") {
       setPaginationParams(options, params.pagination);
     }
+    if (typeof params?.sortBy !== "undefined") {
+      options.params.sort_by = params.sortBy;
+    }
     const endpoint = `sparkdream/rep/v1/initiatives_by_assignee/${params.assignee}`;
     return await this.req.get<QueryInitiativesByAssigneeResponse>(endpoint, options);
   };
   /* AvailableInitiatives Queries a list of AvailableInitiatives items. */
-  availableInitiatives = async (params: QueryAvailableInitiativesRequest = {
-    pagination: undefined
-  }): Promise<QueryAvailableInitiativesResponse> => {
+  availableInitiatives = async (params: QueryAvailableInitiativesRequest): Promise<QueryAvailableInitiativesResponse> => {
     const options: any = {
       params: {}
     };
     if (typeof params?.pagination !== "undefined") {
       setPaginationParams(options, params.pagination);
+    }
+    if (typeof params?.sortBy !== "undefined") {
+      options.params.sort_by = params.sortBy;
     }
     const endpoint = `sparkdream/rep/v1/available_initiatives`;
     return await this.req.get<QueryAvailableInitiativesResponse>(endpoint, options);

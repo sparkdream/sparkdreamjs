@@ -133,6 +133,12 @@ export enum InitiativeStatus {
   INITIATIVE_STATUS_COMPLETED = 5,
   INITIATIVE_STATUS_REJECTED = 6,
   INITIATIVE_STATUS_ABANDONED = 7,
+  /**
+   * INITIATIVE_STATUS_CANCELLED - Retired by the project creator (or Operations Committee) while still
+   * OPEN and unassigned. Distinct from ABANDONED, which records an assignee
+   * walking away from work they had taken on.
+   */
+  INITIATIVE_STATUS_CANCELLED = 8,
   UNRECOGNIZED = -1,
 }
 export const InitiativeStatusAmino = InitiativeStatus;
@@ -162,6 +168,9 @@ export function initiativeStatusFromJSON(object: any): InitiativeStatus {
     case 7:
     case "INITIATIVE_STATUS_ABANDONED":
       return InitiativeStatus.INITIATIVE_STATUS_ABANDONED;
+    case 8:
+    case "INITIATIVE_STATUS_CANCELLED":
+      return InitiativeStatus.INITIATIVE_STATUS_CANCELLED;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -186,6 +195,8 @@ export function initiativeStatusToJSON(object: InitiativeStatus): string {
       return "INITIATIVE_STATUS_REJECTED";
     case InitiativeStatus.INITIATIVE_STATUS_ABANDONED:
       return "INITIATIVE_STATUS_ABANDONED";
+    case InitiativeStatus.INITIATIVE_STATUS_CANCELLED:
+      return "INITIATIVE_STATUS_CANCELLED";
     case InitiativeStatus.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";

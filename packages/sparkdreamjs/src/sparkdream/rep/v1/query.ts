@@ -350,6 +350,13 @@ export interface QueryGetProjectResponseAminoMsg {
  */
 export interface QueryAllProjectRequest {
   pagination?: PageRequest;
+  /**
+   * sort_by orders the full project set before pagination is applied.
+   * Supported keys: "id" (default), "name", "budget" (approved budget),
+   * "status". Direction follows pagination.reverse. When set, pagination is
+   * offset-based (next_key is an offset, not a store key).
+   */
+  sortBy: string;
 }
 export interface QueryAllProjectRequestProtoMsg {
   typeUrl: "/sparkdream.rep.v1.QueryAllProjectRequest";
@@ -363,6 +370,13 @@ export interface QueryAllProjectRequestProtoMsg {
  */
 export interface QueryAllProjectRequestAmino {
   pagination?: PageRequestAmino;
+  /**
+   * sort_by orders the full project set before pagination is applied.
+   * Supported keys: "id" (default), "name", "budget" (approved budget),
+   * "status". Direction follows pagination.reverse. When set, pagination is
+   * offset-based (next_key is an offset, not a store key).
+   */
+  sort_by?: string;
 }
 export interface QueryAllProjectRequestAminoMsg {
   type: "/sparkdream.rep.v1.QueryAllProjectRequest";
@@ -456,6 +470,15 @@ export interface QueryGetInitiativeResponseAminoMsg {
  */
 export interface QueryAllInitiativeRequest {
   pagination?: PageRequest;
+  /**
+   * sort_by orders the full initiative set before pagination is applied.
+   * Supported keys: "id" (default), "title", "status", "budget", "tier",
+   * "conviction" (current/required completion ratio; initiatives with no
+   * required conviction sort last). Direction follows pagination.reverse.
+   * When set, pagination is offset-based (next_key is an offset, not a
+   * store key).
+   */
+  sortBy: string;
 }
 export interface QueryAllInitiativeRequestProtoMsg {
   typeUrl: "/sparkdream.rep.v1.QueryAllInitiativeRequest";
@@ -469,6 +492,15 @@ export interface QueryAllInitiativeRequestProtoMsg {
  */
 export interface QueryAllInitiativeRequestAmino {
   pagination?: PageRequestAmino;
+  /**
+   * sort_by orders the full initiative set before pagination is applied.
+   * Supported keys: "id" (default), "title", "status", "budget", "tier",
+   * "conviction" (current/required completion ratio; initiatives with no
+   * required conviction sort last). Direction follows pagination.reverse.
+   * When set, pagination is offset-based (next_key is an offset, not a
+   * store key).
+   */
+  sort_by?: string;
 }
 export interface QueryAllInitiativeRequestAminoMsg {
   type: "/sparkdream.rep.v1.QueryAllInitiativeRequest";
@@ -1335,6 +1367,10 @@ export interface QueryInterimsByReferenceResponseAminoMsg {
 export interface QueryProjectsByCouncilRequest {
   council: string;
   pagination?: PageRequest;
+  /**
+   * Same keys and semantics as QueryAllProjectRequest.sort_by.
+   */
+  sortBy: string;
 }
 export interface QueryProjectsByCouncilRequestProtoMsg {
   typeUrl: "/sparkdream.rep.v1.QueryProjectsByCouncilRequest";
@@ -1349,6 +1385,10 @@ export interface QueryProjectsByCouncilRequestProtoMsg {
 export interface QueryProjectsByCouncilRequestAmino {
   council?: string;
   pagination?: PageRequestAmino;
+  /**
+   * Same keys and semantics as QueryAllProjectRequest.sort_by.
+   */
+  sort_by?: string;
 }
 export interface QueryProjectsByCouncilRequestAminoMsg {
   type: "/sparkdream.rep.v1.QueryProjectsByCouncilRequest";
@@ -1356,14 +1396,15 @@ export interface QueryProjectsByCouncilRequestAminoMsg {
 }
 /**
  * QueryProjectsByCouncilResponse defines the QueryProjectsByCouncilResponse message.
+ * Prior versions declared singular project_id/name/status fields, which could
+ * never carry more than one match; the fields were replaced (not extended)
+ * because no client could have used them meaningfully.
  * @name QueryProjectsByCouncilResponse
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.QueryProjectsByCouncilResponse
  */
 export interface QueryProjectsByCouncilResponse {
-  projectId: bigint;
-  name: string;
-  status: bigint;
+  projects: Project[];
   pagination?: PageResponse;
 }
 export interface QueryProjectsByCouncilResponseProtoMsg {
@@ -1372,14 +1413,15 @@ export interface QueryProjectsByCouncilResponseProtoMsg {
 }
 /**
  * QueryProjectsByCouncilResponse defines the QueryProjectsByCouncilResponse message.
+ * Prior versions declared singular project_id/name/status fields, which could
+ * never carry more than one match; the fields were replaced (not extended)
+ * because no client could have used them meaningfully.
  * @name QueryProjectsByCouncilResponseAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.QueryProjectsByCouncilResponse
  */
 export interface QueryProjectsByCouncilResponseAmino {
-  project_id?: string;
-  name?: string;
-  status?: string;
+  projects?: ProjectAmino[];
   pagination?: PageResponseAmino;
 }
 export interface QueryProjectsByCouncilResponseAminoMsg {
@@ -1395,6 +1437,10 @@ export interface QueryProjectsByCouncilResponseAminoMsg {
 export interface QueryInitiativesByProjectRequest {
   projectId: bigint;
   pagination?: PageRequest;
+  /**
+   * Same keys and semantics as QueryAllInitiativeRequest.sort_by.
+   */
+  sortBy: string;
 }
 export interface QueryInitiativesByProjectRequestProtoMsg {
   typeUrl: "/sparkdream.rep.v1.QueryInitiativesByProjectRequest";
@@ -1409,6 +1455,10 @@ export interface QueryInitiativesByProjectRequestProtoMsg {
 export interface QueryInitiativesByProjectRequestAmino {
   project_id?: string;
   pagination?: PageRequestAmino;
+  /**
+   * Same keys and semantics as QueryAllInitiativeRequest.sort_by.
+   */
+  sort_by?: string;
 }
 export interface QueryInitiativesByProjectRequestAminoMsg {
   type: "/sparkdream.rep.v1.QueryInitiativesByProjectRequest";
@@ -1451,6 +1501,10 @@ export interface QueryInitiativesByProjectResponseAminoMsg {
 export interface QueryInitiativesByAssigneeRequest {
   assignee: string;
   pagination?: PageRequest;
+  /**
+   * Same keys and semantics as QueryAllInitiativeRequest.sort_by.
+   */
+  sortBy: string;
 }
 export interface QueryInitiativesByAssigneeRequestProtoMsg {
   typeUrl: "/sparkdream.rep.v1.QueryInitiativesByAssigneeRequest";
@@ -1465,6 +1519,10 @@ export interface QueryInitiativesByAssigneeRequestProtoMsg {
 export interface QueryInitiativesByAssigneeRequestAmino {
   assignee?: string;
   pagination?: PageRequestAmino;
+  /**
+   * Same keys and semantics as QueryAllInitiativeRequest.sort_by.
+   */
+  sort_by?: string;
 }
 export interface QueryInitiativesByAssigneeRequestAminoMsg {
   type: "/sparkdream.rep.v1.QueryInitiativesByAssigneeRequest";
@@ -1472,14 +1530,15 @@ export interface QueryInitiativesByAssigneeRequestAminoMsg {
 }
 /**
  * QueryInitiativesByAssigneeResponse defines the QueryInitiativesByAssigneeResponse message.
+ * Prior versions declared singular initiative_id/title/status fields, which
+ * could never carry more than one match; the fields were replaced (not
+ * extended) because no client could have used them meaningfully.
  * @name QueryInitiativesByAssigneeResponse
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.QueryInitiativesByAssigneeResponse
  */
 export interface QueryInitiativesByAssigneeResponse {
-  initiativeId: bigint;
-  title: string;
-  status: bigint;
+  initiatives: Initiative[];
   pagination?: PageResponse;
 }
 export interface QueryInitiativesByAssigneeResponseProtoMsg {
@@ -1488,14 +1547,15 @@ export interface QueryInitiativesByAssigneeResponseProtoMsg {
 }
 /**
  * QueryInitiativesByAssigneeResponse defines the QueryInitiativesByAssigneeResponse message.
+ * Prior versions declared singular initiative_id/title/status fields, which
+ * could never carry more than one match; the fields were replaced (not
+ * extended) because no client could have used them meaningfully.
  * @name QueryInitiativesByAssigneeResponseAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.QueryInitiativesByAssigneeResponse
  */
 export interface QueryInitiativesByAssigneeResponseAmino {
-  initiative_id?: string;
-  title?: string;
-  status?: string;
+  initiatives?: InitiativeAmino[];
   pagination?: PageResponseAmino;
 }
 export interface QueryInitiativesByAssigneeResponseAminoMsg {
@@ -1510,6 +1570,10 @@ export interface QueryInitiativesByAssigneeResponseAminoMsg {
  */
 export interface QueryAvailableInitiativesRequest {
   pagination?: PageRequest;
+  /**
+   * Same keys and semantics as QueryAllInitiativeRequest.sort_by.
+   */
+  sortBy: string;
 }
 export interface QueryAvailableInitiativesRequestProtoMsg {
   typeUrl: "/sparkdream.rep.v1.QueryAvailableInitiativesRequest";
@@ -1523,6 +1587,10 @@ export interface QueryAvailableInitiativesRequestProtoMsg {
  */
 export interface QueryAvailableInitiativesRequestAmino {
   pagination?: PageRequestAmino;
+  /**
+   * Same keys and semantics as QueryAllInitiativeRequest.sort_by.
+   */
+  sort_by?: string;
 }
 export interface QueryAvailableInitiativesRequestAminoMsg {
   type: "/sparkdream.rep.v1.QueryAvailableInitiativesRequest";
@@ -1530,15 +1598,15 @@ export interface QueryAvailableInitiativesRequestAminoMsg {
 }
 /**
  * QueryAvailableInitiativesResponse defines the QueryAvailableInitiativesResponse message.
+ * Prior versions declared singular initiative_id/title/tier/budget fields,
+ * which could never carry more than one match; the fields were replaced (not
+ * extended) because no client could have used them meaningfully.
  * @name QueryAvailableInitiativesResponse
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.QueryAvailableInitiativesResponse
  */
 export interface QueryAvailableInitiativesResponse {
-  initiativeId: bigint;
-  title: string;
-  tier: bigint;
-  budget: string;
+  initiatives: Initiative[];
   pagination?: PageResponse;
 }
 export interface QueryAvailableInitiativesResponseProtoMsg {
@@ -1547,15 +1615,15 @@ export interface QueryAvailableInitiativesResponseProtoMsg {
 }
 /**
  * QueryAvailableInitiativesResponse defines the QueryAvailableInitiativesResponse message.
+ * Prior versions declared singular initiative_id/title/tier/budget fields,
+ * which could never carry more than one match; the fields were replaced (not
+ * extended) because no client could have used them meaningfully.
  * @name QueryAvailableInitiativesResponseAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.QueryAvailableInitiativesResponse
  */
 export interface QueryAvailableInitiativesResponseAmino {
-  initiative_id?: string;
-  title?: string;
-  tier?: string;
-  budget?: string;
+  initiatives?: InitiativeAmino[];
   pagination?: PageResponseAmino;
 }
 export interface QueryAvailableInitiativesResponseAminoMsg {
@@ -5309,7 +5377,8 @@ export const QueryGetProjectResponse = {
 };
 function createBaseQueryAllProjectRequest(): QueryAllProjectRequest {
   return {
-    pagination: undefined
+    pagination: undefined,
+    sortBy: ""
   };
 }
 /**
@@ -5324,6 +5393,9 @@ export const QueryAllProjectRequest = {
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
     }
+    if (message.sortBy !== "") {
+      writer.uint32(18).string(message.sortBy);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryAllProjectRequest {
@@ -5336,6 +5408,9 @@ export const QueryAllProjectRequest = {
         case 1:
           message.pagination = PageRequest.decode(reader, reader.uint32());
           break;
+        case 2:
+          message.sortBy = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -5346,6 +5421,7 @@ export const QueryAllProjectRequest = {
   fromPartial(object: DeepPartial<QueryAllProjectRequest>): QueryAllProjectRequest {
     const message = createBaseQueryAllProjectRequest();
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    message.sortBy = object.sortBy ?? "";
     return message;
   },
   fromAmino(object: QueryAllProjectRequestAmino): QueryAllProjectRequest {
@@ -5353,11 +5429,15 @@ export const QueryAllProjectRequest = {
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromAmino(object.pagination);
     }
+    if (object.sort_by !== undefined && object.sort_by !== null) {
+      message.sortBy = object.sort_by;
+    }
     return message;
   },
   toAmino(message: QueryAllProjectRequest): QueryAllProjectRequestAmino {
     const obj: any = {};
     obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    obj.sort_by = message.sortBy === "" ? undefined : message.sortBy;
     return obj;
   },
   fromAminoMsg(object: QueryAllProjectRequestAminoMsg): QueryAllProjectRequest {
@@ -5599,7 +5679,8 @@ export const QueryGetInitiativeResponse = {
 };
 function createBaseQueryAllInitiativeRequest(): QueryAllInitiativeRequest {
   return {
-    pagination: undefined
+    pagination: undefined,
+    sortBy: ""
   };
 }
 /**
@@ -5614,6 +5695,9 @@ export const QueryAllInitiativeRequest = {
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
     }
+    if (message.sortBy !== "") {
+      writer.uint32(18).string(message.sortBy);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryAllInitiativeRequest {
@@ -5626,6 +5710,9 @@ export const QueryAllInitiativeRequest = {
         case 1:
           message.pagination = PageRequest.decode(reader, reader.uint32());
           break;
+        case 2:
+          message.sortBy = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -5636,6 +5723,7 @@ export const QueryAllInitiativeRequest = {
   fromPartial(object: DeepPartial<QueryAllInitiativeRequest>): QueryAllInitiativeRequest {
     const message = createBaseQueryAllInitiativeRequest();
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    message.sortBy = object.sortBy ?? "";
     return message;
   },
   fromAmino(object: QueryAllInitiativeRequestAmino): QueryAllInitiativeRequest {
@@ -5643,11 +5731,15 @@ export const QueryAllInitiativeRequest = {
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromAmino(object.pagination);
     }
+    if (object.sort_by !== undefined && object.sort_by !== null) {
+      message.sortBy = object.sort_by;
+    }
     return message;
   },
   toAmino(message: QueryAllInitiativeRequest): QueryAllInitiativeRequestAmino {
     const obj: any = {};
     obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    obj.sort_by = message.sortBy === "" ? undefined : message.sortBy;
     return obj;
   },
   fromAminoMsg(object: QueryAllInitiativeRequestAminoMsg): QueryAllInitiativeRequest {
@@ -8100,7 +8192,8 @@ export const QueryInterimsByReferenceResponse = {
 function createBaseQueryProjectsByCouncilRequest(): QueryProjectsByCouncilRequest {
   return {
     council: "",
-    pagination: undefined
+    pagination: undefined,
+    sortBy: ""
   };
 }
 /**
@@ -8118,6 +8211,9 @@ export const QueryProjectsByCouncilRequest = {
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
     }
+    if (message.sortBy !== "") {
+      writer.uint32(26).string(message.sortBy);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryProjectsByCouncilRequest {
@@ -8133,6 +8229,9 @@ export const QueryProjectsByCouncilRequest = {
         case 2:
           message.pagination = PageRequest.decode(reader, reader.uint32());
           break;
+        case 3:
+          message.sortBy = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -8144,6 +8243,7 @@ export const QueryProjectsByCouncilRequest = {
     const message = createBaseQueryProjectsByCouncilRequest();
     message.council = object.council ?? "";
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    message.sortBy = object.sortBy ?? "";
     return message;
   },
   fromAmino(object: QueryProjectsByCouncilRequestAmino): QueryProjectsByCouncilRequest {
@@ -8154,12 +8254,16 @@ export const QueryProjectsByCouncilRequest = {
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromAmino(object.pagination);
     }
+    if (object.sort_by !== undefined && object.sort_by !== null) {
+      message.sortBy = object.sort_by;
+    }
     return message;
   },
   toAmino(message: QueryProjectsByCouncilRequest): QueryProjectsByCouncilRequestAmino {
     const obj: any = {};
     obj.council = message.council === "" ? undefined : message.council;
     obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    obj.sort_by = message.sortBy === "" ? undefined : message.sortBy;
     return obj;
   },
   fromAminoMsg(object: QueryProjectsByCouncilRequestAminoMsg): QueryProjectsByCouncilRequest {
@@ -8180,14 +8284,15 @@ export const QueryProjectsByCouncilRequest = {
 };
 function createBaseQueryProjectsByCouncilResponse(): QueryProjectsByCouncilResponse {
   return {
-    projectId: BigInt(0),
-    name: "",
-    status: BigInt(0),
+    projects: [],
     pagination: undefined
   };
 }
 /**
  * QueryProjectsByCouncilResponse defines the QueryProjectsByCouncilResponse message.
+ * Prior versions declared singular project_id/name/status fields, which could
+ * never carry more than one match; the fields were replaced (not extended)
+ * because no client could have used them meaningfully.
  * @name QueryProjectsByCouncilResponse
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.QueryProjectsByCouncilResponse
@@ -8195,17 +8300,11 @@ function createBaseQueryProjectsByCouncilResponse(): QueryProjectsByCouncilRespo
 export const QueryProjectsByCouncilResponse = {
   typeUrl: "/sparkdream.rep.v1.QueryProjectsByCouncilResponse",
   encode(message: QueryProjectsByCouncilResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.projectId !== BigInt(0)) {
-      writer.uint32(8).uint64(message.projectId);
-    }
-    if (message.name !== "") {
-      writer.uint32(18).string(message.name);
-    }
-    if (message.status !== BigInt(0)) {
-      writer.uint32(24).uint64(message.status);
+    for (const v of message.projects) {
+      Project.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.pagination !== undefined) {
-      PageResponse.encode(message.pagination, writer.uint32(34).fork()).ldelim();
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -8217,15 +8316,9 @@ export const QueryProjectsByCouncilResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.projectId = reader.uint64();
+          message.projects.push(Project.decode(reader, reader.uint32()));
           break;
         case 2:
-          message.name = reader.string();
-          break;
-        case 3:
-          message.status = reader.uint64();
-          break;
-        case 4:
           message.pagination = PageResponse.decode(reader, reader.uint32());
           break;
         default:
@@ -8237,23 +8330,13 @@ export const QueryProjectsByCouncilResponse = {
   },
   fromPartial(object: DeepPartial<QueryProjectsByCouncilResponse>): QueryProjectsByCouncilResponse {
     const message = createBaseQueryProjectsByCouncilResponse();
-    message.projectId = object.projectId !== undefined && object.projectId !== null ? BigInt(object.projectId.toString()) : BigInt(0);
-    message.name = object.name ?? "";
-    message.status = object.status !== undefined && object.status !== null ? BigInt(object.status.toString()) : BigInt(0);
+    message.projects = object.projects?.map(e => Project.fromPartial(e)) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
     return message;
   },
   fromAmino(object: QueryProjectsByCouncilResponseAmino): QueryProjectsByCouncilResponse {
     const message = createBaseQueryProjectsByCouncilResponse();
-    if (object.project_id !== undefined && object.project_id !== null) {
-      message.projectId = BigInt(object.project_id);
-    }
-    if (object.name !== undefined && object.name !== null) {
-      message.name = object.name;
-    }
-    if (object.status !== undefined && object.status !== null) {
-      message.status = BigInt(object.status);
-    }
+    message.projects = object.projects?.map(e => Project.fromAmino(e)) || [];
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageResponse.fromAmino(object.pagination);
     }
@@ -8261,9 +8344,11 @@ export const QueryProjectsByCouncilResponse = {
   },
   toAmino(message: QueryProjectsByCouncilResponse): QueryProjectsByCouncilResponseAmino {
     const obj: any = {};
-    obj.project_id = message.projectId !== BigInt(0) ? message.projectId?.toString() : undefined;
-    obj.name = message.name === "" ? undefined : message.name;
-    obj.status = message.status !== BigInt(0) ? message.status?.toString() : undefined;
+    if (message.projects) {
+      obj.projects = message.projects.map(e => e ? Project.toAmino(e) : undefined);
+    } else {
+      obj.projects = message.projects;
+    }
     obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
     return obj;
   },
@@ -8286,7 +8371,8 @@ export const QueryProjectsByCouncilResponse = {
 function createBaseQueryInitiativesByProjectRequest(): QueryInitiativesByProjectRequest {
   return {
     projectId: BigInt(0),
-    pagination: undefined
+    pagination: undefined,
+    sortBy: ""
   };
 }
 /**
@@ -8304,6 +8390,9 @@ export const QueryInitiativesByProjectRequest = {
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
     }
+    if (message.sortBy !== "") {
+      writer.uint32(26).string(message.sortBy);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryInitiativesByProjectRequest {
@@ -8319,6 +8408,9 @@ export const QueryInitiativesByProjectRequest = {
         case 2:
           message.pagination = PageRequest.decode(reader, reader.uint32());
           break;
+        case 3:
+          message.sortBy = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -8330,6 +8422,7 @@ export const QueryInitiativesByProjectRequest = {
     const message = createBaseQueryInitiativesByProjectRequest();
     message.projectId = object.projectId !== undefined && object.projectId !== null ? BigInt(object.projectId.toString()) : BigInt(0);
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    message.sortBy = object.sortBy ?? "";
     return message;
   },
   fromAmino(object: QueryInitiativesByProjectRequestAmino): QueryInitiativesByProjectRequest {
@@ -8340,12 +8433,16 @@ export const QueryInitiativesByProjectRequest = {
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromAmino(object.pagination);
     }
+    if (object.sort_by !== undefined && object.sort_by !== null) {
+      message.sortBy = object.sort_by;
+    }
     return message;
   },
   toAmino(message: QueryInitiativesByProjectRequest): QueryInitiativesByProjectRequestAmino {
     const obj: any = {};
     obj.project_id = message.projectId !== BigInt(0) ? message.projectId?.toString() : undefined;
     obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    obj.sort_by = message.sortBy === "" ? undefined : message.sortBy;
     return obj;
   },
   fromAminoMsg(object: QueryInitiativesByProjectRequestAminoMsg): QueryInitiativesByProjectRequest {
@@ -8450,7 +8547,8 @@ export const QueryInitiativesByProjectResponse = {
 function createBaseQueryInitiativesByAssigneeRequest(): QueryInitiativesByAssigneeRequest {
   return {
     assignee: "",
-    pagination: undefined
+    pagination: undefined,
+    sortBy: ""
   };
 }
 /**
@@ -8468,6 +8566,9 @@ export const QueryInitiativesByAssigneeRequest = {
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
     }
+    if (message.sortBy !== "") {
+      writer.uint32(26).string(message.sortBy);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryInitiativesByAssigneeRequest {
@@ -8483,6 +8584,9 @@ export const QueryInitiativesByAssigneeRequest = {
         case 2:
           message.pagination = PageRequest.decode(reader, reader.uint32());
           break;
+        case 3:
+          message.sortBy = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -8494,6 +8598,7 @@ export const QueryInitiativesByAssigneeRequest = {
     const message = createBaseQueryInitiativesByAssigneeRequest();
     message.assignee = object.assignee ?? "";
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    message.sortBy = object.sortBy ?? "";
     return message;
   },
   fromAmino(object: QueryInitiativesByAssigneeRequestAmino): QueryInitiativesByAssigneeRequest {
@@ -8504,12 +8609,16 @@ export const QueryInitiativesByAssigneeRequest = {
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromAmino(object.pagination);
     }
+    if (object.sort_by !== undefined && object.sort_by !== null) {
+      message.sortBy = object.sort_by;
+    }
     return message;
   },
   toAmino(message: QueryInitiativesByAssigneeRequest): QueryInitiativesByAssigneeRequestAmino {
     const obj: any = {};
     obj.assignee = message.assignee === "" ? undefined : message.assignee;
     obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    obj.sort_by = message.sortBy === "" ? undefined : message.sortBy;
     return obj;
   },
   fromAminoMsg(object: QueryInitiativesByAssigneeRequestAminoMsg): QueryInitiativesByAssigneeRequest {
@@ -8530,14 +8639,15 @@ export const QueryInitiativesByAssigneeRequest = {
 };
 function createBaseQueryInitiativesByAssigneeResponse(): QueryInitiativesByAssigneeResponse {
   return {
-    initiativeId: BigInt(0),
-    title: "",
-    status: BigInt(0),
+    initiatives: [],
     pagination: undefined
   };
 }
 /**
  * QueryInitiativesByAssigneeResponse defines the QueryInitiativesByAssigneeResponse message.
+ * Prior versions declared singular initiative_id/title/status fields, which
+ * could never carry more than one match; the fields were replaced (not
+ * extended) because no client could have used them meaningfully.
  * @name QueryInitiativesByAssigneeResponse
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.QueryInitiativesByAssigneeResponse
@@ -8545,17 +8655,11 @@ function createBaseQueryInitiativesByAssigneeResponse(): QueryInitiativesByAssig
 export const QueryInitiativesByAssigneeResponse = {
   typeUrl: "/sparkdream.rep.v1.QueryInitiativesByAssigneeResponse",
   encode(message: QueryInitiativesByAssigneeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.initiativeId !== BigInt(0)) {
-      writer.uint32(8).uint64(message.initiativeId);
-    }
-    if (message.title !== "") {
-      writer.uint32(18).string(message.title);
-    }
-    if (message.status !== BigInt(0)) {
-      writer.uint32(24).uint64(message.status);
+    for (const v of message.initiatives) {
+      Initiative.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.pagination !== undefined) {
-      PageResponse.encode(message.pagination, writer.uint32(34).fork()).ldelim();
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -8567,15 +8671,9 @@ export const QueryInitiativesByAssigneeResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.initiativeId = reader.uint64();
+          message.initiatives.push(Initiative.decode(reader, reader.uint32()));
           break;
         case 2:
-          message.title = reader.string();
-          break;
-        case 3:
-          message.status = reader.uint64();
-          break;
-        case 4:
           message.pagination = PageResponse.decode(reader, reader.uint32());
           break;
         default:
@@ -8587,23 +8685,13 @@ export const QueryInitiativesByAssigneeResponse = {
   },
   fromPartial(object: DeepPartial<QueryInitiativesByAssigneeResponse>): QueryInitiativesByAssigneeResponse {
     const message = createBaseQueryInitiativesByAssigneeResponse();
-    message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
-    message.title = object.title ?? "";
-    message.status = object.status !== undefined && object.status !== null ? BigInt(object.status.toString()) : BigInt(0);
+    message.initiatives = object.initiatives?.map(e => Initiative.fromPartial(e)) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
     return message;
   },
   fromAmino(object: QueryInitiativesByAssigneeResponseAmino): QueryInitiativesByAssigneeResponse {
     const message = createBaseQueryInitiativesByAssigneeResponse();
-    if (object.initiative_id !== undefined && object.initiative_id !== null) {
-      message.initiativeId = BigInt(object.initiative_id);
-    }
-    if (object.title !== undefined && object.title !== null) {
-      message.title = object.title;
-    }
-    if (object.status !== undefined && object.status !== null) {
-      message.status = BigInt(object.status);
-    }
+    message.initiatives = object.initiatives?.map(e => Initiative.fromAmino(e)) || [];
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageResponse.fromAmino(object.pagination);
     }
@@ -8611,9 +8699,11 @@ export const QueryInitiativesByAssigneeResponse = {
   },
   toAmino(message: QueryInitiativesByAssigneeResponse): QueryInitiativesByAssigneeResponseAmino {
     const obj: any = {};
-    obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
-    obj.title = message.title === "" ? undefined : message.title;
-    obj.status = message.status !== BigInt(0) ? message.status?.toString() : undefined;
+    if (message.initiatives) {
+      obj.initiatives = message.initiatives.map(e => e ? Initiative.toAmino(e) : undefined);
+    } else {
+      obj.initiatives = message.initiatives;
+    }
     obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
     return obj;
   },
@@ -8635,7 +8725,8 @@ export const QueryInitiativesByAssigneeResponse = {
 };
 function createBaseQueryAvailableInitiativesRequest(): QueryAvailableInitiativesRequest {
   return {
-    pagination: undefined
+    pagination: undefined,
+    sortBy: ""
   };
 }
 /**
@@ -8650,6 +8741,9 @@ export const QueryAvailableInitiativesRequest = {
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
     }
+    if (message.sortBy !== "") {
+      writer.uint32(18).string(message.sortBy);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryAvailableInitiativesRequest {
@@ -8662,6 +8756,9 @@ export const QueryAvailableInitiativesRequest = {
         case 1:
           message.pagination = PageRequest.decode(reader, reader.uint32());
           break;
+        case 2:
+          message.sortBy = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -8672,6 +8769,7 @@ export const QueryAvailableInitiativesRequest = {
   fromPartial(object: DeepPartial<QueryAvailableInitiativesRequest>): QueryAvailableInitiativesRequest {
     const message = createBaseQueryAvailableInitiativesRequest();
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    message.sortBy = object.sortBy ?? "";
     return message;
   },
   fromAmino(object: QueryAvailableInitiativesRequestAmino): QueryAvailableInitiativesRequest {
@@ -8679,11 +8777,15 @@ export const QueryAvailableInitiativesRequest = {
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromAmino(object.pagination);
     }
+    if (object.sort_by !== undefined && object.sort_by !== null) {
+      message.sortBy = object.sort_by;
+    }
     return message;
   },
   toAmino(message: QueryAvailableInitiativesRequest): QueryAvailableInitiativesRequestAmino {
     const obj: any = {};
     obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    obj.sort_by = message.sortBy === "" ? undefined : message.sortBy;
     return obj;
   },
   fromAminoMsg(object: QueryAvailableInitiativesRequestAminoMsg): QueryAvailableInitiativesRequest {
@@ -8704,15 +8806,15 @@ export const QueryAvailableInitiativesRequest = {
 };
 function createBaseQueryAvailableInitiativesResponse(): QueryAvailableInitiativesResponse {
   return {
-    initiativeId: BigInt(0),
-    title: "",
-    tier: BigInt(0),
-    budget: "",
+    initiatives: [],
     pagination: undefined
   };
 }
 /**
  * QueryAvailableInitiativesResponse defines the QueryAvailableInitiativesResponse message.
+ * Prior versions declared singular initiative_id/title/tier/budget fields,
+ * which could never carry more than one match; the fields were replaced (not
+ * extended) because no client could have used them meaningfully.
  * @name QueryAvailableInitiativesResponse
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.QueryAvailableInitiativesResponse
@@ -8720,20 +8822,11 @@ function createBaseQueryAvailableInitiativesResponse(): QueryAvailableInitiative
 export const QueryAvailableInitiativesResponse = {
   typeUrl: "/sparkdream.rep.v1.QueryAvailableInitiativesResponse",
   encode(message: QueryAvailableInitiativesResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.initiativeId !== BigInt(0)) {
-      writer.uint32(8).uint64(message.initiativeId);
-    }
-    if (message.title !== "") {
-      writer.uint32(18).string(message.title);
-    }
-    if (message.tier !== BigInt(0)) {
-      writer.uint32(24).uint64(message.tier);
-    }
-    if (message.budget !== "") {
-      writer.uint32(34).string(message.budget);
+    for (const v of message.initiatives) {
+      Initiative.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.pagination !== undefined) {
-      PageResponse.encode(message.pagination, writer.uint32(42).fork()).ldelim();
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -8745,18 +8838,9 @@ export const QueryAvailableInitiativesResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.initiativeId = reader.uint64();
+          message.initiatives.push(Initiative.decode(reader, reader.uint32()));
           break;
         case 2:
-          message.title = reader.string();
-          break;
-        case 3:
-          message.tier = reader.uint64();
-          break;
-        case 4:
-          message.budget = reader.string();
-          break;
-        case 5:
           message.pagination = PageResponse.decode(reader, reader.uint32());
           break;
         default:
@@ -8768,27 +8852,13 @@ export const QueryAvailableInitiativesResponse = {
   },
   fromPartial(object: DeepPartial<QueryAvailableInitiativesResponse>): QueryAvailableInitiativesResponse {
     const message = createBaseQueryAvailableInitiativesResponse();
-    message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
-    message.title = object.title ?? "";
-    message.tier = object.tier !== undefined && object.tier !== null ? BigInt(object.tier.toString()) : BigInt(0);
-    message.budget = object.budget ?? "";
+    message.initiatives = object.initiatives?.map(e => Initiative.fromPartial(e)) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
     return message;
   },
   fromAmino(object: QueryAvailableInitiativesResponseAmino): QueryAvailableInitiativesResponse {
     const message = createBaseQueryAvailableInitiativesResponse();
-    if (object.initiative_id !== undefined && object.initiative_id !== null) {
-      message.initiativeId = BigInt(object.initiative_id);
-    }
-    if (object.title !== undefined && object.title !== null) {
-      message.title = object.title;
-    }
-    if (object.tier !== undefined && object.tier !== null) {
-      message.tier = BigInt(object.tier);
-    }
-    if (object.budget !== undefined && object.budget !== null) {
-      message.budget = object.budget;
-    }
+    message.initiatives = object.initiatives?.map(e => Initiative.fromAmino(e)) || [];
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageResponse.fromAmino(object.pagination);
     }
@@ -8796,10 +8866,11 @@ export const QueryAvailableInitiativesResponse = {
   },
   toAmino(message: QueryAvailableInitiativesResponse): QueryAvailableInitiativesResponseAmino {
     const obj: any = {};
-    obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
-    obj.title = message.title === "" ? undefined : message.title;
-    obj.tier = message.tier !== BigInt(0) ? message.tier?.toString() : undefined;
-    obj.budget = message.budget === "" ? undefined : message.budget;
+    if (message.initiatives) {
+      obj.initiatives = message.initiatives.map(e => e ? Initiative.toAmino(e) : undefined);
+    } else {
+      obj.initiatives = message.initiatives;
+    }
     obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
     return obj;
   },
