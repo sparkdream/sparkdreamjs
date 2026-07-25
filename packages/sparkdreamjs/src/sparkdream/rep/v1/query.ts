@@ -1665,9 +1665,7 @@ export interface QueryStakesByStakerRequestAminoMsg {
  * @see proto type: sparkdream.rep.v1.QueryStakesByStakerResponse
  */
 export interface QueryStakesByStakerResponse {
-  stakeId: bigint;
-  targetType: bigint;
-  amount: string;
+  stakes: Stake[];
   pagination?: PageResponse;
 }
 export interface QueryStakesByStakerResponseProtoMsg {
@@ -1681,9 +1679,7 @@ export interface QueryStakesByStakerResponseProtoMsg {
  * @see proto type: sparkdream.rep.v1.QueryStakesByStakerResponse
  */
 export interface QueryStakesByStakerResponseAmino {
-  stake_id?: string;
-  target_type?: string;
-  amount?: string;
+  stakes?: StakeAmino[];
   pagination?: PageResponseAmino;
 }
 export interface QueryStakesByStakerResponseAminoMsg {
@@ -8973,9 +8969,7 @@ export const QueryStakesByStakerRequest = {
 };
 function createBaseQueryStakesByStakerResponse(): QueryStakesByStakerResponse {
   return {
-    stakeId: BigInt(0),
-    targetType: BigInt(0),
-    amount: "",
+    stakes: [],
     pagination: undefined
   };
 }
@@ -8988,17 +8982,11 @@ function createBaseQueryStakesByStakerResponse(): QueryStakesByStakerResponse {
 export const QueryStakesByStakerResponse = {
   typeUrl: "/sparkdream.rep.v1.QueryStakesByStakerResponse",
   encode(message: QueryStakesByStakerResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.stakeId !== BigInt(0)) {
-      writer.uint32(8).uint64(message.stakeId);
-    }
-    if (message.targetType !== BigInt(0)) {
-      writer.uint32(16).uint64(message.targetType);
-    }
-    if (message.amount !== "") {
-      writer.uint32(26).string(message.amount);
+    for (const v of message.stakes) {
+      Stake.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.pagination !== undefined) {
-      PageResponse.encode(message.pagination, writer.uint32(34).fork()).ldelim();
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -9010,15 +8998,9 @@ export const QueryStakesByStakerResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.stakeId = reader.uint64();
+          message.stakes.push(Stake.decode(reader, reader.uint32()));
           break;
         case 2:
-          message.targetType = reader.uint64();
-          break;
-        case 3:
-          message.amount = reader.string();
-          break;
-        case 4:
           message.pagination = PageResponse.decode(reader, reader.uint32());
           break;
         default:
@@ -9030,23 +9012,13 @@ export const QueryStakesByStakerResponse = {
   },
   fromPartial(object: DeepPartial<QueryStakesByStakerResponse>): QueryStakesByStakerResponse {
     const message = createBaseQueryStakesByStakerResponse();
-    message.stakeId = object.stakeId !== undefined && object.stakeId !== null ? BigInt(object.stakeId.toString()) : BigInt(0);
-    message.targetType = object.targetType !== undefined && object.targetType !== null ? BigInt(object.targetType.toString()) : BigInt(0);
-    message.amount = object.amount ?? "";
+    message.stakes = object.stakes?.map(e => Stake.fromPartial(e)) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
     return message;
   },
   fromAmino(object: QueryStakesByStakerResponseAmino): QueryStakesByStakerResponse {
     const message = createBaseQueryStakesByStakerResponse();
-    if (object.stake_id !== undefined && object.stake_id !== null) {
-      message.stakeId = BigInt(object.stake_id);
-    }
-    if (object.target_type !== undefined && object.target_type !== null) {
-      message.targetType = BigInt(object.target_type);
-    }
-    if (object.amount !== undefined && object.amount !== null) {
-      message.amount = object.amount;
-    }
+    message.stakes = object.stakes?.map(e => Stake.fromAmino(e)) || [];
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageResponse.fromAmino(object.pagination);
     }
@@ -9054,9 +9026,11 @@ export const QueryStakesByStakerResponse = {
   },
   toAmino(message: QueryStakesByStakerResponse): QueryStakesByStakerResponseAmino {
     const obj: any = {};
-    obj.stake_id = message.stakeId !== BigInt(0) ? message.stakeId?.toString() : undefined;
-    obj.target_type = message.targetType !== BigInt(0) ? message.targetType?.toString() : undefined;
-    obj.amount = message.amount === "" ? undefined : message.amount;
+    if (message.stakes) {
+      obj.stakes = message.stakes.map(e => e ? Stake.toAmino(e) : undefined);
+    } else {
+      obj.stakes = message.stakes;
+    }
     obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
     return obj;
   },
