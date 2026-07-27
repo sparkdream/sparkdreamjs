@@ -242,6 +242,13 @@ export interface Initiative {
    * only). Returned on completion/abandonment, burned on upheld challenge.
    */
   selfAssignBond: string;
+  /**
+   * Address that submitted MsgCreateInitiative. Recorded on state so
+   * authorship is answerable from a node query instead of only from the
+   * initiative_created event (which requires an off-chain indexer).
+   * Immutable once set.
+   */
+  creator: string;
 }
 export interface InitiativeProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Initiative";
@@ -287,6 +294,13 @@ export interface InitiativeAmino {
    * only). Returned on completion/abandonment, burned on upheld challenge.
    */
   self_assign_bond?: string;
+  /**
+   * Address that submitted MsgCreateInitiative. Recorded on state so
+   * authorship is answerable from a node query instead of only from the
+   * initiative_created event (which requires an off-chain indexer).
+   * Immutable once set.
+   */
+  creator?: string;
 }
 export interface InitiativeAminoMsg {
   type: "/sparkdream.rep.v1.Initiative";
@@ -319,7 +333,8 @@ function createBaseInitiative(): Initiative {
     createdAt: BigInt(0),
     completedAt: BigInt(0),
     propagatedConviction: "",
-    selfAssignBond: ""
+    selfAssignBond: "",
+    creator: ""
   };
 }
 /**
@@ -409,6 +424,9 @@ export const Initiative = {
     if (message.selfAssignBond !== "") {
       writer.uint32(210).string(message.selfAssignBond);
     }
+    if (message.creator !== "") {
+      writer.uint32(218).string(message.creator);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Initiative {
@@ -496,6 +514,9 @@ export const Initiative = {
         case 26:
           message.selfAssignBond = reader.string();
           break;
+        case 27:
+          message.creator = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -531,6 +552,7 @@ export const Initiative = {
     message.completedAt = object.completedAt !== undefined && object.completedAt !== null ? BigInt(object.completedAt.toString()) : BigInt(0);
     message.propagatedConviction = object.propagatedConviction ?? "";
     message.selfAssignBond = object.selfAssignBond ?? "";
+    message.creator = object.creator ?? "";
     return message;
   },
   fromAmino(object: InitiativeAmino): Initiative {
@@ -609,6 +631,9 @@ export const Initiative = {
     if (object.self_assign_bond !== undefined && object.self_assign_bond !== null) {
       message.selfAssignBond = object.self_assign_bond;
     }
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
     return message;
   },
   toAmino(message: Initiative): InitiativeAmino {
@@ -647,6 +672,7 @@ export const Initiative = {
     obj.completed_at = message.completedAt !== BigInt(0) ? message.completedAt?.toString() : undefined;
     obj.propagated_conviction = message.propagatedConviction === "" ? undefined : message.propagatedConviction;
     obj.self_assign_bond = message.selfAssignBond === "" ? undefined : message.selfAssignBond;
+    obj.creator = message.creator === "" ? undefined : message.creator;
     return obj;
   },
   fromAminoMsg(object: InitiativeAminoMsg): Initiative {

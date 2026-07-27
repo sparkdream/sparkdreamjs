@@ -1563,6 +1563,134 @@ export interface QueryInitiativesByAssigneeResponseAminoMsg {
   value: QueryInitiativesByAssigneeResponseAmino;
 }
 /**
+ * QueryInitiativesByCreatorRequest defines the QueryInitiativesByCreatorRequest message.
+ * @name QueryInitiativesByCreatorRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryInitiativesByCreatorRequest
+ */
+export interface QueryInitiativesByCreatorRequest {
+  creator: string;
+  pagination?: PageRequest;
+  /**
+   * Same keys and semantics as QueryAllInitiativeRequest.sort_by.
+   */
+  sortBy: string;
+}
+export interface QueryInitiativesByCreatorRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryInitiativesByCreatorRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryInitiativesByCreatorRequest defines the QueryInitiativesByCreatorRequest message.
+ * @name QueryInitiativesByCreatorRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryInitiativesByCreatorRequest
+ */
+export interface QueryInitiativesByCreatorRequestAmino {
+  creator?: string;
+  pagination?: PageRequestAmino;
+  /**
+   * Same keys and semantics as QueryAllInitiativeRequest.sort_by.
+   */
+  sort_by?: string;
+}
+export interface QueryInitiativesByCreatorRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryInitiativesByCreatorRequest";
+  value: QueryInitiativesByCreatorRequestAmino;
+}
+/**
+ * QueryInitiativesByCreatorResponse defines the QueryInitiativesByCreatorResponse message.
+ * @name QueryInitiativesByCreatorResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryInitiativesByCreatorResponse
+ */
+export interface QueryInitiativesByCreatorResponse {
+  initiatives: Initiative[];
+  pagination?: PageResponse;
+}
+export interface QueryInitiativesByCreatorResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryInitiativesByCreatorResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryInitiativesByCreatorResponse defines the QueryInitiativesByCreatorResponse message.
+ * @name QueryInitiativesByCreatorResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryInitiativesByCreatorResponse
+ */
+export interface QueryInitiativesByCreatorResponseAmino {
+  initiatives?: InitiativeAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryInitiativesByCreatorResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryInitiativesByCreatorResponse";
+  value: QueryInitiativesByCreatorResponseAmino;
+}
+/**
+ * QueryProjectsByCreatorRequest defines the QueryProjectsByCreatorRequest message.
+ * @name QueryProjectsByCreatorRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryProjectsByCreatorRequest
+ */
+export interface QueryProjectsByCreatorRequest {
+  creator: string;
+  pagination?: PageRequest;
+  /**
+   * Same keys and semantics as QueryAllProjectRequest.sort_by.
+   */
+  sortBy: string;
+}
+export interface QueryProjectsByCreatorRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryProjectsByCreatorRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryProjectsByCreatorRequest defines the QueryProjectsByCreatorRequest message.
+ * @name QueryProjectsByCreatorRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryProjectsByCreatorRequest
+ */
+export interface QueryProjectsByCreatorRequestAmino {
+  creator?: string;
+  pagination?: PageRequestAmino;
+  /**
+   * Same keys and semantics as QueryAllProjectRequest.sort_by.
+   */
+  sort_by?: string;
+}
+export interface QueryProjectsByCreatorRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryProjectsByCreatorRequest";
+  value: QueryProjectsByCreatorRequestAmino;
+}
+/**
+ * QueryProjectsByCreatorResponse defines the QueryProjectsByCreatorResponse message.
+ * @name QueryProjectsByCreatorResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryProjectsByCreatorResponse
+ */
+export interface QueryProjectsByCreatorResponse {
+  projects: Project[];
+  pagination?: PageResponse;
+}
+export interface QueryProjectsByCreatorResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryProjectsByCreatorResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryProjectsByCreatorResponse defines the QueryProjectsByCreatorResponse message.
+ * @name QueryProjectsByCreatorResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryProjectsByCreatorResponse
+ */
+export interface QueryProjectsByCreatorResponseAmino {
+  projects?: ProjectAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryProjectsByCreatorResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryProjectsByCreatorResponse";
+  value: QueryProjectsByCreatorResponseAmino;
+}
+/**
  * QueryAvailableInitiativesRequest defines the QueryAvailableInitiativesRequest message.
  * @name QueryAvailableInitiativesRequest
  * @package sparkdream.rep.v1
@@ -8716,6 +8844,358 @@ export const QueryInitiativesByAssigneeResponse = {
     return {
       typeUrl: "/sparkdream.rep.v1.QueryInitiativesByAssigneeResponse",
       value: QueryInitiativesByAssigneeResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryInitiativesByCreatorRequest(): QueryInitiativesByCreatorRequest {
+  return {
+    creator: "",
+    pagination: undefined,
+    sortBy: ""
+  };
+}
+/**
+ * QueryInitiativesByCreatorRequest defines the QueryInitiativesByCreatorRequest message.
+ * @name QueryInitiativesByCreatorRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryInitiativesByCreatorRequest
+ */
+export const QueryInitiativesByCreatorRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryInitiativesByCreatorRequest",
+  encode(message: QueryInitiativesByCreatorRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.sortBy !== "") {
+      writer.uint32(26).string(message.sortBy);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryInitiativesByCreatorRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryInitiativesByCreatorRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        case 3:
+          message.sortBy = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryInitiativesByCreatorRequest>): QueryInitiativesByCreatorRequest {
+    const message = createBaseQueryInitiativesByCreatorRequest();
+    message.creator = object.creator ?? "";
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    message.sortBy = object.sortBy ?? "";
+    return message;
+  },
+  fromAmino(object: QueryInitiativesByCreatorRequestAmino): QueryInitiativesByCreatorRequest {
+    const message = createBaseQueryInitiativesByCreatorRequest();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    if (object.sort_by !== undefined && object.sort_by !== null) {
+      message.sortBy = object.sort_by;
+    }
+    return message;
+  },
+  toAmino(message: QueryInitiativesByCreatorRequest): QueryInitiativesByCreatorRequestAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    obj.sort_by = message.sortBy === "" ? undefined : message.sortBy;
+    return obj;
+  },
+  fromAminoMsg(object: QueryInitiativesByCreatorRequestAminoMsg): QueryInitiativesByCreatorRequest {
+    return QueryInitiativesByCreatorRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryInitiativesByCreatorRequestProtoMsg): QueryInitiativesByCreatorRequest {
+    return QueryInitiativesByCreatorRequest.decode(message.value);
+  },
+  toProto(message: QueryInitiativesByCreatorRequest): Uint8Array {
+    return QueryInitiativesByCreatorRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryInitiativesByCreatorRequest): QueryInitiativesByCreatorRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryInitiativesByCreatorRequest",
+      value: QueryInitiativesByCreatorRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryInitiativesByCreatorResponse(): QueryInitiativesByCreatorResponse {
+  return {
+    initiatives: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryInitiativesByCreatorResponse defines the QueryInitiativesByCreatorResponse message.
+ * @name QueryInitiativesByCreatorResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryInitiativesByCreatorResponse
+ */
+export const QueryInitiativesByCreatorResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryInitiativesByCreatorResponse",
+  encode(message: QueryInitiativesByCreatorResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.initiatives) {
+      Initiative.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryInitiativesByCreatorResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryInitiativesByCreatorResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.initiatives.push(Initiative.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryInitiativesByCreatorResponse>): QueryInitiativesByCreatorResponse {
+    const message = createBaseQueryInitiativesByCreatorResponse();
+    message.initiatives = object.initiatives?.map(e => Initiative.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryInitiativesByCreatorResponseAmino): QueryInitiativesByCreatorResponse {
+    const message = createBaseQueryInitiativesByCreatorResponse();
+    message.initiatives = object.initiatives?.map(e => Initiative.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryInitiativesByCreatorResponse): QueryInitiativesByCreatorResponseAmino {
+    const obj: any = {};
+    if (message.initiatives) {
+      obj.initiatives = message.initiatives.map(e => e ? Initiative.toAmino(e) : undefined);
+    } else {
+      obj.initiatives = message.initiatives;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryInitiativesByCreatorResponseAminoMsg): QueryInitiativesByCreatorResponse {
+    return QueryInitiativesByCreatorResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryInitiativesByCreatorResponseProtoMsg): QueryInitiativesByCreatorResponse {
+    return QueryInitiativesByCreatorResponse.decode(message.value);
+  },
+  toProto(message: QueryInitiativesByCreatorResponse): Uint8Array {
+    return QueryInitiativesByCreatorResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryInitiativesByCreatorResponse): QueryInitiativesByCreatorResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryInitiativesByCreatorResponse",
+      value: QueryInitiativesByCreatorResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryProjectsByCreatorRequest(): QueryProjectsByCreatorRequest {
+  return {
+    creator: "",
+    pagination: undefined,
+    sortBy: ""
+  };
+}
+/**
+ * QueryProjectsByCreatorRequest defines the QueryProjectsByCreatorRequest message.
+ * @name QueryProjectsByCreatorRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryProjectsByCreatorRequest
+ */
+export const QueryProjectsByCreatorRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryProjectsByCreatorRequest",
+  encode(message: QueryProjectsByCreatorRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.sortBy !== "") {
+      writer.uint32(26).string(message.sortBy);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryProjectsByCreatorRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryProjectsByCreatorRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        case 3:
+          message.sortBy = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryProjectsByCreatorRequest>): QueryProjectsByCreatorRequest {
+    const message = createBaseQueryProjectsByCreatorRequest();
+    message.creator = object.creator ?? "";
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    message.sortBy = object.sortBy ?? "";
+    return message;
+  },
+  fromAmino(object: QueryProjectsByCreatorRequestAmino): QueryProjectsByCreatorRequest {
+    const message = createBaseQueryProjectsByCreatorRequest();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    if (object.sort_by !== undefined && object.sort_by !== null) {
+      message.sortBy = object.sort_by;
+    }
+    return message;
+  },
+  toAmino(message: QueryProjectsByCreatorRequest): QueryProjectsByCreatorRequestAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    obj.sort_by = message.sortBy === "" ? undefined : message.sortBy;
+    return obj;
+  },
+  fromAminoMsg(object: QueryProjectsByCreatorRequestAminoMsg): QueryProjectsByCreatorRequest {
+    return QueryProjectsByCreatorRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryProjectsByCreatorRequestProtoMsg): QueryProjectsByCreatorRequest {
+    return QueryProjectsByCreatorRequest.decode(message.value);
+  },
+  toProto(message: QueryProjectsByCreatorRequest): Uint8Array {
+    return QueryProjectsByCreatorRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryProjectsByCreatorRequest): QueryProjectsByCreatorRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryProjectsByCreatorRequest",
+      value: QueryProjectsByCreatorRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryProjectsByCreatorResponse(): QueryProjectsByCreatorResponse {
+  return {
+    projects: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryProjectsByCreatorResponse defines the QueryProjectsByCreatorResponse message.
+ * @name QueryProjectsByCreatorResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryProjectsByCreatorResponse
+ */
+export const QueryProjectsByCreatorResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryProjectsByCreatorResponse",
+  encode(message: QueryProjectsByCreatorResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.projects) {
+      Project.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryProjectsByCreatorResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryProjectsByCreatorResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.projects.push(Project.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryProjectsByCreatorResponse>): QueryProjectsByCreatorResponse {
+    const message = createBaseQueryProjectsByCreatorResponse();
+    message.projects = object.projects?.map(e => Project.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryProjectsByCreatorResponseAmino): QueryProjectsByCreatorResponse {
+    const message = createBaseQueryProjectsByCreatorResponse();
+    message.projects = object.projects?.map(e => Project.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryProjectsByCreatorResponse): QueryProjectsByCreatorResponseAmino {
+    const obj: any = {};
+    if (message.projects) {
+      obj.projects = message.projects.map(e => e ? Project.toAmino(e) : undefined);
+    } else {
+      obj.projects = message.projects;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryProjectsByCreatorResponseAminoMsg): QueryProjectsByCreatorResponse {
+    return QueryProjectsByCreatorResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryProjectsByCreatorResponseProtoMsg): QueryProjectsByCreatorResponse {
+    return QueryProjectsByCreatorResponse.decode(message.value);
+  },
+  toProto(message: QueryProjectsByCreatorResponse): Uint8Array {
+    return QueryProjectsByCreatorResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryProjectsByCreatorResponse): QueryProjectsByCreatorResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryProjectsByCreatorResponse",
+      value: QueryProjectsByCreatorResponse.encode(message).finish()
     };
   }
 };
