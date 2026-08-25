@@ -10,7 +10,6 @@ import { Stake, StakeAmino, StakeTargetType, MemberStakePool, MemberStakePoolAmi
 import { Challenge, ChallengeAmino } from "./challenge";
 import { JuryReview, JuryReviewAmino } from "./jury_review";
 import { Interim, InterimAmino } from "./interim";
-import { InterimTemplate, InterimTemplateAmino } from "./interim_template";
 import { ContentChallenge, ContentChallengeAmino } from "./content_challenge";
 import { Tag, TagAmino } from "./tag";
 import { ReservedTag, ReservedTagAmino } from "./reserved_tag";
@@ -21,6 +20,9 @@ import { MemberReport, MemberReportAmino } from "./member_report";
 import { MemberWarning, MemberWarningAmino } from "./member_warning";
 import { GovActionAppeal, GovActionAppealAmino } from "./gov_action_appeal";
 import { JuryParticipation, JuryParticipationAmino } from "./jury_participation";
+import { RoleActivity, RoleActivityAmino } from "./role_activity";
+import { InitiativeReview, InitiativeReviewAmino } from "./initiative_review";
+import { ReviewBounty, ReviewBountyAmino } from "./review_bounty";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 import { Decimal } from "@interchainjs/math";
@@ -959,112 +961,6 @@ export interface QueryAllInterimResponseAminoMsg {
   value: QueryAllInterimResponseAmino;
 }
 /**
- * QueryGetInterimTemplateRequest defines the QueryGetInterimTemplateRequest message.
- * @name QueryGetInterimTemplateRequest
- * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.QueryGetInterimTemplateRequest
- */
-export interface QueryGetInterimTemplateRequest {
-  templateId: string;
-}
-export interface QueryGetInterimTemplateRequestProtoMsg {
-  typeUrl: "/sparkdream.rep.v1.QueryGetInterimTemplateRequest";
-  value: Uint8Array;
-}
-/**
- * QueryGetInterimTemplateRequest defines the QueryGetInterimTemplateRequest message.
- * @name QueryGetInterimTemplateRequestAmino
- * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.QueryGetInterimTemplateRequest
- */
-export interface QueryGetInterimTemplateRequestAmino {
-  template_id?: string;
-}
-export interface QueryGetInterimTemplateRequestAminoMsg {
-  type: "/sparkdream.rep.v1.QueryGetInterimTemplateRequest";
-  value: QueryGetInterimTemplateRequestAmino;
-}
-/**
- * QueryGetInterimTemplateResponse defines the QueryGetInterimTemplateResponse message.
- * @name QueryGetInterimTemplateResponse
- * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.QueryGetInterimTemplateResponse
- */
-export interface QueryGetInterimTemplateResponse {
-  interimTemplate: InterimTemplate;
-}
-export interface QueryGetInterimTemplateResponseProtoMsg {
-  typeUrl: "/sparkdream.rep.v1.QueryGetInterimTemplateResponse";
-  value: Uint8Array;
-}
-/**
- * QueryGetInterimTemplateResponse defines the QueryGetInterimTemplateResponse message.
- * @name QueryGetInterimTemplateResponseAmino
- * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.QueryGetInterimTemplateResponse
- */
-export interface QueryGetInterimTemplateResponseAmino {
-  interim_template?: InterimTemplateAmino;
-}
-export interface QueryGetInterimTemplateResponseAminoMsg {
-  type: "/sparkdream.rep.v1.QueryGetInterimTemplateResponse";
-  value: QueryGetInterimTemplateResponseAmino;
-}
-/**
- * QueryAllInterimTemplateRequest defines the QueryAllInterimTemplateRequest message.
- * @name QueryAllInterimTemplateRequest
- * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.QueryAllInterimTemplateRequest
- */
-export interface QueryAllInterimTemplateRequest {
-  pagination?: PageRequest;
-}
-export interface QueryAllInterimTemplateRequestProtoMsg {
-  typeUrl: "/sparkdream.rep.v1.QueryAllInterimTemplateRequest";
-  value: Uint8Array;
-}
-/**
- * QueryAllInterimTemplateRequest defines the QueryAllInterimTemplateRequest message.
- * @name QueryAllInterimTemplateRequestAmino
- * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.QueryAllInterimTemplateRequest
- */
-export interface QueryAllInterimTemplateRequestAmino {
-  pagination?: PageRequestAmino;
-}
-export interface QueryAllInterimTemplateRequestAminoMsg {
-  type: "/sparkdream.rep.v1.QueryAllInterimTemplateRequest";
-  value: QueryAllInterimTemplateRequestAmino;
-}
-/**
- * QueryAllInterimTemplateResponse defines the QueryAllInterimTemplateResponse message.
- * @name QueryAllInterimTemplateResponse
- * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.QueryAllInterimTemplateResponse
- */
-export interface QueryAllInterimTemplateResponse {
-  interimTemplate: InterimTemplate[];
-  pagination?: PageResponse;
-}
-export interface QueryAllInterimTemplateResponseProtoMsg {
-  typeUrl: "/sparkdream.rep.v1.QueryAllInterimTemplateResponse";
-  value: Uint8Array;
-}
-/**
- * QueryAllInterimTemplateResponse defines the QueryAllInterimTemplateResponse message.
- * @name QueryAllInterimTemplateResponseAmino
- * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.QueryAllInterimTemplateResponse
- */
-export interface QueryAllInterimTemplateResponseAmino {
-  interim_template?: InterimTemplateAmino[];
-  pagination?: PageResponseAmino;
-}
-export interface QueryAllInterimTemplateResponseAminoMsg {
-  type: "/sparkdream.rep.v1.QueryAllInterimTemplateResponse";
-  value: QueryAllInterimTemplateResponseAmino;
-}
-/**
  * QueryMembersByTrustLevelRequest defines the QueryMembersByTrustLevelRequest message.
  * @name QueryMembersByTrustLevelRequest
  * @package sparkdream.rep.v1
@@ -1175,6 +1071,74 @@ export interface QueryInvitationsByInviterResponseAmino {
 export interface QueryInvitationsByInviterResponseAminoMsg {
   type: "/sparkdream.rep.v1.QueryInvitationsByInviterResponse";
   value: QueryInvitationsByInviterResponseAmino;
+}
+/**
+ * QueryJuryReviewsByJurorRequest defines the QueryJuryReviewsByJuror request.
+ * @name QueryJuryReviewsByJurorRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryJuryReviewsByJurorRequest
+ */
+export interface QueryJuryReviewsByJurorRequest {
+  juror: string;
+  /**
+   * When true, return only reviews still awaiting a verdict — the summons a
+   * juror can still act on. Defaults to false, which returns their full
+   * service history.
+   */
+  pendingOnly: boolean;
+  pagination?: PageRequest;
+}
+export interface QueryJuryReviewsByJurorRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryJuryReviewsByJurorRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryJuryReviewsByJurorRequest defines the QueryJuryReviewsByJuror request.
+ * @name QueryJuryReviewsByJurorRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryJuryReviewsByJurorRequest
+ */
+export interface QueryJuryReviewsByJurorRequestAmino {
+  juror?: string;
+  /**
+   * When true, return only reviews still awaiting a verdict — the summons a
+   * juror can still act on. Defaults to false, which returns their full
+   * service history.
+   */
+  pending_only?: boolean;
+  pagination?: PageRequestAmino;
+}
+export interface QueryJuryReviewsByJurorRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryJuryReviewsByJurorRequest";
+  value: QueryJuryReviewsByJurorRequestAmino;
+}
+/**
+ * QueryJuryReviewsByJurorResponse defines the QueryJuryReviewsByJuror response.
+ * @name QueryJuryReviewsByJurorResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryJuryReviewsByJurorResponse
+ */
+export interface QueryJuryReviewsByJurorResponse {
+  juryReview: JuryReview[];
+  pagination?: PageResponse;
+}
+export interface QueryJuryReviewsByJurorResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryJuryReviewsByJurorResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryJuryReviewsByJurorResponse defines the QueryJuryReviewsByJuror response.
+ * @name QueryJuryReviewsByJurorResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryJuryReviewsByJurorResponse
+ */
+export interface QueryJuryReviewsByJurorResponseAmino {
+  jury_review?: JuryReviewAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryJuryReviewsByJurorResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryJuryReviewsByJurorResponse";
+  value: QueryJuryReviewsByJurorResponseAmino;
 }
 /**
  * QueryInterimsByAssigneeRequest defines the QueryInterimsByAssigneeRequest message.
@@ -4656,6 +4620,558 @@ export interface QueryAuthorBondsByTypeResponseAminoMsg {
   type: "/sparkdream.rep.v1.QueryAuthorBondsByTypeResponse";
   value: QueryAuthorBondsByTypeResponseAmino;
 }
+/**
+ * QueryRoleActivityRequest defines the QueryRoleActivity request.
+ * @name QueryRoleActivityRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRoleActivityRequest
+ */
+export interface QueryRoleActivityRequest {
+  roleType: RoleType;
+  address: string;
+}
+export interface QueryRoleActivityRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryRoleActivityRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryRoleActivityRequest defines the QueryRoleActivity request.
+ * @name QueryRoleActivityRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRoleActivityRequest
+ */
+export interface QueryRoleActivityRequestAmino {
+  role_type?: RoleType;
+  address?: string;
+}
+export interface QueryRoleActivityRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryRoleActivityRequest";
+  value: QueryRoleActivityRequestAmino;
+}
+/**
+ * QueryRoleActivityResponse defines the QueryRoleActivity response.
+ * @name QueryRoleActivityResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRoleActivityResponse
+ */
+export interface QueryRoleActivityResponse {
+  roleActivity: RoleActivity;
+}
+export interface QueryRoleActivityResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryRoleActivityResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryRoleActivityResponse defines the QueryRoleActivity response.
+ * @name QueryRoleActivityResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRoleActivityResponse
+ */
+export interface QueryRoleActivityResponseAmino {
+  role_activity?: RoleActivityAmino;
+}
+export interface QueryRoleActivityResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryRoleActivityResponse";
+  value: QueryRoleActivityResponseAmino;
+}
+/**
+ * QueryRoleRewardPoolsRequest is the request for RoleRewardPools.
+ * @name QueryRoleRewardPoolsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRoleRewardPoolsRequest
+ */
+export interface QueryRoleRewardPoolsRequest {}
+export interface QueryRoleRewardPoolsRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryRoleRewardPoolsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryRoleRewardPoolsRequest is the request for RoleRewardPools.
+ * @name QueryRoleRewardPoolsRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRoleRewardPoolsRequest
+ */
+export interface QueryRoleRewardPoolsRequestAmino {}
+export interface QueryRoleRewardPoolsRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryRoleRewardPoolsRequest";
+  value: QueryRoleRewardPoolsRequestAmino;
+}
+/**
+ * RoleRewardPoolStatus is one bonded-role reward pool's funding state.
+ * @name RoleRewardPoolStatus
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.RoleRewardPoolStatus
+ */
+export interface RoleRewardPoolStatus {
+  /**
+   * role identifies the bonded role the pool pays, e.g. "content_sentinel".
+   */
+  role: string;
+  /**
+   * address is the derived sub-address holding the pool balance.
+   */
+  address: string;
+  /**
+   * balance is the pool's current SPARK balance.
+   */
+  balance: string;
+  /**
+   * cap is the pool's configured ceiling; excess is burned each epoch.
+   */
+  cap: string;
+  /**
+   * headroom is max(0, cap - balance) and sets this pool's share of the draw.
+   */
+  headroom: string;
+}
+export interface RoleRewardPoolStatusProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.RoleRewardPoolStatus";
+  value: Uint8Array;
+}
+/**
+ * RoleRewardPoolStatus is one bonded-role reward pool's funding state.
+ * @name RoleRewardPoolStatusAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.RoleRewardPoolStatus
+ */
+export interface RoleRewardPoolStatusAmino {
+  /**
+   * role identifies the bonded role the pool pays, e.g. "content_sentinel".
+   */
+  role?: string;
+  /**
+   * address is the derived sub-address holding the pool balance.
+   */
+  address?: string;
+  /**
+   * balance is the pool's current SPARK balance.
+   */
+  balance?: string;
+  /**
+   * cap is the pool's configured ceiling; excess is burned each epoch.
+   */
+  cap?: string;
+  /**
+   * headroom is max(0, cap - balance) and sets this pool's share of the draw.
+   */
+  headroom?: string;
+}
+export interface RoleRewardPoolStatusAminoMsg {
+  type: "/sparkdream.rep.v1.RoleRewardPoolStatus";
+  value: RoleRewardPoolStatusAmino;
+}
+/**
+ * QueryRoleRewardPoolsResponse is the response for RoleRewardPools.
+ * @name QueryRoleRewardPoolsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRoleRewardPoolsResponse
+ */
+export interface QueryRoleRewardPoolsResponse {
+  pools: RoleRewardPoolStatus[];
+  /**
+   * funded_today is the SPARK already drawn from the community pool on the
+   * current UTC day.
+   */
+  fundedToday: string;
+  /**
+   * daily_funding_cap is today's computed allowance in uspark --
+   * annual_provisions * community_tax * inflation_share / 365. Zero means
+   * automatic funding is disabled or nothing is being minted yet.
+   */
+  dailyFundingCap: string;
+  /**
+   * inflation_share is the role_reward_inflation_share param the allowance is
+   * derived from. Reported alongside the computed amount so an operator can
+   * tell a retuned share from a change in the inflation rate.
+   */
+  inflationShare: string;
+}
+export interface QueryRoleRewardPoolsResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryRoleRewardPoolsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryRoleRewardPoolsResponse is the response for RoleRewardPools.
+ * @name QueryRoleRewardPoolsResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRoleRewardPoolsResponse
+ */
+export interface QueryRoleRewardPoolsResponseAmino {
+  pools?: RoleRewardPoolStatusAmino[];
+  /**
+   * funded_today is the SPARK already drawn from the community pool on the
+   * current UTC day.
+   */
+  funded_today?: string;
+  /**
+   * daily_funding_cap is today's computed allowance in uspark --
+   * annual_provisions * community_tax * inflation_share / 365. Zero means
+   * automatic funding is disabled or nothing is being minted yet.
+   */
+  daily_funding_cap?: string;
+  /**
+   * inflation_share is the role_reward_inflation_share param the allowance is
+   * derived from. Reported alongside the computed amount so an operator can
+   * tell a retuned share from a change in the inflation rate.
+   */
+  inflation_share?: string;
+}
+export interface QueryRoleRewardPoolsResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryRoleRewardPoolsResponse";
+  value: QueryRoleRewardPoolsResponseAmino;
+}
+/**
+ * QueryInitiativeReviewsRequest asks for the verdicts on one initiative.
+ * 
+ * Deliberately has NO round selector. The codebase convention for an optional
+ * numeric filter is a plain field where zero means unset (see
+ * QueryPostsRequest.category_id, QuerySeasonStatsRequest.season,
+ * QueryShieldRequest.epoch) — which works there because none of those domains
+ * has a valid zero. Review rounds number from 0, so the same convention would
+ * make the first round unaddressable. Rather than diverge from the convention
+ * for one message, every round is returned: max_review_rounds bounds the set at
+ * 3, so there is nothing to select between and nothing to paginate.
+ * @name QueryInitiativeReviewsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryInitiativeReviewsRequest
+ */
+export interface QueryInitiativeReviewsRequest {
+  initiativeId: bigint;
+}
+export interface QueryInitiativeReviewsRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryInitiativeReviewsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryInitiativeReviewsRequest asks for the verdicts on one initiative.
+ * 
+ * Deliberately has NO round selector. The codebase convention for an optional
+ * numeric filter is a plain field where zero means unset (see
+ * QueryPostsRequest.category_id, QuerySeasonStatsRequest.season,
+ * QueryShieldRequest.epoch) — which works there because none of those domains
+ * has a valid zero. Review rounds number from 0, so the same convention would
+ * make the first round unaddressable. Rather than diverge from the convention
+ * for one message, every round is returned: max_review_rounds bounds the set at
+ * 3, so there is nothing to select between and nothing to paginate.
+ * @name QueryInitiativeReviewsRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryInitiativeReviewsRequest
+ */
+export interface QueryInitiativeReviewsRequestAmino {
+  initiative_id?: string;
+}
+export interface QueryInitiativeReviewsRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryInitiativeReviewsRequest";
+  value: QueryInitiativeReviewsRequestAmino;
+}
+/**
+ * QueryInitiativeReviewsResponse returns every round's verdicts, plus what the
+ * current round adds up to against the gate.
+ * @name QueryInitiativeReviewsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryInitiativeReviewsResponse
+ */
+export interface QueryInitiativeReviewsResponse {
+  /**
+   * Oldest round first. A rejected round's verdicts stay here so the decision
+   * that sent work back can still be audited.
+   */
+  rounds: InitiativeReviewRound[];
+  /**
+   * The round the gate is judging now.
+   */
+  currentRound: number;
+  /**
+   * Approving verdicts on the current round.
+   */
+  approvals: number;
+  /**
+   * How many approvals the gate needs — the maximum of the initiative's
+   * snapshotted project policy and the live chain-wide budget threshold.
+   */
+  required: number;
+  /**
+   * Whether the gate is satisfied. Reported rather than left to the caller to
+   * recompute, because "approvals >= required" is not the whole rule: a
+   * committee escalation can satisfy or fail the gate on its own.
+   */
+  satisfied: boolean;
+}
+export interface QueryInitiativeReviewsResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryInitiativeReviewsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryInitiativeReviewsResponse returns every round's verdicts, plus what the
+ * current round adds up to against the gate.
+ * @name QueryInitiativeReviewsResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryInitiativeReviewsResponse
+ */
+export interface QueryInitiativeReviewsResponseAmino {
+  /**
+   * Oldest round first. A rejected round's verdicts stay here so the decision
+   * that sent work back can still be audited.
+   */
+  rounds?: InitiativeReviewRoundAmino[];
+  /**
+   * The round the gate is judging now.
+   */
+  current_round?: number;
+  /**
+   * Approving verdicts on the current round.
+   */
+  approvals?: number;
+  /**
+   * How many approvals the gate needs — the maximum of the initiative's
+   * snapshotted project policy and the live chain-wide budget threshold.
+   */
+  required?: number;
+  /**
+   * Whether the gate is satisfied. Reported rather than left to the caller to
+   * recompute, because "approvals >= required" is not the whole rule: a
+   * committee escalation can satisfy or fail the gate on its own.
+   */
+  satisfied?: boolean;
+}
+export interface QueryInitiativeReviewsResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryInitiativeReviewsResponse";
+  value: QueryInitiativeReviewsResponseAmino;
+}
+/**
+ * InitiativeReviewRound groups one round's verdicts.
+ * @name InitiativeReviewRound
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.InitiativeReviewRound
+ */
+export interface InitiativeReviewRound {
+  round: number;
+  reviews: InitiativeReview[];
+  approvals: number;
+}
+export interface InitiativeReviewRoundProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.InitiativeReviewRound";
+  value: Uint8Array;
+}
+/**
+ * InitiativeReviewRound groups one round's verdicts.
+ * @name InitiativeReviewRoundAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.InitiativeReviewRound
+ */
+export interface InitiativeReviewRoundAmino {
+  round?: number;
+  reviews?: InitiativeReviewAmino[];
+  approvals?: number;
+}
+export interface InitiativeReviewRoundAminoMsg {
+  type: "/sparkdream.rep.v1.InitiativeReviewRound";
+  value: InitiativeReviewRoundAmino;
+}
+/**
+ * QueryReviewBountyRequest asks what is escrowed against an initiative.
+ * @name QueryReviewBountyRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryReviewBountyRequest
+ */
+export interface QueryReviewBountyRequest {
+  initiativeId: bigint;
+}
+export interface QueryReviewBountyRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryReviewBountyRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryReviewBountyRequest asks what is escrowed against an initiative.
+ * @name QueryReviewBountyRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryReviewBountyRequest
+ */
+export interface QueryReviewBountyRequestAmino {
+  initiative_id?: string;
+}
+export interface QueryReviewBountyRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryReviewBountyRequest";
+  value: QueryReviewBountyRequestAmino;
+}
+/**
+ * QueryReviewBountyResponse returns the escrow and its reclaim state.
+ * @name QueryReviewBountyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryReviewBountyResponse
+ */
+export interface QueryReviewBountyResponse {
+  bounty: ReviewBounty;
+  /**
+   * Per-funder view of when each contribution matures, so a funder can see what
+   * they may reclaim without recomputing the delay themselves.
+   */
+  reclaimStatus: ReviewBountyReclaimStatus[];
+}
+export interface QueryReviewBountyResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryReviewBountyResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryReviewBountyResponse returns the escrow and its reclaim state.
+ * @name QueryReviewBountyResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryReviewBountyResponse
+ */
+export interface QueryReviewBountyResponseAmino {
+  bounty?: ReviewBountyAmino;
+  /**
+   * Per-funder view of when each contribution matures, so a funder can see what
+   * they may reclaim without recomputing the delay themselves.
+   */
+  reclaim_status?: ReviewBountyReclaimStatusAmino[];
+}
+export interface QueryReviewBountyResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryReviewBountyResponse";
+  value: QueryReviewBountyResponseAmino;
+}
+/**
+ * ReviewBountyReclaimStatus is one contribution's reclaim eligibility.
+ * @name ReviewBountyReclaimStatus
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.ReviewBountyReclaimStatus
+ */
+export interface ReviewBountyReclaimStatus {
+  funder: string;
+  amount: string;
+  /**
+   * Height at which the reclaim delay elapses for this contribution.
+   */
+  reclaimableAtHeight: bigint;
+  /**
+   * False whenever the bounty is committed, regardless of height: a verdict has
+   * been filed and the escrow now belongs to paying for it.
+   */
+  reclaimable: boolean;
+}
+export interface ReviewBountyReclaimStatusProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.ReviewBountyReclaimStatus";
+  value: Uint8Array;
+}
+/**
+ * ReviewBountyReclaimStatus is one contribution's reclaim eligibility.
+ * @name ReviewBountyReclaimStatusAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.ReviewBountyReclaimStatus
+ */
+export interface ReviewBountyReclaimStatusAmino {
+  funder?: string;
+  amount?: string;
+  /**
+   * Height at which the reclaim delay elapses for this contribution.
+   */
+  reclaimable_at_height?: string;
+  /**
+   * False whenever the bounty is committed, regardless of height: a verdict has
+   * been filed and the escrow now belongs to paying for it.
+   */
+  reclaimable?: boolean;
+}
+export interface ReviewBountyReclaimStatusAminoMsg {
+  type: "/sparkdream.rep.v1.ReviewBountyReclaimStatus";
+  value: ReviewBountyReclaimStatusAmino;
+}
+/**
+ * QueryEscalatedReviewsRequest asks what is awaiting the committee.
+ * @name QueryEscalatedReviewsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryEscalatedReviewsRequest
+ */
+export interface QueryEscalatedReviewsRequest {}
+export interface QueryEscalatedReviewsRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryEscalatedReviewsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryEscalatedReviewsRequest asks what is awaiting the committee.
+ * @name QueryEscalatedReviewsRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryEscalatedReviewsRequest
+ */
+export interface QueryEscalatedReviewsRequestAmino {}
+export interface QueryEscalatedReviewsRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryEscalatedReviewsRequest";
+  value: QueryEscalatedReviewsRequestAmino;
+}
+/**
+ * QueryEscalatedReviewsResponse lists the escalated rounds.
+ * 
+ * Escalation is recorded in a separate set rather than on the initiative --
+ * ReviewEscalation is reset to NONE when a round escalates -- so without this
+ * query a committee has no way to find the decisions waiting on it.
+ * @name QueryEscalatedReviewsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryEscalatedReviewsResponse
+ */
+export interface QueryEscalatedReviewsResponse {
+  escalations: EscalatedReview[];
+}
+export interface QueryEscalatedReviewsResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryEscalatedReviewsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryEscalatedReviewsResponse lists the escalated rounds.
+ * 
+ * Escalation is recorded in a separate set rather than on the initiative --
+ * ReviewEscalation is reset to NONE when a round escalates -- so without this
+ * query a committee has no way to find the decisions waiting on it.
+ * @name QueryEscalatedReviewsResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryEscalatedReviewsResponse
+ */
+export interface QueryEscalatedReviewsResponseAmino {
+  escalations?: EscalatedReviewAmino[];
+}
+export interface QueryEscalatedReviewsResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryEscalatedReviewsResponse";
+  value: QueryEscalatedReviewsResponseAmino;
+}
+/**
+ * EscalatedReview is one round sitting with the Operations Committee.
+ * @name EscalatedReview
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.EscalatedReview
+ */
+export interface EscalatedReview {
+  initiativeId: bigint;
+  round: number;
+  /**
+   * Height at which committee silence rejects the round.
+   */
+  reviewDeadline: bigint;
+  title: string;
+  assignee: string;
+}
+export interface EscalatedReviewProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.EscalatedReview";
+  value: Uint8Array;
+}
+/**
+ * EscalatedReview is one round sitting with the Operations Committee.
+ * @name EscalatedReviewAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.EscalatedReview
+ */
+export interface EscalatedReviewAmino {
+  initiative_id?: string;
+  round?: number;
+  /**
+   * Height at which committee silence rejects the round.
+   */
+  review_deadline?: string;
+  title?: string;
+  assignee?: string;
+}
+export interface EscalatedReviewAminoMsg {
+  type: "/sparkdream.rep.v1.EscalatedReview";
+  value: EscalatedReviewAmino;
+}
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
 }
@@ -7125,296 +7641,6 @@ export const QueryAllInterimResponse = {
     };
   }
 };
-function createBaseQueryGetInterimTemplateRequest(): QueryGetInterimTemplateRequest {
-  return {
-    templateId: ""
-  };
-}
-/**
- * QueryGetInterimTemplateRequest defines the QueryGetInterimTemplateRequest message.
- * @name QueryGetInterimTemplateRequest
- * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.QueryGetInterimTemplateRequest
- */
-export const QueryGetInterimTemplateRequest = {
-  typeUrl: "/sparkdream.rep.v1.QueryGetInterimTemplateRequest",
-  encode(message: QueryGetInterimTemplateRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.templateId !== "") {
-      writer.uint32(10).string(message.templateId);
-    }
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetInterimTemplateRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryGetInterimTemplateRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.templateId = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial(object: DeepPartial<QueryGetInterimTemplateRequest>): QueryGetInterimTemplateRequest {
-    const message = createBaseQueryGetInterimTemplateRequest();
-    message.templateId = object.templateId ?? "";
-    return message;
-  },
-  fromAmino(object: QueryGetInterimTemplateRequestAmino): QueryGetInterimTemplateRequest {
-    const message = createBaseQueryGetInterimTemplateRequest();
-    if (object.template_id !== undefined && object.template_id !== null) {
-      message.templateId = object.template_id;
-    }
-    return message;
-  },
-  toAmino(message: QueryGetInterimTemplateRequest): QueryGetInterimTemplateRequestAmino {
-    const obj: any = {};
-    obj.template_id = message.templateId === "" ? undefined : message.templateId;
-    return obj;
-  },
-  fromAminoMsg(object: QueryGetInterimTemplateRequestAminoMsg): QueryGetInterimTemplateRequest {
-    return QueryGetInterimTemplateRequest.fromAmino(object.value);
-  },
-  fromProtoMsg(message: QueryGetInterimTemplateRequestProtoMsg): QueryGetInterimTemplateRequest {
-    return QueryGetInterimTemplateRequest.decode(message.value);
-  },
-  toProto(message: QueryGetInterimTemplateRequest): Uint8Array {
-    return QueryGetInterimTemplateRequest.encode(message).finish();
-  },
-  toProtoMsg(message: QueryGetInterimTemplateRequest): QueryGetInterimTemplateRequestProtoMsg {
-    return {
-      typeUrl: "/sparkdream.rep.v1.QueryGetInterimTemplateRequest",
-      value: QueryGetInterimTemplateRequest.encode(message).finish()
-    };
-  }
-};
-function createBaseQueryGetInterimTemplateResponse(): QueryGetInterimTemplateResponse {
-  return {
-    interimTemplate: InterimTemplate.fromPartial({})
-  };
-}
-/**
- * QueryGetInterimTemplateResponse defines the QueryGetInterimTemplateResponse message.
- * @name QueryGetInterimTemplateResponse
- * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.QueryGetInterimTemplateResponse
- */
-export const QueryGetInterimTemplateResponse = {
-  typeUrl: "/sparkdream.rep.v1.QueryGetInterimTemplateResponse",
-  encode(message: QueryGetInterimTemplateResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.interimTemplate !== undefined) {
-      InterimTemplate.encode(message.interimTemplate, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetInterimTemplateResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryGetInterimTemplateResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.interimTemplate = InterimTemplate.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial(object: DeepPartial<QueryGetInterimTemplateResponse>): QueryGetInterimTemplateResponse {
-    const message = createBaseQueryGetInterimTemplateResponse();
-    message.interimTemplate = object.interimTemplate !== undefined && object.interimTemplate !== null ? InterimTemplate.fromPartial(object.interimTemplate) : undefined;
-    return message;
-  },
-  fromAmino(object: QueryGetInterimTemplateResponseAmino): QueryGetInterimTemplateResponse {
-    const message = createBaseQueryGetInterimTemplateResponse();
-    if (object.interim_template !== undefined && object.interim_template !== null) {
-      message.interimTemplate = InterimTemplate.fromAmino(object.interim_template);
-    }
-    return message;
-  },
-  toAmino(message: QueryGetInterimTemplateResponse): QueryGetInterimTemplateResponseAmino {
-    const obj: any = {};
-    obj.interim_template = message.interimTemplate ? InterimTemplate.toAmino(message.interimTemplate) : undefined;
-    return obj;
-  },
-  fromAminoMsg(object: QueryGetInterimTemplateResponseAminoMsg): QueryGetInterimTemplateResponse {
-    return QueryGetInterimTemplateResponse.fromAmino(object.value);
-  },
-  fromProtoMsg(message: QueryGetInterimTemplateResponseProtoMsg): QueryGetInterimTemplateResponse {
-    return QueryGetInterimTemplateResponse.decode(message.value);
-  },
-  toProto(message: QueryGetInterimTemplateResponse): Uint8Array {
-    return QueryGetInterimTemplateResponse.encode(message).finish();
-  },
-  toProtoMsg(message: QueryGetInterimTemplateResponse): QueryGetInterimTemplateResponseProtoMsg {
-    return {
-      typeUrl: "/sparkdream.rep.v1.QueryGetInterimTemplateResponse",
-      value: QueryGetInterimTemplateResponse.encode(message).finish()
-    };
-  }
-};
-function createBaseQueryAllInterimTemplateRequest(): QueryAllInterimTemplateRequest {
-  return {
-    pagination: undefined
-  };
-}
-/**
- * QueryAllInterimTemplateRequest defines the QueryAllInterimTemplateRequest message.
- * @name QueryAllInterimTemplateRequest
- * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.QueryAllInterimTemplateRequest
- */
-export const QueryAllInterimTemplateRequest = {
-  typeUrl: "/sparkdream.rep.v1.QueryAllInterimTemplateRequest",
-  encode(message: QueryAllInterimTemplateRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.pagination !== undefined) {
-      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllInterimTemplateRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryAllInterimTemplateRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.pagination = PageRequest.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial(object: DeepPartial<QueryAllInterimTemplateRequest>): QueryAllInterimTemplateRequest {
-    const message = createBaseQueryAllInterimTemplateRequest();
-    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
-    return message;
-  },
-  fromAmino(object: QueryAllInterimTemplateRequestAmino): QueryAllInterimTemplateRequest {
-    const message = createBaseQueryAllInterimTemplateRequest();
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromAmino(object.pagination);
-    }
-    return message;
-  },
-  toAmino(message: QueryAllInterimTemplateRequest): QueryAllInterimTemplateRequestAmino {
-    const obj: any = {};
-    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
-    return obj;
-  },
-  fromAminoMsg(object: QueryAllInterimTemplateRequestAminoMsg): QueryAllInterimTemplateRequest {
-    return QueryAllInterimTemplateRequest.fromAmino(object.value);
-  },
-  fromProtoMsg(message: QueryAllInterimTemplateRequestProtoMsg): QueryAllInterimTemplateRequest {
-    return QueryAllInterimTemplateRequest.decode(message.value);
-  },
-  toProto(message: QueryAllInterimTemplateRequest): Uint8Array {
-    return QueryAllInterimTemplateRequest.encode(message).finish();
-  },
-  toProtoMsg(message: QueryAllInterimTemplateRequest): QueryAllInterimTemplateRequestProtoMsg {
-    return {
-      typeUrl: "/sparkdream.rep.v1.QueryAllInterimTemplateRequest",
-      value: QueryAllInterimTemplateRequest.encode(message).finish()
-    };
-  }
-};
-function createBaseQueryAllInterimTemplateResponse(): QueryAllInterimTemplateResponse {
-  return {
-    interimTemplate: [],
-    pagination: undefined
-  };
-}
-/**
- * QueryAllInterimTemplateResponse defines the QueryAllInterimTemplateResponse message.
- * @name QueryAllInterimTemplateResponse
- * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.QueryAllInterimTemplateResponse
- */
-export const QueryAllInterimTemplateResponse = {
-  typeUrl: "/sparkdream.rep.v1.QueryAllInterimTemplateResponse",
-  encode(message: QueryAllInterimTemplateResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    for (const v of message.interimTemplate) {
-      InterimTemplate.encode(v!, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.pagination !== undefined) {
-      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): QueryAllInterimTemplateResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryAllInterimTemplateResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.interimTemplate.push(InterimTemplate.decode(reader, reader.uint32()));
-          break;
-        case 2:
-          message.pagination = PageResponse.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial(object: DeepPartial<QueryAllInterimTemplateResponse>): QueryAllInterimTemplateResponse {
-    const message = createBaseQueryAllInterimTemplateResponse();
-    message.interimTemplate = object.interimTemplate?.map(e => InterimTemplate.fromPartial(e)) || [];
-    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
-    return message;
-  },
-  fromAmino(object: QueryAllInterimTemplateResponseAmino): QueryAllInterimTemplateResponse {
-    const message = createBaseQueryAllInterimTemplateResponse();
-    message.interimTemplate = object.interim_template?.map(e => InterimTemplate.fromAmino(e)) || [];
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromAmino(object.pagination);
-    }
-    return message;
-  },
-  toAmino(message: QueryAllInterimTemplateResponse): QueryAllInterimTemplateResponseAmino {
-    const obj: any = {};
-    if (message.interimTemplate) {
-      obj.interim_template = message.interimTemplate.map(e => e ? InterimTemplate.toAmino(e) : undefined);
-    } else {
-      obj.interim_template = message.interimTemplate;
-    }
-    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
-    return obj;
-  },
-  fromAminoMsg(object: QueryAllInterimTemplateResponseAminoMsg): QueryAllInterimTemplateResponse {
-    return QueryAllInterimTemplateResponse.fromAmino(object.value);
-  },
-  fromProtoMsg(message: QueryAllInterimTemplateResponseProtoMsg): QueryAllInterimTemplateResponse {
-    return QueryAllInterimTemplateResponse.decode(message.value);
-  },
-  toProto(message: QueryAllInterimTemplateResponse): Uint8Array {
-    return QueryAllInterimTemplateResponse.encode(message).finish();
-  },
-  toProtoMsg(message: QueryAllInterimTemplateResponse): QueryAllInterimTemplateResponseProtoMsg {
-    return {
-      typeUrl: "/sparkdream.rep.v1.QueryAllInterimTemplateResponse",
-      value: QueryAllInterimTemplateResponse.encode(message).finish()
-    };
-  }
-};
 function createBaseQueryMembersByTrustLevelRequest(): QueryMembersByTrustLevelRequest {
   return {
     trustLevel: BigInt(0),
@@ -7740,6 +7966,182 @@ export const QueryInvitationsByInviterResponse = {
     return {
       typeUrl: "/sparkdream.rep.v1.QueryInvitationsByInviterResponse",
       value: QueryInvitationsByInviterResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryJuryReviewsByJurorRequest(): QueryJuryReviewsByJurorRequest {
+  return {
+    juror: "",
+    pendingOnly: false,
+    pagination: undefined
+  };
+}
+/**
+ * QueryJuryReviewsByJurorRequest defines the QueryJuryReviewsByJuror request.
+ * @name QueryJuryReviewsByJurorRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryJuryReviewsByJurorRequest
+ */
+export const QueryJuryReviewsByJurorRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryJuryReviewsByJurorRequest",
+  encode(message: QueryJuryReviewsByJurorRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.juror !== "") {
+      writer.uint32(10).string(message.juror);
+    }
+    if (message.pendingOnly === true) {
+      writer.uint32(16).bool(message.pendingOnly);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryJuryReviewsByJurorRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryJuryReviewsByJurorRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.juror = reader.string();
+          break;
+        case 2:
+          message.pendingOnly = reader.bool();
+          break;
+        case 3:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryJuryReviewsByJurorRequest>): QueryJuryReviewsByJurorRequest {
+    const message = createBaseQueryJuryReviewsByJurorRequest();
+    message.juror = object.juror ?? "";
+    message.pendingOnly = object.pendingOnly ?? false;
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryJuryReviewsByJurorRequestAmino): QueryJuryReviewsByJurorRequest {
+    const message = createBaseQueryJuryReviewsByJurorRequest();
+    if (object.juror !== undefined && object.juror !== null) {
+      message.juror = object.juror;
+    }
+    if (object.pending_only !== undefined && object.pending_only !== null) {
+      message.pendingOnly = object.pending_only;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryJuryReviewsByJurorRequest): QueryJuryReviewsByJurorRequestAmino {
+    const obj: any = {};
+    obj.juror = message.juror === "" ? undefined : message.juror;
+    obj.pending_only = message.pendingOnly === false ? undefined : message.pendingOnly;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryJuryReviewsByJurorRequestAminoMsg): QueryJuryReviewsByJurorRequest {
+    return QueryJuryReviewsByJurorRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryJuryReviewsByJurorRequestProtoMsg): QueryJuryReviewsByJurorRequest {
+    return QueryJuryReviewsByJurorRequest.decode(message.value);
+  },
+  toProto(message: QueryJuryReviewsByJurorRequest): Uint8Array {
+    return QueryJuryReviewsByJurorRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryJuryReviewsByJurorRequest): QueryJuryReviewsByJurorRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryJuryReviewsByJurorRequest",
+      value: QueryJuryReviewsByJurorRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryJuryReviewsByJurorResponse(): QueryJuryReviewsByJurorResponse {
+  return {
+    juryReview: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryJuryReviewsByJurorResponse defines the QueryJuryReviewsByJuror response.
+ * @name QueryJuryReviewsByJurorResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryJuryReviewsByJurorResponse
+ */
+export const QueryJuryReviewsByJurorResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryJuryReviewsByJurorResponse",
+  encode(message: QueryJuryReviewsByJurorResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.juryReview) {
+      JuryReview.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryJuryReviewsByJurorResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryJuryReviewsByJurorResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.juryReview.push(JuryReview.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryJuryReviewsByJurorResponse>): QueryJuryReviewsByJurorResponse {
+    const message = createBaseQueryJuryReviewsByJurorResponse();
+    message.juryReview = object.juryReview?.map(e => JuryReview.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryJuryReviewsByJurorResponseAmino): QueryJuryReviewsByJurorResponse {
+    const message = createBaseQueryJuryReviewsByJurorResponse();
+    message.juryReview = object.jury_review?.map(e => JuryReview.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryJuryReviewsByJurorResponse): QueryJuryReviewsByJurorResponseAmino {
+    const obj: any = {};
+    if (message.juryReview) {
+      obj.jury_review = message.juryReview.map(e => e ? JuryReview.toAmino(e) : undefined);
+    } else {
+      obj.jury_review = message.juryReview;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryJuryReviewsByJurorResponseAminoMsg): QueryJuryReviewsByJurorResponse {
+    return QueryJuryReviewsByJurorResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryJuryReviewsByJurorResponseProtoMsg): QueryJuryReviewsByJurorResponse {
+    return QueryJuryReviewsByJurorResponse.decode(message.value);
+  },
+  toProto(message: QueryJuryReviewsByJurorResponse): Uint8Array {
+    return QueryJuryReviewsByJurorResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryJuryReviewsByJurorResponse): QueryJuryReviewsByJurorResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryJuryReviewsByJurorResponse",
+      value: QueryJuryReviewsByJurorResponse.encode(message).finish()
     };
   }
 };
@@ -17420,6 +17822,1234 @@ export const QueryAuthorBondsByTypeResponse = {
     return {
       typeUrl: "/sparkdream.rep.v1.QueryAuthorBondsByTypeResponse",
       value: QueryAuthorBondsByTypeResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRoleActivityRequest(): QueryRoleActivityRequest {
+  return {
+    roleType: 0,
+    address: ""
+  };
+}
+/**
+ * QueryRoleActivityRequest defines the QueryRoleActivity request.
+ * @name QueryRoleActivityRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRoleActivityRequest
+ */
+export const QueryRoleActivityRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryRoleActivityRequest",
+  encode(message: QueryRoleActivityRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.roleType !== 0) {
+      writer.uint32(8).int32(message.roleType);
+    }
+    if (message.address !== "") {
+      writer.uint32(18).string(message.address);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRoleActivityRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRoleActivityRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.roleType = reader.int32() as any;
+          break;
+        case 2:
+          message.address = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryRoleActivityRequest>): QueryRoleActivityRequest {
+    const message = createBaseQueryRoleActivityRequest();
+    message.roleType = object.roleType ?? 0;
+    message.address = object.address ?? "";
+    return message;
+  },
+  fromAmino(object: QueryRoleActivityRequestAmino): QueryRoleActivityRequest {
+    const message = createBaseQueryRoleActivityRequest();
+    if (object.role_type !== undefined && object.role_type !== null) {
+      message.roleType = object.role_type;
+    }
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    }
+    return message;
+  },
+  toAmino(message: QueryRoleActivityRequest): QueryRoleActivityRequestAmino {
+    const obj: any = {};
+    obj.role_type = message.roleType === 0 ? undefined : message.roleType;
+    obj.address = message.address === "" ? undefined : message.address;
+    return obj;
+  },
+  fromAminoMsg(object: QueryRoleActivityRequestAminoMsg): QueryRoleActivityRequest {
+    return QueryRoleActivityRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRoleActivityRequestProtoMsg): QueryRoleActivityRequest {
+    return QueryRoleActivityRequest.decode(message.value);
+  },
+  toProto(message: QueryRoleActivityRequest): Uint8Array {
+    return QueryRoleActivityRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRoleActivityRequest): QueryRoleActivityRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryRoleActivityRequest",
+      value: QueryRoleActivityRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRoleActivityResponse(): QueryRoleActivityResponse {
+  return {
+    roleActivity: RoleActivity.fromPartial({})
+  };
+}
+/**
+ * QueryRoleActivityResponse defines the QueryRoleActivity response.
+ * @name QueryRoleActivityResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRoleActivityResponse
+ */
+export const QueryRoleActivityResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryRoleActivityResponse",
+  encode(message: QueryRoleActivityResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.roleActivity !== undefined) {
+      RoleActivity.encode(message.roleActivity, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRoleActivityResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRoleActivityResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.roleActivity = RoleActivity.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryRoleActivityResponse>): QueryRoleActivityResponse {
+    const message = createBaseQueryRoleActivityResponse();
+    message.roleActivity = object.roleActivity !== undefined && object.roleActivity !== null ? RoleActivity.fromPartial(object.roleActivity) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryRoleActivityResponseAmino): QueryRoleActivityResponse {
+    const message = createBaseQueryRoleActivityResponse();
+    if (object.role_activity !== undefined && object.role_activity !== null) {
+      message.roleActivity = RoleActivity.fromAmino(object.role_activity);
+    }
+    return message;
+  },
+  toAmino(message: QueryRoleActivityResponse): QueryRoleActivityResponseAmino {
+    const obj: any = {};
+    obj.role_activity = message.roleActivity ? RoleActivity.toAmino(message.roleActivity) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryRoleActivityResponseAminoMsg): QueryRoleActivityResponse {
+    return QueryRoleActivityResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRoleActivityResponseProtoMsg): QueryRoleActivityResponse {
+    return QueryRoleActivityResponse.decode(message.value);
+  },
+  toProto(message: QueryRoleActivityResponse): Uint8Array {
+    return QueryRoleActivityResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRoleActivityResponse): QueryRoleActivityResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryRoleActivityResponse",
+      value: QueryRoleActivityResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRoleRewardPoolsRequest(): QueryRoleRewardPoolsRequest {
+  return {};
+}
+/**
+ * QueryRoleRewardPoolsRequest is the request for RoleRewardPools.
+ * @name QueryRoleRewardPoolsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRoleRewardPoolsRequest
+ */
+export const QueryRoleRewardPoolsRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryRoleRewardPoolsRequest",
+  encode(_: QueryRoleRewardPoolsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRoleRewardPoolsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRoleRewardPoolsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<QueryRoleRewardPoolsRequest>): QueryRoleRewardPoolsRequest {
+    const message = createBaseQueryRoleRewardPoolsRequest();
+    return message;
+  },
+  fromAmino(_: QueryRoleRewardPoolsRequestAmino): QueryRoleRewardPoolsRequest {
+    const message = createBaseQueryRoleRewardPoolsRequest();
+    return message;
+  },
+  toAmino(_: QueryRoleRewardPoolsRequest): QueryRoleRewardPoolsRequestAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: QueryRoleRewardPoolsRequestAminoMsg): QueryRoleRewardPoolsRequest {
+    return QueryRoleRewardPoolsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRoleRewardPoolsRequestProtoMsg): QueryRoleRewardPoolsRequest {
+    return QueryRoleRewardPoolsRequest.decode(message.value);
+  },
+  toProto(message: QueryRoleRewardPoolsRequest): Uint8Array {
+    return QueryRoleRewardPoolsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRoleRewardPoolsRequest): QueryRoleRewardPoolsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryRoleRewardPoolsRequest",
+      value: QueryRoleRewardPoolsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseRoleRewardPoolStatus(): RoleRewardPoolStatus {
+  return {
+    role: "",
+    address: "",
+    balance: "",
+    cap: "",
+    headroom: ""
+  };
+}
+/**
+ * RoleRewardPoolStatus is one bonded-role reward pool's funding state.
+ * @name RoleRewardPoolStatus
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.RoleRewardPoolStatus
+ */
+export const RoleRewardPoolStatus = {
+  typeUrl: "/sparkdream.rep.v1.RoleRewardPoolStatus",
+  encode(message: RoleRewardPoolStatus, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.role !== "") {
+      writer.uint32(10).string(message.role);
+    }
+    if (message.address !== "") {
+      writer.uint32(18).string(message.address);
+    }
+    if (message.balance !== "") {
+      writer.uint32(26).string(message.balance);
+    }
+    if (message.cap !== "") {
+      writer.uint32(34).string(message.cap);
+    }
+    if (message.headroom !== "") {
+      writer.uint32(42).string(message.headroom);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): RoleRewardPoolStatus {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoleRewardPoolStatus();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.role = reader.string();
+          break;
+        case 2:
+          message.address = reader.string();
+          break;
+        case 3:
+          message.balance = reader.string();
+          break;
+        case 4:
+          message.cap = reader.string();
+          break;
+        case 5:
+          message.headroom = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<RoleRewardPoolStatus>): RoleRewardPoolStatus {
+    const message = createBaseRoleRewardPoolStatus();
+    message.role = object.role ?? "";
+    message.address = object.address ?? "";
+    message.balance = object.balance ?? "";
+    message.cap = object.cap ?? "";
+    message.headroom = object.headroom ?? "";
+    return message;
+  },
+  fromAmino(object: RoleRewardPoolStatusAmino): RoleRewardPoolStatus {
+    const message = createBaseRoleRewardPoolStatus();
+    if (object.role !== undefined && object.role !== null) {
+      message.role = object.role;
+    }
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    }
+    if (object.balance !== undefined && object.balance !== null) {
+      message.balance = object.balance;
+    }
+    if (object.cap !== undefined && object.cap !== null) {
+      message.cap = object.cap;
+    }
+    if (object.headroom !== undefined && object.headroom !== null) {
+      message.headroom = object.headroom;
+    }
+    return message;
+  },
+  toAmino(message: RoleRewardPoolStatus): RoleRewardPoolStatusAmino {
+    const obj: any = {};
+    obj.role = message.role === "" ? undefined : message.role;
+    obj.address = message.address === "" ? undefined : message.address;
+    obj.balance = message.balance === "" ? undefined : message.balance;
+    obj.cap = message.cap === "" ? undefined : message.cap;
+    obj.headroom = message.headroom === "" ? undefined : message.headroom;
+    return obj;
+  },
+  fromAminoMsg(object: RoleRewardPoolStatusAminoMsg): RoleRewardPoolStatus {
+    return RoleRewardPoolStatus.fromAmino(object.value);
+  },
+  fromProtoMsg(message: RoleRewardPoolStatusProtoMsg): RoleRewardPoolStatus {
+    return RoleRewardPoolStatus.decode(message.value);
+  },
+  toProto(message: RoleRewardPoolStatus): Uint8Array {
+    return RoleRewardPoolStatus.encode(message).finish();
+  },
+  toProtoMsg(message: RoleRewardPoolStatus): RoleRewardPoolStatusProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.RoleRewardPoolStatus",
+      value: RoleRewardPoolStatus.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRoleRewardPoolsResponse(): QueryRoleRewardPoolsResponse {
+  return {
+    pools: [],
+    fundedToday: "",
+    dailyFundingCap: "",
+    inflationShare: ""
+  };
+}
+/**
+ * QueryRoleRewardPoolsResponse is the response for RoleRewardPools.
+ * @name QueryRoleRewardPoolsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRoleRewardPoolsResponse
+ */
+export const QueryRoleRewardPoolsResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryRoleRewardPoolsResponse",
+  encode(message: QueryRoleRewardPoolsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.pools) {
+      RoleRewardPoolStatus.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.fundedToday !== "") {
+      writer.uint32(18).string(message.fundedToday);
+    }
+    if (message.dailyFundingCap !== "") {
+      writer.uint32(26).string(message.dailyFundingCap);
+    }
+    if (message.inflationShare !== "") {
+      writer.uint32(34).string(Decimal.fromUserInput(message.inflationShare, 18).atomics);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRoleRewardPoolsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRoleRewardPoolsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pools.push(RoleRewardPoolStatus.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.fundedToday = reader.string();
+          break;
+        case 3:
+          message.dailyFundingCap = reader.string();
+          break;
+        case 4:
+          message.inflationShare = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryRoleRewardPoolsResponse>): QueryRoleRewardPoolsResponse {
+    const message = createBaseQueryRoleRewardPoolsResponse();
+    message.pools = object.pools?.map(e => RoleRewardPoolStatus.fromPartial(e)) || [];
+    message.fundedToday = object.fundedToday ?? "";
+    message.dailyFundingCap = object.dailyFundingCap ?? "";
+    message.inflationShare = object.inflationShare ?? "";
+    return message;
+  },
+  fromAmino(object: QueryRoleRewardPoolsResponseAmino): QueryRoleRewardPoolsResponse {
+    const message = createBaseQueryRoleRewardPoolsResponse();
+    message.pools = object.pools?.map(e => RoleRewardPoolStatus.fromAmino(e)) || [];
+    if (object.funded_today !== undefined && object.funded_today !== null) {
+      message.fundedToday = object.funded_today;
+    }
+    if (object.daily_funding_cap !== undefined && object.daily_funding_cap !== null) {
+      message.dailyFundingCap = object.daily_funding_cap;
+    }
+    if (object.inflation_share !== undefined && object.inflation_share !== null) {
+      message.inflationShare = object.inflation_share;
+    }
+    return message;
+  },
+  toAmino(message: QueryRoleRewardPoolsResponse): QueryRoleRewardPoolsResponseAmino {
+    const obj: any = {};
+    if (message.pools) {
+      obj.pools = message.pools.map(e => e ? RoleRewardPoolStatus.toAmino(e) : undefined);
+    } else {
+      obj.pools = message.pools;
+    }
+    obj.funded_today = message.fundedToday === "" ? undefined : message.fundedToday;
+    obj.daily_funding_cap = message.dailyFundingCap === "" ? undefined : message.dailyFundingCap;
+    obj.inflation_share = message.inflationShare === "" ? undefined : message.inflationShare;
+    return obj;
+  },
+  fromAminoMsg(object: QueryRoleRewardPoolsResponseAminoMsg): QueryRoleRewardPoolsResponse {
+    return QueryRoleRewardPoolsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRoleRewardPoolsResponseProtoMsg): QueryRoleRewardPoolsResponse {
+    return QueryRoleRewardPoolsResponse.decode(message.value);
+  },
+  toProto(message: QueryRoleRewardPoolsResponse): Uint8Array {
+    return QueryRoleRewardPoolsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRoleRewardPoolsResponse): QueryRoleRewardPoolsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryRoleRewardPoolsResponse",
+      value: QueryRoleRewardPoolsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryInitiativeReviewsRequest(): QueryInitiativeReviewsRequest {
+  return {
+    initiativeId: BigInt(0)
+  };
+}
+/**
+ * QueryInitiativeReviewsRequest asks for the verdicts on one initiative.
+ * 
+ * Deliberately has NO round selector. The codebase convention for an optional
+ * numeric filter is a plain field where zero means unset (see
+ * QueryPostsRequest.category_id, QuerySeasonStatsRequest.season,
+ * QueryShieldRequest.epoch) — which works there because none of those domains
+ * has a valid zero. Review rounds number from 0, so the same convention would
+ * make the first round unaddressable. Rather than diverge from the convention
+ * for one message, every round is returned: max_review_rounds bounds the set at
+ * 3, so there is nothing to select between and nothing to paginate.
+ * @name QueryInitiativeReviewsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryInitiativeReviewsRequest
+ */
+export const QueryInitiativeReviewsRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryInitiativeReviewsRequest",
+  encode(message: QueryInitiativeReviewsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.initiativeId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.initiativeId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryInitiativeReviewsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryInitiativeReviewsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.initiativeId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryInitiativeReviewsRequest>): QueryInitiativeReviewsRequest {
+    const message = createBaseQueryInitiativeReviewsRequest();
+    message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryInitiativeReviewsRequestAmino): QueryInitiativeReviewsRequest {
+    const message = createBaseQueryInitiativeReviewsRequest();
+    if (object.initiative_id !== undefined && object.initiative_id !== null) {
+      message.initiativeId = BigInt(object.initiative_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryInitiativeReviewsRequest): QueryInitiativeReviewsRequestAmino {
+    const obj: any = {};
+    obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryInitiativeReviewsRequestAminoMsg): QueryInitiativeReviewsRequest {
+    return QueryInitiativeReviewsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryInitiativeReviewsRequestProtoMsg): QueryInitiativeReviewsRequest {
+    return QueryInitiativeReviewsRequest.decode(message.value);
+  },
+  toProto(message: QueryInitiativeReviewsRequest): Uint8Array {
+    return QueryInitiativeReviewsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryInitiativeReviewsRequest): QueryInitiativeReviewsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryInitiativeReviewsRequest",
+      value: QueryInitiativeReviewsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryInitiativeReviewsResponse(): QueryInitiativeReviewsResponse {
+  return {
+    rounds: [],
+    currentRound: 0,
+    approvals: 0,
+    required: 0,
+    satisfied: false
+  };
+}
+/**
+ * QueryInitiativeReviewsResponse returns every round's verdicts, plus what the
+ * current round adds up to against the gate.
+ * @name QueryInitiativeReviewsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryInitiativeReviewsResponse
+ */
+export const QueryInitiativeReviewsResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryInitiativeReviewsResponse",
+  encode(message: QueryInitiativeReviewsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.rounds) {
+      InitiativeReviewRound.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.currentRound !== 0) {
+      writer.uint32(16).uint32(message.currentRound);
+    }
+    if (message.approvals !== 0) {
+      writer.uint32(24).uint32(message.approvals);
+    }
+    if (message.required !== 0) {
+      writer.uint32(32).uint32(message.required);
+    }
+    if (message.satisfied === true) {
+      writer.uint32(40).bool(message.satisfied);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryInitiativeReviewsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryInitiativeReviewsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.rounds.push(InitiativeReviewRound.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.currentRound = reader.uint32();
+          break;
+        case 3:
+          message.approvals = reader.uint32();
+          break;
+        case 4:
+          message.required = reader.uint32();
+          break;
+        case 5:
+          message.satisfied = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryInitiativeReviewsResponse>): QueryInitiativeReviewsResponse {
+    const message = createBaseQueryInitiativeReviewsResponse();
+    message.rounds = object.rounds?.map(e => InitiativeReviewRound.fromPartial(e)) || [];
+    message.currentRound = object.currentRound ?? 0;
+    message.approvals = object.approvals ?? 0;
+    message.required = object.required ?? 0;
+    message.satisfied = object.satisfied ?? false;
+    return message;
+  },
+  fromAmino(object: QueryInitiativeReviewsResponseAmino): QueryInitiativeReviewsResponse {
+    const message = createBaseQueryInitiativeReviewsResponse();
+    message.rounds = object.rounds?.map(e => InitiativeReviewRound.fromAmino(e)) || [];
+    if (object.current_round !== undefined && object.current_round !== null) {
+      message.currentRound = object.current_round;
+    }
+    if (object.approvals !== undefined && object.approvals !== null) {
+      message.approvals = object.approvals;
+    }
+    if (object.required !== undefined && object.required !== null) {
+      message.required = object.required;
+    }
+    if (object.satisfied !== undefined && object.satisfied !== null) {
+      message.satisfied = object.satisfied;
+    }
+    return message;
+  },
+  toAmino(message: QueryInitiativeReviewsResponse): QueryInitiativeReviewsResponseAmino {
+    const obj: any = {};
+    if (message.rounds) {
+      obj.rounds = message.rounds.map(e => e ? InitiativeReviewRound.toAmino(e) : undefined);
+    } else {
+      obj.rounds = message.rounds;
+    }
+    obj.current_round = message.currentRound === 0 ? undefined : message.currentRound;
+    obj.approvals = message.approvals === 0 ? undefined : message.approvals;
+    obj.required = message.required === 0 ? undefined : message.required;
+    obj.satisfied = message.satisfied === false ? undefined : message.satisfied;
+    return obj;
+  },
+  fromAminoMsg(object: QueryInitiativeReviewsResponseAminoMsg): QueryInitiativeReviewsResponse {
+    return QueryInitiativeReviewsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryInitiativeReviewsResponseProtoMsg): QueryInitiativeReviewsResponse {
+    return QueryInitiativeReviewsResponse.decode(message.value);
+  },
+  toProto(message: QueryInitiativeReviewsResponse): Uint8Array {
+    return QueryInitiativeReviewsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryInitiativeReviewsResponse): QueryInitiativeReviewsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryInitiativeReviewsResponse",
+      value: QueryInitiativeReviewsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseInitiativeReviewRound(): InitiativeReviewRound {
+  return {
+    round: 0,
+    reviews: [],
+    approvals: 0
+  };
+}
+/**
+ * InitiativeReviewRound groups one round's verdicts.
+ * @name InitiativeReviewRound
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.InitiativeReviewRound
+ */
+export const InitiativeReviewRound = {
+  typeUrl: "/sparkdream.rep.v1.InitiativeReviewRound",
+  encode(message: InitiativeReviewRound, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.round !== 0) {
+      writer.uint32(8).uint32(message.round);
+    }
+    for (const v of message.reviews) {
+      InitiativeReview.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.approvals !== 0) {
+      writer.uint32(24).uint32(message.approvals);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): InitiativeReviewRound {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseInitiativeReviewRound();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.round = reader.uint32();
+          break;
+        case 2:
+          message.reviews.push(InitiativeReview.decode(reader, reader.uint32()));
+          break;
+        case 3:
+          message.approvals = reader.uint32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<InitiativeReviewRound>): InitiativeReviewRound {
+    const message = createBaseInitiativeReviewRound();
+    message.round = object.round ?? 0;
+    message.reviews = object.reviews?.map(e => InitiativeReview.fromPartial(e)) || [];
+    message.approvals = object.approvals ?? 0;
+    return message;
+  },
+  fromAmino(object: InitiativeReviewRoundAmino): InitiativeReviewRound {
+    const message = createBaseInitiativeReviewRound();
+    if (object.round !== undefined && object.round !== null) {
+      message.round = object.round;
+    }
+    message.reviews = object.reviews?.map(e => InitiativeReview.fromAmino(e)) || [];
+    if (object.approvals !== undefined && object.approvals !== null) {
+      message.approvals = object.approvals;
+    }
+    return message;
+  },
+  toAmino(message: InitiativeReviewRound): InitiativeReviewRoundAmino {
+    const obj: any = {};
+    obj.round = message.round === 0 ? undefined : message.round;
+    if (message.reviews) {
+      obj.reviews = message.reviews.map(e => e ? InitiativeReview.toAmino(e) : undefined);
+    } else {
+      obj.reviews = message.reviews;
+    }
+    obj.approvals = message.approvals === 0 ? undefined : message.approvals;
+    return obj;
+  },
+  fromAminoMsg(object: InitiativeReviewRoundAminoMsg): InitiativeReviewRound {
+    return InitiativeReviewRound.fromAmino(object.value);
+  },
+  fromProtoMsg(message: InitiativeReviewRoundProtoMsg): InitiativeReviewRound {
+    return InitiativeReviewRound.decode(message.value);
+  },
+  toProto(message: InitiativeReviewRound): Uint8Array {
+    return InitiativeReviewRound.encode(message).finish();
+  },
+  toProtoMsg(message: InitiativeReviewRound): InitiativeReviewRoundProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.InitiativeReviewRound",
+      value: InitiativeReviewRound.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryReviewBountyRequest(): QueryReviewBountyRequest {
+  return {
+    initiativeId: BigInt(0)
+  };
+}
+/**
+ * QueryReviewBountyRequest asks what is escrowed against an initiative.
+ * @name QueryReviewBountyRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryReviewBountyRequest
+ */
+export const QueryReviewBountyRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryReviewBountyRequest",
+  encode(message: QueryReviewBountyRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.initiativeId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.initiativeId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryReviewBountyRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryReviewBountyRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.initiativeId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryReviewBountyRequest>): QueryReviewBountyRequest {
+    const message = createBaseQueryReviewBountyRequest();
+    message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryReviewBountyRequestAmino): QueryReviewBountyRequest {
+    const message = createBaseQueryReviewBountyRequest();
+    if (object.initiative_id !== undefined && object.initiative_id !== null) {
+      message.initiativeId = BigInt(object.initiative_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryReviewBountyRequest): QueryReviewBountyRequestAmino {
+    const obj: any = {};
+    obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryReviewBountyRequestAminoMsg): QueryReviewBountyRequest {
+    return QueryReviewBountyRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryReviewBountyRequestProtoMsg): QueryReviewBountyRequest {
+    return QueryReviewBountyRequest.decode(message.value);
+  },
+  toProto(message: QueryReviewBountyRequest): Uint8Array {
+    return QueryReviewBountyRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryReviewBountyRequest): QueryReviewBountyRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryReviewBountyRequest",
+      value: QueryReviewBountyRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryReviewBountyResponse(): QueryReviewBountyResponse {
+  return {
+    bounty: ReviewBounty.fromPartial({}),
+    reclaimStatus: []
+  };
+}
+/**
+ * QueryReviewBountyResponse returns the escrow and its reclaim state.
+ * @name QueryReviewBountyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryReviewBountyResponse
+ */
+export const QueryReviewBountyResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryReviewBountyResponse",
+  encode(message: QueryReviewBountyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.bounty !== undefined) {
+      ReviewBounty.encode(message.bounty, writer.uint32(10).fork()).ldelim();
+    }
+    for (const v of message.reclaimStatus) {
+      ReviewBountyReclaimStatus.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryReviewBountyResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryReviewBountyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.bounty = ReviewBounty.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.reclaimStatus.push(ReviewBountyReclaimStatus.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryReviewBountyResponse>): QueryReviewBountyResponse {
+    const message = createBaseQueryReviewBountyResponse();
+    message.bounty = object.bounty !== undefined && object.bounty !== null ? ReviewBounty.fromPartial(object.bounty) : undefined;
+    message.reclaimStatus = object.reclaimStatus?.map(e => ReviewBountyReclaimStatus.fromPartial(e)) || [];
+    return message;
+  },
+  fromAmino(object: QueryReviewBountyResponseAmino): QueryReviewBountyResponse {
+    const message = createBaseQueryReviewBountyResponse();
+    if (object.bounty !== undefined && object.bounty !== null) {
+      message.bounty = ReviewBounty.fromAmino(object.bounty);
+    }
+    message.reclaimStatus = object.reclaim_status?.map(e => ReviewBountyReclaimStatus.fromAmino(e)) || [];
+    return message;
+  },
+  toAmino(message: QueryReviewBountyResponse): QueryReviewBountyResponseAmino {
+    const obj: any = {};
+    obj.bounty = message.bounty ? ReviewBounty.toAmino(message.bounty) : undefined;
+    if (message.reclaimStatus) {
+      obj.reclaim_status = message.reclaimStatus.map(e => e ? ReviewBountyReclaimStatus.toAmino(e) : undefined);
+    } else {
+      obj.reclaim_status = message.reclaimStatus;
+    }
+    return obj;
+  },
+  fromAminoMsg(object: QueryReviewBountyResponseAminoMsg): QueryReviewBountyResponse {
+    return QueryReviewBountyResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryReviewBountyResponseProtoMsg): QueryReviewBountyResponse {
+    return QueryReviewBountyResponse.decode(message.value);
+  },
+  toProto(message: QueryReviewBountyResponse): Uint8Array {
+    return QueryReviewBountyResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryReviewBountyResponse): QueryReviewBountyResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryReviewBountyResponse",
+      value: QueryReviewBountyResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseReviewBountyReclaimStatus(): ReviewBountyReclaimStatus {
+  return {
+    funder: "",
+    amount: "",
+    reclaimableAtHeight: BigInt(0),
+    reclaimable: false
+  };
+}
+/**
+ * ReviewBountyReclaimStatus is one contribution's reclaim eligibility.
+ * @name ReviewBountyReclaimStatus
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.ReviewBountyReclaimStatus
+ */
+export const ReviewBountyReclaimStatus = {
+  typeUrl: "/sparkdream.rep.v1.ReviewBountyReclaimStatus",
+  encode(message: ReviewBountyReclaimStatus, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.funder !== "") {
+      writer.uint32(10).string(message.funder);
+    }
+    if (message.amount !== "") {
+      writer.uint32(18).string(message.amount);
+    }
+    if (message.reclaimableAtHeight !== BigInt(0)) {
+      writer.uint32(24).int64(message.reclaimableAtHeight);
+    }
+    if (message.reclaimable === true) {
+      writer.uint32(32).bool(message.reclaimable);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): ReviewBountyReclaimStatus {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReviewBountyReclaimStatus();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.funder = reader.string();
+          break;
+        case 2:
+          message.amount = reader.string();
+          break;
+        case 3:
+          message.reclaimableAtHeight = reader.int64();
+          break;
+        case 4:
+          message.reclaimable = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<ReviewBountyReclaimStatus>): ReviewBountyReclaimStatus {
+    const message = createBaseReviewBountyReclaimStatus();
+    message.funder = object.funder ?? "";
+    message.amount = object.amount ?? "";
+    message.reclaimableAtHeight = object.reclaimableAtHeight !== undefined && object.reclaimableAtHeight !== null ? BigInt(object.reclaimableAtHeight.toString()) : BigInt(0);
+    message.reclaimable = object.reclaimable ?? false;
+    return message;
+  },
+  fromAmino(object: ReviewBountyReclaimStatusAmino): ReviewBountyReclaimStatus {
+    const message = createBaseReviewBountyReclaimStatus();
+    if (object.funder !== undefined && object.funder !== null) {
+      message.funder = object.funder;
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = object.amount;
+    }
+    if (object.reclaimable_at_height !== undefined && object.reclaimable_at_height !== null) {
+      message.reclaimableAtHeight = BigInt(object.reclaimable_at_height);
+    }
+    if (object.reclaimable !== undefined && object.reclaimable !== null) {
+      message.reclaimable = object.reclaimable;
+    }
+    return message;
+  },
+  toAmino(message: ReviewBountyReclaimStatus): ReviewBountyReclaimStatusAmino {
+    const obj: any = {};
+    obj.funder = message.funder === "" ? undefined : message.funder;
+    obj.amount = message.amount === "" ? undefined : message.amount;
+    obj.reclaimable_at_height = message.reclaimableAtHeight !== BigInt(0) ? message.reclaimableAtHeight?.toString() : undefined;
+    obj.reclaimable = message.reclaimable === false ? undefined : message.reclaimable;
+    return obj;
+  },
+  fromAminoMsg(object: ReviewBountyReclaimStatusAminoMsg): ReviewBountyReclaimStatus {
+    return ReviewBountyReclaimStatus.fromAmino(object.value);
+  },
+  fromProtoMsg(message: ReviewBountyReclaimStatusProtoMsg): ReviewBountyReclaimStatus {
+    return ReviewBountyReclaimStatus.decode(message.value);
+  },
+  toProto(message: ReviewBountyReclaimStatus): Uint8Array {
+    return ReviewBountyReclaimStatus.encode(message).finish();
+  },
+  toProtoMsg(message: ReviewBountyReclaimStatus): ReviewBountyReclaimStatusProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.ReviewBountyReclaimStatus",
+      value: ReviewBountyReclaimStatus.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryEscalatedReviewsRequest(): QueryEscalatedReviewsRequest {
+  return {};
+}
+/**
+ * QueryEscalatedReviewsRequest asks what is awaiting the committee.
+ * @name QueryEscalatedReviewsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryEscalatedReviewsRequest
+ */
+export const QueryEscalatedReviewsRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryEscalatedReviewsRequest",
+  encode(_: QueryEscalatedReviewsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryEscalatedReviewsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryEscalatedReviewsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<QueryEscalatedReviewsRequest>): QueryEscalatedReviewsRequest {
+    const message = createBaseQueryEscalatedReviewsRequest();
+    return message;
+  },
+  fromAmino(_: QueryEscalatedReviewsRequestAmino): QueryEscalatedReviewsRequest {
+    const message = createBaseQueryEscalatedReviewsRequest();
+    return message;
+  },
+  toAmino(_: QueryEscalatedReviewsRequest): QueryEscalatedReviewsRequestAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: QueryEscalatedReviewsRequestAminoMsg): QueryEscalatedReviewsRequest {
+    return QueryEscalatedReviewsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryEscalatedReviewsRequestProtoMsg): QueryEscalatedReviewsRequest {
+    return QueryEscalatedReviewsRequest.decode(message.value);
+  },
+  toProto(message: QueryEscalatedReviewsRequest): Uint8Array {
+    return QueryEscalatedReviewsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryEscalatedReviewsRequest): QueryEscalatedReviewsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryEscalatedReviewsRequest",
+      value: QueryEscalatedReviewsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryEscalatedReviewsResponse(): QueryEscalatedReviewsResponse {
+  return {
+    escalations: []
+  };
+}
+/**
+ * QueryEscalatedReviewsResponse lists the escalated rounds.
+ * 
+ * Escalation is recorded in a separate set rather than on the initiative --
+ * ReviewEscalation is reset to NONE when a round escalates -- so without this
+ * query a committee has no way to find the decisions waiting on it.
+ * @name QueryEscalatedReviewsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryEscalatedReviewsResponse
+ */
+export const QueryEscalatedReviewsResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryEscalatedReviewsResponse",
+  encode(message: QueryEscalatedReviewsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.escalations) {
+      EscalatedReview.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryEscalatedReviewsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryEscalatedReviewsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.escalations.push(EscalatedReview.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryEscalatedReviewsResponse>): QueryEscalatedReviewsResponse {
+    const message = createBaseQueryEscalatedReviewsResponse();
+    message.escalations = object.escalations?.map(e => EscalatedReview.fromPartial(e)) || [];
+    return message;
+  },
+  fromAmino(object: QueryEscalatedReviewsResponseAmino): QueryEscalatedReviewsResponse {
+    const message = createBaseQueryEscalatedReviewsResponse();
+    message.escalations = object.escalations?.map(e => EscalatedReview.fromAmino(e)) || [];
+    return message;
+  },
+  toAmino(message: QueryEscalatedReviewsResponse): QueryEscalatedReviewsResponseAmino {
+    const obj: any = {};
+    if (message.escalations) {
+      obj.escalations = message.escalations.map(e => e ? EscalatedReview.toAmino(e) : undefined);
+    } else {
+      obj.escalations = message.escalations;
+    }
+    return obj;
+  },
+  fromAminoMsg(object: QueryEscalatedReviewsResponseAminoMsg): QueryEscalatedReviewsResponse {
+    return QueryEscalatedReviewsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryEscalatedReviewsResponseProtoMsg): QueryEscalatedReviewsResponse {
+    return QueryEscalatedReviewsResponse.decode(message.value);
+  },
+  toProto(message: QueryEscalatedReviewsResponse): Uint8Array {
+    return QueryEscalatedReviewsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryEscalatedReviewsResponse): QueryEscalatedReviewsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryEscalatedReviewsResponse",
+      value: QueryEscalatedReviewsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseEscalatedReview(): EscalatedReview {
+  return {
+    initiativeId: BigInt(0),
+    round: 0,
+    reviewDeadline: BigInt(0),
+    title: "",
+    assignee: ""
+  };
+}
+/**
+ * EscalatedReview is one round sitting with the Operations Committee.
+ * @name EscalatedReview
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.EscalatedReview
+ */
+export const EscalatedReview = {
+  typeUrl: "/sparkdream.rep.v1.EscalatedReview",
+  encode(message: EscalatedReview, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.initiativeId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.initiativeId);
+    }
+    if (message.round !== 0) {
+      writer.uint32(16).uint32(message.round);
+    }
+    if (message.reviewDeadline !== BigInt(0)) {
+      writer.uint32(24).int64(message.reviewDeadline);
+    }
+    if (message.title !== "") {
+      writer.uint32(34).string(message.title);
+    }
+    if (message.assignee !== "") {
+      writer.uint32(42).string(message.assignee);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): EscalatedReview {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEscalatedReview();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.initiativeId = reader.uint64();
+          break;
+        case 2:
+          message.round = reader.uint32();
+          break;
+        case 3:
+          message.reviewDeadline = reader.int64();
+          break;
+        case 4:
+          message.title = reader.string();
+          break;
+        case 5:
+          message.assignee = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<EscalatedReview>): EscalatedReview {
+    const message = createBaseEscalatedReview();
+    message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
+    message.round = object.round ?? 0;
+    message.reviewDeadline = object.reviewDeadline !== undefined && object.reviewDeadline !== null ? BigInt(object.reviewDeadline.toString()) : BigInt(0);
+    message.title = object.title ?? "";
+    message.assignee = object.assignee ?? "";
+    return message;
+  },
+  fromAmino(object: EscalatedReviewAmino): EscalatedReview {
+    const message = createBaseEscalatedReview();
+    if (object.initiative_id !== undefined && object.initiative_id !== null) {
+      message.initiativeId = BigInt(object.initiative_id);
+    }
+    if (object.round !== undefined && object.round !== null) {
+      message.round = object.round;
+    }
+    if (object.review_deadline !== undefined && object.review_deadline !== null) {
+      message.reviewDeadline = BigInt(object.review_deadline);
+    }
+    if (object.title !== undefined && object.title !== null) {
+      message.title = object.title;
+    }
+    if (object.assignee !== undefined && object.assignee !== null) {
+      message.assignee = object.assignee;
+    }
+    return message;
+  },
+  toAmino(message: EscalatedReview): EscalatedReviewAmino {
+    const obj: any = {};
+    obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
+    obj.round = message.round === 0 ? undefined : message.round;
+    obj.review_deadline = message.reviewDeadline !== BigInt(0) ? message.reviewDeadline?.toString() : undefined;
+    obj.title = message.title === "" ? undefined : message.title;
+    obj.assignee = message.assignee === "" ? undefined : message.assignee;
+    return obj;
+  },
+  fromAminoMsg(object: EscalatedReviewAminoMsg): EscalatedReview {
+    return EscalatedReview.fromAmino(object.value);
+  },
+  fromProtoMsg(message: EscalatedReviewProtoMsg): EscalatedReview {
+    return EscalatedReview.decode(message.value);
+  },
+  toProto(message: EscalatedReview): Uint8Array {
+    return EscalatedReview.encode(message).finish();
+  },
+  toProtoMsg(message: EscalatedReview): EscalatedReviewProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.EscalatedReview",
+      value: EscalatedReview.encode(message).finish()
     };
   }
 };

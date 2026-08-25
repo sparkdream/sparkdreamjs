@@ -66,7 +66,7 @@ export const TagReport = {
       writer.uint32(32).bool(message.underReview);
     }
     for (const v of message.reporters) {
-      writer.uint32(82).string(v!);
+      writer.uint32(42).string(v!);
     }
     return writer;
   },
@@ -89,7 +89,7 @@ export const TagReport = {
         case 4:
           message.underReview = reader.bool();
           break;
-        case 10:
+        case 5:
           message.reporters.push(reader.string());
           break;
         default:

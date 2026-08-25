@@ -1,9 +1,11 @@
 //@ts-nocheck
 import { Params, ParamsAmino, RepOperationalParams, RepOperationalParamsAmino } from "./params";
 import { InterimType, InterimComplexity } from "./interim";
-import { ProjectCategory } from "./project";
-import { CriteriaVote, CriteriaVoteAmino, Verdict } from "./jury_review";
+import { ProjectCategory, VerificationPolicy, VerificationPolicyAmino } from "./project";
+import { VerificationCriteria, VerificationCriteriaAmino } from "./acceptance_criteria";
 import { StakeTargetType } from "./stake";
+import { CriteriaVote, CriteriaVoteAmino, Verdict } from "./jury_review";
+import { ReviewEscalation } from "./initiative";
 import { RoleType } from "./bonded_role";
 import { GovAppealStatus } from "./accountability";
 import { BinaryReader, BinaryWriter } from "../../../binary";
@@ -844,8 +846,12 @@ export interface MsgCreateInitiative {
   tags: string[];
   tier: bigint;
   category: bigint;
-  templateId: string;
   budget: string;
+  /**
+   * Optional definition of done, fixed at creation. See
+   * Initiative.acceptance_criteria.
+   */
+  acceptanceCriteria: VerificationCriteria[];
 }
 export interface MsgCreateInitiativeProtoMsg {
   typeUrl: "/sparkdream.rep.v1.MsgCreateInitiative";
@@ -865,8 +871,12 @@ export interface MsgCreateInitiativeAmino {
   tags?: string[];
   tier?: string;
   category?: string;
-  template_id?: string;
   budget?: string;
+  /**
+   * Optional definition of done, fixed at creation. See
+   * Initiative.acceptance_criteria.
+   */
+  acceptance_criteria?: VerificationCriteriaAmino[];
 }
 export interface MsgCreateInitiativeAminoMsg {
   type: "sparkdream/x/rep/MsgCreateInitiative";
@@ -1005,7 +1015,17 @@ export interface MsgSubmitInitiativeWorkResponseAminoMsg {
   value: MsgSubmitInitiativeWorkResponseAmino;
 }
 /**
- * MsgApproveInitiative defines the MsgApproveInitiative message.
+ * MsgApproveInitiative records a reviewer's verdict on submitted work.
+ * 
+ * Review is advisory for budget-backed, externally assigned work and binding
+ * only in aggregate for stakers, whose disapproval is weighted by the DREAM
+ * they have staked on the initiative. Conviction remains the gate on payout.
+ * 
+ * This message used to carry a `criteria_votes` field that the handler read
+ * nowhere. Per-criterion verdicts belong on MsgSubmitJurorVote, which stores
+ * them on the JurorVote record and validates each id against the initiative's
+ * acceptance criteria. A field the handler silently discards is worse than no
+ * field: clients populate it and users believe it did something.
  * @name MsgApproveInitiative
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgApproveInitiative
@@ -1013,7 +1033,6 @@ export interface MsgSubmitInitiativeWorkResponseAminoMsg {
 export interface MsgApproveInitiative {
   creator: string;
   initiativeId: bigint;
-  criteriaVotes: CriteriaVote[];
   approved: boolean;
   comments: string;
 }
@@ -1022,7 +1041,17 @@ export interface MsgApproveInitiativeProtoMsg {
   value: Uint8Array;
 }
 /**
- * MsgApproveInitiative defines the MsgApproveInitiative message.
+ * MsgApproveInitiative records a reviewer's verdict on submitted work.
+ * 
+ * Review is advisory for budget-backed, externally assigned work and binding
+ * only in aggregate for stakers, whose disapproval is weighted by the DREAM
+ * they have staked on the initiative. Conviction remains the gate on payout.
+ * 
+ * This message used to carry a `criteria_votes` field that the handler read
+ * nowhere. Per-criterion verdicts belong on MsgSubmitJurorVote, which stores
+ * them on the JurorVote record and validates each id against the initiative's
+ * acceptance criteria. A field the handler silently discards is worse than no
+ * field: clients populate it and users believe it did something.
  * @name MsgApproveInitiativeAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgApproveInitiative
@@ -1030,7 +1059,6 @@ export interface MsgApproveInitiativeProtoMsg {
 export interface MsgApproveInitiativeAmino {
   creator?: string;
   initiative_id?: string;
-  criteria_votes?: CriteriaVoteAmino[];
   approved?: boolean;
   comments?: string;
 }
@@ -1416,6 +1444,11 @@ export interface MsgCreateChallenge {
   reason: string;
   evidence: string[];
   stakedDream: string;
+  /**
+   * Optional id of the acceptance criterion the work is said to fail. Must
+   * match one declared on the initiative.
+   */
+  criteriaId: string;
 }
 export interface MsgCreateChallengeProtoMsg {
   typeUrl: "/sparkdream.rep.v1.MsgCreateChallenge";
@@ -1433,6 +1466,11 @@ export interface MsgCreateChallengeAmino {
   reason?: string;
   evidence?: string[];
   staked_dream?: string;
+  /**
+   * Optional id of the acceptance criterion the work is said to fail. Must
+   * match one declared on the initiative.
+   */
+  criteria_id?: string;
 }
 export interface MsgCreateChallengeAminoMsg {
   type: "sparkdream/x/rep/MsgCreateChallenge";
@@ -1459,6 +1497,112 @@ export interface MsgCreateChallengeResponseAmino {}
 export interface MsgCreateChallengeResponseAminoMsg {
   type: "/sparkdream.rep.v1.MsgCreateChallengeResponse";
   value: MsgCreateChallengeResponseAmino;
+}
+/**
+ * MsgAcceptJuryDuty accepts a jury summons, turning a seat drawn by lot into a
+ * commitment to vote.
+ * @name MsgAcceptJuryDuty
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAcceptJuryDuty
+ */
+export interface MsgAcceptJuryDuty {
+  juror: string;
+  juryReviewId: bigint;
+}
+export interface MsgAcceptJuryDutyProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgAcceptJuryDuty";
+  value: Uint8Array;
+}
+/**
+ * MsgAcceptJuryDuty accepts a jury summons, turning a seat drawn by lot into a
+ * commitment to vote.
+ * @name MsgAcceptJuryDutyAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAcceptJuryDuty
+ */
+export interface MsgAcceptJuryDutyAmino {
+  juror?: string;
+  jury_review_id?: string;
+}
+export interface MsgAcceptJuryDutyAminoMsg {
+  type: "sparkdream/x/rep/MsgAcceptJuryDuty";
+  value: MsgAcceptJuryDutyAmino;
+}
+/**
+ * MsgAcceptJuryDutyResponse defines the MsgAcceptJuryDuty response.
+ * @name MsgAcceptJuryDutyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAcceptJuryDutyResponse
+ */
+export interface MsgAcceptJuryDutyResponse {}
+export interface MsgAcceptJuryDutyResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgAcceptJuryDutyResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgAcceptJuryDutyResponse defines the MsgAcceptJuryDuty response.
+ * @name MsgAcceptJuryDutyResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAcceptJuryDutyResponse
+ */
+export interface MsgAcceptJuryDutyResponseAmino {}
+export interface MsgAcceptJuryDutyResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgAcceptJuryDutyResponse";
+  value: MsgAcceptJuryDutyResponseAmino;
+}
+/**
+ * MsgDeclineJuryDuty releases a seat immediately so it can be redrawn. Free by
+ * design: a juror who has no time to review the work should say so early rather
+ * than sit on the seat until the deadline.
+ * @name MsgDeclineJuryDuty
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgDeclineJuryDuty
+ */
+export interface MsgDeclineJuryDuty {
+  juror: string;
+  juryReviewId: bigint;
+}
+export interface MsgDeclineJuryDutyProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgDeclineJuryDuty";
+  value: Uint8Array;
+}
+/**
+ * MsgDeclineJuryDuty releases a seat immediately so it can be redrawn. Free by
+ * design: a juror who has no time to review the work should say so early rather
+ * than sit on the seat until the deadline.
+ * @name MsgDeclineJuryDutyAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgDeclineJuryDuty
+ */
+export interface MsgDeclineJuryDutyAmino {
+  juror?: string;
+  jury_review_id?: string;
+}
+export interface MsgDeclineJuryDutyAminoMsg {
+  type: "sparkdream/x/rep/MsgDeclineJuryDuty";
+  value: MsgDeclineJuryDutyAmino;
+}
+/**
+ * MsgDeclineJuryDutyResponse defines the MsgDeclineJuryDuty response.
+ * @name MsgDeclineJuryDutyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgDeclineJuryDutyResponse
+ */
+export interface MsgDeclineJuryDutyResponse {}
+export interface MsgDeclineJuryDutyResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgDeclineJuryDutyResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgDeclineJuryDutyResponse defines the MsgDeclineJuryDuty response.
+ * @name MsgDeclineJuryDutyResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgDeclineJuryDutyResponse
+ */
+export interface MsgDeclineJuryDutyResponseAmino {}
+export interface MsgDeclineJuryDutyResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgDeclineJuryDutyResponse";
+  value: MsgDeclineJuryDutyResponseAmino;
 }
 /**
  * MsgRespondToChallenge defines the MsgRespondToChallenge message.
@@ -2775,6 +2919,348 @@ export interface MsgCancelInitiativeResponseAmino {}
 export interface MsgCancelInitiativeResponseAminoMsg {
   type: "/sparkdream.rep.v1.MsgCancelInitiativeResponse";
   value: MsgCancelInitiativeResponseAmino;
+}
+/**
+ * MsgSubmitInitiativeReview files one bonded reviewer's verdict on the current
+ * review round of an initiative's submitted work.
+ * 
+ * Filing reserves bond scaled to the initiative's budget, so a reviewer can
+ * only take on as much work as their bond covers and liability tracks what the
+ * review could mint. The bond is released when the challenge window closes
+ * unchallenged, and slashed when a jury overturns the verdict.
+ * @name MsgSubmitInitiativeReview
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSubmitInitiativeReview
+ */
+export interface MsgSubmitInitiativeReview {
+  reviewer: string;
+  initiativeId: bigint;
+  approved: boolean;
+  criteriaVotes: CriteriaVote[];
+  comments: string;
+}
+export interface MsgSubmitInitiativeReviewProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgSubmitInitiativeReview";
+  value: Uint8Array;
+}
+/**
+ * MsgSubmitInitiativeReview files one bonded reviewer's verdict on the current
+ * review round of an initiative's submitted work.
+ * 
+ * Filing reserves bond scaled to the initiative's budget, so a reviewer can
+ * only take on as much work as their bond covers and liability tracks what the
+ * review could mint. The bond is released when the challenge window closes
+ * unchallenged, and slashed when a jury overturns the verdict.
+ * @name MsgSubmitInitiativeReviewAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSubmitInitiativeReview
+ */
+export interface MsgSubmitInitiativeReviewAmino {
+  reviewer?: string;
+  initiative_id?: string;
+  approved?: boolean;
+  criteria_votes?: CriteriaVoteAmino[];
+  comments?: string;
+}
+export interface MsgSubmitInitiativeReviewAminoMsg {
+  type: "sparkdream/x/rep/MsgSubmitInitiativeReview";
+  value: MsgSubmitInitiativeReviewAmino;
+}
+/**
+ * MsgSubmitInitiativeReviewResponse defines the MsgSubmitInitiativeReview response.
+ * @name MsgSubmitInitiativeReviewResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSubmitInitiativeReviewResponse
+ */
+export interface MsgSubmitInitiativeReviewResponse {}
+export interface MsgSubmitInitiativeReviewResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgSubmitInitiativeReviewResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgSubmitInitiativeReviewResponse defines the MsgSubmitInitiativeReview response.
+ * @name MsgSubmitInitiativeReviewResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSubmitInitiativeReviewResponse
+ */
+export interface MsgSubmitInitiativeReviewResponseAmino {}
+export interface MsgSubmitInitiativeReviewResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgSubmitInitiativeReviewResponse";
+  value: MsgSubmitInitiativeReviewResponseAmino;
+}
+/**
+ * MsgSetVerificationPolicy sets how a project's initiatives are reviewed.
+ * 
+ * Authority is the project's creator or the Operations Committee, and it is
+ * settable while the project is ACTIVE rather than fixed at creation: the
+ * reviewer roster grows over time, so a project needs to be able to turn review
+ * on once reviewers exist. The review and challenge windows in the policy are
+ * clamped to max(global, project) — a project may be more conservative than the
+ * chain default, never less.
+ * @name MsgSetVerificationPolicy
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSetVerificationPolicy
+ */
+export interface MsgSetVerificationPolicy {
+  creator: string;
+  projectId: bigint;
+  policy: VerificationPolicy;
+}
+export interface MsgSetVerificationPolicyProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgSetVerificationPolicy";
+  value: Uint8Array;
+}
+/**
+ * MsgSetVerificationPolicy sets how a project's initiatives are reviewed.
+ * 
+ * Authority is the project's creator or the Operations Committee, and it is
+ * settable while the project is ACTIVE rather than fixed at creation: the
+ * reviewer roster grows over time, so a project needs to be able to turn review
+ * on once reviewers exist. The review and challenge windows in the policy are
+ * clamped to max(global, project) — a project may be more conservative than the
+ * chain default, never less.
+ * @name MsgSetVerificationPolicyAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSetVerificationPolicy
+ */
+export interface MsgSetVerificationPolicyAmino {
+  creator?: string;
+  project_id?: string;
+  policy?: VerificationPolicyAmino;
+}
+export interface MsgSetVerificationPolicyAminoMsg {
+  type: "sparkdream/x/rep/MsgSetVerificationPolicy";
+  value: MsgSetVerificationPolicyAmino;
+}
+/**
+ * MsgSetVerificationPolicyResponse defines the MsgSetVerificationPolicy response.
+ * @name MsgSetVerificationPolicyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSetVerificationPolicyResponse
+ */
+export interface MsgSetVerificationPolicyResponse {}
+export interface MsgSetVerificationPolicyResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgSetVerificationPolicyResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgSetVerificationPolicyResponse defines the MsgSetVerificationPolicy response.
+ * @name MsgSetVerificationPolicyResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSetVerificationPolicyResponse
+ */
+export interface MsgSetVerificationPolicyResponseAmino {}
+export interface MsgSetVerificationPolicyResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgSetVerificationPolicyResponse";
+  value: MsgSetVerificationPolicyResponseAmino;
+}
+/**
+ * MsgResolveReviewEscalation settles a review round that hit its deadline
+ * without meeting the reviewer gate.
+ * 
+ * Operations Committee only. The three resolutions are approve (satisfy the
+ * gate), reject (send the work back for another round), and pass (decline to
+ * substitute judgement and let conviction and the challenge window decide).
+ * All three still run the challenge window — committee approval satisfies the
+ * reviewer requirement and nothing else.
+ * @name MsgResolveReviewEscalation
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveReviewEscalation
+ */
+export interface MsgResolveReviewEscalation {
+  creator: string;
+  initiativeId: bigint;
+  resolution: ReviewEscalation;
+  reason: string;
+}
+export interface MsgResolveReviewEscalationProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgResolveReviewEscalation";
+  value: Uint8Array;
+}
+/**
+ * MsgResolveReviewEscalation settles a review round that hit its deadline
+ * without meeting the reviewer gate.
+ * 
+ * Operations Committee only. The three resolutions are approve (satisfy the
+ * gate), reject (send the work back for another round), and pass (decline to
+ * substitute judgement and let conviction and the challenge window decide).
+ * All three still run the challenge window — committee approval satisfies the
+ * reviewer requirement and nothing else.
+ * @name MsgResolveReviewEscalationAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveReviewEscalation
+ */
+export interface MsgResolveReviewEscalationAmino {
+  creator?: string;
+  initiative_id?: string;
+  resolution?: ReviewEscalation;
+  reason?: string;
+}
+export interface MsgResolveReviewEscalationAminoMsg {
+  type: "sparkdream/x/rep/MsgResolveReviewEscalation";
+  value: MsgResolveReviewEscalationAmino;
+}
+/**
+ * MsgResolveReviewEscalationResponse defines the MsgResolveReviewEscalation response.
+ * @name MsgResolveReviewEscalationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveReviewEscalationResponse
+ */
+export interface MsgResolveReviewEscalationResponse {}
+export interface MsgResolveReviewEscalationResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgResolveReviewEscalationResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgResolveReviewEscalationResponse defines the MsgResolveReviewEscalation response.
+ * @name MsgResolveReviewEscalationResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveReviewEscalationResponse
+ */
+export interface MsgResolveReviewEscalationResponseAmino {}
+export interface MsgResolveReviewEscalationResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgResolveReviewEscalationResponse";
+  value: MsgResolveReviewEscalationResponseAmino;
+}
+/**
+ * MsgFundReviewBounty escrows DREAM against an initiative so reviewers have a
+ * reason to look at that one rather than any other.
+ * 
+ * Anyone may fund, and contributions are additive: the creator who wants their
+ * work cleared, a staker protecting conviction already committed, or a third
+ * party who simply wants the thing checked. Restricting it to the creator would
+ * make the amount a statement about one person's budget rather than about how
+ * much the work matters.
+ * @name MsgFundReviewBounty
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgFundReviewBounty
+ */
+export interface MsgFundReviewBounty {
+  funder: string;
+  initiativeId: bigint;
+  amount: string;
+}
+export interface MsgFundReviewBountyProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgFundReviewBounty";
+  value: Uint8Array;
+}
+/**
+ * MsgFundReviewBounty escrows DREAM against an initiative so reviewers have a
+ * reason to look at that one rather than any other.
+ * 
+ * Anyone may fund, and contributions are additive: the creator who wants their
+ * work cleared, a staker protecting conviction already committed, or a third
+ * party who simply wants the thing checked. Restricting it to the creator would
+ * make the amount a statement about one person's budget rather than about how
+ * much the work matters.
+ * @name MsgFundReviewBountyAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgFundReviewBounty
+ */
+export interface MsgFundReviewBountyAmino {
+  funder?: string;
+  initiative_id?: string;
+  amount?: string;
+}
+export interface MsgFundReviewBountyAminoMsg {
+  type: "sparkdream/x/rep/MsgFundReviewBounty";
+  value: MsgFundReviewBountyAmino;
+}
+/**
+ * MsgFundReviewBountyResponse defines the MsgFundReviewBounty response.
+ * @name MsgFundReviewBountyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgFundReviewBountyResponse
+ */
+export interface MsgFundReviewBountyResponse {
+  /**
+   * Total escrowed against the initiative after this contribution.
+   */
+  total: string;
+}
+export interface MsgFundReviewBountyResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgFundReviewBountyResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgFundReviewBountyResponse defines the MsgFundReviewBounty response.
+ * @name MsgFundReviewBountyResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgFundReviewBountyResponse
+ */
+export interface MsgFundReviewBountyResponseAmino {
+  /**
+   * Total escrowed against the initiative after this contribution.
+   */
+  total?: string;
+}
+export interface MsgFundReviewBountyResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgFundReviewBountyResponse";
+  value: MsgFundReviewBountyResponseAmino;
+}
+/**
+ * MsgReclaimReviewBounty returns a funder's own unpaid contribution.
+ * 
+ * Permitted only after review_bounty_reclaim_delay blocks and only while NO
+ * verdict has been filed against the initiative. The delay stops a funder
+ * advertising a bounty and yanking it in the same breath; the verdict bar stops
+ * them yanking it once reviewers have committed bond on the strength of it.
+ * @name MsgReclaimReviewBounty
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReclaimReviewBounty
+ */
+export interface MsgReclaimReviewBounty {
+  funder: string;
+  initiativeId: bigint;
+}
+export interface MsgReclaimReviewBountyProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgReclaimReviewBounty";
+  value: Uint8Array;
+}
+/**
+ * MsgReclaimReviewBounty returns a funder's own unpaid contribution.
+ * 
+ * Permitted only after review_bounty_reclaim_delay blocks and only while NO
+ * verdict has been filed against the initiative. The delay stops a funder
+ * advertising a bounty and yanking it in the same breath; the verdict bar stops
+ * them yanking it once reviewers have committed bond on the strength of it.
+ * @name MsgReclaimReviewBountyAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReclaimReviewBounty
+ */
+export interface MsgReclaimReviewBountyAmino {
+  funder?: string;
+  initiative_id?: string;
+}
+export interface MsgReclaimReviewBountyAminoMsg {
+  type: "sparkdream/x/rep/MsgReclaimReviewBounty";
+  value: MsgReclaimReviewBountyAmino;
+}
+/**
+ * MsgReclaimReviewBountyResponse defines the MsgReclaimReviewBounty response.
+ * @name MsgReclaimReviewBountyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReclaimReviewBountyResponse
+ */
+export interface MsgReclaimReviewBountyResponse {
+  refunded: string;
+}
+export interface MsgReclaimReviewBountyResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgReclaimReviewBountyResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgReclaimReviewBountyResponse defines the MsgReclaimReviewBounty response.
+ * @name MsgReclaimReviewBountyResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReclaimReviewBountyResponse
+ */
+export interface MsgReclaimReviewBountyResponseAmino {
+  refunded?: string;
+}
+export interface MsgReclaimReviewBountyResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgReclaimReviewBountyResponse";
+  value: MsgReclaimReviewBountyResponseAmino;
 }
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
@@ -5135,8 +5621,8 @@ function createBaseMsgCreateInitiative(): MsgCreateInitiative {
     tags: [],
     tier: BigInt(0),
     category: BigInt(0),
-    templateId: "",
-    budget: ""
+    budget: "",
+    acceptanceCriteria: []
   };
 }
 /**
@@ -5162,7 +5648,7 @@ export const MsgCreateInitiative = {
       writer.uint32(34).string(message.description);
     }
     for (const v of message.tags) {
-      writer.uint32(66).string(v!);
+      writer.uint32(58).string(v!);
     }
     if (message.tier !== BigInt(0)) {
       writer.uint32(40).uint64(message.tier);
@@ -5170,11 +5656,11 @@ export const MsgCreateInitiative = {
     if (message.category !== BigInt(0)) {
       writer.uint32(48).uint64(message.category);
     }
-    if (message.templateId !== "") {
-      writer.uint32(58).string(message.templateId);
-    }
     if (message.budget !== "") {
-      writer.uint32(74).string(message.budget);
+      writer.uint32(66).string(message.budget);
+    }
+    for (const v of message.acceptanceCriteria) {
+      VerificationCriteria.encode(v!, writer.uint32(74).fork()).ldelim();
     }
     return writer;
   },
@@ -5197,7 +5683,7 @@ export const MsgCreateInitiative = {
         case 4:
           message.description = reader.string();
           break;
-        case 8:
+        case 7:
           message.tags.push(reader.string());
           break;
         case 5:
@@ -5206,11 +5692,11 @@ export const MsgCreateInitiative = {
         case 6:
           message.category = reader.uint64();
           break;
-        case 7:
-          message.templateId = reader.string();
+        case 8:
+          message.budget = reader.string();
           break;
         case 9:
-          message.budget = reader.string();
+          message.acceptanceCriteria.push(VerificationCriteria.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -5228,8 +5714,8 @@ export const MsgCreateInitiative = {
     message.tags = object.tags?.map(e => e) || [];
     message.tier = object.tier !== undefined && object.tier !== null ? BigInt(object.tier.toString()) : BigInt(0);
     message.category = object.category !== undefined && object.category !== null ? BigInt(object.category.toString()) : BigInt(0);
-    message.templateId = object.templateId ?? "";
     message.budget = object.budget ?? "";
+    message.acceptanceCriteria = object.acceptanceCriteria?.map(e => VerificationCriteria.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: MsgCreateInitiativeAmino): MsgCreateInitiative {
@@ -5253,12 +5739,10 @@ export const MsgCreateInitiative = {
     if (object.category !== undefined && object.category !== null) {
       message.category = BigInt(object.category);
     }
-    if (object.template_id !== undefined && object.template_id !== null) {
-      message.templateId = object.template_id;
-    }
     if (object.budget !== undefined && object.budget !== null) {
       message.budget = object.budget;
     }
+    message.acceptanceCriteria = object.acceptance_criteria?.map(e => VerificationCriteria.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: MsgCreateInitiative): MsgCreateInitiativeAmino {
@@ -5274,8 +5758,12 @@ export const MsgCreateInitiative = {
     }
     obj.tier = message.tier !== BigInt(0) ? message.tier?.toString() : undefined;
     obj.category = message.category !== BigInt(0) ? message.category?.toString() : undefined;
-    obj.template_id = message.templateId === "" ? undefined : message.templateId;
     obj.budget = message.budget === "" ? undefined : message.budget;
+    if (message.acceptanceCriteria) {
+      obj.acceptance_criteria = message.acceptanceCriteria.map(e => e ? VerificationCriteria.toAmino(e) : undefined);
+    } else {
+      obj.acceptance_criteria = message.acceptanceCriteria;
+    }
     return obj;
   },
   fromAminoMsg(object: MsgCreateInitiativeAminoMsg): MsgCreateInitiative {
@@ -5697,13 +6185,22 @@ function createBaseMsgApproveInitiative(): MsgApproveInitiative {
   return {
     creator: "",
     initiativeId: BigInt(0),
-    criteriaVotes: [],
     approved: false,
     comments: ""
   };
 }
 /**
- * MsgApproveInitiative defines the MsgApproveInitiative message.
+ * MsgApproveInitiative records a reviewer's verdict on submitted work.
+ * 
+ * Review is advisory for budget-backed, externally assigned work and binding
+ * only in aggregate for stakers, whose disapproval is weighted by the DREAM
+ * they have staked on the initiative. Conviction remains the gate on payout.
+ * 
+ * This message used to carry a `criteria_votes` field that the handler read
+ * nowhere. Per-criterion verdicts belong on MsgSubmitJurorVote, which stores
+ * them on the JurorVote record and validates each id against the initiative's
+ * acceptance criteria. A field the handler silently discards is worse than no
+ * field: clients populate it and users believe it did something.
  * @name MsgApproveInitiative
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgApproveInitiative
@@ -5718,14 +6215,11 @@ export const MsgApproveInitiative = {
     if (message.initiativeId !== BigInt(0)) {
       writer.uint32(16).uint64(message.initiativeId);
     }
-    for (const v of message.criteriaVotes) {
-      CriteriaVote.encode(v!, writer.uint32(26).fork()).ldelim();
-    }
     if (message.approved === true) {
-      writer.uint32(32).bool(message.approved);
+      writer.uint32(24).bool(message.approved);
     }
     if (message.comments !== "") {
-      writer.uint32(42).string(message.comments);
+      writer.uint32(34).string(message.comments);
     }
     return writer;
   },
@@ -5743,12 +6237,9 @@ export const MsgApproveInitiative = {
           message.initiativeId = reader.uint64();
           break;
         case 3:
-          message.criteriaVotes.push(CriteriaVote.decode(reader, reader.uint32()));
-          break;
-        case 4:
           message.approved = reader.bool();
           break;
-        case 5:
+        case 4:
           message.comments = reader.string();
           break;
         default:
@@ -5762,7 +6253,6 @@ export const MsgApproveInitiative = {
     const message = createBaseMsgApproveInitiative();
     message.creator = object.creator ?? "";
     message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
-    message.criteriaVotes = object.criteriaVotes?.map(e => CriteriaVote.fromPartial(e)) || [];
     message.approved = object.approved ?? false;
     message.comments = object.comments ?? "";
     return message;
@@ -5775,7 +6265,6 @@ export const MsgApproveInitiative = {
     if (object.initiative_id !== undefined && object.initiative_id !== null) {
       message.initiativeId = BigInt(object.initiative_id);
     }
-    message.criteriaVotes = object.criteria_votes?.map(e => CriteriaVote.fromAmino(e)) || [];
     if (object.approved !== undefined && object.approved !== null) {
       message.approved = object.approved;
     }
@@ -5788,11 +6277,6 @@ export const MsgApproveInitiative = {
     const obj: any = {};
     obj.creator = message.creator === "" ? undefined : message.creator;
     obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
-    if (message.criteriaVotes) {
-      obj.criteria_votes = message.criteriaVotes.map(e => e ? CriteriaVote.toAmino(e) : undefined);
-    } else {
-      obj.criteria_votes = message.criteriaVotes;
-    }
     obj.approved = message.approved === false ? undefined : message.approved;
     obj.comments = message.comments === "" ? undefined : message.comments;
     return obj;
@@ -6893,7 +7377,8 @@ function createBaseMsgCreateChallenge(): MsgCreateChallenge {
     initiativeId: BigInt(0),
     reason: "",
     evidence: [],
-    stakedDream: ""
+    stakedDream: "",
+    criteriaId: ""
   };
 }
 /**
@@ -6921,6 +7406,9 @@ export const MsgCreateChallenge = {
     if (message.stakedDream !== "") {
       writer.uint32(42).string(message.stakedDream);
     }
+    if (message.criteriaId !== "") {
+      writer.uint32(50).string(message.criteriaId);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgCreateChallenge {
@@ -6945,6 +7433,9 @@ export const MsgCreateChallenge = {
         case 5:
           message.stakedDream = reader.string();
           break;
+        case 6:
+          message.criteriaId = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -6959,6 +7450,7 @@ export const MsgCreateChallenge = {
     message.reason = object.reason ?? "";
     message.evidence = object.evidence?.map(e => e) || [];
     message.stakedDream = object.stakedDream ?? "";
+    message.criteriaId = object.criteriaId ?? "";
     return message;
   },
   fromAmino(object: MsgCreateChallengeAmino): MsgCreateChallenge {
@@ -6976,6 +7468,9 @@ export const MsgCreateChallenge = {
     if (object.staked_dream !== undefined && object.staked_dream !== null) {
       message.stakedDream = object.staked_dream;
     }
+    if (object.criteria_id !== undefined && object.criteria_id !== null) {
+      message.criteriaId = object.criteria_id;
+    }
     return message;
   },
   toAmino(message: MsgCreateChallenge): MsgCreateChallengeAmino {
@@ -6989,6 +7484,7 @@ export const MsgCreateChallenge = {
       obj.evidence = message.evidence;
     }
     obj.staked_dream = message.stakedDream === "" ? undefined : message.stakedDream;
+    obj.criteria_id = message.criteriaId === "" ? undefined : message.criteriaId;
     return obj;
   },
   fromAminoMsg(object: MsgCreateChallengeAminoMsg): MsgCreateChallenge {
@@ -7066,6 +7562,297 @@ export const MsgCreateChallengeResponse = {
     return {
       typeUrl: "/sparkdream.rep.v1.MsgCreateChallengeResponse",
       value: MsgCreateChallengeResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAcceptJuryDuty(): MsgAcceptJuryDuty {
+  return {
+    juror: "",
+    juryReviewId: BigInt(0)
+  };
+}
+/**
+ * MsgAcceptJuryDuty accepts a jury summons, turning a seat drawn by lot into a
+ * commitment to vote.
+ * @name MsgAcceptJuryDuty
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAcceptJuryDuty
+ */
+export const MsgAcceptJuryDuty = {
+  typeUrl: "/sparkdream.rep.v1.MsgAcceptJuryDuty",
+  aminoType: "sparkdream/x/rep/MsgAcceptJuryDuty",
+  encode(message: MsgAcceptJuryDuty, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.juror !== "") {
+      writer.uint32(10).string(message.juror);
+    }
+    if (message.juryReviewId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.juryReviewId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAcceptJuryDuty {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAcceptJuryDuty();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.juror = reader.string();
+          break;
+        case 2:
+          message.juryReviewId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgAcceptJuryDuty>): MsgAcceptJuryDuty {
+    const message = createBaseMsgAcceptJuryDuty();
+    message.juror = object.juror ?? "";
+    message.juryReviewId = object.juryReviewId !== undefined && object.juryReviewId !== null ? BigInt(object.juryReviewId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgAcceptJuryDutyAmino): MsgAcceptJuryDuty {
+    const message = createBaseMsgAcceptJuryDuty();
+    if (object.juror !== undefined && object.juror !== null) {
+      message.juror = object.juror;
+    }
+    if (object.jury_review_id !== undefined && object.jury_review_id !== null) {
+      message.juryReviewId = BigInt(object.jury_review_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgAcceptJuryDuty): MsgAcceptJuryDutyAmino {
+    const obj: any = {};
+    obj.juror = message.juror === "" ? undefined : message.juror;
+    obj.jury_review_id = message.juryReviewId !== BigInt(0) ? message.juryReviewId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgAcceptJuryDutyAminoMsg): MsgAcceptJuryDuty {
+    return MsgAcceptJuryDuty.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAcceptJuryDuty): MsgAcceptJuryDutyAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgAcceptJuryDuty",
+      value: MsgAcceptJuryDuty.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgAcceptJuryDutyProtoMsg): MsgAcceptJuryDuty {
+    return MsgAcceptJuryDuty.decode(message.value);
+  },
+  toProto(message: MsgAcceptJuryDuty): Uint8Array {
+    return MsgAcceptJuryDuty.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAcceptJuryDuty): MsgAcceptJuryDutyProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgAcceptJuryDuty",
+      value: MsgAcceptJuryDuty.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAcceptJuryDutyResponse(): MsgAcceptJuryDutyResponse {
+  return {};
+}
+/**
+ * MsgAcceptJuryDutyResponse defines the MsgAcceptJuryDuty response.
+ * @name MsgAcceptJuryDutyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAcceptJuryDutyResponse
+ */
+export const MsgAcceptJuryDutyResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgAcceptJuryDutyResponse",
+  encode(_: MsgAcceptJuryDutyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAcceptJuryDutyResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAcceptJuryDutyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgAcceptJuryDutyResponse>): MsgAcceptJuryDutyResponse {
+    const message = createBaseMsgAcceptJuryDutyResponse();
+    return message;
+  },
+  fromAmino(_: MsgAcceptJuryDutyResponseAmino): MsgAcceptJuryDutyResponse {
+    const message = createBaseMsgAcceptJuryDutyResponse();
+    return message;
+  },
+  toAmino(_: MsgAcceptJuryDutyResponse): MsgAcceptJuryDutyResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgAcceptJuryDutyResponseAminoMsg): MsgAcceptJuryDutyResponse {
+    return MsgAcceptJuryDutyResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgAcceptJuryDutyResponseProtoMsg): MsgAcceptJuryDutyResponse {
+    return MsgAcceptJuryDutyResponse.decode(message.value);
+  },
+  toProto(message: MsgAcceptJuryDutyResponse): Uint8Array {
+    return MsgAcceptJuryDutyResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAcceptJuryDutyResponse): MsgAcceptJuryDutyResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgAcceptJuryDutyResponse",
+      value: MsgAcceptJuryDutyResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgDeclineJuryDuty(): MsgDeclineJuryDuty {
+  return {
+    juror: "",
+    juryReviewId: BigInt(0)
+  };
+}
+/**
+ * MsgDeclineJuryDuty releases a seat immediately so it can be redrawn. Free by
+ * design: a juror who has no time to review the work should say so early rather
+ * than sit on the seat until the deadline.
+ * @name MsgDeclineJuryDuty
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgDeclineJuryDuty
+ */
+export const MsgDeclineJuryDuty = {
+  typeUrl: "/sparkdream.rep.v1.MsgDeclineJuryDuty",
+  aminoType: "sparkdream/x/rep/MsgDeclineJuryDuty",
+  encode(message: MsgDeclineJuryDuty, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.juror !== "") {
+      writer.uint32(10).string(message.juror);
+    }
+    if (message.juryReviewId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.juryReviewId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgDeclineJuryDuty {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgDeclineJuryDuty();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.juror = reader.string();
+          break;
+        case 2:
+          message.juryReviewId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgDeclineJuryDuty>): MsgDeclineJuryDuty {
+    const message = createBaseMsgDeclineJuryDuty();
+    message.juror = object.juror ?? "";
+    message.juryReviewId = object.juryReviewId !== undefined && object.juryReviewId !== null ? BigInt(object.juryReviewId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgDeclineJuryDutyAmino): MsgDeclineJuryDuty {
+    const message = createBaseMsgDeclineJuryDuty();
+    if (object.juror !== undefined && object.juror !== null) {
+      message.juror = object.juror;
+    }
+    if (object.jury_review_id !== undefined && object.jury_review_id !== null) {
+      message.juryReviewId = BigInt(object.jury_review_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgDeclineJuryDuty): MsgDeclineJuryDutyAmino {
+    const obj: any = {};
+    obj.juror = message.juror === "" ? undefined : message.juror;
+    obj.jury_review_id = message.juryReviewId !== BigInt(0) ? message.juryReviewId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgDeclineJuryDutyAminoMsg): MsgDeclineJuryDuty {
+    return MsgDeclineJuryDuty.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgDeclineJuryDuty): MsgDeclineJuryDutyAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgDeclineJuryDuty",
+      value: MsgDeclineJuryDuty.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgDeclineJuryDutyProtoMsg): MsgDeclineJuryDuty {
+    return MsgDeclineJuryDuty.decode(message.value);
+  },
+  toProto(message: MsgDeclineJuryDuty): Uint8Array {
+    return MsgDeclineJuryDuty.encode(message).finish();
+  },
+  toProtoMsg(message: MsgDeclineJuryDuty): MsgDeclineJuryDutyProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgDeclineJuryDuty",
+      value: MsgDeclineJuryDuty.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgDeclineJuryDutyResponse(): MsgDeclineJuryDutyResponse {
+  return {};
+}
+/**
+ * MsgDeclineJuryDutyResponse defines the MsgDeclineJuryDuty response.
+ * @name MsgDeclineJuryDutyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgDeclineJuryDutyResponse
+ */
+export const MsgDeclineJuryDutyResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgDeclineJuryDutyResponse",
+  encode(_: MsgDeclineJuryDutyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgDeclineJuryDutyResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgDeclineJuryDutyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgDeclineJuryDutyResponse>): MsgDeclineJuryDutyResponse {
+    const message = createBaseMsgDeclineJuryDutyResponse();
+    return message;
+  },
+  fromAmino(_: MsgDeclineJuryDutyResponseAmino): MsgDeclineJuryDutyResponse {
+    const message = createBaseMsgDeclineJuryDutyResponse();
+    return message;
+  },
+  toAmino(_: MsgDeclineJuryDutyResponse): MsgDeclineJuryDutyResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgDeclineJuryDutyResponseAminoMsg): MsgDeclineJuryDutyResponse {
+    return MsgDeclineJuryDutyResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgDeclineJuryDutyResponseProtoMsg): MsgDeclineJuryDutyResponse {
+    return MsgDeclineJuryDutyResponse.decode(message.value);
+  },
+  toProto(message: MsgDeclineJuryDutyResponse): Uint8Array {
+    return MsgDeclineJuryDutyResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgDeclineJuryDutyResponse): MsgDeclineJuryDutyResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgDeclineJuryDutyResponse",
+      value: MsgDeclineJuryDutyResponse.encode(message).finish()
     };
   }
 };
@@ -11014,6 +11801,870 @@ export const MsgCancelInitiativeResponse = {
     return {
       typeUrl: "/sparkdream.rep.v1.MsgCancelInitiativeResponse",
       value: MsgCancelInitiativeResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSubmitInitiativeReview(): MsgSubmitInitiativeReview {
+  return {
+    reviewer: "",
+    initiativeId: BigInt(0),
+    approved: false,
+    criteriaVotes: [],
+    comments: ""
+  };
+}
+/**
+ * MsgSubmitInitiativeReview files one bonded reviewer's verdict on the current
+ * review round of an initiative's submitted work.
+ * 
+ * Filing reserves bond scaled to the initiative's budget, so a reviewer can
+ * only take on as much work as their bond covers and liability tracks what the
+ * review could mint. The bond is released when the challenge window closes
+ * unchallenged, and slashed when a jury overturns the verdict.
+ * @name MsgSubmitInitiativeReview
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSubmitInitiativeReview
+ */
+export const MsgSubmitInitiativeReview = {
+  typeUrl: "/sparkdream.rep.v1.MsgSubmitInitiativeReview",
+  aminoType: "sparkdream/x/rep/MsgSubmitInitiativeReview",
+  encode(message: MsgSubmitInitiativeReview, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.reviewer !== "") {
+      writer.uint32(10).string(message.reviewer);
+    }
+    if (message.initiativeId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.initiativeId);
+    }
+    if (message.approved === true) {
+      writer.uint32(24).bool(message.approved);
+    }
+    for (const v of message.criteriaVotes) {
+      CriteriaVote.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.comments !== "") {
+      writer.uint32(42).string(message.comments);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSubmitInitiativeReview {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSubmitInitiativeReview();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.reviewer = reader.string();
+          break;
+        case 2:
+          message.initiativeId = reader.uint64();
+          break;
+        case 3:
+          message.approved = reader.bool();
+          break;
+        case 4:
+          message.criteriaVotes.push(CriteriaVote.decode(reader, reader.uint32()));
+          break;
+        case 5:
+          message.comments = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgSubmitInitiativeReview>): MsgSubmitInitiativeReview {
+    const message = createBaseMsgSubmitInitiativeReview();
+    message.reviewer = object.reviewer ?? "";
+    message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
+    message.approved = object.approved ?? false;
+    message.criteriaVotes = object.criteriaVotes?.map(e => CriteriaVote.fromPartial(e)) || [];
+    message.comments = object.comments ?? "";
+    return message;
+  },
+  fromAmino(object: MsgSubmitInitiativeReviewAmino): MsgSubmitInitiativeReview {
+    const message = createBaseMsgSubmitInitiativeReview();
+    if (object.reviewer !== undefined && object.reviewer !== null) {
+      message.reviewer = object.reviewer;
+    }
+    if (object.initiative_id !== undefined && object.initiative_id !== null) {
+      message.initiativeId = BigInt(object.initiative_id);
+    }
+    if (object.approved !== undefined && object.approved !== null) {
+      message.approved = object.approved;
+    }
+    message.criteriaVotes = object.criteria_votes?.map(e => CriteriaVote.fromAmino(e)) || [];
+    if (object.comments !== undefined && object.comments !== null) {
+      message.comments = object.comments;
+    }
+    return message;
+  },
+  toAmino(message: MsgSubmitInitiativeReview): MsgSubmitInitiativeReviewAmino {
+    const obj: any = {};
+    obj.reviewer = message.reviewer === "" ? undefined : message.reviewer;
+    obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
+    obj.approved = message.approved === false ? undefined : message.approved;
+    if (message.criteriaVotes) {
+      obj.criteria_votes = message.criteriaVotes.map(e => e ? CriteriaVote.toAmino(e) : undefined);
+    } else {
+      obj.criteria_votes = message.criteriaVotes;
+    }
+    obj.comments = message.comments === "" ? undefined : message.comments;
+    return obj;
+  },
+  fromAminoMsg(object: MsgSubmitInitiativeReviewAminoMsg): MsgSubmitInitiativeReview {
+    return MsgSubmitInitiativeReview.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSubmitInitiativeReview): MsgSubmitInitiativeReviewAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgSubmitInitiativeReview",
+      value: MsgSubmitInitiativeReview.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgSubmitInitiativeReviewProtoMsg): MsgSubmitInitiativeReview {
+    return MsgSubmitInitiativeReview.decode(message.value);
+  },
+  toProto(message: MsgSubmitInitiativeReview): Uint8Array {
+    return MsgSubmitInitiativeReview.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSubmitInitiativeReview): MsgSubmitInitiativeReviewProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgSubmitInitiativeReview",
+      value: MsgSubmitInitiativeReview.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSubmitInitiativeReviewResponse(): MsgSubmitInitiativeReviewResponse {
+  return {};
+}
+/**
+ * MsgSubmitInitiativeReviewResponse defines the MsgSubmitInitiativeReview response.
+ * @name MsgSubmitInitiativeReviewResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSubmitInitiativeReviewResponse
+ */
+export const MsgSubmitInitiativeReviewResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgSubmitInitiativeReviewResponse",
+  encode(_: MsgSubmitInitiativeReviewResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSubmitInitiativeReviewResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSubmitInitiativeReviewResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgSubmitInitiativeReviewResponse>): MsgSubmitInitiativeReviewResponse {
+    const message = createBaseMsgSubmitInitiativeReviewResponse();
+    return message;
+  },
+  fromAmino(_: MsgSubmitInitiativeReviewResponseAmino): MsgSubmitInitiativeReviewResponse {
+    const message = createBaseMsgSubmitInitiativeReviewResponse();
+    return message;
+  },
+  toAmino(_: MsgSubmitInitiativeReviewResponse): MsgSubmitInitiativeReviewResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgSubmitInitiativeReviewResponseAminoMsg): MsgSubmitInitiativeReviewResponse {
+    return MsgSubmitInitiativeReviewResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgSubmitInitiativeReviewResponseProtoMsg): MsgSubmitInitiativeReviewResponse {
+    return MsgSubmitInitiativeReviewResponse.decode(message.value);
+  },
+  toProto(message: MsgSubmitInitiativeReviewResponse): Uint8Array {
+    return MsgSubmitInitiativeReviewResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSubmitInitiativeReviewResponse): MsgSubmitInitiativeReviewResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgSubmitInitiativeReviewResponse",
+      value: MsgSubmitInitiativeReviewResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSetVerificationPolicy(): MsgSetVerificationPolicy {
+  return {
+    creator: "",
+    projectId: BigInt(0),
+    policy: VerificationPolicy.fromPartial({})
+  };
+}
+/**
+ * MsgSetVerificationPolicy sets how a project's initiatives are reviewed.
+ * 
+ * Authority is the project's creator or the Operations Committee, and it is
+ * settable while the project is ACTIVE rather than fixed at creation: the
+ * reviewer roster grows over time, so a project needs to be able to turn review
+ * on once reviewers exist. The review and challenge windows in the policy are
+ * clamped to max(global, project) — a project may be more conservative than the
+ * chain default, never less.
+ * @name MsgSetVerificationPolicy
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSetVerificationPolicy
+ */
+export const MsgSetVerificationPolicy = {
+  typeUrl: "/sparkdream.rep.v1.MsgSetVerificationPolicy",
+  aminoType: "sparkdream/x/rep/MsgSetVerificationPolicy",
+  encode(message: MsgSetVerificationPolicy, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.projectId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.projectId);
+    }
+    if (message.policy !== undefined) {
+      VerificationPolicy.encode(message.policy, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSetVerificationPolicy {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSetVerificationPolicy();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.projectId = reader.uint64();
+          break;
+        case 3:
+          message.policy = VerificationPolicy.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgSetVerificationPolicy>): MsgSetVerificationPolicy {
+    const message = createBaseMsgSetVerificationPolicy();
+    message.creator = object.creator ?? "";
+    message.projectId = object.projectId !== undefined && object.projectId !== null ? BigInt(object.projectId.toString()) : BigInt(0);
+    message.policy = object.policy !== undefined && object.policy !== null ? VerificationPolicy.fromPartial(object.policy) : undefined;
+    return message;
+  },
+  fromAmino(object: MsgSetVerificationPolicyAmino): MsgSetVerificationPolicy {
+    const message = createBaseMsgSetVerificationPolicy();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.project_id !== undefined && object.project_id !== null) {
+      message.projectId = BigInt(object.project_id);
+    }
+    if (object.policy !== undefined && object.policy !== null) {
+      message.policy = VerificationPolicy.fromAmino(object.policy);
+    }
+    return message;
+  },
+  toAmino(message: MsgSetVerificationPolicy): MsgSetVerificationPolicyAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.project_id = message.projectId !== BigInt(0) ? message.projectId?.toString() : undefined;
+    obj.policy = message.policy ? VerificationPolicy.toAmino(message.policy) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgSetVerificationPolicyAminoMsg): MsgSetVerificationPolicy {
+    return MsgSetVerificationPolicy.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSetVerificationPolicy): MsgSetVerificationPolicyAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgSetVerificationPolicy",
+      value: MsgSetVerificationPolicy.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgSetVerificationPolicyProtoMsg): MsgSetVerificationPolicy {
+    return MsgSetVerificationPolicy.decode(message.value);
+  },
+  toProto(message: MsgSetVerificationPolicy): Uint8Array {
+    return MsgSetVerificationPolicy.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSetVerificationPolicy): MsgSetVerificationPolicyProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgSetVerificationPolicy",
+      value: MsgSetVerificationPolicy.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSetVerificationPolicyResponse(): MsgSetVerificationPolicyResponse {
+  return {};
+}
+/**
+ * MsgSetVerificationPolicyResponse defines the MsgSetVerificationPolicy response.
+ * @name MsgSetVerificationPolicyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSetVerificationPolicyResponse
+ */
+export const MsgSetVerificationPolicyResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgSetVerificationPolicyResponse",
+  encode(_: MsgSetVerificationPolicyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSetVerificationPolicyResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSetVerificationPolicyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgSetVerificationPolicyResponse>): MsgSetVerificationPolicyResponse {
+    const message = createBaseMsgSetVerificationPolicyResponse();
+    return message;
+  },
+  fromAmino(_: MsgSetVerificationPolicyResponseAmino): MsgSetVerificationPolicyResponse {
+    const message = createBaseMsgSetVerificationPolicyResponse();
+    return message;
+  },
+  toAmino(_: MsgSetVerificationPolicyResponse): MsgSetVerificationPolicyResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgSetVerificationPolicyResponseAminoMsg): MsgSetVerificationPolicyResponse {
+    return MsgSetVerificationPolicyResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgSetVerificationPolicyResponseProtoMsg): MsgSetVerificationPolicyResponse {
+    return MsgSetVerificationPolicyResponse.decode(message.value);
+  },
+  toProto(message: MsgSetVerificationPolicyResponse): Uint8Array {
+    return MsgSetVerificationPolicyResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSetVerificationPolicyResponse): MsgSetVerificationPolicyResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgSetVerificationPolicyResponse",
+      value: MsgSetVerificationPolicyResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgResolveReviewEscalation(): MsgResolveReviewEscalation {
+  return {
+    creator: "",
+    initiativeId: BigInt(0),
+    resolution: 0,
+    reason: ""
+  };
+}
+/**
+ * MsgResolveReviewEscalation settles a review round that hit its deadline
+ * without meeting the reviewer gate.
+ * 
+ * Operations Committee only. The three resolutions are approve (satisfy the
+ * gate), reject (send the work back for another round), and pass (decline to
+ * substitute judgement and let conviction and the challenge window decide).
+ * All three still run the challenge window — committee approval satisfies the
+ * reviewer requirement and nothing else.
+ * @name MsgResolveReviewEscalation
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveReviewEscalation
+ */
+export const MsgResolveReviewEscalation = {
+  typeUrl: "/sparkdream.rep.v1.MsgResolveReviewEscalation",
+  aminoType: "sparkdream/x/rep/MsgResolveReviewEscalation",
+  encode(message: MsgResolveReviewEscalation, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.initiativeId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.initiativeId);
+    }
+    if (message.resolution !== 0) {
+      writer.uint32(24).int32(message.resolution);
+    }
+    if (message.reason !== "") {
+      writer.uint32(34).string(message.reason);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgResolveReviewEscalation {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgResolveReviewEscalation();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.initiativeId = reader.uint64();
+          break;
+        case 3:
+          message.resolution = reader.int32() as any;
+          break;
+        case 4:
+          message.reason = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgResolveReviewEscalation>): MsgResolveReviewEscalation {
+    const message = createBaseMsgResolveReviewEscalation();
+    message.creator = object.creator ?? "";
+    message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
+    message.resolution = object.resolution ?? 0;
+    message.reason = object.reason ?? "";
+    return message;
+  },
+  fromAmino(object: MsgResolveReviewEscalationAmino): MsgResolveReviewEscalation {
+    const message = createBaseMsgResolveReviewEscalation();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.initiative_id !== undefined && object.initiative_id !== null) {
+      message.initiativeId = BigInt(object.initiative_id);
+    }
+    if (object.resolution !== undefined && object.resolution !== null) {
+      message.resolution = object.resolution;
+    }
+    if (object.reason !== undefined && object.reason !== null) {
+      message.reason = object.reason;
+    }
+    return message;
+  },
+  toAmino(message: MsgResolveReviewEscalation): MsgResolveReviewEscalationAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
+    obj.resolution = message.resolution === 0 ? undefined : message.resolution;
+    obj.reason = message.reason === "" ? undefined : message.reason;
+    return obj;
+  },
+  fromAminoMsg(object: MsgResolveReviewEscalationAminoMsg): MsgResolveReviewEscalation {
+    return MsgResolveReviewEscalation.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgResolveReviewEscalation): MsgResolveReviewEscalationAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgResolveReviewEscalation",
+      value: MsgResolveReviewEscalation.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgResolveReviewEscalationProtoMsg): MsgResolveReviewEscalation {
+    return MsgResolveReviewEscalation.decode(message.value);
+  },
+  toProto(message: MsgResolveReviewEscalation): Uint8Array {
+    return MsgResolveReviewEscalation.encode(message).finish();
+  },
+  toProtoMsg(message: MsgResolveReviewEscalation): MsgResolveReviewEscalationProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgResolveReviewEscalation",
+      value: MsgResolveReviewEscalation.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgResolveReviewEscalationResponse(): MsgResolveReviewEscalationResponse {
+  return {};
+}
+/**
+ * MsgResolveReviewEscalationResponse defines the MsgResolveReviewEscalation response.
+ * @name MsgResolveReviewEscalationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgResolveReviewEscalationResponse
+ */
+export const MsgResolveReviewEscalationResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgResolveReviewEscalationResponse",
+  encode(_: MsgResolveReviewEscalationResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgResolveReviewEscalationResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgResolveReviewEscalationResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgResolveReviewEscalationResponse>): MsgResolveReviewEscalationResponse {
+    const message = createBaseMsgResolveReviewEscalationResponse();
+    return message;
+  },
+  fromAmino(_: MsgResolveReviewEscalationResponseAmino): MsgResolveReviewEscalationResponse {
+    const message = createBaseMsgResolveReviewEscalationResponse();
+    return message;
+  },
+  toAmino(_: MsgResolveReviewEscalationResponse): MsgResolveReviewEscalationResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgResolveReviewEscalationResponseAminoMsg): MsgResolveReviewEscalationResponse {
+    return MsgResolveReviewEscalationResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgResolveReviewEscalationResponseProtoMsg): MsgResolveReviewEscalationResponse {
+    return MsgResolveReviewEscalationResponse.decode(message.value);
+  },
+  toProto(message: MsgResolveReviewEscalationResponse): Uint8Array {
+    return MsgResolveReviewEscalationResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgResolveReviewEscalationResponse): MsgResolveReviewEscalationResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgResolveReviewEscalationResponse",
+      value: MsgResolveReviewEscalationResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgFundReviewBounty(): MsgFundReviewBounty {
+  return {
+    funder: "",
+    initiativeId: BigInt(0),
+    amount: ""
+  };
+}
+/**
+ * MsgFundReviewBounty escrows DREAM against an initiative so reviewers have a
+ * reason to look at that one rather than any other.
+ * 
+ * Anyone may fund, and contributions are additive: the creator who wants their
+ * work cleared, a staker protecting conviction already committed, or a third
+ * party who simply wants the thing checked. Restricting it to the creator would
+ * make the amount a statement about one person's budget rather than about how
+ * much the work matters.
+ * @name MsgFundReviewBounty
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgFundReviewBounty
+ */
+export const MsgFundReviewBounty = {
+  typeUrl: "/sparkdream.rep.v1.MsgFundReviewBounty",
+  aminoType: "sparkdream/x/rep/MsgFundReviewBounty",
+  encode(message: MsgFundReviewBounty, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.funder !== "") {
+      writer.uint32(10).string(message.funder);
+    }
+    if (message.initiativeId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.initiativeId);
+    }
+    if (message.amount !== "") {
+      writer.uint32(26).string(message.amount);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgFundReviewBounty {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgFundReviewBounty();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.funder = reader.string();
+          break;
+        case 2:
+          message.initiativeId = reader.uint64();
+          break;
+        case 3:
+          message.amount = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgFundReviewBounty>): MsgFundReviewBounty {
+    const message = createBaseMsgFundReviewBounty();
+    message.funder = object.funder ?? "";
+    message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
+    message.amount = object.amount ?? "";
+    return message;
+  },
+  fromAmino(object: MsgFundReviewBountyAmino): MsgFundReviewBounty {
+    const message = createBaseMsgFundReviewBounty();
+    if (object.funder !== undefined && object.funder !== null) {
+      message.funder = object.funder;
+    }
+    if (object.initiative_id !== undefined && object.initiative_id !== null) {
+      message.initiativeId = BigInt(object.initiative_id);
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = object.amount;
+    }
+    return message;
+  },
+  toAmino(message: MsgFundReviewBounty): MsgFundReviewBountyAmino {
+    const obj: any = {};
+    obj.funder = message.funder === "" ? undefined : message.funder;
+    obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
+    obj.amount = message.amount === "" ? undefined : message.amount;
+    return obj;
+  },
+  fromAminoMsg(object: MsgFundReviewBountyAminoMsg): MsgFundReviewBounty {
+    return MsgFundReviewBounty.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgFundReviewBounty): MsgFundReviewBountyAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgFundReviewBounty",
+      value: MsgFundReviewBounty.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgFundReviewBountyProtoMsg): MsgFundReviewBounty {
+    return MsgFundReviewBounty.decode(message.value);
+  },
+  toProto(message: MsgFundReviewBounty): Uint8Array {
+    return MsgFundReviewBounty.encode(message).finish();
+  },
+  toProtoMsg(message: MsgFundReviewBounty): MsgFundReviewBountyProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgFundReviewBounty",
+      value: MsgFundReviewBounty.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgFundReviewBountyResponse(): MsgFundReviewBountyResponse {
+  return {
+    total: ""
+  };
+}
+/**
+ * MsgFundReviewBountyResponse defines the MsgFundReviewBounty response.
+ * @name MsgFundReviewBountyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgFundReviewBountyResponse
+ */
+export const MsgFundReviewBountyResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgFundReviewBountyResponse",
+  encode(message: MsgFundReviewBountyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.total !== "") {
+      writer.uint32(10).string(message.total);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgFundReviewBountyResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgFundReviewBountyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.total = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgFundReviewBountyResponse>): MsgFundReviewBountyResponse {
+    const message = createBaseMsgFundReviewBountyResponse();
+    message.total = object.total ?? "";
+    return message;
+  },
+  fromAmino(object: MsgFundReviewBountyResponseAmino): MsgFundReviewBountyResponse {
+    const message = createBaseMsgFundReviewBountyResponse();
+    if (object.total !== undefined && object.total !== null) {
+      message.total = object.total;
+    }
+    return message;
+  },
+  toAmino(message: MsgFundReviewBountyResponse): MsgFundReviewBountyResponseAmino {
+    const obj: any = {};
+    obj.total = message.total === "" ? undefined : message.total;
+    return obj;
+  },
+  fromAminoMsg(object: MsgFundReviewBountyResponseAminoMsg): MsgFundReviewBountyResponse {
+    return MsgFundReviewBountyResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgFundReviewBountyResponseProtoMsg): MsgFundReviewBountyResponse {
+    return MsgFundReviewBountyResponse.decode(message.value);
+  },
+  toProto(message: MsgFundReviewBountyResponse): Uint8Array {
+    return MsgFundReviewBountyResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgFundReviewBountyResponse): MsgFundReviewBountyResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgFundReviewBountyResponse",
+      value: MsgFundReviewBountyResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgReclaimReviewBounty(): MsgReclaimReviewBounty {
+  return {
+    funder: "",
+    initiativeId: BigInt(0)
+  };
+}
+/**
+ * MsgReclaimReviewBounty returns a funder's own unpaid contribution.
+ * 
+ * Permitted only after review_bounty_reclaim_delay blocks and only while NO
+ * verdict has been filed against the initiative. The delay stops a funder
+ * advertising a bounty and yanking it in the same breath; the verdict bar stops
+ * them yanking it once reviewers have committed bond on the strength of it.
+ * @name MsgReclaimReviewBounty
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReclaimReviewBounty
+ */
+export const MsgReclaimReviewBounty = {
+  typeUrl: "/sparkdream.rep.v1.MsgReclaimReviewBounty",
+  aminoType: "sparkdream/x/rep/MsgReclaimReviewBounty",
+  encode(message: MsgReclaimReviewBounty, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.funder !== "") {
+      writer.uint32(10).string(message.funder);
+    }
+    if (message.initiativeId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.initiativeId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgReclaimReviewBounty {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgReclaimReviewBounty();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.funder = reader.string();
+          break;
+        case 2:
+          message.initiativeId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgReclaimReviewBounty>): MsgReclaimReviewBounty {
+    const message = createBaseMsgReclaimReviewBounty();
+    message.funder = object.funder ?? "";
+    message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgReclaimReviewBountyAmino): MsgReclaimReviewBounty {
+    const message = createBaseMsgReclaimReviewBounty();
+    if (object.funder !== undefined && object.funder !== null) {
+      message.funder = object.funder;
+    }
+    if (object.initiative_id !== undefined && object.initiative_id !== null) {
+      message.initiativeId = BigInt(object.initiative_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgReclaimReviewBounty): MsgReclaimReviewBountyAmino {
+    const obj: any = {};
+    obj.funder = message.funder === "" ? undefined : message.funder;
+    obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgReclaimReviewBountyAminoMsg): MsgReclaimReviewBounty {
+    return MsgReclaimReviewBounty.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgReclaimReviewBounty): MsgReclaimReviewBountyAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgReclaimReviewBounty",
+      value: MsgReclaimReviewBounty.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgReclaimReviewBountyProtoMsg): MsgReclaimReviewBounty {
+    return MsgReclaimReviewBounty.decode(message.value);
+  },
+  toProto(message: MsgReclaimReviewBounty): Uint8Array {
+    return MsgReclaimReviewBounty.encode(message).finish();
+  },
+  toProtoMsg(message: MsgReclaimReviewBounty): MsgReclaimReviewBountyProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgReclaimReviewBounty",
+      value: MsgReclaimReviewBounty.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgReclaimReviewBountyResponse(): MsgReclaimReviewBountyResponse {
+  return {
+    refunded: ""
+  };
+}
+/**
+ * MsgReclaimReviewBountyResponse defines the MsgReclaimReviewBounty response.
+ * @name MsgReclaimReviewBountyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReclaimReviewBountyResponse
+ */
+export const MsgReclaimReviewBountyResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgReclaimReviewBountyResponse",
+  encode(message: MsgReclaimReviewBountyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.refunded !== "") {
+      writer.uint32(10).string(message.refunded);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgReclaimReviewBountyResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgReclaimReviewBountyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.refunded = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgReclaimReviewBountyResponse>): MsgReclaimReviewBountyResponse {
+    const message = createBaseMsgReclaimReviewBountyResponse();
+    message.refunded = object.refunded ?? "";
+    return message;
+  },
+  fromAmino(object: MsgReclaimReviewBountyResponseAmino): MsgReclaimReviewBountyResponse {
+    const message = createBaseMsgReclaimReviewBountyResponse();
+    if (object.refunded !== undefined && object.refunded !== null) {
+      message.refunded = object.refunded;
+    }
+    return message;
+  },
+  toAmino(message: MsgReclaimReviewBountyResponse): MsgReclaimReviewBountyResponseAmino {
+    const obj: any = {};
+    obj.refunded = message.refunded === "" ? undefined : message.refunded;
+    return obj;
+  },
+  fromAminoMsg(object: MsgReclaimReviewBountyResponseAminoMsg): MsgReclaimReviewBountyResponse {
+    return MsgReclaimReviewBountyResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgReclaimReviewBountyResponseProtoMsg): MsgReclaimReviewBountyResponse {
+    return MsgReclaimReviewBountyResponse.decode(message.value);
+  },
+  toProto(message: MsgReclaimReviewBountyResponse): Uint8Array {
+    return MsgReclaimReviewBountyResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgReclaimReviewBountyResponse): MsgReclaimReviewBountyResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgReclaimReviewBountyResponse",
+      value: MsgReclaimReviewBountyResponse.encode(message).finish()
     };
   }
 };

@@ -8,7 +8,6 @@ import { Stake, StakeAmino, MemberStakePool, MemberStakePoolAmino, TagStakePool,
 import { Challenge, ChallengeAmino } from "./challenge";
 import { JuryReview, JuryReviewAmino } from "./jury_review";
 import { Interim, InterimAmino } from "./interim";
-import { InterimTemplate, InterimTemplateAmino } from "./interim_template";
 import { ContentChallenge, ContentChallengeAmino } from "./content_challenge";
 import { Tag, TagAmino } from "./tag";
 import { ReservedTag, ReservedTagAmino } from "./reserved_tag";
@@ -21,6 +20,8 @@ import { MemberWarning, MemberWarningAmino } from "./member_warning";
 import { GovActionAppeal, GovActionAppealAmino } from "./gov_action_appeal";
 import { BondedRole, BondedRoleAmino, BondedRoleConfig, BondedRoleConfigAmino } from "./bonded_role";
 import { RoleActivity, RoleActivityAmino } from "./role_activity";
+import { InitiativeReview, InitiativeReviewAmino } from "./initiative_review";
+import { ReviewBounty, ReviewBountyAmino } from "./review_bounty";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -49,7 +50,6 @@ export interface GenesisState {
   juryReviewCount: bigint;
   interimList: Interim[];
   interimCount: bigint;
-  interimTemplateMap: InterimTemplate[];
   /**
    * Stake pools (for extended staking)
    */
@@ -96,6 +96,29 @@ export interface GenesisState {
   bondedRoleList: BondedRole[];
   bondedRoleConfigList: BondedRoleConfig[];
   roleActivityList: RoleActivity[];
+  /**
+   * Reviewer verdicts. Their bond_reserved is live liability, so losing them on
+   * import would strand committed bond with nothing to release it.
+   */
+  initiativeReviewList: InitiativeReview[];
+  /**
+   * Review rounds sitting with the Operations Committee. This set is the ONLY
+   * marker for "already escalated" — ReviewEscalation is reset to NONE on
+   * escalation — so losing it on import re-escalates every open round and
+   * extends its deadline again, and leaves silent escalations with nothing to
+   * resolve them.
+   */
+  escalatedReviewList: bigint[];
+  /**
+   * Per-UTC-day community-pool draw ledger for the bonded-role reward pools.
+   * Dropping it on import hands the chain a fresh daily allowance.
+   */
+  roleRewardDayFundingList: RoleRewardDayFunding[];
+  /**
+   * Escrowed review bounties. Real DREAM is held against these, so losing them
+   * on import would strand the escrow with nothing able to pay or refund it.
+   */
+  reviewBountyList: ReviewBounty[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.rep.v1.GenesisState";
@@ -127,7 +150,6 @@ export interface GenesisStateAmino {
   jury_review_count?: string;
   interim_list?: InterimAmino[];
   interim_count?: string;
-  interim_template_map?: InterimTemplateAmino[];
   /**
    * Stake pools (for extended staking)
    */
@@ -174,10 +196,65 @@ export interface GenesisStateAmino {
   bonded_role_list?: BondedRoleAmino[];
   bonded_role_config_list?: BondedRoleConfigAmino[];
   role_activity_list?: RoleActivityAmino[];
+  /**
+   * Reviewer verdicts. Their bond_reserved is live liability, so losing them on
+   * import would strand committed bond with nothing to release it.
+   */
+  initiative_review_list?: InitiativeReviewAmino[];
+  /**
+   * Review rounds sitting with the Operations Committee. This set is the ONLY
+   * marker for "already escalated" — ReviewEscalation is reset to NONE on
+   * escalation — so losing it on import re-escalates every open round and
+   * extends its deadline again, and leaves silent escalations with nothing to
+   * resolve them.
+   */
+  escalated_review_list?: string[];
+  /**
+   * Per-UTC-day community-pool draw ledger for the bonded-role reward pools.
+   * Dropping it on import hands the chain a fresh daily allowance.
+   */
+  role_reward_day_funding_list?: RoleRewardDayFundingAmino[];
+  /**
+   * Escrowed review bounties. Real DREAM is held against these, so losing them
+   * on import would strand the escrow with nothing able to pay or refund it.
+   */
+  review_bounty_list?: ReviewBountyAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.rep.v1.GenesisState";
   value: GenesisStateAmino;
+}
+/**
+ * RoleRewardDayFunding is one UTC day's community-pool draw for the
+ * bonded-role reward pools, ledgered so role_reward_daily_funding bounds a day
+ * rather than a block.
+ * @name RoleRewardDayFunding
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.RoleRewardDayFunding
+ */
+export interface RoleRewardDayFunding {
+  day: bigint;
+  amountFunded: string;
+}
+export interface RoleRewardDayFundingProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.RoleRewardDayFunding";
+  value: Uint8Array;
+}
+/**
+ * RoleRewardDayFunding is one UTC day's community-pool draw for the
+ * bonded-role reward pools, ledgered so role_reward_daily_funding bounds a day
+ * rather than a block.
+ * @name RoleRewardDayFundingAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.RoleRewardDayFunding
+ */
+export interface RoleRewardDayFundingAmino {
+  day?: string;
+  amount_funded?: string;
+}
+export interface RoleRewardDayFundingAminoMsg {
+  type: "/sparkdream.rep.v1.RoleRewardDayFunding";
+  value: RoleRewardDayFundingAmino;
 }
 /**
  * ContentInitiativeLink defines a link between content and an initiative for conviction propagation.
@@ -239,7 +316,6 @@ function createBaseGenesisState(): GenesisState {
     juryReviewCount: BigInt(0),
     interimList: [],
     interimCount: BigInt(0),
-    interimTemplateMap: [],
     memberStakePoolList: [],
     tagStakePoolList: [],
     projectStakeInfoList: [],
@@ -261,7 +337,11 @@ function createBaseGenesisState(): GenesisState {
     govActionAppealCount: BigInt(0),
     bondedRoleList: [],
     bondedRoleConfigList: [],
-    roleActivityList: []
+    roleActivityList: [],
+    initiativeReviewList: [],
+    escalatedReviewList: [],
+    roleRewardDayFundingList: [],
+    reviewBountyList: []
   };
 }
 /**
@@ -321,74 +401,85 @@ export const GenesisState = {
     if (message.interimCount !== BigInt(0)) {
       writer.uint32(128).uint64(message.interimCount);
     }
-    for (const v of message.interimTemplateMap) {
-      InterimTemplate.encode(v!, writer.uint32(138).fork()).ldelim();
-    }
     for (const v of message.memberStakePoolList) {
-      MemberStakePool.encode(v!, writer.uint32(146).fork()).ldelim();
+      MemberStakePool.encode(v!, writer.uint32(138).fork()).ldelim();
     }
     for (const v of message.tagStakePoolList) {
-      TagStakePool.encode(v!, writer.uint32(154).fork()).ldelim();
+      TagStakePool.encode(v!, writer.uint32(146).fork()).ldelim();
     }
     for (const v of message.projectStakeInfoList) {
-      ProjectStakeInfo.encode(v!, writer.uint32(162).fork()).ldelim();
+      ProjectStakeInfo.encode(v!, writer.uint32(154).fork()).ldelim();
     }
     for (const v of message.contentChallengeList) {
-      ContentChallenge.encode(v!, writer.uint32(170).fork()).ldelim();
+      ContentChallenge.encode(v!, writer.uint32(162).fork()).ldelim();
     }
     if (message.contentChallengeCount !== BigInt(0)) {
-      writer.uint32(176).uint64(message.contentChallengeCount);
+      writer.uint32(168).uint64(message.contentChallengeCount);
     }
     for (const v of message.contentInitiativeLinks) {
-      ContentInitiativeLink.encode(v!, writer.uint32(186).fork()).ldelim();
+      ContentInitiativeLink.encode(v!, writer.uint32(178).fork()).ldelim();
     }
     for (const v of message.tagMap) {
-      Tag.encode(v!, writer.uint32(194).fork()).ldelim();
+      Tag.encode(v!, writer.uint32(186).fork()).ldelim();
     }
     for (const v of message.reservedTagMap) {
-      ReservedTag.encode(v!, writer.uint32(202).fork()).ldelim();
+      ReservedTag.encode(v!, writer.uint32(194).fork()).ldelim();
     }
     for (const v of message.tagReportMap) {
-      TagReport.encode(v!, writer.uint32(210).fork()).ldelim();
+      TagReport.encode(v!, writer.uint32(202).fork()).ldelim();
     }
     for (const v of message.tagBudgetList) {
-      TagBudget.encode(v!, writer.uint32(218).fork()).ldelim();
+      TagBudget.encode(v!, writer.uint32(210).fork()).ldelim();
     }
     if (message.tagBudgetCount !== BigInt(0)) {
-      writer.uint32(224).uint64(message.tagBudgetCount);
+      writer.uint32(216).uint64(message.tagBudgetCount);
     }
     for (const v of message.tagBudgetAwardList) {
-      TagBudgetAward.encode(v!, writer.uint32(234).fork()).ldelim();
+      TagBudgetAward.encode(v!, writer.uint32(226).fork()).ldelim();
     }
     if (message.tagBudgetAwardCount !== BigInt(0)) {
-      writer.uint32(240).uint64(message.tagBudgetAwardCount);
+      writer.uint32(232).uint64(message.tagBudgetAwardCount);
     }
     for (const v of message.juryParticipationMap) {
-      JuryParticipation.encode(v!, writer.uint32(258).fork()).ldelim();
+      JuryParticipation.encode(v!, writer.uint32(242).fork()).ldelim();
     }
     for (const v of message.memberReportMap) {
-      MemberReport.encode(v!, writer.uint32(266).fork()).ldelim();
+      MemberReport.encode(v!, writer.uint32(250).fork()).ldelim();
     }
     for (const v of message.memberWarningList) {
-      MemberWarning.encode(v!, writer.uint32(274).fork()).ldelim();
+      MemberWarning.encode(v!, writer.uint32(258).fork()).ldelim();
     }
     if (message.memberWarningCount !== BigInt(0)) {
-      writer.uint32(280).uint64(message.memberWarningCount);
+      writer.uint32(264).uint64(message.memberWarningCount);
     }
     for (const v of message.govActionAppealList) {
-      GovActionAppeal.encode(v!, writer.uint32(290).fork()).ldelim();
+      GovActionAppeal.encode(v!, writer.uint32(274).fork()).ldelim();
     }
     if (message.govActionAppealCount !== BigInt(0)) {
-      writer.uint32(296).uint64(message.govActionAppealCount);
+      writer.uint32(280).uint64(message.govActionAppealCount);
     }
     for (const v of message.bondedRoleList) {
-      BondedRole.encode(v!, writer.uint32(306).fork()).ldelim();
+      BondedRole.encode(v!, writer.uint32(290).fork()).ldelim();
     }
     for (const v of message.bondedRoleConfigList) {
-      BondedRoleConfig.encode(v!, writer.uint32(314).fork()).ldelim();
+      BondedRoleConfig.encode(v!, writer.uint32(298).fork()).ldelim();
     }
     for (const v of message.roleActivityList) {
-      RoleActivity.encode(v!, writer.uint32(322).fork()).ldelim();
+      RoleActivity.encode(v!, writer.uint32(306).fork()).ldelim();
+    }
+    for (const v of message.initiativeReviewList) {
+      InitiativeReview.encode(v!, writer.uint32(314).fork()).ldelim();
+    }
+    writer.uint32(322).fork();
+    for (const v of message.escalatedReviewList) {
+      writer.uint64(v);
+    }
+    writer.ldelim();
+    for (const v of message.roleRewardDayFundingList) {
+      RoleRewardDayFunding.encode(v!, writer.uint32(330).fork()).ldelim();
+    }
+    for (const v of message.reviewBountyList) {
+      ReviewBounty.encode(v!, writer.uint32(338).fork()).ldelim();
     }
     return writer;
   },
@@ -448,73 +539,89 @@ export const GenesisState = {
           message.interimCount = reader.uint64();
           break;
         case 17:
-          message.interimTemplateMap.push(InterimTemplate.decode(reader, reader.uint32()));
-          break;
-        case 18:
           message.memberStakePoolList.push(MemberStakePool.decode(reader, reader.uint32()));
           break;
-        case 19:
+        case 18:
           message.tagStakePoolList.push(TagStakePool.decode(reader, reader.uint32()));
           break;
-        case 20:
+        case 19:
           message.projectStakeInfoList.push(ProjectStakeInfo.decode(reader, reader.uint32()));
           break;
-        case 21:
+        case 20:
           message.contentChallengeList.push(ContentChallenge.decode(reader, reader.uint32()));
           break;
-        case 22:
+        case 21:
           message.contentChallengeCount = reader.uint64();
           break;
-        case 23:
+        case 22:
           message.contentInitiativeLinks.push(ContentInitiativeLink.decode(reader, reader.uint32()));
           break;
-        case 24:
+        case 23:
           message.tagMap.push(Tag.decode(reader, reader.uint32()));
           break;
-        case 25:
+        case 24:
           message.reservedTagMap.push(ReservedTag.decode(reader, reader.uint32()));
           break;
-        case 26:
+        case 25:
           message.tagReportMap.push(TagReport.decode(reader, reader.uint32()));
           break;
-        case 27:
+        case 26:
           message.tagBudgetList.push(TagBudget.decode(reader, reader.uint32()));
           break;
-        case 28:
+        case 27:
           message.tagBudgetCount = reader.uint64();
           break;
-        case 29:
+        case 28:
           message.tagBudgetAwardList.push(TagBudgetAward.decode(reader, reader.uint32()));
           break;
-        case 30:
+        case 29:
           message.tagBudgetAwardCount = reader.uint64();
           break;
-        case 32:
+        case 30:
           message.juryParticipationMap.push(JuryParticipation.decode(reader, reader.uint32()));
           break;
-        case 33:
+        case 31:
           message.memberReportMap.push(MemberReport.decode(reader, reader.uint32()));
           break;
-        case 34:
+        case 32:
           message.memberWarningList.push(MemberWarning.decode(reader, reader.uint32()));
           break;
-        case 35:
+        case 33:
           message.memberWarningCount = reader.uint64();
           break;
-        case 36:
+        case 34:
           message.govActionAppealList.push(GovActionAppeal.decode(reader, reader.uint32()));
           break;
-        case 37:
+        case 35:
           message.govActionAppealCount = reader.uint64();
           break;
-        case 38:
+        case 36:
           message.bondedRoleList.push(BondedRole.decode(reader, reader.uint32()));
           break;
-        case 39:
+        case 37:
           message.bondedRoleConfigList.push(BondedRoleConfig.decode(reader, reader.uint32()));
           break;
-        case 40:
+        case 38:
           message.roleActivityList.push(RoleActivity.decode(reader, reader.uint32()));
+          break;
+        case 39:
+          message.initiativeReviewList.push(InitiativeReview.decode(reader, reader.uint32()));
+          break;
+        case 40:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.escalatedReviewList.push(reader.uint64());
+            }
+          } else {
+            message.escalatedReviewList.push(reader.uint64());
+          }
+          break;
+        case 41:
+          message.roleRewardDayFundingList.push(RoleRewardDayFunding.decode(reader, reader.uint32()));
+          break;
+        case 42:
+          message.reviewBountyList.push(ReviewBounty.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -541,7 +648,6 @@ export const GenesisState = {
     message.juryReviewCount = object.juryReviewCount !== undefined && object.juryReviewCount !== null ? BigInt(object.juryReviewCount.toString()) : BigInt(0);
     message.interimList = object.interimList?.map(e => Interim.fromPartial(e)) || [];
     message.interimCount = object.interimCount !== undefined && object.interimCount !== null ? BigInt(object.interimCount.toString()) : BigInt(0);
-    message.interimTemplateMap = object.interimTemplateMap?.map(e => InterimTemplate.fromPartial(e)) || [];
     message.memberStakePoolList = object.memberStakePoolList?.map(e => MemberStakePool.fromPartial(e)) || [];
     message.tagStakePoolList = object.tagStakePoolList?.map(e => TagStakePool.fromPartial(e)) || [];
     message.projectStakeInfoList = object.projectStakeInfoList?.map(e => ProjectStakeInfo.fromPartial(e)) || [];
@@ -564,6 +670,10 @@ export const GenesisState = {
     message.bondedRoleList = object.bondedRoleList?.map(e => BondedRole.fromPartial(e)) || [];
     message.bondedRoleConfigList = object.bondedRoleConfigList?.map(e => BondedRoleConfig.fromPartial(e)) || [];
     message.roleActivityList = object.roleActivityList?.map(e => RoleActivity.fromPartial(e)) || [];
+    message.initiativeReviewList = object.initiativeReviewList?.map(e => InitiativeReview.fromPartial(e)) || [];
+    message.escalatedReviewList = object.escalatedReviewList?.map(e => BigInt(e.toString())) || [];
+    message.roleRewardDayFundingList = object.roleRewardDayFundingList?.map(e => RoleRewardDayFunding.fromPartial(e)) || [];
+    message.reviewBountyList = object.reviewBountyList?.map(e => ReviewBounty.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -600,7 +710,6 @@ export const GenesisState = {
     if (object.interim_count !== undefined && object.interim_count !== null) {
       message.interimCount = BigInt(object.interim_count);
     }
-    message.interimTemplateMap = object.interim_template_map?.map(e => InterimTemplate.fromAmino(e)) || [];
     message.memberStakePoolList = object.member_stake_pool_list?.map(e => MemberStakePool.fromAmino(e)) || [];
     message.tagStakePoolList = object.tag_stake_pool_list?.map(e => TagStakePool.fromAmino(e)) || [];
     message.projectStakeInfoList = object.project_stake_info_list?.map(e => ProjectStakeInfo.fromAmino(e)) || [];
@@ -633,6 +742,10 @@ export const GenesisState = {
     message.bondedRoleList = object.bonded_role_list?.map(e => BondedRole.fromAmino(e)) || [];
     message.bondedRoleConfigList = object.bonded_role_config_list?.map(e => BondedRoleConfig.fromAmino(e)) || [];
     message.roleActivityList = object.role_activity_list?.map(e => RoleActivity.fromAmino(e)) || [];
+    message.initiativeReviewList = object.initiative_review_list?.map(e => InitiativeReview.fromAmino(e)) || [];
+    message.escalatedReviewList = object.escalated_review_list?.map(e => BigInt(e)) || [];
+    message.roleRewardDayFundingList = object.role_reward_day_funding_list?.map(e => RoleRewardDayFunding.fromAmino(e)) || [];
+    message.reviewBountyList = object.review_bounty_list?.map(e => ReviewBounty.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -685,11 +798,6 @@ export const GenesisState = {
       obj.interim_list = message.interimList;
     }
     obj.interim_count = message.interimCount !== BigInt(0) ? message.interimCount?.toString() : undefined;
-    if (message.interimTemplateMap) {
-      obj.interim_template_map = message.interimTemplateMap.map(e => e ? InterimTemplate.toAmino(e) : undefined);
-    } else {
-      obj.interim_template_map = message.interimTemplateMap;
-    }
     if (message.memberStakePoolList) {
       obj.member_stake_pool_list = message.memberStakePoolList.map(e => e ? MemberStakePool.toAmino(e) : undefined);
     } else {
@@ -780,6 +888,26 @@ export const GenesisState = {
     } else {
       obj.role_activity_list = message.roleActivityList;
     }
+    if (message.initiativeReviewList) {
+      obj.initiative_review_list = message.initiativeReviewList.map(e => e ? InitiativeReview.toAmino(e) : undefined);
+    } else {
+      obj.initiative_review_list = message.initiativeReviewList;
+    }
+    if (message.escalatedReviewList) {
+      obj.escalated_review_list = message.escalatedReviewList.map(e => e.toString());
+    } else {
+      obj.escalated_review_list = message.escalatedReviewList;
+    }
+    if (message.roleRewardDayFundingList) {
+      obj.role_reward_day_funding_list = message.roleRewardDayFundingList.map(e => e ? RoleRewardDayFunding.toAmino(e) : undefined);
+    } else {
+      obj.role_reward_day_funding_list = message.roleRewardDayFundingList;
+    }
+    if (message.reviewBountyList) {
+      obj.review_bounty_list = message.reviewBountyList.map(e => e ? ReviewBounty.toAmino(e) : undefined);
+    } else {
+      obj.review_bounty_list = message.reviewBountyList;
+    }
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {
@@ -795,6 +923,89 @@ export const GenesisState = {
     return {
       typeUrl: "/sparkdream.rep.v1.GenesisState",
       value: GenesisState.encode(message).finish()
+    };
+  }
+};
+function createBaseRoleRewardDayFunding(): RoleRewardDayFunding {
+  return {
+    day: BigInt(0),
+    amountFunded: ""
+  };
+}
+/**
+ * RoleRewardDayFunding is one UTC day's community-pool draw for the
+ * bonded-role reward pools, ledgered so role_reward_daily_funding bounds a day
+ * rather than a block.
+ * @name RoleRewardDayFunding
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.RoleRewardDayFunding
+ */
+export const RoleRewardDayFunding = {
+  typeUrl: "/sparkdream.rep.v1.RoleRewardDayFunding",
+  encode(message: RoleRewardDayFunding, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.day !== BigInt(0)) {
+      writer.uint32(8).uint64(message.day);
+    }
+    if (message.amountFunded !== "") {
+      writer.uint32(18).string(message.amountFunded);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): RoleRewardDayFunding {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoleRewardDayFunding();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.day = reader.uint64();
+          break;
+        case 2:
+          message.amountFunded = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<RoleRewardDayFunding>): RoleRewardDayFunding {
+    const message = createBaseRoleRewardDayFunding();
+    message.day = object.day !== undefined && object.day !== null ? BigInt(object.day.toString()) : BigInt(0);
+    message.amountFunded = object.amountFunded ?? "";
+    return message;
+  },
+  fromAmino(object: RoleRewardDayFundingAmino): RoleRewardDayFunding {
+    const message = createBaseRoleRewardDayFunding();
+    if (object.day !== undefined && object.day !== null) {
+      message.day = BigInt(object.day);
+    }
+    if (object.amount_funded !== undefined && object.amount_funded !== null) {
+      message.amountFunded = object.amount_funded;
+    }
+    return message;
+  },
+  toAmino(message: RoleRewardDayFunding): RoleRewardDayFundingAmino {
+    const obj: any = {};
+    obj.day = message.day !== BigInt(0) ? message.day?.toString() : undefined;
+    obj.amount_funded = message.amountFunded === "" ? undefined : message.amountFunded;
+    return obj;
+  },
+  fromAminoMsg(object: RoleRewardDayFundingAminoMsg): RoleRewardDayFunding {
+    return RoleRewardDayFunding.fromAmino(object.value);
+  },
+  fromProtoMsg(message: RoleRewardDayFundingProtoMsg): RoleRewardDayFunding {
+    return RoleRewardDayFunding.decode(message.value);
+  },
+  toProto(message: RoleRewardDayFunding): Uint8Array {
+    return RoleRewardDayFunding.encode(message).finish();
+  },
+  toProtoMsg(message: RoleRewardDayFunding): RoleRewardDayFundingProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.RoleRewardDayFunding",
+      value: RoleRewardDayFunding.encode(message).finish()
     };
   }
 };

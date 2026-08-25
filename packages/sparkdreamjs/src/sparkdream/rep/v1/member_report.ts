@@ -140,20 +140,20 @@ export const MemberReport = {
       writer.uint32(64).int64(message.defenseSubmittedAt);
     }
     for (const v of message.reporters) {
-      writer.uint32(82).string(v!);
+      writer.uint32(74).string(v!);
     }
-    writer.uint32(90).fork();
+    writer.uint32(82).fork();
     for (const v of message.evidencePostIds) {
       writer.uint64(v);
     }
     writer.ldelim();
-    writer.uint32(98).fork();
+    writer.uint32(90).fork();
     for (const v of message.defensePostIds) {
       writer.uint64(v);
     }
     writer.ldelim();
     for (const v of message.reporterBonds) {
-      ReporterBondEntry.encode(v!, writer.uint32(106).fork()).ldelim();
+      ReporterBondEntry.encode(v!, writer.uint32(98).fork()).ldelim();
     }
     return writer;
   },
@@ -188,10 +188,10 @@ export const MemberReport = {
         case 8:
           message.defenseSubmittedAt = reader.int64();
           break;
-        case 10:
+        case 9:
           message.reporters.push(reader.string());
           break;
-        case 11:
+        case 10:
           if ((tag & 7) === 2) {
             const end2 = reader.uint32() + reader.pos;
             while (reader.pos < end2) {
@@ -201,7 +201,7 @@ export const MemberReport = {
             message.evidencePostIds.push(reader.uint64());
           }
           break;
-        case 12:
+        case 11:
           if ((tag & 7) === 2) {
             const end2 = reader.uint32() + reader.pos;
             while (reader.pos < end2) {
@@ -211,7 +211,7 @@ export const MemberReport = {
             message.defensePostIds.push(reader.uint64());
           }
           break;
-        case 13:
+        case 12:
           message.reporterBonds.push(ReporterBondEntry.decode(reader, reader.uint32()));
           break;
         default:

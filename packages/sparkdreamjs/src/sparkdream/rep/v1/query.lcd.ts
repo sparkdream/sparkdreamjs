@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetMemberRequest, QueryGetMemberResponse, QueryAllMemberRequest, QueryAllMemberResponse, QueryGetInvitationRequest, QueryGetInvitationResponse, QueryAllInvitationRequest, QueryAllInvitationResponse, QueryGetProjectRequest, QueryGetProjectResponse, QueryAllProjectRequest, QueryAllProjectResponse, QueryGetInitiativeRequest, QueryGetInitiativeResponse, QueryAllInitiativeRequest, QueryAllInitiativeResponse, QueryGetStakeRequest, QueryGetStakeResponse, QueryAllStakeRequest, QueryAllStakeResponse, QueryGetChallengeRequest, QueryGetChallengeResponse, QueryAllChallengeRequest, QueryAllChallengeResponse, QueryGetJuryReviewRequest, QueryGetJuryReviewResponse, QueryAllJuryReviewRequest, QueryAllJuryReviewResponse, QueryGetInterimRequest, QueryGetInterimResponse, QueryAllInterimRequest, QueryAllInterimResponse, QueryGetInterimTemplateRequest, QueryGetInterimTemplateResponse, QueryAllInterimTemplateRequest, QueryAllInterimTemplateResponse, QueryMembersByTrustLevelRequest, QueryMembersByTrustLevelResponse, QueryInvitationsByInviterRequest, QueryInvitationsByInviterResponse, QueryInterimsByAssigneeRequest, QueryInterimsByAssigneeResponse, QueryInterimsByTypeRequest, QueryInterimsByTypeResponse, QueryInterimsByReferenceRequest, QueryInterimsByReferenceResponse, QueryProjectsByCouncilRequest, QueryProjectsByCouncilResponse, QueryInitiativesByProjectRequest, QueryInitiativesByProjectResponse, QueryInitiativesByAssigneeRequest, QueryInitiativesByAssigneeResponse, QueryInitiativesByCreatorRequest, QueryInitiativesByCreatorResponse, QueryProjectsByCreatorRequest, QueryProjectsByCreatorResponse, QueryAvailableInitiativesRequest, QueryAvailableInitiativesResponse, QueryStakesByStakerRequest, QueryStakesByStakerResponse, QueryStakesByTargetRequest, QueryStakesByTargetResponse, QueryInitiativeConvictionRequest, QueryInitiativeConvictionResponse, QueryChallengesByInitiativeRequest, QueryChallengesByInitiativeResponse, QueryReputationRequest, QueryReputationResponse, QueryPendingStakeRewardsRequest, QueryPendingStakeRewardsResponse, QueryGetMemberStakePoolRequest, QueryGetMemberStakePoolResponse, QueryGetTagStakePoolRequest, QueryGetTagStakePoolResponse, QueryListTagStakePoolsRequest, QueryListTagStakePoolsResponse, QueryGetProjectStakeInfoRequest, QueryGetProjectStakeInfoResponse, QueryContentConvictionRequest, QueryContentConvictionResponse, QueryAuthorBondRequest, QueryAuthorBondResponse, QueryGetContentChallengeRequest, QueryGetContentChallengeResponse, QueryAllContentChallengeRequest, QueryAllContentChallengeResponse, QueryContentChallengesByTargetRequest, QueryContentChallengesByTargetResponse, QueryContentByInitiativeRequest, QueryContentByInitiativeResponse, QueryDreamSupplyStatsRequest, QueryDreamSupplyStatsResponse, QueryMintBurnRatioRequest, QueryMintBurnRatioResponse, QueryEffectiveApyRequest, QueryEffectiveApyResponse, QueryTreasuryStatusRequest, QueryTreasuryStatusResponse, QueryGetTagRequest, QueryGetTagResponse, QueryAllTagRequest, QueryAllTagResponse, QueryGetReservedTagRequest, QueryGetReservedTagResponse, QueryAllReservedTagRequest, QueryAllReservedTagResponse, QueryTagExistsRequest, QueryTagExistsResponse, QueryGetTagReportRequest, QueryGetTagReportResponse, QueryAllTagReportRequest, QueryAllTagReportResponse, QueryTagReportsRequest, QueryTagReportsResponse, QueryGetTagBudgetRequest, QueryGetTagBudgetResponse, QueryAllTagBudgetRequest, QueryAllTagBudgetResponse, QueryGetTagBudgetAwardRequest, QueryGetTagBudgetAwardResponse, QueryAllTagBudgetAwardRequest, QueryAllTagBudgetAwardResponse, QueryTagBudgetByTagRequest, QueryTagBudgetByTagResponse, QueryTagBudgetsRequest, QueryTagBudgetsResponse, QueryTagBudgetAwardsRequest, QueryTagBudgetAwardsResponse, QueryBondedRoleRequest, QueryBondedRoleResponse, QueryBondedRolesByTypeRequest, QueryBondedRolesByTypeResponse, QueryBondedRoleConfigRequest, QueryBondedRoleConfigResponse, QueryGetMemberReportRequest, QueryGetMemberReportResponse, QueryAllMemberReportRequest, QueryAllMemberReportResponse, QueryGetMemberWarningRequest, QueryGetMemberWarningResponse, QueryAllMemberWarningRequest, QueryAllMemberWarningResponse, QueryGetGovActionAppealRequest, QueryGetGovActionAppealResponse, QueryAllGovActionAppealRequest, QueryAllGovActionAppealResponse, QueryGetJuryParticipationRequest, QueryGetJuryParticipationResponse, QueryAllJuryParticipationRequest, QueryAllJuryParticipationResponse, QueryMemberReportsRequest, QueryMemberReportsResponse, QueryMemberWarningsRequest, QueryMemberWarningsResponse, QueryMemberStandingRequest, QueryMemberStandingResponse, QueryRequiredInvitationStakeRequest, QueryRequiredInvitationStakeResponse, QueryAuthorBondsByTypeRequest, QueryAuthorBondsByTypeResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetMemberRequest, QueryGetMemberResponse, QueryAllMemberRequest, QueryAllMemberResponse, QueryGetInvitationRequest, QueryGetInvitationResponse, QueryAllInvitationRequest, QueryAllInvitationResponse, QueryGetProjectRequest, QueryGetProjectResponse, QueryAllProjectRequest, QueryAllProjectResponse, QueryGetInitiativeRequest, QueryGetInitiativeResponse, QueryAllInitiativeRequest, QueryAllInitiativeResponse, QueryGetStakeRequest, QueryGetStakeResponse, QueryAllStakeRequest, QueryAllStakeResponse, QueryGetChallengeRequest, QueryGetChallengeResponse, QueryAllChallengeRequest, QueryAllChallengeResponse, QueryGetJuryReviewRequest, QueryGetJuryReviewResponse, QueryAllJuryReviewRequest, QueryAllJuryReviewResponse, QueryJuryReviewsByJurorRequest, QueryJuryReviewsByJurorResponse, QueryRoleActivityRequest, QueryRoleActivityResponse, QueryGetInterimRequest, QueryGetInterimResponse, QueryAllInterimRequest, QueryAllInterimResponse, QueryMembersByTrustLevelRequest, QueryMembersByTrustLevelResponse, QueryInvitationsByInviterRequest, QueryInvitationsByInviterResponse, QueryInterimsByAssigneeRequest, QueryInterimsByAssigneeResponse, QueryInterimsByTypeRequest, QueryInterimsByTypeResponse, QueryInterimsByReferenceRequest, QueryInterimsByReferenceResponse, QueryProjectsByCouncilRequest, QueryProjectsByCouncilResponse, QueryInitiativesByProjectRequest, QueryInitiativesByProjectResponse, QueryInitiativesByAssigneeRequest, QueryInitiativesByAssigneeResponse, QueryInitiativesByCreatorRequest, QueryInitiativesByCreatorResponse, QueryProjectsByCreatorRequest, QueryProjectsByCreatorResponse, QueryAvailableInitiativesRequest, QueryAvailableInitiativesResponse, QueryStakesByStakerRequest, QueryStakesByStakerResponse, QueryStakesByTargetRequest, QueryStakesByTargetResponse, QueryInitiativeConvictionRequest, QueryInitiativeConvictionResponse, QueryChallengesByInitiativeRequest, QueryChallengesByInitiativeResponse, QueryReputationRequest, QueryReputationResponse, QueryPendingStakeRewardsRequest, QueryPendingStakeRewardsResponse, QueryGetMemberStakePoolRequest, QueryGetMemberStakePoolResponse, QueryGetTagStakePoolRequest, QueryGetTagStakePoolResponse, QueryListTagStakePoolsRequest, QueryListTagStakePoolsResponse, QueryGetProjectStakeInfoRequest, QueryGetProjectStakeInfoResponse, QueryContentConvictionRequest, QueryContentConvictionResponse, QueryAuthorBondRequest, QueryAuthorBondResponse, QueryGetContentChallengeRequest, QueryGetContentChallengeResponse, QueryAllContentChallengeRequest, QueryAllContentChallengeResponse, QueryContentChallengesByTargetRequest, QueryContentChallengesByTargetResponse, QueryContentByInitiativeRequest, QueryContentByInitiativeResponse, QueryDreamSupplyStatsRequest, QueryDreamSupplyStatsResponse, QueryMintBurnRatioRequest, QueryMintBurnRatioResponse, QueryEffectiveApyRequest, QueryEffectiveApyResponse, QueryTreasuryStatusRequest, QueryTreasuryStatusResponse, QueryGetTagRequest, QueryGetTagResponse, QueryAllTagRequest, QueryAllTagResponse, QueryGetReservedTagRequest, QueryGetReservedTagResponse, QueryAllReservedTagRequest, QueryAllReservedTagResponse, QueryTagExistsRequest, QueryTagExistsResponse, QueryGetTagReportRequest, QueryGetTagReportResponse, QueryAllTagReportRequest, QueryAllTagReportResponse, QueryTagReportsRequest, QueryTagReportsResponse, QueryGetTagBudgetRequest, QueryGetTagBudgetResponse, QueryAllTagBudgetRequest, QueryAllTagBudgetResponse, QueryGetTagBudgetAwardRequest, QueryGetTagBudgetAwardResponse, QueryAllTagBudgetAwardRequest, QueryAllTagBudgetAwardResponse, QueryTagBudgetByTagRequest, QueryTagBudgetByTagResponse, QueryTagBudgetsRequest, QueryTagBudgetsResponse, QueryTagBudgetAwardsRequest, QueryTagBudgetAwardsResponse, QueryBondedRoleRequest, QueryBondedRoleResponse, QueryBondedRolesByTypeRequest, QueryBondedRolesByTypeResponse, QueryBondedRoleConfigRequest, QueryBondedRoleConfigResponse, QueryGetMemberReportRequest, QueryGetMemberReportResponse, QueryAllMemberReportRequest, QueryAllMemberReportResponse, QueryGetMemberWarningRequest, QueryGetMemberWarningResponse, QueryAllMemberWarningRequest, QueryAllMemberWarningResponse, QueryGetGovActionAppealRequest, QueryGetGovActionAppealResponse, QueryAllGovActionAppealRequest, QueryAllGovActionAppealResponse, QueryGetJuryParticipationRequest, QueryGetJuryParticipationResponse, QueryAllJuryParticipationRequest, QueryAllJuryParticipationResponse, QueryMemberReportsRequest, QueryMemberReportsResponse, QueryMemberWarningsRequest, QueryMemberWarningsResponse, QueryMemberStandingRequest, QueryMemberStandingResponse, QueryRequiredInvitationStakeRequest, QueryRequiredInvitationStakeResponse, QueryAuthorBondsByTypeRequest, QueryAuthorBondsByTypeResponse, QueryInitiativeReviewsRequest, QueryInitiativeReviewsResponse, QueryReviewBountyRequest, QueryReviewBountyResponse, QueryEscalatedReviewsRequest, QueryEscalatedReviewsResponse, QueryRoleRewardPoolsRequest, QueryRoleRewardPoolsResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -144,6 +144,32 @@ export class LCDQueryClient {
     const endpoint = `sparkdream/rep/v1/jury_review`;
     return await this.req.get<QueryAllJuryReviewResponse>(endpoint, options);
   };
+  /* JuryReviewsByJuror lists the reviews a juror has been seated on. This is
+   how a juror (or their monitoring client) discovers an outstanding summons:
+   jury duty pays but is infrequent, and there is no other way to ask "am I
+   seated" short of paging through every review ever created. */
+  juryReviewsByJuror = async (params: QueryJuryReviewsByJurorRequest): Promise<QueryJuryReviewsByJurorResponse> => {
+    const options: any = {
+      params: {}
+    };
+    if (typeof params?.pendingOnly !== "undefined") {
+      options.params.pending_only = params.pendingOnly;
+    }
+    if (typeof params?.pagination !== "undefined") {
+      setPaginationParams(options, params.pagination);
+    }
+    const endpoint = `sparkdream/rep/v1/jury_reviews_by_juror/${params.juror}`;
+    return await this.req.get<QueryJuryReviewsByJurorResponse>(endpoint, options);
+  };
+  /* RoleActivity returns a bonded role holder's shared accountability record —
+   per-kind action counters, verdict streaks, overturn cooldown and the
+   accuracy ring. x/forum projects the sentinel view of this; reviewers and
+   curators had no way to inspect theirs at all, which matters because the
+   record gates pay and drives demotion. */
+  roleActivity = async (params: QueryRoleActivityRequest): Promise<QueryRoleActivityResponse> => {
+    const endpoint = `sparkdream/rep/v1/role_activity/${params.roleType}/${params.address}`;
+    return await this.req.get<QueryRoleActivityResponse>(endpoint);
+  };
   /* ListInterim Queries a list of Interim items. */
   getInterim = async (params: QueryGetInterimRequest): Promise<QueryGetInterimResponse> => {
     const endpoint = `sparkdream/rep/v1/interim/${params.id}`;
@@ -161,24 +187,6 @@ export class LCDQueryClient {
     }
     const endpoint = `sparkdream/rep/v1/interim`;
     return await this.req.get<QueryAllInterimResponse>(endpoint, options);
-  };
-  /* ListInterimTemplate Queries a list of InterimTemplate items. */
-  getInterimTemplate = async (params: QueryGetInterimTemplateRequest): Promise<QueryGetInterimTemplateResponse> => {
-    const endpoint = `sparkdream/rep/v1/interim_template/${params.templateId}`;
-    return await this.req.get<QueryGetInterimTemplateResponse>(endpoint);
-  };
-  /* ListInterimTemplate defines the ListInterimTemplate RPC. */
-  listInterimTemplate = async (params: QueryAllInterimTemplateRequest = {
-    pagination: undefined
-  }): Promise<QueryAllInterimTemplateResponse> => {
-    const options: any = {
-      params: {}
-    };
-    if (typeof params?.pagination !== "undefined") {
-      setPaginationParams(options, params.pagination);
-    }
-    const endpoint = `sparkdream/rep/v1/interim_template`;
-    return await this.req.get<QueryAllInterimTemplateResponse>(endpoint, options);
   };
   /* MembersByTrustLevel Queries a list of MembersByTrustLevel items. */
   membersByTrustLevel = async (params: QueryMembersByTrustLevelRequest): Promise<QueryMembersByTrustLevelResponse> => {
@@ -728,5 +736,30 @@ export class LCDQueryClient {
     }
     const endpoint = `sparkdream/rep/v1/author_bonds_by_type/${params.targetType}`;
     return await this.req.get<QueryAuthorBondsByTypeResponse>(endpoint, options);
+  };
+  /* InitiativeReviews returns the bonded reviewers' verdicts on one initiative. */
+  initiativeReviews = async (params: QueryInitiativeReviewsRequest): Promise<QueryInitiativeReviewsResponse> => {
+    const endpoint = `sparkdream/rep/v1/initiative_reviews/${params.initiativeId}`;
+    return await this.req.get<QueryInitiativeReviewsResponse>(endpoint);
+  };
+  /* ReviewBounty returns the DREAM escrowed against an initiative to attract
+   reviewers, and when each contribution becomes reclaimable. */
+  reviewBounty = async (params: QueryReviewBountyRequest): Promise<QueryReviewBountyResponse> => {
+    const endpoint = `sparkdream/rep/v1/review_bounty/${params.initiativeId}`;
+    return await this.req.get<QueryReviewBountyResponse>(endpoint);
+  };
+  /* EscalatedReviews lists the review rounds awaiting an Operations Committee
+   decision. */
+  escalatedReviews = async (_params: QueryEscalatedReviewsRequest = {}): Promise<QueryEscalatedReviewsResponse> => {
+    const endpoint = `sparkdream/rep/v1/escalated_reviews`;
+    return await this.req.get<QueryEscalatedReviewsResponse>(endpoint);
+  };
+  /* RoleRewardPools reports the funding state of every bonded-role SPARK
+   reward pool, plus how much of today's community-pool allowance x/rep has
+   already drawn. Automatic funding is otherwise invisible: the pools are
+   derived sub-addresses with no other read surface. */
+  roleRewardPools = async (_params: QueryRoleRewardPoolsRequest = {}): Promise<QueryRoleRewardPoolsResponse> => {
+    const endpoint = `sparkdream/rep/v1/role_reward_pools`;
+    return await this.req.get<QueryRoleRewardPoolsResponse>(endpoint);
   };
 }

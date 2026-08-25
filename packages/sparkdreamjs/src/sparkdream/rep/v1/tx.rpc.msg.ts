@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgInviteMember, MsgInviteMemberResponse, MsgAcceptInvitation, MsgAcceptInvitationResponse, MsgTransferDream, MsgTransferDreamResponse, MsgCreateInterim, MsgCreateInterimResponse, MsgAssignInterim, MsgAssignInterimResponse, MsgSubmitInterimWork, MsgSubmitInterimWorkResponse, MsgApproveInterim, MsgApproveInterimResponse, MsgAbandonInterim, MsgAbandonInterimResponse, MsgCompleteInterim, MsgCompleteInterimResponse, MsgProposeProject, MsgProposeProjectResponse, MsgApproveProjectBudget, MsgApproveProjectBudgetResponse, MsgCancelProject, MsgCancelProjectResponse, MsgCreateInitiative, MsgCreateInitiativeResponse, MsgAssignInitiative, MsgAssignInitiativeResponse, MsgSubmitInitiativeWork, MsgSubmitInitiativeWorkResponse, MsgApproveInitiative, MsgApproveInitiativeResponse, MsgAbandonInitiative, MsgAbandonInitiativeResponse, MsgCompleteInitiative, MsgCompleteInitiativeResponse, MsgStake, MsgStakeResponse, MsgUnstake, MsgUnstakeResponse, MsgClaimStakingRewards, MsgClaimStakingRewardsResponse, MsgCompoundStakingRewards, MsgCompoundStakingRewardsResponse, MsgCreateChallenge, MsgCreateChallengeResponse, MsgRespondToChallenge, MsgRespondToChallengeResponse, MsgSubmitJurorVote, MsgSubmitJurorVoteResponse, MsgSubmitExpertTestimony, MsgSubmitExpertTestimonyResponse, MsgChallengeContent, MsgChallengeContentResponse, MsgRespondToContentChallenge, MsgRespondToContentChallengeResponse, MsgRegisterZkPublicKey, MsgRegisterZkPublicKeyResponse, MsgCreateTag, MsgCreateTagResponse, MsgReportTag, MsgReportTagResponse, MsgResolveTagReport, MsgResolveTagReportResponse, MsgCreateTagBudget, MsgCreateTagBudgetResponse, MsgAwardFromTagBudget, MsgAwardFromTagBudgetResponse, MsgTopUpTagBudget, MsgTopUpTagBudgetResponse, MsgToggleTagBudget, MsgToggleTagBudgetResponse, MsgWithdrawTagBudget, MsgWithdrawTagBudgetResponse, MsgBondRole, MsgBondRoleResponse, MsgUnbondRole, MsgUnbondRoleResponse, MsgCancelUnbondRole, MsgCancelUnbondRoleResponse, MsgReportMember, MsgReportMemberResponse, MsgCosignMemberReport, MsgCosignMemberReportResponse, MsgResolveMemberReport, MsgResolveMemberReportResponse, MsgDefendMemberReport, MsgDefendMemberReportResponse, MsgAppealGovAction, MsgAppealGovActionResponse, MsgResolveGovActionAppeal, MsgResolveGovActionAppealResponse, MsgCancelInitiative, MsgCancelInitiativeResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgInviteMember, MsgInviteMemberResponse, MsgAcceptInvitation, MsgAcceptInvitationResponse, MsgTransferDream, MsgTransferDreamResponse, MsgCreateInterim, MsgCreateInterimResponse, MsgAssignInterim, MsgAssignInterimResponse, MsgSubmitInterimWork, MsgSubmitInterimWorkResponse, MsgApproveInterim, MsgApproveInterimResponse, MsgAbandonInterim, MsgAbandonInterimResponse, MsgCompleteInterim, MsgCompleteInterimResponse, MsgProposeProject, MsgProposeProjectResponse, MsgApproveProjectBudget, MsgApproveProjectBudgetResponse, MsgCancelProject, MsgCancelProjectResponse, MsgCreateInitiative, MsgCreateInitiativeResponse, MsgAssignInitiative, MsgAssignInitiativeResponse, MsgSubmitInitiativeWork, MsgSubmitInitiativeWorkResponse, MsgApproveInitiative, MsgApproveInitiativeResponse, MsgAbandonInitiative, MsgAbandonInitiativeResponse, MsgCompleteInitiative, MsgCompleteInitiativeResponse, MsgStake, MsgStakeResponse, MsgUnstake, MsgUnstakeResponse, MsgClaimStakingRewards, MsgClaimStakingRewardsResponse, MsgCompoundStakingRewards, MsgCompoundStakingRewardsResponse, MsgCreateChallenge, MsgCreateChallengeResponse, MsgRespondToChallenge, MsgRespondToChallengeResponse, MsgSubmitJurorVote, MsgSubmitJurorVoteResponse, MsgAcceptJuryDuty, MsgAcceptJuryDutyResponse, MsgSubmitInitiativeReview, MsgSubmitInitiativeReviewResponse, MsgSetVerificationPolicy, MsgSetVerificationPolicyResponse, MsgResolveReviewEscalation, MsgResolveReviewEscalationResponse, MsgDeclineJuryDuty, MsgDeclineJuryDutyResponse, MsgFundReviewBounty, MsgFundReviewBountyResponse, MsgReclaimReviewBounty, MsgReclaimReviewBountyResponse, MsgSubmitExpertTestimony, MsgSubmitExpertTestimonyResponse, MsgChallengeContent, MsgChallengeContentResponse, MsgRespondToContentChallenge, MsgRespondToContentChallengeResponse, MsgRegisterZkPublicKey, MsgRegisterZkPublicKeyResponse, MsgCreateTag, MsgCreateTagResponse, MsgReportTag, MsgReportTagResponse, MsgResolveTagReport, MsgResolveTagReportResponse, MsgCreateTagBudget, MsgCreateTagBudgetResponse, MsgAwardFromTagBudget, MsgAwardFromTagBudgetResponse, MsgTopUpTagBudget, MsgTopUpTagBudgetResponse, MsgToggleTagBudget, MsgToggleTagBudgetResponse, MsgWithdrawTagBudget, MsgWithdrawTagBudgetResponse, MsgBondRole, MsgBondRoleResponse, MsgUnbondRole, MsgUnbondRoleResponse, MsgCancelUnbondRole, MsgCancelUnbondRoleResponse, MsgReportMember, MsgReportMemberResponse, MsgCosignMemberReport, MsgCosignMemberReportResponse, MsgResolveMemberReport, MsgResolveMemberReportResponse, MsgDefendMemberReport, MsgDefendMemberReportResponse, MsgAppealGovAction, MsgAppealGovActionResponse, MsgResolveGovActionAppeal, MsgResolveGovActionAppealResponse, MsgCancelInitiative, MsgCancelInitiativeResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
@@ -64,6 +64,18 @@ export interface Msg {
   respondToChallenge(request: MsgRespondToChallenge): Promise<MsgRespondToChallengeResponse>;
   /** SubmitJurorVote defines the SubmitJurorVote RPC. */
   submitJurorVote(request: MsgSubmitJurorVote): Promise<MsgSubmitJurorVoteResponse>;
+  acceptJuryDuty(request: MsgAcceptJuryDuty): Promise<MsgAcceptJuryDutyResponse>;
+  /** SubmitInitiativeReview files a bonded reviewer's verdict on submitted work. */
+  submitInitiativeReview(request: MsgSubmitInitiativeReview): Promise<MsgSubmitInitiativeReviewResponse>;
+  /** SetVerificationPolicy configures how a project's initiatives are reviewed. */
+  setVerificationPolicy(request: MsgSetVerificationPolicy): Promise<MsgSetVerificationPolicyResponse>;
+  /** ResolveReviewEscalation settles a review round that reached its deadline. */
+  resolveReviewEscalation(request: MsgResolveReviewEscalation): Promise<MsgResolveReviewEscalationResponse>;
+  declineJuryDuty(request: MsgDeclineJuryDuty): Promise<MsgDeclineJuryDutyResponse>;
+  /** FundReviewBounty escrows DREAM against an initiative to attract reviewers. */
+  fundReviewBounty(request: MsgFundReviewBounty): Promise<MsgFundReviewBountyResponse>;
+  /** ReclaimReviewBounty withdraws a funder's own unpaid contribution. */
+  reclaimReviewBounty(request: MsgReclaimReviewBounty): Promise<MsgReclaimReviewBountyResponse>;
   /** SubmitExpertTestimony defines the SubmitExpertTestimony RPC. */
   submitExpertTestimony(request: MsgSubmitExpertTestimony): Promise<MsgSubmitExpertTestimonyResponse>;
   /** ChallengeContent creates a challenge against bonded content. */
@@ -295,6 +307,48 @@ export class MsgClientImpl implements Msg {
     const data = MsgSubmitJurorVote.encode(request).finish();
     const promise = this.rpc.request("sparkdream.rep.v1.Msg", "SubmitJurorVote", data);
     return promise.then(data => MsgSubmitJurorVoteResponse.decode(new BinaryReader(data)));
+  };
+  /* AcceptJuryDuty */
+  acceptJuryDuty = async (request: MsgAcceptJuryDuty): Promise<MsgAcceptJuryDutyResponse> => {
+    const data = MsgAcceptJuryDuty.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "AcceptJuryDuty", data);
+    return promise.then(data => MsgAcceptJuryDutyResponse.decode(new BinaryReader(data)));
+  };
+  /* SubmitInitiativeReview files a bonded reviewer's verdict on submitted work. */
+  submitInitiativeReview = async (request: MsgSubmitInitiativeReview): Promise<MsgSubmitInitiativeReviewResponse> => {
+    const data = MsgSubmitInitiativeReview.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "SubmitInitiativeReview", data);
+    return promise.then(data => MsgSubmitInitiativeReviewResponse.decode(new BinaryReader(data)));
+  };
+  /* SetVerificationPolicy configures how a project's initiatives are reviewed. */
+  setVerificationPolicy = async (request: MsgSetVerificationPolicy): Promise<MsgSetVerificationPolicyResponse> => {
+    const data = MsgSetVerificationPolicy.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "SetVerificationPolicy", data);
+    return promise.then(data => MsgSetVerificationPolicyResponse.decode(new BinaryReader(data)));
+  };
+  /* ResolveReviewEscalation settles a review round that reached its deadline. */
+  resolveReviewEscalation = async (request: MsgResolveReviewEscalation): Promise<MsgResolveReviewEscalationResponse> => {
+    const data = MsgResolveReviewEscalation.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "ResolveReviewEscalation", data);
+    return promise.then(data => MsgResolveReviewEscalationResponse.decode(new BinaryReader(data)));
+  };
+  /* DeclineJuryDuty */
+  declineJuryDuty = async (request: MsgDeclineJuryDuty): Promise<MsgDeclineJuryDutyResponse> => {
+    const data = MsgDeclineJuryDuty.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "DeclineJuryDuty", data);
+    return promise.then(data => MsgDeclineJuryDutyResponse.decode(new BinaryReader(data)));
+  };
+  /* FundReviewBounty escrows DREAM against an initiative to attract reviewers. */
+  fundReviewBounty = async (request: MsgFundReviewBounty): Promise<MsgFundReviewBountyResponse> => {
+    const data = MsgFundReviewBounty.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "FundReviewBounty", data);
+    return promise.then(data => MsgFundReviewBountyResponse.decode(new BinaryReader(data)));
+  };
+  /* ReclaimReviewBounty withdraws a funder's own unpaid contribution. */
+  reclaimReviewBounty = async (request: MsgReclaimReviewBounty): Promise<MsgReclaimReviewBountyResponse> => {
+    const data = MsgReclaimReviewBounty.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "ReclaimReviewBounty", data);
+    return promise.then(data => MsgReclaimReviewBountyResponse.decode(new BinaryReader(data)));
   };
   /* SubmitExpertTestimony defines the SubmitExpertTestimony RPC. */
   submitExpertTestimony = async (request: MsgSubmitExpertTestimony): Promise<MsgSubmitExpertTestimonyResponse> => {

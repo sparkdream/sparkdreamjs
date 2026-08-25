@@ -1,4 +1,5 @@
 //@ts-nocheck
+import { VerificationCriteria, VerificationCriteriaAmino } from "./acceptance_criteria";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { Decimal } from "@interchainjs/math";
 import { DeepPartial } from "../../../helpers";
@@ -203,6 +204,64 @@ export function initiativeStatusToJSON(object: InitiativeStatus): string {
   }
 }
 /**
+ * How an escalated review round was resolved by the Operations Committee.
+ * 
+ * PASSED is also what committee *inaction* resolves to: silence must never wedge
+ * an initiative, and silence must never mint.
+ */
+export enum ReviewEscalation {
+  REVIEW_ESCALATION_NONE = 0,
+  /**
+   * REVIEW_ESCALATION_APPROVED - Committee satisfied the reviewer gate itself. Writes no RoleActivity — the
+   * committee holds no bond and carries no accuracy record.
+   */
+  REVIEW_ESCALATION_APPROVED = 1,
+  /** REVIEW_ESCALATION_REJECTED - Committee rejected; same effect as a reviewer rejection. */
+  REVIEW_ESCALATION_REJECTED = 2,
+  /**
+   * REVIEW_ESCALATION_PASSED - Committee declined to substitute its judgement. The initiative proceeds on
+   * conviction alone; the challenge window still runs.
+   */
+  REVIEW_ESCALATION_PASSED = 3,
+  UNRECOGNIZED = -1,
+}
+export const ReviewEscalationAmino = ReviewEscalation;
+export function reviewEscalationFromJSON(object: any): ReviewEscalation {
+  switch (object) {
+    case 0:
+    case "REVIEW_ESCALATION_NONE":
+      return ReviewEscalation.REVIEW_ESCALATION_NONE;
+    case 1:
+    case "REVIEW_ESCALATION_APPROVED":
+      return ReviewEscalation.REVIEW_ESCALATION_APPROVED;
+    case 2:
+    case "REVIEW_ESCALATION_REJECTED":
+      return ReviewEscalation.REVIEW_ESCALATION_REJECTED;
+    case 3:
+    case "REVIEW_ESCALATION_PASSED":
+      return ReviewEscalation.REVIEW_ESCALATION_PASSED;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return ReviewEscalation.UNRECOGNIZED;
+  }
+}
+export function reviewEscalationToJSON(object: ReviewEscalation): string {
+  switch (object) {
+    case ReviewEscalation.REVIEW_ESCALATION_NONE:
+      return "REVIEW_ESCALATION_NONE";
+    case ReviewEscalation.REVIEW_ESCALATION_APPROVED:
+      return "REVIEW_ESCALATION_APPROVED";
+    case ReviewEscalation.REVIEW_ESCALATION_REJECTED:
+      return "REVIEW_ESCALATION_REJECTED";
+    case ReviewEscalation.REVIEW_ESCALATION_PASSED:
+      return "REVIEW_ESCALATION_PASSED";
+    case ReviewEscalation.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+/**
  * Initiative defines the Initiative message.
  * @name Initiative
  * @package sparkdream.rep.v1
@@ -216,7 +275,6 @@ export interface Initiative {
   tags: string[];
   tier: InitiativeTier;
   category: InitiativeCategory;
-  templateId: string;
   budget: string;
   assignee: string;
   apprentice: string;
@@ -243,12 +301,52 @@ export interface Initiative {
    */
   selfAssignBond: string;
   /**
+   * The definition of done, pre-committed by the initiative's author before
+   * any work starts and immutable thereafter. Optional; when present it gives
+   * a challenger something concrete and objective to point at
+   * (Challenge.criteria_id) and gives a juror's CriteriaVote a real referent
+   * instead of an unvalidated free-form id.
+   * 
+   * Deliberately declared per-initiative rather than resolved from a registry:
+   * templates have no authoring message and all three networks ship zero of
+   * them, so a template reference would be a pointer into an empty registry.
+   */
+  acceptanceCriteria: VerificationCriteria[];
+  /**
+   * Review-round bookkeeping for the bonded reviewer gate. A rejection returns
+   * the initiative to ASSIGNED and increments the round, so the assignee can
+   * fix the work and resubmit; each round collects its own verdicts. Bounded by
+   * max_review_rounds so a bad-faith assignee cannot burn reviewer effort
+   * indefinitely.
+   */
+  reviewRound: number;
+  /**
+   * Height at which the current round's review window closes. Past this with
+   * the gate unmet, the initiative escalates to the Operations Committee.
+   */
+  reviewDeadline: bigint;
+  /**
+   * Set when the committee has resolved an escalation for the current round, so
+   * the sweep does not escalate the same round twice.
+   */
+  reviewEscalation: ReviewEscalation;
+  /**
    * Address that submitted MsgCreateInitiative. Recorded on state so
    * authorship is answerable from a node query instead of only from the
    * initiative_created event (which requires an off-chain indexer).
    * Immutable once set.
    */
   creator: string;
+  /**
+   * Reviewer approvals this round needs, snapshotted from the project's policy
+   * when the review window opened.
+   * 
+   * Read instead of the live policy so a project cannot relax its own standard
+   * out from under work already under review — the creator owns the policy and,
+   * for self-assigned work, is also the party the gate exists to constrain.
+   * Zero means no reviewer gate for this round, which is the genesis default.
+   */
+  requiredVerifiers: number;
 }
 export interface InitiativeProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Initiative";
@@ -268,7 +366,6 @@ export interface InitiativeAmino {
   tags?: string[];
   tier?: InitiativeTier;
   category?: InitiativeCategory;
-  template_id?: string;
   budget?: string;
   assignee?: string;
   apprentice?: string;
@@ -295,12 +392,52 @@ export interface InitiativeAmino {
    */
   self_assign_bond?: string;
   /**
+   * The definition of done, pre-committed by the initiative's author before
+   * any work starts and immutable thereafter. Optional; when present it gives
+   * a challenger something concrete and objective to point at
+   * (Challenge.criteria_id) and gives a juror's CriteriaVote a real referent
+   * instead of an unvalidated free-form id.
+   * 
+   * Deliberately declared per-initiative rather than resolved from a registry:
+   * templates have no authoring message and all three networks ship zero of
+   * them, so a template reference would be a pointer into an empty registry.
+   */
+  acceptance_criteria?: VerificationCriteriaAmino[];
+  /**
+   * Review-round bookkeeping for the bonded reviewer gate. A rejection returns
+   * the initiative to ASSIGNED and increments the round, so the assignee can
+   * fix the work and resubmit; each round collects its own verdicts. Bounded by
+   * max_review_rounds so a bad-faith assignee cannot burn reviewer effort
+   * indefinitely.
+   */
+  review_round?: number;
+  /**
+   * Height at which the current round's review window closes. Past this with
+   * the gate unmet, the initiative escalates to the Operations Committee.
+   */
+  review_deadline?: string;
+  /**
+   * Set when the committee has resolved an escalation for the current round, so
+   * the sweep does not escalate the same round twice.
+   */
+  review_escalation?: ReviewEscalation;
+  /**
    * Address that submitted MsgCreateInitiative. Recorded on state so
    * authorship is answerable from a node query instead of only from the
    * initiative_created event (which requires an off-chain indexer).
    * Immutable once set.
    */
   creator?: string;
+  /**
+   * Reviewer approvals this round needs, snapshotted from the project's policy
+   * when the review window opened.
+   * 
+   * Read instead of the live policy so a project cannot relax its own standard
+   * out from under work already under review — the creator owns the policy and,
+   * for self-assigned work, is also the party the gate exists to constrain.
+   * Zero means no reviewer gate for this round, which is the genesis default.
+   */
+  required_verifiers?: number;
 }
 export interface InitiativeAminoMsg {
   type: "/sparkdream.rep.v1.Initiative";
@@ -315,7 +452,6 @@ function createBaseInitiative(): Initiative {
     tags: [],
     tier: 0,
     category: 0,
-    templateId: "",
     budget: "",
     assignee: "",
     apprentice: "",
@@ -334,7 +470,12 @@ function createBaseInitiative(): Initiative {
     completedAt: BigInt(0),
     propagatedConviction: "",
     selfAssignBond: "",
-    creator: ""
+    acceptanceCriteria: [],
+    reviewRound: 0,
+    reviewDeadline: BigInt(0),
+    reviewEscalation: 0,
+    creator: "",
+    requiredVerifiers: 0
   };
 }
 /**
@@ -367,65 +508,77 @@ export const Initiative = {
     if (message.category !== 0) {
       writer.uint32(56).int32(message.category);
     }
-    if (message.templateId !== "") {
-      writer.uint32(66).string(message.templateId);
-    }
     if (message.budget !== "") {
-      writer.uint32(74).string(message.budget);
+      writer.uint32(66).string(message.budget);
     }
     if (message.assignee !== "") {
-      writer.uint32(82).string(message.assignee);
+      writer.uint32(74).string(message.assignee);
     }
     if (message.apprentice !== "") {
-      writer.uint32(90).string(message.apprentice);
+      writer.uint32(82).string(message.apprentice);
     }
     if (message.assignedAt !== BigInt(0)) {
-      writer.uint32(96).int64(message.assignedAt);
+      writer.uint32(88).int64(message.assignedAt);
     }
     if (message.deliverableUri !== "") {
-      writer.uint32(106).string(message.deliverableUri);
+      writer.uint32(98).string(message.deliverableUri);
     }
     if (message.submittedAt !== BigInt(0)) {
-      writer.uint32(112).int64(message.submittedAt);
+      writer.uint32(104).int64(message.submittedAt);
     }
     if (message.requiredConviction !== "") {
-      writer.uint32(122).string(Decimal.fromUserInput(message.requiredConviction, 18).atomics);
+      writer.uint32(114).string(Decimal.fromUserInput(message.requiredConviction, 18).atomics);
     }
     if (message.currentConviction !== "") {
-      writer.uint32(130).string(Decimal.fromUserInput(message.currentConviction, 18).atomics);
+      writer.uint32(122).string(Decimal.fromUserInput(message.currentConviction, 18).atomics);
     }
     if (message.externalConviction !== "") {
-      writer.uint32(138).string(Decimal.fromUserInput(message.externalConviction, 18).atomics);
+      writer.uint32(130).string(Decimal.fromUserInput(message.externalConviction, 18).atomics);
     }
     if (message.convictionLastUpdated !== BigInt(0)) {
-      writer.uint32(144).int64(message.convictionLastUpdated);
+      writer.uint32(136).int64(message.convictionLastUpdated);
     }
     if (message.reviewPeriodEnd !== BigInt(0)) {
-      writer.uint32(152).int64(message.reviewPeriodEnd);
+      writer.uint32(144).int64(message.reviewPeriodEnd);
     }
     if (message.challengePeriodEnd !== BigInt(0)) {
-      writer.uint32(160).int64(message.challengePeriodEnd);
+      writer.uint32(152).int64(message.challengePeriodEnd);
     }
     for (const v of message.approvals) {
-      writer.uint32(170).string(v!);
+      writer.uint32(162).string(v!);
     }
     if (message.status !== 0) {
-      writer.uint32(176).int32(message.status);
+      writer.uint32(168).int32(message.status);
     }
     if (message.createdAt !== BigInt(0)) {
-      writer.uint32(184).int64(message.createdAt);
+      writer.uint32(176).int64(message.createdAt);
     }
     if (message.completedAt !== BigInt(0)) {
-      writer.uint32(192).int64(message.completedAt);
+      writer.uint32(184).int64(message.completedAt);
     }
     if (message.propagatedConviction !== "") {
-      writer.uint32(202).string(Decimal.fromUserInput(message.propagatedConviction, 18).atomics);
+      writer.uint32(194).string(Decimal.fromUserInput(message.propagatedConviction, 18).atomics);
     }
     if (message.selfAssignBond !== "") {
-      writer.uint32(210).string(message.selfAssignBond);
+      writer.uint32(202).string(message.selfAssignBond);
+    }
+    for (const v of message.acceptanceCriteria) {
+      VerificationCriteria.encode(v!, writer.uint32(218).fork()).ldelim();
+    }
+    if (message.reviewRound !== 0) {
+      writer.uint32(224).uint32(message.reviewRound);
+    }
+    if (message.reviewDeadline !== BigInt(0)) {
+      writer.uint32(232).int64(message.reviewDeadline);
+    }
+    if (message.reviewEscalation !== 0) {
+      writer.uint32(240).int32(message.reviewEscalation);
     }
     if (message.creator !== "") {
-      writer.uint32(218).string(message.creator);
+      writer.uint32(210).string(message.creator);
+    }
+    if (message.requiredVerifiers !== 0) {
+      writer.uint32(248).uint32(message.requiredVerifiers);
     }
     return writer;
   },
@@ -458,64 +611,76 @@ export const Initiative = {
           message.category = reader.int32() as any;
           break;
         case 8:
-          message.templateId = reader.string();
-          break;
-        case 9:
           message.budget = reader.string();
           break;
-        case 10:
+        case 9:
           message.assignee = reader.string();
           break;
-        case 11:
+        case 10:
           message.apprentice = reader.string();
           break;
-        case 12:
+        case 11:
           message.assignedAt = reader.int64();
           break;
-        case 13:
+        case 12:
           message.deliverableUri = reader.string();
           break;
-        case 14:
+        case 13:
           message.submittedAt = reader.int64();
           break;
-        case 15:
+        case 14:
           message.requiredConviction = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 16:
+        case 15:
           message.currentConviction = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 17:
+        case 16:
           message.externalConviction = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 18:
+        case 17:
           message.convictionLastUpdated = reader.int64();
           break;
-        case 19:
+        case 18:
           message.reviewPeriodEnd = reader.int64();
           break;
-        case 20:
+        case 19:
           message.challengePeriodEnd = reader.int64();
           break;
-        case 21:
+        case 20:
           message.approvals.push(reader.string());
           break;
-        case 22:
+        case 21:
           message.status = reader.int32() as any;
           break;
-        case 23:
+        case 22:
           message.createdAt = reader.int64();
           break;
-        case 24:
+        case 23:
           message.completedAt = reader.int64();
           break;
-        case 25:
+        case 24:
           message.propagatedConviction = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 26:
+        case 25:
           message.selfAssignBond = reader.string();
           break;
         case 27:
+          message.acceptanceCriteria.push(VerificationCriteria.decode(reader, reader.uint32()));
+          break;
+        case 28:
+          message.reviewRound = reader.uint32();
+          break;
+        case 29:
+          message.reviewDeadline = reader.int64();
+          break;
+        case 30:
+          message.reviewEscalation = reader.int32() as any;
+          break;
+        case 26:
           message.creator = reader.string();
+          break;
+        case 31:
+          message.requiredVerifiers = reader.uint32();
           break;
         default:
           reader.skipType(tag & 7);
@@ -533,7 +698,6 @@ export const Initiative = {
     message.tags = object.tags?.map(e => e) || [];
     message.tier = object.tier ?? 0;
     message.category = object.category ?? 0;
-    message.templateId = object.templateId ?? "";
     message.budget = object.budget ?? "";
     message.assignee = object.assignee ?? "";
     message.apprentice = object.apprentice ?? "";
@@ -552,7 +716,12 @@ export const Initiative = {
     message.completedAt = object.completedAt !== undefined && object.completedAt !== null ? BigInt(object.completedAt.toString()) : BigInt(0);
     message.propagatedConviction = object.propagatedConviction ?? "";
     message.selfAssignBond = object.selfAssignBond ?? "";
+    message.acceptanceCriteria = object.acceptanceCriteria?.map(e => VerificationCriteria.fromPartial(e)) || [];
+    message.reviewRound = object.reviewRound ?? 0;
+    message.reviewDeadline = object.reviewDeadline !== undefined && object.reviewDeadline !== null ? BigInt(object.reviewDeadline.toString()) : BigInt(0);
+    message.reviewEscalation = object.reviewEscalation ?? 0;
     message.creator = object.creator ?? "";
+    message.requiredVerifiers = object.requiredVerifiers ?? 0;
     return message;
   },
   fromAmino(object: InitiativeAmino): Initiative {
@@ -575,9 +744,6 @@ export const Initiative = {
     }
     if (object.category !== undefined && object.category !== null) {
       message.category = object.category;
-    }
-    if (object.template_id !== undefined && object.template_id !== null) {
-      message.templateId = object.template_id;
     }
     if (object.budget !== undefined && object.budget !== null) {
       message.budget = object.budget;
@@ -631,8 +797,21 @@ export const Initiative = {
     if (object.self_assign_bond !== undefined && object.self_assign_bond !== null) {
       message.selfAssignBond = object.self_assign_bond;
     }
+    message.acceptanceCriteria = object.acceptance_criteria?.map(e => VerificationCriteria.fromAmino(e)) || [];
+    if (object.review_round !== undefined && object.review_round !== null) {
+      message.reviewRound = object.review_round;
+    }
+    if (object.review_deadline !== undefined && object.review_deadline !== null) {
+      message.reviewDeadline = BigInt(object.review_deadline);
+    }
+    if (object.review_escalation !== undefined && object.review_escalation !== null) {
+      message.reviewEscalation = object.review_escalation;
+    }
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = object.creator;
+    }
+    if (object.required_verifiers !== undefined && object.required_verifiers !== null) {
+      message.requiredVerifiers = object.required_verifiers;
     }
     return message;
   },
@@ -649,7 +828,6 @@ export const Initiative = {
     }
     obj.tier = message.tier === 0 ? undefined : message.tier;
     obj.category = message.category === 0 ? undefined : message.category;
-    obj.template_id = message.templateId === "" ? undefined : message.templateId;
     obj.budget = message.budget === "" ? undefined : message.budget;
     obj.assignee = message.assignee === "" ? undefined : message.assignee;
     obj.apprentice = message.apprentice === "" ? undefined : message.apprentice;
@@ -672,7 +850,16 @@ export const Initiative = {
     obj.completed_at = message.completedAt !== BigInt(0) ? message.completedAt?.toString() : undefined;
     obj.propagated_conviction = message.propagatedConviction === "" ? undefined : message.propagatedConviction;
     obj.self_assign_bond = message.selfAssignBond === "" ? undefined : message.selfAssignBond;
+    if (message.acceptanceCriteria) {
+      obj.acceptance_criteria = message.acceptanceCriteria.map(e => e ? VerificationCriteria.toAmino(e) : undefined);
+    } else {
+      obj.acceptance_criteria = message.acceptanceCriteria;
+    }
+    obj.review_round = message.reviewRound === 0 ? undefined : message.reviewRound;
+    obj.review_deadline = message.reviewDeadline !== BigInt(0) ? message.reviewDeadline?.toString() : undefined;
+    obj.review_escalation = message.reviewEscalation === 0 ? undefined : message.reviewEscalation;
     obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.required_verifiers = message.requiredVerifiers === 0 ? undefined : message.requiredVerifiers;
     return obj;
   },
   fromAminoMsg(object: InitiativeAminoMsg): Initiative {

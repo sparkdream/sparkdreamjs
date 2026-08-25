@@ -74,6 +74,13 @@ export interface Challenge {
   createdAt: bigint;
   resolvedAt: bigint;
   responseDeadline: bigint;
+  /**
+   * The acceptance criterion this challenge says the work fails, when the
+   * initiative declared any. Optional — a challenge may still be a free-form
+   * claim — but naming one turns "the work is bad" into a question the jury can
+   * actually adjudicate against a standard the author agreed to up front.
+   */
+  criteriaId: string;
 }
 export interface ChallengeProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Challenge";
@@ -96,6 +103,13 @@ export interface ChallengeAmino {
   created_at?: string;
   resolved_at?: string;
   response_deadline?: string;
+  /**
+   * The acceptance criterion this challenge says the work fails, when the
+   * initiative declared any. Optional — a challenge may still be a free-form
+   * claim — but naming one turns "the work is bad" into a question the jury can
+   * actually adjudicate against a standard the author agreed to up front.
+   */
+  criteria_id?: string;
 }
 export interface ChallengeAminoMsg {
   type: "/sparkdream.rep.v1.Challenge";
@@ -112,7 +126,8 @@ function createBaseChallenge(): Challenge {
     status: 0,
     createdAt: BigInt(0),
     resolvedAt: BigInt(0),
-    responseDeadline: BigInt(0)
+    responseDeadline: BigInt(0),
+    criteriaId: ""
   };
 }
 /**
@@ -143,16 +158,19 @@ export const Challenge = {
       writer.uint32(50).string(message.stakedDream);
     }
     if (message.status !== 0) {
-      writer.uint32(88).int32(message.status);
+      writer.uint32(56).int32(message.status);
     }
     if (message.createdAt !== BigInt(0)) {
-      writer.uint32(96).int64(message.createdAt);
+      writer.uint32(64).int64(message.createdAt);
     }
     if (message.resolvedAt !== BigInt(0)) {
-      writer.uint32(104).int64(message.resolvedAt);
+      writer.uint32(72).int64(message.resolvedAt);
     }
     if (message.responseDeadline !== BigInt(0)) {
-      writer.uint32(112).int64(message.responseDeadline);
+      writer.uint32(80).int64(message.responseDeadline);
+    }
+    if (message.criteriaId !== "") {
+      writer.uint32(90).string(message.criteriaId);
     }
     return writer;
   },
@@ -181,17 +199,20 @@ export const Challenge = {
         case 6:
           message.stakedDream = reader.string();
           break;
-        case 11:
+        case 7:
           message.status = reader.int32() as any;
           break;
-        case 12:
+        case 8:
           message.createdAt = reader.int64();
           break;
-        case 13:
+        case 9:
           message.resolvedAt = reader.int64();
           break;
-        case 14:
+        case 10:
           message.responseDeadline = reader.int64();
+          break;
+        case 11:
+          message.criteriaId = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -212,6 +233,7 @@ export const Challenge = {
     message.createdAt = object.createdAt !== undefined && object.createdAt !== null ? BigInt(object.createdAt.toString()) : BigInt(0);
     message.resolvedAt = object.resolvedAt !== undefined && object.resolvedAt !== null ? BigInt(object.resolvedAt.toString()) : BigInt(0);
     message.responseDeadline = object.responseDeadline !== undefined && object.responseDeadline !== null ? BigInt(object.responseDeadline.toString()) : BigInt(0);
+    message.criteriaId = object.criteriaId ?? "";
     return message;
   },
   fromAmino(object: ChallengeAmino): Challenge {
@@ -244,6 +266,9 @@ export const Challenge = {
     if (object.response_deadline !== undefined && object.response_deadline !== null) {
       message.responseDeadline = BigInt(object.response_deadline);
     }
+    if (object.criteria_id !== undefined && object.criteria_id !== null) {
+      message.criteriaId = object.criteria_id;
+    }
     return message;
   },
   toAmino(message: Challenge): ChallengeAmino {
@@ -262,6 +287,7 @@ export const Challenge = {
     obj.created_at = message.createdAt !== BigInt(0) ? message.createdAt?.toString() : undefined;
     obj.resolved_at = message.resolvedAt !== BigInt(0) ? message.resolvedAt?.toString() : undefined;
     obj.response_deadline = message.responseDeadline !== BigInt(0) ? message.responseDeadline?.toString() : undefined;
+    obj.criteria_id = message.criteriaId === "" ? undefined : message.criteriaId;
     return obj;
   },
   fromAminoMsg(object: ChallengeAminoMsg): Challenge {

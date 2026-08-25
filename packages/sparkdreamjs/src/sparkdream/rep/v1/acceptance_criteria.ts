@@ -39,40 +39,19 @@ export function criteriaTypeToJSON(object: CriteriaType): string {
   }
 }
 /**
- * InterimTemplate defines the InterimTemplate message.
- * @name InterimTemplate
- * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.InterimTemplate
- */
-export interface InterimTemplate {
-  id: string;
-  name: string;
-  tags: string[];
-  criteria: VerificationCriteria[];
-  verificationGuide: string;
-}
-export interface InterimTemplateProtoMsg {
-  typeUrl: "/sparkdream.rep.v1.InterimTemplate";
-  value: Uint8Array;
-}
-/**
- * InterimTemplate defines the InterimTemplate message.
- * @name InterimTemplateAmino
- * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.InterimTemplate
- */
-export interface InterimTemplateAmino {
-  id?: string;
-  name?: string;
-  tags?: string[];
-  criteria?: VerificationCriteriaAmino[];
-  verification_guide?: string;
-}
-export interface InterimTemplateAminoMsg {
-  type: "/sparkdream.rep.v1.InterimTemplate";
-  value: InterimTemplateAmino;
-}
-/**
+ * A single item in an initiative's definition of done.
+ * 
+ * Declared on the initiative at creation and immutable afterwards, so the
+ * standard is fixed before any work starts. Consumed by MsgCreateChallenge
+ * (the challenger names the criterion the work fails) and by MsgSubmitJurorVote
+ * (a juror's per-item verdicts must answer criteria the initiative actually
+ * declared).
+ * 
+ * These types previously sat alongside an InterimTemplate registry, since
+ * removed: no message ever created a template, all three networks shipped zero
+ * of them, and Initiative.template_id resolved against nothing. Criteria are
+ * declared per-initiative precisely because a template reference would have
+ * been a pointer into an empty store.
  * @name VerificationCriteria
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.VerificationCriteria
@@ -90,6 +69,19 @@ export interface VerificationCriteriaProtoMsg {
   value: Uint8Array;
 }
 /**
+ * A single item in an initiative's definition of done.
+ * 
+ * Declared on the initiative at creation and immutable afterwards, so the
+ * standard is fixed before any work starts. Consumed by MsgCreateChallenge
+ * (the challenger names the criterion the work fails) and by MsgSubmitJurorVote
+ * (a juror's per-item verdicts must answer criteria the initiative actually
+ * declared).
+ * 
+ * These types previously sat alongside an InterimTemplate registry, since
+ * removed: no message ever created a template, all three networks shipped zero
+ * of them, and Initiative.template_id resolved against nothing. Criteria are
+ * declared per-initiative precisely because a template reference would have
+ * been a pointer into an empty store.
  * @name VerificationCriteriaAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.VerificationCriteria
@@ -106,127 +98,6 @@ export interface VerificationCriteriaAminoMsg {
   type: "/sparkdream.rep.v1.VerificationCriteria";
   value: VerificationCriteriaAmino;
 }
-function createBaseInterimTemplate(): InterimTemplate {
-  return {
-    id: "",
-    name: "",
-    tags: [],
-    criteria: [],
-    verificationGuide: ""
-  };
-}
-/**
- * InterimTemplate defines the InterimTemplate message.
- * @name InterimTemplate
- * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.InterimTemplate
- */
-export const InterimTemplate = {
-  typeUrl: "/sparkdream.rep.v1.InterimTemplate",
-  encode(message: InterimTemplate, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
-    }
-    if (message.name !== "") {
-      writer.uint32(18).string(message.name);
-    }
-    for (const v of message.tags) {
-      writer.uint32(26).string(v!);
-    }
-    for (const v of message.criteria) {
-      VerificationCriteria.encode(v!, writer.uint32(34).fork()).ldelim();
-    }
-    if (message.verificationGuide !== "") {
-      writer.uint32(42).string(message.verificationGuide);
-    }
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): InterimTemplate {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseInterimTemplate();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.id = reader.string();
-          break;
-        case 2:
-          message.name = reader.string();
-          break;
-        case 3:
-          message.tags.push(reader.string());
-          break;
-        case 4:
-          message.criteria.push(VerificationCriteria.decode(reader, reader.uint32()));
-          break;
-        case 5:
-          message.verificationGuide = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial(object: DeepPartial<InterimTemplate>): InterimTemplate {
-    const message = createBaseInterimTemplate();
-    message.id = object.id ?? "";
-    message.name = object.name ?? "";
-    message.tags = object.tags?.map(e => e) || [];
-    message.criteria = object.criteria?.map(e => VerificationCriteria.fromPartial(e)) || [];
-    message.verificationGuide = object.verificationGuide ?? "";
-    return message;
-  },
-  fromAmino(object: InterimTemplateAmino): InterimTemplate {
-    const message = createBaseInterimTemplate();
-    if (object.id !== undefined && object.id !== null) {
-      message.id = object.id;
-    }
-    if (object.name !== undefined && object.name !== null) {
-      message.name = object.name;
-    }
-    message.tags = object.tags?.map(e => e) || [];
-    message.criteria = object.criteria?.map(e => VerificationCriteria.fromAmino(e)) || [];
-    if (object.verification_guide !== undefined && object.verification_guide !== null) {
-      message.verificationGuide = object.verification_guide;
-    }
-    return message;
-  },
-  toAmino(message: InterimTemplate): InterimTemplateAmino {
-    const obj: any = {};
-    obj.id = message.id === "" ? undefined : message.id;
-    obj.name = message.name === "" ? undefined : message.name;
-    if (message.tags) {
-      obj.tags = message.tags.map(e => e);
-    } else {
-      obj.tags = message.tags;
-    }
-    if (message.criteria) {
-      obj.criteria = message.criteria.map(e => e ? VerificationCriteria.toAmino(e) : undefined);
-    } else {
-      obj.criteria = message.criteria;
-    }
-    obj.verification_guide = message.verificationGuide === "" ? undefined : message.verificationGuide;
-    return obj;
-  },
-  fromAminoMsg(object: InterimTemplateAminoMsg): InterimTemplate {
-    return InterimTemplate.fromAmino(object.value);
-  },
-  fromProtoMsg(message: InterimTemplateProtoMsg): InterimTemplate {
-    return InterimTemplate.decode(message.value);
-  },
-  toProto(message: InterimTemplate): Uint8Array {
-    return InterimTemplate.encode(message).finish();
-  },
-  toProtoMsg(message: InterimTemplate): InterimTemplateProtoMsg {
-    return {
-      typeUrl: "/sparkdream.rep.v1.InterimTemplate",
-      value: InterimTemplate.encode(message).finish()
-    };
-  }
-};
 function createBaseVerificationCriteria(): VerificationCriteria {
   return {
     id: "",
@@ -238,6 +109,19 @@ function createBaseVerificationCriteria(): VerificationCriteria {
   };
 }
 /**
+ * A single item in an initiative's definition of done.
+ * 
+ * Declared on the initiative at creation and immutable afterwards, so the
+ * standard is fixed before any work starts. Consumed by MsgCreateChallenge
+ * (the challenger names the criterion the work fails) and by MsgSubmitJurorVote
+ * (a juror's per-item verdicts must answer criteria the initiative actually
+ * declared).
+ * 
+ * These types previously sat alongside an InterimTemplate registry, since
+ * removed: no message ever created a template, all three networks shipped zero
+ * of them, and Initiative.template_id resolved against nothing. Criteria are
+ * declared per-initiative precisely because a template reference would have
+ * been a pointer into an empty store.
  * @name VerificationCriteria
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.VerificationCriteria

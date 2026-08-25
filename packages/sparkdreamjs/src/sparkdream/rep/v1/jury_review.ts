@@ -70,6 +70,25 @@ export interface JuryReview {
    * For content challenges (non-zero means this review is for a content challenge, not an initiative challenge)
    */
   contentChallengeId: bigint;
+  /**
+   * Block height by which a seated juror must accept, after which unanswered
+   * seats are vacated and redrawn (see SweepUnansweredJurySeats).
+   */
+  acceptanceDeadline: bigint;
+  /**
+   * Jurors who have accepted the summons. Accepting is what converts a seat
+   * drawn by lot into a commitment: jurors are conscripted by sortition, so
+   * penalising a no-show who never agreed to serve would punish an accident of
+   * the draw. Declining is free and immediate; ignoring the summons is what
+   * costs a seat and counts against the participation rate.
+   */
+  accepted: string[];
+  /**
+   * How many replacement rounds this review has been through. Bounded by
+   * MaxJuryRedraws so a review cannot redraw forever against a pool that will
+   * not answer.
+   */
+  redrawCount: number;
 }
 export interface JuryReviewProtoMsg {
   typeUrl: "/sparkdream.rep.v1.JuryReview";
@@ -100,6 +119,25 @@ export interface JuryReviewAmino {
    * For content challenges (non-zero means this review is for a content challenge, not an initiative challenge)
    */
   content_challenge_id?: string;
+  /**
+   * Block height by which a seated juror must accept, after which unanswered
+   * seats are vacated and redrawn (see SweepUnansweredJurySeats).
+   */
+  acceptance_deadline?: string;
+  /**
+   * Jurors who have accepted the summons. Accepting is what converts a seat
+   * drawn by lot into a commitment: jurors are conscripted by sortition, so
+   * penalising a no-show who never agreed to serve would punish an accident of
+   * the draw. Declining is free and immediate; ignoring the summons is what
+   * costs a seat and counts against the participation rate.
+   */
+  accepted?: string[];
+  /**
+   * How many replacement rounds this review has been through. Bounded by
+   * MaxJuryRedraws so a review cannot redraw forever against a pool that will
+   * not answer.
+   */
+  redraw_count?: number;
 }
 export interface JuryReviewAminoMsg {
   type: "/sparkdream.rep.v1.JuryReview";
@@ -215,7 +253,10 @@ function createBaseJuryReview(): JuryReview {
     deadline: BigInt(0),
     verdict: 0,
     reasoning: "",
-    contentChallengeId: BigInt(0)
+    contentChallengeId: BigInt(0),
+    acceptanceDeadline: BigInt(0),
+    accepted: [],
+    redrawCount: 0
   };
 }
 /**
@@ -272,6 +313,15 @@ export const JuryReview = {
     if (message.contentChallengeId !== BigInt(0)) {
       writer.uint32(120).uint64(message.contentChallengeId);
     }
+    if (message.acceptanceDeadline !== BigInt(0)) {
+      writer.uint32(128).int64(message.acceptanceDeadline);
+    }
+    for (const v of message.accepted) {
+      writer.uint32(138).string(v!);
+    }
+    if (message.redrawCount !== 0) {
+      writer.uint32(144).uint32(message.redrawCount);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): JuryReview {
@@ -326,6 +376,15 @@ export const JuryReview = {
         case 15:
           message.contentChallengeId = reader.uint64();
           break;
+        case 16:
+          message.acceptanceDeadline = reader.int64();
+          break;
+        case 17:
+          message.accepted.push(reader.string());
+          break;
+        case 18:
+          message.redrawCount = reader.uint32();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -350,6 +409,9 @@ export const JuryReview = {
     message.verdict = object.verdict ?? 0;
     message.reasoning = object.reasoning ?? "";
     message.contentChallengeId = object.contentChallengeId !== undefined && object.contentChallengeId !== null ? BigInt(object.contentChallengeId.toString()) : BigInt(0);
+    message.acceptanceDeadline = object.acceptanceDeadline !== undefined && object.acceptanceDeadline !== null ? BigInt(object.acceptanceDeadline.toString()) : BigInt(0);
+    message.accepted = object.accepted?.map(e => e) || [];
+    message.redrawCount = object.redrawCount ?? 0;
     return message;
   },
   fromAmino(object: JuryReviewAmino): JuryReview {
@@ -391,6 +453,13 @@ export const JuryReview = {
     if (object.content_challenge_id !== undefined && object.content_challenge_id !== null) {
       message.contentChallengeId = BigInt(object.content_challenge_id);
     }
+    if (object.acceptance_deadline !== undefined && object.acceptance_deadline !== null) {
+      message.acceptanceDeadline = BigInt(object.acceptance_deadline);
+    }
+    message.accepted = object.accepted?.map(e => e) || [];
+    if (object.redraw_count !== undefined && object.redraw_count !== null) {
+      message.redrawCount = object.redraw_count;
+    }
     return message;
   },
   toAmino(message: JuryReview): JuryReviewAmino {
@@ -426,6 +495,13 @@ export const JuryReview = {
     obj.verdict = message.verdict === 0 ? undefined : message.verdict;
     obj.reasoning = message.reasoning === "" ? undefined : message.reasoning;
     obj.content_challenge_id = message.contentChallengeId !== BigInt(0) ? message.contentChallengeId?.toString() : undefined;
+    obj.acceptance_deadline = message.acceptanceDeadline !== BigInt(0) ? message.acceptanceDeadline?.toString() : undefined;
+    if (message.accepted) {
+      obj.accepted = message.accepted.map(e => e);
+    } else {
+      obj.accepted = message.accepted;
+    }
+    obj.redraw_count = message.redrawCount === 0 ? undefined : message.redrawCount;
     return obj;
   },
   fromAminoMsg(object: JuryReviewAminoMsg): JuryReview {

@@ -378,23 +378,273 @@ export interface Params {
    */
   proposedProjectExpiryBlocks: bigint;
   /**
-   * Fraction of the initiative budget locked as a DREAM bond when the project
-   * creator self-assigns on a budget-backed project (permissionless projects
-   * are exempt — no treasury exposure). Bond is returned on completion or
-   * abandonment and burned when a challenge is upheld. Range [0, 1]; 0 disables.
+   * Fraction of the initiative budget locked as a DREAM bond when an
+   * initiative is self-assigned on a budget-backed project. Bond is returned
+   * on completion or abandonment and burned when a challenge is upheld.
+   * Range [0, 1]; 0 disables.
    */
   selfAssignedBondRate: string;
   /**
    * External-conviction ratio applied instead of external_conviction_ratio when
-   * the assignee is the project creator. Must be >= external_conviction_ratio
-   * and <= 1. Default 1.0: the community alone vouches for self-assigned work.
+   * the initiative is self-assigned. Must be >= external_conviction_ratio and
+   * <= 1. Default 1.0: the community alone vouches for self-assigned work.
    */
   selfAssignedExternalConvictionRatio: string;
   /**
-   * Multiplier applied to the challenge window for creator-assigned
-   * initiatives. Must be >= 1. Default 2.
+   * Multiplier applied to the challenge window for self-assigned initiatives.
+   * Must be >= 1. Default 2.
    */
   selfAssignedChallengeMultiplier: bigint;
+  /**
+   * Bond rate applied instead of self_assigned_bond_rate when the initiative
+   * is self-assigned under a permissionless project. Higher because the two
+   * cases expose the commons differently: a budget-backed initiative MOVES
+   * DREAM that governance already approved, while a permissionless one MINTS
+   * DREAM nobody approved and dilutes every holder. Permissionless
+   * self-assignment used to be exempt from the bond entirely, which disabled
+   * the main economic deterrent exactly where no counterparty exists.
+   * Range [0, 1]; 0 disables. Default 0.25.
+   */
+  permissionlessSelfAssignedBondRate: string;
+  /**
+   * Reputation deducted, per tag of the disputed initiative, from a juror who
+   * accepted a summons and then let it lapse. Accepting is voluntary and
+   * declining is free and immediate, so an abandoned seat is a broken
+   * commitment rather than an accident of the draw.
+   * 
+   * Charged in reputation because that is what qualifies a juror: enough
+   * abandoned seats and they fall below min_juror_reputation and stop being
+   * drawn for that tag at all. Must be non-negative; 0 disables. Default 10.
+   */
+  abandonedJurySeatPenalty: string;
+  /**
+   * Fraction of the disputed initiative's budget paid out to its jury, split
+   * evenly across the seats. Juror pay was a flat StandardComplexityBudget
+   * regardless of what was in dispute, so a challenge over a 100 DREAM
+   * APPRENTICE initiative minted 750 DREAM in juror fees to settle it — more
+   * than the work was worth. Range [0, 1]. Default 0.25.
+   */
+  jurorRewardRate: string;
+  /**
+   * Fraction of an initiative's review period a juror has to answer a summons
+   * before the seat is swept and redrawn.
+   * 
+   * A ratio rather than a block count because the review period varies by two
+   * orders of magnitude across networks: the previous fixed 1200-block (~2h)
+   * window was 1.2% of mainnet's ~7-day review but 133% of devnet's, putting
+   * the acceptance deadline *after* the vote deadline there and making the
+   * sweep unreachable. It also contradicted the reason no-shows go unpunished
+   * — that a member cannot be expected to watch the chain for an event that
+   * reaches them about once a year — by then withdrawing the seat if they did
+   * not answer within two hours.
+   * 
+   * Sized for how long it takes someone to read a notification, not to react
+   * to a block. Range (0, 1). Default 0.25 — about 42 hours on mainnet.
+   * 
+   * Operational alongside the other juror knobs: leaving juror *pay* committee
+   * tunable while juror *timing* needed a governance vote was an artifact of
+   * build order, not a decision.
+   */
+  juryAcceptanceWindowRatio: string;
+  /**
+   * Floor on a single juror's pay, in micro-DREAM.
+   * 
+   * juror_reward_rate scales pay against the disputed initiative's budget, but
+   * content challenges and moderation appeals have no initiative budget to
+   * scale against — for those this floor *is* the whole rate, which is why it
+   * cannot stay a compile-time constant. Default 5 DREAM.
+   */
+  minJurorReward: string;
+  /**
+   * Floor on the responsiveness multiplier applied to a juror's selection
+   * weight. A juror who never answers is drawn less often, never not at all —
+   * a zero-weight address could never earn its way back, since it would stop
+   * being drawn and so could never demonstrate otherwise.
+   * 
+   * Chosen for shape rather than fitted to anything, and meant to be revisited
+   * against observed response rates. Range (0,1]. Default 0.1.
+   */
+  minJurorSelectionWeight: string;
+  /**
+   * Seatings a juror must have before the responsiveness weight applies at all.
+   * Below this there is no meaningful record and they are drawn at full weight.
+   * Like the floor above, a guess awaiting real data. Default 3.
+   */
+  minJurySeatingsForWeighting: bigint;
+  /**
+   * Conviction-weighted completion bonus, as a fraction of the initiative
+   * budget, paid to external stakers on completion.
+   * 
+   * Was a hardcoded 1/10 divisor while the project-side equivalent
+   * (project_completion_bonus_rate) was already a param — the same economic
+   * knob, tunable on one side and fixed on the other. Range [0,1].
+   * Default 0.1.
+   */
+  initiativeCompletionBonusRate: string;
+  /**
+   * Replacement rounds the acceptance sweep may run per jury review.
+   * 
+   * Coupled to jury_acceptance_window_ratio and validated against it: each round
+   * costs one acceptance window out of the review period, so widening the window
+   * without lowering this leaves replacement jurors no time to read the work.
+   * Both live in the same scope so the pair always moves under one authority.
+   * Default 1.
+   */
+  maxJuryRedraws: number;
+  /**
+   * Fraction of an initiative's budget a reviewer commits as bond when filing a
+   * verdict on it, and the amount slashed if a jury overturns that verdict.
+   * 
+   * Scaled rather than flat so liability tracks what the review could mint — a
+   * wrong approval on an EPIC initiative releases up to 10,000 DREAM, and the
+   * same risk should not attach to a 100 DREAM one. It is also self-limiting:
+   * a reviewer can only hold as many open verdicts as their free bond covers.
+   * Range (0,1]. Default 0.1.
+   */
+  reviewerBondReserveRate: string;
+  /**
+   * Fraction of an initiative's budget paid to the reviewers who filed a
+   * verdict on the round that resolved it, scaled by the tier's
+   * reward_multiplier and split evenly across those reviewers.
+   * 
+   * Paid per verdict filed, never per approval — if approving paid and
+   * rejecting did not, the role would rebuild "paid to say yes" one layer down.
+   * Paid when the initiative resolves, so an unacted-on review costs nothing and
+   * filing verdicts earns nothing until something turns on them. Range [0,1].
+   * Default 0.05.
+   */
+  reviewFeeRate: string;
+  /**
+   * Review rounds an initiative may go through before a rejection becomes
+   * terminal. A rejection returns the work to ASSIGNED so the assignee can fix
+   * and resubmit, which is the right remedy for "not done" — but unbounded it
+   * lets a bad-faith assignee burn reviewer effort indefinitely. Default 3.
+   */
+  maxReviewRounds: number;
+  /**
+   * SPARK reward pool for initiative reviewers, mirroring the sentinel pool but
+   * held and tuned separately.
+   * 
+   * The DREAM review fee pays for the act of reviewing; this pays for reviewing
+   * *well*, gated on windowed accuracy the same way sentinel pay is. Separate
+   * knobs because the liability differs by orders of magnitude: a wrong
+   * approval mints DREAM that cannot be clawed back, where a wrong hide costs a
+   * post some visibility.
+   * 
+   * The pool is an ordinary bank sub-address, so a council policy funds it with
+   * a plain send.
+   */
+  maxReviewerRewardPool: string;
+  /**
+   * Fraction of overflow burned per epoch. Default 0.5.
+   */
+  reviewerRewardPoolOverflowBurnRatio: string;
+  /**
+   * Distribution cadence. Default 14400 (~1 day).
+   */
+  reviewerRewardEpochBlocks: bigint;
+  /**
+   * Minimum windowed accuracy to earn a share. Default 0.70.
+   */
+  minReviewerAccuracy: string;
+  /**
+   * Epochs of history the accuracy ring scores. Default 6.
+   */
+  reviewerAccuracyWindowEpochs: bigint;
+  /**
+   * Ceiling on the uspark x/rep may draw from the community pool per UTC day to
+   * fund its bonded-role reward pools.
+   * 
+   * One capped claim on the community pool for the whole module, divided
+   * internally by headroom — adding a fourth bonded role must not mean adding a
+   * fourth funding line. The skim tops pools up toward their own caps and stops
+   * there, so an idle role costs the community pool nothing.
+   * 
+   * Funding is automatic rather than by council transfer because pay that
+   * depends on somebody remembering to send it arrives unpredictably, and
+   * unpredictable pay does not hold a roster.
+   * 
+   * Expressed as a SHARE OF INFLATION rather than an absolute daily amount:
+   * 
+   *   daily_allowance = annual_provisions * community_tax * share / 365
+   * 
+   * A fixed nominal draw takes its largest share of the community pool exactly
+   * when the pool is poorest — inflation floats 2–5%, so a constant amount is
+   * half the pool's income at the top of that range and more than all of it at
+   * the bottom, and x/rep skims before x/split. A share is counter-cyclical:
+   * it takes less when there is less, so the councils' remainder is structural
+   * rather than whatever happens to be left over. It also tracks supply growth
+   * without periodic retuning.
+   * 
+   * The base is inflation, NOT the community pool balance. A share of the
+   * balance would let x/rep raid the 95M SPARK genesis allocation that x/split
+   * exists to hand to the councils, and would take a cut of every direct
+   * fund-community-pool deposit. annual_provisions is also set by x/mint, whose
+   * authority is the burn address — so this rate is anchored to a number no
+   * committee or proposal can move.
+   * 
+   * Default 0.5 (half the community pool's inflation income); zero disables the
+   * skim, leaving the pools to forfeited bonds and direct sends.
+   */
+  roleRewardInflationShare: string;
+  /**
+   * Curator SPARK pool. Same shape and cadence as the sentinel pool above and
+   * sized to match it: curating a collection rating and hiding a post are
+   * comparable judgment calls with comparable liability. Kept as separate
+   * params (and a separate pool) anyway, so neither role can draw on the
+   * other's funds or be retuned by the other's bar.
+   */
+  maxCuratorRewardPool: string;
+  curatorRewardPoolOverflowBurnRatio: string;
+  curatorRewardEpochBlocks: bigint;
+  minCuratorAccuracy: string;
+  curatorAccuracyWindowEpochs: bigint;
+  /**
+   * Budget above which an initiative cannot complete without at least one
+   * reviewer verdict, regardless of the parent project's verification policy.
+   * 
+   * The gate keys on how much DREAM the completion CREATES, not on whether the
+   * project is budget-backed. Permissionless initiatives mint against a
+   * self-declared budget with no treasury behind it, capped only by tier — so
+   * the funded/unfunded axis gets the risk ordering backwards. Mint size is the
+   * number that actually matters and it exists on both paths.
+   * 
+   * Default 100 DREAM, the APPRENTICE ceiling: apprentice work stays exempt
+   * because it is small and it is the on-ramp where reviewer scarcity would
+   * hurt newcomers most, while every permissionless STANDARD initiative — the
+   * whole farming vector — is gated.
+   * 
+   * Composes with the per-project policy as a MAXIMUM, never a replacement: a
+   * project may demand more verifiers than this, never fewer. Zero disables the
+   * chain-wide gate and leaves review entirely to project policy.
+   */
+  reviewRequiredAboveBudget: string;
+  /**
+   * Blocks a review bounty must sit before its funder may reclaim it. Stops a
+   * funder advertising a bounty and withdrawing it in the same breath, which
+   * would let anyone grief the reviewer roster at zero cost. Reclaim is barred
+   * outright once any verdict is filed, regardless of this delay.
+   */
+  reviewBountyReclaimDelay: bigint;
+  /**
+   * Minimum review bounty a PERMISSIONLESS initiative must escrow at creation,
+   * as a fraction of its budget, paid in existing DREAM.
+   * 
+   * Permissionless initiatives mint against a self-declared budget with no
+   * treasury behind them, and their review fee is minted too — so reviewers of
+   * permissionless work are currently paid purely by dilution, the very thing
+   * the funded path's budget-netting exists to avoid. A creator-funded bounty
+   * prices that reviewer attention onto whoever consumes it, is non-inflationary
+   * because it moves existing DREAM, and scales the spam brake with the amount
+   * being minted instead of a flat creation fee.
+   * 
+   * Charged ONLY when the budget exceeds review_required_above_budget: the
+   * bounty funds mandatory review, so below the gate it would take DREAM for a
+   * service that is never delivered. That keeps apprentice work — the on-ramp,
+   * where members arrive holding zero DREAM — free of it. Zero disables the
+   * requirement entirely.
+   */
+  permissionlessMinReviewBountyRate: string;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Params";
@@ -686,23 +936,273 @@ export interface ParamsAmino {
    */
   proposed_project_expiry_blocks?: string;
   /**
-   * Fraction of the initiative budget locked as a DREAM bond when the project
-   * creator self-assigns on a budget-backed project (permissionless projects
-   * are exempt — no treasury exposure). Bond is returned on completion or
-   * abandonment and burned when a challenge is upheld. Range [0, 1]; 0 disables.
+   * Fraction of the initiative budget locked as a DREAM bond when an
+   * initiative is self-assigned on a budget-backed project. Bond is returned
+   * on completion or abandonment and burned when a challenge is upheld.
+   * Range [0, 1]; 0 disables.
    */
   self_assigned_bond_rate?: string;
   /**
    * External-conviction ratio applied instead of external_conviction_ratio when
-   * the assignee is the project creator. Must be >= external_conviction_ratio
-   * and <= 1. Default 1.0: the community alone vouches for self-assigned work.
+   * the initiative is self-assigned. Must be >= external_conviction_ratio and
+   * <= 1. Default 1.0: the community alone vouches for self-assigned work.
    */
   self_assigned_external_conviction_ratio?: string;
   /**
-   * Multiplier applied to the challenge window for creator-assigned
-   * initiatives. Must be >= 1. Default 2.
+   * Multiplier applied to the challenge window for self-assigned initiatives.
+   * Must be >= 1. Default 2.
    */
   self_assigned_challenge_multiplier?: string;
+  /**
+   * Bond rate applied instead of self_assigned_bond_rate when the initiative
+   * is self-assigned under a permissionless project. Higher because the two
+   * cases expose the commons differently: a budget-backed initiative MOVES
+   * DREAM that governance already approved, while a permissionless one MINTS
+   * DREAM nobody approved and dilutes every holder. Permissionless
+   * self-assignment used to be exempt from the bond entirely, which disabled
+   * the main economic deterrent exactly where no counterparty exists.
+   * Range [0, 1]; 0 disables. Default 0.25.
+   */
+  permissionless_self_assigned_bond_rate?: string;
+  /**
+   * Reputation deducted, per tag of the disputed initiative, from a juror who
+   * accepted a summons and then let it lapse. Accepting is voluntary and
+   * declining is free and immediate, so an abandoned seat is a broken
+   * commitment rather than an accident of the draw.
+   * 
+   * Charged in reputation because that is what qualifies a juror: enough
+   * abandoned seats and they fall below min_juror_reputation and stop being
+   * drawn for that tag at all. Must be non-negative; 0 disables. Default 10.
+   */
+  abandoned_jury_seat_penalty?: string;
+  /**
+   * Fraction of the disputed initiative's budget paid out to its jury, split
+   * evenly across the seats. Juror pay was a flat StandardComplexityBudget
+   * regardless of what was in dispute, so a challenge over a 100 DREAM
+   * APPRENTICE initiative minted 750 DREAM in juror fees to settle it — more
+   * than the work was worth. Range [0, 1]. Default 0.25.
+   */
+  juror_reward_rate?: string;
+  /**
+   * Fraction of an initiative's review period a juror has to answer a summons
+   * before the seat is swept and redrawn.
+   * 
+   * A ratio rather than a block count because the review period varies by two
+   * orders of magnitude across networks: the previous fixed 1200-block (~2h)
+   * window was 1.2% of mainnet's ~7-day review but 133% of devnet's, putting
+   * the acceptance deadline *after* the vote deadline there and making the
+   * sweep unreachable. It also contradicted the reason no-shows go unpunished
+   * — that a member cannot be expected to watch the chain for an event that
+   * reaches them about once a year — by then withdrawing the seat if they did
+   * not answer within two hours.
+   * 
+   * Sized for how long it takes someone to read a notification, not to react
+   * to a block. Range (0, 1). Default 0.25 — about 42 hours on mainnet.
+   * 
+   * Operational alongside the other juror knobs: leaving juror *pay* committee
+   * tunable while juror *timing* needed a governance vote was an artifact of
+   * build order, not a decision.
+   */
+  jury_acceptance_window_ratio?: string;
+  /**
+   * Floor on a single juror's pay, in micro-DREAM.
+   * 
+   * juror_reward_rate scales pay against the disputed initiative's budget, but
+   * content challenges and moderation appeals have no initiative budget to
+   * scale against — for those this floor *is* the whole rate, which is why it
+   * cannot stay a compile-time constant. Default 5 DREAM.
+   */
+  min_juror_reward?: string;
+  /**
+   * Floor on the responsiveness multiplier applied to a juror's selection
+   * weight. A juror who never answers is drawn less often, never not at all —
+   * a zero-weight address could never earn its way back, since it would stop
+   * being drawn and so could never demonstrate otherwise.
+   * 
+   * Chosen for shape rather than fitted to anything, and meant to be revisited
+   * against observed response rates. Range (0,1]. Default 0.1.
+   */
+  min_juror_selection_weight?: string;
+  /**
+   * Seatings a juror must have before the responsiveness weight applies at all.
+   * Below this there is no meaningful record and they are drawn at full weight.
+   * Like the floor above, a guess awaiting real data. Default 3.
+   */
+  min_jury_seatings_for_weighting?: string;
+  /**
+   * Conviction-weighted completion bonus, as a fraction of the initiative
+   * budget, paid to external stakers on completion.
+   * 
+   * Was a hardcoded 1/10 divisor while the project-side equivalent
+   * (project_completion_bonus_rate) was already a param — the same economic
+   * knob, tunable on one side and fixed on the other. Range [0,1].
+   * Default 0.1.
+   */
+  initiative_completion_bonus_rate?: string;
+  /**
+   * Replacement rounds the acceptance sweep may run per jury review.
+   * 
+   * Coupled to jury_acceptance_window_ratio and validated against it: each round
+   * costs one acceptance window out of the review period, so widening the window
+   * without lowering this leaves replacement jurors no time to read the work.
+   * Both live in the same scope so the pair always moves under one authority.
+   * Default 1.
+   */
+  max_jury_redraws?: number;
+  /**
+   * Fraction of an initiative's budget a reviewer commits as bond when filing a
+   * verdict on it, and the amount slashed if a jury overturns that verdict.
+   * 
+   * Scaled rather than flat so liability tracks what the review could mint — a
+   * wrong approval on an EPIC initiative releases up to 10,000 DREAM, and the
+   * same risk should not attach to a 100 DREAM one. It is also self-limiting:
+   * a reviewer can only hold as many open verdicts as their free bond covers.
+   * Range (0,1]. Default 0.1.
+   */
+  reviewer_bond_reserve_rate?: string;
+  /**
+   * Fraction of an initiative's budget paid to the reviewers who filed a
+   * verdict on the round that resolved it, scaled by the tier's
+   * reward_multiplier and split evenly across those reviewers.
+   * 
+   * Paid per verdict filed, never per approval — if approving paid and
+   * rejecting did not, the role would rebuild "paid to say yes" one layer down.
+   * Paid when the initiative resolves, so an unacted-on review costs nothing and
+   * filing verdicts earns nothing until something turns on them. Range [0,1].
+   * Default 0.05.
+   */
+  review_fee_rate?: string;
+  /**
+   * Review rounds an initiative may go through before a rejection becomes
+   * terminal. A rejection returns the work to ASSIGNED so the assignee can fix
+   * and resubmit, which is the right remedy for "not done" — but unbounded it
+   * lets a bad-faith assignee burn reviewer effort indefinitely. Default 3.
+   */
+  max_review_rounds?: number;
+  /**
+   * SPARK reward pool for initiative reviewers, mirroring the sentinel pool but
+   * held and tuned separately.
+   * 
+   * The DREAM review fee pays for the act of reviewing; this pays for reviewing
+   * *well*, gated on windowed accuracy the same way sentinel pay is. Separate
+   * knobs because the liability differs by orders of magnitude: a wrong
+   * approval mints DREAM that cannot be clawed back, where a wrong hide costs a
+   * post some visibility.
+   * 
+   * The pool is an ordinary bank sub-address, so a council policy funds it with
+   * a plain send.
+   */
+  max_reviewer_reward_pool?: string;
+  /**
+   * Fraction of overflow burned per epoch. Default 0.5.
+   */
+  reviewer_reward_pool_overflow_burn_ratio?: string;
+  /**
+   * Distribution cadence. Default 14400 (~1 day).
+   */
+  reviewer_reward_epoch_blocks?: string;
+  /**
+   * Minimum windowed accuracy to earn a share. Default 0.70.
+   */
+  min_reviewer_accuracy?: string;
+  /**
+   * Epochs of history the accuracy ring scores. Default 6.
+   */
+  reviewer_accuracy_window_epochs?: string;
+  /**
+   * Ceiling on the uspark x/rep may draw from the community pool per UTC day to
+   * fund its bonded-role reward pools.
+   * 
+   * One capped claim on the community pool for the whole module, divided
+   * internally by headroom — adding a fourth bonded role must not mean adding a
+   * fourth funding line. The skim tops pools up toward their own caps and stops
+   * there, so an idle role costs the community pool nothing.
+   * 
+   * Funding is automatic rather than by council transfer because pay that
+   * depends on somebody remembering to send it arrives unpredictably, and
+   * unpredictable pay does not hold a roster.
+   * 
+   * Expressed as a SHARE OF INFLATION rather than an absolute daily amount:
+   * 
+   *   daily_allowance = annual_provisions * community_tax * share / 365
+   * 
+   * A fixed nominal draw takes its largest share of the community pool exactly
+   * when the pool is poorest — inflation floats 2–5%, so a constant amount is
+   * half the pool's income at the top of that range and more than all of it at
+   * the bottom, and x/rep skims before x/split. A share is counter-cyclical:
+   * it takes less when there is less, so the councils' remainder is structural
+   * rather than whatever happens to be left over. It also tracks supply growth
+   * without periodic retuning.
+   * 
+   * The base is inflation, NOT the community pool balance. A share of the
+   * balance would let x/rep raid the 95M SPARK genesis allocation that x/split
+   * exists to hand to the councils, and would take a cut of every direct
+   * fund-community-pool deposit. annual_provisions is also set by x/mint, whose
+   * authority is the burn address — so this rate is anchored to a number no
+   * committee or proposal can move.
+   * 
+   * Default 0.5 (half the community pool's inflation income); zero disables the
+   * skim, leaving the pools to forfeited bonds and direct sends.
+   */
+  role_reward_inflation_share?: string;
+  /**
+   * Curator SPARK pool. Same shape and cadence as the sentinel pool above and
+   * sized to match it: curating a collection rating and hiding a post are
+   * comparable judgment calls with comparable liability. Kept as separate
+   * params (and a separate pool) anyway, so neither role can draw on the
+   * other's funds or be retuned by the other's bar.
+   */
+  max_curator_reward_pool?: string;
+  curator_reward_pool_overflow_burn_ratio?: string;
+  curator_reward_epoch_blocks?: string;
+  min_curator_accuracy?: string;
+  curator_accuracy_window_epochs?: string;
+  /**
+   * Budget above which an initiative cannot complete without at least one
+   * reviewer verdict, regardless of the parent project's verification policy.
+   * 
+   * The gate keys on how much DREAM the completion CREATES, not on whether the
+   * project is budget-backed. Permissionless initiatives mint against a
+   * self-declared budget with no treasury behind it, capped only by tier — so
+   * the funded/unfunded axis gets the risk ordering backwards. Mint size is the
+   * number that actually matters and it exists on both paths.
+   * 
+   * Default 100 DREAM, the APPRENTICE ceiling: apprentice work stays exempt
+   * because it is small and it is the on-ramp where reviewer scarcity would
+   * hurt newcomers most, while every permissionless STANDARD initiative — the
+   * whole farming vector — is gated.
+   * 
+   * Composes with the per-project policy as a MAXIMUM, never a replacement: a
+   * project may demand more verifiers than this, never fewer. Zero disables the
+   * chain-wide gate and leaves review entirely to project policy.
+   */
+  review_required_above_budget?: string;
+  /**
+   * Blocks a review bounty must sit before its funder may reclaim it. Stops a
+   * funder advertising a bounty and withdrawing it in the same breath, which
+   * would let anyone grief the reviewer roster at zero cost. Reclaim is barred
+   * outright once any verdict is filed, regardless of this delay.
+   */
+  review_bounty_reclaim_delay?: string;
+  /**
+   * Minimum review bounty a PERMISSIONLESS initiative must escrow at creation,
+   * as a fraction of its budget, paid in existing DREAM.
+   * 
+   * Permissionless initiatives mint against a self-declared budget with no
+   * treasury behind them, and their review fee is minted too — so reviewers of
+   * permissionless work are currently paid purely by dilution, the very thing
+   * the funded path's budget-netting exists to avoid. A creator-funded bounty
+   * prices that reviewer attention onto whoever consumes it, is non-inflationary
+   * because it moves existing DREAM, and scales the spam brake with the amount
+   * being minted instead of a flat creation fee.
+   * 
+   * Charged ONLY when the budget exceeds review_required_above_budget: the
+   * bounty funds mandatory review, so below the gate it would take DREAM for a
+   * service that is never delivered. That keeps apprentice work — the on-ramp,
+   * where members arrive holding zero DREAM — free of it. Zero disables the
+   * requirement entirely.
+   */
+  permissionless_min_review_bounty_rate?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/rep/Params";
@@ -903,6 +1403,82 @@ export interface RepOperationalParams {
   maxProjectRequestedBudget: string;
   maxProjectRequestedSpark: string;
   proposedProjectExpiryBlocks: bigint;
+  /**
+   * Reputation deducted from a juror who accepted a summons and abandoned it.
+   * Mirrors abandoned_jury_seat_penalty in Params.
+   */
+  abandonedJurySeatPenalty: string;
+  /**
+   * Fraction of the disputed initiative's budget paid out to its jury, split
+   * evenly across the seats. Juror pay was a flat StandardComplexityBudget
+   * regardless of what was in dispute, so a challenge over a 100 DREAM
+   * APPRENTICE initiative minted 750 DREAM in juror fees to settle it — more
+   * than the work was worth. Range [0, 1]. Default 0.25.
+   */
+  jurorRewardRate: string;
+  /**
+   * Mirrors min_juror_reward in Params.
+   */
+  minJurorReward: string;
+  /**
+   * Mirrors min_juror_selection_weight in Params.
+   */
+  minJurorSelectionWeight: string;
+  /**
+   * Mirrors min_jury_seatings_for_weighting in Params.
+   */
+  minJurySeatingsForWeighting: bigint;
+  /**
+   * Mirrors initiative_completion_bonus_rate in Params.
+   */
+  initiativeCompletionBonusRate: string;
+  /**
+   * Mirrors jury_acceptance_window_ratio in Params. Validated against
+   * max_jury_redraws below — the pair must fit inside the review period.
+   */
+  juryAcceptanceWindowRatio: string;
+  /**
+   * Mirrors max_jury_redraws in Params.
+   */
+  maxJuryRedraws: number;
+  /**
+   * Mirrors reviewer_bond_reserve_rate in Params.
+   */
+  reviewerBondReserveRate: string;
+  /**
+   * Mirrors review_fee_rate in Params.
+   */
+  reviewFeeRate: string;
+  /**
+   * Mirrors max_review_rounds in Params.
+   */
+  maxReviewRounds: number;
+  /**
+   * Mirrors the reviewer reward pool knobs in Params.
+   */
+  maxReviewerRewardPool: string;
+  reviewerRewardPoolOverflowBurnRatio: string;
+  reviewerRewardEpochBlocks: bigint;
+  minReviewerAccuracy: string;
+  reviewerAccuracyWindowEpochs: bigint;
+  /**
+   * Mirrors role_reward_inflation_share in Params.
+   */
+  roleRewardInflationShare: string;
+  /**
+   * Mirrors the curator SPARK pool params in Params.
+   */
+  maxCuratorRewardPool: string;
+  curatorRewardPoolOverflowBurnRatio: string;
+  curatorRewardEpochBlocks: bigint;
+  minCuratorAccuracy: string;
+  curatorAccuracyWindowEpochs: bigint;
+  /**
+   * Mirrors review_required_above_budget in Params.
+   */
+  reviewRequiredAboveBudget: string;
+  reviewBountyReclaimDelay: bigint;
+  permissionlessMinReviewBountyRate: string;
 }
 export interface RepOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.rep.v1.RepOperationalParams";
@@ -1103,6 +1679,82 @@ export interface RepOperationalParamsAmino {
   max_project_requested_budget?: string;
   max_project_requested_spark?: string;
   proposed_project_expiry_blocks?: string;
+  /**
+   * Reputation deducted from a juror who accepted a summons and abandoned it.
+   * Mirrors abandoned_jury_seat_penalty in Params.
+   */
+  abandoned_jury_seat_penalty?: string;
+  /**
+   * Fraction of the disputed initiative's budget paid out to its jury, split
+   * evenly across the seats. Juror pay was a flat StandardComplexityBudget
+   * regardless of what was in dispute, so a challenge over a 100 DREAM
+   * APPRENTICE initiative minted 750 DREAM in juror fees to settle it — more
+   * than the work was worth. Range [0, 1]. Default 0.25.
+   */
+  juror_reward_rate?: string;
+  /**
+   * Mirrors min_juror_reward in Params.
+   */
+  min_juror_reward?: string;
+  /**
+   * Mirrors min_juror_selection_weight in Params.
+   */
+  min_juror_selection_weight?: string;
+  /**
+   * Mirrors min_jury_seatings_for_weighting in Params.
+   */
+  min_jury_seatings_for_weighting?: string;
+  /**
+   * Mirrors initiative_completion_bonus_rate in Params.
+   */
+  initiative_completion_bonus_rate?: string;
+  /**
+   * Mirrors jury_acceptance_window_ratio in Params. Validated against
+   * max_jury_redraws below — the pair must fit inside the review period.
+   */
+  jury_acceptance_window_ratio?: string;
+  /**
+   * Mirrors max_jury_redraws in Params.
+   */
+  max_jury_redraws?: number;
+  /**
+   * Mirrors reviewer_bond_reserve_rate in Params.
+   */
+  reviewer_bond_reserve_rate?: string;
+  /**
+   * Mirrors review_fee_rate in Params.
+   */
+  review_fee_rate?: string;
+  /**
+   * Mirrors max_review_rounds in Params.
+   */
+  max_review_rounds?: number;
+  /**
+   * Mirrors the reviewer reward pool knobs in Params.
+   */
+  max_reviewer_reward_pool?: string;
+  reviewer_reward_pool_overflow_burn_ratio?: string;
+  reviewer_reward_epoch_blocks?: string;
+  min_reviewer_accuracy?: string;
+  reviewer_accuracy_window_epochs?: string;
+  /**
+   * Mirrors role_reward_inflation_share in Params.
+   */
+  role_reward_inflation_share?: string;
+  /**
+   * Mirrors the curator SPARK pool params in Params.
+   */
+  max_curator_reward_pool?: string;
+  curator_reward_pool_overflow_burn_ratio?: string;
+  curator_reward_epoch_blocks?: string;
+  min_curator_accuracy?: string;
+  curator_accuracy_window_epochs?: string;
+  /**
+   * Mirrors review_required_above_budget in Params.
+   */
+  review_required_above_budget?: string;
+  review_bounty_reclaim_delay?: string;
+  permissionless_min_review_bounty_rate?: string;
 }
 export interface RepOperationalParamsAminoMsg {
   type: "sparkdream/x/rep/RepOperationalParams";
@@ -1521,7 +2173,33 @@ function createBaseParams(): Params {
     proposedProjectExpiryBlocks: BigInt(0),
     selfAssignedBondRate: "",
     selfAssignedExternalConvictionRatio: "",
-    selfAssignedChallengeMultiplier: BigInt(0)
+    selfAssignedChallengeMultiplier: BigInt(0),
+    permissionlessSelfAssignedBondRate: "",
+    abandonedJurySeatPenalty: "",
+    jurorRewardRate: "",
+    juryAcceptanceWindowRatio: "",
+    minJurorReward: "",
+    minJurorSelectionWeight: "",
+    minJurySeatingsForWeighting: BigInt(0),
+    initiativeCompletionBonusRate: "",
+    maxJuryRedraws: 0,
+    reviewerBondReserveRate: "",
+    reviewFeeRate: "",
+    maxReviewRounds: 0,
+    maxReviewerRewardPool: "",
+    reviewerRewardPoolOverflowBurnRatio: "",
+    reviewerRewardEpochBlocks: BigInt(0),
+    minReviewerAccuracy: "",
+    reviewerAccuracyWindowEpochs: BigInt(0),
+    roleRewardInflationShare: "",
+    maxCuratorRewardPool: "",
+    curatorRewardPoolOverflowBurnRatio: "",
+    curatorRewardEpochBlocks: BigInt(0),
+    minCuratorAccuracy: "",
+    curatorAccuracyWindowEpochs: BigInt(0),
+    reviewRequiredAboveBudget: "",
+    reviewBountyReclaimDelay: BigInt(0),
+    permissionlessMinReviewBountyRate: ""
   };
 }
 /**
@@ -1816,6 +2494,84 @@ export const Params = {
     if (message.selfAssignedChallengeMultiplier !== BigInt(0)) {
       writer.uint32(752).int64(message.selfAssignedChallengeMultiplier);
     }
+    if (message.permissionlessSelfAssignedBondRate !== "") {
+      writer.uint32(762).string(Decimal.fromUserInput(message.permissionlessSelfAssignedBondRate, 18).atomics);
+    }
+    if (message.abandonedJurySeatPenalty !== "") {
+      writer.uint32(770).string(Decimal.fromUserInput(message.abandonedJurySeatPenalty, 18).atomics);
+    }
+    if (message.jurorRewardRate !== "") {
+      writer.uint32(778).string(Decimal.fromUserInput(message.jurorRewardRate, 18).atomics);
+    }
+    if (message.juryAcceptanceWindowRatio !== "") {
+      writer.uint32(786).string(Decimal.fromUserInput(message.juryAcceptanceWindowRatio, 18).atomics);
+    }
+    if (message.minJurorReward !== "") {
+      writer.uint32(794).string(message.minJurorReward);
+    }
+    if (message.minJurorSelectionWeight !== "") {
+      writer.uint32(802).string(Decimal.fromUserInput(message.minJurorSelectionWeight, 18).atomics);
+    }
+    if (message.minJurySeatingsForWeighting !== BigInt(0)) {
+      writer.uint32(808).uint64(message.minJurySeatingsForWeighting);
+    }
+    if (message.initiativeCompletionBonusRate !== "") {
+      writer.uint32(818).string(Decimal.fromUserInput(message.initiativeCompletionBonusRate, 18).atomics);
+    }
+    if (message.maxJuryRedraws !== 0) {
+      writer.uint32(824).uint32(message.maxJuryRedraws);
+    }
+    if (message.reviewerBondReserveRate !== "") {
+      writer.uint32(834).string(Decimal.fromUserInput(message.reviewerBondReserveRate, 18).atomics);
+    }
+    if (message.reviewFeeRate !== "") {
+      writer.uint32(842).string(Decimal.fromUserInput(message.reviewFeeRate, 18).atomics);
+    }
+    if (message.maxReviewRounds !== 0) {
+      writer.uint32(848).uint32(message.maxReviewRounds);
+    }
+    if (message.maxReviewerRewardPool !== "") {
+      writer.uint32(858).string(message.maxReviewerRewardPool);
+    }
+    if (message.reviewerRewardPoolOverflowBurnRatio !== "") {
+      writer.uint32(866).string(Decimal.fromUserInput(message.reviewerRewardPoolOverflowBurnRatio, 18).atomics);
+    }
+    if (message.reviewerRewardEpochBlocks !== BigInt(0)) {
+      writer.uint32(872).uint64(message.reviewerRewardEpochBlocks);
+    }
+    if (message.minReviewerAccuracy !== "") {
+      writer.uint32(882).string(Decimal.fromUserInput(message.minReviewerAccuracy, 18).atomics);
+    }
+    if (message.reviewerAccuracyWindowEpochs !== BigInt(0)) {
+      writer.uint32(888).uint64(message.reviewerAccuracyWindowEpochs);
+    }
+    if (message.roleRewardInflationShare !== "") {
+      writer.uint32(898).string(Decimal.fromUserInput(message.roleRewardInflationShare, 18).atomics);
+    }
+    if (message.maxCuratorRewardPool !== "") {
+      writer.uint32(906).string(message.maxCuratorRewardPool);
+    }
+    if (message.curatorRewardPoolOverflowBurnRatio !== "") {
+      writer.uint32(914).string(Decimal.fromUserInput(message.curatorRewardPoolOverflowBurnRatio, 18).atomics);
+    }
+    if (message.curatorRewardEpochBlocks !== BigInt(0)) {
+      writer.uint32(920).uint64(message.curatorRewardEpochBlocks);
+    }
+    if (message.minCuratorAccuracy !== "") {
+      writer.uint32(930).string(Decimal.fromUserInput(message.minCuratorAccuracy, 18).atomics);
+    }
+    if (message.curatorAccuracyWindowEpochs !== BigInt(0)) {
+      writer.uint32(936).uint64(message.curatorAccuracyWindowEpochs);
+    }
+    if (message.reviewRequiredAboveBudget !== "") {
+      writer.uint32(946).string(message.reviewRequiredAboveBudget);
+    }
+    if (message.reviewBountyReclaimDelay !== BigInt(0)) {
+      writer.uint32(952).uint64(message.reviewBountyReclaimDelay);
+    }
+    if (message.permissionlessMinReviewBountyRate !== "") {
+      writer.uint32(962).string(Decimal.fromUserInput(message.permissionlessMinReviewBountyRate, 18).atomics);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -2107,6 +2863,84 @@ export const Params = {
         case 94:
           message.selfAssignedChallengeMultiplier = reader.int64();
           break;
+        case 95:
+          message.permissionlessSelfAssignedBondRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 96:
+          message.abandonedJurySeatPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 97:
+          message.jurorRewardRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 98:
+          message.juryAcceptanceWindowRatio = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 99:
+          message.minJurorReward = reader.string();
+          break;
+        case 100:
+          message.minJurorSelectionWeight = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 101:
+          message.minJurySeatingsForWeighting = reader.uint64();
+          break;
+        case 102:
+          message.initiativeCompletionBonusRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 103:
+          message.maxJuryRedraws = reader.uint32();
+          break;
+        case 104:
+          message.reviewerBondReserveRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 105:
+          message.reviewFeeRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 106:
+          message.maxReviewRounds = reader.uint32();
+          break;
+        case 107:
+          message.maxReviewerRewardPool = reader.string();
+          break;
+        case 108:
+          message.reviewerRewardPoolOverflowBurnRatio = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 109:
+          message.reviewerRewardEpochBlocks = reader.uint64();
+          break;
+        case 110:
+          message.minReviewerAccuracy = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 111:
+          message.reviewerAccuracyWindowEpochs = reader.uint64();
+          break;
+        case 112:
+          message.roleRewardInflationShare = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 113:
+          message.maxCuratorRewardPool = reader.string();
+          break;
+        case 114:
+          message.curatorRewardPoolOverflowBurnRatio = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 115:
+          message.curatorRewardEpochBlocks = reader.uint64();
+          break;
+        case 116:
+          message.minCuratorAccuracy = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 117:
+          message.curatorAccuracyWindowEpochs = reader.uint64();
+          break;
+        case 118:
+          message.reviewRequiredAboveBudget = reader.string();
+          break;
+        case 119:
+          message.reviewBountyReclaimDelay = reader.uint64();
+          break;
+        case 120:
+          message.permissionlessMinReviewBountyRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2210,6 +3044,32 @@ export const Params = {
     message.selfAssignedBondRate = object.selfAssignedBondRate ?? "";
     message.selfAssignedExternalConvictionRatio = object.selfAssignedExternalConvictionRatio ?? "";
     message.selfAssignedChallengeMultiplier = object.selfAssignedChallengeMultiplier !== undefined && object.selfAssignedChallengeMultiplier !== null ? BigInt(object.selfAssignedChallengeMultiplier.toString()) : BigInt(0);
+    message.permissionlessSelfAssignedBondRate = object.permissionlessSelfAssignedBondRate ?? "";
+    message.abandonedJurySeatPenalty = object.abandonedJurySeatPenalty ?? "";
+    message.jurorRewardRate = object.jurorRewardRate ?? "";
+    message.juryAcceptanceWindowRatio = object.juryAcceptanceWindowRatio ?? "";
+    message.minJurorReward = object.minJurorReward ?? "";
+    message.minJurorSelectionWeight = object.minJurorSelectionWeight ?? "";
+    message.minJurySeatingsForWeighting = object.minJurySeatingsForWeighting !== undefined && object.minJurySeatingsForWeighting !== null ? BigInt(object.minJurySeatingsForWeighting.toString()) : BigInt(0);
+    message.initiativeCompletionBonusRate = object.initiativeCompletionBonusRate ?? "";
+    message.maxJuryRedraws = object.maxJuryRedraws ?? 0;
+    message.reviewerBondReserveRate = object.reviewerBondReserveRate ?? "";
+    message.reviewFeeRate = object.reviewFeeRate ?? "";
+    message.maxReviewRounds = object.maxReviewRounds ?? 0;
+    message.maxReviewerRewardPool = object.maxReviewerRewardPool ?? "";
+    message.reviewerRewardPoolOverflowBurnRatio = object.reviewerRewardPoolOverflowBurnRatio ?? "";
+    message.reviewerRewardEpochBlocks = object.reviewerRewardEpochBlocks !== undefined && object.reviewerRewardEpochBlocks !== null ? BigInt(object.reviewerRewardEpochBlocks.toString()) : BigInt(0);
+    message.minReviewerAccuracy = object.minReviewerAccuracy ?? "";
+    message.reviewerAccuracyWindowEpochs = object.reviewerAccuracyWindowEpochs !== undefined && object.reviewerAccuracyWindowEpochs !== null ? BigInt(object.reviewerAccuracyWindowEpochs.toString()) : BigInt(0);
+    message.roleRewardInflationShare = object.roleRewardInflationShare ?? "";
+    message.maxCuratorRewardPool = object.maxCuratorRewardPool ?? "";
+    message.curatorRewardPoolOverflowBurnRatio = object.curatorRewardPoolOverflowBurnRatio ?? "";
+    message.curatorRewardEpochBlocks = object.curatorRewardEpochBlocks !== undefined && object.curatorRewardEpochBlocks !== null ? BigInt(object.curatorRewardEpochBlocks.toString()) : BigInt(0);
+    message.minCuratorAccuracy = object.minCuratorAccuracy ?? "";
+    message.curatorAccuracyWindowEpochs = object.curatorAccuracyWindowEpochs !== undefined && object.curatorAccuracyWindowEpochs !== null ? BigInt(object.curatorAccuracyWindowEpochs.toString()) : BigInt(0);
+    message.reviewRequiredAboveBudget = object.reviewRequiredAboveBudget ?? "";
+    message.reviewBountyReclaimDelay = object.reviewBountyReclaimDelay !== undefined && object.reviewBountyReclaimDelay !== null ? BigInt(object.reviewBountyReclaimDelay.toString()) : BigInt(0);
+    message.permissionlessMinReviewBountyRate = object.permissionlessMinReviewBountyRate ?? "";
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -2496,6 +3356,84 @@ export const Params = {
     if (object.self_assigned_challenge_multiplier !== undefined && object.self_assigned_challenge_multiplier !== null) {
       message.selfAssignedChallengeMultiplier = BigInt(object.self_assigned_challenge_multiplier);
     }
+    if (object.permissionless_self_assigned_bond_rate !== undefined && object.permissionless_self_assigned_bond_rate !== null) {
+      message.permissionlessSelfAssignedBondRate = object.permissionless_self_assigned_bond_rate;
+    }
+    if (object.abandoned_jury_seat_penalty !== undefined && object.abandoned_jury_seat_penalty !== null) {
+      message.abandonedJurySeatPenalty = object.abandoned_jury_seat_penalty;
+    }
+    if (object.juror_reward_rate !== undefined && object.juror_reward_rate !== null) {
+      message.jurorRewardRate = object.juror_reward_rate;
+    }
+    if (object.jury_acceptance_window_ratio !== undefined && object.jury_acceptance_window_ratio !== null) {
+      message.juryAcceptanceWindowRatio = object.jury_acceptance_window_ratio;
+    }
+    if (object.min_juror_reward !== undefined && object.min_juror_reward !== null) {
+      message.minJurorReward = object.min_juror_reward;
+    }
+    if (object.min_juror_selection_weight !== undefined && object.min_juror_selection_weight !== null) {
+      message.minJurorSelectionWeight = object.min_juror_selection_weight;
+    }
+    if (object.min_jury_seatings_for_weighting !== undefined && object.min_jury_seatings_for_weighting !== null) {
+      message.minJurySeatingsForWeighting = BigInt(object.min_jury_seatings_for_weighting);
+    }
+    if (object.initiative_completion_bonus_rate !== undefined && object.initiative_completion_bonus_rate !== null) {
+      message.initiativeCompletionBonusRate = object.initiative_completion_bonus_rate;
+    }
+    if (object.max_jury_redraws !== undefined && object.max_jury_redraws !== null) {
+      message.maxJuryRedraws = object.max_jury_redraws;
+    }
+    if (object.reviewer_bond_reserve_rate !== undefined && object.reviewer_bond_reserve_rate !== null) {
+      message.reviewerBondReserveRate = object.reviewer_bond_reserve_rate;
+    }
+    if (object.review_fee_rate !== undefined && object.review_fee_rate !== null) {
+      message.reviewFeeRate = object.review_fee_rate;
+    }
+    if (object.max_review_rounds !== undefined && object.max_review_rounds !== null) {
+      message.maxReviewRounds = object.max_review_rounds;
+    }
+    if (object.max_reviewer_reward_pool !== undefined && object.max_reviewer_reward_pool !== null) {
+      message.maxReviewerRewardPool = object.max_reviewer_reward_pool;
+    }
+    if (object.reviewer_reward_pool_overflow_burn_ratio !== undefined && object.reviewer_reward_pool_overflow_burn_ratio !== null) {
+      message.reviewerRewardPoolOverflowBurnRatio = object.reviewer_reward_pool_overflow_burn_ratio;
+    }
+    if (object.reviewer_reward_epoch_blocks !== undefined && object.reviewer_reward_epoch_blocks !== null) {
+      message.reviewerRewardEpochBlocks = BigInt(object.reviewer_reward_epoch_blocks);
+    }
+    if (object.min_reviewer_accuracy !== undefined && object.min_reviewer_accuracy !== null) {
+      message.minReviewerAccuracy = object.min_reviewer_accuracy;
+    }
+    if (object.reviewer_accuracy_window_epochs !== undefined && object.reviewer_accuracy_window_epochs !== null) {
+      message.reviewerAccuracyWindowEpochs = BigInt(object.reviewer_accuracy_window_epochs);
+    }
+    if (object.role_reward_inflation_share !== undefined && object.role_reward_inflation_share !== null) {
+      message.roleRewardInflationShare = object.role_reward_inflation_share;
+    }
+    if (object.max_curator_reward_pool !== undefined && object.max_curator_reward_pool !== null) {
+      message.maxCuratorRewardPool = object.max_curator_reward_pool;
+    }
+    if (object.curator_reward_pool_overflow_burn_ratio !== undefined && object.curator_reward_pool_overflow_burn_ratio !== null) {
+      message.curatorRewardPoolOverflowBurnRatio = object.curator_reward_pool_overflow_burn_ratio;
+    }
+    if (object.curator_reward_epoch_blocks !== undefined && object.curator_reward_epoch_blocks !== null) {
+      message.curatorRewardEpochBlocks = BigInt(object.curator_reward_epoch_blocks);
+    }
+    if (object.min_curator_accuracy !== undefined && object.min_curator_accuracy !== null) {
+      message.minCuratorAccuracy = object.min_curator_accuracy;
+    }
+    if (object.curator_accuracy_window_epochs !== undefined && object.curator_accuracy_window_epochs !== null) {
+      message.curatorAccuracyWindowEpochs = BigInt(object.curator_accuracy_window_epochs);
+    }
+    if (object.review_required_above_budget !== undefined && object.review_required_above_budget !== null) {
+      message.reviewRequiredAboveBudget = object.review_required_above_budget;
+    }
+    if (object.review_bounty_reclaim_delay !== undefined && object.review_bounty_reclaim_delay !== null) {
+      message.reviewBountyReclaimDelay = BigInt(object.review_bounty_reclaim_delay);
+    }
+    if (object.permissionless_min_review_bounty_rate !== undefined && object.permissionless_min_review_bounty_rate !== null) {
+      message.permissionlessMinReviewBountyRate = object.permissionless_min_review_bounty_rate;
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -2594,6 +3532,32 @@ export const Params = {
     obj.self_assigned_bond_rate = message.selfAssignedBondRate === "" ? undefined : message.selfAssignedBondRate;
     obj.self_assigned_external_conviction_ratio = message.selfAssignedExternalConvictionRatio === "" ? undefined : message.selfAssignedExternalConvictionRatio;
     obj.self_assigned_challenge_multiplier = message.selfAssignedChallengeMultiplier !== BigInt(0) ? message.selfAssignedChallengeMultiplier?.toString() : undefined;
+    obj.permissionless_self_assigned_bond_rate = message.permissionlessSelfAssignedBondRate === "" ? undefined : message.permissionlessSelfAssignedBondRate;
+    obj.abandoned_jury_seat_penalty = message.abandonedJurySeatPenalty === "" ? undefined : message.abandonedJurySeatPenalty;
+    obj.juror_reward_rate = message.jurorRewardRate === "" ? undefined : message.jurorRewardRate;
+    obj.jury_acceptance_window_ratio = message.juryAcceptanceWindowRatio === "" ? undefined : message.juryAcceptanceWindowRatio;
+    obj.min_juror_reward = message.minJurorReward === "" ? undefined : message.minJurorReward;
+    obj.min_juror_selection_weight = message.minJurorSelectionWeight === "" ? undefined : message.minJurorSelectionWeight;
+    obj.min_jury_seatings_for_weighting = message.minJurySeatingsForWeighting !== BigInt(0) ? message.minJurySeatingsForWeighting?.toString() : undefined;
+    obj.initiative_completion_bonus_rate = message.initiativeCompletionBonusRate === "" ? undefined : message.initiativeCompletionBonusRate;
+    obj.max_jury_redraws = message.maxJuryRedraws === 0 ? undefined : message.maxJuryRedraws;
+    obj.reviewer_bond_reserve_rate = message.reviewerBondReserveRate === "" ? undefined : message.reviewerBondReserveRate;
+    obj.review_fee_rate = message.reviewFeeRate === "" ? undefined : message.reviewFeeRate;
+    obj.max_review_rounds = message.maxReviewRounds === 0 ? undefined : message.maxReviewRounds;
+    obj.max_reviewer_reward_pool = message.maxReviewerRewardPool === "" ? undefined : message.maxReviewerRewardPool;
+    obj.reviewer_reward_pool_overflow_burn_ratio = message.reviewerRewardPoolOverflowBurnRatio === "" ? undefined : message.reviewerRewardPoolOverflowBurnRatio;
+    obj.reviewer_reward_epoch_blocks = message.reviewerRewardEpochBlocks !== BigInt(0) ? message.reviewerRewardEpochBlocks?.toString() : undefined;
+    obj.min_reviewer_accuracy = message.minReviewerAccuracy === "" ? undefined : message.minReviewerAccuracy;
+    obj.reviewer_accuracy_window_epochs = message.reviewerAccuracyWindowEpochs !== BigInt(0) ? message.reviewerAccuracyWindowEpochs?.toString() : undefined;
+    obj.role_reward_inflation_share = message.roleRewardInflationShare === "" ? undefined : message.roleRewardInflationShare;
+    obj.max_curator_reward_pool = message.maxCuratorRewardPool === "" ? undefined : message.maxCuratorRewardPool;
+    obj.curator_reward_pool_overflow_burn_ratio = message.curatorRewardPoolOverflowBurnRatio === "" ? undefined : message.curatorRewardPoolOverflowBurnRatio;
+    obj.curator_reward_epoch_blocks = message.curatorRewardEpochBlocks !== BigInt(0) ? message.curatorRewardEpochBlocks?.toString() : undefined;
+    obj.min_curator_accuracy = message.minCuratorAccuracy === "" ? undefined : message.minCuratorAccuracy;
+    obj.curator_accuracy_window_epochs = message.curatorAccuracyWindowEpochs !== BigInt(0) ? message.curatorAccuracyWindowEpochs?.toString() : undefined;
+    obj.review_required_above_budget = message.reviewRequiredAboveBudget === "" ? undefined : message.reviewRequiredAboveBudget;
+    obj.review_bounty_reclaim_delay = message.reviewBountyReclaimDelay !== BigInt(0) ? message.reviewBountyReclaimDelay?.toString() : undefined;
+    obj.permissionless_min_review_bounty_rate = message.permissionlessMinReviewBountyRate === "" ? undefined : message.permissionlessMinReviewBountyRate;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {
@@ -2694,7 +3658,32 @@ function createBaseRepOperationalParams(): RepOperationalParams {
     maxDreamMintPerEpoch: "",
     maxProjectRequestedBudget: "",
     maxProjectRequestedSpark: "",
-    proposedProjectExpiryBlocks: BigInt(0)
+    proposedProjectExpiryBlocks: BigInt(0),
+    abandonedJurySeatPenalty: "",
+    jurorRewardRate: "",
+    minJurorReward: "",
+    minJurorSelectionWeight: "",
+    minJurySeatingsForWeighting: BigInt(0),
+    initiativeCompletionBonusRate: "",
+    juryAcceptanceWindowRatio: "",
+    maxJuryRedraws: 0,
+    reviewerBondReserveRate: "",
+    reviewFeeRate: "",
+    maxReviewRounds: 0,
+    maxReviewerRewardPool: "",
+    reviewerRewardPoolOverflowBurnRatio: "",
+    reviewerRewardEpochBlocks: BigInt(0),
+    minReviewerAccuracy: "",
+    reviewerAccuracyWindowEpochs: BigInt(0),
+    roleRewardInflationShare: "",
+    maxCuratorRewardPool: "",
+    curatorRewardPoolOverflowBurnRatio: "",
+    curatorRewardEpochBlocks: BigInt(0),
+    minCuratorAccuracy: "",
+    curatorAccuracyWindowEpochs: BigInt(0),
+    reviewRequiredAboveBudget: "",
+    reviewBountyReclaimDelay: BigInt(0),
+    permissionlessMinReviewBountyRate: ""
   };
 }
 /**
@@ -2934,6 +3923,81 @@ export const RepOperationalParams = {
     if (message.proposedProjectExpiryBlocks !== BigInt(0)) {
       writer.uint32(592).int64(message.proposedProjectExpiryBlocks);
     }
+    if (message.abandonedJurySeatPenalty !== "") {
+      writer.uint32(610).string(Decimal.fromUserInput(message.abandonedJurySeatPenalty, 18).atomics);
+    }
+    if (message.jurorRewardRate !== "") {
+      writer.uint32(618).string(Decimal.fromUserInput(message.jurorRewardRate, 18).atomics);
+    }
+    if (message.minJurorReward !== "") {
+      writer.uint32(626).string(message.minJurorReward);
+    }
+    if (message.minJurorSelectionWeight !== "") {
+      writer.uint32(634).string(Decimal.fromUserInput(message.minJurorSelectionWeight, 18).atomics);
+    }
+    if (message.minJurySeatingsForWeighting !== BigInt(0)) {
+      writer.uint32(640).uint64(message.minJurySeatingsForWeighting);
+    }
+    if (message.initiativeCompletionBonusRate !== "") {
+      writer.uint32(650).string(Decimal.fromUserInput(message.initiativeCompletionBonusRate, 18).atomics);
+    }
+    if (message.juryAcceptanceWindowRatio !== "") {
+      writer.uint32(658).string(Decimal.fromUserInput(message.juryAcceptanceWindowRatio, 18).atomics);
+    }
+    if (message.maxJuryRedraws !== 0) {
+      writer.uint32(664).uint32(message.maxJuryRedraws);
+    }
+    if (message.reviewerBondReserveRate !== "") {
+      writer.uint32(674).string(Decimal.fromUserInput(message.reviewerBondReserveRate, 18).atomics);
+    }
+    if (message.reviewFeeRate !== "") {
+      writer.uint32(682).string(Decimal.fromUserInput(message.reviewFeeRate, 18).atomics);
+    }
+    if (message.maxReviewRounds !== 0) {
+      writer.uint32(688).uint32(message.maxReviewRounds);
+    }
+    if (message.maxReviewerRewardPool !== "") {
+      writer.uint32(698).string(message.maxReviewerRewardPool);
+    }
+    if (message.reviewerRewardPoolOverflowBurnRatio !== "") {
+      writer.uint32(706).string(Decimal.fromUserInput(message.reviewerRewardPoolOverflowBurnRatio, 18).atomics);
+    }
+    if (message.reviewerRewardEpochBlocks !== BigInt(0)) {
+      writer.uint32(712).uint64(message.reviewerRewardEpochBlocks);
+    }
+    if (message.minReviewerAccuracy !== "") {
+      writer.uint32(722).string(Decimal.fromUserInput(message.minReviewerAccuracy, 18).atomics);
+    }
+    if (message.reviewerAccuracyWindowEpochs !== BigInt(0)) {
+      writer.uint32(728).uint64(message.reviewerAccuracyWindowEpochs);
+    }
+    if (message.roleRewardInflationShare !== "") {
+      writer.uint32(738).string(Decimal.fromUserInput(message.roleRewardInflationShare, 18).atomics);
+    }
+    if (message.maxCuratorRewardPool !== "") {
+      writer.uint32(746).string(message.maxCuratorRewardPool);
+    }
+    if (message.curatorRewardPoolOverflowBurnRatio !== "") {
+      writer.uint32(754).string(Decimal.fromUserInput(message.curatorRewardPoolOverflowBurnRatio, 18).atomics);
+    }
+    if (message.curatorRewardEpochBlocks !== BigInt(0)) {
+      writer.uint32(760).uint64(message.curatorRewardEpochBlocks);
+    }
+    if (message.minCuratorAccuracy !== "") {
+      writer.uint32(770).string(Decimal.fromUserInput(message.minCuratorAccuracy, 18).atomics);
+    }
+    if (message.curatorAccuracyWindowEpochs !== BigInt(0)) {
+      writer.uint32(776).uint64(message.curatorAccuracyWindowEpochs);
+    }
+    if (message.reviewRequiredAboveBudget !== "") {
+      writer.uint32(786).string(message.reviewRequiredAboveBudget);
+    }
+    if (message.reviewBountyReclaimDelay !== BigInt(0)) {
+      writer.uint32(792).uint64(message.reviewBountyReclaimDelay);
+    }
+    if (message.permissionlessMinReviewBountyRate !== "") {
+      writer.uint32(802).string(Decimal.fromUserInput(message.permissionlessMinReviewBountyRate, 18).atomics);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): RepOperationalParams {
@@ -3168,6 +4232,81 @@ export const RepOperationalParams = {
         case 74:
           message.proposedProjectExpiryBlocks = reader.int64();
           break;
+        case 76:
+          message.abandonedJurySeatPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 77:
+          message.jurorRewardRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 78:
+          message.minJurorReward = reader.string();
+          break;
+        case 79:
+          message.minJurorSelectionWeight = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 80:
+          message.minJurySeatingsForWeighting = reader.uint64();
+          break;
+        case 81:
+          message.initiativeCompletionBonusRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 82:
+          message.juryAcceptanceWindowRatio = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 83:
+          message.maxJuryRedraws = reader.uint32();
+          break;
+        case 84:
+          message.reviewerBondReserveRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 85:
+          message.reviewFeeRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 86:
+          message.maxReviewRounds = reader.uint32();
+          break;
+        case 87:
+          message.maxReviewerRewardPool = reader.string();
+          break;
+        case 88:
+          message.reviewerRewardPoolOverflowBurnRatio = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 89:
+          message.reviewerRewardEpochBlocks = reader.uint64();
+          break;
+        case 90:
+          message.minReviewerAccuracy = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 91:
+          message.reviewerAccuracyWindowEpochs = reader.uint64();
+          break;
+        case 92:
+          message.roleRewardInflationShare = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 93:
+          message.maxCuratorRewardPool = reader.string();
+          break;
+        case 94:
+          message.curatorRewardPoolOverflowBurnRatio = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 95:
+          message.curatorRewardEpochBlocks = reader.uint64();
+          break;
+        case 96:
+          message.minCuratorAccuracy = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 97:
+          message.curatorAccuracyWindowEpochs = reader.uint64();
+          break;
+        case 98:
+          message.reviewRequiredAboveBudget = reader.string();
+          break;
+        case 99:
+          message.reviewBountyReclaimDelay = reader.uint64();
+          break;
+        case 100:
+          message.permissionlessMinReviewBountyRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3252,6 +4391,31 @@ export const RepOperationalParams = {
     message.maxProjectRequestedBudget = object.maxProjectRequestedBudget ?? "";
     message.maxProjectRequestedSpark = object.maxProjectRequestedSpark ?? "";
     message.proposedProjectExpiryBlocks = object.proposedProjectExpiryBlocks !== undefined && object.proposedProjectExpiryBlocks !== null ? BigInt(object.proposedProjectExpiryBlocks.toString()) : BigInt(0);
+    message.abandonedJurySeatPenalty = object.abandonedJurySeatPenalty ?? "";
+    message.jurorRewardRate = object.jurorRewardRate ?? "";
+    message.minJurorReward = object.minJurorReward ?? "";
+    message.minJurorSelectionWeight = object.minJurorSelectionWeight ?? "";
+    message.minJurySeatingsForWeighting = object.minJurySeatingsForWeighting !== undefined && object.minJurySeatingsForWeighting !== null ? BigInt(object.minJurySeatingsForWeighting.toString()) : BigInt(0);
+    message.initiativeCompletionBonusRate = object.initiativeCompletionBonusRate ?? "";
+    message.juryAcceptanceWindowRatio = object.juryAcceptanceWindowRatio ?? "";
+    message.maxJuryRedraws = object.maxJuryRedraws ?? 0;
+    message.reviewerBondReserveRate = object.reviewerBondReserveRate ?? "";
+    message.reviewFeeRate = object.reviewFeeRate ?? "";
+    message.maxReviewRounds = object.maxReviewRounds ?? 0;
+    message.maxReviewerRewardPool = object.maxReviewerRewardPool ?? "";
+    message.reviewerRewardPoolOverflowBurnRatio = object.reviewerRewardPoolOverflowBurnRatio ?? "";
+    message.reviewerRewardEpochBlocks = object.reviewerRewardEpochBlocks !== undefined && object.reviewerRewardEpochBlocks !== null ? BigInt(object.reviewerRewardEpochBlocks.toString()) : BigInt(0);
+    message.minReviewerAccuracy = object.minReviewerAccuracy ?? "";
+    message.reviewerAccuracyWindowEpochs = object.reviewerAccuracyWindowEpochs !== undefined && object.reviewerAccuracyWindowEpochs !== null ? BigInt(object.reviewerAccuracyWindowEpochs.toString()) : BigInt(0);
+    message.roleRewardInflationShare = object.roleRewardInflationShare ?? "";
+    message.maxCuratorRewardPool = object.maxCuratorRewardPool ?? "";
+    message.curatorRewardPoolOverflowBurnRatio = object.curatorRewardPoolOverflowBurnRatio ?? "";
+    message.curatorRewardEpochBlocks = object.curatorRewardEpochBlocks !== undefined && object.curatorRewardEpochBlocks !== null ? BigInt(object.curatorRewardEpochBlocks.toString()) : BigInt(0);
+    message.minCuratorAccuracy = object.minCuratorAccuracy ?? "";
+    message.curatorAccuracyWindowEpochs = object.curatorAccuracyWindowEpochs !== undefined && object.curatorAccuracyWindowEpochs !== null ? BigInt(object.curatorAccuracyWindowEpochs.toString()) : BigInt(0);
+    message.reviewRequiredAboveBudget = object.reviewRequiredAboveBudget ?? "";
+    message.reviewBountyReclaimDelay = object.reviewBountyReclaimDelay !== undefined && object.reviewBountyReclaimDelay !== null ? BigInt(object.reviewBountyReclaimDelay.toString()) : BigInt(0);
+    message.permissionlessMinReviewBountyRate = object.permissionlessMinReviewBountyRate ?? "";
     return message;
   },
   fromAmino(object: RepOperationalParamsAmino): RepOperationalParams {
@@ -3481,6 +4645,81 @@ export const RepOperationalParams = {
     if (object.proposed_project_expiry_blocks !== undefined && object.proposed_project_expiry_blocks !== null) {
       message.proposedProjectExpiryBlocks = BigInt(object.proposed_project_expiry_blocks);
     }
+    if (object.abandoned_jury_seat_penalty !== undefined && object.abandoned_jury_seat_penalty !== null) {
+      message.abandonedJurySeatPenalty = object.abandoned_jury_seat_penalty;
+    }
+    if (object.juror_reward_rate !== undefined && object.juror_reward_rate !== null) {
+      message.jurorRewardRate = object.juror_reward_rate;
+    }
+    if (object.min_juror_reward !== undefined && object.min_juror_reward !== null) {
+      message.minJurorReward = object.min_juror_reward;
+    }
+    if (object.min_juror_selection_weight !== undefined && object.min_juror_selection_weight !== null) {
+      message.minJurorSelectionWeight = object.min_juror_selection_weight;
+    }
+    if (object.min_jury_seatings_for_weighting !== undefined && object.min_jury_seatings_for_weighting !== null) {
+      message.minJurySeatingsForWeighting = BigInt(object.min_jury_seatings_for_weighting);
+    }
+    if (object.initiative_completion_bonus_rate !== undefined && object.initiative_completion_bonus_rate !== null) {
+      message.initiativeCompletionBonusRate = object.initiative_completion_bonus_rate;
+    }
+    if (object.jury_acceptance_window_ratio !== undefined && object.jury_acceptance_window_ratio !== null) {
+      message.juryAcceptanceWindowRatio = object.jury_acceptance_window_ratio;
+    }
+    if (object.max_jury_redraws !== undefined && object.max_jury_redraws !== null) {
+      message.maxJuryRedraws = object.max_jury_redraws;
+    }
+    if (object.reviewer_bond_reserve_rate !== undefined && object.reviewer_bond_reserve_rate !== null) {
+      message.reviewerBondReserveRate = object.reviewer_bond_reserve_rate;
+    }
+    if (object.review_fee_rate !== undefined && object.review_fee_rate !== null) {
+      message.reviewFeeRate = object.review_fee_rate;
+    }
+    if (object.max_review_rounds !== undefined && object.max_review_rounds !== null) {
+      message.maxReviewRounds = object.max_review_rounds;
+    }
+    if (object.max_reviewer_reward_pool !== undefined && object.max_reviewer_reward_pool !== null) {
+      message.maxReviewerRewardPool = object.max_reviewer_reward_pool;
+    }
+    if (object.reviewer_reward_pool_overflow_burn_ratio !== undefined && object.reviewer_reward_pool_overflow_burn_ratio !== null) {
+      message.reviewerRewardPoolOverflowBurnRatio = object.reviewer_reward_pool_overflow_burn_ratio;
+    }
+    if (object.reviewer_reward_epoch_blocks !== undefined && object.reviewer_reward_epoch_blocks !== null) {
+      message.reviewerRewardEpochBlocks = BigInt(object.reviewer_reward_epoch_blocks);
+    }
+    if (object.min_reviewer_accuracy !== undefined && object.min_reviewer_accuracy !== null) {
+      message.minReviewerAccuracy = object.min_reviewer_accuracy;
+    }
+    if (object.reviewer_accuracy_window_epochs !== undefined && object.reviewer_accuracy_window_epochs !== null) {
+      message.reviewerAccuracyWindowEpochs = BigInt(object.reviewer_accuracy_window_epochs);
+    }
+    if (object.role_reward_inflation_share !== undefined && object.role_reward_inflation_share !== null) {
+      message.roleRewardInflationShare = object.role_reward_inflation_share;
+    }
+    if (object.max_curator_reward_pool !== undefined && object.max_curator_reward_pool !== null) {
+      message.maxCuratorRewardPool = object.max_curator_reward_pool;
+    }
+    if (object.curator_reward_pool_overflow_burn_ratio !== undefined && object.curator_reward_pool_overflow_burn_ratio !== null) {
+      message.curatorRewardPoolOverflowBurnRatio = object.curator_reward_pool_overflow_burn_ratio;
+    }
+    if (object.curator_reward_epoch_blocks !== undefined && object.curator_reward_epoch_blocks !== null) {
+      message.curatorRewardEpochBlocks = BigInt(object.curator_reward_epoch_blocks);
+    }
+    if (object.min_curator_accuracy !== undefined && object.min_curator_accuracy !== null) {
+      message.minCuratorAccuracy = object.min_curator_accuracy;
+    }
+    if (object.curator_accuracy_window_epochs !== undefined && object.curator_accuracy_window_epochs !== null) {
+      message.curatorAccuracyWindowEpochs = BigInt(object.curator_accuracy_window_epochs);
+    }
+    if (object.review_required_above_budget !== undefined && object.review_required_above_budget !== null) {
+      message.reviewRequiredAboveBudget = object.review_required_above_budget;
+    }
+    if (object.review_bounty_reclaim_delay !== undefined && object.review_bounty_reclaim_delay !== null) {
+      message.reviewBountyReclaimDelay = BigInt(object.review_bounty_reclaim_delay);
+    }
+    if (object.permissionless_min_review_bounty_rate !== undefined && object.permissionless_min_review_bounty_rate !== null) {
+      message.permissionlessMinReviewBountyRate = object.permissionless_min_review_bounty_rate;
+    }
     return message;
   },
   toAmino(message: RepOperationalParams): RepOperationalParamsAmino {
@@ -3560,6 +4799,31 @@ export const RepOperationalParams = {
     obj.max_project_requested_budget = message.maxProjectRequestedBudget === "" ? undefined : message.maxProjectRequestedBudget;
     obj.max_project_requested_spark = message.maxProjectRequestedSpark === "" ? undefined : message.maxProjectRequestedSpark;
     obj.proposed_project_expiry_blocks = message.proposedProjectExpiryBlocks !== BigInt(0) ? message.proposedProjectExpiryBlocks?.toString() : undefined;
+    obj.abandoned_jury_seat_penalty = message.abandonedJurySeatPenalty === "" ? undefined : message.abandonedJurySeatPenalty;
+    obj.juror_reward_rate = message.jurorRewardRate === "" ? undefined : message.jurorRewardRate;
+    obj.min_juror_reward = message.minJurorReward === "" ? undefined : message.minJurorReward;
+    obj.min_juror_selection_weight = message.minJurorSelectionWeight === "" ? undefined : message.minJurorSelectionWeight;
+    obj.min_jury_seatings_for_weighting = message.minJurySeatingsForWeighting !== BigInt(0) ? message.minJurySeatingsForWeighting?.toString() : undefined;
+    obj.initiative_completion_bonus_rate = message.initiativeCompletionBonusRate === "" ? undefined : message.initiativeCompletionBonusRate;
+    obj.jury_acceptance_window_ratio = message.juryAcceptanceWindowRatio === "" ? undefined : message.juryAcceptanceWindowRatio;
+    obj.max_jury_redraws = message.maxJuryRedraws === 0 ? undefined : message.maxJuryRedraws;
+    obj.reviewer_bond_reserve_rate = message.reviewerBondReserveRate === "" ? undefined : message.reviewerBondReserveRate;
+    obj.review_fee_rate = message.reviewFeeRate === "" ? undefined : message.reviewFeeRate;
+    obj.max_review_rounds = message.maxReviewRounds === 0 ? undefined : message.maxReviewRounds;
+    obj.max_reviewer_reward_pool = message.maxReviewerRewardPool === "" ? undefined : message.maxReviewerRewardPool;
+    obj.reviewer_reward_pool_overflow_burn_ratio = message.reviewerRewardPoolOverflowBurnRatio === "" ? undefined : message.reviewerRewardPoolOverflowBurnRatio;
+    obj.reviewer_reward_epoch_blocks = message.reviewerRewardEpochBlocks !== BigInt(0) ? message.reviewerRewardEpochBlocks?.toString() : undefined;
+    obj.min_reviewer_accuracy = message.minReviewerAccuracy === "" ? undefined : message.minReviewerAccuracy;
+    obj.reviewer_accuracy_window_epochs = message.reviewerAccuracyWindowEpochs !== BigInt(0) ? message.reviewerAccuracyWindowEpochs?.toString() : undefined;
+    obj.role_reward_inflation_share = message.roleRewardInflationShare === "" ? undefined : message.roleRewardInflationShare;
+    obj.max_curator_reward_pool = message.maxCuratorRewardPool === "" ? undefined : message.maxCuratorRewardPool;
+    obj.curator_reward_pool_overflow_burn_ratio = message.curatorRewardPoolOverflowBurnRatio === "" ? undefined : message.curatorRewardPoolOverflowBurnRatio;
+    obj.curator_reward_epoch_blocks = message.curatorRewardEpochBlocks !== BigInt(0) ? message.curatorRewardEpochBlocks?.toString() : undefined;
+    obj.min_curator_accuracy = message.minCuratorAccuracy === "" ? undefined : message.minCuratorAccuracy;
+    obj.curator_accuracy_window_epochs = message.curatorAccuracyWindowEpochs !== BigInt(0) ? message.curatorAccuracyWindowEpochs?.toString() : undefined;
+    obj.review_required_above_budget = message.reviewRequiredAboveBudget === "" ? undefined : message.reviewRequiredAboveBudget;
+    obj.review_bounty_reclaim_delay = message.reviewBountyReclaimDelay !== BigInt(0) ? message.reviewBountyReclaimDelay?.toString() : undefined;
+    obj.permissionless_min_review_bounty_rate = message.permissionlessMinReviewBountyRate === "" ? undefined : message.permissionlessMinReviewBountyRate;
     return obj;
   },
   fromAminoMsg(object: RepOperationalParamsAminoMsg): RepOperationalParams {

@@ -77,7 +77,7 @@ export const MemberWarning = {
     if (message.warningNumber !== BigInt(0)) {
       writer.uint32(48).uint64(message.warningNumber);
     }
-    writer.uint32(82).fork();
+    writer.uint32(58).fork();
     for (const v of message.evidencePostIds) {
       writer.uint64(v);
     }
@@ -109,7 +109,7 @@ export const MemberWarning = {
         case 6:
           message.warningNumber = reader.uint64();
           break;
-        case 10:
+        case 7:
           if ((tag & 7) === 2) {
             const end2 = reader.uint32() + reader.pos;
             while (reader.pos < end2) {

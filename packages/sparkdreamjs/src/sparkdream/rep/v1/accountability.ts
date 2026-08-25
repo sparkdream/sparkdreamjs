@@ -11,6 +11,12 @@ export enum GovActionType {
   GOV_ACTION_TYPE_THREAD_MOVE = 7,
   GOV_ACTION_TYPE_REPLY_PIN = 8,
   GOV_ACTION_TYPE_POST_HIDE = 9,
+  /**
+   * GOV_ACTION_TYPE_REVIEW_REJECTION - A reviewer rejection of submitted initiative work. Appealed by the
+   * assignee; a successful appeal voids the rejection and records the
+   * rejecting reviewers as overturned.
+   */
+  GOV_ACTION_TYPE_REVIEW_REJECTION = 10,
   UNRECOGNIZED = -1,
 }
 export const GovActionTypeAmino = GovActionType;
@@ -46,6 +52,9 @@ export function govActionTypeFromJSON(object: any): GovActionType {
     case 9:
     case "GOV_ACTION_TYPE_POST_HIDE":
       return GovActionType.GOV_ACTION_TYPE_POST_HIDE;
+    case 10:
+    case "GOV_ACTION_TYPE_REVIEW_REJECTION":
+      return GovActionType.GOV_ACTION_TYPE_REVIEW_REJECTION;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -74,6 +83,8 @@ export function govActionTypeToJSON(object: GovActionType): string {
       return "GOV_ACTION_TYPE_REPLY_PIN";
     case GovActionType.GOV_ACTION_TYPE_POST_HIDE:
       return "GOV_ACTION_TYPE_POST_HIDE";
+    case GovActionType.GOV_ACTION_TYPE_REVIEW_REJECTION:
+      return "GOV_ACTION_TYPE_REVIEW_REJECTION";
     case GovActionType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";

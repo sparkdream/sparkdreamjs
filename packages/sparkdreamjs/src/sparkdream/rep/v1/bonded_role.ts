@@ -26,6 +26,14 @@ export enum RoleType {
   ROLE_TYPE_CONTENT_SENTINEL = 1,
   ROLE_TYPE_COLLECT_CURATOR = 2,
   ROLE_TYPE_FEDERATION_VERIFIER = 3,
+  /**
+   * ROLE_TYPE_INITIATIVE_REVIEWER - Reviews submitted initiative work against its acceptance criteria. Owned by
+   * x/rep. Distinct from CONTENT_SENTINEL because the competence, the liability
+   * (a wrong approval mints DREAM), the bond sizing and the accuracy
+   * denominators all differ — see the Initiative Review section of
+   * docs/x-rep-spec.md.
+   */
+  ROLE_TYPE_INITIATIVE_REVIEWER = 4,
   UNRECOGNIZED = -1,
 }
 export const RoleTypeAmino = RoleType;
@@ -43,6 +51,9 @@ export function roleTypeFromJSON(object: any): RoleType {
     case 3:
     case "ROLE_TYPE_FEDERATION_VERIFIER":
       return RoleType.ROLE_TYPE_FEDERATION_VERIFIER;
+    case 4:
+    case "ROLE_TYPE_INITIATIVE_REVIEWER":
+      return RoleType.ROLE_TYPE_INITIATIVE_REVIEWER;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -59,6 +70,8 @@ export function roleTypeToJSON(object: RoleType): string {
       return "ROLE_TYPE_COLLECT_CURATOR";
     case RoleType.ROLE_TYPE_FEDERATION_VERIFIER:
       return "ROLE_TYPE_FEDERATION_VERIFIER";
+    case RoleType.ROLE_TYPE_INITIATIVE_REVIEWER:
+      return "ROLE_TYPE_INITIATIVE_REVIEWER";
     case RoleType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
