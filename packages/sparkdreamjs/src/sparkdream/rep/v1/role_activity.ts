@@ -207,6 +207,19 @@ export interface RoleActivity {
   overturnedActions: {
     [key: string]: bigint;
   };
+  /**
+   * last_slash_epoch is the reward epoch (in the units the role's own
+   * reward distribution reads -- see roleRewardEpoch) in which this role
+   * was most recently slashed. Stamped by SlashBond for every role type.
+   * 
+   * Reward distributions may use it as a "no pay in an epoch you were
+   * slashed in" gate; only the federation verifier does today. Stamping it
+   * generically anyway is deliberate: it is a property of the bond, the
+   * stamp is one write on a path that is already writing, and a role that
+   * wants the gate should not have to reintroduce a private counter to get
+   * it. Zero means never slashed under the current accounting.
+   */
+  lastSlashEpoch: bigint;
 }
 export interface RoleActivityProtoMsg {
   typeUrl: "/sparkdream.rep.v1.RoleActivity";
@@ -277,6 +290,19 @@ export interface RoleActivityAmino {
   overturned_actions?: {
     [key: string]: string;
   };
+  /**
+   * last_slash_epoch is the reward epoch (in the units the role's own
+   * reward distribution reads -- see roleRewardEpoch) in which this role
+   * was most recently slashed. Stamped by SlashBond for every role type.
+   * 
+   * Reward distributions may use it as a "no pay in an epoch you were
+   * slashed in" gate; only the federation verifier does today. Stamping it
+   * generically anyway is deliberate: it is a property of the bond, the
+   * stamp is one write on a path that is already writing, and a role that
+   * wants the gate should not have to reintroduce a private counter to get
+   * it. Zero means never slashed under the current accounting.
+   */
+  last_slash_epoch?: string;
 }
 export interface RoleActivityAminoMsg {
   type: "/sparkdream.rep.v1.RoleActivity";
@@ -682,7 +708,8 @@ function createBaseRoleActivity(): RoleActivity {
     epochActions: {},
     totalActions: {},
     upheldActions: {},
-    overturnedActions: {}
+    overturnedActions: {},
+    lastSlashEpoch: BigInt(0)
   };
 }
 /**
@@ -752,6 +779,9 @@ export const RoleActivity = {
         value
       }, writer.uint32(88).fork()).ldelim();
     });
+    if (message.lastSlashEpoch !== BigInt(0)) {
+      writer.uint32(96).int64(message.lastSlashEpoch);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): RoleActivity {
@@ -806,6 +836,9 @@ export const RoleActivity = {
             message.overturnedActions[entry11.key] = entry11.value;
           }
           break;
+        case 12:
+          message.lastSlashEpoch = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -854,6 +887,7 @@ export const RoleActivity = {
       }
       return acc;
     }, {});
+    message.lastSlashEpoch = object.lastSlashEpoch !== undefined && object.lastSlashEpoch !== null ? BigInt(object.lastSlashEpoch.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: RoleActivityAmino): RoleActivity {
@@ -909,6 +943,9 @@ export const RoleActivity = {
       }
       return acc;
     }, {});
+    if (object.last_slash_epoch !== undefined && object.last_slash_epoch !== null) {
+      message.lastSlashEpoch = BigInt(object.last_slash_epoch);
+    }
     return message;
   },
   toAmino(message: RoleActivity): RoleActivityAmino {
@@ -948,6 +985,7 @@ export const RoleActivity = {
         obj.overturned_actions[k] = v.toString();
       });
     }
+    obj.last_slash_epoch = message.lastSlashEpoch !== BigInt(0) ? message.lastSlashEpoch?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: RoleActivityAminoMsg): RoleActivity {

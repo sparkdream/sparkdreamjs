@@ -645,6 +645,43 @@ export interface Params {
    * requirement entirely.
    */
   permissionlessMinReviewBountyRate: string;
+  /**
+   * --- Federation verifier pay (SPARK pool + DREAM stipend) ---
+   * 
+   * The verifier's whole reward distribution lives here rather than in
+   * x/federation, for the same reason the curator's lives here rather than in
+   * x/collect: the accuracy it scores comes from the shared RoleActivity
+   * record x/rep owns, and the epoch it resets is the epoch the accuracy ring
+   * is stamped in. Two modules distributing on two independently-editable
+   * cadences would both reset those per-epoch counters and neither would read
+   * a coherent window. x/federation keeps the verification mechanics -- bond,
+   * slash, challenge windows, cooldown base -- and reports actions here.
+   * 
+   * The verifier is the one bonded role whose work has an OFF-chain cost:
+   * fetching the peer's content and hashing it, then paying SPARK gas to
+   * submit. Paying only in DREAM made it the single role where doing the job
+   * drains the holder's SPARK and returns a token they cannot spend on gas.
+   */
+  maxVerifierRewardPool: string;
+  verifierRewardPoolOverflowBurnRatio: string;
+  verifierRewardEpochBlocks: bigint;
+  minVerifierAccuracy: string;
+  verifierAccuracyWindowEpochs: bigint;
+  /**
+   * Verified items required in an epoch to earn anything that epoch. This is
+   * the ONLY place volume enters verifier pay -- as a floor, never as a
+   * weight. See the score formula in x/rep/keeper/verifier_reward_distribution.go
+   * for why weighting by verified_count is the wrong curve for this role.
+   */
+  minEpochVerifications: number;
+  /**
+   * Flat DREAM minted per eligible verifier per epoch, scaled down pro-rata
+   * when the roster would push the epoch's total past the mint cap. Auto-bonds
+   * while the verifier is in RECOVERY so a slashed verifier can rebuild their
+   * bond by working rather than by fronting DREAM.
+   */
+  verifierDreamReward: string;
+  maxVerifierDreamMintPerEpoch: string;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Params";
@@ -1203,6 +1240,43 @@ export interface ParamsAmino {
    * requirement entirely.
    */
   permissionless_min_review_bounty_rate?: string;
+  /**
+   * --- Federation verifier pay (SPARK pool + DREAM stipend) ---
+   * 
+   * The verifier's whole reward distribution lives here rather than in
+   * x/federation, for the same reason the curator's lives here rather than in
+   * x/collect: the accuracy it scores comes from the shared RoleActivity
+   * record x/rep owns, and the epoch it resets is the epoch the accuracy ring
+   * is stamped in. Two modules distributing on two independently-editable
+   * cadences would both reset those per-epoch counters and neither would read
+   * a coherent window. x/federation keeps the verification mechanics -- bond,
+   * slash, challenge windows, cooldown base -- and reports actions here.
+   * 
+   * The verifier is the one bonded role whose work has an OFF-chain cost:
+   * fetching the peer's content and hashing it, then paying SPARK gas to
+   * submit. Paying only in DREAM made it the single role where doing the job
+   * drains the holder's SPARK and returns a token they cannot spend on gas.
+   */
+  max_verifier_reward_pool?: string;
+  verifier_reward_pool_overflow_burn_ratio?: string;
+  verifier_reward_epoch_blocks?: string;
+  min_verifier_accuracy?: string;
+  verifier_accuracy_window_epochs?: string;
+  /**
+   * Verified items required in an epoch to earn anything that epoch. This is
+   * the ONLY place volume enters verifier pay -- as a floor, never as a
+   * weight. See the score formula in x/rep/keeper/verifier_reward_distribution.go
+   * for why weighting by verified_count is the wrong curve for this role.
+   */
+  min_epoch_verifications?: number;
+  /**
+   * Flat DREAM minted per eligible verifier per epoch, scaled down pro-rata
+   * when the roster would push the epoch's total past the mint cap. Auto-bonds
+   * while the verifier is in RECOVERY so a slashed verifier can rebuild their
+   * bond by working rather than by fronting DREAM.
+   */
+  verifier_dream_reward?: string;
+  max_verifier_dream_mint_per_epoch?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/rep/Params";
@@ -1479,6 +1553,17 @@ export interface RepOperationalParams {
   reviewRequiredAboveBudget: string;
   reviewBountyReclaimDelay: bigint;
   permissionlessMinReviewBountyRate: string;
+  /**
+   * Mirrors the federation-verifier pay params in Params.
+   */
+  maxVerifierRewardPool: string;
+  verifierRewardPoolOverflowBurnRatio: string;
+  verifierRewardEpochBlocks: bigint;
+  minVerifierAccuracy: string;
+  verifierAccuracyWindowEpochs: bigint;
+  minEpochVerifications: number;
+  verifierDreamReward: string;
+  maxVerifierDreamMintPerEpoch: string;
 }
 export interface RepOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.rep.v1.RepOperationalParams";
@@ -1755,6 +1840,17 @@ export interface RepOperationalParamsAmino {
   review_required_above_budget?: string;
   review_bounty_reclaim_delay?: string;
   permissionless_min_review_bounty_rate?: string;
+  /**
+   * Mirrors the federation-verifier pay params in Params.
+   */
+  max_verifier_reward_pool?: string;
+  verifier_reward_pool_overflow_burn_ratio?: string;
+  verifier_reward_epoch_blocks?: string;
+  min_verifier_accuracy?: string;
+  verifier_accuracy_window_epochs?: string;
+  min_epoch_verifications?: number;
+  verifier_dream_reward?: string;
+  max_verifier_dream_mint_per_epoch?: string;
 }
 export interface RepOperationalParamsAminoMsg {
   type: "sparkdream/x/rep/RepOperationalParams";
@@ -2199,7 +2295,15 @@ function createBaseParams(): Params {
     curatorAccuracyWindowEpochs: BigInt(0),
     reviewRequiredAboveBudget: "",
     reviewBountyReclaimDelay: BigInt(0),
-    permissionlessMinReviewBountyRate: ""
+    permissionlessMinReviewBountyRate: "",
+    maxVerifierRewardPool: "",
+    verifierRewardPoolOverflowBurnRatio: "",
+    verifierRewardEpochBlocks: BigInt(0),
+    minVerifierAccuracy: "",
+    verifierAccuracyWindowEpochs: BigInt(0),
+    minEpochVerifications: 0,
+    verifierDreamReward: "",
+    maxVerifierDreamMintPerEpoch: ""
   };
 }
 /**
@@ -2572,6 +2676,30 @@ export const Params = {
     if (message.permissionlessMinReviewBountyRate !== "") {
       writer.uint32(962).string(Decimal.fromUserInput(message.permissionlessMinReviewBountyRate, 18).atomics);
     }
+    if (message.maxVerifierRewardPool !== "") {
+      writer.uint32(970).string(message.maxVerifierRewardPool);
+    }
+    if (message.verifierRewardPoolOverflowBurnRatio !== "") {
+      writer.uint32(978).string(Decimal.fromUserInput(message.verifierRewardPoolOverflowBurnRatio, 18).atomics);
+    }
+    if (message.verifierRewardEpochBlocks !== BigInt(0)) {
+      writer.uint32(984).uint64(message.verifierRewardEpochBlocks);
+    }
+    if (message.minVerifierAccuracy !== "") {
+      writer.uint32(994).string(Decimal.fromUserInput(message.minVerifierAccuracy, 18).atomics);
+    }
+    if (message.verifierAccuracyWindowEpochs !== BigInt(0)) {
+      writer.uint32(1000).uint64(message.verifierAccuracyWindowEpochs);
+    }
+    if (message.minEpochVerifications !== 0) {
+      writer.uint32(1008).uint32(message.minEpochVerifications);
+    }
+    if (message.verifierDreamReward !== "") {
+      writer.uint32(1018).string(message.verifierDreamReward);
+    }
+    if (message.maxVerifierDreamMintPerEpoch !== "") {
+      writer.uint32(1026).string(message.maxVerifierDreamMintPerEpoch);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -2941,6 +3069,30 @@ export const Params = {
         case 120:
           message.permissionlessMinReviewBountyRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
+        case 121:
+          message.maxVerifierRewardPool = reader.string();
+          break;
+        case 122:
+          message.verifierRewardPoolOverflowBurnRatio = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 123:
+          message.verifierRewardEpochBlocks = reader.uint64();
+          break;
+        case 124:
+          message.minVerifierAccuracy = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 125:
+          message.verifierAccuracyWindowEpochs = reader.uint64();
+          break;
+        case 126:
+          message.minEpochVerifications = reader.uint32();
+          break;
+        case 127:
+          message.verifierDreamReward = reader.string();
+          break;
+        case 128:
+          message.maxVerifierDreamMintPerEpoch = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3070,6 +3222,14 @@ export const Params = {
     message.reviewRequiredAboveBudget = object.reviewRequiredAboveBudget ?? "";
     message.reviewBountyReclaimDelay = object.reviewBountyReclaimDelay !== undefined && object.reviewBountyReclaimDelay !== null ? BigInt(object.reviewBountyReclaimDelay.toString()) : BigInt(0);
     message.permissionlessMinReviewBountyRate = object.permissionlessMinReviewBountyRate ?? "";
+    message.maxVerifierRewardPool = object.maxVerifierRewardPool ?? "";
+    message.verifierRewardPoolOverflowBurnRatio = object.verifierRewardPoolOverflowBurnRatio ?? "";
+    message.verifierRewardEpochBlocks = object.verifierRewardEpochBlocks !== undefined && object.verifierRewardEpochBlocks !== null ? BigInt(object.verifierRewardEpochBlocks.toString()) : BigInt(0);
+    message.minVerifierAccuracy = object.minVerifierAccuracy ?? "";
+    message.verifierAccuracyWindowEpochs = object.verifierAccuracyWindowEpochs !== undefined && object.verifierAccuracyWindowEpochs !== null ? BigInt(object.verifierAccuracyWindowEpochs.toString()) : BigInt(0);
+    message.minEpochVerifications = object.minEpochVerifications ?? 0;
+    message.verifierDreamReward = object.verifierDreamReward ?? "";
+    message.maxVerifierDreamMintPerEpoch = object.maxVerifierDreamMintPerEpoch ?? "";
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -3434,6 +3594,30 @@ export const Params = {
     if (object.permissionless_min_review_bounty_rate !== undefined && object.permissionless_min_review_bounty_rate !== null) {
       message.permissionlessMinReviewBountyRate = object.permissionless_min_review_bounty_rate;
     }
+    if (object.max_verifier_reward_pool !== undefined && object.max_verifier_reward_pool !== null) {
+      message.maxVerifierRewardPool = object.max_verifier_reward_pool;
+    }
+    if (object.verifier_reward_pool_overflow_burn_ratio !== undefined && object.verifier_reward_pool_overflow_burn_ratio !== null) {
+      message.verifierRewardPoolOverflowBurnRatio = object.verifier_reward_pool_overflow_burn_ratio;
+    }
+    if (object.verifier_reward_epoch_blocks !== undefined && object.verifier_reward_epoch_blocks !== null) {
+      message.verifierRewardEpochBlocks = BigInt(object.verifier_reward_epoch_blocks);
+    }
+    if (object.min_verifier_accuracy !== undefined && object.min_verifier_accuracy !== null) {
+      message.minVerifierAccuracy = object.min_verifier_accuracy;
+    }
+    if (object.verifier_accuracy_window_epochs !== undefined && object.verifier_accuracy_window_epochs !== null) {
+      message.verifierAccuracyWindowEpochs = BigInt(object.verifier_accuracy_window_epochs);
+    }
+    if (object.min_epoch_verifications !== undefined && object.min_epoch_verifications !== null) {
+      message.minEpochVerifications = object.min_epoch_verifications;
+    }
+    if (object.verifier_dream_reward !== undefined && object.verifier_dream_reward !== null) {
+      message.verifierDreamReward = object.verifier_dream_reward;
+    }
+    if (object.max_verifier_dream_mint_per_epoch !== undefined && object.max_verifier_dream_mint_per_epoch !== null) {
+      message.maxVerifierDreamMintPerEpoch = object.max_verifier_dream_mint_per_epoch;
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -3558,6 +3742,14 @@ export const Params = {
     obj.review_required_above_budget = message.reviewRequiredAboveBudget === "" ? undefined : message.reviewRequiredAboveBudget;
     obj.review_bounty_reclaim_delay = message.reviewBountyReclaimDelay !== BigInt(0) ? message.reviewBountyReclaimDelay?.toString() : undefined;
     obj.permissionless_min_review_bounty_rate = message.permissionlessMinReviewBountyRate === "" ? undefined : message.permissionlessMinReviewBountyRate;
+    obj.max_verifier_reward_pool = message.maxVerifierRewardPool === "" ? undefined : message.maxVerifierRewardPool;
+    obj.verifier_reward_pool_overflow_burn_ratio = message.verifierRewardPoolOverflowBurnRatio === "" ? undefined : message.verifierRewardPoolOverflowBurnRatio;
+    obj.verifier_reward_epoch_blocks = message.verifierRewardEpochBlocks !== BigInt(0) ? message.verifierRewardEpochBlocks?.toString() : undefined;
+    obj.min_verifier_accuracy = message.minVerifierAccuracy === "" ? undefined : message.minVerifierAccuracy;
+    obj.verifier_accuracy_window_epochs = message.verifierAccuracyWindowEpochs !== BigInt(0) ? message.verifierAccuracyWindowEpochs?.toString() : undefined;
+    obj.min_epoch_verifications = message.minEpochVerifications === 0 ? undefined : message.minEpochVerifications;
+    obj.verifier_dream_reward = message.verifierDreamReward === "" ? undefined : message.verifierDreamReward;
+    obj.max_verifier_dream_mint_per_epoch = message.maxVerifierDreamMintPerEpoch === "" ? undefined : message.maxVerifierDreamMintPerEpoch;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {
@@ -3683,7 +3875,15 @@ function createBaseRepOperationalParams(): RepOperationalParams {
     curatorAccuracyWindowEpochs: BigInt(0),
     reviewRequiredAboveBudget: "",
     reviewBountyReclaimDelay: BigInt(0),
-    permissionlessMinReviewBountyRate: ""
+    permissionlessMinReviewBountyRate: "",
+    maxVerifierRewardPool: "",
+    verifierRewardPoolOverflowBurnRatio: "",
+    verifierRewardEpochBlocks: BigInt(0),
+    minVerifierAccuracy: "",
+    verifierAccuracyWindowEpochs: BigInt(0),
+    minEpochVerifications: 0,
+    verifierDreamReward: "",
+    maxVerifierDreamMintPerEpoch: ""
   };
 }
 /**
@@ -3998,6 +4198,30 @@ export const RepOperationalParams = {
     if (message.permissionlessMinReviewBountyRate !== "") {
       writer.uint32(802).string(Decimal.fromUserInput(message.permissionlessMinReviewBountyRate, 18).atomics);
     }
+    if (message.maxVerifierRewardPool !== "") {
+      writer.uint32(810).string(message.maxVerifierRewardPool);
+    }
+    if (message.verifierRewardPoolOverflowBurnRatio !== "") {
+      writer.uint32(818).string(Decimal.fromUserInput(message.verifierRewardPoolOverflowBurnRatio, 18).atomics);
+    }
+    if (message.verifierRewardEpochBlocks !== BigInt(0)) {
+      writer.uint32(824).uint64(message.verifierRewardEpochBlocks);
+    }
+    if (message.minVerifierAccuracy !== "") {
+      writer.uint32(834).string(Decimal.fromUserInput(message.minVerifierAccuracy, 18).atomics);
+    }
+    if (message.verifierAccuracyWindowEpochs !== BigInt(0)) {
+      writer.uint32(840).uint64(message.verifierAccuracyWindowEpochs);
+    }
+    if (message.minEpochVerifications !== 0) {
+      writer.uint32(848).uint32(message.minEpochVerifications);
+    }
+    if (message.verifierDreamReward !== "") {
+      writer.uint32(858).string(message.verifierDreamReward);
+    }
+    if (message.maxVerifierDreamMintPerEpoch !== "") {
+      writer.uint32(866).string(message.maxVerifierDreamMintPerEpoch);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): RepOperationalParams {
@@ -4307,6 +4531,30 @@ export const RepOperationalParams = {
         case 100:
           message.permissionlessMinReviewBountyRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
+        case 101:
+          message.maxVerifierRewardPool = reader.string();
+          break;
+        case 102:
+          message.verifierRewardPoolOverflowBurnRatio = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 103:
+          message.verifierRewardEpochBlocks = reader.uint64();
+          break;
+        case 104:
+          message.minVerifierAccuracy = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 105:
+          message.verifierAccuracyWindowEpochs = reader.uint64();
+          break;
+        case 106:
+          message.minEpochVerifications = reader.uint32();
+          break;
+        case 107:
+          message.verifierDreamReward = reader.string();
+          break;
+        case 108:
+          message.maxVerifierDreamMintPerEpoch = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4416,6 +4664,14 @@ export const RepOperationalParams = {
     message.reviewRequiredAboveBudget = object.reviewRequiredAboveBudget ?? "";
     message.reviewBountyReclaimDelay = object.reviewBountyReclaimDelay !== undefined && object.reviewBountyReclaimDelay !== null ? BigInt(object.reviewBountyReclaimDelay.toString()) : BigInt(0);
     message.permissionlessMinReviewBountyRate = object.permissionlessMinReviewBountyRate ?? "";
+    message.maxVerifierRewardPool = object.maxVerifierRewardPool ?? "";
+    message.verifierRewardPoolOverflowBurnRatio = object.verifierRewardPoolOverflowBurnRatio ?? "";
+    message.verifierRewardEpochBlocks = object.verifierRewardEpochBlocks !== undefined && object.verifierRewardEpochBlocks !== null ? BigInt(object.verifierRewardEpochBlocks.toString()) : BigInt(0);
+    message.minVerifierAccuracy = object.minVerifierAccuracy ?? "";
+    message.verifierAccuracyWindowEpochs = object.verifierAccuracyWindowEpochs !== undefined && object.verifierAccuracyWindowEpochs !== null ? BigInt(object.verifierAccuracyWindowEpochs.toString()) : BigInt(0);
+    message.minEpochVerifications = object.minEpochVerifications ?? 0;
+    message.verifierDreamReward = object.verifierDreamReward ?? "";
+    message.maxVerifierDreamMintPerEpoch = object.maxVerifierDreamMintPerEpoch ?? "";
     return message;
   },
   fromAmino(object: RepOperationalParamsAmino): RepOperationalParams {
@@ -4720,6 +4976,30 @@ export const RepOperationalParams = {
     if (object.permissionless_min_review_bounty_rate !== undefined && object.permissionless_min_review_bounty_rate !== null) {
       message.permissionlessMinReviewBountyRate = object.permissionless_min_review_bounty_rate;
     }
+    if (object.max_verifier_reward_pool !== undefined && object.max_verifier_reward_pool !== null) {
+      message.maxVerifierRewardPool = object.max_verifier_reward_pool;
+    }
+    if (object.verifier_reward_pool_overflow_burn_ratio !== undefined && object.verifier_reward_pool_overflow_burn_ratio !== null) {
+      message.verifierRewardPoolOverflowBurnRatio = object.verifier_reward_pool_overflow_burn_ratio;
+    }
+    if (object.verifier_reward_epoch_blocks !== undefined && object.verifier_reward_epoch_blocks !== null) {
+      message.verifierRewardEpochBlocks = BigInt(object.verifier_reward_epoch_blocks);
+    }
+    if (object.min_verifier_accuracy !== undefined && object.min_verifier_accuracy !== null) {
+      message.minVerifierAccuracy = object.min_verifier_accuracy;
+    }
+    if (object.verifier_accuracy_window_epochs !== undefined && object.verifier_accuracy_window_epochs !== null) {
+      message.verifierAccuracyWindowEpochs = BigInt(object.verifier_accuracy_window_epochs);
+    }
+    if (object.min_epoch_verifications !== undefined && object.min_epoch_verifications !== null) {
+      message.minEpochVerifications = object.min_epoch_verifications;
+    }
+    if (object.verifier_dream_reward !== undefined && object.verifier_dream_reward !== null) {
+      message.verifierDreamReward = object.verifier_dream_reward;
+    }
+    if (object.max_verifier_dream_mint_per_epoch !== undefined && object.max_verifier_dream_mint_per_epoch !== null) {
+      message.maxVerifierDreamMintPerEpoch = object.max_verifier_dream_mint_per_epoch;
+    }
     return message;
   },
   toAmino(message: RepOperationalParams): RepOperationalParamsAmino {
@@ -4824,6 +5104,14 @@ export const RepOperationalParams = {
     obj.review_required_above_budget = message.reviewRequiredAboveBudget === "" ? undefined : message.reviewRequiredAboveBudget;
     obj.review_bounty_reclaim_delay = message.reviewBountyReclaimDelay !== BigInt(0) ? message.reviewBountyReclaimDelay?.toString() : undefined;
     obj.permissionless_min_review_bounty_rate = message.permissionlessMinReviewBountyRate === "" ? undefined : message.permissionlessMinReviewBountyRate;
+    obj.max_verifier_reward_pool = message.maxVerifierRewardPool === "" ? undefined : message.maxVerifierRewardPool;
+    obj.verifier_reward_pool_overflow_burn_ratio = message.verifierRewardPoolOverflowBurnRatio === "" ? undefined : message.verifierRewardPoolOverflowBurnRatio;
+    obj.verifier_reward_epoch_blocks = message.verifierRewardEpochBlocks !== BigInt(0) ? message.verifierRewardEpochBlocks?.toString() : undefined;
+    obj.min_verifier_accuracy = message.minVerifierAccuracy === "" ? undefined : message.minVerifierAccuracy;
+    obj.verifier_accuracy_window_epochs = message.verifierAccuracyWindowEpochs !== BigInt(0) ? message.verifierAccuracyWindowEpochs?.toString() : undefined;
+    obj.min_epoch_verifications = message.minEpochVerifications === 0 ? undefined : message.minEpochVerifications;
+    obj.verifier_dream_reward = message.verifierDreamReward === "" ? undefined : message.verifierDreamReward;
+    obj.max_verifier_dream_mint_per_epoch = message.maxVerifierDreamMintPerEpoch === "" ? undefined : message.maxVerifierDreamMintPerEpoch;
     return obj;
   },
   fromAminoMsg(object: RepOperationalParamsAminoMsg): RepOperationalParams {

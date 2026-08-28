@@ -88,12 +88,43 @@ export interface Params {
   challengeJuryDeadline: Duration;
   verifierDemotionCooldown: Duration;
   verifierOverturnBaseCooldown: Duration;
+  /**
+   * upheld_to_reset_overturns is how many CONSECUTIVE upheld verdicts clear a
+   * verifier's overturn streak. Federation owns the value; x/rep enforces it,
+   * via BondedRoleConfig.upheld_to_reset_overturns written through by
+   * SyncVerifierBondedRoleConfig -- same path as the two cooldowns above.
+   */
   upheldToResetOverturns: number;
-  minEpochVerifications: number;
-  minVerifierAccuracy: string;
-  operatorRewardShare: string;
-  verifierDreamReward: string;
-  maxVerifierDreamMintPerEpoch: string;
+  /**
+   * operator_reward_inflation_share is the fraction of the community pool's
+   * INFLATION income federation may draw per UTC day:
+   * 
+   *   daily_allowance = annual_provisions * community_tax * share / 365
+   * 
+   * A share rather than a fixed amount, for the reason x/rep documents: a
+   * fixed draw takes its largest share of the pool exactly when the pool is
+   * poorest. The base is the inflation rate, never the pool balance -- the
+   * balance holds the genesis allocation earmarked for the councils. Zero
+   * disables automatic funding, leaving the pool to direct sends.
+   */
+  operatorRewardInflationShare: string;
+  /**
+   * Upper cap on the pool; excess is burned at the ratio below, so an
+   * over-funded pool cannot sit as a standing prize.
+   */
+  maxOperatorRewardPool: string;
+  operatorRewardPoolOverflowBurnRatio: string;
+  operatorRewardEpochBlocks: bigint;
+  /**
+   * Minimum independently-verified submissions in an epoch to earn anything.
+   */
+  minEpochVerifiedSubmissions: number;
+  /**
+   * Ceiling on epoch_unverified / epoch_submitted. An operator flooding the
+   * queue with content no verifier will confirm is spending verifier
+   * attention rather than producing value.
+   */
+  maxUnverifiedRate: string;
   /**
    * Anonymous challenge resolution
    */
@@ -206,12 +237,43 @@ export interface ParamsAmino {
   challenge_jury_deadline?: DurationAmino;
   verifier_demotion_cooldown?: DurationAmino;
   verifier_overturn_base_cooldown?: DurationAmino;
+  /**
+   * upheld_to_reset_overturns is how many CONSECUTIVE upheld verdicts clear a
+   * verifier's overturn streak. Federation owns the value; x/rep enforces it,
+   * via BondedRoleConfig.upheld_to_reset_overturns written through by
+   * SyncVerifierBondedRoleConfig -- same path as the two cooldowns above.
+   */
   upheld_to_reset_overturns?: number;
-  min_epoch_verifications?: number;
-  min_verifier_accuracy?: string;
-  operator_reward_share?: string;
-  verifier_dream_reward?: string;
-  max_verifier_dream_mint_per_epoch?: string;
+  /**
+   * operator_reward_inflation_share is the fraction of the community pool's
+   * INFLATION income federation may draw per UTC day:
+   * 
+   *   daily_allowance = annual_provisions * community_tax * share / 365
+   * 
+   * A share rather than a fixed amount, for the reason x/rep documents: a
+   * fixed draw takes its largest share of the pool exactly when the pool is
+   * poorest. The base is the inflation rate, never the pool balance -- the
+   * balance holds the genesis allocation earmarked for the councils. Zero
+   * disables automatic funding, leaving the pool to direct sends.
+   */
+  operator_reward_inflation_share?: string;
+  /**
+   * Upper cap on the pool; excess is burned at the ratio below, so an
+   * over-funded pool cannot sit as a standing prize.
+   */
+  max_operator_reward_pool?: string;
+  operator_reward_pool_overflow_burn_ratio?: string;
+  operator_reward_epoch_blocks?: string;
+  /**
+   * Minimum independently-verified submissions in an epoch to earn anything.
+   */
+  min_epoch_verified_submissions?: number;
+  /**
+   * Ceiling on epoch_unverified / epoch_submitted. An operator flooding the
+   * queue with content no verifier will confirm is spending verifier
+   * attention rather than producing value.
+   */
+  max_unverified_rate?: string;
   /**
    * Anonymous challenge resolution
    */
@@ -318,11 +380,12 @@ function createBaseParams(): Params {
     verifierDemotionCooldown: Duration.fromPartial({}),
     verifierOverturnBaseCooldown: Duration.fromPartial({}),
     upheldToResetOverturns: 0,
-    minEpochVerifications: 0,
-    minVerifierAccuracy: "",
-    operatorRewardShare: "",
-    verifierDreamReward: "",
-    maxVerifierDreamMintPerEpoch: "",
+    operatorRewardInflationShare: "",
+    maxOperatorRewardPool: "",
+    operatorRewardPoolOverflowBurnRatio: "",
+    operatorRewardEpochBlocks: BigInt(0),
+    minEpochVerifiedSubmissions: 0,
+    maxUnverifiedRate: "",
     arbiterQuorum: 0,
     arbiterResolutionWindow: Duration.fromPartial({}),
     arbiterEscalationWindow: Duration.fromPartial({}),
@@ -342,130 +405,133 @@ export const Params = {
   aminoType: "sparkdream/x/federation/Params",
   encode(message: Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.maxBridgesPerPeer !== BigInt(0)) {
-      writer.uint32(16).uint64(message.maxBridgesPerPeer);
+      writer.uint32(8).uint64(message.maxBridgesPerPeer);
     }
     for (const v of message.knownContentTypes) {
-      writer.uint32(42).string(v!);
+      writer.uint32(18).string(v!);
     }
     if (message.maxInboundPerBlock !== BigInt(0)) {
-      writer.uint32(48).uint64(message.maxInboundPerBlock);
+      writer.uint32(24).uint64(message.maxInboundPerBlock);
     }
     if (message.maxContentBodySize !== BigInt(0)) {
-      writer.uint32(56).uint64(message.maxContentBodySize);
+      writer.uint32(32).uint64(message.maxContentBodySize);
     }
     if (message.maxContentUriSize !== BigInt(0)) {
-      writer.uint32(64).uint64(message.maxContentUriSize);
+      writer.uint32(40).uint64(message.maxContentUriSize);
     }
     if (message.maxProtocolMetadataSize !== BigInt(0)) {
-      writer.uint32(72).uint64(message.maxProtocolMetadataSize);
+      writer.uint32(48).uint64(message.maxProtocolMetadataSize);
     }
     if (message.contentTtl !== undefined) {
-      Duration.encode(message.contentTtl, writer.uint32(82).fork()).ldelim();
+      Duration.encode(message.contentTtl, writer.uint32(58).fork()).ldelim();
     }
     if (message.attestationTtl !== undefined) {
-      Duration.encode(message.attestationTtl, writer.uint32(90).fork()).ldelim();
+      Duration.encode(message.attestationTtl, writer.uint32(66).fork()).ldelim();
     }
     if (message.globalMaxTrustCredit !== 0) {
-      writer.uint32(96).uint32(message.globalMaxTrustCredit);
+      writer.uint32(72).uint32(message.globalMaxTrustCredit);
     }
     if (message.trustDiscountRate !== "") {
-      writer.uint32(106).string(Decimal.fromUserInput(message.trustDiscountRate, 18).atomics);
+      writer.uint32(82).string(Decimal.fromUserInput(message.trustDiscountRate, 18).atomics);
     }
     if (message.maxIdentityLinksPerUser !== 0) {
-      writer.uint32(112).uint32(message.maxIdentityLinksPerUser);
+      writer.uint32(88).uint32(message.maxIdentityLinksPerUser);
     }
     if (message.unverifiedLinkTtl !== undefined) {
-      Duration.encode(message.unverifiedLinkTtl, writer.uint32(122).fork()).ldelim();
+      Duration.encode(message.unverifiedLinkTtl, writer.uint32(98).fork()).ldelim();
     }
     if (message.challengeTtl !== undefined) {
-      Duration.encode(message.challengeTtl, writer.uint32(130).fork()).ldelim();
+      Duration.encode(message.challengeTtl, writer.uint32(106).fork()).ldelim();
     }
     if (message.bridgeInactivityThreshold !== BigInt(0)) {
-      writer.uint32(136).uint64(message.bridgeInactivityThreshold);
+      writer.uint32(112).uint64(message.bridgeInactivityThreshold);
     }
     if (message.ibcPort !== "") {
-      writer.uint32(146).string(message.ibcPort);
+      writer.uint32(122).string(message.ibcPort);
     }
     if (message.ibcChannelVersion !== "") {
-      writer.uint32(154).string(message.ibcChannelVersion);
+      writer.uint32(130).string(message.ibcChannelVersion);
     }
     if (message.ibcPacketTimeout !== undefined) {
-      Duration.encode(message.ibcPacketTimeout, writer.uint32(162).fork()).ldelim();
+      Duration.encode(message.ibcPacketTimeout, writer.uint32(138).fork()).ldelim();
     }
     if (message.maxPrunePerBlock !== BigInt(0)) {
-      writer.uint32(168).uint64(message.maxPrunePerBlock);
+      writer.uint32(144).uint64(message.maxPrunePerBlock);
     }
     if (message.maxOutboundPerBlock !== BigInt(0)) {
-      writer.uint32(176).uint64(message.maxOutboundPerBlock);
+      writer.uint32(152).uint64(message.maxOutboundPerBlock);
     }
     if (message.rateLimitWindow !== undefined) {
-      Duration.encode(message.rateLimitWindow, writer.uint32(186).fork()).ldelim();
+      Duration.encode(message.rateLimitWindow, writer.uint32(162).fork()).ldelim();
     }
     if (message.minVerifierTrustLevel !== 0) {
-      writer.uint32(192).uint32(message.minVerifierTrustLevel);
+      writer.uint32(168).uint32(message.minVerifierTrustLevel);
     }
     if (message.minVerifierBond !== "") {
-      writer.uint32(202).string(message.minVerifierBond);
+      writer.uint32(178).string(message.minVerifierBond);
     }
     if (message.verifierRecoveryThreshold !== "") {
-      writer.uint32(210).string(message.verifierRecoveryThreshold);
+      writer.uint32(186).string(message.verifierRecoveryThreshold);
     }
     if (message.verifierSlashAmount !== "") {
-      writer.uint32(218).string(message.verifierSlashAmount);
+      writer.uint32(194).string(message.verifierSlashAmount);
     }
     if (message.verificationWindow !== undefined) {
-      Duration.encode(message.verificationWindow, writer.uint32(226).fork()).ldelim();
+      Duration.encode(message.verificationWindow, writer.uint32(202).fork()).ldelim();
     }
     if (message.challengeWindow !== undefined) {
-      Duration.encode(message.challengeWindow, writer.uint32(234).fork()).ldelim();
+      Duration.encode(message.challengeWindow, writer.uint32(210).fork()).ldelim();
     }
     if (message.challengeFeeAmount !== "") {
-      writer.uint32(242).string(message.challengeFeeAmount);
+      writer.uint32(218).string(message.challengeFeeAmount);
     }
     if (message.challengeJuryDeadline !== undefined) {
-      Duration.encode(message.challengeJuryDeadline, writer.uint32(250).fork()).ldelim();
+      Duration.encode(message.challengeJuryDeadline, writer.uint32(226).fork()).ldelim();
     }
     if (message.verifierDemotionCooldown !== undefined) {
-      Duration.encode(message.verifierDemotionCooldown, writer.uint32(258).fork()).ldelim();
+      Duration.encode(message.verifierDemotionCooldown, writer.uint32(234).fork()).ldelim();
     }
     if (message.verifierOverturnBaseCooldown !== undefined) {
-      Duration.encode(message.verifierOverturnBaseCooldown, writer.uint32(266).fork()).ldelim();
+      Duration.encode(message.verifierOverturnBaseCooldown, writer.uint32(242).fork()).ldelim();
     }
     if (message.upheldToResetOverturns !== 0) {
-      writer.uint32(272).uint32(message.upheldToResetOverturns);
+      writer.uint32(248).uint32(message.upheldToResetOverturns);
     }
-    if (message.minEpochVerifications !== 0) {
-      writer.uint32(280).uint32(message.minEpochVerifications);
+    if (message.operatorRewardInflationShare !== "") {
+      writer.uint32(258).string(Decimal.fromUserInput(message.operatorRewardInflationShare, 18).atomics);
     }
-    if (message.minVerifierAccuracy !== "") {
-      writer.uint32(290).string(Decimal.fromUserInput(message.minVerifierAccuracy, 18).atomics);
+    if (message.maxOperatorRewardPool !== "") {
+      writer.uint32(266).string(message.maxOperatorRewardPool);
     }
-    if (message.operatorRewardShare !== "") {
-      writer.uint32(298).string(Decimal.fromUserInput(message.operatorRewardShare, 18).atomics);
+    if (message.operatorRewardPoolOverflowBurnRatio !== "") {
+      writer.uint32(274).string(Decimal.fromUserInput(message.operatorRewardPoolOverflowBurnRatio, 18).atomics);
     }
-    if (message.verifierDreamReward !== "") {
-      writer.uint32(306).string(message.verifierDreamReward);
+    if (message.operatorRewardEpochBlocks !== BigInt(0)) {
+      writer.uint32(280).uint64(message.operatorRewardEpochBlocks);
     }
-    if (message.maxVerifierDreamMintPerEpoch !== "") {
-      writer.uint32(314).string(message.maxVerifierDreamMintPerEpoch);
+    if (message.minEpochVerifiedSubmissions !== 0) {
+      writer.uint32(288).uint32(message.minEpochVerifiedSubmissions);
+    }
+    if (message.maxUnverifiedRate !== "") {
+      writer.uint32(298).string(Decimal.fromUserInput(message.maxUnverifiedRate, 18).atomics);
     }
     if (message.arbiterQuorum !== 0) {
-      writer.uint32(320).uint32(message.arbiterQuorum);
+      writer.uint32(304).uint32(message.arbiterQuorum);
     }
     if (message.arbiterResolutionWindow !== undefined) {
-      Duration.encode(message.arbiterResolutionWindow, writer.uint32(330).fork()).ldelim();
+      Duration.encode(message.arbiterResolutionWindow, writer.uint32(314).fork()).ldelim();
     }
     if (message.arbiterEscalationWindow !== undefined) {
-      Duration.encode(message.arbiterEscalationWindow, writer.uint32(338).fork()).ldelim();
+      Duration.encode(message.arbiterEscalationWindow, writer.uint32(322).fork()).ldelim();
     }
     if (message.escalationFeeAmount !== "") {
-      writer.uint32(346).string(message.escalationFeeAmount);
+      writer.uint32(330).string(message.escalationFeeAmount);
     }
     if (message.challengeCooldown !== undefined) {
-      Duration.encode(message.challengeCooldown, writer.uint32(354).fork()).ldelim();
+      Duration.encode(message.challengeCooldown, writer.uint32(338).fork()).ldelim();
     }
     if (message.verifierUnbondCooldown !== undefined) {
-      Duration.encode(message.verifierUnbondCooldown, writer.uint32(362).fork()).ldelim();
+      Duration.encode(message.verifierUnbondCooldown, writer.uint32(346).fork()).ldelim();
     }
     return writer;
   },
@@ -476,130 +542,133 @@ export const Params = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 2:
+        case 1:
           message.maxBridgesPerPeer = reader.uint64();
           break;
-        case 5:
+        case 2:
           message.knownContentTypes.push(reader.string());
           break;
-        case 6:
+        case 3:
           message.maxInboundPerBlock = reader.uint64();
           break;
-        case 7:
+        case 4:
           message.maxContentBodySize = reader.uint64();
           break;
-        case 8:
+        case 5:
           message.maxContentUriSize = reader.uint64();
           break;
-        case 9:
+        case 6:
           message.maxProtocolMetadataSize = reader.uint64();
           break;
-        case 10:
+        case 7:
           message.contentTtl = Duration.decode(reader, reader.uint32());
           break;
-        case 11:
+        case 8:
           message.attestationTtl = Duration.decode(reader, reader.uint32());
           break;
-        case 12:
+        case 9:
           message.globalMaxTrustCredit = reader.uint32();
           break;
-        case 13:
+        case 10:
           message.trustDiscountRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 14:
+        case 11:
           message.maxIdentityLinksPerUser = reader.uint32();
           break;
-        case 15:
+        case 12:
           message.unverifiedLinkTtl = Duration.decode(reader, reader.uint32());
           break;
-        case 16:
+        case 13:
           message.challengeTtl = Duration.decode(reader, reader.uint32());
           break;
-        case 17:
+        case 14:
           message.bridgeInactivityThreshold = reader.uint64();
           break;
-        case 18:
+        case 15:
           message.ibcPort = reader.string();
           break;
-        case 19:
+        case 16:
           message.ibcChannelVersion = reader.string();
           break;
-        case 20:
+        case 17:
           message.ibcPacketTimeout = Duration.decode(reader, reader.uint32());
           break;
-        case 21:
+        case 18:
           message.maxPrunePerBlock = reader.uint64();
           break;
-        case 22:
+        case 19:
           message.maxOutboundPerBlock = reader.uint64();
           break;
-        case 23:
+        case 20:
           message.rateLimitWindow = Duration.decode(reader, reader.uint32());
           break;
-        case 24:
+        case 21:
           message.minVerifierTrustLevel = reader.uint32();
           break;
-        case 25:
+        case 22:
           message.minVerifierBond = reader.string();
           break;
-        case 26:
+        case 23:
           message.verifierRecoveryThreshold = reader.string();
           break;
-        case 27:
+        case 24:
           message.verifierSlashAmount = reader.string();
           break;
-        case 28:
+        case 25:
           message.verificationWindow = Duration.decode(reader, reader.uint32());
           break;
-        case 29:
+        case 26:
           message.challengeWindow = Duration.decode(reader, reader.uint32());
           break;
-        case 30:
+        case 27:
           message.challengeFeeAmount = reader.string();
           break;
-        case 31:
+        case 28:
           message.challengeJuryDeadline = Duration.decode(reader, reader.uint32());
           break;
-        case 32:
+        case 29:
           message.verifierDemotionCooldown = Duration.decode(reader, reader.uint32());
           break;
-        case 33:
+        case 30:
           message.verifierOverturnBaseCooldown = Duration.decode(reader, reader.uint32());
           break;
-        case 34:
+        case 31:
           message.upheldToResetOverturns = reader.uint32();
           break;
+        case 32:
+          message.operatorRewardInflationShare = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 33:
+          message.maxOperatorRewardPool = reader.string();
+          break;
+        case 34:
+          message.operatorRewardPoolOverflowBurnRatio = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
         case 35:
-          message.minEpochVerifications = reader.uint32();
+          message.operatorRewardEpochBlocks = reader.uint64();
           break;
         case 36:
-          message.minVerifierAccuracy = Decimal.fromAtomics(reader.string(), 18).toString();
+          message.minEpochVerifiedSubmissions = reader.uint32();
           break;
         case 37:
-          message.operatorRewardShare = Decimal.fromAtomics(reader.string(), 18).toString();
+          message.maxUnverifiedRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
         case 38:
-          message.verifierDreamReward = reader.string();
-          break;
-        case 39:
-          message.maxVerifierDreamMintPerEpoch = reader.string();
-          break;
-        case 40:
           message.arbiterQuorum = reader.uint32();
           break;
-        case 41:
+        case 39:
           message.arbiterResolutionWindow = Duration.decode(reader, reader.uint32());
           break;
-        case 42:
+        case 40:
           message.arbiterEscalationWindow = Duration.decode(reader, reader.uint32());
           break;
-        case 43:
+        case 41:
           message.escalationFeeAmount = reader.string();
           break;
-        case 44:
+        case 42:
           message.challengeCooldown = Duration.decode(reader, reader.uint32());
           break;
-        case 45:
+        case 43:
           message.verifierUnbondCooldown = Duration.decode(reader, reader.uint32());
           break;
         default:
@@ -642,11 +711,12 @@ export const Params = {
     message.verifierDemotionCooldown = object.verifierDemotionCooldown !== undefined && object.verifierDemotionCooldown !== null ? Duration.fromPartial(object.verifierDemotionCooldown) : undefined;
     message.verifierOverturnBaseCooldown = object.verifierOverturnBaseCooldown !== undefined && object.verifierOverturnBaseCooldown !== null ? Duration.fromPartial(object.verifierOverturnBaseCooldown) : undefined;
     message.upheldToResetOverturns = object.upheldToResetOverturns ?? 0;
-    message.minEpochVerifications = object.minEpochVerifications ?? 0;
-    message.minVerifierAccuracy = object.minVerifierAccuracy ?? "";
-    message.operatorRewardShare = object.operatorRewardShare ?? "";
-    message.verifierDreamReward = object.verifierDreamReward ?? "";
-    message.maxVerifierDreamMintPerEpoch = object.maxVerifierDreamMintPerEpoch ?? "";
+    message.operatorRewardInflationShare = object.operatorRewardInflationShare ?? "";
+    message.maxOperatorRewardPool = object.maxOperatorRewardPool ?? "";
+    message.operatorRewardPoolOverflowBurnRatio = object.operatorRewardPoolOverflowBurnRatio ?? "";
+    message.operatorRewardEpochBlocks = object.operatorRewardEpochBlocks !== undefined && object.operatorRewardEpochBlocks !== null ? BigInt(object.operatorRewardEpochBlocks.toString()) : BigInt(0);
+    message.minEpochVerifiedSubmissions = object.minEpochVerifiedSubmissions ?? 0;
+    message.maxUnverifiedRate = object.maxUnverifiedRate ?? "";
     message.arbiterQuorum = object.arbiterQuorum ?? 0;
     message.arbiterResolutionWindow = object.arbiterResolutionWindow !== undefined && object.arbiterResolutionWindow !== null ? Duration.fromPartial(object.arbiterResolutionWindow) : undefined;
     message.arbiterEscalationWindow = object.arbiterEscalationWindow !== undefined && object.arbiterEscalationWindow !== null ? Duration.fromPartial(object.arbiterEscalationWindow) : undefined;
@@ -748,20 +818,23 @@ export const Params = {
     if (object.upheld_to_reset_overturns !== undefined && object.upheld_to_reset_overturns !== null) {
       message.upheldToResetOverturns = object.upheld_to_reset_overturns;
     }
-    if (object.min_epoch_verifications !== undefined && object.min_epoch_verifications !== null) {
-      message.minEpochVerifications = object.min_epoch_verifications;
+    if (object.operator_reward_inflation_share !== undefined && object.operator_reward_inflation_share !== null) {
+      message.operatorRewardInflationShare = object.operator_reward_inflation_share;
     }
-    if (object.min_verifier_accuracy !== undefined && object.min_verifier_accuracy !== null) {
-      message.minVerifierAccuracy = object.min_verifier_accuracy;
+    if (object.max_operator_reward_pool !== undefined && object.max_operator_reward_pool !== null) {
+      message.maxOperatorRewardPool = object.max_operator_reward_pool;
     }
-    if (object.operator_reward_share !== undefined && object.operator_reward_share !== null) {
-      message.operatorRewardShare = object.operator_reward_share;
+    if (object.operator_reward_pool_overflow_burn_ratio !== undefined && object.operator_reward_pool_overflow_burn_ratio !== null) {
+      message.operatorRewardPoolOverflowBurnRatio = object.operator_reward_pool_overflow_burn_ratio;
     }
-    if (object.verifier_dream_reward !== undefined && object.verifier_dream_reward !== null) {
-      message.verifierDreamReward = object.verifier_dream_reward;
+    if (object.operator_reward_epoch_blocks !== undefined && object.operator_reward_epoch_blocks !== null) {
+      message.operatorRewardEpochBlocks = BigInt(object.operator_reward_epoch_blocks);
     }
-    if (object.max_verifier_dream_mint_per_epoch !== undefined && object.max_verifier_dream_mint_per_epoch !== null) {
-      message.maxVerifierDreamMintPerEpoch = object.max_verifier_dream_mint_per_epoch;
+    if (object.min_epoch_verified_submissions !== undefined && object.min_epoch_verified_submissions !== null) {
+      message.minEpochVerifiedSubmissions = object.min_epoch_verified_submissions;
+    }
+    if (object.max_unverified_rate !== undefined && object.max_unverified_rate !== null) {
+      message.maxUnverifiedRate = object.max_unverified_rate;
     }
     if (object.arbiter_quorum !== undefined && object.arbiter_quorum !== null) {
       message.arbiterQuorum = object.arbiter_quorum;
@@ -820,11 +893,12 @@ export const Params = {
     obj.verifier_demotion_cooldown = message.verifierDemotionCooldown ? Duration.toAmino(message.verifierDemotionCooldown) : undefined;
     obj.verifier_overturn_base_cooldown = message.verifierOverturnBaseCooldown ? Duration.toAmino(message.verifierOverturnBaseCooldown) : undefined;
     obj.upheld_to_reset_overturns = message.upheldToResetOverturns === 0 ? undefined : message.upheldToResetOverturns;
-    obj.min_epoch_verifications = message.minEpochVerifications === 0 ? undefined : message.minEpochVerifications;
-    obj.min_verifier_accuracy = message.minVerifierAccuracy === "" ? undefined : message.minVerifierAccuracy;
-    obj.operator_reward_share = message.operatorRewardShare === "" ? undefined : message.operatorRewardShare;
-    obj.verifier_dream_reward = message.verifierDreamReward === "" ? undefined : message.verifierDreamReward;
-    obj.max_verifier_dream_mint_per_epoch = message.maxVerifierDreamMintPerEpoch === "" ? undefined : message.maxVerifierDreamMintPerEpoch;
+    obj.operator_reward_inflation_share = message.operatorRewardInflationShare === "" ? undefined : message.operatorRewardInflationShare;
+    obj.max_operator_reward_pool = message.maxOperatorRewardPool === "" ? undefined : message.maxOperatorRewardPool;
+    obj.operator_reward_pool_overflow_burn_ratio = message.operatorRewardPoolOverflowBurnRatio === "" ? undefined : message.operatorRewardPoolOverflowBurnRatio;
+    obj.operator_reward_epoch_blocks = message.operatorRewardEpochBlocks !== BigInt(0) ? message.operatorRewardEpochBlocks?.toString() : undefined;
+    obj.min_epoch_verified_submissions = message.minEpochVerifiedSubmissions === 0 ? undefined : message.minEpochVerifiedSubmissions;
+    obj.max_unverified_rate = message.maxUnverifiedRate === "" ? undefined : message.maxUnverifiedRate;
     obj.arbiter_quorum = message.arbiterQuorum === 0 ? undefined : message.arbiterQuorum;
     obj.arbiter_resolution_window = message.arbiterResolutionWindow ? Duration.toAmino(message.arbiterResolutionWindow) : undefined;
     obj.arbiter_escalation_window = message.arbiterEscalationWindow ? Duration.toAmino(message.arbiterEscalationWindow) : undefined;

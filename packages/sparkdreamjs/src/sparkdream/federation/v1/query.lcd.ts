@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetPeerRequest, QueryGetPeerResponse, QueryListPeersRequest, QueryListPeersResponse, QueryGetPeerPolicyRequest, QueryGetPeerPolicyResponse, QueryGetBridgeBindingRequest, QueryGetBridgeBindingResponse, QueryListBridgeBindingsRequest, QueryListBridgeBindingsResponse, QueryGetFederatedContentRequest, QueryGetFederatedContentResponse, QueryListFederatedContentRequest, QueryListFederatedContentResponse, QueryGetIdentityLinkRequest, QueryGetIdentityLinkResponse, QueryListIdentityLinksRequest, QueryListIdentityLinksResponse, QueryResolveRemoteIdentityRequest, QueryResolveRemoteIdentityResponse, QueryGetPendingIdentityChallengeRequest, QueryGetPendingIdentityChallengeResponse, QueryListPendingIdentityChallengesRequest, QueryListPendingIdentityChallengesResponse, QueryGetReputationAttestationRequest, QueryGetReputationAttestationResponse, QueryListOutboundAttestationsRequest, QueryListOutboundAttestationsResponse, QueryVerifierActivityRequest, QueryVerifierActivityResponse, QueryGetVerificationRecordRequest, QueryGetVerificationRecordResponse, QueryGetEscalatedChallengeRequest, QueryGetEscalatedChallengeResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetPeerRequest, QueryGetPeerResponse, QueryListPeersRequest, QueryListPeersResponse, QueryGetPeerPolicyRequest, QueryGetPeerPolicyResponse, QueryGetBridgeBindingRequest, QueryGetBridgeBindingResponse, QueryListBridgeBindingsRequest, QueryListBridgeBindingsResponse, QueryGetFederatedContentRequest, QueryGetFederatedContentResponse, QueryListFederatedContentRequest, QueryListFederatedContentResponse, QueryGetIdentityLinkRequest, QueryGetIdentityLinkResponse, QueryListIdentityLinksRequest, QueryListIdentityLinksResponse, QueryResolveRemoteIdentityRequest, QueryResolveRemoteIdentityResponse, QueryGetPendingIdentityChallengeRequest, QueryGetPendingIdentityChallengeResponse, QueryListPendingIdentityChallengesRequest, QueryListPendingIdentityChallengesResponse, QueryGetReputationAttestationRequest, QueryGetReputationAttestationResponse, QueryListOutboundAttestationsRequest, QueryListOutboundAttestationsResponse, QueryVerifierActivityRequest, QueryVerifierActivityResponse, QueryOperatorRewardPoolRequest, QueryOperatorRewardPoolResponse, QueryGetVerificationRecordRequest, QueryGetVerificationRecordResponse, QueryGetEscalatedChallengeRequest, QueryGetEscalatedChallengeResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -132,13 +132,22 @@ export class LCDQueryClient {
     const endpoint = `sparkdream/federation/v1/list_outbound_attestations`;
     return await this.req.get<QueryListOutboundAttestationsResponse>(endpoint, options);
   };
-  /* VerifierActivity returns federation-specific per-verifier counters
-   (verifications, upheld, overturned, consecutive streaks). The generic
+  /* VerifierActivity returns the per-verifier counter view: federation's
+   slim stored record (unchallenged verifications) overlaid with the
+   shared accountability state x/rep owns on RoleActivity -- per-kind
+   verification counts, verdict streaks, overturn cooldown. The generic
    bond/status record lives in x/rep under
    BondedRole(ROLE_TYPE_FEDERATION_VERIFIER, addr). */
   verifierActivity = async (params: QueryVerifierActivityRequest): Promise<QueryVerifierActivityResponse> => {
     const endpoint = `sparkdream/federation/v1/verifier_activity/${params.address}`;
     return await this.req.get<QueryVerifierActivityResponse>(endpoint);
+  };
+  /* OperatorRewardPool reports the bridge-operator SPARK pool's balance, cap
+   and today's draw against the daily allowance. Without it "why was I not
+   paid this epoch" has no on-chain answer. */
+  operatorRewardPool = async (_params: QueryOperatorRewardPoolRequest = {}): Promise<QueryOperatorRewardPoolResponse> => {
+    const endpoint = `sparkdream/federation/v1/operator_reward_pool`;
+    return await this.req.get<QueryOperatorRewardPoolResponse>(endpoint);
   };
   /* GetVerificationRecord */
   getVerificationRecord = async (params: QueryGetVerificationRecordRequest): Promise<QueryGetVerificationRecordResponse> => {

@@ -361,6 +361,27 @@ export interface BondedRoleConfig {
    * the owning module's operational params.
    */
   unbondCooldown: bigint;
+  /**
+   * upheld_to_reset_overturns is how many CONSECUTIVE upheld verdicts clear
+   * an accumulated overturn streak. Zero or one = reset on the first upheld
+   * verdict (the moderation-role behavior). Higher values make the streak
+   * -- and therefore the demotion ratchet and the escalating cooldown --
+   * stickier, so a role cannot alternate wrong/right indefinitely and stay
+   * out of demotion range.
+   */
+  upheldToResetOverturns: bigint;
+  /**
+   * overturn_base_cooldown is the lockout in seconds applied on an
+   * overturned verdict for kinds in the CooldownOnOverturn policy table.
+   * Zero falls back to DefaultRoleOverturnCooldown (24h).
+   */
+  overturnBaseCooldown: bigint;
+  /**
+   * overturn_cooldown_escalates doubles the lockout per consecutive
+   * overturn -- base * 2^(streak-1), capped at 7 days. Off means every
+   * overturn draws the same flat base cooldown.
+   */
+  overturnCooldownEscalates: boolean;
 }
 export interface BondedRoleConfigProtoMsg {
   typeUrl: "/sparkdream.rep.v1.BondedRoleConfig";
@@ -425,6 +446,27 @@ export interface BondedRoleConfigAmino {
    * the owning module's operational params.
    */
   unbond_cooldown?: string;
+  /**
+   * upheld_to_reset_overturns is how many CONSECUTIVE upheld verdicts clear
+   * an accumulated overturn streak. Zero or one = reset on the first upheld
+   * verdict (the moderation-role behavior). Higher values make the streak
+   * -- and therefore the demotion ratchet and the escalating cooldown --
+   * stickier, so a role cannot alternate wrong/right indefinitely and stay
+   * out of demotion range.
+   */
+  upheld_to_reset_overturns?: string;
+  /**
+   * overturn_base_cooldown is the lockout in seconds applied on an
+   * overturned verdict for kinds in the CooldownOnOverturn policy table.
+   * Zero falls back to DefaultRoleOverturnCooldown (24h).
+   */
+  overturn_base_cooldown?: string;
+  /**
+   * overturn_cooldown_escalates doubles the lockout per consecutive
+   * overturn -- base * 2^(streak-1), capped at 7 days. Off means every
+   * overturn draws the same flat base cooldown.
+   */
+  overturn_cooldown_escalates?: boolean;
 }
 export interface BondedRoleConfigAminoMsg {
   type: "/sparkdream.rep.v1.BondedRoleConfig";
@@ -655,7 +697,10 @@ function createBaseBondedRoleConfig(): BondedRoleConfig {
     minAgeBlocks: BigInt(0),
     demotionCooldown: BigInt(0),
     demotionThreshold: "",
-    unbondCooldown: BigInt(0)
+    unbondCooldown: BigInt(0),
+    upheldToResetOverturns: BigInt(0),
+    overturnBaseCooldown: BigInt(0),
+    overturnCooldownEscalates: false
   };
 }
 /**
@@ -698,6 +743,15 @@ export const BondedRoleConfig = {
     if (message.unbondCooldown !== BigInt(0)) {
       writer.uint32(64).int64(message.unbondCooldown);
     }
+    if (message.upheldToResetOverturns !== BigInt(0)) {
+      writer.uint32(72).uint64(message.upheldToResetOverturns);
+    }
+    if (message.overturnBaseCooldown !== BigInt(0)) {
+      writer.uint32(80).int64(message.overturnBaseCooldown);
+    }
+    if (message.overturnCooldownEscalates === true) {
+      writer.uint32(88).bool(message.overturnCooldownEscalates);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): BondedRoleConfig {
@@ -731,6 +785,15 @@ export const BondedRoleConfig = {
         case 8:
           message.unbondCooldown = reader.int64();
           break;
+        case 9:
+          message.upheldToResetOverturns = reader.uint64();
+          break;
+        case 10:
+          message.overturnBaseCooldown = reader.int64();
+          break;
+        case 11:
+          message.overturnCooldownEscalates = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -748,6 +811,9 @@ export const BondedRoleConfig = {
     message.demotionCooldown = object.demotionCooldown !== undefined && object.demotionCooldown !== null ? BigInt(object.demotionCooldown.toString()) : BigInt(0);
     message.demotionThreshold = object.demotionThreshold ?? "";
     message.unbondCooldown = object.unbondCooldown !== undefined && object.unbondCooldown !== null ? BigInt(object.unbondCooldown.toString()) : BigInt(0);
+    message.upheldToResetOverturns = object.upheldToResetOverturns !== undefined && object.upheldToResetOverturns !== null ? BigInt(object.upheldToResetOverturns.toString()) : BigInt(0);
+    message.overturnBaseCooldown = object.overturnBaseCooldown !== undefined && object.overturnBaseCooldown !== null ? BigInt(object.overturnBaseCooldown.toString()) : BigInt(0);
+    message.overturnCooldownEscalates = object.overturnCooldownEscalates ?? false;
     return message;
   },
   fromAmino(object: BondedRoleConfigAmino): BondedRoleConfig {
@@ -776,6 +842,15 @@ export const BondedRoleConfig = {
     if (object.unbond_cooldown !== undefined && object.unbond_cooldown !== null) {
       message.unbondCooldown = BigInt(object.unbond_cooldown);
     }
+    if (object.upheld_to_reset_overturns !== undefined && object.upheld_to_reset_overturns !== null) {
+      message.upheldToResetOverturns = BigInt(object.upheld_to_reset_overturns);
+    }
+    if (object.overturn_base_cooldown !== undefined && object.overturn_base_cooldown !== null) {
+      message.overturnBaseCooldown = BigInt(object.overturn_base_cooldown);
+    }
+    if (object.overturn_cooldown_escalates !== undefined && object.overturn_cooldown_escalates !== null) {
+      message.overturnCooldownEscalates = object.overturn_cooldown_escalates;
+    }
     return message;
   },
   toAmino(message: BondedRoleConfig): BondedRoleConfigAmino {
@@ -788,6 +863,9 @@ export const BondedRoleConfig = {
     obj.demotion_cooldown = message.demotionCooldown !== BigInt(0) ? message.demotionCooldown?.toString() : undefined;
     obj.demotion_threshold = message.demotionThreshold === "" ? undefined : message.demotionThreshold;
     obj.unbond_cooldown = message.unbondCooldown !== BigInt(0) ? message.unbondCooldown?.toString() : undefined;
+    obj.upheld_to_reset_overturns = message.upheldToResetOverturns !== BigInt(0) ? message.upheldToResetOverturns?.toString() : undefined;
+    obj.overturn_base_cooldown = message.overturnBaseCooldown !== BigInt(0) ? message.overturnBaseCooldown?.toString() : undefined;
+    obj.overturn_cooldown_escalates = message.overturnCooldownEscalates === false ? undefined : message.overturnCooldownEscalates;
     return obj;
   },
   fromAminoMsg(object: BondedRoleConfigAminoMsg): BondedRoleConfig {

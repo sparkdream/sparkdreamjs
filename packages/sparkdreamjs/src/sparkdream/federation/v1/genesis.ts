@@ -27,6 +27,13 @@ export interface GenesisState {
   verificationRecords: VerificationRecord[];
   nextContentId: bigint;
   nextOutboundAttestationId: bigint;
+  /**
+   * Per-UTC-day community-pool draw ledger for the bridge-operator reward
+   * pool. Dropping it on import hands the chain a fresh daily allowance, so
+   * operator_reward_daily_funding would bound a day only until the next
+   * export. Mirrors x/rep's role_reward_day_funding_list.
+   */
+  operatorRewardDayFundingList: OperatorRewardDayFunding[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.federation.v1.GenesisState";
@@ -55,10 +62,49 @@ export interface GenesisStateAmino {
   verification_records?: VerificationRecordAmino[];
   next_content_id?: string;
   next_outbound_attestation_id?: string;
+  /**
+   * Per-UTC-day community-pool draw ledger for the bridge-operator reward
+   * pool. Dropping it on import hands the chain a fresh daily allowance, so
+   * operator_reward_daily_funding would bound a day only until the next
+   * export. Mirrors x/rep's role_reward_day_funding_list.
+   */
+  operator_reward_day_funding_list?: OperatorRewardDayFundingAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.federation.v1.GenesisState";
   value: GenesisStateAmino;
+}
+/**
+ * OperatorRewardDayFunding is one UTC day's community-pool draw for the
+ * bridge-operator reward pool, ledgered so the daily cap bounds a day rather
+ * than a block.
+ * @name OperatorRewardDayFunding
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.OperatorRewardDayFunding
+ */
+export interface OperatorRewardDayFunding {
+  day: bigint;
+  amountFunded: string;
+}
+export interface OperatorRewardDayFundingProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.OperatorRewardDayFunding";
+  value: Uint8Array;
+}
+/**
+ * OperatorRewardDayFunding is one UTC day's community-pool draw for the
+ * bridge-operator reward pool, ledgered so the daily cap bounds a day rather
+ * than a block.
+ * @name OperatorRewardDayFundingAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.OperatorRewardDayFunding
+ */
+export interface OperatorRewardDayFundingAmino {
+  day?: string;
+  amount_funded?: string;
+}
+export interface OperatorRewardDayFundingAminoMsg {
+  type: "/sparkdream.federation.v1.OperatorRewardDayFunding";
+  value: OperatorRewardDayFundingAmino;
 }
 function createBaseGenesisState(): GenesisState {
   return {
@@ -74,7 +120,8 @@ function createBaseGenesisState(): GenesisState {
     verifierActivities: [],
     verificationRecords: [],
     nextContentId: BigInt(0),
-    nextOutboundAttestationId: BigInt(0)
+    nextOutboundAttestationId: BigInt(0),
+    operatorRewardDayFundingList: []
   };
 }
 /**
@@ -114,7 +161,7 @@ export const GenesisState = {
       OutboundAttestation.encode(v!, writer.uint32(74).fork()).ldelim();
     }
     for (const v of message.verifierActivities) {
-      VerifierActivity.encode(v!, writer.uint32(114).fork()).ldelim();
+      VerifierActivity.encode(v!, writer.uint32(82).fork()).ldelim();
     }
     for (const v of message.verificationRecords) {
       VerificationRecord.encode(v!, writer.uint32(90).fork()).ldelim();
@@ -124,6 +171,9 @@ export const GenesisState = {
     }
     if (message.nextOutboundAttestationId !== BigInt(0)) {
       writer.uint32(104).uint64(message.nextOutboundAttestationId);
+    }
+    for (const v of message.operatorRewardDayFundingList) {
+      OperatorRewardDayFunding.encode(v!, writer.uint32(114).fork()).ldelim();
     }
     return writer;
   },
@@ -161,7 +211,7 @@ export const GenesisState = {
         case 9:
           message.outboundAttestations.push(OutboundAttestation.decode(reader, reader.uint32()));
           break;
-        case 14:
+        case 10:
           message.verifierActivities.push(VerifierActivity.decode(reader, reader.uint32()));
           break;
         case 11:
@@ -172,6 +222,9 @@ export const GenesisState = {
           break;
         case 13:
           message.nextOutboundAttestationId = reader.uint64();
+          break;
+        case 14:
+          message.operatorRewardDayFundingList.push(OperatorRewardDayFunding.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -195,6 +248,7 @@ export const GenesisState = {
     message.verificationRecords = object.verificationRecords?.map(e => VerificationRecord.fromPartial(e)) || [];
     message.nextContentId = object.nextContentId !== undefined && object.nextContentId !== null ? BigInt(object.nextContentId.toString()) : BigInt(0);
     message.nextOutboundAttestationId = object.nextOutboundAttestationId !== undefined && object.nextOutboundAttestationId !== null ? BigInt(object.nextOutboundAttestationId.toString()) : BigInt(0);
+    message.operatorRewardDayFundingList = object.operatorRewardDayFundingList?.map(e => OperatorRewardDayFunding.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -220,6 +274,7 @@ export const GenesisState = {
     if (object.next_outbound_attestation_id !== undefined && object.next_outbound_attestation_id !== null) {
       message.nextOutboundAttestationId = BigInt(object.next_outbound_attestation_id);
     }
+    message.operatorRewardDayFundingList = object.operator_reward_day_funding_list?.map(e => OperatorRewardDayFunding.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -273,6 +328,11 @@ export const GenesisState = {
     }
     obj.next_content_id = message.nextContentId !== BigInt(0) ? message.nextContentId?.toString() : undefined;
     obj.next_outbound_attestation_id = message.nextOutboundAttestationId !== BigInt(0) ? message.nextOutboundAttestationId?.toString() : undefined;
+    if (message.operatorRewardDayFundingList) {
+      obj.operator_reward_day_funding_list = message.operatorRewardDayFundingList.map(e => e ? OperatorRewardDayFunding.toAmino(e) : undefined);
+    } else {
+      obj.operator_reward_day_funding_list = message.operatorRewardDayFundingList;
+    }
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {
@@ -288,6 +348,89 @@ export const GenesisState = {
     return {
       typeUrl: "/sparkdream.federation.v1.GenesisState",
       value: GenesisState.encode(message).finish()
+    };
+  }
+};
+function createBaseOperatorRewardDayFunding(): OperatorRewardDayFunding {
+  return {
+    day: BigInt(0),
+    amountFunded: ""
+  };
+}
+/**
+ * OperatorRewardDayFunding is one UTC day's community-pool draw for the
+ * bridge-operator reward pool, ledgered so the daily cap bounds a day rather
+ * than a block.
+ * @name OperatorRewardDayFunding
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.OperatorRewardDayFunding
+ */
+export const OperatorRewardDayFunding = {
+  typeUrl: "/sparkdream.federation.v1.OperatorRewardDayFunding",
+  encode(message: OperatorRewardDayFunding, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.day !== BigInt(0)) {
+      writer.uint32(8).uint64(message.day);
+    }
+    if (message.amountFunded !== "") {
+      writer.uint32(18).string(message.amountFunded);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): OperatorRewardDayFunding {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseOperatorRewardDayFunding();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.day = reader.uint64();
+          break;
+        case 2:
+          message.amountFunded = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<OperatorRewardDayFunding>): OperatorRewardDayFunding {
+    const message = createBaseOperatorRewardDayFunding();
+    message.day = object.day !== undefined && object.day !== null ? BigInt(object.day.toString()) : BigInt(0);
+    message.amountFunded = object.amountFunded ?? "";
+    return message;
+  },
+  fromAmino(object: OperatorRewardDayFundingAmino): OperatorRewardDayFunding {
+    const message = createBaseOperatorRewardDayFunding();
+    if (object.day !== undefined && object.day !== null) {
+      message.day = BigInt(object.day);
+    }
+    if (object.amount_funded !== undefined && object.amount_funded !== null) {
+      message.amountFunded = object.amount_funded;
+    }
+    return message;
+  },
+  toAmino(message: OperatorRewardDayFunding): OperatorRewardDayFundingAmino {
+    const obj: any = {};
+    obj.day = message.day !== BigInt(0) ? message.day?.toString() : undefined;
+    obj.amount_funded = message.amountFunded === "" ? undefined : message.amountFunded;
+    return obj;
+  },
+  fromAminoMsg(object: OperatorRewardDayFundingAminoMsg): OperatorRewardDayFunding {
+    return OperatorRewardDayFunding.fromAmino(object.value);
+  },
+  fromProtoMsg(message: OperatorRewardDayFundingProtoMsg): OperatorRewardDayFunding {
+    return OperatorRewardDayFunding.decode(message.value);
+  },
+  toProto(message: OperatorRewardDayFunding): Uint8Array {
+    return OperatorRewardDayFunding.encode(message).finish();
+  },
+  toProtoMsg(message: OperatorRewardDayFunding): OperatorRewardDayFundingProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.OperatorRewardDayFunding",
+      value: OperatorRewardDayFunding.encode(message).finish()
     };
   }
 };

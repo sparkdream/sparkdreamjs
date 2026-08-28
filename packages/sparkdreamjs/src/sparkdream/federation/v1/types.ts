@@ -589,6 +589,28 @@ export interface BridgeBinding {
    * submissions from suspended bindings.
    */
   suspended: boolean;
+  /**
+   * --- Per-epoch counters, reset at every operator reward distribution ---
+   * 
+   * The lifetime counters above cannot score a reward: they only grow, so a
+   * long-serving operator would out-earn an equally productive newcomer
+   * forever on history alone. These mirror them for the current reward epoch
+   * and are zeroed on every distribution, eligible or not.
+   */
+  epochSubmitted: bigint;
+  epochVerified: bigint;
+  epochRejected: bigint;
+  epochUnverified: bigint;
+  /**
+   * last_reward_epoch is the most recent epoch in which this binding was
+   * paid. Zero means never paid.
+   */
+  lastRewardEpoch: bigint;
+  /**
+   * cumulative_rewards is lifetime SPARK paid to this binding
+   * (math.Int string, bond-denom micro-units).
+   */
+  cumulativeRewards: string;
 }
 export interface BridgeBindingProtoMsg {
   typeUrl: "/sparkdream.federation.v1.BridgeBinding";
@@ -628,6 +650,28 @@ export interface BridgeBindingAmino {
    * submissions from suspended bindings.
    */
   suspended?: boolean;
+  /**
+   * --- Per-epoch counters, reset at every operator reward distribution ---
+   * 
+   * The lifetime counters above cannot score a reward: they only grow, so a
+   * long-serving operator would out-earn an equally productive newcomer
+   * forever on history alone. These mirror them for the current reward epoch
+   * and are zeroed on every distribution, eligible or not.
+   */
+  epoch_submitted?: string;
+  epoch_verified?: string;
+  epoch_rejected?: string;
+  epoch_unverified?: string;
+  /**
+   * last_reward_epoch is the most recent epoch in which this binding was
+   * paid. Zero means never paid.
+   */
+  last_reward_epoch?: string;
+  /**
+   * cumulative_rewards is lifetime SPARK paid to this binding
+   * (math.Int string, bond-denom micro-units).
+   */
+  cumulative_rewards?: string;
 }
 export interface BridgeBindingAminoMsg {
   type: "/sparkdream.federation.v1.BridgeBinding";
@@ -1525,7 +1569,13 @@ function createBaseBridgeBinding(): BridgeBinding {
     contentRejected: BigInt(0),
     contentUnverified: BigInt(0),
     lastSubmissionAt: BigInt(0),
-    suspended: false
+    suspended: false,
+    epochSubmitted: BigInt(0),
+    epochVerified: BigInt(0),
+    epochRejected: BigInt(0),
+    epochUnverified: BigInt(0),
+    lastRewardEpoch: BigInt(0),
+    cumulativeRewards: ""
   };
 }
 /**
@@ -1581,6 +1631,24 @@ export const BridgeBinding = {
     if (message.suspended === true) {
       writer.uint32(88).bool(message.suspended);
     }
+    if (message.epochSubmitted !== BigInt(0)) {
+      writer.uint32(96).uint64(message.epochSubmitted);
+    }
+    if (message.epochVerified !== BigInt(0)) {
+      writer.uint32(104).uint64(message.epochVerified);
+    }
+    if (message.epochRejected !== BigInt(0)) {
+      writer.uint32(112).uint64(message.epochRejected);
+    }
+    if (message.epochUnverified !== BigInt(0)) {
+      writer.uint32(120).uint64(message.epochUnverified);
+    }
+    if (message.lastRewardEpoch !== BigInt(0)) {
+      writer.uint32(128).int64(message.lastRewardEpoch);
+    }
+    if (message.cumulativeRewards !== "") {
+      writer.uint32(138).string(message.cumulativeRewards);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): BridgeBinding {
@@ -1623,6 +1691,24 @@ export const BridgeBinding = {
         case 11:
           message.suspended = reader.bool();
           break;
+        case 12:
+          message.epochSubmitted = reader.uint64();
+          break;
+        case 13:
+          message.epochVerified = reader.uint64();
+          break;
+        case 14:
+          message.epochRejected = reader.uint64();
+          break;
+        case 15:
+          message.epochUnverified = reader.uint64();
+          break;
+        case 16:
+          message.lastRewardEpoch = reader.int64();
+          break;
+        case 17:
+          message.cumulativeRewards = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1643,6 +1729,12 @@ export const BridgeBinding = {
     message.contentUnverified = object.contentUnverified !== undefined && object.contentUnverified !== null ? BigInt(object.contentUnverified.toString()) : BigInt(0);
     message.lastSubmissionAt = object.lastSubmissionAt !== undefined && object.lastSubmissionAt !== null ? BigInt(object.lastSubmissionAt.toString()) : BigInt(0);
     message.suspended = object.suspended ?? false;
+    message.epochSubmitted = object.epochSubmitted !== undefined && object.epochSubmitted !== null ? BigInt(object.epochSubmitted.toString()) : BigInt(0);
+    message.epochVerified = object.epochVerified !== undefined && object.epochVerified !== null ? BigInt(object.epochVerified.toString()) : BigInt(0);
+    message.epochRejected = object.epochRejected !== undefined && object.epochRejected !== null ? BigInt(object.epochRejected.toString()) : BigInt(0);
+    message.epochUnverified = object.epochUnverified !== undefined && object.epochUnverified !== null ? BigInt(object.epochUnverified.toString()) : BigInt(0);
+    message.lastRewardEpoch = object.lastRewardEpoch !== undefined && object.lastRewardEpoch !== null ? BigInt(object.lastRewardEpoch.toString()) : BigInt(0);
+    message.cumulativeRewards = object.cumulativeRewards ?? "";
     return message;
   },
   fromAmino(object: BridgeBindingAmino): BridgeBinding {
@@ -1680,6 +1772,24 @@ export const BridgeBinding = {
     if (object.suspended !== undefined && object.suspended !== null) {
       message.suspended = object.suspended;
     }
+    if (object.epoch_submitted !== undefined && object.epoch_submitted !== null) {
+      message.epochSubmitted = BigInt(object.epoch_submitted);
+    }
+    if (object.epoch_verified !== undefined && object.epoch_verified !== null) {
+      message.epochVerified = BigInt(object.epoch_verified);
+    }
+    if (object.epoch_rejected !== undefined && object.epoch_rejected !== null) {
+      message.epochRejected = BigInt(object.epoch_rejected);
+    }
+    if (object.epoch_unverified !== undefined && object.epoch_unverified !== null) {
+      message.epochUnverified = BigInt(object.epoch_unverified);
+    }
+    if (object.last_reward_epoch !== undefined && object.last_reward_epoch !== null) {
+      message.lastRewardEpoch = BigInt(object.last_reward_epoch);
+    }
+    if (object.cumulative_rewards !== undefined && object.cumulative_rewards !== null) {
+      message.cumulativeRewards = object.cumulative_rewards;
+    }
     return message;
   },
   toAmino(message: BridgeBinding): BridgeBindingAmino {
@@ -1695,6 +1805,12 @@ export const BridgeBinding = {
     obj.content_unverified = message.contentUnverified !== BigInt(0) ? message.contentUnverified?.toString() : undefined;
     obj.last_submission_at = message.lastSubmissionAt !== BigInt(0) ? message.lastSubmissionAt?.toString() : undefined;
     obj.suspended = message.suspended === false ? undefined : message.suspended;
+    obj.epoch_submitted = message.epochSubmitted !== BigInt(0) ? message.epochSubmitted?.toString() : undefined;
+    obj.epoch_verified = message.epochVerified !== BigInt(0) ? message.epochVerified?.toString() : undefined;
+    obj.epoch_rejected = message.epochRejected !== BigInt(0) ? message.epochRejected?.toString() : undefined;
+    obj.epoch_unverified = message.epochUnverified !== BigInt(0) ? message.epochUnverified?.toString() : undefined;
+    obj.last_reward_epoch = message.lastRewardEpoch !== BigInt(0) ? message.lastRewardEpoch?.toString() : undefined;
+    obj.cumulative_rewards = message.cumulativeRewards === "" ? undefined : message.cumulativeRewards;
     return obj;
   },
   fromAminoMsg(object: BridgeBindingAminoMsg): BridgeBinding {

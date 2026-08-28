@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetPeerRequest, QueryGetPeerResponse, QueryListPeersRequest, QueryListPeersResponse, QueryGetPeerPolicyRequest, QueryGetPeerPolicyResponse, QueryGetBridgeBindingRequest, QueryGetBridgeBindingResponse, QueryListBridgeBindingsRequest, QueryListBridgeBindingsResponse, QueryGetFederatedContentRequest, QueryGetFederatedContentResponse, QueryListFederatedContentRequest, QueryListFederatedContentResponse, QueryGetIdentityLinkRequest, QueryGetIdentityLinkResponse, QueryListIdentityLinksRequest, QueryListIdentityLinksResponse, QueryResolveRemoteIdentityRequest, QueryResolveRemoteIdentityResponse, QueryGetPendingIdentityChallengeRequest, QueryGetPendingIdentityChallengeResponse, QueryListPendingIdentityChallengesRequest, QueryListPendingIdentityChallengesResponse, QueryGetReputationAttestationRequest, QueryGetReputationAttestationResponse, QueryListOutboundAttestationsRequest, QueryListOutboundAttestationsResponse, QueryVerifierActivityRequest, QueryVerifierActivityResponse, QueryGetVerificationRecordRequest, QueryGetVerificationRecordResponse, QueryGetEscalatedChallengeRequest, QueryGetEscalatedChallengeResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetPeerRequest, QueryGetPeerResponse, QueryListPeersRequest, QueryListPeersResponse, QueryGetPeerPolicyRequest, QueryGetPeerPolicyResponse, QueryGetBridgeBindingRequest, QueryGetBridgeBindingResponse, QueryListBridgeBindingsRequest, QueryListBridgeBindingsResponse, QueryGetFederatedContentRequest, QueryGetFederatedContentResponse, QueryListFederatedContentRequest, QueryListFederatedContentResponse, QueryGetIdentityLinkRequest, QueryGetIdentityLinkResponse, QueryListIdentityLinksRequest, QueryListIdentityLinksResponse, QueryResolveRemoteIdentityRequest, QueryResolveRemoteIdentityResponse, QueryGetPendingIdentityChallengeRequest, QueryGetPendingIdentityChallengeResponse, QueryListPendingIdentityChallengesRequest, QueryListPendingIdentityChallengesResponse, QueryGetReputationAttestationRequest, QueryGetReputationAttestationResponse, QueryListOutboundAttestationsRequest, QueryListOutboundAttestationsResponse, QueryVerifierActivityRequest, QueryVerifierActivityResponse, QueryOperatorRewardPoolRequest, QueryOperatorRewardPoolResponse, QueryGetVerificationRecordRequest, QueryGetVerificationRecordResponse, QueryGetEscalatedChallengeRequest, QueryGetEscalatedChallengeResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   params(request?: QueryParamsRequest): Promise<QueryParamsResponse>;
@@ -21,12 +21,20 @@ export interface Query {
   getReputationAttestation(request: QueryGetReputationAttestationRequest): Promise<QueryGetReputationAttestationResponse>;
   listOutboundAttestations(request?: QueryListOutboundAttestationsRequest): Promise<QueryListOutboundAttestationsResponse>;
   /**
-   * VerifierActivity returns federation-specific per-verifier counters
-   * (verifications, upheld, overturned, consecutive streaks). The generic
+   * VerifierActivity returns the per-verifier counter view: federation's
+   * slim stored record (unchallenged verifications) overlaid with the
+   * shared accountability state x/rep owns on RoleActivity -- per-kind
+   * verification counts, verdict streaks, overturn cooldown. The generic
    * bond/status record lives in x/rep under
    * BondedRole(ROLE_TYPE_FEDERATION_VERIFIER, addr).
    */
   verifierActivity(request: QueryVerifierActivityRequest): Promise<QueryVerifierActivityResponse>;
+  /**
+   * OperatorRewardPool reports the bridge-operator SPARK pool's balance, cap
+   * and today's draw against the daily allowance. Without it "why was I not
+   * paid this epoch" has no on-chain answer.
+   */
+  operatorRewardPool(request?: QueryOperatorRewardPoolRequest): Promise<QueryOperatorRewardPoolResponse>;
   getVerificationRecord(request: QueryGetVerificationRecordRequest): Promise<QueryGetVerificationRecordResponse>;
   getEscalatedChallenge(request: QueryGetEscalatedChallengeRequest): Promise<QueryGetEscalatedChallengeResponse>;
 }
@@ -135,14 +143,24 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.federation.v1.Query", "ListOutboundAttestations", data);
     return promise.then(data => QueryListOutboundAttestationsResponse.decode(new BinaryReader(data)));
   };
-  /* VerifierActivity returns federation-specific per-verifier counters
-   (verifications, upheld, overturned, consecutive streaks). The generic
+  /* VerifierActivity returns the per-verifier counter view: federation's
+   slim stored record (unchallenged verifications) overlaid with the
+   shared accountability state x/rep owns on RoleActivity -- per-kind
+   verification counts, verdict streaks, overturn cooldown. The generic
    bond/status record lives in x/rep under
    BondedRole(ROLE_TYPE_FEDERATION_VERIFIER, addr). */
   verifierActivity = async (request: QueryVerifierActivityRequest): Promise<QueryVerifierActivityResponse> => {
     const data = QueryVerifierActivityRequest.encode(request).finish();
     const promise = this.rpc.request("sparkdream.federation.v1.Query", "VerifierActivity", data);
     return promise.then(data => QueryVerifierActivityResponse.decode(new BinaryReader(data)));
+  };
+  /* OperatorRewardPool reports the bridge-operator SPARK pool's balance, cap
+   and today's draw against the daily allowance. Without it "why was I not
+   paid this epoch" has no on-chain answer. */
+  operatorRewardPool = async (request: QueryOperatorRewardPoolRequest = {}): Promise<QueryOperatorRewardPoolResponse> => {
+    const data = QueryOperatorRewardPoolRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.federation.v1.Query", "OperatorRewardPool", data);
+    return promise.then(data => QueryOperatorRewardPoolResponse.decode(new BinaryReader(data)));
   };
   /* GetVerificationRecord */
   getVerificationRecord = async (request: QueryGetVerificationRecordRequest): Promise<QueryGetVerificationRecordResponse> => {
@@ -208,6 +226,9 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     verifierActivity(request: QueryVerifierActivityRequest): Promise<QueryVerifierActivityResponse> {
       return queryService.verifierActivity(request);
+    },
+    operatorRewardPool(request?: QueryOperatorRewardPoolRequest): Promise<QueryOperatorRewardPoolResponse> {
+      return queryService.operatorRewardPool(request);
     },
     getVerificationRecord(request: QueryGetVerificationRecordRequest): Promise<QueryGetVerificationRecordResponse> {
       return queryService.getVerificationRecord(request);

@@ -2,9 +2,10 @@
 import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "../../../cosmos/base/query/v1beta1/pagination";
 import { Params, ParamsAmino } from "./params";
 import { Peer, PeerAmino, PeerPolicy, PeerPolicyAmino, BridgeBinding, BridgeBindingAmino, FederatedContent, FederatedContentAmino, IdentityLink, IdentityLinkAmino, PendingIdentityChallenge, PendingIdentityChallengeAmino, ReputationAttestation, ReputationAttestationAmino, OutboundAttestation, OutboundAttestationAmino, VerificationRecord, VerificationRecordAmino, EscalatedChallenge, EscalatedChallengeAmino } from "./types";
-import { VerifierActivity, VerifierActivityAmino } from "./verifier_activity";
+import { VerifierActivityView, VerifierActivityViewAmino } from "./verifier_activity";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
+import { Decimal } from "@interchainjs/math";
 /**
  * --- Params ---
  * @name QueryParamsRequest
@@ -807,7 +808,7 @@ export interface QueryVerifierActivityRequestAminoMsg {
  * @see proto type: sparkdream.federation.v1.QueryVerifierActivityResponse
  */
 export interface QueryVerifierActivityResponse {
-  activity: VerifierActivity;
+  activity: VerifierActivityView;
 }
 export interface QueryVerifierActivityResponseProtoMsg {
   typeUrl: "/sparkdream.federation.v1.QueryVerifierActivityResponse";
@@ -819,11 +820,91 @@ export interface QueryVerifierActivityResponseProtoMsg {
  * @see proto type: sparkdream.federation.v1.QueryVerifierActivityResponse
  */
 export interface QueryVerifierActivityResponseAmino {
-  activity?: VerifierActivityAmino;
+  activity?: VerifierActivityViewAmino;
 }
 export interface QueryVerifierActivityResponseAminoMsg {
   type: "/sparkdream.federation.v1.QueryVerifierActivityResponse";
   value: QueryVerifierActivityResponseAmino;
+}
+/**
+ * --- Operator reward pool ---
+ * @name QueryOperatorRewardPoolRequest
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.QueryOperatorRewardPoolRequest
+ */
+export interface QueryOperatorRewardPoolRequest {}
+export interface QueryOperatorRewardPoolRequestProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.QueryOperatorRewardPoolRequest";
+  value: Uint8Array;
+}
+/**
+ * --- Operator reward pool ---
+ * @name QueryOperatorRewardPoolRequestAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.QueryOperatorRewardPoolRequest
+ */
+export interface QueryOperatorRewardPoolRequestAmino {}
+export interface QueryOperatorRewardPoolRequestAminoMsg {
+  type: "/sparkdream.federation.v1.QueryOperatorRewardPoolRequest";
+  value: QueryOperatorRewardPoolRequestAmino;
+}
+/**
+ * @name QueryOperatorRewardPoolResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.QueryOperatorRewardPoolResponse
+ */
+export interface QueryOperatorRewardPoolResponse {
+  /**
+   * address is the pool's bank sub-address; it is an ordinary account, so a
+   * council can top it up with a plain send.
+   */
+  address: string;
+  balance: string;
+  cap: string;
+  headroom: string;
+  /**
+   * funded_today / daily_funding_cap are the UTC-day draw ledger.
+   */
+  fundedToday: string;
+  dailyFundingCap: string;
+  /**
+   * inflation_share is the operator_reward_inflation_share the allowance is
+   * derived from; zero means automatic funding is off.
+   */
+  inflationShare: string;
+}
+export interface QueryOperatorRewardPoolResponseProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.QueryOperatorRewardPoolResponse";
+  value: Uint8Array;
+}
+/**
+ * @name QueryOperatorRewardPoolResponseAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.QueryOperatorRewardPoolResponse
+ */
+export interface QueryOperatorRewardPoolResponseAmino {
+  /**
+   * address is the pool's bank sub-address; it is an ordinary account, so a
+   * council can top it up with a plain send.
+   */
+  address?: string;
+  balance?: string;
+  cap?: string;
+  headroom?: string;
+  /**
+   * funded_today / daily_funding_cap are the UTC-day draw ledger.
+   */
+  funded_today?: string;
+  daily_funding_cap?: string;
+  /**
+   * inflation_share is the operator_reward_inflation_share the allowance is
+   * derived from; zero means automatic funding is off.
+   */
+  inflation_share?: string;
+}
+export interface QueryOperatorRewardPoolResponseAminoMsg {
+  type: "/sparkdream.federation.v1.QueryOperatorRewardPoolResponse";
+  value: QueryOperatorRewardPoolResponseAmino;
 }
 /**
  * --- VerificationRecord ---
@@ -3200,7 +3281,7 @@ export const QueryVerifierActivityRequest = {
 };
 function createBaseQueryVerifierActivityResponse(): QueryVerifierActivityResponse {
   return {
-    activity: VerifierActivity.fromPartial({})
+    activity: VerifierActivityView.fromPartial({})
   };
 }
 /**
@@ -3212,7 +3293,7 @@ export const QueryVerifierActivityResponse = {
   typeUrl: "/sparkdream.federation.v1.QueryVerifierActivityResponse",
   encode(message: QueryVerifierActivityResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.activity !== undefined) {
-      VerifierActivity.encode(message.activity, writer.uint32(10).fork()).ldelim();
+      VerifierActivityView.encode(message.activity, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -3224,7 +3305,7 @@ export const QueryVerifierActivityResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.activity = VerifierActivity.decode(reader, reader.uint32());
+          message.activity = VerifierActivityView.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -3235,19 +3316,19 @@ export const QueryVerifierActivityResponse = {
   },
   fromPartial(object: DeepPartial<QueryVerifierActivityResponse>): QueryVerifierActivityResponse {
     const message = createBaseQueryVerifierActivityResponse();
-    message.activity = object.activity !== undefined && object.activity !== null ? VerifierActivity.fromPartial(object.activity) : undefined;
+    message.activity = object.activity !== undefined && object.activity !== null ? VerifierActivityView.fromPartial(object.activity) : undefined;
     return message;
   },
   fromAmino(object: QueryVerifierActivityResponseAmino): QueryVerifierActivityResponse {
     const message = createBaseQueryVerifierActivityResponse();
     if (object.activity !== undefined && object.activity !== null) {
-      message.activity = VerifierActivity.fromAmino(object.activity);
+      message.activity = VerifierActivityView.fromAmino(object.activity);
     }
     return message;
   },
   toAmino(message: QueryVerifierActivityResponse): QueryVerifierActivityResponseAmino {
     const obj: any = {};
-    obj.activity = message.activity ? VerifierActivity.toAmino(message.activity) : undefined;
+    obj.activity = message.activity ? VerifierActivityView.toAmino(message.activity) : undefined;
     return obj;
   },
   fromAminoMsg(object: QueryVerifierActivityResponseAminoMsg): QueryVerifierActivityResponse {
@@ -3263,6 +3344,202 @@ export const QueryVerifierActivityResponse = {
     return {
       typeUrl: "/sparkdream.federation.v1.QueryVerifierActivityResponse",
       value: QueryVerifierActivityResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryOperatorRewardPoolRequest(): QueryOperatorRewardPoolRequest {
+  return {};
+}
+/**
+ * --- Operator reward pool ---
+ * @name QueryOperatorRewardPoolRequest
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.QueryOperatorRewardPoolRequest
+ */
+export const QueryOperatorRewardPoolRequest = {
+  typeUrl: "/sparkdream.federation.v1.QueryOperatorRewardPoolRequest",
+  encode(_: QueryOperatorRewardPoolRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryOperatorRewardPoolRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryOperatorRewardPoolRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<QueryOperatorRewardPoolRequest>): QueryOperatorRewardPoolRequest {
+    const message = createBaseQueryOperatorRewardPoolRequest();
+    return message;
+  },
+  fromAmino(_: QueryOperatorRewardPoolRequestAmino): QueryOperatorRewardPoolRequest {
+    const message = createBaseQueryOperatorRewardPoolRequest();
+    return message;
+  },
+  toAmino(_: QueryOperatorRewardPoolRequest): QueryOperatorRewardPoolRequestAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: QueryOperatorRewardPoolRequestAminoMsg): QueryOperatorRewardPoolRequest {
+    return QueryOperatorRewardPoolRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryOperatorRewardPoolRequestProtoMsg): QueryOperatorRewardPoolRequest {
+    return QueryOperatorRewardPoolRequest.decode(message.value);
+  },
+  toProto(message: QueryOperatorRewardPoolRequest): Uint8Array {
+    return QueryOperatorRewardPoolRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryOperatorRewardPoolRequest): QueryOperatorRewardPoolRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.QueryOperatorRewardPoolRequest",
+      value: QueryOperatorRewardPoolRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryOperatorRewardPoolResponse(): QueryOperatorRewardPoolResponse {
+  return {
+    address: "",
+    balance: "",
+    cap: "",
+    headroom: "",
+    fundedToday: "",
+    dailyFundingCap: "",
+    inflationShare: ""
+  };
+}
+/**
+ * @name QueryOperatorRewardPoolResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.QueryOperatorRewardPoolResponse
+ */
+export const QueryOperatorRewardPoolResponse = {
+  typeUrl: "/sparkdream.federation.v1.QueryOperatorRewardPoolResponse",
+  encode(message: QueryOperatorRewardPoolResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.address !== "") {
+      writer.uint32(10).string(message.address);
+    }
+    if (message.balance !== "") {
+      writer.uint32(18).string(message.balance);
+    }
+    if (message.cap !== "") {
+      writer.uint32(26).string(message.cap);
+    }
+    if (message.headroom !== "") {
+      writer.uint32(34).string(message.headroom);
+    }
+    if (message.fundedToday !== "") {
+      writer.uint32(42).string(message.fundedToday);
+    }
+    if (message.dailyFundingCap !== "") {
+      writer.uint32(50).string(message.dailyFundingCap);
+    }
+    if (message.inflationShare !== "") {
+      writer.uint32(58).string(Decimal.fromUserInput(message.inflationShare, 18).atomics);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryOperatorRewardPoolResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryOperatorRewardPoolResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.address = reader.string();
+          break;
+        case 2:
+          message.balance = reader.string();
+          break;
+        case 3:
+          message.cap = reader.string();
+          break;
+        case 4:
+          message.headroom = reader.string();
+          break;
+        case 5:
+          message.fundedToday = reader.string();
+          break;
+        case 6:
+          message.dailyFundingCap = reader.string();
+          break;
+        case 7:
+          message.inflationShare = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryOperatorRewardPoolResponse>): QueryOperatorRewardPoolResponse {
+    const message = createBaseQueryOperatorRewardPoolResponse();
+    message.address = object.address ?? "";
+    message.balance = object.balance ?? "";
+    message.cap = object.cap ?? "";
+    message.headroom = object.headroom ?? "";
+    message.fundedToday = object.fundedToday ?? "";
+    message.dailyFundingCap = object.dailyFundingCap ?? "";
+    message.inflationShare = object.inflationShare ?? "";
+    return message;
+  },
+  fromAmino(object: QueryOperatorRewardPoolResponseAmino): QueryOperatorRewardPoolResponse {
+    const message = createBaseQueryOperatorRewardPoolResponse();
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    }
+    if (object.balance !== undefined && object.balance !== null) {
+      message.balance = object.balance;
+    }
+    if (object.cap !== undefined && object.cap !== null) {
+      message.cap = object.cap;
+    }
+    if (object.headroom !== undefined && object.headroom !== null) {
+      message.headroom = object.headroom;
+    }
+    if (object.funded_today !== undefined && object.funded_today !== null) {
+      message.fundedToday = object.funded_today;
+    }
+    if (object.daily_funding_cap !== undefined && object.daily_funding_cap !== null) {
+      message.dailyFundingCap = object.daily_funding_cap;
+    }
+    if (object.inflation_share !== undefined && object.inflation_share !== null) {
+      message.inflationShare = object.inflation_share;
+    }
+    return message;
+  },
+  toAmino(message: QueryOperatorRewardPoolResponse): QueryOperatorRewardPoolResponseAmino {
+    const obj: any = {};
+    obj.address = message.address === "" ? undefined : message.address;
+    obj.balance = message.balance === "" ? undefined : message.balance;
+    obj.cap = message.cap === "" ? undefined : message.cap;
+    obj.headroom = message.headroom === "" ? undefined : message.headroom;
+    obj.funded_today = message.fundedToday === "" ? undefined : message.fundedToday;
+    obj.daily_funding_cap = message.dailyFundingCap === "" ? undefined : message.dailyFundingCap;
+    obj.inflation_share = message.inflationShare === "" ? undefined : message.inflationShare;
+    return obj;
+  },
+  fromAminoMsg(object: QueryOperatorRewardPoolResponseAminoMsg): QueryOperatorRewardPoolResponse {
+    return QueryOperatorRewardPoolResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryOperatorRewardPoolResponseProtoMsg): QueryOperatorRewardPoolResponse {
+    return QueryOperatorRewardPoolResponse.decode(message.value);
+  },
+  toProto(message: QueryOperatorRewardPoolResponse): Uint8Array {
+    return QueryOperatorRewardPoolResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryOperatorRewardPoolResponse): QueryOperatorRewardPoolResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.QueryOperatorRewardPoolResponse",
+      value: QueryOperatorRewardPoolResponse.encode(message).finish()
     };
   }
 };
