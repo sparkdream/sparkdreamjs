@@ -13,13 +13,19 @@
 // Every rep message with a repeated field is patched here to mirror aminojson's
 // omitempty (return `undefined` when empty). The rest of the converters pass
 // straight through to the auto-generated toAmino/fromAmino.
+//
+// MAINTENANCE: this map REPLACES the generated one wholesale, so it must list
+// every message in tx.proto. A message added to the proto but not added here
+// ends up with no amino converter at all, and amino (Ledger) signing for it
+// fails at runtime. When syncing protos, diff the message list in
+// protos/sparkdream/rep/v1/tx.proto against the keys below.
 
 import {
   MsgUpdateParams, MsgUpdateOperationalParams, MsgInviteMember, MsgAcceptInvitation,
   MsgTransferDream, MsgCreateInterim, MsgAssignInterim, MsgSubmitInterimWork,
   MsgApproveInterim, MsgAbandonInterim, MsgCompleteInterim, MsgProposeProject,
   MsgApproveProjectBudget, MsgCancelProject, MsgCreateInitiative, MsgAssignInitiative,
-  MsgSubmitInitiativeWork, MsgApproveInitiative, MsgAbandonInitiative,
+  MsgSubmitInitiativeWork, MsgApproveInitiative, MsgUnassignInitiative,
   MsgCompleteInitiative, MsgStake, MsgUnstake, MsgClaimStakingRewards,
   MsgCompoundStakingRewards, MsgCreateChallenge, MsgRespondToChallenge,
   MsgSubmitJurorVote, MsgSubmitExpertTestimony, MsgChallengeContent,
@@ -28,6 +34,9 @@ import {
   MsgToggleTagBudget, MsgWithdrawTagBudget, MsgBondRole, MsgUnbondRole,
   MsgReportMember, MsgCosignMemberReport, MsgResolveMemberReport,
   MsgDefendMemberReport, MsgAppealGovAction, MsgResolveGovActionAppeal,
+  MsgAcceptJuryDuty, MsgSubmitInitiativeReview, MsgSetVerificationPolicy,
+  MsgResolveReviewEscalation, MsgDeclineJuryDuty, MsgFundReviewBounty,
+  MsgReclaimReviewBounty, MsgCancelUnbondRole, MsgCloseInitiative,
 } from "./tx";
 import { CriteriaVote } from "./jury_review";
 
@@ -176,10 +185,10 @@ export const AminoConverter = {
     },
     fromAmino: MsgApproveInitiative.fromAmino,
   },
-  "/sparkdream.rep.v1.MsgAbandonInitiative": {
-    aminoType: "sparkdream/x/rep/MsgAbandonInitiative",
-    toAmino: MsgAbandonInitiative.toAmino,
-    fromAmino: MsgAbandonInitiative.fromAmino,
+  "/sparkdream.rep.v1.MsgUnassignInitiative": {
+    aminoType: "sparkdream/x/rep/MsgUnassignInitiative",
+    toAmino: MsgUnassignInitiative.toAmino,
+    fromAmino: MsgUnassignInitiative.fromAmino,
   },
   "/sparkdream.rep.v1.MsgCompleteInitiative": {
     aminoType: "sparkdream/x/rep/MsgCompleteInitiative",
@@ -250,6 +259,51 @@ export const AminoConverter = {
       return obj;
     },
     fromAmino: MsgSubmitJurorVote.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgAcceptJuryDuty": {
+    aminoType: "sparkdream/x/rep/MsgAcceptJuryDuty",
+    toAmino: MsgAcceptJuryDuty.toAmino,
+    fromAmino: MsgAcceptJuryDuty.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgSubmitInitiativeReview": {
+    aminoType: "sparkdream/x/rep/MsgSubmitInitiativeReview",
+    toAmino(message: any): any {
+      const obj: any = {};
+      obj.reviewer = message.reviewer === "" ? undefined : message.reviewer;
+      obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
+      obj.approved = message.approved === false ? undefined : message.approved;
+      obj.criteria_votes = (message.criteriaVotes?.length ?? 0) > 0
+        ? message.criteriaVotes.map((e: any) => e ? CriteriaVote.toAmino(e) : undefined)
+        : undefined;
+      obj.comments = message.comments === "" ? undefined : message.comments;
+      return obj;
+    },
+    fromAmino: MsgSubmitInitiativeReview.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgSetVerificationPolicy": {
+    aminoType: "sparkdream/x/rep/MsgSetVerificationPolicy",
+    toAmino: MsgSetVerificationPolicy.toAmino,
+    fromAmino: MsgSetVerificationPolicy.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgResolveReviewEscalation": {
+    aminoType: "sparkdream/x/rep/MsgResolveReviewEscalation",
+    toAmino: MsgResolveReviewEscalation.toAmino,
+    fromAmino: MsgResolveReviewEscalation.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgDeclineJuryDuty": {
+    aminoType: "sparkdream/x/rep/MsgDeclineJuryDuty",
+    toAmino: MsgDeclineJuryDuty.toAmino,
+    fromAmino: MsgDeclineJuryDuty.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgFundReviewBounty": {
+    aminoType: "sparkdream/x/rep/MsgFundReviewBounty",
+    toAmino: MsgFundReviewBounty.toAmino,
+    fromAmino: MsgFundReviewBounty.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgReclaimReviewBounty": {
+    aminoType: "sparkdream/x/rep/MsgReclaimReviewBounty",
+    toAmino: MsgReclaimReviewBounty.toAmino,
+    fromAmino: MsgReclaimReviewBounty.fromAmino,
   },
   "/sparkdream.rep.v1.MsgSubmitExpertTestimony": {
     aminoType: "sparkdream/x/rep/MsgSubmitExpertTestimony",
@@ -341,6 +395,11 @@ export const AminoConverter = {
     toAmino: MsgUnbondRole.toAmino,
     fromAmino: MsgUnbondRole.fromAmino,
   },
+  "/sparkdream.rep.v1.MsgCancelUnbondRole": {
+    aminoType: "sparkdream/x/rep/MsgCancelUnbondRole",
+    toAmino: MsgCancelUnbondRole.toAmino,
+    fromAmino: MsgCancelUnbondRole.fromAmino,
+  },
   "/sparkdream.rep.v1.MsgReportMember": {
     aminoType: "sparkdream/x/rep/MsgReportMember",
     toAmino: MsgReportMember.toAmino,
@@ -370,5 +429,10 @@ export const AminoConverter = {
     aminoType: "sparkdream/x/rep/MsgResolveGovActionAppeal",
     toAmino: MsgResolveGovActionAppeal.toAmino,
     fromAmino: MsgResolveGovActionAppeal.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgCloseInitiative": {
+    aminoType: "sparkdream/x/rep/MsgCloseInitiative",
+    toAmino: MsgCloseInitiative.toAmino,
+    fromAmino: MsgCloseInitiative.fromAmino,
   },
 };

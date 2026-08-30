@@ -387,7 +387,10 @@ export interface Params {
   /**
    * External-conviction ratio applied instead of external_conviction_ratio when
    * the initiative is self-assigned. Must be >= external_conviction_ratio and
-   * <= 1. Default 1.0: the community alone vouches for self-assigned work.
+   * <= 1. Default 0.75 — a distinct-staker floor as much as a magnitude one,
+   * since max_conviction_share_per_member caps any one member's contribution:
+   * ceil(0.75 / 0.33) = 3 independent stakers, against 2 for externally
+   * assigned work.
    */
   selfAssignedExternalConvictionRatio: string;
   /**
@@ -551,6 +554,63 @@ export interface Params {
    * Epochs of history the accuracy ring scores. Default 6.
    */
   reviewerAccuracyWindowEpochs: bigint;
+  /**
+   * Reviewer bonded-role policy: the eligibility and exit terms for
+   * ROLE_TYPE_INITIATIVE_REVIEWER.
+   * 
+   * These live here rather than only in the BondedRoleConfig store so the
+   * reviewer role has the same shape as every other bonded role: params are the
+   * source of truth and are written through to rep's enforcement state on
+   * InitGenesis and on every operational param update (x/forum does this for
+   * the sentinel, x/collect for the curator). Before that, the reviewer was the
+   * one role no module owned, so its config was reachable only by editing
+   * genesis or shipping an upgrade.
+   * 
+   * Field numbers jump past the reviewer pay knobs above because these were
+   * added later; they belong to this block by topic, not by number.
+   * 
+   * min_reviewer_bond is deliberately a LOW barrier to entry (500 DREAM), not a
+   * measure of what a bad verdict costs. Per-verdict exposure is the reserve --
+   * SlashReviewersOnOverturn charges BondReserved, which is
+   * reviewer_bond_reserve_rate x the initiative's budget -- so liability already
+   * scales with what the review could mint, whatever the floor is.
+   * 
+   * Reviewers scale up by bonding more when they want bigger work. Free bond
+   * above a reviewer's open reserves is what decides which initiatives they can
+   * pick up and how many at once: at the default 10% rate the floor alone covers
+   * work up to ~5,000 DREAM of budget, while an EPIC initiative (10,000 cap)
+   * reserves 1,000. Raising the ceiling is just another MsgBondRole against the
+   * same record -- it adds to current_bond and is reservable on the next verdict,
+   * with no waiting period and no need to unbond first. Keeping the entry price
+   * low is the point: reviewing should be something an ordinary member can start
+   * doing and then grow into, rather than something gated on holding a large
+   * balance up front.
+   */
+  minReviewerBond: string;
+  /**
+   * Free bond below which a reviewer is demoted out of the role. Conventionally
+   * half of min_reviewer_bond.
+   */
+  reviewerDemotionThreshold: string;
+  /**
+   * Trust level a member must hold to bond as a reviewer. The trust ladder
+   * already encodes reputation, so this is the whole eligibility gate and
+   * min_reviewer_rep_tier stays 0 (see BondedRoleConfig seeding notes).
+   * 
+   * Required, unlike the sentinel's and curator's: BondRole skips the trust
+   * check entirely on an empty string, so an omitted level would silently open
+   * the one role whose approvals mint DREAM. An ungated roster is still
+   * expressible as TRUST_LEVEL_NEW.
+   */
+  minReviewerTrustLevel: string;
+  minReviewerRepTier: bigint;
+  minReviewerAgeBlocks: bigint;
+  reviewerDemotionCooldown: bigint;
+  /**
+   * Bond stays slashable through this window after an unbond request, so open
+   * verdicts can age out and still be charged if a jury overturns them.
+   */
+  reviewerUnbondCooldown: bigint;
   /**
    * Ceiling on the uspark x/rep may draw from the community pool per UTC day to
    * fund its bonded-role reward pools.
@@ -982,7 +1042,10 @@ export interface ParamsAmino {
   /**
    * External-conviction ratio applied instead of external_conviction_ratio when
    * the initiative is self-assigned. Must be >= external_conviction_ratio and
-   * <= 1. Default 1.0: the community alone vouches for self-assigned work.
+   * <= 1. Default 0.75 — a distinct-staker floor as much as a magnitude one,
+   * since max_conviction_share_per_member caps any one member's contribution:
+   * ceil(0.75 / 0.33) = 3 independent stakers, against 2 for externally
+   * assigned work.
    */
   self_assigned_external_conviction_ratio?: string;
   /**
@@ -1146,6 +1209,63 @@ export interface ParamsAmino {
    * Epochs of history the accuracy ring scores. Default 6.
    */
   reviewer_accuracy_window_epochs?: string;
+  /**
+   * Reviewer bonded-role policy: the eligibility and exit terms for
+   * ROLE_TYPE_INITIATIVE_REVIEWER.
+   * 
+   * These live here rather than only in the BondedRoleConfig store so the
+   * reviewer role has the same shape as every other bonded role: params are the
+   * source of truth and are written through to rep's enforcement state on
+   * InitGenesis and on every operational param update (x/forum does this for
+   * the sentinel, x/collect for the curator). Before that, the reviewer was the
+   * one role no module owned, so its config was reachable only by editing
+   * genesis or shipping an upgrade.
+   * 
+   * Field numbers jump past the reviewer pay knobs above because these were
+   * added later; they belong to this block by topic, not by number.
+   * 
+   * min_reviewer_bond is deliberately a LOW barrier to entry (500 DREAM), not a
+   * measure of what a bad verdict costs. Per-verdict exposure is the reserve --
+   * SlashReviewersOnOverturn charges BondReserved, which is
+   * reviewer_bond_reserve_rate x the initiative's budget -- so liability already
+   * scales with what the review could mint, whatever the floor is.
+   * 
+   * Reviewers scale up by bonding more when they want bigger work. Free bond
+   * above a reviewer's open reserves is what decides which initiatives they can
+   * pick up and how many at once: at the default 10% rate the floor alone covers
+   * work up to ~5,000 DREAM of budget, while an EPIC initiative (10,000 cap)
+   * reserves 1,000. Raising the ceiling is just another MsgBondRole against the
+   * same record -- it adds to current_bond and is reservable on the next verdict,
+   * with no waiting period and no need to unbond first. Keeping the entry price
+   * low is the point: reviewing should be something an ordinary member can start
+   * doing and then grow into, rather than something gated on holding a large
+   * balance up front.
+   */
+  min_reviewer_bond?: string;
+  /**
+   * Free bond below which a reviewer is demoted out of the role. Conventionally
+   * half of min_reviewer_bond.
+   */
+  reviewer_demotion_threshold?: string;
+  /**
+   * Trust level a member must hold to bond as a reviewer. The trust ladder
+   * already encodes reputation, so this is the whole eligibility gate and
+   * min_reviewer_rep_tier stays 0 (see BondedRoleConfig seeding notes).
+   * 
+   * Required, unlike the sentinel's and curator's: BondRole skips the trust
+   * check entirely on an empty string, so an omitted level would silently open
+   * the one role whose approvals mint DREAM. An ungated roster is still
+   * expressible as TRUST_LEVEL_NEW.
+   */
+  min_reviewer_trust_level?: string;
+  min_reviewer_rep_tier?: string;
+  min_reviewer_age_blocks?: string;
+  reviewer_demotion_cooldown?: string;
+  /**
+   * Bond stays slashable through this window after an unbond request, so open
+   * verdicts can age out and still be charged if a jury overturns them.
+   */
+  reviewer_unbond_cooldown?: string;
   /**
    * Ceiling on the uspark x/rep may draw from the community pool per UTC day to
    * fund its bonded-role reward pools.
@@ -1564,6 +1684,18 @@ export interface RepOperationalParams {
   minEpochVerifications: number;
   verifierDreamReward: string;
   maxVerifierDreamMintPerEpoch: string;
+  /**
+   * Mirrors the reviewer bonded-role policy in Params. Updating these writes
+   * through to the BondedRoleConfig for ROLE_TYPE_INITIATIVE_REVIEWER, so the
+   * reviewer bond floor is tunable by council vote like every other role's.
+   */
+  minReviewerBond: string;
+  reviewerDemotionThreshold: string;
+  minReviewerTrustLevel: string;
+  minReviewerRepTier: bigint;
+  minReviewerAgeBlocks: bigint;
+  reviewerDemotionCooldown: bigint;
+  reviewerUnbondCooldown: bigint;
 }
 export interface RepOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.rep.v1.RepOperationalParams";
@@ -1851,6 +1983,18 @@ export interface RepOperationalParamsAmino {
   min_epoch_verifications?: number;
   verifier_dream_reward?: string;
   max_verifier_dream_mint_per_epoch?: string;
+  /**
+   * Mirrors the reviewer bonded-role policy in Params. Updating these writes
+   * through to the BondedRoleConfig for ROLE_TYPE_INITIATIVE_REVIEWER, so the
+   * reviewer bond floor is tunable by council vote like every other role's.
+   */
+  min_reviewer_bond?: string;
+  reviewer_demotion_threshold?: string;
+  min_reviewer_trust_level?: string;
+  min_reviewer_rep_tier?: string;
+  min_reviewer_age_blocks?: string;
+  reviewer_demotion_cooldown?: string;
+  reviewer_unbond_cooldown?: string;
 }
 export interface RepOperationalParamsAminoMsg {
   type: "sparkdream/x/rep/RepOperationalParams";
@@ -2287,6 +2431,13 @@ function createBaseParams(): Params {
     reviewerRewardEpochBlocks: BigInt(0),
     minReviewerAccuracy: "",
     reviewerAccuracyWindowEpochs: BigInt(0),
+    minReviewerBond: "",
+    reviewerDemotionThreshold: "",
+    minReviewerTrustLevel: "",
+    minReviewerRepTier: BigInt(0),
+    minReviewerAgeBlocks: BigInt(0),
+    reviewerDemotionCooldown: BigInt(0),
+    reviewerUnbondCooldown: BigInt(0),
     roleRewardInflationShare: "",
     maxCuratorRewardPool: "",
     curatorRewardPoolOverflowBurnRatio: "",
@@ -2648,6 +2799,27 @@ export const Params = {
     }
     if (message.reviewerAccuracyWindowEpochs !== BigInt(0)) {
       writer.uint32(888).uint64(message.reviewerAccuracyWindowEpochs);
+    }
+    if (message.minReviewerBond !== "") {
+      writer.uint32(1034).string(message.minReviewerBond);
+    }
+    if (message.reviewerDemotionThreshold !== "") {
+      writer.uint32(1042).string(message.reviewerDemotionThreshold);
+    }
+    if (message.minReviewerTrustLevel !== "") {
+      writer.uint32(1050).string(message.minReviewerTrustLevel);
+    }
+    if (message.minReviewerRepTier !== BigInt(0)) {
+      writer.uint32(1056).uint64(message.minReviewerRepTier);
+    }
+    if (message.minReviewerAgeBlocks !== BigInt(0)) {
+      writer.uint32(1064).int64(message.minReviewerAgeBlocks);
+    }
+    if (message.reviewerDemotionCooldown !== BigInt(0)) {
+      writer.uint32(1072).int64(message.reviewerDemotionCooldown);
+    }
+    if (message.reviewerUnbondCooldown !== BigInt(0)) {
+      writer.uint32(1080).int64(message.reviewerUnbondCooldown);
     }
     if (message.roleRewardInflationShare !== "") {
       writer.uint32(898).string(Decimal.fromUserInput(message.roleRewardInflationShare, 18).atomics);
@@ -3042,6 +3214,27 @@ export const Params = {
         case 111:
           message.reviewerAccuracyWindowEpochs = reader.uint64();
           break;
+        case 129:
+          message.minReviewerBond = reader.string();
+          break;
+        case 130:
+          message.reviewerDemotionThreshold = reader.string();
+          break;
+        case 131:
+          message.minReviewerTrustLevel = reader.string();
+          break;
+        case 132:
+          message.minReviewerRepTier = reader.uint64();
+          break;
+        case 133:
+          message.minReviewerAgeBlocks = reader.int64();
+          break;
+        case 134:
+          message.reviewerDemotionCooldown = reader.int64();
+          break;
+        case 135:
+          message.reviewerUnbondCooldown = reader.int64();
+          break;
         case 112:
           message.roleRewardInflationShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
@@ -3213,6 +3406,13 @@ export const Params = {
     message.reviewerRewardEpochBlocks = object.reviewerRewardEpochBlocks !== undefined && object.reviewerRewardEpochBlocks !== null ? BigInt(object.reviewerRewardEpochBlocks.toString()) : BigInt(0);
     message.minReviewerAccuracy = object.minReviewerAccuracy ?? "";
     message.reviewerAccuracyWindowEpochs = object.reviewerAccuracyWindowEpochs !== undefined && object.reviewerAccuracyWindowEpochs !== null ? BigInt(object.reviewerAccuracyWindowEpochs.toString()) : BigInt(0);
+    message.minReviewerBond = object.minReviewerBond ?? "";
+    message.reviewerDemotionThreshold = object.reviewerDemotionThreshold ?? "";
+    message.minReviewerTrustLevel = object.minReviewerTrustLevel ?? "";
+    message.minReviewerRepTier = object.minReviewerRepTier !== undefined && object.minReviewerRepTier !== null ? BigInt(object.minReviewerRepTier.toString()) : BigInt(0);
+    message.minReviewerAgeBlocks = object.minReviewerAgeBlocks !== undefined && object.minReviewerAgeBlocks !== null ? BigInt(object.minReviewerAgeBlocks.toString()) : BigInt(0);
+    message.reviewerDemotionCooldown = object.reviewerDemotionCooldown !== undefined && object.reviewerDemotionCooldown !== null ? BigInt(object.reviewerDemotionCooldown.toString()) : BigInt(0);
+    message.reviewerUnbondCooldown = object.reviewerUnbondCooldown !== undefined && object.reviewerUnbondCooldown !== null ? BigInt(object.reviewerUnbondCooldown.toString()) : BigInt(0);
     message.roleRewardInflationShare = object.roleRewardInflationShare ?? "";
     message.maxCuratorRewardPool = object.maxCuratorRewardPool ?? "";
     message.curatorRewardPoolOverflowBurnRatio = object.curatorRewardPoolOverflowBurnRatio ?? "";
@@ -3567,6 +3767,27 @@ export const Params = {
     if (object.reviewer_accuracy_window_epochs !== undefined && object.reviewer_accuracy_window_epochs !== null) {
       message.reviewerAccuracyWindowEpochs = BigInt(object.reviewer_accuracy_window_epochs);
     }
+    if (object.min_reviewer_bond !== undefined && object.min_reviewer_bond !== null) {
+      message.minReviewerBond = object.min_reviewer_bond;
+    }
+    if (object.reviewer_demotion_threshold !== undefined && object.reviewer_demotion_threshold !== null) {
+      message.reviewerDemotionThreshold = object.reviewer_demotion_threshold;
+    }
+    if (object.min_reviewer_trust_level !== undefined && object.min_reviewer_trust_level !== null) {
+      message.minReviewerTrustLevel = object.min_reviewer_trust_level;
+    }
+    if (object.min_reviewer_rep_tier !== undefined && object.min_reviewer_rep_tier !== null) {
+      message.minReviewerRepTier = BigInt(object.min_reviewer_rep_tier);
+    }
+    if (object.min_reviewer_age_blocks !== undefined && object.min_reviewer_age_blocks !== null) {
+      message.minReviewerAgeBlocks = BigInt(object.min_reviewer_age_blocks);
+    }
+    if (object.reviewer_demotion_cooldown !== undefined && object.reviewer_demotion_cooldown !== null) {
+      message.reviewerDemotionCooldown = BigInt(object.reviewer_demotion_cooldown);
+    }
+    if (object.reviewer_unbond_cooldown !== undefined && object.reviewer_unbond_cooldown !== null) {
+      message.reviewerUnbondCooldown = BigInt(object.reviewer_unbond_cooldown);
+    }
     if (object.role_reward_inflation_share !== undefined && object.role_reward_inflation_share !== null) {
       message.roleRewardInflationShare = object.role_reward_inflation_share;
     }
@@ -3733,6 +3954,13 @@ export const Params = {
     obj.reviewer_reward_epoch_blocks = message.reviewerRewardEpochBlocks !== BigInt(0) ? message.reviewerRewardEpochBlocks?.toString() : undefined;
     obj.min_reviewer_accuracy = message.minReviewerAccuracy === "" ? undefined : message.minReviewerAccuracy;
     obj.reviewer_accuracy_window_epochs = message.reviewerAccuracyWindowEpochs !== BigInt(0) ? message.reviewerAccuracyWindowEpochs?.toString() : undefined;
+    obj.min_reviewer_bond = message.minReviewerBond === "" ? undefined : message.minReviewerBond;
+    obj.reviewer_demotion_threshold = message.reviewerDemotionThreshold === "" ? undefined : message.reviewerDemotionThreshold;
+    obj.min_reviewer_trust_level = message.minReviewerTrustLevel === "" ? undefined : message.minReviewerTrustLevel;
+    obj.min_reviewer_rep_tier = message.minReviewerRepTier !== BigInt(0) ? message.minReviewerRepTier?.toString() : undefined;
+    obj.min_reviewer_age_blocks = message.minReviewerAgeBlocks !== BigInt(0) ? message.minReviewerAgeBlocks?.toString() : undefined;
+    obj.reviewer_demotion_cooldown = message.reviewerDemotionCooldown !== BigInt(0) ? message.reviewerDemotionCooldown?.toString() : undefined;
+    obj.reviewer_unbond_cooldown = message.reviewerUnbondCooldown !== BigInt(0) ? message.reviewerUnbondCooldown?.toString() : undefined;
     obj.role_reward_inflation_share = message.roleRewardInflationShare === "" ? undefined : message.roleRewardInflationShare;
     obj.max_curator_reward_pool = message.maxCuratorRewardPool === "" ? undefined : message.maxCuratorRewardPool;
     obj.curator_reward_pool_overflow_burn_ratio = message.curatorRewardPoolOverflowBurnRatio === "" ? undefined : message.curatorRewardPoolOverflowBurnRatio;
@@ -3883,7 +4111,14 @@ function createBaseRepOperationalParams(): RepOperationalParams {
     verifierAccuracyWindowEpochs: BigInt(0),
     minEpochVerifications: 0,
     verifierDreamReward: "",
-    maxVerifierDreamMintPerEpoch: ""
+    maxVerifierDreamMintPerEpoch: "",
+    minReviewerBond: "",
+    reviewerDemotionThreshold: "",
+    minReviewerTrustLevel: "",
+    minReviewerRepTier: BigInt(0),
+    minReviewerAgeBlocks: BigInt(0),
+    reviewerDemotionCooldown: BigInt(0),
+    reviewerUnbondCooldown: BigInt(0)
   };
 }
 /**
@@ -4222,6 +4457,27 @@ export const RepOperationalParams = {
     if (message.maxVerifierDreamMintPerEpoch !== "") {
       writer.uint32(866).string(message.maxVerifierDreamMintPerEpoch);
     }
+    if (message.minReviewerBond !== "") {
+      writer.uint32(874).string(message.minReviewerBond);
+    }
+    if (message.reviewerDemotionThreshold !== "") {
+      writer.uint32(882).string(message.reviewerDemotionThreshold);
+    }
+    if (message.minReviewerTrustLevel !== "") {
+      writer.uint32(890).string(message.minReviewerTrustLevel);
+    }
+    if (message.minReviewerRepTier !== BigInt(0)) {
+      writer.uint32(896).uint64(message.minReviewerRepTier);
+    }
+    if (message.minReviewerAgeBlocks !== BigInt(0)) {
+      writer.uint32(904).int64(message.minReviewerAgeBlocks);
+    }
+    if (message.reviewerDemotionCooldown !== BigInt(0)) {
+      writer.uint32(912).int64(message.reviewerDemotionCooldown);
+    }
+    if (message.reviewerUnbondCooldown !== BigInt(0)) {
+      writer.uint32(920).int64(message.reviewerUnbondCooldown);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): RepOperationalParams {
@@ -4555,6 +4811,27 @@ export const RepOperationalParams = {
         case 108:
           message.maxVerifierDreamMintPerEpoch = reader.string();
           break;
+        case 109:
+          message.minReviewerBond = reader.string();
+          break;
+        case 110:
+          message.reviewerDemotionThreshold = reader.string();
+          break;
+        case 111:
+          message.minReviewerTrustLevel = reader.string();
+          break;
+        case 112:
+          message.minReviewerRepTier = reader.uint64();
+          break;
+        case 113:
+          message.minReviewerAgeBlocks = reader.int64();
+          break;
+        case 114:
+          message.reviewerDemotionCooldown = reader.int64();
+          break;
+        case 115:
+          message.reviewerUnbondCooldown = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4672,6 +4949,13 @@ export const RepOperationalParams = {
     message.minEpochVerifications = object.minEpochVerifications ?? 0;
     message.verifierDreamReward = object.verifierDreamReward ?? "";
     message.maxVerifierDreamMintPerEpoch = object.maxVerifierDreamMintPerEpoch ?? "";
+    message.minReviewerBond = object.minReviewerBond ?? "";
+    message.reviewerDemotionThreshold = object.reviewerDemotionThreshold ?? "";
+    message.minReviewerTrustLevel = object.minReviewerTrustLevel ?? "";
+    message.minReviewerRepTier = object.minReviewerRepTier !== undefined && object.minReviewerRepTier !== null ? BigInt(object.minReviewerRepTier.toString()) : BigInt(0);
+    message.minReviewerAgeBlocks = object.minReviewerAgeBlocks !== undefined && object.minReviewerAgeBlocks !== null ? BigInt(object.minReviewerAgeBlocks.toString()) : BigInt(0);
+    message.reviewerDemotionCooldown = object.reviewerDemotionCooldown !== undefined && object.reviewerDemotionCooldown !== null ? BigInt(object.reviewerDemotionCooldown.toString()) : BigInt(0);
+    message.reviewerUnbondCooldown = object.reviewerUnbondCooldown !== undefined && object.reviewerUnbondCooldown !== null ? BigInt(object.reviewerUnbondCooldown.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: RepOperationalParamsAmino): RepOperationalParams {
@@ -5000,6 +5284,27 @@ export const RepOperationalParams = {
     if (object.max_verifier_dream_mint_per_epoch !== undefined && object.max_verifier_dream_mint_per_epoch !== null) {
       message.maxVerifierDreamMintPerEpoch = object.max_verifier_dream_mint_per_epoch;
     }
+    if (object.min_reviewer_bond !== undefined && object.min_reviewer_bond !== null) {
+      message.minReviewerBond = object.min_reviewer_bond;
+    }
+    if (object.reviewer_demotion_threshold !== undefined && object.reviewer_demotion_threshold !== null) {
+      message.reviewerDemotionThreshold = object.reviewer_demotion_threshold;
+    }
+    if (object.min_reviewer_trust_level !== undefined && object.min_reviewer_trust_level !== null) {
+      message.minReviewerTrustLevel = object.min_reviewer_trust_level;
+    }
+    if (object.min_reviewer_rep_tier !== undefined && object.min_reviewer_rep_tier !== null) {
+      message.minReviewerRepTier = BigInt(object.min_reviewer_rep_tier);
+    }
+    if (object.min_reviewer_age_blocks !== undefined && object.min_reviewer_age_blocks !== null) {
+      message.minReviewerAgeBlocks = BigInt(object.min_reviewer_age_blocks);
+    }
+    if (object.reviewer_demotion_cooldown !== undefined && object.reviewer_demotion_cooldown !== null) {
+      message.reviewerDemotionCooldown = BigInt(object.reviewer_demotion_cooldown);
+    }
+    if (object.reviewer_unbond_cooldown !== undefined && object.reviewer_unbond_cooldown !== null) {
+      message.reviewerUnbondCooldown = BigInt(object.reviewer_unbond_cooldown);
+    }
     return message;
   },
   toAmino(message: RepOperationalParams): RepOperationalParamsAmino {
@@ -5112,6 +5417,13 @@ export const RepOperationalParams = {
     obj.min_epoch_verifications = message.minEpochVerifications === 0 ? undefined : message.minEpochVerifications;
     obj.verifier_dream_reward = message.verifierDreamReward === "" ? undefined : message.verifierDreamReward;
     obj.max_verifier_dream_mint_per_epoch = message.maxVerifierDreamMintPerEpoch === "" ? undefined : message.maxVerifierDreamMintPerEpoch;
+    obj.min_reviewer_bond = message.minReviewerBond === "" ? undefined : message.minReviewerBond;
+    obj.reviewer_demotion_threshold = message.reviewerDemotionThreshold === "" ? undefined : message.reviewerDemotionThreshold;
+    obj.min_reviewer_trust_level = message.minReviewerTrustLevel === "" ? undefined : message.minReviewerTrustLevel;
+    obj.min_reviewer_rep_tier = message.minReviewerRepTier !== BigInt(0) ? message.minReviewerRepTier?.toString() : undefined;
+    obj.min_reviewer_age_blocks = message.minReviewerAgeBlocks !== BigInt(0) ? message.minReviewerAgeBlocks?.toString() : undefined;
+    obj.reviewer_demotion_cooldown = message.reviewerDemotionCooldown !== BigInt(0) ? message.reviewerDemotionCooldown?.toString() : undefined;
+    obj.reviewer_unbond_cooldown = message.reviewerUnbondCooldown !== BigInt(0) ? message.reviewerUnbondCooldown?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: RepOperationalParamsAminoMsg): RepOperationalParams {

@@ -1089,56 +1089,74 @@ export interface MsgApproveInitiativeResponseAminoMsg {
   value: MsgApproveInitiativeResponseAmino;
 }
 /**
- * MsgAbandonInitiative defines the MsgAbandonInitiative message.
- * @name MsgAbandonInitiative
+ * MsgUnassignInitiative releases an assignment and returns the initiative to
+ * OPEN so someone else can pick it up. It does not retire the work item —
+ * MsgCloseInitiative does that — and it leaves conviction and its stakes
+ * untouched, so the demand the community built up survives a change of hands.
+ * 
+ * Signed by the assignee stepping down, or by the Operations Committee forcing
+ * the release of work that has stalled. Deliberately NOT open to the project
+ * creator, unlike MsgAssignInitiative: the creator is an interested party, and
+ * letting them pull an assignment back would be a rug-pull on work in flight.
+ * Their lever is MsgCloseInitiative, which retires the item outright.
+ * @name MsgUnassignInitiative
  * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.MsgAbandonInitiative
+ * @see proto type: sparkdream.rep.v1.MsgUnassignInitiative
  */
-export interface MsgAbandonInitiative {
+export interface MsgUnassignInitiative {
   creator: string;
   initiativeId: bigint;
   reason: string;
 }
-export interface MsgAbandonInitiativeProtoMsg {
-  typeUrl: "/sparkdream.rep.v1.MsgAbandonInitiative";
+export interface MsgUnassignInitiativeProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgUnassignInitiative";
   value: Uint8Array;
 }
 /**
- * MsgAbandonInitiative defines the MsgAbandonInitiative message.
- * @name MsgAbandonInitiativeAmino
+ * MsgUnassignInitiative releases an assignment and returns the initiative to
+ * OPEN so someone else can pick it up. It does not retire the work item —
+ * MsgCloseInitiative does that — and it leaves conviction and its stakes
+ * untouched, so the demand the community built up survives a change of hands.
+ * 
+ * Signed by the assignee stepping down, or by the Operations Committee forcing
+ * the release of work that has stalled. Deliberately NOT open to the project
+ * creator, unlike MsgAssignInitiative: the creator is an interested party, and
+ * letting them pull an assignment back would be a rug-pull on work in flight.
+ * Their lever is MsgCloseInitiative, which retires the item outright.
+ * @name MsgUnassignInitiativeAmino
  * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.MsgAbandonInitiative
+ * @see proto type: sparkdream.rep.v1.MsgUnassignInitiative
  */
-export interface MsgAbandonInitiativeAmino {
+export interface MsgUnassignInitiativeAmino {
   creator?: string;
   initiative_id?: string;
   reason?: string;
 }
-export interface MsgAbandonInitiativeAminoMsg {
-  type: "sparkdream/x/rep/MsgAbandonInitiative";
-  value: MsgAbandonInitiativeAmino;
+export interface MsgUnassignInitiativeAminoMsg {
+  type: "sparkdream/x/rep/MsgUnassignInitiative";
+  value: MsgUnassignInitiativeAmino;
 }
 /**
- * MsgAbandonInitiativeResponse defines the MsgAbandonInitiativeResponse message.
- * @name MsgAbandonInitiativeResponse
+ * MsgUnassignInitiativeResponse defines the MsgUnassignInitiativeResponse message.
+ * @name MsgUnassignInitiativeResponse
  * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.MsgAbandonInitiativeResponse
+ * @see proto type: sparkdream.rep.v1.MsgUnassignInitiativeResponse
  */
-export interface MsgAbandonInitiativeResponse {}
-export interface MsgAbandonInitiativeResponseProtoMsg {
-  typeUrl: "/sparkdream.rep.v1.MsgAbandonInitiativeResponse";
+export interface MsgUnassignInitiativeResponse {}
+export interface MsgUnassignInitiativeResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgUnassignInitiativeResponse";
   value: Uint8Array;
 }
 /**
- * MsgAbandonInitiativeResponse defines the MsgAbandonInitiativeResponse message.
- * @name MsgAbandonInitiativeResponseAmino
+ * MsgUnassignInitiativeResponse defines the MsgUnassignInitiativeResponse message.
+ * @name MsgUnassignInitiativeResponseAmino
  * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.MsgAbandonInitiativeResponse
+ * @see proto type: sparkdream.rep.v1.MsgUnassignInitiativeResponse
  */
-export interface MsgAbandonInitiativeResponseAmino {}
-export interface MsgAbandonInitiativeResponseAminoMsg {
-  type: "/sparkdream.rep.v1.MsgAbandonInitiativeResponse";
-  value: MsgAbandonInitiativeResponseAmino;
+export interface MsgUnassignInitiativeResponseAmino {}
+export interface MsgUnassignInitiativeResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgUnassignInitiativeResponse";
+  value: MsgUnassignInitiativeResponseAmino;
 }
 /**
  * MsgCompleteInitiative defines the MsgCompleteInitiative message.
@@ -2867,58 +2885,64 @@ export interface MsgResolveGovActionAppealResponseAminoMsg {
   value: MsgResolveGovActionAppealResponseAmino;
 }
 /**
- * MsgCancelInitiative retires an OPEN, unassigned initiative. Callable by the
- * parent project's creator or the Operations Committee.
- * @name MsgCancelInitiative
+ * MsgCloseInitiative retires an initiative and returns its budget to the
+ * parent project. Callable by the project's creator or the Operations
+ * Committee, whether or not anyone is currently assigned: the project side
+ * must be able to stop funding work it no longer wants without needing the
+ * assignee's cooperation.
+ * @name MsgCloseInitiative
  * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.MsgCancelInitiative
+ * @see proto type: sparkdream.rep.v1.MsgCloseInitiative
  */
-export interface MsgCancelInitiative {
+export interface MsgCloseInitiative {
   creator: string;
   initiativeId: bigint;
   reason: string;
 }
-export interface MsgCancelInitiativeProtoMsg {
-  typeUrl: "/sparkdream.rep.v1.MsgCancelInitiative";
+export interface MsgCloseInitiativeProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgCloseInitiative";
   value: Uint8Array;
 }
 /**
- * MsgCancelInitiative retires an OPEN, unassigned initiative. Callable by the
- * parent project's creator or the Operations Committee.
- * @name MsgCancelInitiativeAmino
+ * MsgCloseInitiative retires an initiative and returns its budget to the
+ * parent project. Callable by the project's creator or the Operations
+ * Committee, whether or not anyone is currently assigned: the project side
+ * must be able to stop funding work it no longer wants without needing the
+ * assignee's cooperation.
+ * @name MsgCloseInitiativeAmino
  * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.MsgCancelInitiative
+ * @see proto type: sparkdream.rep.v1.MsgCloseInitiative
  */
-export interface MsgCancelInitiativeAmino {
+export interface MsgCloseInitiativeAmino {
   creator?: string;
   initiative_id?: string;
   reason?: string;
 }
-export interface MsgCancelInitiativeAminoMsg {
-  type: "sparkdream/x/rep/MsgCancelInitiative";
-  value: MsgCancelInitiativeAmino;
+export interface MsgCloseInitiativeAminoMsg {
+  type: "sparkdream/x/rep/MsgCloseInitiative";
+  value: MsgCloseInitiativeAmino;
 }
 /**
- * MsgCancelInitiativeResponse defines the MsgCancelInitiativeResponse message.
- * @name MsgCancelInitiativeResponse
+ * MsgCloseInitiativeResponse defines the MsgCloseInitiativeResponse message.
+ * @name MsgCloseInitiativeResponse
  * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.MsgCancelInitiativeResponse
+ * @see proto type: sparkdream.rep.v1.MsgCloseInitiativeResponse
  */
-export interface MsgCancelInitiativeResponse {}
-export interface MsgCancelInitiativeResponseProtoMsg {
-  typeUrl: "/sparkdream.rep.v1.MsgCancelInitiativeResponse";
+export interface MsgCloseInitiativeResponse {}
+export interface MsgCloseInitiativeResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgCloseInitiativeResponse";
   value: Uint8Array;
 }
 /**
- * MsgCancelInitiativeResponse defines the MsgCancelInitiativeResponse message.
- * @name MsgCancelInitiativeResponseAmino
+ * MsgCloseInitiativeResponse defines the MsgCloseInitiativeResponse message.
+ * @name MsgCloseInitiativeResponseAmino
  * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.MsgCancelInitiativeResponse
+ * @see proto type: sparkdream.rep.v1.MsgCloseInitiativeResponse
  */
-export interface MsgCancelInitiativeResponseAmino {}
-export interface MsgCancelInitiativeResponseAminoMsg {
-  type: "/sparkdream.rep.v1.MsgCancelInitiativeResponse";
-  value: MsgCancelInitiativeResponseAmino;
+export interface MsgCloseInitiativeResponseAmino {}
+export interface MsgCloseInitiativeResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgCloseInitiativeResponse";
+  value: MsgCloseInitiativeResponseAmino;
 }
 /**
  * MsgSubmitInitiativeReview files one bonded reviewer's verdict on the current
@@ -6359,7 +6383,7 @@ export const MsgApproveInitiativeResponse = {
     };
   }
 };
-function createBaseMsgAbandonInitiative(): MsgAbandonInitiative {
+function createBaseMsgUnassignInitiative(): MsgUnassignInitiative {
   return {
     creator: "",
     initiativeId: BigInt(0),
@@ -6367,15 +6391,24 @@ function createBaseMsgAbandonInitiative(): MsgAbandonInitiative {
   };
 }
 /**
- * MsgAbandonInitiative defines the MsgAbandonInitiative message.
- * @name MsgAbandonInitiative
+ * MsgUnassignInitiative releases an assignment and returns the initiative to
+ * OPEN so someone else can pick it up. It does not retire the work item —
+ * MsgCloseInitiative does that — and it leaves conviction and its stakes
+ * untouched, so the demand the community built up survives a change of hands.
+ * 
+ * Signed by the assignee stepping down, or by the Operations Committee forcing
+ * the release of work that has stalled. Deliberately NOT open to the project
+ * creator, unlike MsgAssignInitiative: the creator is an interested party, and
+ * letting them pull an assignment back would be a rug-pull on work in flight.
+ * Their lever is MsgCloseInitiative, which retires the item outright.
+ * @name MsgUnassignInitiative
  * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.MsgAbandonInitiative
+ * @see proto type: sparkdream.rep.v1.MsgUnassignInitiative
  */
-export const MsgAbandonInitiative = {
-  typeUrl: "/sparkdream.rep.v1.MsgAbandonInitiative",
-  aminoType: "sparkdream/x/rep/MsgAbandonInitiative",
-  encode(message: MsgAbandonInitiative, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+export const MsgUnassignInitiative = {
+  typeUrl: "/sparkdream.rep.v1.MsgUnassignInitiative",
+  aminoType: "sparkdream/x/rep/MsgUnassignInitiative",
+  encode(message: MsgUnassignInitiative, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
@@ -6387,10 +6420,10 @@ export const MsgAbandonInitiative = {
     }
     return writer;
   },
-  decode(input: BinaryReader | Uint8Array, length?: number): MsgAbandonInitiative {
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUnassignInitiative {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgAbandonInitiative();
+    const message = createBaseMsgUnassignInitiative();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -6410,15 +6443,15 @@ export const MsgAbandonInitiative = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgAbandonInitiative>): MsgAbandonInitiative {
-    const message = createBaseMsgAbandonInitiative();
+  fromPartial(object: DeepPartial<MsgUnassignInitiative>): MsgUnassignInitiative {
+    const message = createBaseMsgUnassignInitiative();
     message.creator = object.creator ?? "";
     message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
     message.reason = object.reason ?? "";
     return message;
   },
-  fromAmino(object: MsgAbandonInitiativeAmino): MsgAbandonInitiative {
-    const message = createBaseMsgAbandonInitiative();
+  fromAmino(object: MsgUnassignInitiativeAmino): MsgUnassignInitiative {
+    const message = createBaseMsgUnassignInitiative();
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = object.creator;
     }
@@ -6430,53 +6463,53 @@ export const MsgAbandonInitiative = {
     }
     return message;
   },
-  toAmino(message: MsgAbandonInitiative): MsgAbandonInitiativeAmino {
+  toAmino(message: MsgUnassignInitiative): MsgUnassignInitiativeAmino {
     const obj: any = {};
     obj.creator = message.creator === "" ? undefined : message.creator;
     obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
     obj.reason = message.reason === "" ? undefined : message.reason;
     return obj;
   },
-  fromAminoMsg(object: MsgAbandonInitiativeAminoMsg): MsgAbandonInitiative {
-    return MsgAbandonInitiative.fromAmino(object.value);
+  fromAminoMsg(object: MsgUnassignInitiativeAminoMsg): MsgUnassignInitiative {
+    return MsgUnassignInitiative.fromAmino(object.value);
   },
-  toAminoMsg(message: MsgAbandonInitiative): MsgAbandonInitiativeAminoMsg {
+  toAminoMsg(message: MsgUnassignInitiative): MsgUnassignInitiativeAminoMsg {
     return {
-      type: "sparkdream/x/rep/MsgAbandonInitiative",
-      value: MsgAbandonInitiative.toAmino(message)
+      type: "sparkdream/x/rep/MsgUnassignInitiative",
+      value: MsgUnassignInitiative.toAmino(message)
     };
   },
-  fromProtoMsg(message: MsgAbandonInitiativeProtoMsg): MsgAbandonInitiative {
-    return MsgAbandonInitiative.decode(message.value);
+  fromProtoMsg(message: MsgUnassignInitiativeProtoMsg): MsgUnassignInitiative {
+    return MsgUnassignInitiative.decode(message.value);
   },
-  toProto(message: MsgAbandonInitiative): Uint8Array {
-    return MsgAbandonInitiative.encode(message).finish();
+  toProto(message: MsgUnassignInitiative): Uint8Array {
+    return MsgUnassignInitiative.encode(message).finish();
   },
-  toProtoMsg(message: MsgAbandonInitiative): MsgAbandonInitiativeProtoMsg {
+  toProtoMsg(message: MsgUnassignInitiative): MsgUnassignInitiativeProtoMsg {
     return {
-      typeUrl: "/sparkdream.rep.v1.MsgAbandonInitiative",
-      value: MsgAbandonInitiative.encode(message).finish()
+      typeUrl: "/sparkdream.rep.v1.MsgUnassignInitiative",
+      value: MsgUnassignInitiative.encode(message).finish()
     };
   }
 };
-function createBaseMsgAbandonInitiativeResponse(): MsgAbandonInitiativeResponse {
+function createBaseMsgUnassignInitiativeResponse(): MsgUnassignInitiativeResponse {
   return {};
 }
 /**
- * MsgAbandonInitiativeResponse defines the MsgAbandonInitiativeResponse message.
- * @name MsgAbandonInitiativeResponse
+ * MsgUnassignInitiativeResponse defines the MsgUnassignInitiativeResponse message.
+ * @name MsgUnassignInitiativeResponse
  * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.MsgAbandonInitiativeResponse
+ * @see proto type: sparkdream.rep.v1.MsgUnassignInitiativeResponse
  */
-export const MsgAbandonInitiativeResponse = {
-  typeUrl: "/sparkdream.rep.v1.MsgAbandonInitiativeResponse",
-  encode(_: MsgAbandonInitiativeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+export const MsgUnassignInitiativeResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgUnassignInitiativeResponse",
+  encode(_: MsgUnassignInitiativeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
-  decode(input: BinaryReader | Uint8Array, length?: number): MsgAbandonInitiativeResponse {
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUnassignInitiativeResponse {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgAbandonInitiativeResponse();
+    const message = createBaseMsgUnassignInitiativeResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -6487,31 +6520,31 @@ export const MsgAbandonInitiativeResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgAbandonInitiativeResponse>): MsgAbandonInitiativeResponse {
-    const message = createBaseMsgAbandonInitiativeResponse();
+  fromPartial(_: DeepPartial<MsgUnassignInitiativeResponse>): MsgUnassignInitiativeResponse {
+    const message = createBaseMsgUnassignInitiativeResponse();
     return message;
   },
-  fromAmino(_: MsgAbandonInitiativeResponseAmino): MsgAbandonInitiativeResponse {
-    const message = createBaseMsgAbandonInitiativeResponse();
+  fromAmino(_: MsgUnassignInitiativeResponseAmino): MsgUnassignInitiativeResponse {
+    const message = createBaseMsgUnassignInitiativeResponse();
     return message;
   },
-  toAmino(_: MsgAbandonInitiativeResponse): MsgAbandonInitiativeResponseAmino {
+  toAmino(_: MsgUnassignInitiativeResponse): MsgUnassignInitiativeResponseAmino {
     const obj: any = {};
     return obj;
   },
-  fromAminoMsg(object: MsgAbandonInitiativeResponseAminoMsg): MsgAbandonInitiativeResponse {
-    return MsgAbandonInitiativeResponse.fromAmino(object.value);
+  fromAminoMsg(object: MsgUnassignInitiativeResponseAminoMsg): MsgUnassignInitiativeResponse {
+    return MsgUnassignInitiativeResponse.fromAmino(object.value);
   },
-  fromProtoMsg(message: MsgAbandonInitiativeResponseProtoMsg): MsgAbandonInitiativeResponse {
-    return MsgAbandonInitiativeResponse.decode(message.value);
+  fromProtoMsg(message: MsgUnassignInitiativeResponseProtoMsg): MsgUnassignInitiativeResponse {
+    return MsgUnassignInitiativeResponse.decode(message.value);
   },
-  toProto(message: MsgAbandonInitiativeResponse): Uint8Array {
-    return MsgAbandonInitiativeResponse.encode(message).finish();
+  toProto(message: MsgUnassignInitiativeResponse): Uint8Array {
+    return MsgUnassignInitiativeResponse.encode(message).finish();
   },
-  toProtoMsg(message: MsgAbandonInitiativeResponse): MsgAbandonInitiativeResponseProtoMsg {
+  toProtoMsg(message: MsgUnassignInitiativeResponse): MsgUnassignInitiativeResponseProtoMsg {
     return {
-      typeUrl: "/sparkdream.rep.v1.MsgAbandonInitiativeResponse",
-      value: MsgAbandonInitiativeResponse.encode(message).finish()
+      typeUrl: "/sparkdream.rep.v1.MsgUnassignInitiativeResponse",
+      value: MsgUnassignInitiativeResponse.encode(message).finish()
     };
   }
 };
@@ -11647,7 +11680,7 @@ export const MsgResolveGovActionAppealResponse = {
     };
   }
 };
-function createBaseMsgCancelInitiative(): MsgCancelInitiative {
+function createBaseMsgCloseInitiative(): MsgCloseInitiative {
   return {
     creator: "",
     initiativeId: BigInt(0),
@@ -11655,16 +11688,19 @@ function createBaseMsgCancelInitiative(): MsgCancelInitiative {
   };
 }
 /**
- * MsgCancelInitiative retires an OPEN, unassigned initiative. Callable by the
- * parent project's creator or the Operations Committee.
- * @name MsgCancelInitiative
+ * MsgCloseInitiative retires an initiative and returns its budget to the
+ * parent project. Callable by the project's creator or the Operations
+ * Committee, whether or not anyone is currently assigned: the project side
+ * must be able to stop funding work it no longer wants without needing the
+ * assignee's cooperation.
+ * @name MsgCloseInitiative
  * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.MsgCancelInitiative
+ * @see proto type: sparkdream.rep.v1.MsgCloseInitiative
  */
-export const MsgCancelInitiative = {
-  typeUrl: "/sparkdream.rep.v1.MsgCancelInitiative",
-  aminoType: "sparkdream/x/rep/MsgCancelInitiative",
-  encode(message: MsgCancelInitiative, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+export const MsgCloseInitiative = {
+  typeUrl: "/sparkdream.rep.v1.MsgCloseInitiative",
+  aminoType: "sparkdream/x/rep/MsgCloseInitiative",
+  encode(message: MsgCloseInitiative, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
@@ -11676,10 +11712,10 @@ export const MsgCancelInitiative = {
     }
     return writer;
   },
-  decode(input: BinaryReader | Uint8Array, length?: number): MsgCancelInitiative {
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCloseInitiative {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgCancelInitiative();
+    const message = createBaseMsgCloseInitiative();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -11699,15 +11735,15 @@ export const MsgCancelInitiative = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgCancelInitiative>): MsgCancelInitiative {
-    const message = createBaseMsgCancelInitiative();
+  fromPartial(object: DeepPartial<MsgCloseInitiative>): MsgCloseInitiative {
+    const message = createBaseMsgCloseInitiative();
     message.creator = object.creator ?? "";
     message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
     message.reason = object.reason ?? "";
     return message;
   },
-  fromAmino(object: MsgCancelInitiativeAmino): MsgCancelInitiative {
-    const message = createBaseMsgCancelInitiative();
+  fromAmino(object: MsgCloseInitiativeAmino): MsgCloseInitiative {
+    const message = createBaseMsgCloseInitiative();
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = object.creator;
     }
@@ -11719,53 +11755,53 @@ export const MsgCancelInitiative = {
     }
     return message;
   },
-  toAmino(message: MsgCancelInitiative): MsgCancelInitiativeAmino {
+  toAmino(message: MsgCloseInitiative): MsgCloseInitiativeAmino {
     const obj: any = {};
     obj.creator = message.creator === "" ? undefined : message.creator;
     obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
     obj.reason = message.reason === "" ? undefined : message.reason;
     return obj;
   },
-  fromAminoMsg(object: MsgCancelInitiativeAminoMsg): MsgCancelInitiative {
-    return MsgCancelInitiative.fromAmino(object.value);
+  fromAminoMsg(object: MsgCloseInitiativeAminoMsg): MsgCloseInitiative {
+    return MsgCloseInitiative.fromAmino(object.value);
   },
-  toAminoMsg(message: MsgCancelInitiative): MsgCancelInitiativeAminoMsg {
+  toAminoMsg(message: MsgCloseInitiative): MsgCloseInitiativeAminoMsg {
     return {
-      type: "sparkdream/x/rep/MsgCancelInitiative",
-      value: MsgCancelInitiative.toAmino(message)
+      type: "sparkdream/x/rep/MsgCloseInitiative",
+      value: MsgCloseInitiative.toAmino(message)
     };
   },
-  fromProtoMsg(message: MsgCancelInitiativeProtoMsg): MsgCancelInitiative {
-    return MsgCancelInitiative.decode(message.value);
+  fromProtoMsg(message: MsgCloseInitiativeProtoMsg): MsgCloseInitiative {
+    return MsgCloseInitiative.decode(message.value);
   },
-  toProto(message: MsgCancelInitiative): Uint8Array {
-    return MsgCancelInitiative.encode(message).finish();
+  toProto(message: MsgCloseInitiative): Uint8Array {
+    return MsgCloseInitiative.encode(message).finish();
   },
-  toProtoMsg(message: MsgCancelInitiative): MsgCancelInitiativeProtoMsg {
+  toProtoMsg(message: MsgCloseInitiative): MsgCloseInitiativeProtoMsg {
     return {
-      typeUrl: "/sparkdream.rep.v1.MsgCancelInitiative",
-      value: MsgCancelInitiative.encode(message).finish()
+      typeUrl: "/sparkdream.rep.v1.MsgCloseInitiative",
+      value: MsgCloseInitiative.encode(message).finish()
     };
   }
 };
-function createBaseMsgCancelInitiativeResponse(): MsgCancelInitiativeResponse {
+function createBaseMsgCloseInitiativeResponse(): MsgCloseInitiativeResponse {
   return {};
 }
 /**
- * MsgCancelInitiativeResponse defines the MsgCancelInitiativeResponse message.
- * @name MsgCancelInitiativeResponse
+ * MsgCloseInitiativeResponse defines the MsgCloseInitiativeResponse message.
+ * @name MsgCloseInitiativeResponse
  * @package sparkdream.rep.v1
- * @see proto type: sparkdream.rep.v1.MsgCancelInitiativeResponse
+ * @see proto type: sparkdream.rep.v1.MsgCloseInitiativeResponse
  */
-export const MsgCancelInitiativeResponse = {
-  typeUrl: "/sparkdream.rep.v1.MsgCancelInitiativeResponse",
-  encode(_: MsgCancelInitiativeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+export const MsgCloseInitiativeResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgCloseInitiativeResponse",
+  encode(_: MsgCloseInitiativeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
-  decode(input: BinaryReader | Uint8Array, length?: number): MsgCancelInitiativeResponse {
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCloseInitiativeResponse {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgCancelInitiativeResponse();
+    const message = createBaseMsgCloseInitiativeResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -11776,31 +11812,31 @@ export const MsgCancelInitiativeResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgCancelInitiativeResponse>): MsgCancelInitiativeResponse {
-    const message = createBaseMsgCancelInitiativeResponse();
+  fromPartial(_: DeepPartial<MsgCloseInitiativeResponse>): MsgCloseInitiativeResponse {
+    const message = createBaseMsgCloseInitiativeResponse();
     return message;
   },
-  fromAmino(_: MsgCancelInitiativeResponseAmino): MsgCancelInitiativeResponse {
-    const message = createBaseMsgCancelInitiativeResponse();
+  fromAmino(_: MsgCloseInitiativeResponseAmino): MsgCloseInitiativeResponse {
+    const message = createBaseMsgCloseInitiativeResponse();
     return message;
   },
-  toAmino(_: MsgCancelInitiativeResponse): MsgCancelInitiativeResponseAmino {
+  toAmino(_: MsgCloseInitiativeResponse): MsgCloseInitiativeResponseAmino {
     const obj: any = {};
     return obj;
   },
-  fromAminoMsg(object: MsgCancelInitiativeResponseAminoMsg): MsgCancelInitiativeResponse {
-    return MsgCancelInitiativeResponse.fromAmino(object.value);
+  fromAminoMsg(object: MsgCloseInitiativeResponseAminoMsg): MsgCloseInitiativeResponse {
+    return MsgCloseInitiativeResponse.fromAmino(object.value);
   },
-  fromProtoMsg(message: MsgCancelInitiativeResponseProtoMsg): MsgCancelInitiativeResponse {
-    return MsgCancelInitiativeResponse.decode(message.value);
+  fromProtoMsg(message: MsgCloseInitiativeResponseProtoMsg): MsgCloseInitiativeResponse {
+    return MsgCloseInitiativeResponse.decode(message.value);
   },
-  toProto(message: MsgCancelInitiativeResponse): Uint8Array {
-    return MsgCancelInitiativeResponse.encode(message).finish();
+  toProto(message: MsgCloseInitiativeResponse): Uint8Array {
+    return MsgCloseInitiativeResponse.encode(message).finish();
   },
-  toProtoMsg(message: MsgCancelInitiativeResponse): MsgCancelInitiativeResponseProtoMsg {
+  toProtoMsg(message: MsgCloseInitiativeResponse): MsgCloseInitiativeResponseProtoMsg {
     return {
-      typeUrl: "/sparkdream.rep.v1.MsgCancelInitiativeResponse",
-      value: MsgCancelInitiativeResponse.encode(message).finish()
+      typeUrl: "/sparkdream.rep.v1.MsgCloseInitiativeResponse",
+      value: MsgCloseInitiativeResponse.encode(message).finish()
     };
   }
 };

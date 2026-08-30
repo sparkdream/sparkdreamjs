@@ -133,13 +133,15 @@ export enum InitiativeStatus {
   INITIATIVE_STATUS_CHALLENGED = 4,
   INITIATIVE_STATUS_COMPLETED = 5,
   INITIATIVE_STATUS_REJECTED = 6,
-  INITIATIVE_STATUS_ABANDONED = 7,
   /**
-   * INITIATIVE_STATUS_CANCELLED - Retired by the project creator (or Operations Committee) while still
-   * OPEN and unassigned. Distinct from ABANDONED, which records an assignee
-   * walking away from work they had taken on.
+   * INITIATIVE_STATUS_CLOSED - Retired by the project creator or the Operations Committee. The work is
+   * not being done and its budget has gone back to the project.
+   * 
+   * Distinct from COMPLETED, which is narrower: COMPLETED means the work was
+   * delivered, passed its gates and paid out. CLOSED carries no claim about
+   * the work at all, only that the project stopped funding it.
    */
-  INITIATIVE_STATUS_CANCELLED = 8,
+  INITIATIVE_STATUS_CLOSED = 7,
   UNRECOGNIZED = -1,
 }
 export const InitiativeStatusAmino = InitiativeStatus;
@@ -167,11 +169,8 @@ export function initiativeStatusFromJSON(object: any): InitiativeStatus {
     case "INITIATIVE_STATUS_REJECTED":
       return InitiativeStatus.INITIATIVE_STATUS_REJECTED;
     case 7:
-    case "INITIATIVE_STATUS_ABANDONED":
-      return InitiativeStatus.INITIATIVE_STATUS_ABANDONED;
-    case 8:
-    case "INITIATIVE_STATUS_CANCELLED":
-      return InitiativeStatus.INITIATIVE_STATUS_CANCELLED;
+    case "INITIATIVE_STATUS_CLOSED":
+      return InitiativeStatus.INITIATIVE_STATUS_CLOSED;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -194,10 +193,8 @@ export function initiativeStatusToJSON(object: InitiativeStatus): string {
       return "INITIATIVE_STATUS_COMPLETED";
     case InitiativeStatus.INITIATIVE_STATUS_REJECTED:
       return "INITIATIVE_STATUS_REJECTED";
-    case InitiativeStatus.INITIATIVE_STATUS_ABANDONED:
-      return "INITIATIVE_STATUS_ABANDONED";
-    case InitiativeStatus.INITIATIVE_STATUS_CANCELLED:
-      return "INITIATIVE_STATUS_CANCELLED";
+    case InitiativeStatus.INITIATIVE_STATUS_CLOSED:
+      return "INITIATIVE_STATUS_CLOSED";
     case InitiativeStatus.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
