@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { Params, ParamsAmino, RepOperationalParams, RepOperationalParamsAmino } from "./params";
-import { InterimType, InterimComplexity } from "./interim";
+import { InterimType, InterimComplexity, AdjudicationDecision } from "./interim";
 import { ProjectCategory, VerificationPolicy, VerificationPolicyAmino } from "./project";
 import { VerificationCriteria, VerificationCriteriaAmino } from "./acceptance_criteria";
 import { StakeTargetType } from "./stake";
@@ -618,6 +618,12 @@ export interface MsgCompleteInterim {
   creator: string;
   interimId: bigint;
   completionNotes: string;
+  /**
+   * Required when the interim is an ADJUDICATION: the committee's verdict on
+   * the challenge the interim was raised to settle. Ignored for every other
+   * interim type.
+   */
+  decision: AdjudicationDecision;
 }
 export interface MsgCompleteInterimProtoMsg {
   typeUrl: "/sparkdream.rep.v1.MsgCompleteInterim";
@@ -633,6 +639,12 @@ export interface MsgCompleteInterimAmino {
   creator?: string;
   interim_id?: string;
   completion_notes?: string;
+  /**
+   * Required when the interim is an ADJUDICATION: the committee's verdict on
+   * the challenge the interim was raised to settle. Ignored for every other
+   * interim type.
+   */
+  decision?: AdjudicationDecision;
 }
 export interface MsgCompleteInterimAminoMsg {
   type: "sparkdream/x/rep/MsgCompleteInterim";
@@ -4914,7 +4926,8 @@ function createBaseMsgCompleteInterim(): MsgCompleteInterim {
   return {
     creator: "",
     interimId: BigInt(0),
-    completionNotes: ""
+    completionNotes: "",
+    decision: 0
   };
 }
 /**
@@ -4936,6 +4949,9 @@ export const MsgCompleteInterim = {
     if (message.completionNotes !== "") {
       writer.uint32(26).string(message.completionNotes);
     }
+    if (message.decision !== 0) {
+      writer.uint32(32).int32(message.decision);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgCompleteInterim {
@@ -4954,6 +4970,9 @@ export const MsgCompleteInterim = {
         case 3:
           message.completionNotes = reader.string();
           break;
+        case 4:
+          message.decision = reader.int32() as any;
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4966,6 +4985,7 @@ export const MsgCompleteInterim = {
     message.creator = object.creator ?? "";
     message.interimId = object.interimId !== undefined && object.interimId !== null ? BigInt(object.interimId.toString()) : BigInt(0);
     message.completionNotes = object.completionNotes ?? "";
+    message.decision = object.decision ?? 0;
     return message;
   },
   fromAmino(object: MsgCompleteInterimAmino): MsgCompleteInterim {
@@ -4979,6 +4999,9 @@ export const MsgCompleteInterim = {
     if (object.completion_notes !== undefined && object.completion_notes !== null) {
       message.completionNotes = object.completion_notes;
     }
+    if (object.decision !== undefined && object.decision !== null) {
+      message.decision = object.decision;
+    }
     return message;
   },
   toAmino(message: MsgCompleteInterim): MsgCompleteInterimAmino {
@@ -4986,6 +5009,7 @@ export const MsgCompleteInterim = {
     obj.creator = message.creator === "" ? undefined : message.creator;
     obj.interim_id = message.interimId !== BigInt(0) ? message.interimId?.toString() : undefined;
     obj.completion_notes = message.completionNotes === "" ? undefined : message.completionNotes;
+    obj.decision = message.decision === 0 ? undefined : message.decision;
     return obj;
   },
   fromAminoMsg(object: MsgCompleteInterimAminoMsg): MsgCompleteInterim {

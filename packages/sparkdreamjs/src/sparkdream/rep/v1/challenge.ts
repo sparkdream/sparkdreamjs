@@ -1,4 +1,5 @@
 //@ts-nocheck
+import { InitiativeStatus } from "./initiative";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 export enum ChallengeStatus {
@@ -81,6 +82,17 @@ export interface Challenge {
    * actually adjudicate against a standard the author agreed to up front.
    */
   criteriaId: string;
+  /**
+   * The initiative status to restore if this challenge is rejected. Challenges
+   * may be filed while the work is still SUBMITTED — before its challenge
+   * window has opened — and rejecting such a challenge must not skip that
+   * window: restoring SUBMITTED hands the initiative back to the ordinary
+   * transition, which sets a fresh review + challenge period. Challenges filed
+   * on IN_REVIEW work restore IN_REVIEW, whose window has already run. The
+   * zero value (OPEN, on chains predating the snapshot) also restores
+   * IN_REVIEW, the historical behaviour.
+   */
+  statusBeforeChallenge: InitiativeStatus;
 }
 export interface ChallengeProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Challenge";
@@ -110,6 +122,17 @@ export interface ChallengeAmino {
    * actually adjudicate against a standard the author agreed to up front.
    */
   criteria_id?: string;
+  /**
+   * The initiative status to restore if this challenge is rejected. Challenges
+   * may be filed while the work is still SUBMITTED — before its challenge
+   * window has opened — and rejecting such a challenge must not skip that
+   * window: restoring SUBMITTED hands the initiative back to the ordinary
+   * transition, which sets a fresh review + challenge period. Challenges filed
+   * on IN_REVIEW work restore IN_REVIEW, whose window has already run. The
+   * zero value (OPEN, on chains predating the snapshot) also restores
+   * IN_REVIEW, the historical behaviour.
+   */
+  status_before_challenge?: InitiativeStatus;
 }
 export interface ChallengeAminoMsg {
   type: "/sparkdream.rep.v1.Challenge";
@@ -127,7 +150,8 @@ function createBaseChallenge(): Challenge {
     createdAt: BigInt(0),
     resolvedAt: BigInt(0),
     responseDeadline: BigInt(0),
-    criteriaId: ""
+    criteriaId: "",
+    statusBeforeChallenge: 0
   };
 }
 /**
@@ -172,6 +196,9 @@ export const Challenge = {
     if (message.criteriaId !== "") {
       writer.uint32(90).string(message.criteriaId);
     }
+    if (message.statusBeforeChallenge !== 0) {
+      writer.uint32(96).int32(message.statusBeforeChallenge);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Challenge {
@@ -214,6 +241,9 @@ export const Challenge = {
         case 11:
           message.criteriaId = reader.string();
           break;
+        case 12:
+          message.statusBeforeChallenge = reader.int32() as any;
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -234,6 +264,7 @@ export const Challenge = {
     message.resolvedAt = object.resolvedAt !== undefined && object.resolvedAt !== null ? BigInt(object.resolvedAt.toString()) : BigInt(0);
     message.responseDeadline = object.responseDeadline !== undefined && object.responseDeadline !== null ? BigInt(object.responseDeadline.toString()) : BigInt(0);
     message.criteriaId = object.criteriaId ?? "";
+    message.statusBeforeChallenge = object.statusBeforeChallenge ?? 0;
     return message;
   },
   fromAmino(object: ChallengeAmino): Challenge {
@@ -269,6 +300,9 @@ export const Challenge = {
     if (object.criteria_id !== undefined && object.criteria_id !== null) {
       message.criteriaId = object.criteria_id;
     }
+    if (object.status_before_challenge !== undefined && object.status_before_challenge !== null) {
+      message.statusBeforeChallenge = object.status_before_challenge;
+    }
     return message;
   },
   toAmino(message: Challenge): ChallengeAmino {
@@ -288,6 +322,7 @@ export const Challenge = {
     obj.resolved_at = message.resolvedAt !== BigInt(0) ? message.resolvedAt?.toString() : undefined;
     obj.response_deadline = message.responseDeadline !== BigInt(0) ? message.responseDeadline?.toString() : undefined;
     obj.criteria_id = message.criteriaId === "" ? undefined : message.criteriaId;
+    obj.status_before_challenge = message.statusBeforeChallenge === 0 ? undefined : message.statusBeforeChallenge;
     return obj;
   },
   fromAminoMsg(object: ChallengeAminoMsg): Challenge {

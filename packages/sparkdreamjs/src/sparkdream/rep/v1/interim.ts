@@ -1,6 +1,50 @@
 //@ts-nocheck
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
+/**
+ * AdjudicationDecision is the Operations Committee's verdict on the challenge
+ * an ADJUDICATION interim was raised to settle — the terminal path for an
+ * inconclusive jury, and for challenges escalated when no jury could be seated.
+ */
+export enum AdjudicationDecision {
+  ADJUDICATION_DECISION_UNSPECIFIED = 0,
+  /** ADJUDICATION_DECISION_UPHOLD - The challenge stands: the work failed. Resolves the challenge as UPHELD. */
+  ADJUDICATION_DECISION_UPHOLD = 1,
+  /** ADJUDICATION_DECISION_REJECT - The challenge fails: the work stands. Resolves the challenge as REJECTED. */
+  ADJUDICATION_DECISION_REJECT = 2,
+  UNRECOGNIZED = -1,
+}
+export const AdjudicationDecisionAmino = AdjudicationDecision;
+export function adjudicationDecisionFromJSON(object: any): AdjudicationDecision {
+  switch (object) {
+    case 0:
+    case "ADJUDICATION_DECISION_UNSPECIFIED":
+      return AdjudicationDecision.ADJUDICATION_DECISION_UNSPECIFIED;
+    case 1:
+    case "ADJUDICATION_DECISION_UPHOLD":
+      return AdjudicationDecision.ADJUDICATION_DECISION_UPHOLD;
+    case 2:
+    case "ADJUDICATION_DECISION_REJECT":
+      return AdjudicationDecision.ADJUDICATION_DECISION_REJECT;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return AdjudicationDecision.UNRECOGNIZED;
+  }
+}
+export function adjudicationDecisionToJSON(object: AdjudicationDecision): string {
+  switch (object) {
+    case AdjudicationDecision.ADJUDICATION_DECISION_UNSPECIFIED:
+      return "ADJUDICATION_DECISION_UNSPECIFIED";
+    case AdjudicationDecision.ADJUDICATION_DECISION_UPHOLD:
+      return "ADJUDICATION_DECISION_UPHOLD";
+    case AdjudicationDecision.ADJUDICATION_DECISION_REJECT:
+      return "ADJUDICATION_DECISION_REJECT";
+    case AdjudicationDecision.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
 export enum InterimType {
   /** INTERIM_TYPE_JURY_DUTY - Jury and dispute resolution */
   INTERIM_TYPE_JURY_DUTY = 0,
@@ -247,6 +291,14 @@ export interface Interim {
    */
   status: InterimStatus;
   completionNotes: string;
+  /**
+   * The committee's verdict, set when an ADJUDICATION interim is completed.
+   * Unset on every other type. Structured rather than parsed out of
+   * completion_notes: a free-text keyword that fails to match (or matches the
+   * wrong branch) used to leave the challenge it was raised to settle
+   * unresolved forever, with the interim completed and nothing left to retry.
+   */
+  decision: AdjudicationDecision;
 }
 export interface InterimProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Interim";
@@ -293,6 +345,14 @@ export interface InterimAmino {
    */
   status?: InterimStatus;
   completion_notes?: string;
+  /**
+   * The committee's verdict, set when an ADJUDICATION interim is completed.
+   * Unset on every other type. Structured rather than parsed out of
+   * completion_notes: a free-text keyword that fails to match (or matches the
+   * wrong branch) used to leave the challenge it was raised to settle
+   * unresolved forever, with the interim completed and nothing left to retry.
+   */
+  decision?: AdjudicationDecision;
 }
 export interface InterimAminoMsg {
   type: "/sparkdream.rep.v1.Interim";
@@ -312,7 +372,8 @@ function createBaseInterim(): Interim {
     createdAt: BigInt(0),
     completedAt: BigInt(0),
     status: 0,
-    completionNotes: ""
+    completionNotes: "",
+    decision: 0
   };
 }
 /**
@@ -363,6 +424,9 @@ export const Interim = {
     if (message.completionNotes !== "") {
       writer.uint32(106).string(message.completionNotes);
     }
+    if (message.decision !== 0) {
+      writer.uint32(112).int32(message.decision);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Interim {
@@ -411,6 +475,9 @@ export const Interim = {
         case 13:
           message.completionNotes = reader.string();
           break;
+        case 14:
+          message.decision = reader.int32() as any;
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -433,6 +500,7 @@ export const Interim = {
     message.completedAt = object.completedAt !== undefined && object.completedAt !== null ? BigInt(object.completedAt.toString()) : BigInt(0);
     message.status = object.status ?? 0;
     message.completionNotes = object.completionNotes ?? "";
+    message.decision = object.decision ?? 0;
     return message;
   },
   fromAmino(object: InterimAmino): Interim {
@@ -474,6 +542,9 @@ export const Interim = {
     if (object.completion_notes !== undefined && object.completion_notes !== null) {
       message.completionNotes = object.completion_notes;
     }
+    if (object.decision !== undefined && object.decision !== null) {
+      message.decision = object.decision;
+    }
     return message;
   },
   toAmino(message: Interim): InterimAmino {
@@ -495,6 +566,7 @@ export const Interim = {
     obj.completed_at = message.completedAt !== BigInt(0) ? message.completedAt?.toString() : undefined;
     obj.status = message.status === 0 ? undefined : message.status;
     obj.completion_notes = message.completionNotes === "" ? undefined : message.completionNotes;
+    obj.decision = message.decision === 0 ? undefined : message.decision;
     return obj;
   },
   fromAminoMsg(object: InterimAminoMsg): Interim {

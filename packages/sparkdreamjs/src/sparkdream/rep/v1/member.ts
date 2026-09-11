@@ -340,6 +340,33 @@ export interface Member {
   lifetimeForumRepPerTag: {
     [key: string]: string;
   };
+  /**
+   * Block height at which the member joined. This is the height-domain
+   * twin of joined_at (a unix timestamp): the new-member decay grace
+   * window is denominated in epochs — height / epoch_blocks — so it must
+   * be measured against a height, not a timestamp. Dividing the unix
+   * timestamp by epoch_blocks produced an astronomically large "join
+   * epoch", a deeply negative member age, and a grace window that never
+   * expired for invited members (genesis-seeded members with joined_at=0
+   * were unaffected). Members restored from genesis written before this
+   * field carry 0, which reads as "joined at genesis" — they exit grace
+   * after NewMemberDecayGraceEpochs epochs, the same behaviour
+   * genesis-seeded members have always had.
+   */
+  joinedAtHeight: bigint;
+  /**
+   * Aggregate DREAM this member currently holds in content-conviction stakes
+   * across ALL content items (blog, forum, collection). Backs the per-member
+   * max_total_content_stake_per_member cap: the per-item cap only sets the
+   * granularity of parking DREAM here, so the aggregate is what bounds the
+   * total. (Content stakes earn no DREAM but do decay.) Maintained
+   * by updateStakePoolTotals — the single choke point for stake-amount
+   * mutations — and recomputed by ReconcileStakePoolTotals on genesis import.
+   * Author bonds are not counted here; they are slashable escrow with their
+   * own per-item cap. Nil on records written before this field existed;
+   * readers must treat nil as zero.
+   */
+  contentStakedDream: string;
 }
 export interface MemberProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Member";
@@ -468,6 +495,33 @@ export interface MemberAmino {
   lifetime_forum_rep_per_tag?: {
     [key: string]: string;
   };
+  /**
+   * Block height at which the member joined. This is the height-domain
+   * twin of joined_at (a unix timestamp): the new-member decay grace
+   * window is denominated in epochs — height / epoch_blocks — so it must
+   * be measured against a height, not a timestamp. Dividing the unix
+   * timestamp by epoch_blocks produced an astronomically large "join
+   * epoch", a deeply negative member age, and a grace window that never
+   * expired for invited members (genesis-seeded members with joined_at=0
+   * were unaffected). Members restored from genesis written before this
+   * field carry 0, which reads as "joined at genesis" — they exit grace
+   * after NewMemberDecayGraceEpochs epochs, the same behaviour
+   * genesis-seeded members have always had.
+   */
+  joined_at_height?: string;
+  /**
+   * Aggregate DREAM this member currently holds in content-conviction stakes
+   * across ALL content items (blog, forum, collection). Backs the per-member
+   * max_total_content_stake_per_member cap: the per-item cap only sets the
+   * granularity of parking DREAM here, so the aggregate is what bounds the
+   * total. (Content stakes earn no DREAM but do decay.) Maintained
+   * by updateStakePoolTotals — the single choke point for stake-amount
+   * mutations — and recomputed by ReconcileStakePoolTotals on genesis import.
+   * Author bonds are not counted here; they are slashable escrow with their
+   * own per-item cap. Nil on records written before this field existed;
+   * readers must treat nil as zero.
+   */
+  content_staked_dream?: string;
 }
 export interface MemberAminoMsg {
   type: "/sparkdream.rep.v1.Member";
@@ -909,7 +963,9 @@ function createBaseMember(): Member {
     epochSalvations: 0,
     lastSalvationEpoch: BigInt(0),
     forumRepPerTag: {},
-    lifetimeForumRepPerTag: {}
+    lifetimeForumRepPerTag: {},
+    joinedAtHeight: BigInt(0),
+    contentStakedDream: ""
   };
 }
 /**
@@ -1032,6 +1088,12 @@ export const Member = {
         value
       }, writer.uint32(258).fork()).ldelim();
     });
+    if (message.joinedAtHeight !== BigInt(0)) {
+      writer.uint32(264).int64(message.joinedAtHeight);
+    }
+    if (message.contentStakedDream !== "") {
+      writer.uint32(274).string(message.contentStakedDream);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Member {
@@ -1152,6 +1214,12 @@ export const Member = {
             message.lifetimeForumRepPerTag[entry32.key] = entry32.value;
           }
           break;
+        case 33:
+          message.joinedAtHeight = reader.int64();
+          break;
+        case 34:
+          message.contentStakedDream = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1228,6 +1296,8 @@ export const Member = {
       }
       return acc;
     }, {});
+    message.joinedAtHeight = object.joinedAtHeight !== undefined && object.joinedAtHeight !== null ? BigInt(object.joinedAtHeight.toString()) : BigInt(0);
+    message.contentStakedDream = object.contentStakedDream ?? "";
     return message;
   },
   fromAmino(object: MemberAmino): Member {
@@ -1351,6 +1421,12 @@ export const Member = {
       }
       return acc;
     }, {});
+    if (object.joined_at_height !== undefined && object.joined_at_height !== null) {
+      message.joinedAtHeight = BigInt(object.joined_at_height);
+    }
+    if (object.content_staked_dream !== undefined && object.content_staked_dream !== null) {
+      message.contentStakedDream = object.content_staked_dream;
+    }
     return message;
   },
   toAmino(message: Member): MemberAmino {
@@ -1416,6 +1492,8 @@ export const Member = {
         obj.lifetime_forum_rep_per_tag[k] = v;
       });
     }
+    obj.joined_at_height = message.joinedAtHeight !== BigInt(0) ? message.joinedAtHeight?.toString() : undefined;
+    obj.content_staked_dream = message.contentStakedDream === "" ? undefined : message.contentStakedDream;
     return obj;
   },
   fromAminoMsg(object: MemberAminoMsg): Member {

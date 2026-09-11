@@ -2704,8 +2704,19 @@ export interface QueryDreamSupplyStatsRequestAminoMsg {
  * @see proto type: sparkdream.rep.v1.QueryDreamSupplyStatsResponse
  */
 export interface QueryDreamSupplyStatsResponse {
-  totalMinted: string;
-  totalBurned: string;
+  /**
+   * Season-scoped flow figures, the same pair QueryMintBurnRatio returns. They
+   * were named total_minted/total_burned while reading the per-season
+   * counters, which reads as an all-time supply figure and is not: those
+   * counters reset every season in InitSeasonalPool.
+   * 
+   * There are no all-time counters to point them at instead, and adding some
+   * would be redundant — circulating (every member's balance, staked included)
+   * plus treasury_balance below is already the complete live supply, which is
+   * what all-time minted-minus-burned would only approximate.
+   */
+  seasonMinted: string;
+  seasonBurned: string;
   circulating: string;
   totalStaked: string;
   treasuryBalance: string;
@@ -2721,8 +2732,19 @@ export interface QueryDreamSupplyStatsResponseProtoMsg {
  * @see proto type: sparkdream.rep.v1.QueryDreamSupplyStatsResponse
  */
 export interface QueryDreamSupplyStatsResponseAmino {
-  total_minted?: string;
-  total_burned?: string;
+  /**
+   * Season-scoped flow figures, the same pair QueryMintBurnRatio returns. They
+   * were named total_minted/total_burned while reading the per-season
+   * counters, which reads as an all-time supply figure and is not: those
+   * counters reset every season in InitSeasonalPool.
+   * 
+   * There are no all-time counters to point them at instead, and adding some
+   * would be redundant — circulating (every member's balance, staked included)
+   * plus treasury_balance below is already the complete live supply, which is
+   * what all-time minted-minus-burned would only approximate.
+   */
+  season_minted?: string;
+  season_burned?: string;
   circulating?: string;
   total_staked?: string;
   treasury_balance?: string;
@@ -12437,8 +12459,8 @@ export const QueryDreamSupplyStatsRequest = {
 };
 function createBaseQueryDreamSupplyStatsResponse(): QueryDreamSupplyStatsResponse {
   return {
-    totalMinted: "",
-    totalBurned: "",
+    seasonMinted: "",
+    seasonBurned: "",
     circulating: "",
     totalStaked: "",
     treasuryBalance: "",
@@ -12453,11 +12475,11 @@ function createBaseQueryDreamSupplyStatsResponse(): QueryDreamSupplyStatsRespons
 export const QueryDreamSupplyStatsResponse = {
   typeUrl: "/sparkdream.rep.v1.QueryDreamSupplyStatsResponse",
   encode(message: QueryDreamSupplyStatsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.totalMinted !== "") {
-      writer.uint32(10).string(message.totalMinted);
+    if (message.seasonMinted !== "") {
+      writer.uint32(10).string(message.seasonMinted);
     }
-    if (message.totalBurned !== "") {
-      writer.uint32(18).string(message.totalBurned);
+    if (message.seasonBurned !== "") {
+      writer.uint32(18).string(message.seasonBurned);
     }
     if (message.circulating !== "") {
       writer.uint32(26).string(message.circulating);
@@ -12481,10 +12503,10 @@ export const QueryDreamSupplyStatsResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.totalMinted = reader.string();
+          message.seasonMinted = reader.string();
           break;
         case 2:
-          message.totalBurned = reader.string();
+          message.seasonBurned = reader.string();
           break;
         case 3:
           message.circulating = reader.string();
@@ -12507,8 +12529,8 @@ export const QueryDreamSupplyStatsResponse = {
   },
   fromPartial(object: DeepPartial<QueryDreamSupplyStatsResponse>): QueryDreamSupplyStatsResponse {
     const message = createBaseQueryDreamSupplyStatsResponse();
-    message.totalMinted = object.totalMinted ?? "";
-    message.totalBurned = object.totalBurned ?? "";
+    message.seasonMinted = object.seasonMinted ?? "";
+    message.seasonBurned = object.seasonBurned ?? "";
     message.circulating = object.circulating ?? "";
     message.totalStaked = object.totalStaked ?? "";
     message.treasuryBalance = object.treasuryBalance ?? "";
@@ -12517,11 +12539,11 @@ export const QueryDreamSupplyStatsResponse = {
   },
   fromAmino(object: QueryDreamSupplyStatsResponseAmino): QueryDreamSupplyStatsResponse {
     const message = createBaseQueryDreamSupplyStatsResponse();
-    if (object.total_minted !== undefined && object.total_minted !== null) {
-      message.totalMinted = object.total_minted;
+    if (object.season_minted !== undefined && object.season_minted !== null) {
+      message.seasonMinted = object.season_minted;
     }
-    if (object.total_burned !== undefined && object.total_burned !== null) {
-      message.totalBurned = object.total_burned;
+    if (object.season_burned !== undefined && object.season_burned !== null) {
+      message.seasonBurned = object.season_burned;
     }
     if (object.circulating !== undefined && object.circulating !== null) {
       message.circulating = object.circulating;
@@ -12539,8 +12561,8 @@ export const QueryDreamSupplyStatsResponse = {
   },
   toAmino(message: QueryDreamSupplyStatsResponse): QueryDreamSupplyStatsResponseAmino {
     const obj: any = {};
-    obj.total_minted = message.totalMinted === "" ? undefined : message.totalMinted;
-    obj.total_burned = message.totalBurned === "" ? undefined : message.totalBurned;
+    obj.season_minted = message.seasonMinted === "" ? undefined : message.seasonMinted;
+    obj.season_burned = message.seasonBurned === "" ? undefined : message.seasonBurned;
     obj.circulating = message.circulating === "" ? undefined : message.circulating;
     obj.total_staked = message.totalStaked === "" ? undefined : message.totalStaked;
     obj.treasury_balance = message.treasuryBalance === "" ? undefined : message.treasuryBalance;

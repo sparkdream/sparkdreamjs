@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { Params, ParamsAmino } from "./params";
-import { Member, MemberAmino } from "./member";
+import { Member, MemberAmino, GiftRecord, GiftRecordAmino } from "./member";
 import { Invitation, InvitationAmino } from "./invitation";
 import { Project, ProjectAmino } from "./project";
 import { Initiative, InitiativeAmino } from "./initiative";
@@ -119,6 +119,21 @@ export interface GenesisState {
    * on import would strand the escrow with nothing able to pay or refund it.
    */
   reviewBountyList: ReviewBounty[];
+  /**
+   * The module's own token ledger and accumulators. x/rep keeps DREAM outside
+   * x/bank, so none of this is recoverable from anywhere else — an export that
+   * omits it hands the importing chain a zero treasury, zero season counters
+   * (re-opening every per-season cap mid-season), a zero seasonal pool (so the
+   * "only seed an uninitialised pool" guard in InitGenesis refills a whole
+   * season budget on every import), a reset per-epoch mint allowance, and a
+   * decay clock that re-applies an extra epoch.
+   */
+  economicState?: EconomicState;
+  /**
+   * Per-recipient gift cooldown records. Not exported meant a capped gift
+   * re-enabled itself across a restart.
+   */
+  giftRecordList: GiftRecordEntry[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.rep.v1.GenesisState";
@@ -219,10 +234,125 @@ export interface GenesisStateAmino {
    * on import would strand the escrow with nothing able to pay or refund it.
    */
   review_bounty_list?: ReviewBountyAmino[];
+  /**
+   * The module's own token ledger and accumulators. x/rep keeps DREAM outside
+   * x/bank, so none of this is recoverable from anywhere else — an export that
+   * omits it hands the importing chain a zero treasury, zero season counters
+   * (re-opening every per-season cap mid-season), a zero seasonal pool (so the
+   * "only seed an uninitialised pool" guard in InitGenesis refills a whole
+   * season budget on every import), a reset per-epoch mint allowance, and a
+   * decay clock that re-applies an extra epoch.
+   */
+  economic_state?: EconomicStateAmino;
+  /**
+   * Per-recipient gift cooldown records. Not exported meant a capped gift
+   * re-enabled itself across a restart.
+   */
+  gift_record_list?: GiftRecordEntryAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.rep.v1.GenesisState";
   value: GenesisStateAmino;
+}
+/**
+ * EconomicState carries x/rep's token ledger across a genesis round trip.
+ * Int and Dec values travel as strings so an absent field reads as zero rather
+ * than as a malformed number.
+ * @name EconomicState
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.EconomicState
+ */
+export interface EconomicState {
+  treasuryBalance: string;
+  seasonMinted: string;
+  seasonBurned: string;
+  seasonInitiativeRewardsMinted: string;
+  seasonStakingRewardsMinted: string;
+  seasonInterimRewardsMinted: string;
+  seasonTreasuryInflow: string;
+  seasonTreasuryOutflow: string;
+  seasonalPoolRemaining: string;
+  /**
+   * Monotonic for the life of the chain. Exporting it is what lets
+   * RebaseStakeRewardDebt be a no-op on a faithful round trip instead of the
+   * repair it has to be when the accumulator resets to zero.
+   */
+  seasonalPoolAccPerShare: string;
+  seasonalPoolSeason: bigint;
+  seasonalPoolStartEpoch: bigint;
+  epochMintedEpoch: bigint;
+  epochMintedAmount: string;
+  decayLastProcessedEpoch: bigint;
+}
+export interface EconomicStateProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.EconomicState";
+  value: Uint8Array;
+}
+/**
+ * EconomicState carries x/rep's token ledger across a genesis round trip.
+ * Int and Dec values travel as strings so an absent field reads as zero rather
+ * than as a malformed number.
+ * @name EconomicStateAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.EconomicState
+ */
+export interface EconomicStateAmino {
+  treasury_balance?: string;
+  season_minted?: string;
+  season_burned?: string;
+  season_initiative_rewards_minted?: string;
+  season_staking_rewards_minted?: string;
+  season_interim_rewards_minted?: string;
+  season_treasury_inflow?: string;
+  season_treasury_outflow?: string;
+  seasonal_pool_remaining?: string;
+  /**
+   * Monotonic for the life of the chain. Exporting it is what lets
+   * RebaseStakeRewardDebt be a no-op on a faithful round trip instead of the
+   * repair it has to be when the accumulator resets to zero.
+   */
+  seasonal_pool_acc_per_share?: string;
+  seasonal_pool_season?: string;
+  seasonal_pool_start_epoch?: string;
+  epoch_minted_epoch?: string;
+  epoch_minted_amount?: string;
+  decay_last_processed_epoch?: string;
+}
+export interface EconomicStateAminoMsg {
+  type: "/sparkdream.rep.v1.EconomicState";
+  value: EconomicStateAmino;
+}
+/**
+ * GiftRecordEntry is one (sender, recipient) gift cooldown record, flattened
+ * for genesis because the live collection is keyed by the pair.
+ * @name GiftRecordEntry
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.GiftRecordEntry
+ */
+export interface GiftRecordEntry {
+  sender: string;
+  recipient: string;
+  record?: GiftRecord;
+}
+export interface GiftRecordEntryProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.GiftRecordEntry";
+  value: Uint8Array;
+}
+/**
+ * GiftRecordEntry is one (sender, recipient) gift cooldown record, flattened
+ * for genesis because the live collection is keyed by the pair.
+ * @name GiftRecordEntryAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.GiftRecordEntry
+ */
+export interface GiftRecordEntryAmino {
+  sender?: string;
+  recipient?: string;
+  record?: GiftRecordAmino;
+}
+export interface GiftRecordEntryAminoMsg {
+  type: "/sparkdream.rep.v1.GiftRecordEntry";
+  value: GiftRecordEntryAmino;
 }
 /**
  * RoleRewardDayFunding is one UTC day's community-pool draw for the
@@ -341,7 +471,9 @@ function createBaseGenesisState(): GenesisState {
     initiativeReviewList: [],
     escalatedReviewList: [],
     roleRewardDayFundingList: [],
-    reviewBountyList: []
+    reviewBountyList: [],
+    economicState: undefined,
+    giftRecordList: []
   };
 }
 /**
@@ -480,6 +612,12 @@ export const GenesisState = {
     }
     for (const v of message.reviewBountyList) {
       ReviewBounty.encode(v!, writer.uint32(338).fork()).ldelim();
+    }
+    if (message.economicState !== undefined) {
+      EconomicState.encode(message.economicState, writer.uint32(346).fork()).ldelim();
+    }
+    for (const v of message.giftRecordList) {
+      GiftRecordEntry.encode(v!, writer.uint32(354).fork()).ldelim();
     }
     return writer;
   },
@@ -623,6 +761,12 @@ export const GenesisState = {
         case 42:
           message.reviewBountyList.push(ReviewBounty.decode(reader, reader.uint32()));
           break;
+        case 43:
+          message.economicState = EconomicState.decode(reader, reader.uint32());
+          break;
+        case 44:
+          message.giftRecordList.push(GiftRecordEntry.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -674,6 +818,8 @@ export const GenesisState = {
     message.escalatedReviewList = object.escalatedReviewList?.map(e => BigInt(e.toString())) || [];
     message.roleRewardDayFundingList = object.roleRewardDayFundingList?.map(e => RoleRewardDayFunding.fromPartial(e)) || [];
     message.reviewBountyList = object.reviewBountyList?.map(e => ReviewBounty.fromPartial(e)) || [];
+    message.economicState = object.economicState !== undefined && object.economicState !== null ? EconomicState.fromPartial(object.economicState) : undefined;
+    message.giftRecordList = object.giftRecordList?.map(e => GiftRecordEntry.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -746,6 +892,10 @@ export const GenesisState = {
     message.escalatedReviewList = object.escalated_review_list?.map(e => BigInt(e)) || [];
     message.roleRewardDayFundingList = object.role_reward_day_funding_list?.map(e => RoleRewardDayFunding.fromAmino(e)) || [];
     message.reviewBountyList = object.review_bounty_list?.map(e => ReviewBounty.fromAmino(e)) || [];
+    if (object.economic_state !== undefined && object.economic_state !== null) {
+      message.economicState = EconomicState.fromAmino(object.economic_state);
+    }
+    message.giftRecordList = object.gift_record_list?.map(e => GiftRecordEntry.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -908,6 +1058,12 @@ export const GenesisState = {
     } else {
       obj.review_bounty_list = message.reviewBountyList;
     }
+    obj.economic_state = message.economicState ? EconomicState.toAmino(message.economicState) : undefined;
+    if (message.giftRecordList) {
+      obj.gift_record_list = message.giftRecordList.map(e => e ? GiftRecordEntry.toAmino(e) : undefined);
+    } else {
+      obj.gift_record_list = message.giftRecordList;
+    }
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {
@@ -923,6 +1079,339 @@ export const GenesisState = {
     return {
       typeUrl: "/sparkdream.rep.v1.GenesisState",
       value: GenesisState.encode(message).finish()
+    };
+  }
+};
+function createBaseEconomicState(): EconomicState {
+  return {
+    treasuryBalance: "",
+    seasonMinted: "",
+    seasonBurned: "",
+    seasonInitiativeRewardsMinted: "",
+    seasonStakingRewardsMinted: "",
+    seasonInterimRewardsMinted: "",
+    seasonTreasuryInflow: "",
+    seasonTreasuryOutflow: "",
+    seasonalPoolRemaining: "",
+    seasonalPoolAccPerShare: "",
+    seasonalPoolSeason: BigInt(0),
+    seasonalPoolStartEpoch: BigInt(0),
+    epochMintedEpoch: BigInt(0),
+    epochMintedAmount: "",
+    decayLastProcessedEpoch: BigInt(0)
+  };
+}
+/**
+ * EconomicState carries x/rep's token ledger across a genesis round trip.
+ * Int and Dec values travel as strings so an absent field reads as zero rather
+ * than as a malformed number.
+ * @name EconomicState
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.EconomicState
+ */
+export const EconomicState = {
+  typeUrl: "/sparkdream.rep.v1.EconomicState",
+  encode(message: EconomicState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.treasuryBalance !== "") {
+      writer.uint32(10).string(message.treasuryBalance);
+    }
+    if (message.seasonMinted !== "") {
+      writer.uint32(18).string(message.seasonMinted);
+    }
+    if (message.seasonBurned !== "") {
+      writer.uint32(26).string(message.seasonBurned);
+    }
+    if (message.seasonInitiativeRewardsMinted !== "") {
+      writer.uint32(34).string(message.seasonInitiativeRewardsMinted);
+    }
+    if (message.seasonStakingRewardsMinted !== "") {
+      writer.uint32(42).string(message.seasonStakingRewardsMinted);
+    }
+    if (message.seasonInterimRewardsMinted !== "") {
+      writer.uint32(50).string(message.seasonInterimRewardsMinted);
+    }
+    if (message.seasonTreasuryInflow !== "") {
+      writer.uint32(58).string(message.seasonTreasuryInflow);
+    }
+    if (message.seasonTreasuryOutflow !== "") {
+      writer.uint32(66).string(message.seasonTreasuryOutflow);
+    }
+    if (message.seasonalPoolRemaining !== "") {
+      writer.uint32(74).string(message.seasonalPoolRemaining);
+    }
+    if (message.seasonalPoolAccPerShare !== "") {
+      writer.uint32(82).string(message.seasonalPoolAccPerShare);
+    }
+    if (message.seasonalPoolSeason !== BigInt(0)) {
+      writer.uint32(88).uint64(message.seasonalPoolSeason);
+    }
+    if (message.seasonalPoolStartEpoch !== BigInt(0)) {
+      writer.uint32(96).uint64(message.seasonalPoolStartEpoch);
+    }
+    if (message.epochMintedEpoch !== BigInt(0)) {
+      writer.uint32(104).uint64(message.epochMintedEpoch);
+    }
+    if (message.epochMintedAmount !== "") {
+      writer.uint32(114).string(message.epochMintedAmount);
+    }
+    if (message.decayLastProcessedEpoch !== BigInt(0)) {
+      writer.uint32(120).uint64(message.decayLastProcessedEpoch);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): EconomicState {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEconomicState();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.treasuryBalance = reader.string();
+          break;
+        case 2:
+          message.seasonMinted = reader.string();
+          break;
+        case 3:
+          message.seasonBurned = reader.string();
+          break;
+        case 4:
+          message.seasonInitiativeRewardsMinted = reader.string();
+          break;
+        case 5:
+          message.seasonStakingRewardsMinted = reader.string();
+          break;
+        case 6:
+          message.seasonInterimRewardsMinted = reader.string();
+          break;
+        case 7:
+          message.seasonTreasuryInflow = reader.string();
+          break;
+        case 8:
+          message.seasonTreasuryOutflow = reader.string();
+          break;
+        case 9:
+          message.seasonalPoolRemaining = reader.string();
+          break;
+        case 10:
+          message.seasonalPoolAccPerShare = reader.string();
+          break;
+        case 11:
+          message.seasonalPoolSeason = reader.uint64();
+          break;
+        case 12:
+          message.seasonalPoolStartEpoch = reader.uint64();
+          break;
+        case 13:
+          message.epochMintedEpoch = reader.uint64();
+          break;
+        case 14:
+          message.epochMintedAmount = reader.string();
+          break;
+        case 15:
+          message.decayLastProcessedEpoch = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<EconomicState>): EconomicState {
+    const message = createBaseEconomicState();
+    message.treasuryBalance = object.treasuryBalance ?? "";
+    message.seasonMinted = object.seasonMinted ?? "";
+    message.seasonBurned = object.seasonBurned ?? "";
+    message.seasonInitiativeRewardsMinted = object.seasonInitiativeRewardsMinted ?? "";
+    message.seasonStakingRewardsMinted = object.seasonStakingRewardsMinted ?? "";
+    message.seasonInterimRewardsMinted = object.seasonInterimRewardsMinted ?? "";
+    message.seasonTreasuryInflow = object.seasonTreasuryInflow ?? "";
+    message.seasonTreasuryOutflow = object.seasonTreasuryOutflow ?? "";
+    message.seasonalPoolRemaining = object.seasonalPoolRemaining ?? "";
+    message.seasonalPoolAccPerShare = object.seasonalPoolAccPerShare ?? "";
+    message.seasonalPoolSeason = object.seasonalPoolSeason !== undefined && object.seasonalPoolSeason !== null ? BigInt(object.seasonalPoolSeason.toString()) : BigInt(0);
+    message.seasonalPoolStartEpoch = object.seasonalPoolStartEpoch !== undefined && object.seasonalPoolStartEpoch !== null ? BigInt(object.seasonalPoolStartEpoch.toString()) : BigInt(0);
+    message.epochMintedEpoch = object.epochMintedEpoch !== undefined && object.epochMintedEpoch !== null ? BigInt(object.epochMintedEpoch.toString()) : BigInt(0);
+    message.epochMintedAmount = object.epochMintedAmount ?? "";
+    message.decayLastProcessedEpoch = object.decayLastProcessedEpoch !== undefined && object.decayLastProcessedEpoch !== null ? BigInt(object.decayLastProcessedEpoch.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: EconomicStateAmino): EconomicState {
+    const message = createBaseEconomicState();
+    if (object.treasury_balance !== undefined && object.treasury_balance !== null) {
+      message.treasuryBalance = object.treasury_balance;
+    }
+    if (object.season_minted !== undefined && object.season_minted !== null) {
+      message.seasonMinted = object.season_minted;
+    }
+    if (object.season_burned !== undefined && object.season_burned !== null) {
+      message.seasonBurned = object.season_burned;
+    }
+    if (object.season_initiative_rewards_minted !== undefined && object.season_initiative_rewards_minted !== null) {
+      message.seasonInitiativeRewardsMinted = object.season_initiative_rewards_minted;
+    }
+    if (object.season_staking_rewards_minted !== undefined && object.season_staking_rewards_minted !== null) {
+      message.seasonStakingRewardsMinted = object.season_staking_rewards_minted;
+    }
+    if (object.season_interim_rewards_minted !== undefined && object.season_interim_rewards_minted !== null) {
+      message.seasonInterimRewardsMinted = object.season_interim_rewards_minted;
+    }
+    if (object.season_treasury_inflow !== undefined && object.season_treasury_inflow !== null) {
+      message.seasonTreasuryInflow = object.season_treasury_inflow;
+    }
+    if (object.season_treasury_outflow !== undefined && object.season_treasury_outflow !== null) {
+      message.seasonTreasuryOutflow = object.season_treasury_outflow;
+    }
+    if (object.seasonal_pool_remaining !== undefined && object.seasonal_pool_remaining !== null) {
+      message.seasonalPoolRemaining = object.seasonal_pool_remaining;
+    }
+    if (object.seasonal_pool_acc_per_share !== undefined && object.seasonal_pool_acc_per_share !== null) {
+      message.seasonalPoolAccPerShare = object.seasonal_pool_acc_per_share;
+    }
+    if (object.seasonal_pool_season !== undefined && object.seasonal_pool_season !== null) {
+      message.seasonalPoolSeason = BigInt(object.seasonal_pool_season);
+    }
+    if (object.seasonal_pool_start_epoch !== undefined && object.seasonal_pool_start_epoch !== null) {
+      message.seasonalPoolStartEpoch = BigInt(object.seasonal_pool_start_epoch);
+    }
+    if (object.epoch_minted_epoch !== undefined && object.epoch_minted_epoch !== null) {
+      message.epochMintedEpoch = BigInt(object.epoch_minted_epoch);
+    }
+    if (object.epoch_minted_amount !== undefined && object.epoch_minted_amount !== null) {
+      message.epochMintedAmount = object.epoch_minted_amount;
+    }
+    if (object.decay_last_processed_epoch !== undefined && object.decay_last_processed_epoch !== null) {
+      message.decayLastProcessedEpoch = BigInt(object.decay_last_processed_epoch);
+    }
+    return message;
+  },
+  toAmino(message: EconomicState): EconomicStateAmino {
+    const obj: any = {};
+    obj.treasury_balance = message.treasuryBalance === "" ? undefined : message.treasuryBalance;
+    obj.season_minted = message.seasonMinted === "" ? undefined : message.seasonMinted;
+    obj.season_burned = message.seasonBurned === "" ? undefined : message.seasonBurned;
+    obj.season_initiative_rewards_minted = message.seasonInitiativeRewardsMinted === "" ? undefined : message.seasonInitiativeRewardsMinted;
+    obj.season_staking_rewards_minted = message.seasonStakingRewardsMinted === "" ? undefined : message.seasonStakingRewardsMinted;
+    obj.season_interim_rewards_minted = message.seasonInterimRewardsMinted === "" ? undefined : message.seasonInterimRewardsMinted;
+    obj.season_treasury_inflow = message.seasonTreasuryInflow === "" ? undefined : message.seasonTreasuryInflow;
+    obj.season_treasury_outflow = message.seasonTreasuryOutflow === "" ? undefined : message.seasonTreasuryOutflow;
+    obj.seasonal_pool_remaining = message.seasonalPoolRemaining === "" ? undefined : message.seasonalPoolRemaining;
+    obj.seasonal_pool_acc_per_share = message.seasonalPoolAccPerShare === "" ? undefined : message.seasonalPoolAccPerShare;
+    obj.seasonal_pool_season = message.seasonalPoolSeason !== BigInt(0) ? message.seasonalPoolSeason?.toString() : undefined;
+    obj.seasonal_pool_start_epoch = message.seasonalPoolStartEpoch !== BigInt(0) ? message.seasonalPoolStartEpoch?.toString() : undefined;
+    obj.epoch_minted_epoch = message.epochMintedEpoch !== BigInt(0) ? message.epochMintedEpoch?.toString() : undefined;
+    obj.epoch_minted_amount = message.epochMintedAmount === "" ? undefined : message.epochMintedAmount;
+    obj.decay_last_processed_epoch = message.decayLastProcessedEpoch !== BigInt(0) ? message.decayLastProcessedEpoch?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: EconomicStateAminoMsg): EconomicState {
+    return EconomicState.fromAmino(object.value);
+  },
+  fromProtoMsg(message: EconomicStateProtoMsg): EconomicState {
+    return EconomicState.decode(message.value);
+  },
+  toProto(message: EconomicState): Uint8Array {
+    return EconomicState.encode(message).finish();
+  },
+  toProtoMsg(message: EconomicState): EconomicStateProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.EconomicState",
+      value: EconomicState.encode(message).finish()
+    };
+  }
+};
+function createBaseGiftRecordEntry(): GiftRecordEntry {
+  return {
+    sender: "",
+    recipient: "",
+    record: undefined
+  };
+}
+/**
+ * GiftRecordEntry is one (sender, recipient) gift cooldown record, flattened
+ * for genesis because the live collection is keyed by the pair.
+ * @name GiftRecordEntry
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.GiftRecordEntry
+ */
+export const GiftRecordEntry = {
+  typeUrl: "/sparkdream.rep.v1.GiftRecordEntry",
+  encode(message: GiftRecordEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.sender !== "") {
+      writer.uint32(10).string(message.sender);
+    }
+    if (message.recipient !== "") {
+      writer.uint32(18).string(message.recipient);
+    }
+    if (message.record !== undefined) {
+      GiftRecord.encode(message.record, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): GiftRecordEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGiftRecordEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.sender = reader.string();
+          break;
+        case 2:
+          message.recipient = reader.string();
+          break;
+        case 3:
+          message.record = GiftRecord.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<GiftRecordEntry>): GiftRecordEntry {
+    const message = createBaseGiftRecordEntry();
+    message.sender = object.sender ?? "";
+    message.recipient = object.recipient ?? "";
+    message.record = object.record !== undefined && object.record !== null ? GiftRecord.fromPartial(object.record) : undefined;
+    return message;
+  },
+  fromAmino(object: GiftRecordEntryAmino): GiftRecordEntry {
+    const message = createBaseGiftRecordEntry();
+    if (object.sender !== undefined && object.sender !== null) {
+      message.sender = object.sender;
+    }
+    if (object.recipient !== undefined && object.recipient !== null) {
+      message.recipient = object.recipient;
+    }
+    if (object.record !== undefined && object.record !== null) {
+      message.record = GiftRecord.fromAmino(object.record);
+    }
+    return message;
+  },
+  toAmino(message: GiftRecordEntry): GiftRecordEntryAmino {
+    const obj: any = {};
+    obj.sender = message.sender === "" ? undefined : message.sender;
+    obj.recipient = message.recipient === "" ? undefined : message.recipient;
+    obj.record = message.record ? GiftRecord.toAmino(message.record) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: GiftRecordEntryAminoMsg): GiftRecordEntry {
+    return GiftRecordEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: GiftRecordEntryProtoMsg): GiftRecordEntry {
+    return GiftRecordEntry.decode(message.value);
+  },
+  toProto(message: GiftRecordEntry): Uint8Array {
+    return GiftRecordEntry.encode(message).finish();
+  },
+  toProtoMsg(message: GiftRecordEntry): GiftRecordEntryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.GiftRecordEntry",
+      value: GiftRecordEntry.encode(message).finish()
     };
   }
 };

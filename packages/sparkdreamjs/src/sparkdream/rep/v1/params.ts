@@ -249,6 +249,41 @@ export interface Params {
    */
   maxStakingRewardsPerSeason: string;
   /**
+   * Ceiling on each epoch's reward slice, as a yield on the DREAM actually
+   * staked (default 0.0005 = 0.05% per epoch, 7.5% over a 150-epoch season
+   * gross, ~3.75% net of staked_decay_rate).
+   * 
+   * The slice is otherwise remaining/remaining_epochs no matter how little is
+   * staked, so yield per staked DREAM diverges as the staked base shrinks and
+   * acc_per_share grows without bound: a chain with 1.47 DREAM staked hands the
+   * entire season budget to three dust stakes. Whatever this cap withholds
+   * stays in the pool rather than being distributed or dropped.
+   */
+  stakingRewardYieldPerEpoch: string;
+  /**
+   * Share of the previous season's non-staking DREAM mints that funds this
+   * season's staking reward pool (default 0.05 = 5%), so emission tracks what
+   * the chain actually produced rather than the calendar.
+   * 
+   * Staking rewards are excluded from the base. Counting them would let each
+   * season's pool inflate the next one's, compounding with nothing but the
+   * schedule cap below to stop it.
+   */
+  stakingPoolMintShare: string;
+  /**
+   * Schedule ceiling on the seasonal pool:
+   * 
+   *   cap = staking_pool_cap_base * (season + 1) * staking_pool_cap_rate
+   * 
+   * The base is the chain's initial DREAM supply (25,000 DREAM at genesis) and
+   * the rate defaults to 0.05, so the ceiling opens at 1,250 DREAM in season 0
+   * and widens by that much each season. It backstops the mint-share term above
+   * on a chain whose mint volume spikes; max_staking_rewards_per_season remains
+   * the absolute ceiling over both.
+   */
+  stakingPoolCapBase: string;
+  stakingPoolCapRate: string;
+  /**
    * Per-epoch decay on staked DREAM (default 0.05% = 0.0005)
    */
   stakedDecayRate: string;
@@ -274,6 +309,31 @@ export interface Params {
    * but without this cap, a whale can stake disproportionately and extract most seasonal staking rewards.
    */
   maxInitiativeStakePerMember: string;
+  /**
+   * Anti-dust floor on the DREAM one MsgStake may lock (default 0.002 DREAM =
+   * 2,000 micro-DREAM). There was no floor at all, so a member could open the
+   * ten tranches max_stake_tranches_per_target allows at one micro-DREAM each
+   * and be counted as a participant in every conviction and payout weighting
+   * the initiative runs.
+   * 
+   * The default is pinned to 1/staking_reward_yield_per_epoch: the smallest
+   * stake whose own per-epoch accrual (amount * yield, truncated to an integer)
+   * reaches one micro-DREAM. Below that a record can never earn anything, and
+   * should not occupy a state slot. Move it with the yield. What bounds the
+   * return on a small position is max_completion_bonus_stake_multiple, not
+   * this.
+   */
+  minStakeAmount: string;
+  /**
+   * Per-season cap on total DREAM minted to pay interim work (default 50,000
+   * DREAM). The initiative cap below has always existed; the interim path had
+   * no season bound at all, which left it as the one DREAM-creating flow whose
+   * total was limited only by max_dream_mint_per_epoch — 250,000 DREAM/day
+   * against a 25,000 DREAM genesis supply. Interims are self-assigned and
+   * self-completed by design, so the per-member active cap alone does not
+   * bound the total: a member can complete and re-create indefinitely.
+   */
+  maxInterimRewardsPerSeason: string;
   /**
    * Per-season cap on total DREAM minted via initiative completion rewards (default 100,000 DREAM).
    * Bounds total extraction even if colluding members rubber-stamp initiatives.
@@ -484,6 +544,43 @@ export interface Params {
    * Default 0.1.
    */
   initiativeCompletionBonusRate: string;
+  /**
+   * Ceiling on the initiative completion bonus, as a multiple of the external
+   * DREAM actually staked behind the initiative (default 3.0):
+   * 
+   *   bonus_pool = min(initiative_completion_bonus_rate * budget,
+   *                    max_completion_bonus_stake_multiple * external_stake)
+   * 
+   * Default 3.0. Without it the bonus is a fixed share of the budget while the
+   * capital needed to unlock that budget falls as 1/N in the number of stakers —
+   * required_conviction is conviction_per_dream * sqrt(budget), each of N
+   * stakers supplies sqrt(stake), so the total stake that clears the gate is
+   * conviction_per_dream^2 * budget / N. The bonus per staker is then
+   * 2.5 * N times their own stake: 7.5x at three stakers, 25x at ten, 62.5x at
+   * twenty-five, risk-free on any initiative that completes.
+   * 
+   * Pricing the bonus off capital at risk instead of participant count
+   * restores the stake-to-budget ratio the conviction formula was designed
+   * around (~4%) without touching the sqrt weighting that deliberately rewards
+   * breadth. Range: 0 disables the bonus entirely.
+   */
+  maxCompletionBonusStakeMultiple: string;
+  /**
+   * Ceiling on the TOTAL DREAM one member may hold across all content
+   * conviction stakes (blog, forum, collection — every item combined), on top
+   * of the per-item max_content_stake_per_member.
+   * 
+   * Content stakes neither decay (decayStakes skips them) nor earn, so without
+   * an aggregate bound they are an unbounded decay-free store of value: DREAM
+   * parked there escapes the unstaked decay nudge entirely while a reward-
+   * bearing stake pays for itself in yield only when the seasonal pool is not
+   * calendar-bound. The per-item cap alone does not bound the park — one
+   * member can hold max_content_stake_per_member on every item ever created.
+   * Must be >= max_content_stake_per_member. Default 20,000 DREAM (2x the
+   * per-item cap). Author bonds are not counted; they are slashable escrow
+   * with their own per-item cap.
+   */
+  maxTotalContentStakePerMember: string;
   /**
    * Replacement rounds the acceptance sweep may run per jury review.
    * 
@@ -904,6 +1001,41 @@ export interface ParamsAmino {
    */
   max_staking_rewards_per_season?: string;
   /**
+   * Ceiling on each epoch's reward slice, as a yield on the DREAM actually
+   * staked (default 0.0005 = 0.05% per epoch, 7.5% over a 150-epoch season
+   * gross, ~3.75% net of staked_decay_rate).
+   * 
+   * The slice is otherwise remaining/remaining_epochs no matter how little is
+   * staked, so yield per staked DREAM diverges as the staked base shrinks and
+   * acc_per_share grows without bound: a chain with 1.47 DREAM staked hands the
+   * entire season budget to three dust stakes. Whatever this cap withholds
+   * stays in the pool rather than being distributed or dropped.
+   */
+  staking_reward_yield_per_epoch?: string;
+  /**
+   * Share of the previous season's non-staking DREAM mints that funds this
+   * season's staking reward pool (default 0.05 = 5%), so emission tracks what
+   * the chain actually produced rather than the calendar.
+   * 
+   * Staking rewards are excluded from the base. Counting them would let each
+   * season's pool inflate the next one's, compounding with nothing but the
+   * schedule cap below to stop it.
+   */
+  staking_pool_mint_share?: string;
+  /**
+   * Schedule ceiling on the seasonal pool:
+   * 
+   *   cap = staking_pool_cap_base * (season + 1) * staking_pool_cap_rate
+   * 
+   * The base is the chain's initial DREAM supply (25,000 DREAM at genesis) and
+   * the rate defaults to 0.05, so the ceiling opens at 1,250 DREAM in season 0
+   * and widens by that much each season. It backstops the mint-share term above
+   * on a chain whose mint volume spikes; max_staking_rewards_per_season remains
+   * the absolute ceiling over both.
+   */
+  staking_pool_cap_base?: string;
+  staking_pool_cap_rate?: string;
+  /**
    * Per-epoch decay on staked DREAM (default 0.05% = 0.0005)
    */
   staked_decay_rate?: string;
@@ -929,6 +1061,31 @@ export interface ParamsAmino {
    * but without this cap, a whale can stake disproportionately and extract most seasonal staking rewards.
    */
   max_initiative_stake_per_member?: string;
+  /**
+   * Anti-dust floor on the DREAM one MsgStake may lock (default 0.002 DREAM =
+   * 2,000 micro-DREAM). There was no floor at all, so a member could open the
+   * ten tranches max_stake_tranches_per_target allows at one micro-DREAM each
+   * and be counted as a participant in every conviction and payout weighting
+   * the initiative runs.
+   * 
+   * The default is pinned to 1/staking_reward_yield_per_epoch: the smallest
+   * stake whose own per-epoch accrual (amount * yield, truncated to an integer)
+   * reaches one micro-DREAM. Below that a record can never earn anything, and
+   * should not occupy a state slot. Move it with the yield. What bounds the
+   * return on a small position is max_completion_bonus_stake_multiple, not
+   * this.
+   */
+  min_stake_amount?: string;
+  /**
+   * Per-season cap on total DREAM minted to pay interim work (default 50,000
+   * DREAM). The initiative cap below has always existed; the interim path had
+   * no season bound at all, which left it as the one DREAM-creating flow whose
+   * total was limited only by max_dream_mint_per_epoch — 250,000 DREAM/day
+   * against a 25,000 DREAM genesis supply. Interims are self-assigned and
+   * self-completed by design, so the per-member active cap alone does not
+   * bound the total: a member can complete and re-create indefinitely.
+   */
+  max_interim_rewards_per_season?: string;
   /**
    * Per-season cap on total DREAM minted via initiative completion rewards (default 100,000 DREAM).
    * Bounds total extraction even if colluding members rubber-stamp initiatives.
@@ -1139,6 +1296,43 @@ export interface ParamsAmino {
    * Default 0.1.
    */
   initiative_completion_bonus_rate?: string;
+  /**
+   * Ceiling on the initiative completion bonus, as a multiple of the external
+   * DREAM actually staked behind the initiative (default 3.0):
+   * 
+   *   bonus_pool = min(initiative_completion_bonus_rate * budget,
+   *                    max_completion_bonus_stake_multiple * external_stake)
+   * 
+   * Default 3.0. Without it the bonus is a fixed share of the budget while the
+   * capital needed to unlock that budget falls as 1/N in the number of stakers —
+   * required_conviction is conviction_per_dream * sqrt(budget), each of N
+   * stakers supplies sqrt(stake), so the total stake that clears the gate is
+   * conviction_per_dream^2 * budget / N. The bonus per staker is then
+   * 2.5 * N times their own stake: 7.5x at three stakers, 25x at ten, 62.5x at
+   * twenty-five, risk-free on any initiative that completes.
+   * 
+   * Pricing the bonus off capital at risk instead of participant count
+   * restores the stake-to-budget ratio the conviction formula was designed
+   * around (~4%) without touching the sqrt weighting that deliberately rewards
+   * breadth. Range: 0 disables the bonus entirely.
+   */
+  max_completion_bonus_stake_multiple?: string;
+  /**
+   * Ceiling on the TOTAL DREAM one member may hold across all content
+   * conviction stakes (blog, forum, collection — every item combined), on top
+   * of the per-item max_content_stake_per_member.
+   * 
+   * Content stakes neither decay (decayStakes skips them) nor earn, so without
+   * an aggregate bound they are an unbounded decay-free store of value: DREAM
+   * parked there escapes the unstaked decay nudge entirely while a reward-
+   * bearing stake pays for itself in yield only when the seasonal pool is not
+   * calendar-bound. The per-item cap alone does not bound the park — one
+   * member can hold max_content_stake_per_member on every item ever created.
+   * Must be >= max_content_stake_per_member. Default 20,000 DREAM (2x the
+   * per-item cap). Author bonds are not counted; they are slashable escrow
+   * with their own per-item cap.
+   */
+  max_total_content_stake_per_member?: string;
   /**
    * Replacement rounds the acceptance sweep may run per jury review.
    * 
@@ -1533,6 +1727,14 @@ export interface RepOperationalParams {
    */
   maxInitiativeStakePerMember: string;
   /**
+   * Mirrors min_stake_amount in Params.
+   */
+  minStakeAmount: string;
+  /**
+   * Mirrors max_interim_rewards_per_season in Params.
+   */
+  maxInterimRewardsPerSeason: string;
+  /**
    * Per-season initiative reward minting cap (mirrors Params.max_initiative_rewards_per_season)
    */
   maxInitiativeRewardsPerSeason: string;
@@ -1627,6 +1829,15 @@ export interface RepOperationalParams {
    */
   initiativeCompletionBonusRate: string;
   /**
+   * Mirrors max_completion_bonus_stake_multiple in Params.
+   */
+  maxCompletionBonusStakeMultiple: string;
+  /**
+   * Mirrors max_total_content_stake_per_member in Params: the aggregate
+   * per-member ceiling across all content conviction stakes.
+   */
+  maxTotalContentStakePerMember: string;
+  /**
    * Mirrors jury_acceptance_window_ratio in Params. Validated against
    * max_jury_redraws below — the pair must fit inside the review period.
    */
@@ -1696,6 +1907,13 @@ export interface RepOperationalParams {
   minReviewerAgeBlocks: bigint;
   reviewerDemotionCooldown: bigint;
   reviewerUnbondCooldown: bigint;
+  /**
+   * Seasonal staking pool shape; see the same fields on Params.
+   */
+  stakingRewardYieldPerEpoch: string;
+  stakingPoolMintShare: string;
+  stakingPoolCapBase: string;
+  stakingPoolCapRate: string;
 }
 export interface RepOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.rep.v1.RepOperationalParams";
@@ -1832,6 +2050,14 @@ export interface RepOperationalParamsAmino {
    */
   max_initiative_stake_per_member?: string;
   /**
+   * Mirrors min_stake_amount in Params.
+   */
+  min_stake_amount?: string;
+  /**
+   * Mirrors max_interim_rewards_per_season in Params.
+   */
+  max_interim_rewards_per_season?: string;
+  /**
    * Per-season initiative reward minting cap (mirrors Params.max_initiative_rewards_per_season)
    */
   max_initiative_rewards_per_season?: string;
@@ -1926,6 +2152,15 @@ export interface RepOperationalParamsAmino {
    */
   initiative_completion_bonus_rate?: string;
   /**
+   * Mirrors max_completion_bonus_stake_multiple in Params.
+   */
+  max_completion_bonus_stake_multiple?: string;
+  /**
+   * Mirrors max_total_content_stake_per_member in Params: the aggregate
+   * per-member ceiling across all content conviction stakes.
+   */
+  max_total_content_stake_per_member?: string;
+  /**
    * Mirrors jury_acceptance_window_ratio in Params. Validated against
    * max_jury_redraws below — the pair must fit inside the review period.
    */
@@ -1995,6 +2230,13 @@ export interface RepOperationalParamsAmino {
   min_reviewer_age_blocks?: string;
   reviewer_demotion_cooldown?: string;
   reviewer_unbond_cooldown?: string;
+  /**
+   * Seasonal staking pool shape; see the same fields on Params.
+   */
+  staking_reward_yield_per_epoch?: string;
+  staking_pool_mint_share?: string;
+  staking_pool_cap_base?: string;
+  staking_pool_cap_rate?: string;
 }
 export interface RepOperationalParamsAminoMsg {
   type: "sparkdream/x/rep/RepOperationalParams";
@@ -2383,12 +2625,18 @@ function createBaseParams(): Params {
     invitationStakeBurnRate: "",
     maxReputationGainPerEpoch: "",
     maxStakingRewardsPerSeason: "",
+    stakingRewardYieldPerEpoch: "",
+    stakingPoolMintShare: "",
+    stakingPoolCapBase: "",
+    stakingPoolCapRate: "",
     stakedDecayRate: "",
     newMemberDecayGraceEpochs: BigInt(0),
     maxTreasuryBalance: "",
     treasuryFundsInterims: false,
     treasuryFundsRetroPgf: false,
     maxInitiativeStakePerMember: "",
+    minStakeAmount: "",
+    maxInterimRewardsPerSeason: "",
     maxInitiativeRewardsPerSeason: "",
     largeProjectBudgetThreshold: "",
     projectCreationFee: "",
@@ -2422,6 +2670,8 @@ function createBaseParams(): Params {
     minJurorSelectionWeight: "",
     minJurySeatingsForWeighting: BigInt(0),
     initiativeCompletionBonusRate: "",
+    maxCompletionBonusStakeMultiple: "",
+    maxTotalContentStakePerMember: "",
     maxJuryRedraws: 0,
     reviewerBondReserveRate: "",
     reviewFeeRate: "",
@@ -2656,6 +2906,18 @@ export const Params = {
     if (message.maxStakingRewardsPerSeason !== "") {
       writer.uint32(506).string(message.maxStakingRewardsPerSeason);
     }
+    if (message.stakingRewardYieldPerEpoch !== "") {
+      writer.uint32(1090).string(Decimal.fromUserInput(message.stakingRewardYieldPerEpoch, 18).atomics);
+    }
+    if (message.stakingPoolMintShare !== "") {
+      writer.uint32(1098).string(Decimal.fromUserInput(message.stakingPoolMintShare, 18).atomics);
+    }
+    if (message.stakingPoolCapBase !== "") {
+      writer.uint32(1106).string(message.stakingPoolCapBase);
+    }
+    if (message.stakingPoolCapRate !== "") {
+      writer.uint32(1114).string(Decimal.fromUserInput(message.stakingPoolCapRate, 18).atomics);
+    }
     if (message.stakedDecayRate !== "") {
       writer.uint32(514).string(Decimal.fromUserInput(message.stakedDecayRate, 18).atomics);
     }
@@ -2673,6 +2935,12 @@ export const Params = {
     }
     if (message.maxInitiativeStakePerMember !== "") {
       writer.uint32(554).string(message.maxInitiativeStakePerMember);
+    }
+    if (message.minStakeAmount !== "") {
+      writer.uint32(1122).string(message.minStakeAmount);
+    }
+    if (message.maxInterimRewardsPerSeason !== "") {
+      writer.uint32(1146).string(message.maxInterimRewardsPerSeason);
     }
     if (message.maxInitiativeRewardsPerSeason !== "") {
       writer.uint32(562).string(message.maxInitiativeRewardsPerSeason);
@@ -2772,6 +3040,12 @@ export const Params = {
     }
     if (message.initiativeCompletionBonusRate !== "") {
       writer.uint32(818).string(Decimal.fromUserInput(message.initiativeCompletionBonusRate, 18).atomics);
+    }
+    if (message.maxCompletionBonusStakeMultiple !== "") {
+      writer.uint32(1130).string(Decimal.fromUserInput(message.maxCompletionBonusStakeMultiple, 18).atomics);
+    }
+    if (message.maxTotalContentStakePerMember !== "") {
+      writer.uint32(1138).string(message.maxTotalContentStakePerMember);
     }
     if (message.maxJuryRedraws !== 0) {
       writer.uint32(824).uint32(message.maxJuryRedraws);
@@ -3070,6 +3344,18 @@ export const Params = {
         case 63:
           message.maxStakingRewardsPerSeason = reader.string();
           break;
+        case 136:
+          message.stakingRewardYieldPerEpoch = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 137:
+          message.stakingPoolMintShare = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 138:
+          message.stakingPoolCapBase = reader.string();
+          break;
+        case 139:
+          message.stakingPoolCapRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
         case 64:
           message.stakedDecayRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
@@ -3087,6 +3373,12 @@ export const Params = {
           break;
         case 69:
           message.maxInitiativeStakePerMember = reader.string();
+          break;
+        case 140:
+          message.minStakeAmount = reader.string();
+          break;
+        case 143:
+          message.maxInterimRewardsPerSeason = reader.string();
           break;
         case 70:
           message.maxInitiativeRewardsPerSeason = reader.string();
@@ -3186,6 +3478,12 @@ export const Params = {
           break;
         case 102:
           message.initiativeCompletionBonusRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 141:
+          message.maxCompletionBonusStakeMultiple = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 142:
+          message.maxTotalContentStakePerMember = reader.string();
           break;
         case 103:
           message.maxJuryRedraws = reader.uint32();
@@ -3358,12 +3656,18 @@ export const Params = {
     message.invitationStakeBurnRate = object.invitationStakeBurnRate ?? "";
     message.maxReputationGainPerEpoch = object.maxReputationGainPerEpoch ?? "";
     message.maxStakingRewardsPerSeason = object.maxStakingRewardsPerSeason ?? "";
+    message.stakingRewardYieldPerEpoch = object.stakingRewardYieldPerEpoch ?? "";
+    message.stakingPoolMintShare = object.stakingPoolMintShare ?? "";
+    message.stakingPoolCapBase = object.stakingPoolCapBase ?? "";
+    message.stakingPoolCapRate = object.stakingPoolCapRate ?? "";
     message.stakedDecayRate = object.stakedDecayRate ?? "";
     message.newMemberDecayGraceEpochs = object.newMemberDecayGraceEpochs !== undefined && object.newMemberDecayGraceEpochs !== null ? BigInt(object.newMemberDecayGraceEpochs.toString()) : BigInt(0);
     message.maxTreasuryBalance = object.maxTreasuryBalance ?? "";
     message.treasuryFundsInterims = object.treasuryFundsInterims ?? false;
     message.treasuryFundsRetroPgf = object.treasuryFundsRetroPgf ?? false;
     message.maxInitiativeStakePerMember = object.maxInitiativeStakePerMember ?? "";
+    message.minStakeAmount = object.minStakeAmount ?? "";
+    message.maxInterimRewardsPerSeason = object.maxInterimRewardsPerSeason ?? "";
     message.maxInitiativeRewardsPerSeason = object.maxInitiativeRewardsPerSeason ?? "";
     message.largeProjectBudgetThreshold = object.largeProjectBudgetThreshold ?? "";
     message.projectCreationFee = object.projectCreationFee ?? "";
@@ -3397,6 +3701,8 @@ export const Params = {
     message.minJurorSelectionWeight = object.minJurorSelectionWeight ?? "";
     message.minJurySeatingsForWeighting = object.minJurySeatingsForWeighting !== undefined && object.minJurySeatingsForWeighting !== null ? BigInt(object.minJurySeatingsForWeighting.toString()) : BigInt(0);
     message.initiativeCompletionBonusRate = object.initiativeCompletionBonusRate ?? "";
+    message.maxCompletionBonusStakeMultiple = object.maxCompletionBonusStakeMultiple ?? "";
+    message.maxTotalContentStakePerMember = object.maxTotalContentStakePerMember ?? "";
     message.maxJuryRedraws = object.maxJuryRedraws ?? 0;
     message.reviewerBondReserveRate = object.reviewerBondReserveRate ?? "";
     message.reviewFeeRate = object.reviewFeeRate ?? "";
@@ -3623,6 +3929,18 @@ export const Params = {
     if (object.max_staking_rewards_per_season !== undefined && object.max_staking_rewards_per_season !== null) {
       message.maxStakingRewardsPerSeason = object.max_staking_rewards_per_season;
     }
+    if (object.staking_reward_yield_per_epoch !== undefined && object.staking_reward_yield_per_epoch !== null) {
+      message.stakingRewardYieldPerEpoch = object.staking_reward_yield_per_epoch;
+    }
+    if (object.staking_pool_mint_share !== undefined && object.staking_pool_mint_share !== null) {
+      message.stakingPoolMintShare = object.staking_pool_mint_share;
+    }
+    if (object.staking_pool_cap_base !== undefined && object.staking_pool_cap_base !== null) {
+      message.stakingPoolCapBase = object.staking_pool_cap_base;
+    }
+    if (object.staking_pool_cap_rate !== undefined && object.staking_pool_cap_rate !== null) {
+      message.stakingPoolCapRate = object.staking_pool_cap_rate;
+    }
     if (object.staked_decay_rate !== undefined && object.staked_decay_rate !== null) {
       message.stakedDecayRate = object.staked_decay_rate;
     }
@@ -3640,6 +3958,12 @@ export const Params = {
     }
     if (object.max_initiative_stake_per_member !== undefined && object.max_initiative_stake_per_member !== null) {
       message.maxInitiativeStakePerMember = object.max_initiative_stake_per_member;
+    }
+    if (object.min_stake_amount !== undefined && object.min_stake_amount !== null) {
+      message.minStakeAmount = object.min_stake_amount;
+    }
+    if (object.max_interim_rewards_per_season !== undefined && object.max_interim_rewards_per_season !== null) {
+      message.maxInterimRewardsPerSeason = object.max_interim_rewards_per_season;
     }
     if (object.max_initiative_rewards_per_season !== undefined && object.max_initiative_rewards_per_season !== null) {
       message.maxInitiativeRewardsPerSeason = object.max_initiative_rewards_per_season;
@@ -3739,6 +4063,12 @@ export const Params = {
     }
     if (object.initiative_completion_bonus_rate !== undefined && object.initiative_completion_bonus_rate !== null) {
       message.initiativeCompletionBonusRate = object.initiative_completion_bonus_rate;
+    }
+    if (object.max_completion_bonus_stake_multiple !== undefined && object.max_completion_bonus_stake_multiple !== null) {
+      message.maxCompletionBonusStakeMultiple = object.max_completion_bonus_stake_multiple;
+    }
+    if (object.max_total_content_stake_per_member !== undefined && object.max_total_content_stake_per_member !== null) {
+      message.maxTotalContentStakePerMember = object.max_total_content_stake_per_member;
     }
     if (object.max_jury_redraws !== undefined && object.max_jury_redraws !== null) {
       message.maxJuryRedraws = object.max_jury_redraws;
@@ -3906,12 +4236,18 @@ export const Params = {
     obj.invitation_stake_burn_rate = message.invitationStakeBurnRate === "" ? undefined : message.invitationStakeBurnRate;
     obj.max_reputation_gain_per_epoch = message.maxReputationGainPerEpoch === "" ? undefined : message.maxReputationGainPerEpoch;
     obj.max_staking_rewards_per_season = message.maxStakingRewardsPerSeason === "" ? undefined : message.maxStakingRewardsPerSeason;
+    obj.staking_reward_yield_per_epoch = message.stakingRewardYieldPerEpoch === "" ? undefined : message.stakingRewardYieldPerEpoch;
+    obj.staking_pool_mint_share = message.stakingPoolMintShare === "" ? undefined : message.stakingPoolMintShare;
+    obj.staking_pool_cap_base = message.stakingPoolCapBase === "" ? undefined : message.stakingPoolCapBase;
+    obj.staking_pool_cap_rate = message.stakingPoolCapRate === "" ? undefined : message.stakingPoolCapRate;
     obj.staked_decay_rate = message.stakedDecayRate === "" ? undefined : message.stakedDecayRate;
     obj.new_member_decay_grace_epochs = message.newMemberDecayGraceEpochs !== BigInt(0) ? message.newMemberDecayGraceEpochs?.toString() : undefined;
     obj.max_treasury_balance = message.maxTreasuryBalance === "" ? undefined : message.maxTreasuryBalance;
     obj.treasury_funds_interims = message.treasuryFundsInterims === false ? undefined : message.treasuryFundsInterims;
     obj.treasury_funds_retro_pgf = message.treasuryFundsRetroPgf === false ? undefined : message.treasuryFundsRetroPgf;
     obj.max_initiative_stake_per_member = message.maxInitiativeStakePerMember === "" ? undefined : message.maxInitiativeStakePerMember;
+    obj.min_stake_amount = message.minStakeAmount === "" ? undefined : message.minStakeAmount;
+    obj.max_interim_rewards_per_season = message.maxInterimRewardsPerSeason === "" ? undefined : message.maxInterimRewardsPerSeason;
     obj.max_initiative_rewards_per_season = message.maxInitiativeRewardsPerSeason === "" ? undefined : message.maxInitiativeRewardsPerSeason;
     obj.large_project_budget_threshold = message.largeProjectBudgetThreshold === "" ? undefined : message.largeProjectBudgetThreshold;
     obj.project_creation_fee = message.projectCreationFee === "" ? undefined : message.projectCreationFee;
@@ -3945,6 +4281,8 @@ export const Params = {
     obj.min_juror_selection_weight = message.minJurorSelectionWeight === "" ? undefined : message.minJurorSelectionWeight;
     obj.min_jury_seatings_for_weighting = message.minJurySeatingsForWeighting !== BigInt(0) ? message.minJurySeatingsForWeighting?.toString() : undefined;
     obj.initiative_completion_bonus_rate = message.initiativeCompletionBonusRate === "" ? undefined : message.initiativeCompletionBonusRate;
+    obj.max_completion_bonus_stake_multiple = message.maxCompletionBonusStakeMultiple === "" ? undefined : message.maxCompletionBonusStakeMultiple;
+    obj.max_total_content_stake_per_member = message.maxTotalContentStakePerMember === "" ? undefined : message.maxTotalContentStakePerMember;
     obj.max_jury_redraws = message.maxJuryRedraws === 0 ? undefined : message.maxJuryRedraws;
     obj.reviewer_bond_reserve_rate = message.reviewerBondReserveRate === "" ? undefined : message.reviewerBondReserveRate;
     obj.review_fee_rate = message.reviewFeeRate === "" ? undefined : message.reviewFeeRate;
@@ -4059,6 +4397,8 @@ function createBaseRepOperationalParams(): RepOperationalParams {
     treasuryFundsInterims: false,
     treasuryFundsRetroPgf: false,
     maxInitiativeStakePerMember: "",
+    minStakeAmount: "",
+    maxInterimRewardsPerSeason: "",
     maxInitiativeRewardsPerSeason: "",
     largeProjectBudgetThreshold: "",
     projectCreationFee: "",
@@ -4085,6 +4425,8 @@ function createBaseRepOperationalParams(): RepOperationalParams {
     minJurorSelectionWeight: "",
     minJurySeatingsForWeighting: BigInt(0),
     initiativeCompletionBonusRate: "",
+    maxCompletionBonusStakeMultiple: "",
+    maxTotalContentStakePerMember: "",
     juryAcceptanceWindowRatio: "",
     maxJuryRedraws: 0,
     reviewerBondReserveRate: "",
@@ -4118,7 +4460,11 @@ function createBaseRepOperationalParams(): RepOperationalParams {
     minReviewerRepTier: BigInt(0),
     minReviewerAgeBlocks: BigInt(0),
     reviewerDemotionCooldown: BigInt(0),
-    reviewerUnbondCooldown: BigInt(0)
+    reviewerUnbondCooldown: BigInt(0),
+    stakingRewardYieldPerEpoch: "",
+    stakingPoolMintShare: "",
+    stakingPoolCapBase: "",
+    stakingPoolCapRate: ""
   };
 }
 /**
@@ -4298,6 +4644,12 @@ export const RepOperationalParams = {
     if (message.maxInitiativeStakePerMember !== "") {
       writer.uint32(442).string(message.maxInitiativeStakePerMember);
     }
+    if (message.minStakeAmount !== "") {
+      writer.uint32(962).string(message.minStakeAmount);
+    }
+    if (message.maxInterimRewardsPerSeason !== "") {
+      writer.uint32(986).string(message.maxInterimRewardsPerSeason);
+    }
     if (message.maxInitiativeRewardsPerSeason !== "") {
       writer.uint32(450).string(message.maxInitiativeRewardsPerSeason);
     }
@@ -4375,6 +4727,12 @@ export const RepOperationalParams = {
     }
     if (message.initiativeCompletionBonusRate !== "") {
       writer.uint32(650).string(Decimal.fromUserInput(message.initiativeCompletionBonusRate, 18).atomics);
+    }
+    if (message.maxCompletionBonusStakeMultiple !== "") {
+      writer.uint32(970).string(Decimal.fromUserInput(message.maxCompletionBonusStakeMultiple, 18).atomics);
+    }
+    if (message.maxTotalContentStakePerMember !== "") {
+      writer.uint32(978).string(message.maxTotalContentStakePerMember);
     }
     if (message.juryAcceptanceWindowRatio !== "") {
       writer.uint32(658).string(Decimal.fromUserInput(message.juryAcceptanceWindowRatio, 18).atomics);
@@ -4477,6 +4835,18 @@ export const RepOperationalParams = {
     }
     if (message.reviewerUnbondCooldown !== BigInt(0)) {
       writer.uint32(920).int64(message.reviewerUnbondCooldown);
+    }
+    if (message.stakingRewardYieldPerEpoch !== "") {
+      writer.uint32(930).string(Decimal.fromUserInput(message.stakingRewardYieldPerEpoch, 18).atomics);
+    }
+    if (message.stakingPoolMintShare !== "") {
+      writer.uint32(938).string(Decimal.fromUserInput(message.stakingPoolMintShare, 18).atomics);
+    }
+    if (message.stakingPoolCapBase !== "") {
+      writer.uint32(946).string(message.stakingPoolCapBase);
+    }
+    if (message.stakingPoolCapRate !== "") {
+      writer.uint32(954).string(Decimal.fromUserInput(message.stakingPoolCapRate, 18).atomics);
     }
     return writer;
   },
@@ -4652,6 +5022,12 @@ export const RepOperationalParams = {
         case 55:
           message.maxInitiativeStakePerMember = reader.string();
           break;
+        case 120:
+          message.minStakeAmount = reader.string();
+          break;
+        case 123:
+          message.maxInterimRewardsPerSeason = reader.string();
+          break;
         case 56:
           message.maxInitiativeRewardsPerSeason = reader.string();
           break;
@@ -4729,6 +5105,12 @@ export const RepOperationalParams = {
           break;
         case 81:
           message.initiativeCompletionBonusRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 121:
+          message.maxCompletionBonusStakeMultiple = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 122:
+          message.maxTotalContentStakePerMember = reader.string();
           break;
         case 82:
           message.juryAcceptanceWindowRatio = Decimal.fromAtomics(reader.string(), 18).toString();
@@ -4832,6 +5214,18 @@ export const RepOperationalParams = {
         case 115:
           message.reviewerUnbondCooldown = reader.int64();
           break;
+        case 116:
+          message.stakingRewardYieldPerEpoch = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 117:
+          message.stakingPoolMintShare = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 118:
+          message.stakingPoolCapBase = reader.string();
+          break;
+        case 119:
+          message.stakingPoolCapRate = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4896,6 +5290,8 @@ export const RepOperationalParams = {
     message.treasuryFundsInterims = object.treasuryFundsInterims ?? false;
     message.treasuryFundsRetroPgf = object.treasuryFundsRetroPgf ?? false;
     message.maxInitiativeStakePerMember = object.maxInitiativeStakePerMember ?? "";
+    message.minStakeAmount = object.minStakeAmount ?? "";
+    message.maxInterimRewardsPerSeason = object.maxInterimRewardsPerSeason ?? "";
     message.maxInitiativeRewardsPerSeason = object.maxInitiativeRewardsPerSeason ?? "";
     message.largeProjectBudgetThreshold = object.largeProjectBudgetThreshold ?? "";
     message.projectCreationFee = object.projectCreationFee ?? "";
@@ -4922,6 +5318,8 @@ export const RepOperationalParams = {
     message.minJurorSelectionWeight = object.minJurorSelectionWeight ?? "";
     message.minJurySeatingsForWeighting = object.minJurySeatingsForWeighting !== undefined && object.minJurySeatingsForWeighting !== null ? BigInt(object.minJurySeatingsForWeighting.toString()) : BigInt(0);
     message.initiativeCompletionBonusRate = object.initiativeCompletionBonusRate ?? "";
+    message.maxCompletionBonusStakeMultiple = object.maxCompletionBonusStakeMultiple ?? "";
+    message.maxTotalContentStakePerMember = object.maxTotalContentStakePerMember ?? "";
     message.juryAcceptanceWindowRatio = object.juryAcceptanceWindowRatio ?? "";
     message.maxJuryRedraws = object.maxJuryRedraws ?? 0;
     message.reviewerBondReserveRate = object.reviewerBondReserveRate ?? "";
@@ -4956,6 +5354,10 @@ export const RepOperationalParams = {
     message.minReviewerAgeBlocks = object.minReviewerAgeBlocks !== undefined && object.minReviewerAgeBlocks !== null ? BigInt(object.minReviewerAgeBlocks.toString()) : BigInt(0);
     message.reviewerDemotionCooldown = object.reviewerDemotionCooldown !== undefined && object.reviewerDemotionCooldown !== null ? BigInt(object.reviewerDemotionCooldown.toString()) : BigInt(0);
     message.reviewerUnbondCooldown = object.reviewerUnbondCooldown !== undefined && object.reviewerUnbondCooldown !== null ? BigInt(object.reviewerUnbondCooldown.toString()) : BigInt(0);
+    message.stakingRewardYieldPerEpoch = object.stakingRewardYieldPerEpoch ?? "";
+    message.stakingPoolMintShare = object.stakingPoolMintShare ?? "";
+    message.stakingPoolCapBase = object.stakingPoolCapBase ?? "";
+    message.stakingPoolCapRate = object.stakingPoolCapRate ?? "";
     return message;
   },
   fromAmino(object: RepOperationalParamsAmino): RepOperationalParams {
@@ -5125,6 +5527,12 @@ export const RepOperationalParams = {
     if (object.max_initiative_stake_per_member !== undefined && object.max_initiative_stake_per_member !== null) {
       message.maxInitiativeStakePerMember = object.max_initiative_stake_per_member;
     }
+    if (object.min_stake_amount !== undefined && object.min_stake_amount !== null) {
+      message.minStakeAmount = object.min_stake_amount;
+    }
+    if (object.max_interim_rewards_per_season !== undefined && object.max_interim_rewards_per_season !== null) {
+      message.maxInterimRewardsPerSeason = object.max_interim_rewards_per_season;
+    }
     if (object.max_initiative_rewards_per_season !== undefined && object.max_initiative_rewards_per_season !== null) {
       message.maxInitiativeRewardsPerSeason = object.max_initiative_rewards_per_season;
     }
@@ -5202,6 +5610,12 @@ export const RepOperationalParams = {
     }
     if (object.initiative_completion_bonus_rate !== undefined && object.initiative_completion_bonus_rate !== null) {
       message.initiativeCompletionBonusRate = object.initiative_completion_bonus_rate;
+    }
+    if (object.max_completion_bonus_stake_multiple !== undefined && object.max_completion_bonus_stake_multiple !== null) {
+      message.maxCompletionBonusStakeMultiple = object.max_completion_bonus_stake_multiple;
+    }
+    if (object.max_total_content_stake_per_member !== undefined && object.max_total_content_stake_per_member !== null) {
+      message.maxTotalContentStakePerMember = object.max_total_content_stake_per_member;
     }
     if (object.jury_acceptance_window_ratio !== undefined && object.jury_acceptance_window_ratio !== null) {
       message.juryAcceptanceWindowRatio = object.jury_acceptance_window_ratio;
@@ -5305,6 +5719,18 @@ export const RepOperationalParams = {
     if (object.reviewer_unbond_cooldown !== undefined && object.reviewer_unbond_cooldown !== null) {
       message.reviewerUnbondCooldown = BigInt(object.reviewer_unbond_cooldown);
     }
+    if (object.staking_reward_yield_per_epoch !== undefined && object.staking_reward_yield_per_epoch !== null) {
+      message.stakingRewardYieldPerEpoch = object.staking_reward_yield_per_epoch;
+    }
+    if (object.staking_pool_mint_share !== undefined && object.staking_pool_mint_share !== null) {
+      message.stakingPoolMintShare = object.staking_pool_mint_share;
+    }
+    if (object.staking_pool_cap_base !== undefined && object.staking_pool_cap_base !== null) {
+      message.stakingPoolCapBase = object.staking_pool_cap_base;
+    }
+    if (object.staking_pool_cap_rate !== undefined && object.staking_pool_cap_rate !== null) {
+      message.stakingPoolCapRate = object.staking_pool_cap_rate;
+    }
     return message;
   },
   toAmino(message: RepOperationalParams): RepOperationalParamsAmino {
@@ -5364,6 +5790,8 @@ export const RepOperationalParams = {
     obj.treasury_funds_interims = message.treasuryFundsInterims === false ? undefined : message.treasuryFundsInterims;
     obj.treasury_funds_retro_pgf = message.treasuryFundsRetroPgf === false ? undefined : message.treasuryFundsRetroPgf;
     obj.max_initiative_stake_per_member = message.maxInitiativeStakePerMember === "" ? undefined : message.maxInitiativeStakePerMember;
+    obj.min_stake_amount = message.minStakeAmount === "" ? undefined : message.minStakeAmount;
+    obj.max_interim_rewards_per_season = message.maxInterimRewardsPerSeason === "" ? undefined : message.maxInterimRewardsPerSeason;
     obj.max_initiative_rewards_per_season = message.maxInitiativeRewardsPerSeason === "" ? undefined : message.maxInitiativeRewardsPerSeason;
     obj.large_project_budget_threshold = message.largeProjectBudgetThreshold === "" ? undefined : message.largeProjectBudgetThreshold;
     obj.project_creation_fee = message.projectCreationFee === "" ? undefined : message.projectCreationFee;
@@ -5390,6 +5818,8 @@ export const RepOperationalParams = {
     obj.min_juror_selection_weight = message.minJurorSelectionWeight === "" ? undefined : message.minJurorSelectionWeight;
     obj.min_jury_seatings_for_weighting = message.minJurySeatingsForWeighting !== BigInt(0) ? message.minJurySeatingsForWeighting?.toString() : undefined;
     obj.initiative_completion_bonus_rate = message.initiativeCompletionBonusRate === "" ? undefined : message.initiativeCompletionBonusRate;
+    obj.max_completion_bonus_stake_multiple = message.maxCompletionBonusStakeMultiple === "" ? undefined : message.maxCompletionBonusStakeMultiple;
+    obj.max_total_content_stake_per_member = message.maxTotalContentStakePerMember === "" ? undefined : message.maxTotalContentStakePerMember;
     obj.jury_acceptance_window_ratio = message.juryAcceptanceWindowRatio === "" ? undefined : message.juryAcceptanceWindowRatio;
     obj.max_jury_redraws = message.maxJuryRedraws === 0 ? undefined : message.maxJuryRedraws;
     obj.reviewer_bond_reserve_rate = message.reviewerBondReserveRate === "" ? undefined : message.reviewerBondReserveRate;
@@ -5424,6 +5854,10 @@ export const RepOperationalParams = {
     obj.min_reviewer_age_blocks = message.minReviewerAgeBlocks !== BigInt(0) ? message.minReviewerAgeBlocks?.toString() : undefined;
     obj.reviewer_demotion_cooldown = message.reviewerDemotionCooldown !== BigInt(0) ? message.reviewerDemotionCooldown?.toString() : undefined;
     obj.reviewer_unbond_cooldown = message.reviewerUnbondCooldown !== BigInt(0) ? message.reviewerUnbondCooldown?.toString() : undefined;
+    obj.staking_reward_yield_per_epoch = message.stakingRewardYieldPerEpoch === "" ? undefined : message.stakingRewardYieldPerEpoch;
+    obj.staking_pool_mint_share = message.stakingPoolMintShare === "" ? undefined : message.stakingPoolMintShare;
+    obj.staking_pool_cap_base = message.stakingPoolCapBase === "" ? undefined : message.stakingPoolCapBase;
+    obj.staking_pool_cap_rate = message.stakingPoolCapRate === "" ? undefined : message.stakingPoolCapRate;
     return obj;
   },
   fromAminoMsg(object: RepOperationalParamsAminoMsg): RepOperationalParams {
