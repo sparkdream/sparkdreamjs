@@ -1,0 +1,22 @@
+// Syncthing ignore patterns for sparkdreamjs (yarn workspace)
+// Keep identical on every peer.
+
+// Dependencies, ~499 MB
+node_modules
+
+// Vendored proto sources, 701 MB, gitignored upstream as **/git-modules/
+git-modules
+
+// Build output, regenerate with yarn build
+dist
+build
+*.tsbuildinfo
+
+// Local key material
+keyring-file
+
+// Noise
+*.log
+.DS_Store
+Thumbs.db
+*.swp
