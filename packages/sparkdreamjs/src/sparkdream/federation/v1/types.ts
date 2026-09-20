@@ -512,7 +512,6 @@ export interface PeerPolicy {
    */
   allowReputationQueries: boolean;
   acceptReputationAttestations: boolean;
-  maxTrustCredit: number;
   /**
    * Moderation
    */
@@ -544,7 +543,6 @@ export interface PeerPolicyAmino {
    */
   allow_reputation_queries?: boolean;
   accept_reputation_attestations?: boolean;
-  max_trust_credit?: number;
   /**
    * Moderation
    */
@@ -1372,7 +1370,6 @@ function createBasePeerPolicy(): PeerPolicy {
     outboundRateLimitPerEpoch: BigInt(0),
     allowReputationQueries: false,
     acceptReputationAttestations: false,
-    maxTrustCredit: 0,
     requireReview: false,
     blockedIdentities: []
   };
@@ -1402,7 +1399,7 @@ export const PeerPolicy = {
       writer.uint32(40).uint64(message.inboundRateLimitPerEpoch);
     }
     if (message.outboundRateLimitPerEpoch !== BigInt(0)) {
-      writer.uint32(88).uint64(message.outboundRateLimitPerEpoch);
+      writer.uint32(80).uint64(message.outboundRateLimitPerEpoch);
     }
     if (message.allowReputationQueries === true) {
       writer.uint32(48).bool(message.allowReputationQueries);
@@ -1410,14 +1407,11 @@ export const PeerPolicy = {
     if (message.acceptReputationAttestations === true) {
       writer.uint32(56).bool(message.acceptReputationAttestations);
     }
-    if (message.maxTrustCredit !== 0) {
-      writer.uint32(64).uint32(message.maxTrustCredit);
-    }
     if (message.requireReview === true) {
-      writer.uint32(72).bool(message.requireReview);
+      writer.uint32(64).bool(message.requireReview);
     }
     for (const v of message.blockedIdentities) {
-      writer.uint32(82).string(v!);
+      writer.uint32(74).string(v!);
     }
     return writer;
   },
@@ -1443,7 +1437,7 @@ export const PeerPolicy = {
         case 5:
           message.inboundRateLimitPerEpoch = reader.uint64();
           break;
-        case 11:
+        case 10:
           message.outboundRateLimitPerEpoch = reader.uint64();
           break;
         case 6:
@@ -1453,12 +1447,9 @@ export const PeerPolicy = {
           message.acceptReputationAttestations = reader.bool();
           break;
         case 8:
-          message.maxTrustCredit = reader.uint32();
-          break;
-        case 9:
           message.requireReview = reader.bool();
           break;
-        case 10:
+        case 9:
           message.blockedIdentities.push(reader.string());
           break;
         default:
@@ -1478,7 +1469,6 @@ export const PeerPolicy = {
     message.outboundRateLimitPerEpoch = object.outboundRateLimitPerEpoch !== undefined && object.outboundRateLimitPerEpoch !== null ? BigInt(object.outboundRateLimitPerEpoch.toString()) : BigInt(0);
     message.allowReputationQueries = object.allowReputationQueries ?? false;
     message.acceptReputationAttestations = object.acceptReputationAttestations ?? false;
-    message.maxTrustCredit = object.maxTrustCredit ?? 0;
     message.requireReview = object.requireReview ?? false;
     message.blockedIdentities = object.blockedIdentities?.map(e => e) || [];
     return message;
@@ -1505,9 +1495,6 @@ export const PeerPolicy = {
     if (object.accept_reputation_attestations !== undefined && object.accept_reputation_attestations !== null) {
       message.acceptReputationAttestations = object.accept_reputation_attestations;
     }
-    if (object.max_trust_credit !== undefined && object.max_trust_credit !== null) {
-      message.maxTrustCredit = object.max_trust_credit;
-    }
     if (object.require_review !== undefined && object.require_review !== null) {
       message.requireReview = object.require_review;
     }
@@ -1532,7 +1519,6 @@ export const PeerPolicy = {
     obj.outbound_rate_limit_per_epoch = message.outboundRateLimitPerEpoch !== BigInt(0) ? message.outboundRateLimitPerEpoch?.toString() : undefined;
     obj.allow_reputation_queries = message.allowReputationQueries === false ? undefined : message.allowReputationQueries;
     obj.accept_reputation_attestations = message.acceptReputationAttestations === false ? undefined : message.acceptReputationAttestations;
-    obj.max_trust_credit = message.maxTrustCredit === 0 ? undefined : message.maxTrustCredit;
     obj.require_review = message.requireReview === false ? undefined : message.requireReview;
     if (message.blockedIdentities) {
       obj.blocked_identities = message.blockedIdentities.map(e => e);

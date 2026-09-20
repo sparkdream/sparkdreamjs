@@ -40,7 +40,6 @@ export interface Params {
    */
   attestationTtl: Duration;
   globalMaxTrustCredit: number;
-  trustDiscountRate: string;
   /**
    * Identity
    */
@@ -189,7 +188,6 @@ export interface ParamsAmino {
    */
   attestation_ttl?: DurationAmino;
   global_max_trust_credit?: number;
-  trust_discount_rate?: string;
   /**
    * Identity
    */
@@ -316,7 +314,6 @@ export interface FederationOperationalParams {
   contentTtl: Duration;
   attestationTtl: Duration;
   globalMaxTrustCredit: number;
-  trustDiscountRate: string;
   bridgeInactivityThreshold: bigint;
   maxPrunePerBlock: bigint;
 }
@@ -339,7 +336,6 @@ export interface FederationOperationalParamsAmino {
   content_ttl?: DurationAmino;
   attestation_ttl?: DurationAmino;
   global_max_trust_credit?: number;
-  trust_discount_rate?: string;
   bridge_inactivity_threshold?: string;
   max_prune_per_block?: string;
 }
@@ -358,7 +354,6 @@ function createBaseParams(): Params {
     contentTtl: Duration.fromPartial({}),
     attestationTtl: Duration.fromPartial({}),
     globalMaxTrustCredit: 0,
-    trustDiscountRate: "",
     maxIdentityLinksPerUser: 0,
     unverifiedLinkTtl: Duration.fromPartial({}),
     challengeTtl: Duration.fromPartial({}),
@@ -431,107 +426,104 @@ export const Params = {
     if (message.globalMaxTrustCredit !== 0) {
       writer.uint32(72).uint32(message.globalMaxTrustCredit);
     }
-    if (message.trustDiscountRate !== "") {
-      writer.uint32(82).string(Decimal.fromUserInput(message.trustDiscountRate, 18).atomics);
-    }
     if (message.maxIdentityLinksPerUser !== 0) {
-      writer.uint32(88).uint32(message.maxIdentityLinksPerUser);
+      writer.uint32(80).uint32(message.maxIdentityLinksPerUser);
     }
     if (message.unverifiedLinkTtl !== undefined) {
-      Duration.encode(message.unverifiedLinkTtl, writer.uint32(98).fork()).ldelim();
+      Duration.encode(message.unverifiedLinkTtl, writer.uint32(90).fork()).ldelim();
     }
     if (message.challengeTtl !== undefined) {
-      Duration.encode(message.challengeTtl, writer.uint32(106).fork()).ldelim();
+      Duration.encode(message.challengeTtl, writer.uint32(98).fork()).ldelim();
     }
     if (message.bridgeInactivityThreshold !== BigInt(0)) {
-      writer.uint32(112).uint64(message.bridgeInactivityThreshold);
+      writer.uint32(104).uint64(message.bridgeInactivityThreshold);
     }
     if (message.ibcPort !== "") {
-      writer.uint32(122).string(message.ibcPort);
+      writer.uint32(114).string(message.ibcPort);
     }
     if (message.ibcChannelVersion !== "") {
-      writer.uint32(130).string(message.ibcChannelVersion);
+      writer.uint32(122).string(message.ibcChannelVersion);
     }
     if (message.ibcPacketTimeout !== undefined) {
-      Duration.encode(message.ibcPacketTimeout, writer.uint32(138).fork()).ldelim();
+      Duration.encode(message.ibcPacketTimeout, writer.uint32(130).fork()).ldelim();
     }
     if (message.maxPrunePerBlock !== BigInt(0)) {
-      writer.uint32(144).uint64(message.maxPrunePerBlock);
+      writer.uint32(136).uint64(message.maxPrunePerBlock);
     }
     if (message.maxOutboundPerBlock !== BigInt(0)) {
-      writer.uint32(152).uint64(message.maxOutboundPerBlock);
+      writer.uint32(144).uint64(message.maxOutboundPerBlock);
     }
     if (message.rateLimitWindow !== undefined) {
-      Duration.encode(message.rateLimitWindow, writer.uint32(162).fork()).ldelim();
+      Duration.encode(message.rateLimitWindow, writer.uint32(154).fork()).ldelim();
     }
     if (message.minVerifierTrustLevel !== 0) {
-      writer.uint32(168).uint32(message.minVerifierTrustLevel);
+      writer.uint32(160).uint32(message.minVerifierTrustLevel);
     }
     if (message.minVerifierBond !== "") {
-      writer.uint32(178).string(message.minVerifierBond);
+      writer.uint32(170).string(message.minVerifierBond);
     }
     if (message.verifierRecoveryThreshold !== "") {
-      writer.uint32(186).string(message.verifierRecoveryThreshold);
+      writer.uint32(178).string(message.verifierRecoveryThreshold);
     }
     if (message.verifierSlashAmount !== "") {
-      writer.uint32(194).string(message.verifierSlashAmount);
+      writer.uint32(186).string(message.verifierSlashAmount);
     }
     if (message.verificationWindow !== undefined) {
-      Duration.encode(message.verificationWindow, writer.uint32(202).fork()).ldelim();
+      Duration.encode(message.verificationWindow, writer.uint32(194).fork()).ldelim();
     }
     if (message.challengeWindow !== undefined) {
-      Duration.encode(message.challengeWindow, writer.uint32(210).fork()).ldelim();
+      Duration.encode(message.challengeWindow, writer.uint32(202).fork()).ldelim();
     }
     if (message.challengeFeeAmount !== "") {
-      writer.uint32(218).string(message.challengeFeeAmount);
+      writer.uint32(210).string(message.challengeFeeAmount);
     }
     if (message.challengeJuryDeadline !== undefined) {
-      Duration.encode(message.challengeJuryDeadline, writer.uint32(226).fork()).ldelim();
+      Duration.encode(message.challengeJuryDeadline, writer.uint32(218).fork()).ldelim();
     }
     if (message.verifierDemotionCooldown !== undefined) {
-      Duration.encode(message.verifierDemotionCooldown, writer.uint32(234).fork()).ldelim();
+      Duration.encode(message.verifierDemotionCooldown, writer.uint32(226).fork()).ldelim();
     }
     if (message.verifierOverturnBaseCooldown !== undefined) {
-      Duration.encode(message.verifierOverturnBaseCooldown, writer.uint32(242).fork()).ldelim();
+      Duration.encode(message.verifierOverturnBaseCooldown, writer.uint32(234).fork()).ldelim();
     }
     if (message.upheldToResetOverturns !== 0) {
-      writer.uint32(248).uint32(message.upheldToResetOverturns);
+      writer.uint32(240).uint32(message.upheldToResetOverturns);
     }
     if (message.operatorRewardInflationShare !== "") {
-      writer.uint32(258).string(Decimal.fromUserInput(message.operatorRewardInflationShare, 18).atomics);
+      writer.uint32(250).string(Decimal.fromUserInput(message.operatorRewardInflationShare, 18).atomics);
     }
     if (message.maxOperatorRewardPool !== "") {
-      writer.uint32(266).string(message.maxOperatorRewardPool);
+      writer.uint32(258).string(message.maxOperatorRewardPool);
     }
     if (message.operatorRewardPoolOverflowBurnRatio !== "") {
-      writer.uint32(274).string(Decimal.fromUserInput(message.operatorRewardPoolOverflowBurnRatio, 18).atomics);
+      writer.uint32(266).string(Decimal.fromUserInput(message.operatorRewardPoolOverflowBurnRatio, 18).atomics);
     }
     if (message.operatorRewardEpochBlocks !== BigInt(0)) {
-      writer.uint32(280).uint64(message.operatorRewardEpochBlocks);
+      writer.uint32(272).uint64(message.operatorRewardEpochBlocks);
     }
     if (message.minEpochVerifiedSubmissions !== 0) {
-      writer.uint32(288).uint32(message.minEpochVerifiedSubmissions);
+      writer.uint32(280).uint32(message.minEpochVerifiedSubmissions);
     }
     if (message.maxUnverifiedRate !== "") {
-      writer.uint32(298).string(Decimal.fromUserInput(message.maxUnverifiedRate, 18).atomics);
+      writer.uint32(290).string(Decimal.fromUserInput(message.maxUnverifiedRate, 18).atomics);
     }
     if (message.arbiterQuorum !== 0) {
-      writer.uint32(304).uint32(message.arbiterQuorum);
+      writer.uint32(296).uint32(message.arbiterQuorum);
     }
     if (message.arbiterResolutionWindow !== undefined) {
-      Duration.encode(message.arbiterResolutionWindow, writer.uint32(314).fork()).ldelim();
+      Duration.encode(message.arbiterResolutionWindow, writer.uint32(306).fork()).ldelim();
     }
     if (message.arbiterEscalationWindow !== undefined) {
-      Duration.encode(message.arbiterEscalationWindow, writer.uint32(322).fork()).ldelim();
+      Duration.encode(message.arbiterEscalationWindow, writer.uint32(314).fork()).ldelim();
     }
     if (message.escalationFeeAmount !== "") {
-      writer.uint32(330).string(message.escalationFeeAmount);
+      writer.uint32(322).string(message.escalationFeeAmount);
     }
     if (message.challengeCooldown !== undefined) {
-      Duration.encode(message.challengeCooldown, writer.uint32(338).fork()).ldelim();
+      Duration.encode(message.challengeCooldown, writer.uint32(330).fork()).ldelim();
     }
     if (message.verifierUnbondCooldown !== undefined) {
-      Duration.encode(message.verifierUnbondCooldown, writer.uint32(346).fork()).ldelim();
+      Duration.encode(message.verifierUnbondCooldown, writer.uint32(338).fork()).ldelim();
     }
     return writer;
   },
@@ -570,105 +562,102 @@ export const Params = {
           message.globalMaxTrustCredit = reader.uint32();
           break;
         case 10:
-          message.trustDiscountRate = Decimal.fromAtomics(reader.string(), 18).toString();
-          break;
-        case 11:
           message.maxIdentityLinksPerUser = reader.uint32();
           break;
-        case 12:
+        case 11:
           message.unverifiedLinkTtl = Duration.decode(reader, reader.uint32());
           break;
-        case 13:
+        case 12:
           message.challengeTtl = Duration.decode(reader, reader.uint32());
           break;
-        case 14:
+        case 13:
           message.bridgeInactivityThreshold = reader.uint64();
           break;
-        case 15:
+        case 14:
           message.ibcPort = reader.string();
           break;
-        case 16:
+        case 15:
           message.ibcChannelVersion = reader.string();
           break;
-        case 17:
+        case 16:
           message.ibcPacketTimeout = Duration.decode(reader, reader.uint32());
           break;
-        case 18:
+        case 17:
           message.maxPrunePerBlock = reader.uint64();
           break;
-        case 19:
+        case 18:
           message.maxOutboundPerBlock = reader.uint64();
           break;
-        case 20:
+        case 19:
           message.rateLimitWindow = Duration.decode(reader, reader.uint32());
           break;
-        case 21:
+        case 20:
           message.minVerifierTrustLevel = reader.uint32();
           break;
-        case 22:
+        case 21:
           message.minVerifierBond = reader.string();
           break;
-        case 23:
+        case 22:
           message.verifierRecoveryThreshold = reader.string();
           break;
-        case 24:
+        case 23:
           message.verifierSlashAmount = reader.string();
           break;
-        case 25:
+        case 24:
           message.verificationWindow = Duration.decode(reader, reader.uint32());
           break;
-        case 26:
+        case 25:
           message.challengeWindow = Duration.decode(reader, reader.uint32());
           break;
-        case 27:
+        case 26:
           message.challengeFeeAmount = reader.string();
           break;
-        case 28:
+        case 27:
           message.challengeJuryDeadline = Duration.decode(reader, reader.uint32());
           break;
-        case 29:
+        case 28:
           message.verifierDemotionCooldown = Duration.decode(reader, reader.uint32());
           break;
-        case 30:
+        case 29:
           message.verifierOverturnBaseCooldown = Duration.decode(reader, reader.uint32());
           break;
-        case 31:
+        case 30:
           message.upheldToResetOverturns = reader.uint32();
           break;
-        case 32:
+        case 31:
           message.operatorRewardInflationShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 33:
+        case 32:
           message.maxOperatorRewardPool = reader.string();
           break;
-        case 34:
+        case 33:
           message.operatorRewardPoolOverflowBurnRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 35:
+        case 34:
           message.operatorRewardEpochBlocks = reader.uint64();
           break;
-        case 36:
+        case 35:
           message.minEpochVerifiedSubmissions = reader.uint32();
           break;
-        case 37:
+        case 36:
           message.maxUnverifiedRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 38:
+        case 37:
           message.arbiterQuorum = reader.uint32();
           break;
-        case 39:
+        case 38:
           message.arbiterResolutionWindow = Duration.decode(reader, reader.uint32());
           break;
-        case 40:
+        case 39:
           message.arbiterEscalationWindow = Duration.decode(reader, reader.uint32());
           break;
-        case 41:
+        case 40:
           message.escalationFeeAmount = reader.string();
           break;
-        case 42:
+        case 41:
           message.challengeCooldown = Duration.decode(reader, reader.uint32());
           break;
-        case 43:
+        case 42:
           message.verifierUnbondCooldown = Duration.decode(reader, reader.uint32());
           break;
         default:
@@ -689,7 +678,6 @@ export const Params = {
     message.contentTtl = object.contentTtl !== undefined && object.contentTtl !== null ? Duration.fromPartial(object.contentTtl) : undefined;
     message.attestationTtl = object.attestationTtl !== undefined && object.attestationTtl !== null ? Duration.fromPartial(object.attestationTtl) : undefined;
     message.globalMaxTrustCredit = object.globalMaxTrustCredit ?? 0;
-    message.trustDiscountRate = object.trustDiscountRate ?? "";
     message.maxIdentityLinksPerUser = object.maxIdentityLinksPerUser ?? 0;
     message.unverifiedLinkTtl = object.unverifiedLinkTtl !== undefined && object.unverifiedLinkTtl !== null ? Duration.fromPartial(object.unverifiedLinkTtl) : undefined;
     message.challengeTtl = object.challengeTtl !== undefined && object.challengeTtl !== null ? Duration.fromPartial(object.challengeTtl) : undefined;
@@ -751,9 +739,6 @@ export const Params = {
     }
     if (object.global_max_trust_credit !== undefined && object.global_max_trust_credit !== null) {
       message.globalMaxTrustCredit = object.global_max_trust_credit;
-    }
-    if (object.trust_discount_rate !== undefined && object.trust_discount_rate !== null) {
-      message.trustDiscountRate = object.trust_discount_rate;
     }
     if (object.max_identity_links_per_user !== undefined && object.max_identity_links_per_user !== null) {
       message.maxIdentityLinksPerUser = object.max_identity_links_per_user;
@@ -871,7 +856,6 @@ export const Params = {
     obj.content_ttl = message.contentTtl ? Duration.toAmino(message.contentTtl) : undefined;
     obj.attestation_ttl = message.attestationTtl ? Duration.toAmino(message.attestationTtl) : undefined;
     obj.global_max_trust_credit = message.globalMaxTrustCredit === 0 ? undefined : message.globalMaxTrustCredit;
-    obj.trust_discount_rate = message.trustDiscountRate === "" ? undefined : message.trustDiscountRate;
     obj.max_identity_links_per_user = message.maxIdentityLinksPerUser === 0 ? undefined : message.maxIdentityLinksPerUser;
     obj.unverified_link_ttl = message.unverifiedLinkTtl ? Duration.toAmino(message.unverifiedLinkTtl) : undefined;
     obj.challenge_ttl = message.challengeTtl ? Duration.toAmino(message.challengeTtl) : undefined;
@@ -939,7 +923,6 @@ function createBaseFederationOperationalParams(): FederationOperationalParams {
     contentTtl: Duration.fromPartial({}),
     attestationTtl: Duration.fromPartial({}),
     globalMaxTrustCredit: 0,
-    trustDiscountRate: "",
     bridgeInactivityThreshold: BigInt(0),
     maxPrunePerBlock: BigInt(0)
   };
@@ -977,14 +960,11 @@ export const FederationOperationalParams = {
     if (message.globalMaxTrustCredit !== 0) {
       writer.uint32(64).uint32(message.globalMaxTrustCredit);
     }
-    if (message.trustDiscountRate !== "") {
-      writer.uint32(74).string(Decimal.fromUserInput(message.trustDiscountRate, 18).atomics);
-    }
     if (message.bridgeInactivityThreshold !== BigInt(0)) {
-      writer.uint32(80).uint64(message.bridgeInactivityThreshold);
+      writer.uint32(72).uint64(message.bridgeInactivityThreshold);
     }
     if (message.maxPrunePerBlock !== BigInt(0)) {
-      writer.uint32(88).uint64(message.maxPrunePerBlock);
+      writer.uint32(80).uint64(message.maxPrunePerBlock);
     }
     return writer;
   },
@@ -1020,12 +1000,9 @@ export const FederationOperationalParams = {
           message.globalMaxTrustCredit = reader.uint32();
           break;
         case 9:
-          message.trustDiscountRate = Decimal.fromAtomics(reader.string(), 18).toString();
-          break;
-        case 10:
           message.bridgeInactivityThreshold = reader.uint64();
           break;
-        case 11:
+        case 10:
           message.maxPrunePerBlock = reader.uint64();
           break;
         default:
@@ -1045,7 +1022,6 @@ export const FederationOperationalParams = {
     message.contentTtl = object.contentTtl !== undefined && object.contentTtl !== null ? Duration.fromPartial(object.contentTtl) : undefined;
     message.attestationTtl = object.attestationTtl !== undefined && object.attestationTtl !== null ? Duration.fromPartial(object.attestationTtl) : undefined;
     message.globalMaxTrustCredit = object.globalMaxTrustCredit ?? 0;
-    message.trustDiscountRate = object.trustDiscountRate ?? "";
     message.bridgeInactivityThreshold = object.bridgeInactivityThreshold !== undefined && object.bridgeInactivityThreshold !== null ? BigInt(object.bridgeInactivityThreshold.toString()) : BigInt(0);
     message.maxPrunePerBlock = object.maxPrunePerBlock !== undefined && object.maxPrunePerBlock !== null ? BigInt(object.maxPrunePerBlock.toString()) : BigInt(0);
     return message;
@@ -1076,9 +1052,6 @@ export const FederationOperationalParams = {
     if (object.global_max_trust_credit !== undefined && object.global_max_trust_credit !== null) {
       message.globalMaxTrustCredit = object.global_max_trust_credit;
     }
-    if (object.trust_discount_rate !== undefined && object.trust_discount_rate !== null) {
-      message.trustDiscountRate = object.trust_discount_rate;
-    }
     if (object.bridge_inactivity_threshold !== undefined && object.bridge_inactivity_threshold !== null) {
       message.bridgeInactivityThreshold = BigInt(object.bridge_inactivity_threshold);
     }
@@ -1097,7 +1070,6 @@ export const FederationOperationalParams = {
     obj.content_ttl = message.contentTtl ? Duration.toAmino(message.contentTtl) : undefined;
     obj.attestation_ttl = message.attestationTtl ? Duration.toAmino(message.attestationTtl) : undefined;
     obj.global_max_trust_credit = message.globalMaxTrustCredit === 0 ? undefined : message.globalMaxTrustCredit;
-    obj.trust_discount_rate = message.trustDiscountRate === "" ? undefined : message.trustDiscountRate;
     obj.bridge_inactivity_threshold = message.bridgeInactivityThreshold !== BigInt(0) ? message.bridgeInactivityThreshold?.toString() : undefined;
     obj.max_prune_per_block = message.maxPrunePerBlock !== BigInt(0) ? message.maxPrunePerBlock?.toString() : undefined;
     return obj;
