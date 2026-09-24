@@ -172,6 +172,30 @@ export enum FederatedContentStatus {
   FEDERATED_CONTENT_STATUS_DISPUTED = 4,
   FEDERATED_CONTENT_STATUS_CHALLENGED = 5,
   FEDERATED_CONTENT_STATUS_REJECTED = 6,
+  /**
+   * FEDERATED_CONTENT_STATUS_UNRESOLVED - UNRESOLVED is system-assigned: the arbiter resolution window expired
+   * without quorum, so no finding was ever made about the content. It is
+   * terminal, deliberately excluded from MsgModerateContent (OpsComm
+   * moderates HIDDEN/ACTIVE/VERIFIED/REJECTED, not system states), and
+   * was chosen over reverting to PENDING_VERIFICATION because a revived
+   * record would have no VerificationWindow queue entry and a verification
+   * deadline already in the past — unverifiable and unreapable until
+   * content_ttl. Local state only: FederatedContentStatus never crosses
+   * the IBC wire (see packet_wire_compat_test.go).
+   */
+  FEDERATED_CONTENT_STATUS_UNRESOLVED = 7,
+  /**
+   * FEDERATED_CONTENT_STATUS_SUPERSEDED - SUPERSEDED is system-assigned: the submitting operator anchored a newer
+   * version of the same content_uri (an edit) while this record was still
+   * PENDING_VERIFICATION. The anchored version no longer exists at the
+   * source, so no verifier can ever confirm it; retiring it here keeps it
+   * out of the verification-expiry sweep, which would otherwise count it
+   * against an honest operator as unverified. Terminal and excluded from
+   * MsgModerateContent for the same reason as UNRESOLVED: moderating it
+   * could manufacture a VERIFIED status for bytes nobody verified. Local
+   * state only; never crosses the IBC wire.
+   */
+  FEDERATED_CONTENT_STATUS_SUPERSEDED = 8,
   UNRECOGNIZED = -1,
 }
 export const FederatedContentStatusAmino = FederatedContentStatus;
@@ -198,6 +222,12 @@ export function federatedContentStatusFromJSON(object: any): FederatedContentSta
     case 6:
     case "FEDERATED_CONTENT_STATUS_REJECTED":
       return FederatedContentStatus.FEDERATED_CONTENT_STATUS_REJECTED;
+    case 7:
+    case "FEDERATED_CONTENT_STATUS_UNRESOLVED":
+      return FederatedContentStatus.FEDERATED_CONTENT_STATUS_UNRESOLVED;
+    case 8:
+    case "FEDERATED_CONTENT_STATUS_SUPERSEDED":
+      return FederatedContentStatus.FEDERATED_CONTENT_STATUS_SUPERSEDED;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -220,6 +250,10 @@ export function federatedContentStatusToJSON(object: FederatedContentStatus): st
       return "FEDERATED_CONTENT_STATUS_CHALLENGED";
     case FederatedContentStatus.FEDERATED_CONTENT_STATUS_REJECTED:
       return "FEDERATED_CONTENT_STATUS_REJECTED";
+    case FederatedContentStatus.FEDERATED_CONTENT_STATUS_UNRESOLVED:
+      return "FEDERATED_CONTENT_STATUS_UNRESOLVED";
+    case FederatedContentStatus.FEDERATED_CONTENT_STATUS_SUPERSEDED:
+      return "FEDERATED_CONTENT_STATUS_SUPERSEDED";
     case FederatedContentStatus.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -517,6 +551,16 @@ export interface PeerPolicy {
    */
   requireReview: boolean;
   blockedIdentities: string[];
+  /**
+   * content_hosts lists hostnames, beyond the peer id itself, that may
+   * appear in an inbound content_uri. ActivityPub peers only. An instance
+   * whose AS2 ids live on a different host than its account domain (a
+   * WEB_DOMAIN split) lists that host here; otherwise leave it empty and
+   * only the peer id's own host is accepted. Without the check a bridge
+   * bonded for one peer could anchor another instance's posts under this
+   * peer's name.
+   */
+  contentHosts: string[];
 }
 export interface PeerPolicyProtoMsg {
   typeUrl: "/sparkdream.federation.v1.PeerPolicy";
@@ -548,6 +592,16 @@ export interface PeerPolicyAmino {
    */
   require_review?: boolean;
   blocked_identities?: string[];
+  /**
+   * content_hosts lists hostnames, beyond the peer id itself, that may
+   * appear in an inbound content_uri. ActivityPub peers only. An instance
+   * whose AS2 ids live on a different host than its account domain (a
+   * WEB_DOMAIN split) lists that host here; otherwise leave it empty and
+   * only the peer id's own host is accepted. Without the check a bridge
+   * bonded for one peer could anchor another instance's posts under this
+   * peer's name.
+   */
+  content_hosts?: string[];
 }
 export interface PeerPolicyAminoMsg {
   type: "/sparkdream.federation.v1.PeerPolicy";
@@ -710,6 +764,19 @@ export interface VerificationRecord {
    * clears it back to UNSPECIFIED, deferring resolution to the jury path.
    */
   pendingVerifierVerdict: PendingVerifierVerdict;
+  /**
+   * commitment_released records that CommittedAmount was already given
+   * back to the verifier's available bond via x/rep ReleaseBond. The
+   * flag exists because the alternative — inferring from Outcome —
+   * cannot distinguish an upheld challenge (SlashBond already freed the
+   * commitment; a second release would silently eat a different
+   * concurrent commitment, since ReleaseBond is saturating) from the
+   * paths that owe a release, and the record outlives the content
+   * (pruneExpiredContent drops Content but never VerificationRecords).
+   * True means released; false means either not yet resolved or freed
+   * by SlashBond on the upheld path.
+   */
+  commitmentReleased: boolean;
 }
 export interface VerificationRecordProtoMsg {
   typeUrl: "/sparkdream.federation.v1.VerificationRecord";
@@ -750,6 +817,19 @@ export interface VerificationRecordAmino {
    * clears it back to UNSPECIFIED, deferring resolution to the jury path.
    */
   pending_verifier_verdict?: PendingVerifierVerdict;
+  /**
+   * commitment_released records that CommittedAmount was already given
+   * back to the verifier's available bond via x/rep ReleaseBond. The
+   * flag exists because the alternative — inferring from Outcome —
+   * cannot distinguish an upheld challenge (SlashBond already freed the
+   * commitment; a second release would silently eat a different
+   * concurrent commitment, since ReleaseBond is saturating) from the
+   * paths that owe a release, and the record outlives the content
+   * (pruneExpiredContent drops Content but never VerificationRecords).
+   * True means released; false means either not yet resolved or freed
+   * by SlashBond on the upheld path.
+   */
+  commitment_released?: boolean;
 }
 export interface VerificationRecordAminoMsg {
   type: "/sparkdream.federation.v1.VerificationRecord";
@@ -898,6 +978,17 @@ export interface FederatedContent {
   status: FederatedContentStatus;
   expiresAt: bigint;
   contentHash: Uint8Array;
+  /**
+   * supersedes names the earlier record of the same content_uri that this
+   * one replaces (an edit). Unset for a first version.
+   */
+  supersedes?: ContentRef;
+  /**
+   * superseded_by is the id of the newer record that replaced this one,
+   * 0 while none has. A successor is always allocated after its
+   * predecessor, so it is never content id 0 and 0 is unambiguous here.
+   */
+  supersededBy: bigint;
 }
 export interface FederatedContentProtoMsg {
   typeUrl: "/sparkdream.federation.v1.FederatedContent";
@@ -926,10 +1017,51 @@ export interface FederatedContentAmino {
   status?: FederatedContentStatus;
   expires_at?: string;
   content_hash?: string;
+  /**
+   * supersedes names the earlier record of the same content_uri that this
+   * one replaces (an edit). Unset for a first version.
+   */
+  supersedes?: ContentRefAmino;
+  /**
+   * superseded_by is the id of the newer record that replaced this one,
+   * 0 while none has. A successor is always allocated after its
+   * predecessor, so it is never content id 0 and 0 is unambiguous here.
+   */
+  superseded_by?: string;
 }
 export interface FederatedContentAminoMsg {
   type: "/sparkdream.federation.v1.FederatedContent";
   value: FederatedContentAmino;
+}
+/**
+ * ContentRef points at a FederatedContent record. A message rather than a
+ * bare uint64 because content ids start at 0: a nil ref is "none", which
+ * a zero id could not express.
+ * @name ContentRef
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.ContentRef
+ */
+export interface ContentRef {
+  contentId: bigint;
+}
+export interface ContentRefProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.ContentRef";
+  value: Uint8Array;
+}
+/**
+ * ContentRef points at a FederatedContent record. A message rather than a
+ * bare uint64 because content ids start at 0: a nil ref is "none", which
+ * a zero id could not express.
+ * @name ContentRefAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.ContentRef
+ */
+export interface ContentRefAmino {
+  content_id?: string;
+}
+export interface ContentRefAminoMsg {
+  type: "/sparkdream.federation.v1.ContentRef";
+  value: ContentRefAmino;
 }
 /**
  * IdentityLink maps a local address to a remote identity on a federation peer.
@@ -1371,7 +1503,8 @@ function createBasePeerPolicy(): PeerPolicy {
     allowReputationQueries: false,
     acceptReputationAttestations: false,
     requireReview: false,
-    blockedIdentities: []
+    blockedIdentities: [],
+    contentHosts: []
   };
 }
 /**
@@ -1413,6 +1546,9 @@ export const PeerPolicy = {
     for (const v of message.blockedIdentities) {
       writer.uint32(74).string(v!);
     }
+    for (const v of message.contentHosts) {
+      writer.uint32(90).string(v!);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): PeerPolicy {
@@ -1452,6 +1588,9 @@ export const PeerPolicy = {
         case 9:
           message.blockedIdentities.push(reader.string());
           break;
+        case 11:
+          message.contentHosts.push(reader.string());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1471,6 +1610,7 @@ export const PeerPolicy = {
     message.acceptReputationAttestations = object.acceptReputationAttestations ?? false;
     message.requireReview = object.requireReview ?? false;
     message.blockedIdentities = object.blockedIdentities?.map(e => e) || [];
+    message.contentHosts = object.contentHosts?.map(e => e) || [];
     return message;
   },
   fromAmino(object: PeerPolicyAmino): PeerPolicy {
@@ -1499,6 +1639,7 @@ export const PeerPolicy = {
       message.requireReview = object.require_review;
     }
     message.blockedIdentities = object.blocked_identities?.map(e => e) || [];
+    message.contentHosts = object.content_hosts?.map(e => e) || [];
     return message;
   },
   toAmino(message: PeerPolicy): PeerPolicyAmino {
@@ -1524,6 +1665,11 @@ export const PeerPolicy = {
       obj.blocked_identities = message.blockedIdentities.map(e => e);
     } else {
       obj.blocked_identities = message.blockedIdentities;
+    }
+    if (message.contentHosts) {
+      obj.content_hosts = message.contentHosts.map(e => e);
+    } else {
+      obj.content_hosts = message.contentHosts;
     }
     return obj;
   },
@@ -1829,7 +1975,8 @@ function createBaseVerificationRecord(): VerificationRecord {
     lastChallengeResolvedAt: BigInt(0),
     challenger: "",
     escrowedChallengeFee: "",
-    pendingVerifierVerdict: 0
+    pendingVerifierVerdict: 0,
+    commitmentReleased: false
   };
 }
 /**
@@ -1880,6 +2027,9 @@ export const VerificationRecord = {
     if (message.pendingVerifierVerdict !== 0) {
       writer.uint32(104).int32(message.pendingVerifierVerdict);
     }
+    if (message.commitmentReleased === true) {
+      writer.uint32(112).bool(message.commitmentReleased);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): VerificationRecord {
@@ -1928,6 +2078,9 @@ export const VerificationRecord = {
         case 13:
           message.pendingVerifierVerdict = reader.int32() as any;
           break;
+        case 14:
+          message.commitmentReleased = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1950,6 +2103,7 @@ export const VerificationRecord = {
     message.challenger = object.challenger ?? "";
     message.escrowedChallengeFee = object.escrowedChallengeFee ?? "";
     message.pendingVerifierVerdict = object.pendingVerifierVerdict ?? 0;
+    message.commitmentReleased = object.commitmentReleased ?? false;
     return message;
   },
   fromAmino(object: VerificationRecordAmino): VerificationRecord {
@@ -1993,6 +2147,9 @@ export const VerificationRecord = {
     if (object.pending_verifier_verdict !== undefined && object.pending_verifier_verdict !== null) {
       message.pendingVerifierVerdict = object.pending_verifier_verdict;
     }
+    if (object.commitment_released !== undefined && object.commitment_released !== null) {
+      message.commitmentReleased = object.commitment_released;
+    }
     return message;
   },
   toAmino(message: VerificationRecord): VerificationRecordAmino {
@@ -2010,6 +2167,7 @@ export const VerificationRecord = {
     obj.challenger = message.challenger === "" ? undefined : message.challenger;
     obj.escrowed_challenge_fee = message.escrowedChallengeFee === "" ? undefined : message.escrowedChallengeFee;
     obj.pending_verifier_verdict = message.pendingVerifierVerdict === 0 ? undefined : message.pendingVerifierVerdict;
+    obj.commitment_released = message.commitmentReleased === false ? undefined : message.commitmentReleased;
     return obj;
   },
   fromAminoMsg(object: VerificationRecordAminoMsg): VerificationRecord {
@@ -2286,7 +2444,9 @@ function createBaseFederatedContent(): FederatedContent {
     submittedBy: "",
     status: 0,
     expiresAt: BigInt(0),
-    contentHash: new Uint8Array()
+    contentHash: new Uint8Array(),
+    supersedes: undefined,
+    supersededBy: BigInt(0)
   };
 }
 /**
@@ -2346,6 +2506,12 @@ export const FederatedContent = {
     if (message.contentHash.length !== 0) {
       writer.uint32(130).bytes(message.contentHash);
     }
+    if (message.supersedes !== undefined) {
+      ContentRef.encode(message.supersedes, writer.uint32(138).fork()).ldelim();
+    }
+    if (message.supersededBy !== BigInt(0)) {
+      writer.uint32(144).uint64(message.supersededBy);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): FederatedContent {
@@ -2403,6 +2569,12 @@ export const FederatedContent = {
         case 16:
           message.contentHash = reader.bytes();
           break;
+        case 17:
+          message.supersedes = ContentRef.decode(reader, reader.uint32());
+          break;
+        case 18:
+          message.supersededBy = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2428,6 +2600,8 @@ export const FederatedContent = {
     message.status = object.status ?? 0;
     message.expiresAt = object.expiresAt !== undefined && object.expiresAt !== null ? BigInt(object.expiresAt.toString()) : BigInt(0);
     message.contentHash = object.contentHash ?? new Uint8Array();
+    message.supersedes = object.supersedes !== undefined && object.supersedes !== null ? ContentRef.fromPartial(object.supersedes) : undefined;
+    message.supersededBy = object.supersededBy !== undefined && object.supersededBy !== null ? BigInt(object.supersededBy.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: FederatedContentAmino): FederatedContent {
@@ -2480,6 +2654,12 @@ export const FederatedContent = {
     if (object.content_hash !== undefined && object.content_hash !== null) {
       message.contentHash = bytesFromBase64(object.content_hash);
     }
+    if (object.supersedes !== undefined && object.supersedes !== null) {
+      message.supersedes = ContentRef.fromAmino(object.supersedes);
+    }
+    if (object.superseded_by !== undefined && object.superseded_by !== null) {
+      message.supersededBy = BigInt(object.superseded_by);
+    }
     return message;
   },
   toAmino(message: FederatedContent): FederatedContentAmino {
@@ -2500,6 +2680,8 @@ export const FederatedContent = {
     obj.status = message.status === 0 ? undefined : message.status;
     obj.expires_at = message.expiresAt !== BigInt(0) ? message.expiresAt?.toString() : undefined;
     obj.content_hash = message.contentHash ? base64FromBytes(message.contentHash) : undefined;
+    obj.supersedes = message.supersedes ? ContentRef.toAmino(message.supersedes) : undefined;
+    obj.superseded_by = message.supersededBy !== BigInt(0) ? message.supersededBy?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: FederatedContentAminoMsg): FederatedContent {
@@ -2515,6 +2697,77 @@ export const FederatedContent = {
     return {
       typeUrl: "/sparkdream.federation.v1.FederatedContent",
       value: FederatedContent.encode(message).finish()
+    };
+  }
+};
+function createBaseContentRef(): ContentRef {
+  return {
+    contentId: BigInt(0)
+  };
+}
+/**
+ * ContentRef points at a FederatedContent record. A message rather than a
+ * bare uint64 because content ids start at 0: a nil ref is "none", which
+ * a zero id could not express.
+ * @name ContentRef
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.ContentRef
+ */
+export const ContentRef = {
+  typeUrl: "/sparkdream.federation.v1.ContentRef",
+  encode(message: ContentRef, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.contentId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.contentId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): ContentRef {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseContentRef();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.contentId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<ContentRef>): ContentRef {
+    const message = createBaseContentRef();
+    message.contentId = object.contentId !== undefined && object.contentId !== null ? BigInt(object.contentId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: ContentRefAmino): ContentRef {
+    const message = createBaseContentRef();
+    if (object.content_id !== undefined && object.content_id !== null) {
+      message.contentId = BigInt(object.content_id);
+    }
+    return message;
+  },
+  toAmino(message: ContentRef): ContentRefAmino {
+    const obj: any = {};
+    obj.content_id = message.contentId !== BigInt(0) ? message.contentId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: ContentRefAminoMsg): ContentRef {
+    return ContentRef.fromAmino(object.value);
+  },
+  fromProtoMsg(message: ContentRefProtoMsg): ContentRef {
+    return ContentRef.decode(message.value);
+  },
+  toProto(message: ContentRef): Uint8Array {
+    return ContentRef.encode(message).finish();
+  },
+  toProtoMsg(message: ContentRef): ContentRefProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.ContentRef",
+      value: ContentRef.encode(message).finish()
     };
   }
 };

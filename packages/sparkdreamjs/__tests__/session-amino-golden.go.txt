@@ -1,0 +1,59 @@
+// Chain-side renderer for session-amino.golden.json. Not compiled here; see the
+// golden file's "_source" key for how to run it inside the sparkdream repo.
+package types_test
+
+import (
+	"encoding/hex"
+	"encoding/json"
+	"os"
+	"testing"
+
+	"cosmossdk.io/x/tx/signing/aminojson"
+	gogoproto "github.com/cosmos/gogoproto/proto"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/dynamicpb"
+
+	_ "github.com/cosmos/cosmos-sdk/x/bank/types"
+	_ "sparkdream/x/session/types"
+)
+
+func TestRenderAminoGolden(t *testing.T) {
+	raw, err := os.ReadFile(os.Getenv("FIXTURES"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var fx map[string]struct {
+		TypeURL  string `json:"type_url"`
+		ProtoHex string `json:"proto_hex"`
+	}
+	if err := json.Unmarshal(raw, &fx); err != nil {
+		t.Fatal(err)
+	}
+	files, err := gogoproto.MergedRegistry()
+	if err != nil {
+		t.Fatal(err)
+	}
+	types := dynamicpb.NewTypes(files)
+	enc := aminojson.NewEncoder(aminojson.EncoderOptions{FileResolver: files, TypeResolver: types})
+	out := map[string]any{}
+	for name, f := range fx {
+		mt, err := types.FindMessageByURL(f.TypeURL)
+		if err != nil {
+			t.Fatal(name, err)
+		}
+		bz, _ := hex.DecodeString(f.ProtoHex)
+		msg := mt.New().Interface()
+		if err := proto.Unmarshal(bz, msg); err != nil {
+			t.Fatal(name, err)
+		}
+		js, err := enc.Marshal(msg)
+		if err != nil {
+			t.Fatal(name, err)
+		}
+		out[name] = map[string]string{"proto_hex": f.ProtoHex, "amino": string(js)}
+	}
+	res, _ := json.MarshalIndent(out, "", "  ")
+	if err := os.WriteFile(os.Getenv("OUT"), res, 0o644); err != nil {
+		t.Fatal(err)
+	}
+}

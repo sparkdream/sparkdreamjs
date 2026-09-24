@@ -63,14 +63,24 @@ export class LCDQueryClient {
     return await this.req.get<QueryGetFederatedContentResponse>(endpoint);
   };
   /* ListFederatedContent */
-  listFederatedContent = async (params: QueryListFederatedContentRequest = {
-    pagination: undefined
-  }): Promise<QueryListFederatedContentResponse> => {
+  listFederatedContent = async (params: QueryListFederatedContentRequest): Promise<QueryListFederatedContentResponse> => {
     const options: any = {
       params: {}
     };
     if (typeof params?.pagination !== "undefined") {
       setPaginationParams(options, params.pagination);
+    }
+    if (typeof params?.peerId !== "undefined") {
+      options.params.peer_id = params.peerId;
+    }
+    if (typeof params?.contentType !== "undefined") {
+      options.params.content_type = params.contentType;
+    }
+    if (typeof params?.creatorIdentity !== "undefined") {
+      options.params.creator_identity = params.creatorIdentity;
+    }
+    if (typeof params?.status !== "undefined") {
+      options.params.status = params.status;
     }
     const endpoint = `sparkdream/federation/v1/list_federated_content`;
     return await this.req.get<QueryListFederatedContentResponse>(endpoint, options);

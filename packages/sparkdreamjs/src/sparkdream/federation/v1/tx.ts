@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { Params, ParamsAmino, FederationOperationalParams, FederationOperationalParamsAmino } from "./params";
-import { PeerType, PeerPolicy, PeerPolicyAmino, FederatedContentStatus, JuryVerdict } from "./types";
+import { PeerType, PeerPolicy, PeerPolicyAmino, ContentRef, ContentRefAmino, FederatedContentStatus, JuryVerdict } from "./types";
 import { ChainIdentity, ChainIdentityAmino } from "../../identity/v1/chain_identity";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
@@ -472,6 +472,13 @@ export interface MsgSubmitFederatedContent {
   protocolMetadata: Uint8Array;
   remoteCreatedAt: bigint;
   contentHash: Uint8Array;
+  /**
+   * supersedes marks this submission as a new version of an earlier record
+   * the same operator anchored for the same peer and content_uri (an edit
+   * at the source). A PENDING_VERIFICATION predecessor is retired to
+   * SUPERSEDED; one already past verification only gains the forward link.
+   */
+  supersedes?: ContentRef;
 }
 export interface MsgSubmitFederatedContentProtoMsg {
   typeUrl: "/sparkdream.federation.v1.MsgSubmitFederatedContent";
@@ -495,6 +502,13 @@ export interface MsgSubmitFederatedContentAmino {
   protocol_metadata?: string;
   remote_created_at?: string;
   content_hash?: string;
+  /**
+   * supersedes marks this submission as a new version of an earlier record
+   * the same operator anchored for the same peer and content_uri (an edit
+   * at the source). A PENDING_VERIFICATION predecessor is retired to
+   * SUPERSEDED; one already past verification only gains the forward link.
+   */
+  supersedes?: ContentRefAmino;
 }
 export interface MsgSubmitFederatedContentAminoMsg {
   type: "sparkdream/x/federation/MsgSubmitFederatedContent";
@@ -2672,7 +2686,8 @@ function createBaseMsgSubmitFederatedContent(): MsgSubmitFederatedContent {
     contentUri: "",
     protocolMetadata: new Uint8Array(),
     remoteCreatedAt: BigInt(0),
-    contentHash: new Uint8Array()
+    contentHash: new Uint8Array(),
+    supersedes: undefined
   };
 }
 /**
@@ -2720,6 +2735,9 @@ export const MsgSubmitFederatedContent = {
     if (message.contentHash.length !== 0) {
       writer.uint32(98).bytes(message.contentHash);
     }
+    if (message.supersedes !== undefined) {
+      ContentRef.encode(message.supersedes, writer.uint32(106).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgSubmitFederatedContent {
@@ -2765,6 +2783,9 @@ export const MsgSubmitFederatedContent = {
         case 12:
           message.contentHash = reader.bytes();
           break;
+        case 13:
+          message.supersedes = ContentRef.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2786,6 +2807,7 @@ export const MsgSubmitFederatedContent = {
     message.protocolMetadata = object.protocolMetadata ?? new Uint8Array();
     message.remoteCreatedAt = object.remoteCreatedAt !== undefined && object.remoteCreatedAt !== null ? BigInt(object.remoteCreatedAt.toString()) : BigInt(0);
     message.contentHash = object.contentHash ?? new Uint8Array();
+    message.supersedes = object.supersedes !== undefined && object.supersedes !== null ? ContentRef.fromPartial(object.supersedes) : undefined;
     return message;
   },
   fromAmino(object: MsgSubmitFederatedContentAmino): MsgSubmitFederatedContent {
@@ -2826,6 +2848,9 @@ export const MsgSubmitFederatedContent = {
     if (object.content_hash !== undefined && object.content_hash !== null) {
       message.contentHash = bytesFromBase64(object.content_hash);
     }
+    if (object.supersedes !== undefined && object.supersedes !== null) {
+      message.supersedes = ContentRef.fromAmino(object.supersedes);
+    }
     return message;
   },
   toAmino(message: MsgSubmitFederatedContent): MsgSubmitFederatedContentAmino {
@@ -2842,6 +2867,7 @@ export const MsgSubmitFederatedContent = {
     obj.protocol_metadata = message.protocolMetadata ? base64FromBytes(message.protocolMetadata) : undefined;
     obj.remote_created_at = message.remoteCreatedAt !== BigInt(0) ? message.remoteCreatedAt?.toString() : undefined;
     obj.content_hash = message.contentHash ? base64FromBytes(message.contentHash) : undefined;
+    obj.supersedes = message.supersedes ? ContentRef.toAmino(message.supersedes) : undefined;
     return obj;
   },
   fromAminoMsg(object: MsgSubmitFederatedContentAminoMsg): MsgSubmitFederatedContent {

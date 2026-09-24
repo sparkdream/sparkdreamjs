@@ -12,7 +12,7 @@ export interface Query {
   getBridgeBinding(request: QueryGetBridgeBindingRequest): Promise<QueryGetBridgeBindingResponse>;
   listBridgeBindings(request?: QueryListBridgeBindingsRequest): Promise<QueryListBridgeBindingsResponse>;
   getFederatedContent(request: QueryGetFederatedContentRequest): Promise<QueryGetFederatedContentResponse>;
-  listFederatedContent(request?: QueryListFederatedContentRequest): Promise<QueryListFederatedContentResponse>;
+  listFederatedContent(request: QueryListFederatedContentRequest): Promise<QueryListFederatedContentResponse>;
   getIdentityLink(request: QueryGetIdentityLinkRequest): Promise<QueryGetIdentityLinkResponse>;
   listIdentityLinks(request?: QueryListIdentityLinksRequest): Promise<QueryListIdentityLinksResponse>;
   resolveRemoteIdentity(request: QueryResolveRemoteIdentityRequest): Promise<QueryResolveRemoteIdentityResponse>;
@@ -90,9 +90,7 @@ export class QueryClientImpl implements Query {
     return promise.then(data => QueryGetFederatedContentResponse.decode(new BinaryReader(data)));
   };
   /* ListFederatedContent */
-  listFederatedContent = async (request: QueryListFederatedContentRequest = {
-    pagination: undefined
-  }): Promise<QueryListFederatedContentResponse> => {
+  listFederatedContent = async (request: QueryListFederatedContentRequest): Promise<QueryListFederatedContentResponse> => {
     const data = QueryListFederatedContentRequest.encode(request).finish();
     const promise = this.rpc.request("sparkdream.federation.v1.Query", "ListFederatedContent", data);
     return promise.then(data => QueryListFederatedContentResponse.decode(new BinaryReader(data)));
@@ -200,7 +198,7 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     getFederatedContent(request: QueryGetFederatedContentRequest): Promise<QueryGetFederatedContentResponse> {
       return queryService.getFederatedContent(request);
     },
-    listFederatedContent(request?: QueryListFederatedContentRequest): Promise<QueryListFederatedContentResponse> {
+    listFederatedContent(request: QueryListFederatedContentRequest): Promise<QueryListFederatedContentResponse> {
       return queryService.listFederatedContent(request);
     },
     getIdentityLink(request: QueryGetIdentityLinkRequest): Promise<QueryGetIdentityLinkResponse> {

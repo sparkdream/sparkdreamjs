@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { Params, ParamsAmino } from "./params";
-import { Peer, PeerAmino, PeerPolicy, PeerPolicyAmino, BridgeBinding, BridgeBindingAmino, FederatedContent, FederatedContentAmino, IdentityLink, IdentityLinkAmino, ReputationAttestation, ReputationAttestationAmino, OutboundAttestation, OutboundAttestationAmino, VerificationRecord, VerificationRecordAmino } from "./types";
+import { Peer, PeerAmino, PeerPolicy, PeerPolicyAmino, BridgeBinding, BridgeBindingAmino, FederatedContent, FederatedContentAmino, IdentityLink, IdentityLinkAmino, ReputationAttestation, ReputationAttestationAmino, OutboundAttestation, OutboundAttestationAmino, VerificationRecord, VerificationRecordAmino, EscalatedChallenge, EscalatedChallengeAmino, ArbiterHashSubmission, ArbiterHashSubmissionAmino } from "./types";
 import { VerifierActivity, VerifierActivityAmino } from "./verifier_activity";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
@@ -34,6 +34,30 @@ export interface GenesisState {
    * export. Mirrors x/rep's role_reward_day_funding_list.
    */
   operatorRewardDayFundingList: OperatorRewardDayFunding[];
+  /**
+   * In-flight verification-lifecycle queues. These are NOT derivable from
+   * the records above: ArbiterResolutionQueue and ArbiterEscalationQueue
+   * hold deadlines that live nowhere else, and dropping them on an
+   * export/import upgrade strands every in-flight record — DISPUTED or
+   * CHALLENGED forever, with the verifier's committed bond unreleasable
+   * because the walk that would release it has no queue entry to walk.
+   * (VerificationWindow and ChallengeWindow are recomputable in principle,
+   * but exporting them keeps one rule for the whole lifecycle instead of
+   * two.)
+   */
+  verificationWindowQueue: ContentDeadline[];
+  challengeWindowQueue: ContentDeadline[];
+  arbiterResolutionQueue: ContentDeadline[];
+  arbiterEscalationQueue: ContentDeadline[];
+  escalatedChallenges: EscalatedChallenge[];
+  escalatedChallengeDeadlineQueue: ContentDeadline[];
+  /**
+   * Partial arbiter quorum progress. Dropping these silently resets a
+   * dispute's vote tally to zero mid-window.
+   */
+  arbiterSubmissions: ArbiterSubmissionEntry[];
+  arbiterHashCounts: ArbiterHashCount[];
+  nextArbiterAnonSubmissionId: bigint;
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.federation.v1.GenesisState";
@@ -69,10 +93,144 @@ export interface GenesisStateAmino {
    * export. Mirrors x/rep's role_reward_day_funding_list.
    */
   operator_reward_day_funding_list?: OperatorRewardDayFundingAmino[];
+  /**
+   * In-flight verification-lifecycle queues. These are NOT derivable from
+   * the records above: ArbiterResolutionQueue and ArbiterEscalationQueue
+   * hold deadlines that live nowhere else, and dropping them on an
+   * export/import upgrade strands every in-flight record — DISPUTED or
+   * CHALLENGED forever, with the verifier's committed bond unreleasable
+   * because the walk that would release it has no queue entry to walk.
+   * (VerificationWindow and ChallengeWindow are recomputable in principle,
+   * but exporting them keeps one rule for the whole lifecycle instead of
+   * two.)
+   */
+  verification_window_queue?: ContentDeadlineAmino[];
+  challenge_window_queue?: ContentDeadlineAmino[];
+  arbiter_resolution_queue?: ContentDeadlineAmino[];
+  arbiter_escalation_queue?: ContentDeadlineAmino[];
+  escalated_challenges?: EscalatedChallengeAmino[];
+  escalated_challenge_deadline_queue?: ContentDeadlineAmino[];
+  /**
+   * Partial arbiter quorum progress. Dropping these silently resets a
+   * dispute's vote tally to zero mid-window.
+   */
+  arbiter_submissions?: ArbiterSubmissionEntryAmino[];
+  arbiter_hash_counts?: ArbiterHashCountAmino[];
+  next_arbiter_anon_submission_id?: string;
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.federation.v1.GenesisState";
   value: GenesisStateAmino;
+}
+/**
+ * ContentDeadline is one (deadline, content_id) entry of a federation
+ * EndBlocker time queue. All four verification-lifecycle queues share this
+ * shape, so they share this message.
+ * @name ContentDeadline
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.ContentDeadline
+ */
+export interface ContentDeadline {
+  deadline: bigint;
+  contentId: bigint;
+}
+export interface ContentDeadlineProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.ContentDeadline";
+  value: Uint8Array;
+}
+/**
+ * ContentDeadline is one (deadline, content_id) entry of a federation
+ * EndBlocker time queue. All four verification-lifecycle queues share this
+ * shape, so they share this message.
+ * @name ContentDeadlineAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.ContentDeadline
+ */
+export interface ContentDeadlineAmino {
+  deadline?: string;
+  content_id?: string;
+}
+export interface ContentDeadlineAminoMsg {
+  type: "/sparkdream.federation.v1.ContentDeadline";
+  value: ContentDeadlineAmino;
+}
+/**
+ * ArbiterSubmissionEntry is one ArbiterSubmissions map entry. The submitter
+ * key is part of the STATE key rather than of ArbiterHashSubmission —
+ * identified arbiters key by bech32 address, anonymous ones by "anon:<seq>"
+ * (where the Operator field holds the shield module address instead) — so it
+ * must be exported alongside the value or the "no double vote per operator"
+ * rule cannot be reconstructed.
+ * @name ArbiterSubmissionEntry
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.ArbiterSubmissionEntry
+ */
+export interface ArbiterSubmissionEntry {
+  submitterKey: string;
+  submission: ArbiterHashSubmission;
+}
+export interface ArbiterSubmissionEntryProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.ArbiterSubmissionEntry";
+  value: Uint8Array;
+}
+/**
+ * ArbiterSubmissionEntry is one ArbiterSubmissions map entry. The submitter
+ * key is part of the STATE key rather than of ArbiterHashSubmission —
+ * identified arbiters key by bech32 address, anonymous ones by "anon:<seq>"
+ * (where the Operator field holds the shield module address instead) — so it
+ * must be exported alongside the value or the "no double vote per operator"
+ * rule cannot be reconstructed.
+ * @name ArbiterSubmissionEntryAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.ArbiterSubmissionEntry
+ */
+export interface ArbiterSubmissionEntryAmino {
+  submitter_key?: string;
+  submission?: ArbiterHashSubmissionAmino;
+}
+export interface ArbiterSubmissionEntryAminoMsg {
+  type: "/sparkdream.federation.v1.ArbiterSubmissionEntry";
+  value: ArbiterSubmissionEntryAmino;
+}
+/**
+ * ArbiterHashCount is one (content_id, content_hash) -> votes tally from the
+ * arbiter quorum counter.
+ * @name ArbiterHashCount
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.ArbiterHashCount
+ */
+export interface ArbiterHashCount {
+  contentId: bigint;
+  /**
+   * content_hash is the lowercase hex encoding of the submitted hash, which
+   * is how ArbiterHashCounts keys it in state.
+   */
+  contentHash: string;
+  count: number;
+}
+export interface ArbiterHashCountProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.ArbiterHashCount";
+  value: Uint8Array;
+}
+/**
+ * ArbiterHashCount is one (content_id, content_hash) -> votes tally from the
+ * arbiter quorum counter.
+ * @name ArbiterHashCountAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.ArbiterHashCount
+ */
+export interface ArbiterHashCountAmino {
+  content_id?: string;
+  /**
+   * content_hash is the lowercase hex encoding of the submitted hash, which
+   * is how ArbiterHashCounts keys it in state.
+   */
+  content_hash?: string;
+  count?: number;
+}
+export interface ArbiterHashCountAminoMsg {
+  type: "/sparkdream.federation.v1.ArbiterHashCount";
+  value: ArbiterHashCountAmino;
 }
 /**
  * OperatorRewardDayFunding is one UTC day's community-pool draw for the
@@ -121,7 +279,16 @@ function createBaseGenesisState(): GenesisState {
     verificationRecords: [],
     nextContentId: BigInt(0),
     nextOutboundAttestationId: BigInt(0),
-    operatorRewardDayFundingList: []
+    operatorRewardDayFundingList: [],
+    verificationWindowQueue: [],
+    challengeWindowQueue: [],
+    arbiterResolutionQueue: [],
+    arbiterEscalationQueue: [],
+    escalatedChallenges: [],
+    escalatedChallengeDeadlineQueue: [],
+    arbiterSubmissions: [],
+    arbiterHashCounts: [],
+    nextArbiterAnonSubmissionId: BigInt(0)
   };
 }
 /**
@@ -175,6 +342,33 @@ export const GenesisState = {
     for (const v of message.operatorRewardDayFundingList) {
       OperatorRewardDayFunding.encode(v!, writer.uint32(114).fork()).ldelim();
     }
+    for (const v of message.verificationWindowQueue) {
+      ContentDeadline.encode(v!, writer.uint32(122).fork()).ldelim();
+    }
+    for (const v of message.challengeWindowQueue) {
+      ContentDeadline.encode(v!, writer.uint32(130).fork()).ldelim();
+    }
+    for (const v of message.arbiterResolutionQueue) {
+      ContentDeadline.encode(v!, writer.uint32(138).fork()).ldelim();
+    }
+    for (const v of message.arbiterEscalationQueue) {
+      ContentDeadline.encode(v!, writer.uint32(146).fork()).ldelim();
+    }
+    for (const v of message.escalatedChallenges) {
+      EscalatedChallenge.encode(v!, writer.uint32(154).fork()).ldelim();
+    }
+    for (const v of message.escalatedChallengeDeadlineQueue) {
+      ContentDeadline.encode(v!, writer.uint32(162).fork()).ldelim();
+    }
+    for (const v of message.arbiterSubmissions) {
+      ArbiterSubmissionEntry.encode(v!, writer.uint32(170).fork()).ldelim();
+    }
+    for (const v of message.arbiterHashCounts) {
+      ArbiterHashCount.encode(v!, writer.uint32(178).fork()).ldelim();
+    }
+    if (message.nextArbiterAnonSubmissionId !== BigInt(0)) {
+      writer.uint32(184).uint64(message.nextArbiterAnonSubmissionId);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -226,6 +420,33 @@ export const GenesisState = {
         case 14:
           message.operatorRewardDayFundingList.push(OperatorRewardDayFunding.decode(reader, reader.uint32()));
           break;
+        case 15:
+          message.verificationWindowQueue.push(ContentDeadline.decode(reader, reader.uint32()));
+          break;
+        case 16:
+          message.challengeWindowQueue.push(ContentDeadline.decode(reader, reader.uint32()));
+          break;
+        case 17:
+          message.arbiterResolutionQueue.push(ContentDeadline.decode(reader, reader.uint32()));
+          break;
+        case 18:
+          message.arbiterEscalationQueue.push(ContentDeadline.decode(reader, reader.uint32()));
+          break;
+        case 19:
+          message.escalatedChallenges.push(EscalatedChallenge.decode(reader, reader.uint32()));
+          break;
+        case 20:
+          message.escalatedChallengeDeadlineQueue.push(ContentDeadline.decode(reader, reader.uint32()));
+          break;
+        case 21:
+          message.arbiterSubmissions.push(ArbiterSubmissionEntry.decode(reader, reader.uint32()));
+          break;
+        case 22:
+          message.arbiterHashCounts.push(ArbiterHashCount.decode(reader, reader.uint32()));
+          break;
+        case 23:
+          message.nextArbiterAnonSubmissionId = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -249,6 +470,15 @@ export const GenesisState = {
     message.nextContentId = object.nextContentId !== undefined && object.nextContentId !== null ? BigInt(object.nextContentId.toString()) : BigInt(0);
     message.nextOutboundAttestationId = object.nextOutboundAttestationId !== undefined && object.nextOutboundAttestationId !== null ? BigInt(object.nextOutboundAttestationId.toString()) : BigInt(0);
     message.operatorRewardDayFundingList = object.operatorRewardDayFundingList?.map(e => OperatorRewardDayFunding.fromPartial(e)) || [];
+    message.verificationWindowQueue = object.verificationWindowQueue?.map(e => ContentDeadline.fromPartial(e)) || [];
+    message.challengeWindowQueue = object.challengeWindowQueue?.map(e => ContentDeadline.fromPartial(e)) || [];
+    message.arbiterResolutionQueue = object.arbiterResolutionQueue?.map(e => ContentDeadline.fromPartial(e)) || [];
+    message.arbiterEscalationQueue = object.arbiterEscalationQueue?.map(e => ContentDeadline.fromPartial(e)) || [];
+    message.escalatedChallenges = object.escalatedChallenges?.map(e => EscalatedChallenge.fromPartial(e)) || [];
+    message.escalatedChallengeDeadlineQueue = object.escalatedChallengeDeadlineQueue?.map(e => ContentDeadline.fromPartial(e)) || [];
+    message.arbiterSubmissions = object.arbiterSubmissions?.map(e => ArbiterSubmissionEntry.fromPartial(e)) || [];
+    message.arbiterHashCounts = object.arbiterHashCounts?.map(e => ArbiterHashCount.fromPartial(e)) || [];
+    message.nextArbiterAnonSubmissionId = object.nextArbiterAnonSubmissionId !== undefined && object.nextArbiterAnonSubmissionId !== null ? BigInt(object.nextArbiterAnonSubmissionId.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -275,6 +505,17 @@ export const GenesisState = {
       message.nextOutboundAttestationId = BigInt(object.next_outbound_attestation_id);
     }
     message.operatorRewardDayFundingList = object.operator_reward_day_funding_list?.map(e => OperatorRewardDayFunding.fromAmino(e)) || [];
+    message.verificationWindowQueue = object.verification_window_queue?.map(e => ContentDeadline.fromAmino(e)) || [];
+    message.challengeWindowQueue = object.challenge_window_queue?.map(e => ContentDeadline.fromAmino(e)) || [];
+    message.arbiterResolutionQueue = object.arbiter_resolution_queue?.map(e => ContentDeadline.fromAmino(e)) || [];
+    message.arbiterEscalationQueue = object.arbiter_escalation_queue?.map(e => ContentDeadline.fromAmino(e)) || [];
+    message.escalatedChallenges = object.escalated_challenges?.map(e => EscalatedChallenge.fromAmino(e)) || [];
+    message.escalatedChallengeDeadlineQueue = object.escalated_challenge_deadline_queue?.map(e => ContentDeadline.fromAmino(e)) || [];
+    message.arbiterSubmissions = object.arbiter_submissions?.map(e => ArbiterSubmissionEntry.fromAmino(e)) || [];
+    message.arbiterHashCounts = object.arbiter_hash_counts?.map(e => ArbiterHashCount.fromAmino(e)) || [];
+    if (object.next_arbiter_anon_submission_id !== undefined && object.next_arbiter_anon_submission_id !== null) {
+      message.nextArbiterAnonSubmissionId = BigInt(object.next_arbiter_anon_submission_id);
+    }
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -333,6 +574,47 @@ export const GenesisState = {
     } else {
       obj.operator_reward_day_funding_list = message.operatorRewardDayFundingList;
     }
+    if (message.verificationWindowQueue) {
+      obj.verification_window_queue = message.verificationWindowQueue.map(e => e ? ContentDeadline.toAmino(e) : undefined);
+    } else {
+      obj.verification_window_queue = message.verificationWindowQueue;
+    }
+    if (message.challengeWindowQueue) {
+      obj.challenge_window_queue = message.challengeWindowQueue.map(e => e ? ContentDeadline.toAmino(e) : undefined);
+    } else {
+      obj.challenge_window_queue = message.challengeWindowQueue;
+    }
+    if (message.arbiterResolutionQueue) {
+      obj.arbiter_resolution_queue = message.arbiterResolutionQueue.map(e => e ? ContentDeadline.toAmino(e) : undefined);
+    } else {
+      obj.arbiter_resolution_queue = message.arbiterResolutionQueue;
+    }
+    if (message.arbiterEscalationQueue) {
+      obj.arbiter_escalation_queue = message.arbiterEscalationQueue.map(e => e ? ContentDeadline.toAmino(e) : undefined);
+    } else {
+      obj.arbiter_escalation_queue = message.arbiterEscalationQueue;
+    }
+    if (message.escalatedChallenges) {
+      obj.escalated_challenges = message.escalatedChallenges.map(e => e ? EscalatedChallenge.toAmino(e) : undefined);
+    } else {
+      obj.escalated_challenges = message.escalatedChallenges;
+    }
+    if (message.escalatedChallengeDeadlineQueue) {
+      obj.escalated_challenge_deadline_queue = message.escalatedChallengeDeadlineQueue.map(e => e ? ContentDeadline.toAmino(e) : undefined);
+    } else {
+      obj.escalated_challenge_deadline_queue = message.escalatedChallengeDeadlineQueue;
+    }
+    if (message.arbiterSubmissions) {
+      obj.arbiter_submissions = message.arbiterSubmissions.map(e => e ? ArbiterSubmissionEntry.toAmino(e) : undefined);
+    } else {
+      obj.arbiter_submissions = message.arbiterSubmissions;
+    }
+    if (message.arbiterHashCounts) {
+      obj.arbiter_hash_counts = message.arbiterHashCounts.map(e => e ? ArbiterHashCount.toAmino(e) : undefined);
+    } else {
+      obj.arbiter_hash_counts = message.arbiterHashCounts;
+    }
+    obj.next_arbiter_anon_submission_id = message.nextArbiterAnonSubmissionId !== BigInt(0) ? message.nextArbiterAnonSubmissionId?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {
@@ -348,6 +630,269 @@ export const GenesisState = {
     return {
       typeUrl: "/sparkdream.federation.v1.GenesisState",
       value: GenesisState.encode(message).finish()
+    };
+  }
+};
+function createBaseContentDeadline(): ContentDeadline {
+  return {
+    deadline: BigInt(0),
+    contentId: BigInt(0)
+  };
+}
+/**
+ * ContentDeadline is one (deadline, content_id) entry of a federation
+ * EndBlocker time queue. All four verification-lifecycle queues share this
+ * shape, so they share this message.
+ * @name ContentDeadline
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.ContentDeadline
+ */
+export const ContentDeadline = {
+  typeUrl: "/sparkdream.federation.v1.ContentDeadline",
+  encode(message: ContentDeadline, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.deadline !== BigInt(0)) {
+      writer.uint32(8).int64(message.deadline);
+    }
+    if (message.contentId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.contentId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): ContentDeadline {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseContentDeadline();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.deadline = reader.int64();
+          break;
+        case 2:
+          message.contentId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<ContentDeadline>): ContentDeadline {
+    const message = createBaseContentDeadline();
+    message.deadline = object.deadline !== undefined && object.deadline !== null ? BigInt(object.deadline.toString()) : BigInt(0);
+    message.contentId = object.contentId !== undefined && object.contentId !== null ? BigInt(object.contentId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: ContentDeadlineAmino): ContentDeadline {
+    const message = createBaseContentDeadline();
+    if (object.deadline !== undefined && object.deadline !== null) {
+      message.deadline = BigInt(object.deadline);
+    }
+    if (object.content_id !== undefined && object.content_id !== null) {
+      message.contentId = BigInt(object.content_id);
+    }
+    return message;
+  },
+  toAmino(message: ContentDeadline): ContentDeadlineAmino {
+    const obj: any = {};
+    obj.deadline = message.deadline !== BigInt(0) ? message.deadline?.toString() : undefined;
+    obj.content_id = message.contentId !== BigInt(0) ? message.contentId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: ContentDeadlineAminoMsg): ContentDeadline {
+    return ContentDeadline.fromAmino(object.value);
+  },
+  fromProtoMsg(message: ContentDeadlineProtoMsg): ContentDeadline {
+    return ContentDeadline.decode(message.value);
+  },
+  toProto(message: ContentDeadline): Uint8Array {
+    return ContentDeadline.encode(message).finish();
+  },
+  toProtoMsg(message: ContentDeadline): ContentDeadlineProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.ContentDeadline",
+      value: ContentDeadline.encode(message).finish()
+    };
+  }
+};
+function createBaseArbiterSubmissionEntry(): ArbiterSubmissionEntry {
+  return {
+    submitterKey: "",
+    submission: ArbiterHashSubmission.fromPartial({})
+  };
+}
+/**
+ * ArbiterSubmissionEntry is one ArbiterSubmissions map entry. The submitter
+ * key is part of the STATE key rather than of ArbiterHashSubmission —
+ * identified arbiters key by bech32 address, anonymous ones by "anon:<seq>"
+ * (where the Operator field holds the shield module address instead) — so it
+ * must be exported alongside the value or the "no double vote per operator"
+ * rule cannot be reconstructed.
+ * @name ArbiterSubmissionEntry
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.ArbiterSubmissionEntry
+ */
+export const ArbiterSubmissionEntry = {
+  typeUrl: "/sparkdream.federation.v1.ArbiterSubmissionEntry",
+  encode(message: ArbiterSubmissionEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.submitterKey !== "") {
+      writer.uint32(10).string(message.submitterKey);
+    }
+    if (message.submission !== undefined) {
+      ArbiterHashSubmission.encode(message.submission, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): ArbiterSubmissionEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseArbiterSubmissionEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.submitterKey = reader.string();
+          break;
+        case 2:
+          message.submission = ArbiterHashSubmission.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<ArbiterSubmissionEntry>): ArbiterSubmissionEntry {
+    const message = createBaseArbiterSubmissionEntry();
+    message.submitterKey = object.submitterKey ?? "";
+    message.submission = object.submission !== undefined && object.submission !== null ? ArbiterHashSubmission.fromPartial(object.submission) : undefined;
+    return message;
+  },
+  fromAmino(object: ArbiterSubmissionEntryAmino): ArbiterSubmissionEntry {
+    const message = createBaseArbiterSubmissionEntry();
+    if (object.submitter_key !== undefined && object.submitter_key !== null) {
+      message.submitterKey = object.submitter_key;
+    }
+    if (object.submission !== undefined && object.submission !== null) {
+      message.submission = ArbiterHashSubmission.fromAmino(object.submission);
+    }
+    return message;
+  },
+  toAmino(message: ArbiterSubmissionEntry): ArbiterSubmissionEntryAmino {
+    const obj: any = {};
+    obj.submitter_key = message.submitterKey === "" ? undefined : message.submitterKey;
+    obj.submission = message.submission ? ArbiterHashSubmission.toAmino(message.submission) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: ArbiterSubmissionEntryAminoMsg): ArbiterSubmissionEntry {
+    return ArbiterSubmissionEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: ArbiterSubmissionEntryProtoMsg): ArbiterSubmissionEntry {
+    return ArbiterSubmissionEntry.decode(message.value);
+  },
+  toProto(message: ArbiterSubmissionEntry): Uint8Array {
+    return ArbiterSubmissionEntry.encode(message).finish();
+  },
+  toProtoMsg(message: ArbiterSubmissionEntry): ArbiterSubmissionEntryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.ArbiterSubmissionEntry",
+      value: ArbiterSubmissionEntry.encode(message).finish()
+    };
+  }
+};
+function createBaseArbiterHashCount(): ArbiterHashCount {
+  return {
+    contentId: BigInt(0),
+    contentHash: "",
+    count: 0
+  };
+}
+/**
+ * ArbiterHashCount is one (content_id, content_hash) -> votes tally from the
+ * arbiter quorum counter.
+ * @name ArbiterHashCount
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.ArbiterHashCount
+ */
+export const ArbiterHashCount = {
+  typeUrl: "/sparkdream.federation.v1.ArbiterHashCount",
+  encode(message: ArbiterHashCount, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.contentId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.contentId);
+    }
+    if (message.contentHash !== "") {
+      writer.uint32(18).string(message.contentHash);
+    }
+    if (message.count !== 0) {
+      writer.uint32(24).uint32(message.count);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): ArbiterHashCount {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseArbiterHashCount();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.contentId = reader.uint64();
+          break;
+        case 2:
+          message.contentHash = reader.string();
+          break;
+        case 3:
+          message.count = reader.uint32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<ArbiterHashCount>): ArbiterHashCount {
+    const message = createBaseArbiterHashCount();
+    message.contentId = object.contentId !== undefined && object.contentId !== null ? BigInt(object.contentId.toString()) : BigInt(0);
+    message.contentHash = object.contentHash ?? "";
+    message.count = object.count ?? 0;
+    return message;
+  },
+  fromAmino(object: ArbiterHashCountAmino): ArbiterHashCount {
+    const message = createBaseArbiterHashCount();
+    if (object.content_id !== undefined && object.content_id !== null) {
+      message.contentId = BigInt(object.content_id);
+    }
+    if (object.content_hash !== undefined && object.content_hash !== null) {
+      message.contentHash = object.content_hash;
+    }
+    if (object.count !== undefined && object.count !== null) {
+      message.count = object.count;
+    }
+    return message;
+  },
+  toAmino(message: ArbiterHashCount): ArbiterHashCountAmino {
+    const obj: any = {};
+    obj.content_id = message.contentId !== BigInt(0) ? message.contentId?.toString() : undefined;
+    obj.content_hash = message.contentHash === "" ? undefined : message.contentHash;
+    obj.count = message.count === 0 ? undefined : message.count;
+    return obj;
+  },
+  fromAminoMsg(object: ArbiterHashCountAminoMsg): ArbiterHashCount {
+    return ArbiterHashCount.fromAmino(object.value);
+  },
+  fromProtoMsg(message: ArbiterHashCountProtoMsg): ArbiterHashCount {
+    return ArbiterHashCount.decode(message.value);
+  },
+  toProto(message: ArbiterHashCount): Uint8Array {
+    return ArbiterHashCount.encode(message).finish();
+  },
+  toProtoMsg(message: ArbiterHashCount): ArbiterHashCountProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.ArbiterHashCount",
+      value: ArbiterHashCount.encode(message).finish()
     };
   }
 };

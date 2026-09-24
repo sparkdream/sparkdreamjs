@@ -1,0 +1,49 @@
+{
+  "_source": "Rendered by the chain's cosmossdk.io/x/tx/signing/aminojson encoder from each fixture's proto bytes. To regenerate: SESSION_AMINO_DUMP=/tmp/fx.json npx jest __tests__/session-amino.test.ts, copy __tests__/session-amino-golden.go.txt into sparkdream/x/session/types/ as a _test.go file, run FIXTURES=/tmp/fx.json OUT=/tmp/golden.json go test ./x/session/types -run TestRenderAminoGolden, wrap the output as {\"fixtures\": ...} here, then delete the Go file.",
+  "fixtures": {
+    "claim_recurring_pull": {
+      "amino": "{\"type\":\"sparkdream/x/session/MsgClaimRecurringPull\",\"value\":{\"grant_id\":\"7\",\"grantee\":\"sprkdrm1grantee000000000000000000000000000\"}}",
+      "proto_hex": "0a2a7370726b64726d316772616e7465653030303030303030303030303030303030303030303030303030301007"
+    },
+    "create_recurring_pull": {
+      "amino": "{\"type\":\"sparkdream/x/session/MsgCreateGrant\",\"value\":{\"Payload\":{\"type\":\"sparkdream/session/RecurringPullPayload\",\"value\":{\"recurring_pull\":{\"amount_per_period\":{\"amount\":\"5000000\",\"denom\":\"uspark\"},\"period_seconds\":\"604800\",\"start_time\":\"1790000000\"}}},\"expires_at\":\"2026-12-31T00:00:00Z\",\"grantee\":\"sprkdrm1grantee000000000000000000000000000\",\"granter\":\"sprkdrm1granter000000000000000000000000000\",\"note\":\"rent\"}}",
+      "proto_hex": "0a2a7370726b64726d316772616e746572303030303030303030303030303030303030303030303030303030122a7370726b64726d316772616e7465653030303030303030303030303030303030303030303030303030301a060880b6d6d906220472656e745a1d0a110a0675737061726b1207353030303030301080f5241880f7c4d506"
+    },
+    "create_scheduled_exec": {
+      "amino": "{\"type\":\"sparkdream/x/session/MsgCreateGrant\",\"value\":{\"Payload\":{\"type\":\"sparkdream/session/ScheduledOneshotPayload\",\"value\":{\"scheduled_oneshot\":{\"Action\":{\"type\":\"sparkdream/session/OneshotExec\",\"value\":{\"exec\":{\"gas_limit\":\"200000\",\"msg\":{\"type\":\"cosmos-sdk/MsgSend\",\"value\":{\"amount\":[{\"amount\":\"7\",\"denom\":\"uspark\"}],\"from_address\":\"sprkdrm1granter000000000000000000000000000\",\"to_address\":\"sprkdrm1other00000000000000000000000000000\"}}}}},\"fire_at\":\"1795000000\"}}},\"expires_at\":\"2026-12-31T00:00:00Z\",\"grantee\":\"sprkdrm1grantee000000000000000000000000000\",\"granter\":\"sprkdrm1granter000000000000000000000000000\"}}",
+      "proto_hex": "0a2a7370726b64726d316772616e746572303030303030303030303030303030303030303030303030303030122a7370726b64726d316772616e7465653030303030303030303030303030303030303030303030303030301a060880b6d6d9066a9501128c010a85010a1c2f636f736d6f732e62616e6b2e763162657461312e4d736753656e6412650a2a7370726b64726d316772616e746572303030303030303030303030303030303030303030303030303030122a7370726b64726d316f7468657230303030303030303030303030303030303030303030303030303030301a0b0a0675737061726b12013710c09a0c50c08df6d706"
+    },
+    "create_scheduled_transfer": {
+      "amino": "{\"type\":\"sparkdream/x/session/MsgCreateGrant\",\"value\":{\"Payload\":{\"type\":\"sparkdream/session/ScheduledOneshotPayload\",\"value\":{\"scheduled_oneshot\":{\"Action\":{\"type\":\"sparkdream/session/OneshotTransfer\",\"value\":{\"transfer\":{\"amount\":{\"amount\":\"250000\",\"denom\":\"uspark\"},\"recipient\":\"sprkdrm1grantee000000000000000000000000000\"}}},\"fire_at\":\"1795000000\"}}},\"expires_at\":\"2026-12-31T00:00:00Z\",\"grantee\":\"sprkdrm1grantee000000000000000000000000000\",\"granter\":\"sprkdrm1granter000000000000000000000000000\",\"note\":\"gift\"}}",
+      "proto_hex": "0a2a7370726b64726d316772616e746572303030303030303030303030303030303030303030303030303030122a7370726b64726d316772616e7465653030303030303030303030303030303030303030303030303030301a060880b6d6d9062204676966746a460a3e0a2a7370726b64726d316772616e74656530303030303030303030303030303030303030303030303030303012100a0675737061726b120632353030303050c08df6d706"
+    },
+    "create_session_key": {
+      "amino": "{\"type\":\"sparkdream/x/session/MsgCreateGrant\",\"value\":{\"Payload\":{\"type\":\"sparkdream/session/SessionKeyPayload\",\"value\":{\"session_key\":{\"allow_self_revoke\":true,\"allowed_msg_types\":[\"/sparkdream.blog.v1.MsgCreatePost\"],\"max_exec_count\":\"100\",\"spend_limit\":{\"amount\":\"3000000\",\"denom\":\"uspark\"}}}},\"expires_at\":\"2026-12-31T00:00:00Z\",\"grantee\":\"sprkdrm1grantee000000000000000000000000000\",\"granter\":\"sprkdrm1granter000000000000000000000000000\"}}",
+      "proto_hex": "0a2a7370726b64726d316772616e746572303030303030303030303030303030303030303030303030303030122a7370726b64726d316772616e7465653030303030303030303030303030303030303030303030303030301a060880b6d6d906523a0a212f737061726b647265616d2e626c6f672e76312e4d7367437265617465506f737412110a0675737061726b12073330303030303020643801"
+    },
+    "create_spending_allowance_open": {
+      "amino": "{\"type\":\"sparkdream/x/session/MsgCreateGrant\",\"value\":{\"Payload\":{\"type\":\"sparkdream/session/SpendingAllowancePayload\",\"value\":{\"spending_allowance\":{\"denom\":\"uspark\",\"max_per_period\":{\"amount\":\"1000000\",\"denom\":\"uspark\"},\"period_seconds\":\"86400\"}}},\"expires_at\":\"2026-12-31T00:00:00Z\",\"grantee\":\"sprkdrm1grantee000000000000000000000000000\",\"granter\":\"sprkdrm1granter000000000000000000000000000\"}}",
+      "proto_hex": "0a2a7370726b64726d316772616e746572303030303030303030303030303030303030303030303030303030122a7370726b64726d316772616e7465653030303030303030303030303030303030303030303030303030301a060880b6d6d906621f0a110a0675737061726b1207313030303030301080a305320675737061726b"
+    },
+    "create_spending_allowance_whitelist": {
+      "amino": "{\"type\":\"sparkdream/x/session/MsgCreateGrant\",\"value\":{\"Payload\":{\"type\":\"sparkdream/session/SpendingAllowancePayload\",\"value\":{\"spending_allowance\":{\"allowed_recipients\":[\"sprkdrm1other00000000000000000000000000000\",\"sprkdrm1grantee000000000000000000000000000\"],\"denom\":\"uspark\",\"max_per_period\":{\"amount\":\"1000000\",\"denom\":\"uspark\"},\"period_seconds\":\"86400\"}}},\"expires_at\":\"2026-12-31T00:00:00Z\",\"grantee\":\"sprkdrm1grantee000000000000000000000000000\",\"granter\":\"sprkdrm1granter000000000000000000000000000\"}}",
+      "proto_hex": "0a2a7370726b64726d316772616e746572303030303030303030303030303030303030303030303030303030122a7370726b64726d316772616e7465653030303030303030303030303030303030303030303030303030301a060880b6d6d90662770a110a0675737061726b1207313030303030301080a3052a2a7370726b64726d316f7468657230303030303030303030303030303030303030303030303030303030302a2a7370726b64726d316772616e746565303030303030303030303030303030303030303030303030303030320675737061726b"
+    },
+    "decline_grant": {
+      "amino": "{\"type\":\"sparkdream/x/session/MsgDeclineGrant\",\"value\":{\"grant_id\":\"11\",\"grantee\":\"sprkdrm1grantee000000000000000000000000000\"}}",
+      "proto_hex": "0a2a7370726b64726d316772616e746565303030303030303030303030303030303030303030303030303030100b"
+    },
+    "pull_allowance": {
+      "amino": "{\"type\":\"sparkdream/x/session/MsgPullAllowance\",\"value\":{\"amount\":{\"amount\":\"42\",\"denom\":\"uspark\"},\"grant_id\":\"8\",\"grantee\":\"sprkdrm1grantee000000000000000000000000000\",\"recipient\":\"sprkdrm1other00000000000000000000000000000\"}}",
+      "proto_hex": "0a2a7370726b64726d316772616e74656530303030303030303030303030303030303030303030303030303010081a2a7370726b64726d316f746865723030303030303030303030303030303030303030303030303030303030220c0a0675737061726b12023432"
+    },
+    "retry_scheduled_oneshot": {
+      "amino": "{\"type\":\"sparkdream/x/session/MsgRetryScheduledOneshot\",\"value\":{\"caller\":\"sprkdrm1granter000000000000000000000000000\",\"grant_id\":\"9\"}}",
+      "proto_hex": "0a2a7370726b64726d316772616e7465723030303030303030303030303030303030303030303030303030301009"
+    },
+    "revoke_grant": {
+      "amino": "{\"type\":\"sparkdream/x/session/MsgRevokeGrant\",\"value\":{\"grant_id\":\"10\",\"granter\":\"sprkdrm1granter000000000000000000000000000\"}}",
+      "proto_hex": "0a2a7370726b64726d316772616e746572303030303030303030303030303030303030303030303030303030100a"
+    }
+  }
+}

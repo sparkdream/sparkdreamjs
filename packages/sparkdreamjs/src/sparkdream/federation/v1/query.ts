@@ -371,6 +371,21 @@ export interface QueryGetFederatedContentResponseAminoMsg {
  */
 export interface QueryListFederatedContentRequest {
   pagination?: PageRequest;
+  /**
+   * Optional filters, routed through the ContentByPeer / ContentByType /
+   * ContentByCreator indexes where one applies. Empty string means "no
+   * filter"; status takes the full enum name (e.g.
+   * "FEDERATED_CONTENT_STATUS_PENDING_VERIFICATION") because the enum's
+   * zero value is PENDING_VERIFICATION itself, so a numeric field could
+   * not express "filter pending" vs "no filter". The verifier runner
+   * polls peer_id + status rather than paging the whole list. This is a
+   * query message, not a federation packet — appending fields here is
+   * safe per the no-reserved-fields rule.
+   */
+  peerId: string;
+  contentType: string;
+  creatorIdentity: string;
+  status: string;
 }
 export interface QueryListFederatedContentRequestProtoMsg {
   typeUrl: "/sparkdream.federation.v1.QueryListFederatedContentRequest";
@@ -383,6 +398,21 @@ export interface QueryListFederatedContentRequestProtoMsg {
  */
 export interface QueryListFederatedContentRequestAmino {
   pagination?: PageRequestAmino;
+  /**
+   * Optional filters, routed through the ContentByPeer / ContentByType /
+   * ContentByCreator indexes where one applies. Empty string means "no
+   * filter"; status takes the full enum name (e.g.
+   * "FEDERATED_CONTENT_STATUS_PENDING_VERIFICATION") because the enum's
+   * zero value is PENDING_VERIFICATION itself, so a numeric field could
+   * not express "filter pending" vs "no filter". The verifier runner
+   * polls peer_id + status rather than paging the whole list. This is a
+   * query message, not a federation packet — appending fields here is
+   * safe per the no-reserved-fields rule.
+   */
+  peer_id?: string;
+  content_type?: string;
+  creator_identity?: string;
+  status?: string;
 }
 export interface QueryListFederatedContentRequestAminoMsg {
   type: "/sparkdream.federation.v1.QueryListFederatedContentRequest";
@@ -2003,7 +2033,11 @@ export const QueryGetFederatedContentResponse = {
 };
 function createBaseQueryListFederatedContentRequest(): QueryListFederatedContentRequest {
   return {
-    pagination: undefined
+    pagination: undefined,
+    peerId: "",
+    contentType: "",
+    creatorIdentity: "",
+    status: ""
   };
 }
 /**
@@ -2017,6 +2051,18 @@ export const QueryListFederatedContentRequest = {
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
     }
+    if (message.peerId !== "") {
+      writer.uint32(18).string(message.peerId);
+    }
+    if (message.contentType !== "") {
+      writer.uint32(26).string(message.contentType);
+    }
+    if (message.creatorIdentity !== "") {
+      writer.uint32(34).string(message.creatorIdentity);
+    }
+    if (message.status !== "") {
+      writer.uint32(42).string(message.status);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryListFederatedContentRequest {
@@ -2029,6 +2075,18 @@ export const QueryListFederatedContentRequest = {
         case 1:
           message.pagination = PageRequest.decode(reader, reader.uint32());
           break;
+        case 2:
+          message.peerId = reader.string();
+          break;
+        case 3:
+          message.contentType = reader.string();
+          break;
+        case 4:
+          message.creatorIdentity = reader.string();
+          break;
+        case 5:
+          message.status = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2039,6 +2097,10 @@ export const QueryListFederatedContentRequest = {
   fromPartial(object: DeepPartial<QueryListFederatedContentRequest>): QueryListFederatedContentRequest {
     const message = createBaseQueryListFederatedContentRequest();
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    message.peerId = object.peerId ?? "";
+    message.contentType = object.contentType ?? "";
+    message.creatorIdentity = object.creatorIdentity ?? "";
+    message.status = object.status ?? "";
     return message;
   },
   fromAmino(object: QueryListFederatedContentRequestAmino): QueryListFederatedContentRequest {
@@ -2046,11 +2108,27 @@ export const QueryListFederatedContentRequest = {
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromAmino(object.pagination);
     }
+    if (object.peer_id !== undefined && object.peer_id !== null) {
+      message.peerId = object.peer_id;
+    }
+    if (object.content_type !== undefined && object.content_type !== null) {
+      message.contentType = object.content_type;
+    }
+    if (object.creator_identity !== undefined && object.creator_identity !== null) {
+      message.creatorIdentity = object.creator_identity;
+    }
+    if (object.status !== undefined && object.status !== null) {
+      message.status = object.status;
+    }
     return message;
   },
   toAmino(message: QueryListFederatedContentRequest): QueryListFederatedContentRequestAmino {
     const obj: any = {};
     obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    obj.peer_id = message.peerId === "" ? undefined : message.peerId;
+    obj.content_type = message.contentType === "" ? undefined : message.contentType;
+    obj.creator_identity = message.creatorIdentity === "" ? undefined : message.creatorIdentity;
+    obj.status = message.status === "" ? undefined : message.status;
     return obj;
   },
   fromAminoMsg(object: QueryListFederatedContentRequestAminoMsg): QueryListFederatedContentRequest {
