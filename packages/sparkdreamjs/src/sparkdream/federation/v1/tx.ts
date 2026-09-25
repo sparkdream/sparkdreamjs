@@ -78,6 +78,14 @@ export interface MsgRegisterPeer {
    * metadata so wallets render <SYMBOL>.ibc instead of ibc/<hash>.
    */
   peerIdentity?: ChainIdentity;
+  /**
+   * ibc_transfer_channel_id is this chain's end of the ICS-20 `transfer`
+   * channel to the peer. Optional. Distinct from ibc_channel_id, which is
+   * the `federation` port channel: the two are opened separately and
+   * rarely share a number. Voucher metadata for peer_identity is keyed on
+   * this channel and is skipped when it is empty.
+   */
+  ibcTransferChannelId: string;
 }
 export interface MsgRegisterPeerProtoMsg {
   typeUrl: "/sparkdream.federation.v1.MsgRegisterPeer";
@@ -111,6 +119,14 @@ export interface MsgRegisterPeerAmino {
    * metadata so wallets render <SYMBOL>.ibc instead of ibc/<hash>.
    */
   peer_identity?: ChainIdentityAmino;
+  /**
+   * ibc_transfer_channel_id is this chain's end of the ICS-20 `transfer`
+   * channel to the peer. Optional. Distinct from ibc_channel_id, which is
+   * the `federation` port channel: the two are opened separately and
+   * rarely share a number. Voucher metadata for peer_identity is keyed on
+   * this channel and is skipped when it is empty.
+   */
+  ibc_transfer_channel_id?: string;
 }
 export interface MsgRegisterPeerAminoMsg {
   type: "sparkdream/x/federation/MsgRegisterPeer";
@@ -1515,7 +1531,8 @@ function createBaseMsgRegisterPeer(): MsgRegisterPeer {
     ibcChannelId: "",
     metadata: "",
     controllerGroup: "",
-    peerIdentity: undefined
+    peerIdentity: undefined,
+    ibcTransferChannelId: ""
   };
 }
 /**
@@ -1551,6 +1568,9 @@ export const MsgRegisterPeer = {
     if (message.peerIdentity !== undefined) {
       ChainIdentity.encode(message.peerIdentity, writer.uint32(66).fork()).ldelim();
     }
+    if (message.ibcTransferChannelId !== "") {
+      writer.uint32(74).string(message.ibcTransferChannelId);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgRegisterPeer {
@@ -1584,6 +1604,9 @@ export const MsgRegisterPeer = {
         case 8:
           message.peerIdentity = ChainIdentity.decode(reader, reader.uint32());
           break;
+        case 9:
+          message.ibcTransferChannelId = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1601,6 +1624,7 @@ export const MsgRegisterPeer = {
     message.metadata = object.metadata ?? "";
     message.controllerGroup = object.controllerGroup ?? "";
     message.peerIdentity = object.peerIdentity !== undefined && object.peerIdentity !== null ? ChainIdentity.fromPartial(object.peerIdentity) : undefined;
+    message.ibcTransferChannelId = object.ibcTransferChannelId ?? "";
     return message;
   },
   fromAmino(object: MsgRegisterPeerAmino): MsgRegisterPeer {
@@ -1629,6 +1653,9 @@ export const MsgRegisterPeer = {
     if (object.peer_identity !== undefined && object.peer_identity !== null) {
       message.peerIdentity = ChainIdentity.fromAmino(object.peer_identity);
     }
+    if (object.ibc_transfer_channel_id !== undefined && object.ibc_transfer_channel_id !== null) {
+      message.ibcTransferChannelId = object.ibc_transfer_channel_id;
+    }
     return message;
   },
   toAmino(message: MsgRegisterPeer): MsgRegisterPeerAmino {
@@ -1641,6 +1668,7 @@ export const MsgRegisterPeer = {
     obj.metadata = message.metadata === "" ? undefined : message.metadata;
     obj.controller_group = message.controllerGroup === "" ? undefined : message.controllerGroup;
     obj.peer_identity = message.peerIdentity ? ChainIdentity.toAmino(message.peerIdentity) : undefined;
+    obj.ibc_transfer_channel_id = message.ibcTransferChannelId === "" ? undefined : message.ibcTransferChannelId;
     return obj;
   },
   fromAminoMsg(object: MsgRegisterPeerAminoMsg): MsgRegisterPeer {
