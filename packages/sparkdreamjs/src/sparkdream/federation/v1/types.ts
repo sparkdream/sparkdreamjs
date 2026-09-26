@@ -573,6 +573,26 @@ export interface PeerPolicy {
    * peer's name.
    */
   contentHosts: string[];
+  /**
+   * Author curation for bridged content (MsgSubmitFederatedContent, the
+   * external-protocol peers). An author is admitted only when BOTH gates
+   * pass, and blocked_identities still overrides both:
+   * 
+   *   allowed_identities  the admitted authors ("@user@host"), or "*" for
+   *                       any author. Empty admits nobody: a new external
+   *                       peer anchors nothing until the Operations
+   *                       Committee decides who is in scope.
+   *   curation            an x/collect collection whose active link items
+   *                       name the admitted authors, curated by the
+   *                       collection's owner and collaborators without a
+   *                       proposal per author. Unset: no collection gate.
+   * 
+   * So "*" plus a collection lets the collection alone decide, and a list
+   * without a collection lets the list alone decide. The author's own
+   * consent (following the bridge account) is a bridge-side rule on top.
+   */
+  allowedIdentities: string[];
+  curation?: IdentityCuration;
 }
 export interface PeerPolicyProtoMsg {
   typeUrl: "/sparkdream.federation.v1.PeerPolicy";
@@ -614,10 +634,66 @@ export interface PeerPolicyAmino {
    * peer's name.
    */
   content_hosts?: string[];
+  /**
+   * Author curation for bridged content (MsgSubmitFederatedContent, the
+   * external-protocol peers). An author is admitted only when BOTH gates
+   * pass, and blocked_identities still overrides both:
+   * 
+   *   allowed_identities  the admitted authors ("@user@host"), or "*" for
+   *                       any author. Empty admits nobody: a new external
+   *                       peer anchors nothing until the Operations
+   *                       Committee decides who is in scope.
+   *   curation            an x/collect collection whose active link items
+   *                       name the admitted authors, curated by the
+   *                       collection's owner and collaborators without a
+   *                       proposal per author. Unset: no collection gate.
+   * 
+   * So "*" plus a collection lets the collection alone decide, and a list
+   * without a collection lets the list alone decide. The author's own
+   * consent (following the bridge account) is a bridge-side rule on top.
+   */
+  allowed_identities?: string[];
+  curation?: IdentityCurationAmino;
 }
 export interface PeerPolicyAminoMsg {
   type: "/sparkdream.federation.v1.PeerPolicy";
   value: PeerPolicyAmino;
+}
+/**
+ * IdentityCuration points a peer's author gate at an x/collect collection.
+ * @name IdentityCuration
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.IdentityCuration
+ */
+export interface IdentityCuration {
+  /**
+   * collection_id is the x/collect collection listing admitted authors, one
+   * link item each: an "@user@host" handle or the profile URL
+   * ("https://host/@user"). Only active items in an active collection count.
+   */
+  collectionId: bigint;
+}
+export interface IdentityCurationProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.IdentityCuration";
+  value: Uint8Array;
+}
+/**
+ * IdentityCuration points a peer's author gate at an x/collect collection.
+ * @name IdentityCurationAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.IdentityCuration
+ */
+export interface IdentityCurationAmino {
+  /**
+   * collection_id is the x/collect collection listing admitted authors, one
+   * link item each: an "@user@host" handle or the profile URL
+   * ("https://host/@user"). Only active items in an active collection count.
+   */
+  collection_id?: string;
+}
+export interface IdentityCurationAminoMsg {
+  type: "/sparkdream.federation.v1.IdentityCuration";
+  value: IdentityCurationAmino;
 }
 /**
  * BridgeBinding represents the federation-owned binding between a bridge
@@ -1528,7 +1604,9 @@ function createBasePeerPolicy(): PeerPolicy {
     acceptReputationAttestations: false,
     requireReview: false,
     blockedIdentities: [],
-    contentHosts: []
+    contentHosts: [],
+    allowedIdentities: [],
+    curation: undefined
   };
 }
 /**
@@ -1573,6 +1651,12 @@ export const PeerPolicy = {
     for (const v of message.contentHosts) {
       writer.uint32(90).string(v!);
     }
+    for (const v of message.allowedIdentities) {
+      writer.uint32(98).string(v!);
+    }
+    if (message.curation !== undefined) {
+      IdentityCuration.encode(message.curation, writer.uint32(106).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): PeerPolicy {
@@ -1615,6 +1699,12 @@ export const PeerPolicy = {
         case 11:
           message.contentHosts.push(reader.string());
           break;
+        case 12:
+          message.allowedIdentities.push(reader.string());
+          break;
+        case 13:
+          message.curation = IdentityCuration.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1635,6 +1725,8 @@ export const PeerPolicy = {
     message.requireReview = object.requireReview ?? false;
     message.blockedIdentities = object.blockedIdentities?.map(e => e) || [];
     message.contentHosts = object.contentHosts?.map(e => e) || [];
+    message.allowedIdentities = object.allowedIdentities?.map(e => e) || [];
+    message.curation = object.curation !== undefined && object.curation !== null ? IdentityCuration.fromPartial(object.curation) : undefined;
     return message;
   },
   fromAmino(object: PeerPolicyAmino): PeerPolicy {
@@ -1664,6 +1756,10 @@ export const PeerPolicy = {
     }
     message.blockedIdentities = object.blocked_identities?.map(e => e) || [];
     message.contentHosts = object.content_hosts?.map(e => e) || [];
+    message.allowedIdentities = object.allowed_identities?.map(e => e) || [];
+    if (object.curation !== undefined && object.curation !== null) {
+      message.curation = IdentityCuration.fromAmino(object.curation);
+    }
     return message;
   },
   toAmino(message: PeerPolicy): PeerPolicyAmino {
@@ -1695,6 +1791,12 @@ export const PeerPolicy = {
     } else {
       obj.content_hosts = message.contentHosts;
     }
+    if (message.allowedIdentities) {
+      obj.allowed_identities = message.allowedIdentities.map(e => e);
+    } else {
+      obj.allowed_identities = message.allowedIdentities;
+    }
+    obj.curation = message.curation ? IdentityCuration.toAmino(message.curation) : undefined;
     return obj;
   },
   fromAminoMsg(object: PeerPolicyAminoMsg): PeerPolicy {
@@ -1710,6 +1812,75 @@ export const PeerPolicy = {
     return {
       typeUrl: "/sparkdream.federation.v1.PeerPolicy",
       value: PeerPolicy.encode(message).finish()
+    };
+  }
+};
+function createBaseIdentityCuration(): IdentityCuration {
+  return {
+    collectionId: BigInt(0)
+  };
+}
+/**
+ * IdentityCuration points a peer's author gate at an x/collect collection.
+ * @name IdentityCuration
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.IdentityCuration
+ */
+export const IdentityCuration = {
+  typeUrl: "/sparkdream.federation.v1.IdentityCuration",
+  encode(message: IdentityCuration, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.collectionId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.collectionId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): IdentityCuration {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseIdentityCuration();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.collectionId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<IdentityCuration>): IdentityCuration {
+    const message = createBaseIdentityCuration();
+    message.collectionId = object.collectionId !== undefined && object.collectionId !== null ? BigInt(object.collectionId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: IdentityCurationAmino): IdentityCuration {
+    const message = createBaseIdentityCuration();
+    if (object.collection_id !== undefined && object.collection_id !== null) {
+      message.collectionId = BigInt(object.collection_id);
+    }
+    return message;
+  },
+  toAmino(message: IdentityCuration): IdentityCurationAmino {
+    const obj: any = {};
+    obj.collection_id = message.collectionId !== BigInt(0) ? message.collectionId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: IdentityCurationAminoMsg): IdentityCuration {
+    return IdentityCuration.fromAmino(object.value);
+  },
+  fromProtoMsg(message: IdentityCurationProtoMsg): IdentityCuration {
+    return IdentityCuration.decode(message.value);
+  },
+  toProto(message: IdentityCuration): Uint8Array {
+    return IdentityCuration.encode(message).finish();
+  },
+  toProtoMsg(message: IdentityCuration): IdentityCurationProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.IdentityCuration",
+      value: IdentityCuration.encode(message).finish()
     };
   }
 };
