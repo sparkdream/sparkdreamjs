@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateServiceTypeConfig, MsgUpdateServiceTypeConfigResponse, MsgRegisterOperator, MsgRegisterOperatorResponse, MsgUpdateMetadata, MsgUpdateMetadataResponse, MsgUnbondOperator, MsgUnbondOperatorResponse, MsgClaimUnbondedBond, MsgClaimUnbondedBondResponse, MsgTopUpBond, MsgTopUpBondResponse, MsgReportOperator, MsgReportOperatorResponse, MsgResolveReport, MsgResolveReportResponse, MsgContestSlash, MsgContestSlashResponse, MsgResolveReportByJury, MsgResolveReportByJuryResponse, MsgOpenControllerTransferCase, MsgOpenControllerTransferCaseResponse, MsgFinalizeControllerTransfer, MsgFinalizeControllerTransferResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateServiceTypeConfig, MsgUpdateServiceTypeConfigResponse, MsgRegisterOperator, MsgRegisterOperatorResponse, MsgUpdateMetadata, MsgUpdateMetadataResponse, MsgUnbondOperator, MsgUnbondOperatorResponse, MsgClaimUnbondedBond, MsgClaimUnbondedBondResponse, MsgTopUpBond, MsgTopUpBondResponse, MsgReportOperator, MsgReportOperatorResponse, MsgResolveReport, MsgResolveReportResponse, MsgContestSlash, MsgContestSlashResponse, MsgResolveReportByJury, MsgResolveReportByJuryResponse, MsgOpenControllerTransferCase, MsgOpenControllerTransferCaseResponse, MsgFinalizeControllerTransfer, MsgFinalizeControllerTransferResponse, MsgSubmitCheckpoint, MsgSubmitCheckpointResponse } from "./tx";
 /** Msg defines the Msg service for x/service. See x-service-spec.md §5. */
 export interface Msg {
   /** UpdateParams updates module-wide params (§4.2). Authority = x/gov. */
@@ -61,6 +61,13 @@ export interface Msg {
    * transfer cases; signer is the x/rep module account (§5.4 + §6.2).
    */
   finalizeControllerTransfer(request: MsgFinalizeControllerTransfer): Promise<MsgFinalizeControllerTransferResponse>;
+  /**
+   * SubmitCheckpoint records how far the signing operator's off-chain work
+   * has progressed (height + output root). Generic across service types;
+   * drives liveness system reports when the service type sets
+   * checkpoint_max_lag_blocks (docs/content-scanning.md §8.2).
+   */
+  submitCheckpoint(request: MsgSubmitCheckpoint): Promise<MsgSubmitCheckpointResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -155,6 +162,15 @@ export class MsgClientImpl implements Msg {
     const data = MsgFinalizeControllerTransfer.encode(request).finish();
     const promise = this.rpc.request("sparkdream.service.v1.Msg", "FinalizeControllerTransfer", data);
     return promise.then(data => MsgFinalizeControllerTransferResponse.decode(new BinaryReader(data)));
+  };
+  /* SubmitCheckpoint records how far the signing operator's off-chain work
+   has progressed (height + output root). Generic across service types;
+   drives liveness system reports when the service type sets
+   checkpoint_max_lag_blocks (docs/content-scanning.md §8.2). */
+  submitCheckpoint = async (request: MsgSubmitCheckpoint): Promise<MsgSubmitCheckpointResponse> => {
+    const data = MsgSubmitCheckpoint.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.service.v1.Msg", "SubmitCheckpoint", data);
+    return promise.then(data => MsgSubmitCheckpointResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

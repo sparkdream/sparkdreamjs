@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryOperatorRequest, QueryOperatorResponse, QueryServiceTypeRequest, QueryServiceTypeResponse, QueryServiceTypesRequest, QueryServiceTypesResponse, QueryOperatorsRequest, QueryOperatorsResponse, QueryOperatorsByControllerRequest, QueryOperatorsByControllerResponse, QueryOperatorsByServiceTypeRequest, QueryOperatorsByServiceTypeResponse, QueryReportRequest, QueryReportResponse, QueryReportsByOperatorRequest, QueryReportsByOperatorResponse, QueryOperatorReputationSnapshotRequest, QueryOperatorReputationSnapshotResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryOperatorRequest, QueryOperatorResponse, QueryServiceTypeRequest, QueryServiceTypeResponse, QueryServiceTypesRequest, QueryServiceTypesResponse, QueryOperatorsRequest, QueryOperatorsResponse, QueryOperatorsByControllerRequest, QueryOperatorsByControllerResponse, QueryOperatorsByServiceTypeRequest, QueryOperatorsByServiceTypeResponse, QueryReportRequest, QueryReportResponse, QueryReportsByOperatorRequest, QueryReportsByOperatorResponse, QueryOperatorReputationSnapshotRequest, QueryOperatorReputationSnapshotResponse, QueryCheckpointRequest, QueryCheckpointResponse, QueryCheckpointsByServiceTypeRequest, QueryCheckpointsByServiceTypeResponse } from "./query";
 /** Query defines the gRPC querier service for x/service.
  See x-service-spec.md §8. */
 export interface Query {
@@ -36,6 +36,14 @@ export interface Query {
    * state write.
    */
   operatorReputationSnapshot(request: QueryOperatorReputationSnapshotRequest): Promise<QueryOperatorReputationSnapshotResponse>;
+  /** Checkpoint returns the latest checkpoint for (operator, service_type). */
+  checkpoint(request: QueryCheckpointRequest): Promise<QueryCheckpointResponse>;
+  /**
+   * CheckpointsByServiceType returns the latest checkpoint of every operator
+   * under a service type. Clients use it to find the effective scanned
+   * height of the attestation quorum (docs/content-scanning.md §4.4).
+   */
+  checkpointsByServiceType(request: QueryCheckpointsByServiceTypeRequest): Promise<QueryCheckpointsByServiceTypeResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -106,6 +114,20 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.service.v1.Query", "OperatorReputationSnapshot", data);
     return promise.then(data => QueryOperatorReputationSnapshotResponse.decode(new BinaryReader(data)));
   };
+  /* Checkpoint returns the latest checkpoint for (operator, service_type). */
+  checkpoint = async (request: QueryCheckpointRequest): Promise<QueryCheckpointResponse> => {
+    const data = QueryCheckpointRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.service.v1.Query", "Checkpoint", data);
+    return promise.then(data => QueryCheckpointResponse.decode(new BinaryReader(data)));
+  };
+  /* CheckpointsByServiceType returns the latest checkpoint of every operator
+   under a service type. Clients use it to find the effective scanned
+   height of the attestation quorum (docs/content-scanning.md §4.4). */
+  checkpointsByServiceType = async (request: QueryCheckpointsByServiceTypeRequest): Promise<QueryCheckpointsByServiceTypeResponse> => {
+    const data = QueryCheckpointsByServiceTypeRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.service.v1.Query", "CheckpointsByServiceType", data);
+    return promise.then(data => QueryCheckpointsByServiceTypeResponse.decode(new BinaryReader(data)));
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);
@@ -140,6 +162,12 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     operatorReputationSnapshot(request: QueryOperatorReputationSnapshotRequest): Promise<QueryOperatorReputationSnapshotResponse> {
       return queryService.operatorReputationSnapshot(request);
+    },
+    checkpoint(request: QueryCheckpointRequest): Promise<QueryCheckpointResponse> {
+      return queryService.checkpoint(request);
+    },
+    checkpointsByServiceType(request: QueryCheckpointsByServiceTypeRequest): Promise<QueryCheckpointsByServiceTypeResponse> {
+      return queryService.checkpointsByServiceType(request);
     }
   };
 };

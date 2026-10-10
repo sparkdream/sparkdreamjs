@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { ContentType } from "../../common/v1/content_type";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /** PostStatus defines the lifecycle status of a post. */
 export enum PostStatus {
   POST_STATUS_UNSPECIFIED = 0,
@@ -229,6 +229,18 @@ export interface Reply {
    * True if anonymous reply has entered conviction-sustained state
    */
   convictionSustained: boolean;
+  /**
+   * OR of sparkdream.common.v1.MediaFlag bits; chain-computed, never author-set
+   */
+  mediaFlags: number;
+  /**
+   * labelling rules that produced media_flags (common MediaRulesVersion)
+   */
+  mediaRulesVersion: number;
+  /**
+   * sha256 of the body exactly as stored (post-encoding, pre-decompression)
+   */
+  bodyHash: Uint8Array;
 }
 export interface ReplyProtoMsg {
   typeUrl: "/sparkdream.blog.v1.Reply";
@@ -313,6 +325,18 @@ export interface ReplyAmino {
    * True if anonymous reply has entered conviction-sustained state
    */
   conviction_sustained?: boolean;
+  /**
+   * OR of sparkdream.common.v1.MediaFlag bits; chain-computed, never author-set
+   */
+  media_flags?: number;
+  /**
+   * labelling rules that produced media_flags (common MediaRulesVersion)
+   */
+  media_rules_version?: number;
+  /**
+   * sha256 of the body exactly as stored (post-encoding, pre-decompression)
+   */
+  body_hash?: string;
 }
 export interface ReplyAminoMsg {
   type: "/sparkdream.blog.v1.Reply";
@@ -495,7 +519,10 @@ function createBaseReply(): Reply {
     pinnedBy: "",
     pinnedAt: BigInt(0),
     feeBytesHighWater: BigInt(0),
-    convictionSustained: false
+    convictionSustained: false,
+    mediaFlags: 0,
+    mediaRulesVersion: 0,
+    bodyHash: new Uint8Array()
   };
 }
 /**
@@ -561,6 +588,15 @@ export const Reply = {
     if (message.convictionSustained === true) {
       writer.uint32(144).bool(message.convictionSustained);
     }
+    if (message.mediaFlags !== 0) {
+      writer.uint32(152).uint32(message.mediaFlags);
+    }
+    if (message.mediaRulesVersion !== 0) {
+      writer.uint32(160).uint32(message.mediaRulesVersion);
+    }
+    if (message.bodyHash.length !== 0) {
+      writer.uint32(170).bytes(message.bodyHash);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Reply {
@@ -624,6 +660,15 @@ export const Reply = {
         case 18:
           message.convictionSustained = reader.bool();
           break;
+        case 19:
+          message.mediaFlags = reader.uint32();
+          break;
+        case 20:
+          message.mediaRulesVersion = reader.uint32();
+          break;
+        case 21:
+          message.bodyHash = reader.bytes();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -651,6 +696,9 @@ export const Reply = {
     message.pinnedAt = object.pinnedAt !== undefined && object.pinnedAt !== null ? BigInt(object.pinnedAt.toString()) : BigInt(0);
     message.feeBytesHighWater = object.feeBytesHighWater !== undefined && object.feeBytesHighWater !== null ? BigInt(object.feeBytesHighWater.toString()) : BigInt(0);
     message.convictionSustained = object.convictionSustained ?? false;
+    message.mediaFlags = object.mediaFlags ?? 0;
+    message.mediaRulesVersion = object.mediaRulesVersion ?? 0;
+    message.bodyHash = object.bodyHash ?? new Uint8Array();
     return message;
   },
   fromAmino(object: ReplyAmino): Reply {
@@ -709,6 +757,15 @@ export const Reply = {
     if (object.conviction_sustained !== undefined && object.conviction_sustained !== null) {
       message.convictionSustained = object.conviction_sustained;
     }
+    if (object.media_flags !== undefined && object.media_flags !== null) {
+      message.mediaFlags = object.media_flags;
+    }
+    if (object.media_rules_version !== undefined && object.media_rules_version !== null) {
+      message.mediaRulesVersion = object.media_rules_version;
+    }
+    if (object.body_hash !== undefined && object.body_hash !== null) {
+      message.bodyHash = bytesFromBase64(object.body_hash);
+    }
     return message;
   },
   toAmino(message: Reply): ReplyAmino {
@@ -731,6 +788,9 @@ export const Reply = {
     obj.pinned_at = message.pinnedAt !== BigInt(0) ? message.pinnedAt?.toString() : undefined;
     obj.fee_bytes_high_water = message.feeBytesHighWater !== BigInt(0) ? message.feeBytesHighWater?.toString() : undefined;
     obj.conviction_sustained = message.convictionSustained === false ? undefined : message.convictionSustained;
+    obj.media_flags = message.mediaFlags === 0 ? undefined : message.mediaFlags;
+    obj.media_rules_version = message.mediaRulesVersion === 0 ? undefined : message.mediaRulesVersion;
+    obj.body_hash = message.bodyHash ? base64FromBytes(message.bodyHash) : undefined;
     return obj;
   },
   fromAminoMsg(object: ReplyAminoMsg): Reply {

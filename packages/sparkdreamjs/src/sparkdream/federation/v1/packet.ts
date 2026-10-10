@@ -113,6 +113,13 @@ export interface ContentPacket {
   createdAt: bigint;
   contentHash: Uint8Array;
   protocolMetadata: Uint8Array;
+  /**
+   * license is the license the content is published under on the sending
+   * chain ("CC0-1.0" for Spark Dream content). The receiver accepts only
+   * public-domain licenses; a packet without one is refused. Appended, as
+   * every field here must be (wire-pinned, see packet_wire_compat_test.go).
+   */
+  license: string;
 }
 export interface ContentPacketProtoMsg {
   typeUrl: "/sparkdream.federation.v1.ContentPacket";
@@ -135,6 +142,13 @@ export interface ContentPacketAmino {
   created_at?: string;
   content_hash?: string;
   protocol_metadata?: string;
+  /**
+   * license is the license the content is published under on the sending
+   * chain ("CC0-1.0" for Spark Dream content). The receiver accepts only
+   * public-domain licenses; a packet without one is refused. Appended, as
+   * every field here must be (wire-pinned, see packet_wire_compat_test.go).
+   */
+  license?: string;
 }
 export interface ContentPacketAminoMsg {
   type: "/sparkdream.federation.v1.ContentPacket";
@@ -566,7 +580,8 @@ function createBaseContentPacket(): ContentPacket {
     contentUri: "",
     createdAt: BigInt(0),
     contentHash: new Uint8Array(),
-    protocolMetadata: new Uint8Array()
+    protocolMetadata: new Uint8Array(),
+    license: ""
   };
 }
 /**
@@ -608,6 +623,9 @@ export const ContentPacket = {
     if (message.protocolMetadata.length !== 0) {
       writer.uint32(82).bytes(message.protocolMetadata);
     }
+    if (message.license !== "") {
+      writer.uint32(90).string(message.license);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): ContentPacket {
@@ -647,6 +665,9 @@ export const ContentPacket = {
         case 10:
           message.protocolMetadata = reader.bytes();
           break;
+        case 11:
+          message.license = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -666,6 +687,7 @@ export const ContentPacket = {
     message.createdAt = object.createdAt !== undefined && object.createdAt !== null ? BigInt(object.createdAt.toString()) : BigInt(0);
     message.contentHash = object.contentHash ?? new Uint8Array();
     message.protocolMetadata = object.protocolMetadata ?? new Uint8Array();
+    message.license = object.license ?? "";
     return message;
   },
   fromAmino(object: ContentPacketAmino): ContentPacket {
@@ -700,6 +722,9 @@ export const ContentPacket = {
     if (object.protocol_metadata !== undefined && object.protocol_metadata !== null) {
       message.protocolMetadata = bytesFromBase64(object.protocol_metadata);
     }
+    if (object.license !== undefined && object.license !== null) {
+      message.license = object.license;
+    }
     return message;
   },
   toAmino(message: ContentPacket): ContentPacketAmino {
@@ -714,6 +739,7 @@ export const ContentPacket = {
     obj.created_at = message.createdAt !== BigInt(0) ? message.createdAt?.toString() : undefined;
     obj.content_hash = message.contentHash ? base64FromBytes(message.contentHash) : undefined;
     obj.protocol_metadata = message.protocolMetadata ? base64FromBytes(message.protocolMetadata) : undefined;
+    obj.license = message.license === "" ? undefined : message.license;
     return obj;
   },
   fromAminoMsg(object: ContentPacketAminoMsg): ContentPacket {

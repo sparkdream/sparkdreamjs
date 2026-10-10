@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { TelescopeGeneratedType } from "../../../types";
 import { Registry } from "@cosmjs/proto-signing";
-import { MsgUpdateParams, MsgUpdateServiceTypeConfig, MsgRegisterOperator, MsgUpdateMetadata, MsgUnbondOperator, MsgClaimUnbondedBond, MsgTopUpBond, MsgReportOperator, MsgResolveReport, MsgContestSlash, MsgResolveReportByJury, MsgOpenControllerTransferCase, MsgFinalizeControllerTransfer } from "./tx";
-export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.service.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.service.v1.MsgUpdateServiceTypeConfig", MsgUpdateServiceTypeConfig], ["/sparkdream.service.v1.MsgRegisterOperator", MsgRegisterOperator], ["/sparkdream.service.v1.MsgUpdateMetadata", MsgUpdateMetadata], ["/sparkdream.service.v1.MsgUnbondOperator", MsgUnbondOperator], ["/sparkdream.service.v1.MsgClaimUnbondedBond", MsgClaimUnbondedBond], ["/sparkdream.service.v1.MsgTopUpBond", MsgTopUpBond], ["/sparkdream.service.v1.MsgReportOperator", MsgReportOperator], ["/sparkdream.service.v1.MsgResolveReport", MsgResolveReport], ["/sparkdream.service.v1.MsgContestSlash", MsgContestSlash], ["/sparkdream.service.v1.MsgResolveReportByJury", MsgResolveReportByJury], ["/sparkdream.service.v1.MsgOpenControllerTransferCase", MsgOpenControllerTransferCase], ["/sparkdream.service.v1.MsgFinalizeControllerTransfer", MsgFinalizeControllerTransfer]];
+import { MsgUpdateParams, MsgUpdateServiceTypeConfig, MsgRegisterOperator, MsgUpdateMetadata, MsgUnbondOperator, MsgClaimUnbondedBond, MsgTopUpBond, MsgReportOperator, MsgResolveReport, MsgContestSlash, MsgResolveReportByJury, MsgOpenControllerTransferCase, MsgFinalizeControllerTransfer, MsgSubmitCheckpoint } from "./tx";
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.service.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.service.v1.MsgUpdateServiceTypeConfig", MsgUpdateServiceTypeConfig], ["/sparkdream.service.v1.MsgRegisterOperator", MsgRegisterOperator], ["/sparkdream.service.v1.MsgUpdateMetadata", MsgUpdateMetadata], ["/sparkdream.service.v1.MsgUnbondOperator", MsgUnbondOperator], ["/sparkdream.service.v1.MsgClaimUnbondedBond", MsgClaimUnbondedBond], ["/sparkdream.service.v1.MsgTopUpBond", MsgTopUpBond], ["/sparkdream.service.v1.MsgReportOperator", MsgReportOperator], ["/sparkdream.service.v1.MsgResolveReport", MsgResolveReport], ["/sparkdream.service.v1.MsgContestSlash", MsgContestSlash], ["/sparkdream.service.v1.MsgResolveReportByJury", MsgResolveReportByJury], ["/sparkdream.service.v1.MsgOpenControllerTransferCase", MsgOpenControllerTransferCase], ["/sparkdream.service.v1.MsgFinalizeControllerTransfer", MsgFinalizeControllerTransfer], ["/sparkdream.service.v1.MsgSubmitCheckpoint", MsgSubmitCheckpoint]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -87,6 +87,12 @@ export const MessageComposer = {
         typeUrl: "/sparkdream.service.v1.MsgFinalizeControllerTransfer",
         value: MsgFinalizeControllerTransfer.encode(value).finish()
       };
+    },
+    submitCheckpoint(value: MsgSubmitCheckpoint) {
+      return {
+        typeUrl: "/sparkdream.service.v1.MsgSubmitCheckpoint",
+        value: MsgSubmitCheckpoint.encode(value).finish()
+      };
     }
   },
   withTypeUrl: {
@@ -165,6 +171,12 @@ export const MessageComposer = {
     finalizeControllerTransfer(value: MsgFinalizeControllerTransfer) {
       return {
         typeUrl: "/sparkdream.service.v1.MsgFinalizeControllerTransfer",
+        value
+      };
+    },
+    submitCheckpoint(value: MsgSubmitCheckpoint) {
+      return {
+        typeUrl: "/sparkdream.service.v1.MsgSubmitCheckpoint",
         value
       };
     }
@@ -246,6 +258,12 @@ export const MessageComposer = {
       return {
         typeUrl: "/sparkdream.service.v1.MsgFinalizeControllerTransfer",
         value: MsgFinalizeControllerTransfer.fromPartial(value)
+      };
+    },
+    submitCheckpoint(value: MsgSubmitCheckpoint) {
+      return {
+        typeUrl: "/sparkdream.service.v1.MsgSubmitCheckpoint",
+        value: MsgSubmitCheckpoint.fromPartial(value)
       };
     }
   }

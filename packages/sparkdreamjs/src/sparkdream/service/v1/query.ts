@@ -4,6 +4,7 @@ import { Params, ParamsAmino } from "./params";
 import { Operator, OperatorAmino } from "./operator";
 import { ServiceTypeConfig, ServiceTypeConfigAmino } from "./service_type_config";
 import { Report, ReportAmino } from "./report";
+import { Checkpoint, CheckpointAmino } from "./checkpoint";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -599,6 +600,118 @@ export interface QueryOperatorReputationSnapshotResponseAmino {
 export interface QueryOperatorReputationSnapshotResponseAminoMsg {
   type: "/sparkdream.service.v1.QueryOperatorReputationSnapshotResponse";
   value: QueryOperatorReputationSnapshotResponseAmino;
+}
+/**
+ * QueryCheckpointRequest selects one operator's checkpoint.
+ * @name QueryCheckpointRequest
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.QueryCheckpointRequest
+ */
+export interface QueryCheckpointRequest {
+  operator: string;
+  serviceType: string;
+}
+export interface QueryCheckpointRequestProtoMsg {
+  typeUrl: "/sparkdream.service.v1.QueryCheckpointRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryCheckpointRequest selects one operator's checkpoint.
+ * @name QueryCheckpointRequestAmino
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.QueryCheckpointRequest
+ */
+export interface QueryCheckpointRequestAmino {
+  operator?: string;
+  service_type?: string;
+}
+export interface QueryCheckpointRequestAminoMsg {
+  type: "/sparkdream.service.v1.QueryCheckpointRequest";
+  value: QueryCheckpointRequestAmino;
+}
+/**
+ * QueryCheckpointResponse returns the operator's latest checkpoint.
+ * @name QueryCheckpointResponse
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.QueryCheckpointResponse
+ */
+export interface QueryCheckpointResponse {
+  checkpoint: Checkpoint;
+}
+export interface QueryCheckpointResponseProtoMsg {
+  typeUrl: "/sparkdream.service.v1.QueryCheckpointResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryCheckpointResponse returns the operator's latest checkpoint.
+ * @name QueryCheckpointResponseAmino
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.QueryCheckpointResponse
+ */
+export interface QueryCheckpointResponseAmino {
+  checkpoint?: CheckpointAmino;
+}
+export interface QueryCheckpointResponseAminoMsg {
+  type: "/sparkdream.service.v1.QueryCheckpointResponse";
+  value: QueryCheckpointResponseAmino;
+}
+/**
+ * QueryCheckpointsByServiceTypeRequest pages a service type's checkpoints.
+ * @name QueryCheckpointsByServiceTypeRequest
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.QueryCheckpointsByServiceTypeRequest
+ */
+export interface QueryCheckpointsByServiceTypeRequest {
+  serviceType: string;
+  pagination?: PageRequest;
+}
+export interface QueryCheckpointsByServiceTypeRequestProtoMsg {
+  typeUrl: "/sparkdream.service.v1.QueryCheckpointsByServiceTypeRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryCheckpointsByServiceTypeRequest pages a service type's checkpoints.
+ * @name QueryCheckpointsByServiceTypeRequestAmino
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.QueryCheckpointsByServiceTypeRequest
+ */
+export interface QueryCheckpointsByServiceTypeRequestAmino {
+  service_type?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryCheckpointsByServiceTypeRequestAminoMsg {
+  type: "/sparkdream.service.v1.QueryCheckpointsByServiceTypeRequest";
+  value: QueryCheckpointsByServiceTypeRequestAmino;
+}
+/**
+ * QueryCheckpointsByServiceTypeResponse lists checkpoints in operator
+ * address byte order.
+ * @name QueryCheckpointsByServiceTypeResponse
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.QueryCheckpointsByServiceTypeResponse
+ */
+export interface QueryCheckpointsByServiceTypeResponse {
+  checkpoints: Checkpoint[];
+  pagination?: PageResponse;
+}
+export interface QueryCheckpointsByServiceTypeResponseProtoMsg {
+  typeUrl: "/sparkdream.service.v1.QueryCheckpointsByServiceTypeResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryCheckpointsByServiceTypeResponse lists checkpoints in operator
+ * address byte order.
+ * @name QueryCheckpointsByServiceTypeResponseAmino
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.QueryCheckpointsByServiceTypeResponse
+ */
+export interface QueryCheckpointsByServiceTypeResponseAmino {
+  checkpoints?: CheckpointAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryCheckpointsByServiceTypeResponseAminoMsg {
+  type: "/sparkdream.service.v1.QueryCheckpointsByServiceTypeResponse";
+  value: QueryCheckpointsByServiceTypeResponseAmino;
 }
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
@@ -2167,6 +2280,321 @@ export const QueryOperatorReputationSnapshotResponse = {
     return {
       typeUrl: "/sparkdream.service.v1.QueryOperatorReputationSnapshotResponse",
       value: QueryOperatorReputationSnapshotResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryCheckpointRequest(): QueryCheckpointRequest {
+  return {
+    operator: "",
+    serviceType: ""
+  };
+}
+/**
+ * QueryCheckpointRequest selects one operator's checkpoint.
+ * @name QueryCheckpointRequest
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.QueryCheckpointRequest
+ */
+export const QueryCheckpointRequest = {
+  typeUrl: "/sparkdream.service.v1.QueryCheckpointRequest",
+  encode(message: QueryCheckpointRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.operator !== "") {
+      writer.uint32(10).string(message.operator);
+    }
+    if (message.serviceType !== "") {
+      writer.uint32(18).string(message.serviceType);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryCheckpointRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryCheckpointRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.operator = reader.string();
+          break;
+        case 2:
+          message.serviceType = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryCheckpointRequest>): QueryCheckpointRequest {
+    const message = createBaseQueryCheckpointRequest();
+    message.operator = object.operator ?? "";
+    message.serviceType = object.serviceType ?? "";
+    return message;
+  },
+  fromAmino(object: QueryCheckpointRequestAmino): QueryCheckpointRequest {
+    const message = createBaseQueryCheckpointRequest();
+    if (object.operator !== undefined && object.operator !== null) {
+      message.operator = object.operator;
+    }
+    if (object.service_type !== undefined && object.service_type !== null) {
+      message.serviceType = object.service_type;
+    }
+    return message;
+  },
+  toAmino(message: QueryCheckpointRequest): QueryCheckpointRequestAmino {
+    const obj: any = {};
+    obj.operator = message.operator === "" ? undefined : message.operator;
+    obj.service_type = message.serviceType === "" ? undefined : message.serviceType;
+    return obj;
+  },
+  fromAminoMsg(object: QueryCheckpointRequestAminoMsg): QueryCheckpointRequest {
+    return QueryCheckpointRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryCheckpointRequestProtoMsg): QueryCheckpointRequest {
+    return QueryCheckpointRequest.decode(message.value);
+  },
+  toProto(message: QueryCheckpointRequest): Uint8Array {
+    return QueryCheckpointRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryCheckpointRequest): QueryCheckpointRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.service.v1.QueryCheckpointRequest",
+      value: QueryCheckpointRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryCheckpointResponse(): QueryCheckpointResponse {
+  return {
+    checkpoint: Checkpoint.fromPartial({})
+  };
+}
+/**
+ * QueryCheckpointResponse returns the operator's latest checkpoint.
+ * @name QueryCheckpointResponse
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.QueryCheckpointResponse
+ */
+export const QueryCheckpointResponse = {
+  typeUrl: "/sparkdream.service.v1.QueryCheckpointResponse",
+  encode(message: QueryCheckpointResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.checkpoint !== undefined) {
+      Checkpoint.encode(message.checkpoint, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryCheckpointResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryCheckpointResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.checkpoint = Checkpoint.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryCheckpointResponse>): QueryCheckpointResponse {
+    const message = createBaseQueryCheckpointResponse();
+    message.checkpoint = object.checkpoint !== undefined && object.checkpoint !== null ? Checkpoint.fromPartial(object.checkpoint) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryCheckpointResponseAmino): QueryCheckpointResponse {
+    const message = createBaseQueryCheckpointResponse();
+    if (object.checkpoint !== undefined && object.checkpoint !== null) {
+      message.checkpoint = Checkpoint.fromAmino(object.checkpoint);
+    }
+    return message;
+  },
+  toAmino(message: QueryCheckpointResponse): QueryCheckpointResponseAmino {
+    const obj: any = {};
+    obj.checkpoint = message.checkpoint ? Checkpoint.toAmino(message.checkpoint) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryCheckpointResponseAminoMsg): QueryCheckpointResponse {
+    return QueryCheckpointResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryCheckpointResponseProtoMsg): QueryCheckpointResponse {
+    return QueryCheckpointResponse.decode(message.value);
+  },
+  toProto(message: QueryCheckpointResponse): Uint8Array {
+    return QueryCheckpointResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryCheckpointResponse): QueryCheckpointResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.service.v1.QueryCheckpointResponse",
+      value: QueryCheckpointResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryCheckpointsByServiceTypeRequest(): QueryCheckpointsByServiceTypeRequest {
+  return {
+    serviceType: "",
+    pagination: undefined
+  };
+}
+/**
+ * QueryCheckpointsByServiceTypeRequest pages a service type's checkpoints.
+ * @name QueryCheckpointsByServiceTypeRequest
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.QueryCheckpointsByServiceTypeRequest
+ */
+export const QueryCheckpointsByServiceTypeRequest = {
+  typeUrl: "/sparkdream.service.v1.QueryCheckpointsByServiceTypeRequest",
+  encode(message: QueryCheckpointsByServiceTypeRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.serviceType !== "") {
+      writer.uint32(10).string(message.serviceType);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryCheckpointsByServiceTypeRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryCheckpointsByServiceTypeRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.serviceType = reader.string();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryCheckpointsByServiceTypeRequest>): QueryCheckpointsByServiceTypeRequest {
+    const message = createBaseQueryCheckpointsByServiceTypeRequest();
+    message.serviceType = object.serviceType ?? "";
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryCheckpointsByServiceTypeRequestAmino): QueryCheckpointsByServiceTypeRequest {
+    const message = createBaseQueryCheckpointsByServiceTypeRequest();
+    if (object.service_type !== undefined && object.service_type !== null) {
+      message.serviceType = object.service_type;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryCheckpointsByServiceTypeRequest): QueryCheckpointsByServiceTypeRequestAmino {
+    const obj: any = {};
+    obj.service_type = message.serviceType === "" ? undefined : message.serviceType;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryCheckpointsByServiceTypeRequestAminoMsg): QueryCheckpointsByServiceTypeRequest {
+    return QueryCheckpointsByServiceTypeRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryCheckpointsByServiceTypeRequestProtoMsg): QueryCheckpointsByServiceTypeRequest {
+    return QueryCheckpointsByServiceTypeRequest.decode(message.value);
+  },
+  toProto(message: QueryCheckpointsByServiceTypeRequest): Uint8Array {
+    return QueryCheckpointsByServiceTypeRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryCheckpointsByServiceTypeRequest): QueryCheckpointsByServiceTypeRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.service.v1.QueryCheckpointsByServiceTypeRequest",
+      value: QueryCheckpointsByServiceTypeRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryCheckpointsByServiceTypeResponse(): QueryCheckpointsByServiceTypeResponse {
+  return {
+    checkpoints: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryCheckpointsByServiceTypeResponse lists checkpoints in operator
+ * address byte order.
+ * @name QueryCheckpointsByServiceTypeResponse
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.QueryCheckpointsByServiceTypeResponse
+ */
+export const QueryCheckpointsByServiceTypeResponse = {
+  typeUrl: "/sparkdream.service.v1.QueryCheckpointsByServiceTypeResponse",
+  encode(message: QueryCheckpointsByServiceTypeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.checkpoints) {
+      Checkpoint.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryCheckpointsByServiceTypeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryCheckpointsByServiceTypeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.checkpoints.push(Checkpoint.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryCheckpointsByServiceTypeResponse>): QueryCheckpointsByServiceTypeResponse {
+    const message = createBaseQueryCheckpointsByServiceTypeResponse();
+    message.checkpoints = object.checkpoints?.map(e => Checkpoint.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryCheckpointsByServiceTypeResponseAmino): QueryCheckpointsByServiceTypeResponse {
+    const message = createBaseQueryCheckpointsByServiceTypeResponse();
+    message.checkpoints = object.checkpoints?.map(e => Checkpoint.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryCheckpointsByServiceTypeResponse): QueryCheckpointsByServiceTypeResponseAmino {
+    const obj: any = {};
+    if (message.checkpoints) {
+      obj.checkpoints = message.checkpoints.map(e => e ? Checkpoint.toAmino(e) : undefined);
+    } else {
+      obj.checkpoints = message.checkpoints;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryCheckpointsByServiceTypeResponseAminoMsg): QueryCheckpointsByServiceTypeResponse {
+    return QueryCheckpointsByServiceTypeResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryCheckpointsByServiceTypeResponseProtoMsg): QueryCheckpointsByServiceTypeResponse {
+    return QueryCheckpointsByServiceTypeResponse.decode(message.value);
+  },
+  toProto(message: QueryCheckpointsByServiceTypeResponse): Uint8Array {
+    return QueryCheckpointsByServiceTypeResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryCheckpointsByServiceTypeResponse): QueryCheckpointsByServiceTypeResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.service.v1.QueryCheckpointsByServiceTypeResponse",
+      value: QueryCheckpointsByServiceTypeResponse.encode(message).finish()
     };
   }
 };

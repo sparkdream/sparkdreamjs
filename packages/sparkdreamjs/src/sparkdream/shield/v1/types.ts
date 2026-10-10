@@ -78,6 +78,46 @@ export function nullifierScopeTypeToJSON(object: NullifierScopeType): string {
       return "UNRECOGNIZED";
   }
 }
+/** NullifierMode controls what an operation's nullifier proves. */
+export enum NullifierMode {
+  /** NULLIFIER_MODE_CONSUME - The nullifier is consumed: each (member, scope) acts once. */
+  NULLIFIER_MODE_CONSUME = 0,
+  /**
+   * NULLIFIER_MODE_OWNERSHIP - The nullifier proves ownership of anonymously created content and is
+   * reused: the target module's ShieldOwnershipResolver supplies the owner's
+   * domain, scope and tag (the creation nullifier), the proof must reproduce
+   * the tag, and the owner's sequence (bound into the message hash) stops
+   * replays. Immediate mode only.
+   */
+  NULLIFIER_MODE_OWNERSHIP = 1,
+  UNRECOGNIZED = -1,
+}
+export const NullifierModeAmino = NullifierMode;
+export function nullifierModeFromJSON(object: any): NullifierMode {
+  switch (object) {
+    case 0:
+    case "NULLIFIER_MODE_CONSUME":
+      return NullifierMode.NULLIFIER_MODE_CONSUME;
+    case 1:
+    case "NULLIFIER_MODE_OWNERSHIP":
+      return NullifierMode.NULLIFIER_MODE_OWNERSHIP;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return NullifierMode.UNRECOGNIZED;
+  }
+}
+export function nullifierModeToJSON(object: NullifierMode): string {
+  switch (object) {
+    case NullifierMode.NULLIFIER_MODE_CONSUME:
+      return "NULLIFIER_MODE_CONSUME";
+    case NullifierMode.NULLIFIER_MODE_OWNERSHIP:
+      return "NULLIFIER_MODE_OWNERSHIP";
+    case NullifierMode.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
 /** ShieldBatchMode controls which execution modes an operation supports. */
 export enum ShieldBatchMode {
   /** SHIELD_BATCH_MODE_IMMEDIATE_ONLY - Only immediate execution allowed */
@@ -240,6 +280,19 @@ export interface ShieldedOpRegistration {
    * Must refer to a uint64 field in the inner message
    */
   scopeFieldPath: string;
+  /**
+   * What the nullifier proves: a consumed one-time action (default) or
+   * ownership of anonymously created content. OWNERSHIP ignores
+   * nullifier_scope_type and scope_field_path (the target module supplies the
+   * owner's scope) and requires batch_mode IMMEDIATE_ONLY.
+   */
+  nullifierMode: NullifierMode;
+  /**
+   * For NULLIFIER_SCOPE_EPOCH: the scope is current_epoch / epoch_window, so
+   * each member gets one action per window of this many shield epochs instead
+   * of one per epoch. 0 or 1 = every epoch. Must be 0 for other scope types.
+   */
+  epochWindow: bigint;
 }
 export interface ShieldedOpRegistrationProtoMsg {
   typeUrl: "/sparkdream.shield.v1.ShieldedOpRegistration";
@@ -286,6 +339,19 @@ export interface ShieldedOpRegistrationAmino {
    * Must refer to a uint64 field in the inner message
    */
   scope_field_path?: string;
+  /**
+   * What the nullifier proves: a consumed one-time action (default) or
+   * ownership of anonymously created content. OWNERSHIP ignores
+   * nullifier_scope_type and scope_field_path (the target module supplies the
+   * owner's scope) and requires batch_mode IMMEDIATE_ONLY.
+   */
+  nullifier_mode?: NullifierMode;
+  /**
+   * For NULLIFIER_SCOPE_EPOCH: the scope is current_epoch / epoch_window, so
+   * each member gets one action per window of this many shield epochs instead
+   * of one per epoch. 0 or 1 = every epoch. Must be 0 for other scope types.
+   */
+  epoch_window?: string;
 }
 export interface ShieldedOpRegistrationAminoMsg {
   type: "/sparkdream.shield.v1.ShieldedOpRegistration";
@@ -1119,7 +1185,7 @@ export interface VerificationKey {
    */
   circuitId: string;
   /**
-   * serialized Groth16/PLONK verification key
+   * serialized Groth16 verification key
    */
   vkBytes: Uint8Array;
   description: string;
@@ -1140,7 +1206,7 @@ export interface VerificationKeyAmino {
    */
   circuit_id?: string;
   /**
-   * serialized Groth16/PLONK verification key
+   * serialized Groth16 verification key
    */
   vk_bytes?: string;
   description?: string;
@@ -1216,7 +1282,9 @@ function createBaseShieldedOpRegistration(): ShieldedOpRegistration {
     nullifierScopeType: 0,
     active: false,
     batchMode: 0,
-    scopeFieldPath: ""
+    scopeFieldPath: "",
+    nullifierMode: 0,
+    epochWindow: BigInt(0)
   };
 }
 /**
@@ -1252,6 +1320,12 @@ export const ShieldedOpRegistration = {
     if (message.scopeFieldPath !== "") {
       writer.uint32(66).string(message.scopeFieldPath);
     }
+    if (message.nullifierMode !== 0) {
+      writer.uint32(72).int32(message.nullifierMode);
+    }
+    if (message.epochWindow !== BigInt(0)) {
+      writer.uint32(80).uint64(message.epochWindow);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): ShieldedOpRegistration {
@@ -1285,6 +1359,12 @@ export const ShieldedOpRegistration = {
         case 8:
           message.scopeFieldPath = reader.string();
           break;
+        case 9:
+          message.nullifierMode = reader.int32() as any;
+          break;
+        case 10:
+          message.epochWindow = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1302,6 +1382,8 @@ export const ShieldedOpRegistration = {
     message.active = object.active ?? false;
     message.batchMode = object.batchMode ?? 0;
     message.scopeFieldPath = object.scopeFieldPath ?? "";
+    message.nullifierMode = object.nullifierMode ?? 0;
+    message.epochWindow = object.epochWindow !== undefined && object.epochWindow !== null ? BigInt(object.epochWindow.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ShieldedOpRegistrationAmino): ShieldedOpRegistration {
@@ -1330,6 +1412,12 @@ export const ShieldedOpRegistration = {
     if (object.scope_field_path !== undefined && object.scope_field_path !== null) {
       message.scopeFieldPath = object.scope_field_path;
     }
+    if (object.nullifier_mode !== undefined && object.nullifier_mode !== null) {
+      message.nullifierMode = object.nullifier_mode;
+    }
+    if (object.epoch_window !== undefined && object.epoch_window !== null) {
+      message.epochWindow = BigInt(object.epoch_window);
+    }
     return message;
   },
   toAmino(message: ShieldedOpRegistration): ShieldedOpRegistrationAmino {
@@ -1342,6 +1430,8 @@ export const ShieldedOpRegistration = {
     obj.active = message.active === false ? undefined : message.active;
     obj.batch_mode = message.batchMode === 0 ? undefined : message.batchMode;
     obj.scope_field_path = message.scopeFieldPath === "" ? undefined : message.scopeFieldPath;
+    obj.nullifier_mode = message.nullifierMode === 0 ? undefined : message.nullifierMode;
+    obj.epoch_window = message.epochWindow !== BigInt(0) ? message.epochWindow?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ShieldedOpRegistrationAminoMsg): ShieldedOpRegistration {

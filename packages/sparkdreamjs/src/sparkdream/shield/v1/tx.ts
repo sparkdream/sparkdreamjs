@@ -70,7 +70,7 @@ export interface MsgShieldedExec {
    */
   innerMessage?: Any;
   /**
-   * ZK proof bytes (PLONK over BN254).
+   * ZK proof bytes (Groth16 over BN254).
    * REQUIRED for IMMEDIATE mode, EMPTY for ENCRYPTED_BATCH mode.
    */
   proof: Uint8Array;
@@ -130,7 +130,7 @@ export interface MsgShieldedExecAmino {
    */
   inner_message?: AnyAmino;
   /**
-   * ZK proof bytes (PLONK over BN254).
+   * ZK proof bytes (Groth16 over BN254).
    * REQUIRED for IMMEDIATE mode, EMPTY for ENCRYPTED_BATCH mode.
    */
   proof?: string;

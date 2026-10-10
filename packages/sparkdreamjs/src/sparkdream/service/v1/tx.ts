@@ -742,6 +742,62 @@ export interface MsgFinalizeControllerTransferResponseAminoMsg {
   type: "/sparkdream.service.v1.MsgFinalizeControllerTransferResponse";
   value: MsgFinalizeControllerTransferResponseAmino;
 }
+/**
+ * MsgSubmitCheckpoint is signed by the operator itself. The operator must be
+ * ACTIVE or UNDERFUNDED under service_type; height must exceed its previous
+ * checkpoint and must not exceed the current block height; root is 32 bytes.
+ * @name MsgSubmitCheckpoint
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.MsgSubmitCheckpoint
+ */
+export interface MsgSubmitCheckpoint {
+  operator: string;
+  serviceType: string;
+  height: bigint;
+  root: Uint8Array;
+}
+export interface MsgSubmitCheckpointProtoMsg {
+  typeUrl: "/sparkdream.service.v1.MsgSubmitCheckpoint";
+  value: Uint8Array;
+}
+/**
+ * MsgSubmitCheckpoint is signed by the operator itself. The operator must be
+ * ACTIVE or UNDERFUNDED under service_type; height must exceed its previous
+ * checkpoint and must not exceed the current block height; root is 32 bytes.
+ * @name MsgSubmitCheckpointAmino
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.MsgSubmitCheckpoint
+ */
+export interface MsgSubmitCheckpointAmino {
+  operator?: string;
+  service_type?: string;
+  height?: string;
+  root?: string;
+}
+export interface MsgSubmitCheckpointAminoMsg {
+  type: "sparkdream/x/service/MsgSubmitCheckpoint";
+  value: MsgSubmitCheckpointAmino;
+}
+/**
+ * @name MsgSubmitCheckpointResponse
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.MsgSubmitCheckpointResponse
+ */
+export interface MsgSubmitCheckpointResponse {}
+export interface MsgSubmitCheckpointResponseProtoMsg {
+  typeUrl: "/sparkdream.service.v1.MsgSubmitCheckpointResponse";
+  value: Uint8Array;
+}
+/**
+ * @name MsgSubmitCheckpointResponseAmino
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.MsgSubmitCheckpointResponse
+ */
+export interface MsgSubmitCheckpointResponseAmino {}
+export interface MsgSubmitCheckpointResponseAminoMsg {
+  type: "/sparkdream.service.v1.MsgSubmitCheckpointResponse";
+  value: MsgSubmitCheckpointResponseAmino;
+}
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
     authority: "",
@@ -2858,6 +2914,175 @@ export const MsgFinalizeControllerTransferResponse = {
     return {
       typeUrl: "/sparkdream.service.v1.MsgFinalizeControllerTransferResponse",
       value: MsgFinalizeControllerTransferResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSubmitCheckpoint(): MsgSubmitCheckpoint {
+  return {
+    operator: "",
+    serviceType: "",
+    height: BigInt(0),
+    root: new Uint8Array()
+  };
+}
+/**
+ * MsgSubmitCheckpoint is signed by the operator itself. The operator must be
+ * ACTIVE or UNDERFUNDED under service_type; height must exceed its previous
+ * checkpoint and must not exceed the current block height; root is 32 bytes.
+ * @name MsgSubmitCheckpoint
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.MsgSubmitCheckpoint
+ */
+export const MsgSubmitCheckpoint = {
+  typeUrl: "/sparkdream.service.v1.MsgSubmitCheckpoint",
+  aminoType: "sparkdream/x/service/MsgSubmitCheckpoint",
+  encode(message: MsgSubmitCheckpoint, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.operator !== "") {
+      writer.uint32(10).string(message.operator);
+    }
+    if (message.serviceType !== "") {
+      writer.uint32(18).string(message.serviceType);
+    }
+    if (message.height !== BigInt(0)) {
+      writer.uint32(24).int64(message.height);
+    }
+    if (message.root.length !== 0) {
+      writer.uint32(34).bytes(message.root);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSubmitCheckpoint {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSubmitCheckpoint();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.operator = reader.string();
+          break;
+        case 2:
+          message.serviceType = reader.string();
+          break;
+        case 3:
+          message.height = reader.int64();
+          break;
+        case 4:
+          message.root = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgSubmitCheckpoint>): MsgSubmitCheckpoint {
+    const message = createBaseMsgSubmitCheckpoint();
+    message.operator = object.operator ?? "";
+    message.serviceType = object.serviceType ?? "";
+    message.height = object.height !== undefined && object.height !== null ? BigInt(object.height.toString()) : BigInt(0);
+    message.root = object.root ?? new Uint8Array();
+    return message;
+  },
+  fromAmino(object: MsgSubmitCheckpointAmino): MsgSubmitCheckpoint {
+    const message = createBaseMsgSubmitCheckpoint();
+    if (object.operator !== undefined && object.operator !== null) {
+      message.operator = object.operator;
+    }
+    if (object.service_type !== undefined && object.service_type !== null) {
+      message.serviceType = object.service_type;
+    }
+    if (object.height !== undefined && object.height !== null) {
+      message.height = BigInt(object.height);
+    }
+    if (object.root !== undefined && object.root !== null) {
+      message.root = bytesFromBase64(object.root);
+    }
+    return message;
+  },
+  toAmino(message: MsgSubmitCheckpoint): MsgSubmitCheckpointAmino {
+    const obj: any = {};
+    obj.operator = message.operator === "" ? undefined : message.operator;
+    obj.service_type = message.serviceType === "" ? undefined : message.serviceType;
+    obj.height = message.height !== BigInt(0) ? message.height?.toString() : undefined;
+    obj.root = message.root ? base64FromBytes(message.root) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgSubmitCheckpointAminoMsg): MsgSubmitCheckpoint {
+    return MsgSubmitCheckpoint.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSubmitCheckpoint): MsgSubmitCheckpointAminoMsg {
+    return {
+      type: "sparkdream/x/service/MsgSubmitCheckpoint",
+      value: MsgSubmitCheckpoint.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgSubmitCheckpointProtoMsg): MsgSubmitCheckpoint {
+    return MsgSubmitCheckpoint.decode(message.value);
+  },
+  toProto(message: MsgSubmitCheckpoint): Uint8Array {
+    return MsgSubmitCheckpoint.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSubmitCheckpoint): MsgSubmitCheckpointProtoMsg {
+    return {
+      typeUrl: "/sparkdream.service.v1.MsgSubmitCheckpoint",
+      value: MsgSubmitCheckpoint.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSubmitCheckpointResponse(): MsgSubmitCheckpointResponse {
+  return {};
+}
+/**
+ * @name MsgSubmitCheckpointResponse
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.MsgSubmitCheckpointResponse
+ */
+export const MsgSubmitCheckpointResponse = {
+  typeUrl: "/sparkdream.service.v1.MsgSubmitCheckpointResponse",
+  encode(_: MsgSubmitCheckpointResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSubmitCheckpointResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSubmitCheckpointResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgSubmitCheckpointResponse>): MsgSubmitCheckpointResponse {
+    const message = createBaseMsgSubmitCheckpointResponse();
+    return message;
+  },
+  fromAmino(_: MsgSubmitCheckpointResponseAmino): MsgSubmitCheckpointResponse {
+    const message = createBaseMsgSubmitCheckpointResponse();
+    return message;
+  },
+  toAmino(_: MsgSubmitCheckpointResponse): MsgSubmitCheckpointResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgSubmitCheckpointResponseAminoMsg): MsgSubmitCheckpointResponse {
+    return MsgSubmitCheckpointResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgSubmitCheckpointResponseProtoMsg): MsgSubmitCheckpointResponse {
+    return MsgSubmitCheckpointResponse.decode(message.value);
+  },
+  toProto(message: MsgSubmitCheckpointResponse): Uint8Array {
+    return MsgSubmitCheckpointResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSubmitCheckpointResponse): MsgSubmitCheckpointResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.service.v1.MsgSubmitCheckpointResponse",
+      value: MsgSubmitCheckpointResponse.encode(message).finish()
     };
   }
 };

@@ -23,8 +23,9 @@ import { JuryParticipation, JuryParticipationAmino } from "./jury_participation"
 import { RoleActivity, RoleActivityAmino } from "./role_activity";
 import { InitiativeReview, InitiativeReviewAmino } from "./initiative_review";
 import { ReviewBounty, ReviewBountyAmino } from "./review_bounty";
+import { InitiativeBounty, InitiativeBountyAmino } from "./initiative_bounty";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 import { Decimal } from "@interchainjs/math";
 /**
  * QueryParamsRequest is request type for the Query/Params RPC method.
@@ -2705,11 +2706,6 @@ export interface QueryDreamSupplyStatsRequestAminoMsg {
  */
 export interface QueryDreamSupplyStatsResponse {
   /**
-   * Season-scoped flow figures, the same pair QueryMintBurnRatio returns. They
-   * were named total_minted/total_burned while reading the per-season
-   * counters, which reads as an all-time supply figure and is not: those
-   * counters reset every season in InitSeasonalPool.
-   * 
    * There are no all-time counters to point them at instead, and adding some
    * would be redundant — circulating (every member's balance, staked included)
    * plus treasury_balance below is already the complete live supply, which is
@@ -2733,11 +2729,6 @@ export interface QueryDreamSupplyStatsResponseProtoMsg {
  */
 export interface QueryDreamSupplyStatsResponseAmino {
   /**
-   * Season-scoped flow figures, the same pair QueryMintBurnRatio returns. They
-   * were named total_minted/total_burned while reading the per-season
-   * counters, which reads as an all-time supply figure and is not: those
-   * counters reset every season in InitSeasonalPool.
-   * 
    * There are no all-time counters to point them at instead, and adding some
    * would be redundant — circulating (every member's balance, staked included)
    * plus treasury_balance below is already the complete live supply, which is
@@ -5193,6 +5184,212 @@ export interface EscalatedReviewAmino {
 export interface EscalatedReviewAminoMsg {
   type: "/sparkdream.rep.v1.EscalatedReview";
   value: EscalatedReviewAmino;
+}
+/**
+ * QueryInitiativeBountyRequest asks what is escrowed against an initiative.
+ * @name QueryInitiativeBountyRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryInitiativeBountyRequest
+ */
+export interface QueryInitiativeBountyRequest {
+  initiativeId: bigint;
+}
+export interface QueryInitiativeBountyRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryInitiativeBountyRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryInitiativeBountyRequest asks what is escrowed against an initiative.
+ * @name QueryInitiativeBountyRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryInitiativeBountyRequest
+ */
+export interface QueryInitiativeBountyRequestAmino {
+  initiative_id?: string;
+}
+export interface QueryInitiativeBountyRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryInitiativeBountyRequest";
+  value: QueryInitiativeBountyRequestAmino;
+}
+/**
+ * QueryInitiativeBountyResponse returns the escrow and its reclaim state.
+ * @name QueryInitiativeBountyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryInitiativeBountyResponse
+ */
+export interface QueryInitiativeBountyResponse {
+  bounty: InitiativeBounty;
+  reclaimStatus: InitiativeBountyReclaimStatus[];
+}
+export interface QueryInitiativeBountyResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryInitiativeBountyResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryInitiativeBountyResponse returns the escrow and its reclaim state.
+ * @name QueryInitiativeBountyResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryInitiativeBountyResponse
+ */
+export interface QueryInitiativeBountyResponseAmino {
+  bounty?: InitiativeBountyAmino;
+  reclaim_status?: InitiativeBountyReclaimStatusAmino[];
+}
+export interface QueryInitiativeBountyResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryInitiativeBountyResponse";
+  value: QueryInitiativeBountyResponseAmino;
+}
+/**
+ * InitiativeBountyReclaimStatus is one contribution's reclaim eligibility.
+ * @name InitiativeBountyReclaimStatus
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.InitiativeBountyReclaimStatus
+ */
+export interface InitiativeBountyReclaimStatus {
+  funder: string;
+  amount: string;
+  /**
+   * Height at which the reclaim delay elapses for this contribution.
+   */
+  reclaimableAtHeight: bigint;
+  /**
+   * False whenever the initiative is not OPEN, regardless of height: an
+   * assignee is working on the strength of the bounty.
+   */
+  reclaimable: boolean;
+}
+export interface InitiativeBountyReclaimStatusProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.InitiativeBountyReclaimStatus";
+  value: Uint8Array;
+}
+/**
+ * InitiativeBountyReclaimStatus is one contribution's reclaim eligibility.
+ * @name InitiativeBountyReclaimStatusAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.InitiativeBountyReclaimStatus
+ */
+export interface InitiativeBountyReclaimStatusAmino {
+  funder?: string;
+  amount?: string;
+  /**
+   * Height at which the reclaim delay elapses for this contribution.
+   */
+  reclaimable_at_height?: string;
+  /**
+   * False whenever the initiative is not OPEN, regardless of height: an
+   * assignee is working on the strength of the bounty.
+   */
+  reclaimable?: boolean;
+}
+export interface InitiativeBountyReclaimStatusAminoMsg {
+  type: "/sparkdream.rep.v1.InitiativeBountyReclaimStatus";
+  value: InitiativeBountyReclaimStatusAmino;
+}
+/**
+ * QueryTrustTreeRequest pages through the trust tree's non-empty leaves.
+ * @name QueryTrustTreeRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTrustTreeRequest
+ */
+export interface QueryTrustTreeRequest {
+  pagination?: PageRequest;
+}
+export interface QueryTrustTreeRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryTrustTreeRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryTrustTreeRequest pages through the trust tree's non-empty leaves.
+ * @name QueryTrustTreeRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTrustTreeRequest
+ */
+export interface QueryTrustTreeRequestAmino {
+  pagination?: PageRequestAmino;
+}
+export interface QueryTrustTreeRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryTrustTreeRequest";
+  value: QueryTrustTreeRequestAmino;
+}
+/**
+ * TrustTreeLeaf is one non-empty leaf of the member trust tree.
+ * @name TrustTreeLeaf
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.TrustTreeLeaf
+ */
+export interface TrustTreeLeaf {
+  index: bigint;
+  hash: Uint8Array;
+}
+export interface TrustTreeLeafProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.TrustTreeLeaf";
+  value: Uint8Array;
+}
+/**
+ * TrustTreeLeaf is one non-empty leaf of the member trust tree.
+ * @name TrustTreeLeafAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.TrustTreeLeaf
+ */
+export interface TrustTreeLeafAmino {
+  index?: string;
+  hash?: string;
+}
+export interface TrustTreeLeafAminoMsg {
+  type: "/sparkdream.rep.v1.TrustTreeLeaf";
+  value: TrustTreeLeafAmino;
+}
+/**
+ * QueryTrustTreeResponse returns the trust tree root and a page of leaves.
+ * @name QueryTrustTreeResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTrustTreeResponse
+ */
+export interface QueryTrustTreeResponse {
+  /**
+   * root is the current Merkle root; empty before the tree is first built.
+   */
+  root: Uint8Array;
+  /**
+   * depth is the tree depth (number of levels above the leaves).
+   */
+  depth: number;
+  /**
+   * leaf_count is the number of leaf slots allocated so far.
+   */
+  leafCount: bigint;
+  leaves: TrustTreeLeaf[];
+  pagination?: PageResponse;
+}
+export interface QueryTrustTreeResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryTrustTreeResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryTrustTreeResponse returns the trust tree root and a page of leaves.
+ * @name QueryTrustTreeResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTrustTreeResponse
+ */
+export interface QueryTrustTreeResponseAmino {
+  /**
+   * root is the current Merkle root; empty before the tree is first built.
+   */
+  root?: string;
+  /**
+   * depth is the tree depth (number of levels above the leaves).
+   */
+  depth?: number;
+  /**
+   * leaf_count is the number of leaf slots allocated so far.
+   */
+  leaf_count?: string;
+  leaves?: TrustTreeLeafAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryTrustTreeResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryTrustTreeResponse";
+  value: QueryTrustTreeResponseAmino;
 }
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
@@ -19072,6 +19269,532 @@ export const EscalatedReview = {
     return {
       typeUrl: "/sparkdream.rep.v1.EscalatedReview",
       value: EscalatedReview.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryInitiativeBountyRequest(): QueryInitiativeBountyRequest {
+  return {
+    initiativeId: BigInt(0)
+  };
+}
+/**
+ * QueryInitiativeBountyRequest asks what is escrowed against an initiative.
+ * @name QueryInitiativeBountyRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryInitiativeBountyRequest
+ */
+export const QueryInitiativeBountyRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryInitiativeBountyRequest",
+  encode(message: QueryInitiativeBountyRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.initiativeId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.initiativeId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryInitiativeBountyRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryInitiativeBountyRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.initiativeId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryInitiativeBountyRequest>): QueryInitiativeBountyRequest {
+    const message = createBaseQueryInitiativeBountyRequest();
+    message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryInitiativeBountyRequestAmino): QueryInitiativeBountyRequest {
+    const message = createBaseQueryInitiativeBountyRequest();
+    if (object.initiative_id !== undefined && object.initiative_id !== null) {
+      message.initiativeId = BigInt(object.initiative_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryInitiativeBountyRequest): QueryInitiativeBountyRequestAmino {
+    const obj: any = {};
+    obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryInitiativeBountyRequestAminoMsg): QueryInitiativeBountyRequest {
+    return QueryInitiativeBountyRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryInitiativeBountyRequestProtoMsg): QueryInitiativeBountyRequest {
+    return QueryInitiativeBountyRequest.decode(message.value);
+  },
+  toProto(message: QueryInitiativeBountyRequest): Uint8Array {
+    return QueryInitiativeBountyRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryInitiativeBountyRequest): QueryInitiativeBountyRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryInitiativeBountyRequest",
+      value: QueryInitiativeBountyRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryInitiativeBountyResponse(): QueryInitiativeBountyResponse {
+  return {
+    bounty: InitiativeBounty.fromPartial({}),
+    reclaimStatus: []
+  };
+}
+/**
+ * QueryInitiativeBountyResponse returns the escrow and its reclaim state.
+ * @name QueryInitiativeBountyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryInitiativeBountyResponse
+ */
+export const QueryInitiativeBountyResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryInitiativeBountyResponse",
+  encode(message: QueryInitiativeBountyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.bounty !== undefined) {
+      InitiativeBounty.encode(message.bounty, writer.uint32(10).fork()).ldelim();
+    }
+    for (const v of message.reclaimStatus) {
+      InitiativeBountyReclaimStatus.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryInitiativeBountyResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryInitiativeBountyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.bounty = InitiativeBounty.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.reclaimStatus.push(InitiativeBountyReclaimStatus.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryInitiativeBountyResponse>): QueryInitiativeBountyResponse {
+    const message = createBaseQueryInitiativeBountyResponse();
+    message.bounty = object.bounty !== undefined && object.bounty !== null ? InitiativeBounty.fromPartial(object.bounty) : undefined;
+    message.reclaimStatus = object.reclaimStatus?.map(e => InitiativeBountyReclaimStatus.fromPartial(e)) || [];
+    return message;
+  },
+  fromAmino(object: QueryInitiativeBountyResponseAmino): QueryInitiativeBountyResponse {
+    const message = createBaseQueryInitiativeBountyResponse();
+    if (object.bounty !== undefined && object.bounty !== null) {
+      message.bounty = InitiativeBounty.fromAmino(object.bounty);
+    }
+    message.reclaimStatus = object.reclaim_status?.map(e => InitiativeBountyReclaimStatus.fromAmino(e)) || [];
+    return message;
+  },
+  toAmino(message: QueryInitiativeBountyResponse): QueryInitiativeBountyResponseAmino {
+    const obj: any = {};
+    obj.bounty = message.bounty ? InitiativeBounty.toAmino(message.bounty) : undefined;
+    if (message.reclaimStatus) {
+      obj.reclaim_status = message.reclaimStatus.map(e => e ? InitiativeBountyReclaimStatus.toAmino(e) : undefined);
+    } else {
+      obj.reclaim_status = message.reclaimStatus;
+    }
+    return obj;
+  },
+  fromAminoMsg(object: QueryInitiativeBountyResponseAminoMsg): QueryInitiativeBountyResponse {
+    return QueryInitiativeBountyResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryInitiativeBountyResponseProtoMsg): QueryInitiativeBountyResponse {
+    return QueryInitiativeBountyResponse.decode(message.value);
+  },
+  toProto(message: QueryInitiativeBountyResponse): Uint8Array {
+    return QueryInitiativeBountyResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryInitiativeBountyResponse): QueryInitiativeBountyResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryInitiativeBountyResponse",
+      value: QueryInitiativeBountyResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseInitiativeBountyReclaimStatus(): InitiativeBountyReclaimStatus {
+  return {
+    funder: "",
+    amount: "",
+    reclaimableAtHeight: BigInt(0),
+    reclaimable: false
+  };
+}
+/**
+ * InitiativeBountyReclaimStatus is one contribution's reclaim eligibility.
+ * @name InitiativeBountyReclaimStatus
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.InitiativeBountyReclaimStatus
+ */
+export const InitiativeBountyReclaimStatus = {
+  typeUrl: "/sparkdream.rep.v1.InitiativeBountyReclaimStatus",
+  encode(message: InitiativeBountyReclaimStatus, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.funder !== "") {
+      writer.uint32(10).string(message.funder);
+    }
+    if (message.amount !== "") {
+      writer.uint32(18).string(message.amount);
+    }
+    if (message.reclaimableAtHeight !== BigInt(0)) {
+      writer.uint32(24).int64(message.reclaimableAtHeight);
+    }
+    if (message.reclaimable === true) {
+      writer.uint32(32).bool(message.reclaimable);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): InitiativeBountyReclaimStatus {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseInitiativeBountyReclaimStatus();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.funder = reader.string();
+          break;
+        case 2:
+          message.amount = reader.string();
+          break;
+        case 3:
+          message.reclaimableAtHeight = reader.int64();
+          break;
+        case 4:
+          message.reclaimable = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<InitiativeBountyReclaimStatus>): InitiativeBountyReclaimStatus {
+    const message = createBaseInitiativeBountyReclaimStatus();
+    message.funder = object.funder ?? "";
+    message.amount = object.amount ?? "";
+    message.reclaimableAtHeight = object.reclaimableAtHeight !== undefined && object.reclaimableAtHeight !== null ? BigInt(object.reclaimableAtHeight.toString()) : BigInt(0);
+    message.reclaimable = object.reclaimable ?? false;
+    return message;
+  },
+  fromAmino(object: InitiativeBountyReclaimStatusAmino): InitiativeBountyReclaimStatus {
+    const message = createBaseInitiativeBountyReclaimStatus();
+    if (object.funder !== undefined && object.funder !== null) {
+      message.funder = object.funder;
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = object.amount;
+    }
+    if (object.reclaimable_at_height !== undefined && object.reclaimable_at_height !== null) {
+      message.reclaimableAtHeight = BigInt(object.reclaimable_at_height);
+    }
+    if (object.reclaimable !== undefined && object.reclaimable !== null) {
+      message.reclaimable = object.reclaimable;
+    }
+    return message;
+  },
+  toAmino(message: InitiativeBountyReclaimStatus): InitiativeBountyReclaimStatusAmino {
+    const obj: any = {};
+    obj.funder = message.funder === "" ? undefined : message.funder;
+    obj.amount = message.amount === "" ? undefined : message.amount;
+    obj.reclaimable_at_height = message.reclaimableAtHeight !== BigInt(0) ? message.reclaimableAtHeight?.toString() : undefined;
+    obj.reclaimable = message.reclaimable === false ? undefined : message.reclaimable;
+    return obj;
+  },
+  fromAminoMsg(object: InitiativeBountyReclaimStatusAminoMsg): InitiativeBountyReclaimStatus {
+    return InitiativeBountyReclaimStatus.fromAmino(object.value);
+  },
+  fromProtoMsg(message: InitiativeBountyReclaimStatusProtoMsg): InitiativeBountyReclaimStatus {
+    return InitiativeBountyReclaimStatus.decode(message.value);
+  },
+  toProto(message: InitiativeBountyReclaimStatus): Uint8Array {
+    return InitiativeBountyReclaimStatus.encode(message).finish();
+  },
+  toProtoMsg(message: InitiativeBountyReclaimStatus): InitiativeBountyReclaimStatusProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.InitiativeBountyReclaimStatus",
+      value: InitiativeBountyReclaimStatus.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryTrustTreeRequest(): QueryTrustTreeRequest {
+  return {
+    pagination: undefined
+  };
+}
+/**
+ * QueryTrustTreeRequest pages through the trust tree's non-empty leaves.
+ * @name QueryTrustTreeRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTrustTreeRequest
+ */
+export const QueryTrustTreeRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryTrustTreeRequest",
+  encode(message: QueryTrustTreeRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryTrustTreeRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryTrustTreeRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryTrustTreeRequest>): QueryTrustTreeRequest {
+    const message = createBaseQueryTrustTreeRequest();
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryTrustTreeRequestAmino): QueryTrustTreeRequest {
+    const message = createBaseQueryTrustTreeRequest();
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryTrustTreeRequest): QueryTrustTreeRequestAmino {
+    const obj: any = {};
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryTrustTreeRequestAminoMsg): QueryTrustTreeRequest {
+    return QueryTrustTreeRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryTrustTreeRequestProtoMsg): QueryTrustTreeRequest {
+    return QueryTrustTreeRequest.decode(message.value);
+  },
+  toProto(message: QueryTrustTreeRequest): Uint8Array {
+    return QueryTrustTreeRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryTrustTreeRequest): QueryTrustTreeRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryTrustTreeRequest",
+      value: QueryTrustTreeRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseTrustTreeLeaf(): TrustTreeLeaf {
+  return {
+    index: BigInt(0),
+    hash: new Uint8Array()
+  };
+}
+/**
+ * TrustTreeLeaf is one non-empty leaf of the member trust tree.
+ * @name TrustTreeLeaf
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.TrustTreeLeaf
+ */
+export const TrustTreeLeaf = {
+  typeUrl: "/sparkdream.rep.v1.TrustTreeLeaf",
+  encode(message: TrustTreeLeaf, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.index !== BigInt(0)) {
+      writer.uint32(8).uint64(message.index);
+    }
+    if (message.hash.length !== 0) {
+      writer.uint32(18).bytes(message.hash);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): TrustTreeLeaf {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTrustTreeLeaf();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.index = reader.uint64();
+          break;
+        case 2:
+          message.hash = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<TrustTreeLeaf>): TrustTreeLeaf {
+    const message = createBaseTrustTreeLeaf();
+    message.index = object.index !== undefined && object.index !== null ? BigInt(object.index.toString()) : BigInt(0);
+    message.hash = object.hash ?? new Uint8Array();
+    return message;
+  },
+  fromAmino(object: TrustTreeLeafAmino): TrustTreeLeaf {
+    const message = createBaseTrustTreeLeaf();
+    if (object.index !== undefined && object.index !== null) {
+      message.index = BigInt(object.index);
+    }
+    if (object.hash !== undefined && object.hash !== null) {
+      message.hash = bytesFromBase64(object.hash);
+    }
+    return message;
+  },
+  toAmino(message: TrustTreeLeaf): TrustTreeLeafAmino {
+    const obj: any = {};
+    obj.index = message.index !== BigInt(0) ? message.index?.toString() : undefined;
+    obj.hash = message.hash ? base64FromBytes(message.hash) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: TrustTreeLeafAminoMsg): TrustTreeLeaf {
+    return TrustTreeLeaf.fromAmino(object.value);
+  },
+  fromProtoMsg(message: TrustTreeLeafProtoMsg): TrustTreeLeaf {
+    return TrustTreeLeaf.decode(message.value);
+  },
+  toProto(message: TrustTreeLeaf): Uint8Array {
+    return TrustTreeLeaf.encode(message).finish();
+  },
+  toProtoMsg(message: TrustTreeLeaf): TrustTreeLeafProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.TrustTreeLeaf",
+      value: TrustTreeLeaf.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryTrustTreeResponse(): QueryTrustTreeResponse {
+  return {
+    root: new Uint8Array(),
+    depth: 0,
+    leafCount: BigInt(0),
+    leaves: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryTrustTreeResponse returns the trust tree root and a page of leaves.
+ * @name QueryTrustTreeResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryTrustTreeResponse
+ */
+export const QueryTrustTreeResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryTrustTreeResponse",
+  encode(message: QueryTrustTreeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.root.length !== 0) {
+      writer.uint32(10).bytes(message.root);
+    }
+    if (message.depth !== 0) {
+      writer.uint32(16).uint32(message.depth);
+    }
+    if (message.leafCount !== BigInt(0)) {
+      writer.uint32(24).uint64(message.leafCount);
+    }
+    for (const v of message.leaves) {
+      TrustTreeLeaf.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(42).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryTrustTreeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryTrustTreeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.root = reader.bytes();
+          break;
+        case 2:
+          message.depth = reader.uint32();
+          break;
+        case 3:
+          message.leafCount = reader.uint64();
+          break;
+        case 4:
+          message.leaves.push(TrustTreeLeaf.decode(reader, reader.uint32()));
+          break;
+        case 5:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryTrustTreeResponse>): QueryTrustTreeResponse {
+    const message = createBaseQueryTrustTreeResponse();
+    message.root = object.root ?? new Uint8Array();
+    message.depth = object.depth ?? 0;
+    message.leafCount = object.leafCount !== undefined && object.leafCount !== null ? BigInt(object.leafCount.toString()) : BigInt(0);
+    message.leaves = object.leaves?.map(e => TrustTreeLeaf.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryTrustTreeResponseAmino): QueryTrustTreeResponse {
+    const message = createBaseQueryTrustTreeResponse();
+    if (object.root !== undefined && object.root !== null) {
+      message.root = bytesFromBase64(object.root);
+    }
+    if (object.depth !== undefined && object.depth !== null) {
+      message.depth = object.depth;
+    }
+    if (object.leaf_count !== undefined && object.leaf_count !== null) {
+      message.leafCount = BigInt(object.leaf_count);
+    }
+    message.leaves = object.leaves?.map(e => TrustTreeLeaf.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryTrustTreeResponse): QueryTrustTreeResponseAmino {
+    const obj: any = {};
+    obj.root = message.root ? base64FromBytes(message.root) : undefined;
+    obj.depth = message.depth === 0 ? undefined : message.depth;
+    obj.leaf_count = message.leafCount !== BigInt(0) ? message.leafCount?.toString() : undefined;
+    if (message.leaves) {
+      obj.leaves = message.leaves.map(e => e ? TrustTreeLeaf.toAmino(e) : undefined);
+    } else {
+      obj.leaves = message.leaves;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryTrustTreeResponseAminoMsg): QueryTrustTreeResponse {
+    return QueryTrustTreeResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryTrustTreeResponseProtoMsg): QueryTrustTreeResponse {
+    return QueryTrustTreeResponse.decode(message.value);
+  },
+  toProto(message: QueryTrustTreeResponse): Uint8Array {
+    return QueryTrustTreeResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryTrustTreeResponse): QueryTrustTreeResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryTrustTreeResponse",
+      value: QueryTrustTreeResponse.encode(message).finish()
     };
   }
 };

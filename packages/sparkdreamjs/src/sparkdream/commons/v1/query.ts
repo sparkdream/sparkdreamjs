@@ -2,7 +2,7 @@
 import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "../../../cosmos/base/query/v1beta1/pagination";
 import { Params, ParamsAmino } from "./params";
 import { PolicyPermissions, PolicyPermissionsAmino } from "./policy_permissions";
-import { DecisionPolicy, DecisionPolicyAmino, Group, GroupAmino, Member, MemberAmino, Proposal, ProposalAmino, Vote, VoteAmino, TallyResult, TallyResultAmino } from "./group";
+import { DecisionPolicy, DecisionPolicyAmino, Group, GroupAmino, Member, MemberAmino, Proposal, ProposalAmino, Vote, VoteAmino, TallyResult, TallyResultAmino, AnonVoteTally, AnonVoteTallyAmino } from "./group";
 import { Category, CategoryAmino } from "./category";
 import { RecurringSpend, RecurringSpendAmino } from "./recurring_spend";
 import { BinaryReader, BinaryWriter } from "../../../binary";
@@ -507,6 +507,11 @@ export interface QueryGetProposalResponse {
   proposal: Proposal;
   votes: Vote[];
   tally: TallyResult;
+  /**
+   * anon_tally counts the anonymous votes cast through x/shield (weight 1
+   * each, tallied separately from council member votes).
+   */
+  anonTally: AnonVoteTally;
 }
 export interface QueryGetProposalResponseProtoMsg {
   typeUrl: "/sparkdream.commons.v1.QueryGetProposalResponse";
@@ -522,6 +527,11 @@ export interface QueryGetProposalResponseAmino {
   proposal?: ProposalAmino;
   votes?: VoteAmino[];
   tally?: TallyResultAmino;
+  /**
+   * anon_tally counts the anonymous votes cast through x/shield (weight 1
+   * each, tallied separately from council member votes).
+   */
+  anon_tally?: AnonVoteTallyAmino;
 }
 export interface QueryGetProposalResponseAminoMsg {
   type: "/sparkdream.commons.v1.QueryGetProposalResponse";
@@ -624,6 +634,10 @@ export interface QueryGetProposalVotesRequestAminoMsg {
 export interface QueryGetProposalVotesResponse {
   votes: Vote[];
   tally: TallyResult;
+  /**
+   * anon_tally counts the anonymous votes cast through x/shield.
+   */
+  anonTally: AnonVoteTally;
 }
 export interface QueryGetProposalVotesResponseProtoMsg {
   typeUrl: "/sparkdream.commons.v1.QueryGetProposalVotesResponse";
@@ -638,6 +652,10 @@ export interface QueryGetProposalVotesResponseProtoMsg {
 export interface QueryGetProposalVotesResponseAmino {
   votes?: VoteAmino[];
   tally?: TallyResultAmino;
+  /**
+   * anon_tally counts the anonymous votes cast through x/shield.
+   */
+  anon_tally?: AnonVoteTallyAmino;
 }
 export interface QueryGetProposalVotesResponseAminoMsg {
   type: "/sparkdream.commons.v1.QueryGetProposalVotesResponse";
@@ -2156,7 +2174,8 @@ function createBaseQueryGetProposalResponse(): QueryGetProposalResponse {
   return {
     proposal: Proposal.fromPartial({}),
     votes: [],
-    tally: TallyResult.fromPartial({})
+    tally: TallyResult.fromPartial({}),
+    anonTally: AnonVoteTally.fromPartial({})
   };
 }
 /**
@@ -2177,6 +2196,9 @@ export const QueryGetProposalResponse = {
     if (message.tally !== undefined) {
       TallyResult.encode(message.tally, writer.uint32(26).fork()).ldelim();
     }
+    if (message.anonTally !== undefined) {
+      AnonVoteTally.encode(message.anonTally, writer.uint32(34).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryGetProposalResponse {
@@ -2195,6 +2217,9 @@ export const QueryGetProposalResponse = {
         case 3:
           message.tally = TallyResult.decode(reader, reader.uint32());
           break;
+        case 4:
+          message.anonTally = AnonVoteTally.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2207,6 +2232,7 @@ export const QueryGetProposalResponse = {
     message.proposal = object.proposal !== undefined && object.proposal !== null ? Proposal.fromPartial(object.proposal) : undefined;
     message.votes = object.votes?.map(e => Vote.fromPartial(e)) || [];
     message.tally = object.tally !== undefined && object.tally !== null ? TallyResult.fromPartial(object.tally) : undefined;
+    message.anonTally = object.anonTally !== undefined && object.anonTally !== null ? AnonVoteTally.fromPartial(object.anonTally) : undefined;
     return message;
   },
   fromAmino(object: QueryGetProposalResponseAmino): QueryGetProposalResponse {
@@ -2217,6 +2243,9 @@ export const QueryGetProposalResponse = {
     message.votes = object.votes?.map(e => Vote.fromAmino(e)) || [];
     if (object.tally !== undefined && object.tally !== null) {
       message.tally = TallyResult.fromAmino(object.tally);
+    }
+    if (object.anon_tally !== undefined && object.anon_tally !== null) {
+      message.anonTally = AnonVoteTally.fromAmino(object.anon_tally);
     }
     return message;
   },
@@ -2229,6 +2258,7 @@ export const QueryGetProposalResponse = {
       obj.votes = message.votes;
     }
     obj.tally = message.tally ? TallyResult.toAmino(message.tally) : undefined;
+    obj.anon_tally = message.anonTally ? AnonVoteTally.toAmino(message.anonTally) : undefined;
     return obj;
   },
   fromAminoMsg(object: QueryGetProposalResponseAminoMsg): QueryGetProposalResponse {
@@ -2483,7 +2513,8 @@ export const QueryGetProposalVotesRequest = {
 function createBaseQueryGetProposalVotesResponse(): QueryGetProposalVotesResponse {
   return {
     votes: [],
-    tally: TallyResult.fromPartial({})
+    tally: TallyResult.fromPartial({}),
+    anonTally: AnonVoteTally.fromPartial({})
   };
 }
 /**
@@ -2501,6 +2532,9 @@ export const QueryGetProposalVotesResponse = {
     if (message.tally !== undefined) {
       TallyResult.encode(message.tally, writer.uint32(18).fork()).ldelim();
     }
+    if (message.anonTally !== undefined) {
+      AnonVoteTally.encode(message.anonTally, writer.uint32(26).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryGetProposalVotesResponse {
@@ -2516,6 +2550,9 @@ export const QueryGetProposalVotesResponse = {
         case 2:
           message.tally = TallyResult.decode(reader, reader.uint32());
           break;
+        case 3:
+          message.anonTally = AnonVoteTally.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2527,6 +2564,7 @@ export const QueryGetProposalVotesResponse = {
     const message = createBaseQueryGetProposalVotesResponse();
     message.votes = object.votes?.map(e => Vote.fromPartial(e)) || [];
     message.tally = object.tally !== undefined && object.tally !== null ? TallyResult.fromPartial(object.tally) : undefined;
+    message.anonTally = object.anonTally !== undefined && object.anonTally !== null ? AnonVoteTally.fromPartial(object.anonTally) : undefined;
     return message;
   },
   fromAmino(object: QueryGetProposalVotesResponseAmino): QueryGetProposalVotesResponse {
@@ -2534,6 +2572,9 @@ export const QueryGetProposalVotesResponse = {
     message.votes = object.votes?.map(e => Vote.fromAmino(e)) || [];
     if (object.tally !== undefined && object.tally !== null) {
       message.tally = TallyResult.fromAmino(object.tally);
+    }
+    if (object.anon_tally !== undefined && object.anon_tally !== null) {
+      message.anonTally = AnonVoteTally.fromAmino(object.anon_tally);
     }
     return message;
   },
@@ -2545,6 +2586,7 @@ export const QueryGetProposalVotesResponse = {
       obj.votes = message.votes;
     }
     obj.tally = message.tally ? TallyResult.toAmino(message.tally) : undefined;
+    obj.anon_tally = message.anonTally ? AnonVoteTally.toAmino(message.anonTally) : undefined;
     return obj;
   },
   fromAminoMsg(object: QueryGetProposalVotesResponseAminoMsg): QueryGetProposalVotesResponse {

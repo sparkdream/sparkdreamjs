@@ -2,7 +2,7 @@
 import { ContentType } from "../../common/v1/content_type";
 import { PostStatus } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /**
  * Post defines the Post message.
  * @name Post
@@ -98,6 +98,18 @@ export interface Post {
    * Tags referenced against the shared x/rep tag registry
    */
   tags: string[];
+  /**
+   * OR of sparkdream.common.v1.MediaFlag bits; chain-computed, never author-set
+   */
+  mediaFlags: number;
+  /**
+   * labelling rules that produced media_flags (common MediaRulesVersion)
+   */
+  mediaRulesVersion: number;
+  /**
+   * sha256 of the body exactly as stored (post-encoding, pre-decompression)
+   */
+  bodyHash: Uint8Array;
 }
 export interface PostProtoMsg {
   typeUrl: "/sparkdream.blog.v1.Post";
@@ -198,6 +210,18 @@ export interface PostAmino {
    * Tags referenced against the shared x/rep tag registry
    */
   tags?: string[];
+  /**
+   * OR of sparkdream.common.v1.MediaFlag bits; chain-computed, never author-set
+   */
+  media_flags?: number;
+  /**
+   * labelling rules that produced media_flags (common MediaRulesVersion)
+   */
+  media_rules_version?: number;
+  /**
+   * sha256 of the body exactly as stored (post-encoding, pre-decompression)
+   */
+  body_hash?: string;
 }
 export interface PostAminoMsg {
   type: "/sparkdream.blog.v1.Post";
@@ -226,7 +250,10 @@ function createBasePost(): Post {
     editedAt: BigInt(0),
     initiativeId: BigInt(0),
     convictionSustained: false,
-    tags: []
+    tags: [],
+    mediaFlags: 0,
+    mediaRulesVersion: 0,
+    bodyHash: new Uint8Array()
   };
 }
 /**
@@ -304,6 +331,15 @@ export const Post = {
     for (const v of message.tags) {
       writer.uint32(178).string(v!);
     }
+    if (message.mediaFlags !== 0) {
+      writer.uint32(184).uint32(message.mediaFlags);
+    }
+    if (message.mediaRulesVersion !== 0) {
+      writer.uint32(192).uint32(message.mediaRulesVersion);
+    }
+    if (message.bodyHash.length !== 0) {
+      writer.uint32(202).bytes(message.bodyHash);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Post {
@@ -379,6 +415,15 @@ export const Post = {
         case 22:
           message.tags.push(reader.string());
           break;
+        case 23:
+          message.mediaFlags = reader.uint32();
+          break;
+        case 24:
+          message.mediaRulesVersion = reader.uint32();
+          break;
+        case 25:
+          message.bodyHash = reader.bytes();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -410,6 +455,9 @@ export const Post = {
     message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
     message.convictionSustained = object.convictionSustained ?? false;
     message.tags = object.tags?.map(e => e) || [];
+    message.mediaFlags = object.mediaFlags ?? 0;
+    message.mediaRulesVersion = object.mediaRulesVersion ?? 0;
+    message.bodyHash = object.bodyHash ?? new Uint8Array();
     return message;
   },
   fromAmino(object: PostAmino): Post {
@@ -478,6 +526,15 @@ export const Post = {
       message.convictionSustained = object.conviction_sustained;
     }
     message.tags = object.tags?.map(e => e) || [];
+    if (object.media_flags !== undefined && object.media_flags !== null) {
+      message.mediaFlags = object.media_flags;
+    }
+    if (object.media_rules_version !== undefined && object.media_rules_version !== null) {
+      message.mediaRulesVersion = object.media_rules_version;
+    }
+    if (object.body_hash !== undefined && object.body_hash !== null) {
+      message.bodyHash = bytesFromBase64(object.body_hash);
+    }
     return message;
   },
   toAmino(message: Post): PostAmino {
@@ -508,6 +565,9 @@ export const Post = {
     } else {
       obj.tags = message.tags;
     }
+    obj.media_flags = message.mediaFlags === 0 ? undefined : message.mediaFlags;
+    obj.media_rules_version = message.mediaRulesVersion === 0 ? undefined : message.mediaRulesVersion;
+    obj.body_hash = message.bodyHash ? base64FromBytes(message.bodyHash) : undefined;
     return obj;
   },
   fromAminoMsg(object: PostAminoMsg): Post {

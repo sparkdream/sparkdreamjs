@@ -81,6 +81,14 @@ export interface Params {
    * e.g. 33 means re-key if >33% of DKG participants are no longer in the bonded set.
    */
   maxValidatorSetDrift: number;
+  /**
+   * Maximum fee (in the bond denom) the shield module pays for one
+   * MsgShieldedExec. The submitter chooses the fee but the module pays it, so
+   * without a ceiling one exec could hand the whole gas reserve to the fee
+   * collector. A tx whose fee exceeds this, or is in any other denom, is
+   * rejected before anything is paid.
+   */
+  maxFeePerExec: string;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.shield.v1.Params";
@@ -166,6 +174,14 @@ export interface ParamsAmino {
    * e.g. 33 means re-key if >33% of DKG participants are no longer in the bonded set.
    */
   max_validator_set_drift?: number;
+  /**
+   * Maximum fee (in the bond denom) the shield module pays for one
+   * MsgShieldedExec. The submitter chooses the fee but the module pays it, so
+   * without a ceiling one exec could hand the whole gas reserve to the fee
+   * collector. A tx whose fee exceeds this, or is in any other denom, is
+   * rejected before anything is paid.
+   */
+  max_fee_per_exec?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/shield/Params";
@@ -190,7 +206,8 @@ function createBaseParams(): Params {
     tleJailDuration: BigInt(0),
     minTleValidators: 0,
     dkgWindowBlocks: BigInt(0),
-    maxValidatorSetDrift: 0
+    maxValidatorSetDrift: 0,
+    maxFeePerExec: ""
   };
 }
 /**
@@ -257,6 +274,9 @@ export const Params = {
     if (message.maxValidatorSetDrift !== 0) {
       writer.uint32(144).uint32(message.maxValidatorSetDrift);
     }
+    if (message.maxFeePerExec !== "") {
+      writer.uint32(154).string(message.maxFeePerExec);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -320,6 +340,9 @@ export const Params = {
         case 18:
           message.maxValidatorSetDrift = reader.uint32();
           break;
+        case 19:
+          message.maxFeePerExec = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -347,6 +370,7 @@ export const Params = {
     message.minTleValidators = object.minTleValidators ?? 0;
     message.dkgWindowBlocks = object.dkgWindowBlocks !== undefined && object.dkgWindowBlocks !== null ? BigInt(object.dkgWindowBlocks.toString()) : BigInt(0);
     message.maxValidatorSetDrift = object.maxValidatorSetDrift ?? 0;
+    message.maxFeePerExec = object.maxFeePerExec ?? "";
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -405,6 +429,9 @@ export const Params = {
     if (object.max_validator_set_drift !== undefined && object.max_validator_set_drift !== null) {
       message.maxValidatorSetDrift = object.max_validator_set_drift;
     }
+    if (object.max_fee_per_exec !== undefined && object.max_fee_per_exec !== null) {
+      message.maxFeePerExec = object.max_fee_per_exec;
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -427,6 +454,7 @@ export const Params = {
     obj.min_tle_validators = message.minTleValidators === 0 ? undefined : message.minTleValidators;
     obj.dkg_window_blocks = message.dkgWindowBlocks !== BigInt(0) ? message.dkgWindowBlocks?.toString() : undefined;
     obj.max_validator_set_drift = message.maxValidatorSetDrift === 0 ? undefined : message.maxValidatorSetDrift;
+    obj.max_fee_per_exec = message.maxFeePerExec === "" ? undefined : message.maxFeePerExec;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {

@@ -8,6 +8,7 @@ import { ControllerTransferCase, ControllerTransferCaseAmino } from "./controlle
 import { ReporterRateLimit, ReporterRateLimitAmino } from "./reporter_rate_limit";
 import { RefileCooldown, RefileCooldownAmino } from "./refile_cooldown";
 import { Tier1LastSlash, Tier1LastSlashAmino } from "./tier1_last_slash";
+import { Checkpoint, CheckpointAmino } from "./checkpoint";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -76,6 +77,13 @@ export interface GenesisState {
    * next_escrow_id restores the Tier1Escrow auto-incrementing counter.
    */
   nextEscrowId: bigint;
+  /**
+   * checkpoints are the latest MsgSubmitCheckpoint record per
+   * (service_type, operator). Liveness deadlines are not exported; they
+   * are rebuilt from checkpoints and each type's checkpoint_max_lag_blocks
+   * at import.
+   */
+  checkpoints: Checkpoint[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.service.v1.GenesisState";
@@ -147,6 +155,13 @@ export interface GenesisStateAmino {
    * next_escrow_id restores the Tier1Escrow auto-incrementing counter.
    */
   next_escrow_id?: string;
+  /**
+   * checkpoints are the latest MsgSubmitCheckpoint record per
+   * (service_type, operator). Liveness deadlines are not exported; they
+   * are rebuilt from checkpoints and each type's checkpoint_max_lag_blocks
+   * at import.
+   */
+  checkpoints?: CheckpointAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.service.v1.GenesisState";
@@ -165,7 +180,8 @@ function createBaseGenesisState(): GenesisState {
     refileCooldowns: [],
     tier1LastSlash: [],
     nextReportId: BigInt(0),
-    nextEscrowId: BigInt(0)
+    nextEscrowId: BigInt(0),
+    checkpoints: []
   };
 }
 /**
@@ -214,6 +230,9 @@ export const GenesisState = {
     if (message.nextEscrowId !== BigInt(0)) {
       writer.uint32(96).uint64(message.nextEscrowId);
     }
+    for (const v of message.checkpoints) {
+      Checkpoint.encode(v!, writer.uint32(106).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -259,6 +278,9 @@ export const GenesisState = {
         case 12:
           message.nextEscrowId = reader.uint64();
           break;
+        case 13:
+          message.checkpoints.push(Checkpoint.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -280,6 +302,7 @@ export const GenesisState = {
     message.tier1LastSlash = object.tier1LastSlash?.map(e => Tier1LastSlash.fromPartial(e)) || [];
     message.nextReportId = object.nextReportId !== undefined && object.nextReportId !== null ? BigInt(object.nextReportId.toString()) : BigInt(0);
     message.nextEscrowId = object.nextEscrowId !== undefined && object.nextEscrowId !== null ? BigInt(object.nextEscrowId.toString()) : BigInt(0);
+    message.checkpoints = object.checkpoints?.map(e => Checkpoint.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -302,6 +325,7 @@ export const GenesisState = {
     if (object.next_escrow_id !== undefined && object.next_escrow_id !== null) {
       message.nextEscrowId = BigInt(object.next_escrow_id);
     }
+    message.checkpoints = object.checkpoints?.map(e => Checkpoint.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -354,6 +378,11 @@ export const GenesisState = {
     }
     obj.next_report_id = message.nextReportId !== BigInt(0) ? message.nextReportId?.toString() : undefined;
     obj.next_escrow_id = message.nextEscrowId !== BigInt(0) ? message.nextEscrowId?.toString() : undefined;
+    if (message.checkpoints) {
+      obj.checkpoints = message.checkpoints.map(e => e ? Checkpoint.toAmino(e) : undefined);
+    } else {
+      obj.checkpoints = message.checkpoints;
+    }
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {

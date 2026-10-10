@@ -102,6 +102,11 @@ export const createLCDClient = async ({
       }
     },
     sparkdream: {
+      artifact: {
+        v1: new (await import("./artifact/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
       blog: {
         v1: new (await import("./blog/v1/query.lcd")).LCDQueryClient({
           requestClient

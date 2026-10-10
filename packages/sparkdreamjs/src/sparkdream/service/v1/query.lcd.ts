@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponse, QueryOperatorRequest, QueryOperatorResponse, QueryServiceTypeRequest, QueryServiceTypeResponse, QueryServiceTypesRequest, QueryServiceTypesResponse, QueryOperatorsRequest, QueryOperatorsResponse, QueryOperatorsByControllerRequest, QueryOperatorsByControllerResponse, QueryOperatorsByServiceTypeRequest, QueryOperatorsByServiceTypeResponse, QueryReportRequest, QueryReportResponse, QueryReportsByOperatorRequest, QueryReportsByOperatorResponse, QueryOperatorReputationSnapshotRequest, QueryOperatorReputationSnapshotResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryOperatorRequest, QueryOperatorResponse, QueryServiceTypeRequest, QueryServiceTypeResponse, QueryServiceTypesRequest, QueryServiceTypesResponse, QueryOperatorsRequest, QueryOperatorsResponse, QueryOperatorsByControllerRequest, QueryOperatorsByControllerResponse, QueryOperatorsByServiceTypeRequest, QueryOperatorsByServiceTypeResponse, QueryReportRequest, QueryReportResponse, QueryReportsByOperatorRequest, QueryReportsByOperatorResponse, QueryOperatorReputationSnapshotRequest, QueryOperatorReputationSnapshotResponse, QueryCheckpointRequest, QueryCheckpointResponse, QueryCheckpointsByServiceTypeRequest, QueryCheckpointsByServiceTypeResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -109,5 +109,23 @@ export class LCDQueryClient {
   operatorReputationSnapshot = async (params: QueryOperatorReputationSnapshotRequest): Promise<QueryOperatorReputationSnapshotResponse> => {
     const endpoint = `sparkdream/service/v1/operator_reputation_snapshot/${params.address}`;
     return await this.req.get<QueryOperatorReputationSnapshotResponse>(endpoint);
+  };
+  /* Checkpoint returns the latest checkpoint for (operator, service_type). */
+  checkpoint = async (params: QueryCheckpointRequest): Promise<QueryCheckpointResponse> => {
+    const endpoint = `sparkdream/service/v1/checkpoint/${params.operator}/${params.serviceType}`;
+    return await this.req.get<QueryCheckpointResponse>(endpoint);
+  };
+  /* CheckpointsByServiceType returns the latest checkpoint of every operator
+   under a service type. Clients use it to find the effective scanned
+   height of the attestation quorum (docs/content-scanning.md §4.4). */
+  checkpointsByServiceType = async (params: QueryCheckpointsByServiceTypeRequest): Promise<QueryCheckpointsByServiceTypeResponse> => {
+    const options: any = {
+      params: {}
+    };
+    if (typeof params?.pagination !== "undefined") {
+      setPaginationParams(options, params.pagination);
+    }
+    const endpoint = `sparkdream/service/v1/checkpoints_by_service_type/${params.serviceType}`;
+    return await this.req.get<QueryCheckpointsByServiceTypeResponse>(endpoint, options);
   };
 }

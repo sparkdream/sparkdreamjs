@@ -2,7 +2,7 @@
 import { PostStatus } from "./types";
 import { ContentType } from "../../common/v1/content_type";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /**
  * Post defines the Post message.
  * @name Post
@@ -52,6 +52,21 @@ export interface Post {
    * MsgMakePostPermanent. Zero when promoted_by is empty.
    */
   promotedAt: bigint;
+  /**
+   * media_flags is the OR of sparkdream.common.v1.MediaFlag bits, computed by
+   * the chain on every content write. Non-zero withholds content from list
+   * and show queries (fetch it via PostContent). See docs/content-scanning.md.
+   */
+  mediaFlags: number;
+  /**
+   * media_rules_version is the labelling rules version that produced media_flags.
+   */
+  mediaRulesVersion: number;
+  /**
+   * body_hash is the sha256 of content exactly as stored (post-encoding,
+   * pre-decompression).
+   */
+  bodyHash: Uint8Array;
 }
 export interface PostProtoMsg {
   typeUrl: "/sparkdream.forum.v1.Post";
@@ -106,6 +121,21 @@ export interface PostAmino {
    * MsgMakePostPermanent. Zero when promoted_by is empty.
    */
   promoted_at?: string;
+  /**
+   * media_flags is the OR of sparkdream.common.v1.MediaFlag bits, computed by
+   * the chain on every content write. Non-zero withholds content from list
+   * and show queries (fetch it via PostContent). See docs/content-scanning.md.
+   */
+  media_flags?: number;
+  /**
+   * media_rules_version is the labelling rules version that produced media_flags.
+   */
+  media_rules_version?: number;
+  /**
+   * body_hash is the sha256 of content exactly as stored (post-encoding,
+   * pre-decompression).
+   */
+  body_hash?: string;
 }
 export interface PostAminoMsg {
   type: "/sparkdream.forum.v1.Post";
@@ -142,7 +172,10 @@ function createBasePost(): Post {
     initiativeId: BigInt(0),
     convictionSustained: false,
     promotedBy: "",
-    promotedAt: BigInt(0)
+    promotedAt: BigInt(0),
+    mediaFlags: 0,
+    mediaRulesVersion: 0,
+    bodyHash: new Uint8Array()
   };
 }
 /**
@@ -244,6 +277,15 @@ export const Post = {
     if (message.promotedAt !== BigInt(0)) {
       writer.uint32(280).int64(message.promotedAt);
     }
+    if (message.mediaFlags !== 0) {
+      writer.uint32(288).uint32(message.mediaFlags);
+    }
+    if (message.mediaRulesVersion !== 0) {
+      writer.uint32(296).uint32(message.mediaRulesVersion);
+    }
+    if (message.bodyHash.length !== 0) {
+      writer.uint32(306).bytes(message.bodyHash);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Post {
@@ -343,6 +385,15 @@ export const Post = {
         case 35:
           message.promotedAt = reader.int64();
           break;
+        case 36:
+          message.mediaFlags = reader.uint32();
+          break;
+        case 37:
+          message.mediaRulesVersion = reader.uint32();
+          break;
+        case 38:
+          message.bodyHash = reader.bytes();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -382,6 +433,9 @@ export const Post = {
     message.convictionSustained = object.convictionSustained ?? false;
     message.promotedBy = object.promotedBy ?? "";
     message.promotedAt = object.promotedAt !== undefined && object.promotedAt !== null ? BigInt(object.promotedAt.toString()) : BigInt(0);
+    message.mediaFlags = object.mediaFlags ?? 0;
+    message.mediaRulesVersion = object.mediaRulesVersion ?? 0;
+    message.bodyHash = object.bodyHash ?? new Uint8Array();
     return message;
   },
   fromAmino(object: PostAmino): Post {
@@ -474,6 +528,15 @@ export const Post = {
     if (object.promoted_at !== undefined && object.promoted_at !== null) {
       message.promotedAt = BigInt(object.promoted_at);
     }
+    if (object.media_flags !== undefined && object.media_flags !== null) {
+      message.mediaFlags = object.media_flags;
+    }
+    if (object.media_rules_version !== undefined && object.media_rules_version !== null) {
+      message.mediaRulesVersion = object.media_rules_version;
+    }
+    if (object.body_hash !== undefined && object.body_hash !== null) {
+      message.bodyHash = bytesFromBase64(object.body_hash);
+    }
     return message;
   },
   toAmino(message: Post): PostAmino {
@@ -512,6 +575,9 @@ export const Post = {
     obj.conviction_sustained = message.convictionSustained === false ? undefined : message.convictionSustained;
     obj.promoted_by = message.promotedBy === "" ? undefined : message.promotedBy;
     obj.promoted_at = message.promotedAt !== BigInt(0) ? message.promotedAt?.toString() : undefined;
+    obj.media_flags = message.mediaFlags === 0 ? undefined : message.mediaFlags;
+    obj.media_rules_version = message.mediaRulesVersion === 0 ? undefined : message.mediaRulesVersion;
+    obj.body_hash = message.bodyHash ? base64FromBytes(message.bodyHash) : undefined;
     return obj;
   },
   fromAminoMsg(object: PostAminoMsg): Post {

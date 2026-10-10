@@ -17,6 +17,18 @@ export enum GovActionType {
    * rejecting reviewers as overturned.
    */
   GOV_ACTION_TYPE_REVIEW_REJECTION = 10,
+  /**
+   * GOV_ACTION_TYPE_COLLECT_HIDE - A content-sentinel or council hide of an x/collect collection or item.
+   * action_target is the collect HideRecord id. Filed only through
+   * x/collect MsgAppealHide (rep's MsgAppealGovAction rejects it).
+   */
+  GOV_ACTION_TYPE_COLLECT_HIDE = 11,
+  /**
+   * GOV_ACTION_TYPE_ARTIFACT_HIDE - A content-sentinel or council hide of an x/artifact class or token.
+   * action_target is the artifact HideRecord id. Filed only through
+   * x/artifact MsgAppealHide.
+   */
+  GOV_ACTION_TYPE_ARTIFACT_HIDE = 12,
   UNRECOGNIZED = -1,
 }
 export const GovActionTypeAmino = GovActionType;
@@ -55,6 +67,12 @@ export function govActionTypeFromJSON(object: any): GovActionType {
     case 10:
     case "GOV_ACTION_TYPE_REVIEW_REJECTION":
       return GovActionType.GOV_ACTION_TYPE_REVIEW_REJECTION;
+    case 11:
+    case "GOV_ACTION_TYPE_COLLECT_HIDE":
+      return GovActionType.GOV_ACTION_TYPE_COLLECT_HIDE;
+    case 12:
+    case "GOV_ACTION_TYPE_ARTIFACT_HIDE":
+      return GovActionType.GOV_ACTION_TYPE_ARTIFACT_HIDE;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -85,6 +103,10 @@ export function govActionTypeToJSON(object: GovActionType): string {
       return "GOV_ACTION_TYPE_POST_HIDE";
     case GovActionType.GOV_ACTION_TYPE_REVIEW_REJECTION:
       return "GOV_ACTION_TYPE_REVIEW_REJECTION";
+    case GovActionType.GOV_ACTION_TYPE_COLLECT_HIDE:
+      return "GOV_ACTION_TYPE_COLLECT_HIDE";
+    case GovActionType.GOV_ACTION_TYPE_ARTIFACT_HIDE:
+      return "GOV_ACTION_TYPE_ARTIFACT_HIDE";
     case GovActionType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";

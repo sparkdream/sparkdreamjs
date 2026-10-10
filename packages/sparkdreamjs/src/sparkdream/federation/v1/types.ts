@@ -1077,6 +1077,23 @@ export interface FederatedContent {
    * predecessor, so it is never content id 0 and 0 is unambiguous here.
    */
   supersededBy: bigint;
+  /**
+   * license is the public-domain license the content entered the chain
+   * under ("CC0-1.0" or "PDM-1.0"). Always set: content without one is
+   * rejected at submission and on IBC receive.
+   */
+  license: string;
+  /**
+   * media_flags is the OR of sparkdream.common.v1.MediaFlag bits, computed on
+   * submission and IBC receive (body scanned for data URIs; content_uri set).
+   * Non-zero withholds body from list and show queries (fetch it via
+   * FederatedContentBody). content_hash already covers the body hash.
+   */
+  mediaFlags: number;
+  /**
+   * media_rules_version is the labelling rules version that produced media_flags.
+   */
+  mediaRulesVersion: number;
 }
 export interface FederatedContentProtoMsg {
   typeUrl: "/sparkdream.federation.v1.FederatedContent";
@@ -1116,6 +1133,23 @@ export interface FederatedContentAmino {
    * predecessor, so it is never content id 0 and 0 is unambiguous here.
    */
   superseded_by?: string;
+  /**
+   * license is the public-domain license the content entered the chain
+   * under ("CC0-1.0" or "PDM-1.0"). Always set: content without one is
+   * rejected at submission and on IBC receive.
+   */
+  license?: string;
+  /**
+   * media_flags is the OR of sparkdream.common.v1.MediaFlag bits, computed on
+   * submission and IBC receive (body scanned for data URIs; content_uri set).
+   * Non-zero withholds body from list and show queries (fetch it via
+   * FederatedContentBody). content_hash already covers the body hash.
+   */
+  media_flags?: number;
+  /**
+   * media_rules_version is the labelling rules version that produced media_flags.
+   */
+  media_rules_version?: number;
 }
 export interface FederatedContentAminoMsg {
   type: "/sparkdream.federation.v1.FederatedContent";
@@ -2641,7 +2675,10 @@ function createBaseFederatedContent(): FederatedContent {
     expiresAt: BigInt(0),
     contentHash: new Uint8Array(),
     supersedes: undefined,
-    supersededBy: BigInt(0)
+    supersededBy: BigInt(0),
+    license: "",
+    mediaFlags: 0,
+    mediaRulesVersion: 0
   };
 }
 /**
@@ -2707,6 +2744,15 @@ export const FederatedContent = {
     if (message.supersededBy !== BigInt(0)) {
       writer.uint32(144).uint64(message.supersededBy);
     }
+    if (message.license !== "") {
+      writer.uint32(154).string(message.license);
+    }
+    if (message.mediaFlags !== 0) {
+      writer.uint32(160).uint32(message.mediaFlags);
+    }
+    if (message.mediaRulesVersion !== 0) {
+      writer.uint32(168).uint32(message.mediaRulesVersion);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): FederatedContent {
@@ -2770,6 +2816,15 @@ export const FederatedContent = {
         case 18:
           message.supersededBy = reader.uint64();
           break;
+        case 19:
+          message.license = reader.string();
+          break;
+        case 20:
+          message.mediaFlags = reader.uint32();
+          break;
+        case 21:
+          message.mediaRulesVersion = reader.uint32();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2797,6 +2852,9 @@ export const FederatedContent = {
     message.contentHash = object.contentHash ?? new Uint8Array();
     message.supersedes = object.supersedes !== undefined && object.supersedes !== null ? ContentRef.fromPartial(object.supersedes) : undefined;
     message.supersededBy = object.supersededBy !== undefined && object.supersededBy !== null ? BigInt(object.supersededBy.toString()) : BigInt(0);
+    message.license = object.license ?? "";
+    message.mediaFlags = object.mediaFlags ?? 0;
+    message.mediaRulesVersion = object.mediaRulesVersion ?? 0;
     return message;
   },
   fromAmino(object: FederatedContentAmino): FederatedContent {
@@ -2855,6 +2913,15 @@ export const FederatedContent = {
     if (object.superseded_by !== undefined && object.superseded_by !== null) {
       message.supersededBy = BigInt(object.superseded_by);
     }
+    if (object.license !== undefined && object.license !== null) {
+      message.license = object.license;
+    }
+    if (object.media_flags !== undefined && object.media_flags !== null) {
+      message.mediaFlags = object.media_flags;
+    }
+    if (object.media_rules_version !== undefined && object.media_rules_version !== null) {
+      message.mediaRulesVersion = object.media_rules_version;
+    }
     return message;
   },
   toAmino(message: FederatedContent): FederatedContentAmino {
@@ -2877,6 +2944,9 @@ export const FederatedContent = {
     obj.content_hash = message.contentHash ? base64FromBytes(message.contentHash) : undefined;
     obj.supersedes = message.supersedes ? ContentRef.toAmino(message.supersedes) : undefined;
     obj.superseded_by = message.supersededBy !== BigInt(0) ? message.supersededBy?.toString() : undefined;
+    obj.license = message.license === "" ? undefined : message.license;
+    obj.media_flags = message.mediaFlags === 0 ? undefined : message.mediaFlags;
+    obj.media_rules_version = message.mediaRulesVersion === 0 ? undefined : message.mediaRulesVersion;
     return obj;
   },
   fromAminoMsg(object: FederatedContentAminoMsg): FederatedContent {

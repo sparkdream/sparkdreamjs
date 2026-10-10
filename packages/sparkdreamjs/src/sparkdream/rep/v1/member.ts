@@ -267,7 +267,11 @@ export interface Member {
   zeroedAt: bigint;
   zeroedCount: number;
   lastDecayEpoch: bigint;
-  tipsGivenThisEpoch: number;
+  /**
+   * DREAM tipped this epoch (amount, not count), reset lazily when
+   * last_tip_epoch falls behind. Nil on records written before it existed.
+   */
+  tipsSentThisEpoch: string;
   lastTipEpoch: bigint;
   /**
    * Cached counts for performance (avoid full table scans)
@@ -278,13 +282,14 @@ export interface Member {
    */
   completedInitiativesCount: number;
   /**
-   * Gift tracking for rate limiting
+   * DREAM received through member-to-member transfers (tips and initiative
+   * bounty payouts) in the current epoch, bounded by
+   * max_transfer_received_per_epoch. The binding transfer limit sits on the
+   * recipient: a buyer can collect from any number of senders, so only a cap
+   * on what one account takes in bounds how fast a position can be bought.
    */
-  giftsSentThisEpoch: string;
-  /**
-   * Epoch when gift counter was last reset
-   */
-  lastGiftEpoch: bigint;
+  transferReceivedThisEpoch: string;
+  lastTransferReceivedEpoch: bigint;
   /**
    * Invitation credit tracking for lazy seasonal reset
    */
@@ -367,6 +372,28 @@ export interface Member {
    * readers must treat nil as zero.
    */
   contentStakedDream: string;
+  /**
+   * Season-scale counterpart of transfer_received_this_epoch, bounded by
+   * max_transfer_received_per_season.
+   */
+  transferReceivedThisSeason: string;
+  lastTransferReceivedSeason: bigint;
+  /**
+   * DREAM this member escrowed into initiative bounties this epoch, bounded by
+   * max_initiative_bounty_per_funder_epoch.
+   */
+  initiativeBountyFundedThisEpoch: string;
+  lastInitiativeBountyEpoch: bigint;
+  /**
+   * The content license this member agreed to publish under
+   * (docs/content-license.md). Set from MsgAcceptInvitation's signed
+   * accepted_content_license, or for genesis members from the genesis file,
+   * where GenesisState.Validate requires it. Never changed afterwards: a CC0
+   * dedication cannot be revoked, so zeroing and status changes leave it
+   * alone. An address joins only once, so the agreement was made at
+   * joined_at / joined_at_height.
+   */
+  contentLicense: string;
 }
 export interface MemberProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Member";
@@ -422,7 +449,11 @@ export interface MemberAmino {
   zeroed_at?: string;
   zeroed_count?: number;
   last_decay_epoch?: string;
-  tips_given_this_epoch?: number;
+  /**
+   * DREAM tipped this epoch (amount, not count), reset lazily when
+   * last_tip_epoch falls behind. Nil on records written before it existed.
+   */
+  tips_sent_this_epoch?: string;
   last_tip_epoch?: string;
   /**
    * Cached counts for performance (avoid full table scans)
@@ -433,13 +464,14 @@ export interface MemberAmino {
    */
   completed_initiatives_count?: number;
   /**
-   * Gift tracking for rate limiting
+   * DREAM received through member-to-member transfers (tips and initiative
+   * bounty payouts) in the current epoch, bounded by
+   * max_transfer_received_per_epoch. The binding transfer limit sits on the
+   * recipient: a buyer can collect from any number of senders, so only a cap
+   * on what one account takes in bounds how fast a position can be bought.
    */
-  gifts_sent_this_epoch?: string;
-  /**
-   * Epoch when gift counter was last reset
-   */
-  last_gift_epoch?: string;
+  transfer_received_this_epoch?: string;
+  last_transfer_received_epoch?: string;
   /**
    * Invitation credit tracking for lazy seasonal reset
    */
@@ -522,14 +554,38 @@ export interface MemberAmino {
    * readers must treat nil as zero.
    */
   content_staked_dream?: string;
+  /**
+   * Season-scale counterpart of transfer_received_this_epoch, bounded by
+   * max_transfer_received_per_season.
+   */
+  transfer_received_this_season?: string;
+  last_transfer_received_season?: string;
+  /**
+   * DREAM this member escrowed into initiative bounties this epoch, bounded by
+   * max_initiative_bounty_per_funder_epoch.
+   */
+  initiative_bounty_funded_this_epoch?: string;
+  last_initiative_bounty_epoch?: string;
+  /**
+   * The content license this member agreed to publish under
+   * (docs/content-license.md). Set from MsgAcceptInvitation's signed
+   * accepted_content_license, or for genesis members from the genesis file,
+   * where GenesisState.Validate requires it. Never changed afterwards: a CC0
+   * dedication cannot be revoked, so zeroing and status changes leave it
+   * alone. An address joins only once, so the agreement was made at
+   * joined_at / joined_at_height.
+   */
+  content_license?: string;
 }
 export interface MemberAminoMsg {
   type: "/sparkdream.rep.v1.Member";
   value: MemberAmino;
 }
 /**
- * GiftRecord tracks the last time a sender gifted a specific recipient
- * Used to enforce per-recipient cooldown periods
+ * GiftRecord is the lifetime ledger of what a sender has gifted one of their
+ * invitees, bounded by max_gift_per_invitee. A gift is a one-time seed to help
+ * an invitee get started, so the cap is per invitee for life rather than per
+ * epoch.
  * @name GiftRecord
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.GiftRecord
@@ -537,18 +593,17 @@ export interface MemberAminoMsg {
 export interface GiftRecord {
   sender: string;
   recipient: string;
-  /**
-   * Block height when last gift was sent
-   */
-  lastGiftBlock: bigint;
+  totalGifted: string;
 }
 export interface GiftRecordProtoMsg {
   typeUrl: "/sparkdream.rep.v1.GiftRecord";
   value: Uint8Array;
 }
 /**
- * GiftRecord tracks the last time a sender gifted a specific recipient
- * Used to enforce per-recipient cooldown periods
+ * GiftRecord is the lifetime ledger of what a sender has gifted one of their
+ * invitees, bounded by max_gift_per_invitee. A gift is a one-time seed to help
+ * an invitee get started, so the cap is per invitee for life rather than per
+ * epoch.
  * @name GiftRecordAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.GiftRecord
@@ -556,10 +611,7 @@ export interface GiftRecordProtoMsg {
 export interface GiftRecordAmino {
   sender?: string;
   recipient?: string;
-  /**
-   * Block height when last gift was sent
-   */
-  last_gift_block?: string;
+  total_gifted?: string;
 }
 export interface GiftRecordAminoMsg {
   type: "/sparkdream.rep.v1.GiftRecord";
@@ -950,12 +1002,12 @@ function createBaseMember(): Member {
     zeroedAt: BigInt(0),
     zeroedCount: 0,
     lastDecayEpoch: BigInt(0),
-    tipsGivenThisEpoch: 0,
+    tipsSentThisEpoch: "",
     lastTipEpoch: BigInt(0),
     completedInterimsCount: 0,
     completedInitiativesCount: 0,
-    giftsSentThisEpoch: "",
-    lastGiftEpoch: BigInt(0),
+    transferReceivedThisEpoch: "",
+    lastTransferReceivedEpoch: BigInt(0),
     lastCreditResetSeason: BigInt(0),
     reputationGainedThisEpoch: {},
     lastRepGainEpoch: BigInt(0),
@@ -965,7 +1017,12 @@ function createBaseMember(): Member {
     forumRepPerTag: {},
     lifetimeForumRepPerTag: {},
     joinedAtHeight: BigInt(0),
-    contentStakedDream: ""
+    contentStakedDream: "",
+    transferReceivedThisSeason: "",
+    lastTransferReceivedSeason: BigInt(0),
+    initiativeBountyFundedThisEpoch: "",
+    lastInitiativeBountyEpoch: BigInt(0),
+    contentLicense: ""
   };
 }
 /**
@@ -1037,8 +1094,8 @@ export const Member = {
     if (message.lastDecayEpoch !== BigInt(0)) {
       writer.uint32(144).int64(message.lastDecayEpoch);
     }
-    if (message.tipsGivenThisEpoch !== 0) {
-      writer.uint32(152).uint32(message.tipsGivenThisEpoch);
+    if (message.tipsSentThisEpoch !== "") {
+      writer.uint32(154).string(message.tipsSentThisEpoch);
     }
     if (message.lastTipEpoch !== BigInt(0)) {
       writer.uint32(160).int64(message.lastTipEpoch);
@@ -1049,11 +1106,11 @@ export const Member = {
     if (message.completedInitiativesCount !== 0) {
       writer.uint32(176).uint32(message.completedInitiativesCount);
     }
-    if (message.giftsSentThisEpoch !== "") {
-      writer.uint32(186).string(message.giftsSentThisEpoch);
+    if (message.transferReceivedThisEpoch !== "") {
+      writer.uint32(186).string(message.transferReceivedThisEpoch);
     }
-    if (message.lastGiftEpoch !== BigInt(0)) {
-      writer.uint32(192).int64(message.lastGiftEpoch);
+    if (message.lastTransferReceivedEpoch !== BigInt(0)) {
+      writer.uint32(192).int64(message.lastTransferReceivedEpoch);
     }
     if (message.lastCreditResetSeason !== BigInt(0)) {
       writer.uint32(200).int64(message.lastCreditResetSeason);
@@ -1093,6 +1150,21 @@ export const Member = {
     }
     if (message.contentStakedDream !== "") {
       writer.uint32(274).string(message.contentStakedDream);
+    }
+    if (message.transferReceivedThisSeason !== "") {
+      writer.uint32(282).string(message.transferReceivedThisSeason);
+    }
+    if (message.lastTransferReceivedSeason !== BigInt(0)) {
+      writer.uint32(288).int64(message.lastTransferReceivedSeason);
+    }
+    if (message.initiativeBountyFundedThisEpoch !== "") {
+      writer.uint32(298).string(message.initiativeBountyFundedThisEpoch);
+    }
+    if (message.lastInitiativeBountyEpoch !== BigInt(0)) {
+      writer.uint32(304).int64(message.lastInitiativeBountyEpoch);
+    }
+    if (message.contentLicense !== "") {
+      writer.uint32(314).string(message.contentLicense);
     }
     return writer;
   },
@@ -1164,7 +1236,7 @@ export const Member = {
           message.lastDecayEpoch = reader.int64();
           break;
         case 19:
-          message.tipsGivenThisEpoch = reader.uint32();
+          message.tipsSentThisEpoch = reader.string();
           break;
         case 20:
           message.lastTipEpoch = reader.int64();
@@ -1176,10 +1248,10 @@ export const Member = {
           message.completedInitiativesCount = reader.uint32();
           break;
         case 23:
-          message.giftsSentThisEpoch = reader.string();
+          message.transferReceivedThisEpoch = reader.string();
           break;
         case 24:
-          message.lastGiftEpoch = reader.int64();
+          message.lastTransferReceivedEpoch = reader.int64();
           break;
         case 25:
           message.lastCreditResetSeason = reader.int64();
@@ -1219,6 +1291,21 @@ export const Member = {
           break;
         case 34:
           message.contentStakedDream = reader.string();
+          break;
+        case 35:
+          message.transferReceivedThisSeason = reader.string();
+          break;
+        case 36:
+          message.lastTransferReceivedSeason = reader.int64();
+          break;
+        case 37:
+          message.initiativeBountyFundedThisEpoch = reader.string();
+          break;
+        case 38:
+          message.lastInitiativeBountyEpoch = reader.int64();
+          break;
+        case 39:
+          message.contentLicense = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1261,12 +1348,12 @@ export const Member = {
     message.zeroedAt = object.zeroedAt !== undefined && object.zeroedAt !== null ? BigInt(object.zeroedAt.toString()) : BigInt(0);
     message.zeroedCount = object.zeroedCount ?? 0;
     message.lastDecayEpoch = object.lastDecayEpoch !== undefined && object.lastDecayEpoch !== null ? BigInt(object.lastDecayEpoch.toString()) : BigInt(0);
-    message.tipsGivenThisEpoch = object.tipsGivenThisEpoch ?? 0;
+    message.tipsSentThisEpoch = object.tipsSentThisEpoch ?? "";
     message.lastTipEpoch = object.lastTipEpoch !== undefined && object.lastTipEpoch !== null ? BigInt(object.lastTipEpoch.toString()) : BigInt(0);
     message.completedInterimsCount = object.completedInterimsCount ?? 0;
     message.completedInitiativesCount = object.completedInitiativesCount ?? 0;
-    message.giftsSentThisEpoch = object.giftsSentThisEpoch ?? "";
-    message.lastGiftEpoch = object.lastGiftEpoch !== undefined && object.lastGiftEpoch !== null ? BigInt(object.lastGiftEpoch.toString()) : BigInt(0);
+    message.transferReceivedThisEpoch = object.transferReceivedThisEpoch ?? "";
+    message.lastTransferReceivedEpoch = object.lastTransferReceivedEpoch !== undefined && object.lastTransferReceivedEpoch !== null ? BigInt(object.lastTransferReceivedEpoch.toString()) : BigInt(0);
     message.lastCreditResetSeason = object.lastCreditResetSeason !== undefined && object.lastCreditResetSeason !== null ? BigInt(object.lastCreditResetSeason.toString()) : BigInt(0);
     message.reputationGainedThisEpoch = Object.entries(object.reputationGainedThisEpoch ?? {}).reduce<{
       [key: string]: string;
@@ -1298,6 +1385,11 @@ export const Member = {
     }, {});
     message.joinedAtHeight = object.joinedAtHeight !== undefined && object.joinedAtHeight !== null ? BigInt(object.joinedAtHeight.toString()) : BigInt(0);
     message.contentStakedDream = object.contentStakedDream ?? "";
+    message.transferReceivedThisSeason = object.transferReceivedThisSeason ?? "";
+    message.lastTransferReceivedSeason = object.lastTransferReceivedSeason !== undefined && object.lastTransferReceivedSeason !== null ? BigInt(object.lastTransferReceivedSeason.toString()) : BigInt(0);
+    message.initiativeBountyFundedThisEpoch = object.initiativeBountyFundedThisEpoch ?? "";
+    message.lastInitiativeBountyEpoch = object.lastInitiativeBountyEpoch !== undefined && object.lastInitiativeBountyEpoch !== null ? BigInt(object.lastInitiativeBountyEpoch.toString()) : BigInt(0);
+    message.contentLicense = object.contentLicense ?? "";
     return message;
   },
   fromAmino(object: MemberAmino): Member {
@@ -1364,8 +1456,8 @@ export const Member = {
     if (object.last_decay_epoch !== undefined && object.last_decay_epoch !== null) {
       message.lastDecayEpoch = BigInt(object.last_decay_epoch);
     }
-    if (object.tips_given_this_epoch !== undefined && object.tips_given_this_epoch !== null) {
-      message.tipsGivenThisEpoch = object.tips_given_this_epoch;
+    if (object.tips_sent_this_epoch !== undefined && object.tips_sent_this_epoch !== null) {
+      message.tipsSentThisEpoch = object.tips_sent_this_epoch;
     }
     if (object.last_tip_epoch !== undefined && object.last_tip_epoch !== null) {
       message.lastTipEpoch = BigInt(object.last_tip_epoch);
@@ -1376,11 +1468,11 @@ export const Member = {
     if (object.completed_initiatives_count !== undefined && object.completed_initiatives_count !== null) {
       message.completedInitiativesCount = object.completed_initiatives_count;
     }
-    if (object.gifts_sent_this_epoch !== undefined && object.gifts_sent_this_epoch !== null) {
-      message.giftsSentThisEpoch = object.gifts_sent_this_epoch;
+    if (object.transfer_received_this_epoch !== undefined && object.transfer_received_this_epoch !== null) {
+      message.transferReceivedThisEpoch = object.transfer_received_this_epoch;
     }
-    if (object.last_gift_epoch !== undefined && object.last_gift_epoch !== null) {
-      message.lastGiftEpoch = BigInt(object.last_gift_epoch);
+    if (object.last_transfer_received_epoch !== undefined && object.last_transfer_received_epoch !== null) {
+      message.lastTransferReceivedEpoch = BigInt(object.last_transfer_received_epoch);
     }
     if (object.last_credit_reset_season !== undefined && object.last_credit_reset_season !== null) {
       message.lastCreditResetSeason = BigInt(object.last_credit_reset_season);
@@ -1427,6 +1519,21 @@ export const Member = {
     if (object.content_staked_dream !== undefined && object.content_staked_dream !== null) {
       message.contentStakedDream = object.content_staked_dream;
     }
+    if (object.transfer_received_this_season !== undefined && object.transfer_received_this_season !== null) {
+      message.transferReceivedThisSeason = object.transfer_received_this_season;
+    }
+    if (object.last_transfer_received_season !== undefined && object.last_transfer_received_season !== null) {
+      message.lastTransferReceivedSeason = BigInt(object.last_transfer_received_season);
+    }
+    if (object.initiative_bounty_funded_this_epoch !== undefined && object.initiative_bounty_funded_this_epoch !== null) {
+      message.initiativeBountyFundedThisEpoch = object.initiative_bounty_funded_this_epoch;
+    }
+    if (object.last_initiative_bounty_epoch !== undefined && object.last_initiative_bounty_epoch !== null) {
+      message.lastInitiativeBountyEpoch = BigInt(object.last_initiative_bounty_epoch);
+    }
+    if (object.content_license !== undefined && object.content_license !== null) {
+      message.contentLicense = object.content_license;
+    }
     return message;
   },
   toAmino(message: Member): MemberAmino {
@@ -1463,12 +1570,12 @@ export const Member = {
     obj.zeroed_at = message.zeroedAt !== BigInt(0) ? message.zeroedAt?.toString() : undefined;
     obj.zeroed_count = message.zeroedCount === 0 ? undefined : message.zeroedCount;
     obj.last_decay_epoch = message.lastDecayEpoch !== BigInt(0) ? message.lastDecayEpoch?.toString() : undefined;
-    obj.tips_given_this_epoch = message.tipsGivenThisEpoch === 0 ? undefined : message.tipsGivenThisEpoch;
+    obj.tips_sent_this_epoch = message.tipsSentThisEpoch === "" ? undefined : message.tipsSentThisEpoch;
     obj.last_tip_epoch = message.lastTipEpoch !== BigInt(0) ? message.lastTipEpoch?.toString() : undefined;
     obj.completed_interims_count = message.completedInterimsCount === 0 ? undefined : message.completedInterimsCount;
     obj.completed_initiatives_count = message.completedInitiativesCount === 0 ? undefined : message.completedInitiativesCount;
-    obj.gifts_sent_this_epoch = message.giftsSentThisEpoch === "" ? undefined : message.giftsSentThisEpoch;
-    obj.last_gift_epoch = message.lastGiftEpoch !== BigInt(0) ? message.lastGiftEpoch?.toString() : undefined;
+    obj.transfer_received_this_epoch = message.transferReceivedThisEpoch === "" ? undefined : message.transferReceivedThisEpoch;
+    obj.last_transfer_received_epoch = message.lastTransferReceivedEpoch !== BigInt(0) ? message.lastTransferReceivedEpoch?.toString() : undefined;
     obj.last_credit_reset_season = message.lastCreditResetSeason !== BigInt(0) ? message.lastCreditResetSeason?.toString() : undefined;
     obj.reputation_gained_this_epoch = {};
     if (message.reputationGainedThisEpoch) {
@@ -1494,6 +1601,11 @@ export const Member = {
     }
     obj.joined_at_height = message.joinedAtHeight !== BigInt(0) ? message.joinedAtHeight?.toString() : undefined;
     obj.content_staked_dream = message.contentStakedDream === "" ? undefined : message.contentStakedDream;
+    obj.transfer_received_this_season = message.transferReceivedThisSeason === "" ? undefined : message.transferReceivedThisSeason;
+    obj.last_transfer_received_season = message.lastTransferReceivedSeason !== BigInt(0) ? message.lastTransferReceivedSeason?.toString() : undefined;
+    obj.initiative_bounty_funded_this_epoch = message.initiativeBountyFundedThisEpoch === "" ? undefined : message.initiativeBountyFundedThisEpoch;
+    obj.last_initiative_bounty_epoch = message.lastInitiativeBountyEpoch !== BigInt(0) ? message.lastInitiativeBountyEpoch?.toString() : undefined;
+    obj.content_license = message.contentLicense === "" ? undefined : message.contentLicense;
     return obj;
   },
   fromAminoMsg(object: MemberAminoMsg): Member {
@@ -1516,12 +1628,14 @@ function createBaseGiftRecord(): GiftRecord {
   return {
     sender: "",
     recipient: "",
-    lastGiftBlock: BigInt(0)
+    totalGifted: ""
   };
 }
 /**
- * GiftRecord tracks the last time a sender gifted a specific recipient
- * Used to enforce per-recipient cooldown periods
+ * GiftRecord is the lifetime ledger of what a sender has gifted one of their
+ * invitees, bounded by max_gift_per_invitee. A gift is a one-time seed to help
+ * an invitee get started, so the cap is per invitee for life rather than per
+ * epoch.
  * @name GiftRecord
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.GiftRecord
@@ -1535,8 +1649,8 @@ export const GiftRecord = {
     if (message.recipient !== "") {
       writer.uint32(18).string(message.recipient);
     }
-    if (message.lastGiftBlock !== BigInt(0)) {
-      writer.uint32(24).int64(message.lastGiftBlock);
+    if (message.totalGifted !== "") {
+      writer.uint32(26).string(message.totalGifted);
     }
     return writer;
   },
@@ -1554,7 +1668,7 @@ export const GiftRecord = {
           message.recipient = reader.string();
           break;
         case 3:
-          message.lastGiftBlock = reader.int64();
+          message.totalGifted = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1567,7 +1681,7 @@ export const GiftRecord = {
     const message = createBaseGiftRecord();
     message.sender = object.sender ?? "";
     message.recipient = object.recipient ?? "";
-    message.lastGiftBlock = object.lastGiftBlock !== undefined && object.lastGiftBlock !== null ? BigInt(object.lastGiftBlock.toString()) : BigInt(0);
+    message.totalGifted = object.totalGifted ?? "";
     return message;
   },
   fromAmino(object: GiftRecordAmino): GiftRecord {
@@ -1578,8 +1692,8 @@ export const GiftRecord = {
     if (object.recipient !== undefined && object.recipient !== null) {
       message.recipient = object.recipient;
     }
-    if (object.last_gift_block !== undefined && object.last_gift_block !== null) {
-      message.lastGiftBlock = BigInt(object.last_gift_block);
+    if (object.total_gifted !== undefined && object.total_gifted !== null) {
+      message.totalGifted = object.total_gifted;
     }
     return message;
   },
@@ -1587,7 +1701,7 @@ export const GiftRecord = {
     const obj: any = {};
     obj.sender = message.sender === "" ? undefined : message.sender;
     obj.recipient = message.recipient === "" ? undefined : message.recipient;
-    obj.last_gift_block = message.lastGiftBlock !== BigInt(0) ? message.lastGiftBlock?.toString() : undefined;
+    obj.total_gifted = message.totalGifted === "" ? undefined : message.totalGifted;
     return obj;
   },
   fromAminoMsg(object: GiftRecordAminoMsg): GiftRecord {

@@ -81,9 +81,7 @@ export interface Params {
    */
   sentinelCommitAmount: string;
   hideExpiryBlocks: bigint;
-  appealFee: string;
   appealCooldownBlocks: bigint;
-  appealDeadlineBlocks: bigint;
   /**
    * Blocks after HiddenAt during which the hiding sentinel may
    * self-correct via MsgUnhideContent. Must be < hide_expiry_blocks.
@@ -290,9 +288,7 @@ export interface ParamsAmino {
    */
   sentinel_commit_amount?: string;
   hide_expiry_blocks?: string;
-  appeal_fee?: string;
   appeal_cooldown_blocks?: string;
-  appeal_deadline_blocks?: string;
   /**
    * Blocks after HiddenAt during which the hiding sentinel may
    * self-correct via MsgUnhideContent. Must be < hide_expiry_blocks.
@@ -467,9 +463,7 @@ function createBaseParams(): Params {
     maxFlagReasonLength: 0,
     sentinelCommitAmount: "",
     hideExpiryBlocks: BigInt(0),
-    appealFee: "",
     appealCooldownBlocks: BigInt(0),
-    appealDeadlineBlocks: BigInt(0),
     sentinelUnhideWindowBlocks: BigInt(0),
     maxHidesPerSentinelPerDay: 0,
     endorsementCreationFee: "",
@@ -568,163 +562,157 @@ export const Params = {
       writer.uint32(162).string(message.perItemSpamTax);
     }
     if (message.sponsorFee !== "") {
-      writer.uint32(178).string(message.sponsorFee);
+      writer.uint32(170).string(message.sponsorFee);
     }
     if (message.minSponsorTrustLevel !== "") {
-      writer.uint32(186).string(message.minSponsorTrustLevel);
+      writer.uint32(178).string(message.minSponsorTrustLevel);
     }
     if (message.sponsorshipRequestTtlBlocks !== BigInt(0)) {
-      writer.uint32(192).int64(message.sponsorshipRequestTtlBlocks);
+      writer.uint32(184).int64(message.sponsorshipRequestTtlBlocks);
     }
     if (message.minCuratorBond !== "") {
-      writer.uint32(202).string(message.minCuratorBond);
+      writer.uint32(194).string(message.minCuratorBond);
     }
     if (message.minCuratorTrustLevel !== "") {
-      writer.uint32(210).string(message.minCuratorTrustLevel);
+      writer.uint32(202).string(message.minCuratorTrustLevel);
     }
     if (message.minCuratorAgeBlocks !== BigInt(0)) {
-      writer.uint32(216).int64(message.minCuratorAgeBlocks);
+      writer.uint32(208).int64(message.minCuratorAgeBlocks);
     }
     if (message.maxTagsPerReview !== 0) {
-      writer.uint32(224).uint32(message.maxTagsPerReview);
+      writer.uint32(216).uint32(message.maxTagsPerReview);
     }
     if (message.maxReviewCommentLength !== 0) {
-      writer.uint32(232).uint32(message.maxReviewCommentLength);
+      writer.uint32(224).uint32(message.maxReviewCommentLength);
     }
     if (message.maxReviewsPerCollection !== 0) {
-      writer.uint32(240).uint32(message.maxReviewsPerCollection);
+      writer.uint32(232).uint32(message.maxReviewsPerCollection);
     }
     if (message.curatorSlashFraction !== "") {
-      writer.uint32(250).string(Decimal.fromUserInput(message.curatorSlashFraction, 18).atomics);
+      writer.uint32(242).string(Decimal.fromUserInput(message.curatorSlashFraction, 18).atomics);
     }
     if (message.challengeWindowBlocks !== BigInt(0)) {
-      writer.uint32(256).int64(message.challengeWindowBlocks);
+      writer.uint32(248).int64(message.challengeWindowBlocks);
     }
     if (message.challengeDeposit !== "") {
-      writer.uint32(266).string(message.challengeDeposit);
+      writer.uint32(258).string(message.challengeDeposit);
     }
     if (message.maxChallengeReasonLength !== 0) {
-      writer.uint32(272).uint32(message.maxChallengeReasonLength);
+      writer.uint32(264).uint32(message.maxChallengeReasonLength);
     }
     if (message.maxPrunePerBlock !== 0) {
-      writer.uint32(280).uint32(message.maxPrunePerBlock);
+      writer.uint32(272).uint32(message.maxPrunePerBlock);
     }
     if (message.challengeRewardFraction !== "") {
-      writer.uint32(290).string(Decimal.fromUserInput(message.challengeRewardFraction, 18).atomics);
+      writer.uint32(282).string(Decimal.fromUserInput(message.challengeRewardFraction, 18).atomics);
     }
     if (message.downvoteCost !== "") {
-      writer.uint32(298).string(message.downvoteCost);
+      writer.uint32(290).string(message.downvoteCost);
     }
     if (message.maxUpvotesPerDay !== 0) {
-      writer.uint32(304).uint32(message.maxUpvotesPerDay);
+      writer.uint32(296).uint32(message.maxUpvotesPerDay);
     }
     if (message.maxDownvotesPerDay !== 0) {
-      writer.uint32(312).uint32(message.maxDownvotesPerDay);
+      writer.uint32(304).uint32(message.maxDownvotesPerDay);
     }
     if (message.flagReviewThreshold !== 0) {
-      writer.uint32(320).uint32(message.flagReviewThreshold);
+      writer.uint32(312).uint32(message.flagReviewThreshold);
     }
     if (message.maxFlagsPerDay !== 0) {
-      writer.uint32(328).uint32(message.maxFlagsPerDay);
+      writer.uint32(320).uint32(message.maxFlagsPerDay);
     }
     if (message.maxFlaggersPerTarget !== 0) {
-      writer.uint32(336).uint32(message.maxFlaggersPerTarget);
+      writer.uint32(328).uint32(message.maxFlaggersPerTarget);
     }
     if (message.flagExpirationBlocks !== BigInt(0)) {
-      writer.uint32(344).int64(message.flagExpirationBlocks);
+      writer.uint32(336).int64(message.flagExpirationBlocks);
     }
     if (message.maxFlagReasonLength !== 0) {
-      writer.uint32(352).uint32(message.maxFlagReasonLength);
+      writer.uint32(344).uint32(message.maxFlagReasonLength);
     }
     if (message.sentinelCommitAmount !== "") {
-      writer.uint32(362).string(message.sentinelCommitAmount);
+      writer.uint32(354).string(message.sentinelCommitAmount);
     }
     if (message.hideExpiryBlocks !== BigInt(0)) {
-      writer.uint32(368).int64(message.hideExpiryBlocks);
-    }
-    if (message.appealFee !== "") {
-      writer.uint32(378).string(message.appealFee);
+      writer.uint32(360).int64(message.hideExpiryBlocks);
     }
     if (message.appealCooldownBlocks !== BigInt(0)) {
-      writer.uint32(384).int64(message.appealCooldownBlocks);
-    }
-    if (message.appealDeadlineBlocks !== BigInt(0)) {
-      writer.uint32(392).int64(message.appealDeadlineBlocks);
+      writer.uint32(368).int64(message.appealCooldownBlocks);
     }
     if (message.sentinelUnhideWindowBlocks !== BigInt(0)) {
-      writer.uint32(608).int64(message.sentinelUnhideWindowBlocks);
+      writer.uint32(560).int64(message.sentinelUnhideWindowBlocks);
     }
     if (message.maxHidesPerSentinelPerDay !== 0) {
-      writer.uint32(616).uint32(message.maxHidesPerSentinelPerDay);
+      writer.uint32(568).uint32(message.maxHidesPerSentinelPerDay);
     }
     if (message.endorsementCreationFee !== "") {
-      writer.uint32(402).string(message.endorsementCreationFee);
+      writer.uint32(378).string(message.endorsementCreationFee);
     }
     if (message.endorsementDreamStake !== "") {
-      writer.uint32(410).string(message.endorsementDreamStake);
+      writer.uint32(386).string(message.endorsementDreamStake);
     }
     if (message.endorsementStakeDuration !== BigInt(0)) {
-      writer.uint32(416).int64(message.endorsementStakeDuration);
+      writer.uint32(392).int64(message.endorsementStakeDuration);
     }
     if (message.endorsementExpiryBlocks !== BigInt(0)) {
-      writer.uint32(424).int64(message.endorsementExpiryBlocks);
+      writer.uint32(400).int64(message.endorsementExpiryBlocks);
     }
     if (message.endorsementFeeEndorserShare !== "") {
-      writer.uint32(434).string(Decimal.fromUserInput(message.endorsementFeeEndorserShare, 18).atomics);
+      writer.uint32(410).string(Decimal.fromUserInput(message.endorsementFeeEndorserShare, 18).atomics);
     }
     if (message.endorsementDeletionBurnFraction !== "") {
-      writer.uint32(442).string(Decimal.fromUserInput(message.endorsementDeletionBurnFraction, 18).atomics);
+      writer.uint32(418).string(Decimal.fromUserInput(message.endorsementDeletionBurnFraction, 18).atomics);
     }
     if (message.convictionRenewalThreshold !== "") {
-      writer.uint32(450).string(Decimal.fromUserInput(message.convictionRenewalThreshold, 18).atomics);
+      writer.uint32(426).string(Decimal.fromUserInput(message.convictionRenewalThreshold, 18).atomics);
     }
     if (message.convictionRenewalPeriod !== BigInt(0)) {
-      writer.uint32(456).int64(message.convictionRenewalPeriod);
+      writer.uint32(432).int64(message.convictionRenewalPeriod);
     }
     if (message.pinMinTrustLevel !== 0) {
-      writer.uint32(488).uint32(message.pinMinTrustLevel);
+      writer.uint32(440).uint32(message.pinMinTrustLevel);
     }
     if (message.maxPinsPerDay !== 0) {
-      writer.uint32(496).uint32(message.maxPinsPerDay);
+      writer.uint32(448).uint32(message.maxPinsPerDay);
     }
     if (message.curatorDemotionCooldown !== BigInt(0)) {
-      writer.uint32(504).int64(message.curatorDemotionCooldown);
+      writer.uint32(456).int64(message.curatorDemotionCooldown);
     }
     if (message.curatorDemotionThreshold !== "") {
-      writer.uint32(514).string(message.curatorDemotionThreshold);
+      writer.uint32(466).string(message.curatorDemotionThreshold);
     }
     if (message.curatorOverturnDemotionStreak !== BigInt(0)) {
-      writer.uint32(520).uint64(message.curatorOverturnDemotionStreak);
+      writer.uint32(472).uint64(message.curatorOverturnDemotionStreak);
     }
     if (message.curatorUnbondCooldown !== BigInt(0)) {
-      writer.uint32(528).int64(message.curatorUnbondCooldown);
+      writer.uint32(480).int64(message.curatorUnbondCooldown);
     }
     if (message.makePermanentMinTrustLevel !== 0) {
-      writer.uint32(536).uint32(message.makePermanentMinTrustLevel);
+      writer.uint32(488).uint32(message.makePermanentMinTrustLevel);
     }
     if (message.maxMakePermanentPerDay !== 0) {
-      writer.uint32(600).uint32(message.maxMakePermanentPerDay);
+      writer.uint32(552).uint32(message.maxMakePermanentPerDay);
     }
     if (message.nonMemberCollabDreamStake !== "") {
-      writer.uint32(546).string(message.nonMemberCollabDreamStake);
+      writer.uint32(498).string(message.nonMemberCollabDreamStake);
     }
     if (message.nonMemberCollabBurnFraction !== "") {
-      writer.uint32(554).string(Decimal.fromUserInput(message.nonMemberCollabBurnFraction, 18).atomics);
+      writer.uint32(506).string(Decimal.fromUserInput(message.nonMemberCollabBurnFraction, 18).atomics);
     }
     if (message.maxNonMemberCollaboratorsPerCollection !== 0) {
-      writer.uint32(560).uint32(message.maxNonMemberCollaboratorsPerCollection);
+      writer.uint32(512).uint32(message.maxNonMemberCollaboratorsPerCollection);
     }
     if (message.maxPromotionsPerBlock !== 0) {
-      writer.uint32(568).uint32(message.maxPromotionsPerBlock);
+      writer.uint32(520).uint32(message.maxPromotionsPerBlock);
     }
     if (message.endorserRepPenalty !== "") {
-      writer.uint32(578).string(Decimal.fromUserInput(message.endorserRepPenalty, 18).atomics);
+      writer.uint32(530).string(Decimal.fromUserInput(message.endorserRepPenalty, 18).atomics);
     }
     if (message.collabInviterRepPenalty !== "") {
-      writer.uint32(586).string(Decimal.fromUserInput(message.collabInviterRepPenalty, 18).atomics);
+      writer.uint32(538).string(Decimal.fromUserInput(message.collabInviterRepPenalty, 18).atomics);
     }
     if (message.authorRepPenalty !== "") {
-      writer.uint32(594).string(Decimal.fromUserInput(message.authorRepPenalty, 18).atomics);
+      writer.uint32(546).string(Decimal.fromUserInput(message.authorRepPenalty, 18).atomics);
     }
     return writer;
   },
@@ -795,163 +783,157 @@ export const Params = {
         case 20:
           message.perItemSpamTax = reader.string();
           break;
-        case 22:
+        case 21:
           message.sponsorFee = reader.string();
           break;
-        case 23:
+        case 22:
           message.minSponsorTrustLevel = reader.string();
           break;
-        case 24:
+        case 23:
           message.sponsorshipRequestTtlBlocks = reader.int64();
           break;
-        case 25:
+        case 24:
           message.minCuratorBond = reader.string();
           break;
-        case 26:
+        case 25:
           message.minCuratorTrustLevel = reader.string();
           break;
-        case 27:
+        case 26:
           message.minCuratorAgeBlocks = reader.int64();
           break;
-        case 28:
+        case 27:
           message.maxTagsPerReview = reader.uint32();
           break;
-        case 29:
+        case 28:
           message.maxReviewCommentLength = reader.uint32();
           break;
-        case 30:
+        case 29:
           message.maxReviewsPerCollection = reader.uint32();
           break;
-        case 31:
+        case 30:
           message.curatorSlashFraction = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 32:
+        case 31:
           message.challengeWindowBlocks = reader.int64();
           break;
-        case 33:
+        case 32:
           message.challengeDeposit = reader.string();
           break;
-        case 34:
+        case 33:
           message.maxChallengeReasonLength = reader.uint32();
           break;
-        case 35:
+        case 34:
           message.maxPrunePerBlock = reader.uint32();
           break;
-        case 36:
+        case 35:
           message.challengeRewardFraction = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 37:
+        case 36:
           message.downvoteCost = reader.string();
           break;
-        case 38:
+        case 37:
           message.maxUpvotesPerDay = reader.uint32();
           break;
-        case 39:
+        case 38:
           message.maxDownvotesPerDay = reader.uint32();
           break;
-        case 40:
+        case 39:
           message.flagReviewThreshold = reader.uint32();
           break;
-        case 41:
+        case 40:
           message.maxFlagsPerDay = reader.uint32();
           break;
-        case 42:
+        case 41:
           message.maxFlaggersPerTarget = reader.uint32();
           break;
-        case 43:
+        case 42:
           message.flagExpirationBlocks = reader.int64();
           break;
-        case 44:
+        case 43:
           message.maxFlagReasonLength = reader.uint32();
           break;
-        case 45:
+        case 44:
           message.sentinelCommitAmount = reader.string();
           break;
-        case 46:
+        case 45:
           message.hideExpiryBlocks = reader.int64();
           break;
-        case 47:
-          message.appealFee = reader.string();
-          break;
-        case 48:
+        case 46:
           message.appealCooldownBlocks = reader.int64();
           break;
-        case 49:
-          message.appealDeadlineBlocks = reader.int64();
-          break;
-        case 76:
+        case 70:
           message.sentinelUnhideWindowBlocks = reader.int64();
           break;
-        case 77:
+        case 71:
           message.maxHidesPerSentinelPerDay = reader.uint32();
           break;
-        case 50:
+        case 47:
           message.endorsementCreationFee = reader.string();
           break;
-        case 51:
+        case 48:
           message.endorsementDreamStake = reader.string();
           break;
-        case 52:
+        case 49:
           message.endorsementStakeDuration = reader.int64();
           break;
-        case 53:
+        case 50:
           message.endorsementExpiryBlocks = reader.int64();
           break;
-        case 54:
+        case 51:
           message.endorsementFeeEndorserShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 55:
+        case 52:
           message.endorsementDeletionBurnFraction = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 56:
+        case 53:
           message.convictionRenewalThreshold = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 57:
+        case 54:
           message.convictionRenewalPeriod = reader.int64();
           break;
-        case 61:
+        case 55:
           message.pinMinTrustLevel = reader.uint32();
           break;
-        case 62:
+        case 56:
           message.maxPinsPerDay = reader.uint32();
           break;
-        case 63:
+        case 57:
           message.curatorDemotionCooldown = reader.int64();
           break;
-        case 64:
+        case 58:
           message.curatorDemotionThreshold = reader.string();
           break;
-        case 65:
+        case 59:
           message.curatorOverturnDemotionStreak = reader.uint64();
           break;
-        case 66:
+        case 60:
           message.curatorUnbondCooldown = reader.int64();
           break;
-        case 67:
+        case 61:
           message.makePermanentMinTrustLevel = reader.uint32();
           break;
-        case 75:
+        case 69:
           message.maxMakePermanentPerDay = reader.uint32();
           break;
-        case 68:
+        case 62:
           message.nonMemberCollabDreamStake = reader.string();
           break;
-        case 69:
+        case 63:
           message.nonMemberCollabBurnFraction = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 70:
+        case 64:
           message.maxNonMemberCollaboratorsPerCollection = reader.uint32();
           break;
-        case 71:
+        case 65:
           message.maxPromotionsPerBlock = reader.uint32();
           break;
-        case 72:
+        case 66:
           message.endorserRepPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 73:
+        case 67:
           message.collabInviterRepPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 74:
+        case 68:
           message.authorRepPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
         default:
@@ -1008,9 +990,7 @@ export const Params = {
     message.maxFlagReasonLength = object.maxFlagReasonLength ?? 0;
     message.sentinelCommitAmount = object.sentinelCommitAmount ?? "";
     message.hideExpiryBlocks = object.hideExpiryBlocks !== undefined && object.hideExpiryBlocks !== null ? BigInt(object.hideExpiryBlocks.toString()) : BigInt(0);
-    message.appealFee = object.appealFee ?? "";
     message.appealCooldownBlocks = object.appealCooldownBlocks !== undefined && object.appealCooldownBlocks !== null ? BigInt(object.appealCooldownBlocks.toString()) : BigInt(0);
-    message.appealDeadlineBlocks = object.appealDeadlineBlocks !== undefined && object.appealDeadlineBlocks !== null ? BigInt(object.appealDeadlineBlocks.toString()) : BigInt(0);
     message.sentinelUnhideWindowBlocks = object.sentinelUnhideWindowBlocks !== undefined && object.sentinelUnhideWindowBlocks !== null ? BigInt(object.sentinelUnhideWindowBlocks.toString()) : BigInt(0);
     message.maxHidesPerSentinelPerDay = object.maxHidesPerSentinelPerDay ?? 0;
     message.endorsementCreationFee = object.endorsementCreationFee ?? "";
@@ -1175,14 +1155,8 @@ export const Params = {
     if (object.hide_expiry_blocks !== undefined && object.hide_expiry_blocks !== null) {
       message.hideExpiryBlocks = BigInt(object.hide_expiry_blocks);
     }
-    if (object.appeal_fee !== undefined && object.appeal_fee !== null) {
-      message.appealFee = object.appeal_fee;
-    }
     if (object.appeal_cooldown_blocks !== undefined && object.appeal_cooldown_blocks !== null) {
       message.appealCooldownBlocks = BigInt(object.appeal_cooldown_blocks);
-    }
-    if (object.appeal_deadline_blocks !== undefined && object.appeal_deadline_blocks !== null) {
-      message.appealDeadlineBlocks = BigInt(object.appeal_deadline_blocks);
     }
     if (object.sentinel_unhide_window_blocks !== undefined && object.sentinel_unhide_window_blocks !== null) {
       message.sentinelUnhideWindowBlocks = BigInt(object.sentinel_unhide_window_blocks);
@@ -1308,9 +1282,7 @@ export const Params = {
     obj.max_flag_reason_length = message.maxFlagReasonLength === 0 ? undefined : message.maxFlagReasonLength;
     obj.sentinel_commit_amount = message.sentinelCommitAmount === "" ? undefined : message.sentinelCommitAmount;
     obj.hide_expiry_blocks = message.hideExpiryBlocks !== BigInt(0) ? message.hideExpiryBlocks?.toString() : undefined;
-    obj.appeal_fee = message.appealFee === "" ? undefined : message.appealFee;
     obj.appeal_cooldown_blocks = message.appealCooldownBlocks !== BigInt(0) ? message.appealCooldownBlocks?.toString() : undefined;
-    obj.appeal_deadline_blocks = message.appealDeadlineBlocks !== BigInt(0) ? message.appealDeadlineBlocks?.toString() : undefined;
     obj.sentinel_unhide_window_blocks = message.sentinelUnhideWindowBlocks !== BigInt(0) ? message.sentinelUnhideWindowBlocks?.toString() : undefined;
     obj.max_hides_per_sentinel_per_day = message.maxHidesPerSentinelPerDay === 0 ? undefined : message.maxHidesPerSentinelPerDay;
     obj.endorsement_creation_fee = message.endorsementCreationFee === "" ? undefined : message.endorsementCreationFee;

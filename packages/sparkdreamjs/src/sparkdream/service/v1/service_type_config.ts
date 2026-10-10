@@ -132,6 +132,30 @@ export interface ServiceTypeConfig {
    * this field is just the starting proposal.
    */
   challengeDefaultSlashBps: number;
+  /**
+   * attestation_quorum is how many independent ACTIVE operators of this
+   * type must agree before clients accept an attestation as positive
+   * (for content scanners: "clean" for the same hash, see
+   * docs/content-scanning.md §4.4). 0 means operators of this type do not
+   * attest. Read by clients from the chain so every frontend shares one
+   * baseline; a frontend may require more.
+   */
+  attestationQuorum: number;
+  /**
+   * elevated_attestation_quorum is the quorum for subjects from low-trust
+   * sources (content scanners: media authored by TRUST_LEVEL_NEW or
+   * TRUST_LEVEL_PROVISIONAL members, §9). 0 means attestation_quorum
+   * applies; otherwise MUST be >= attestation_quorum.
+   */
+  elevatedAttestationQuorum: number;
+  /**
+   * checkpoint_max_lag_blocks is how far an ACTIVE operator's checkpoint
+   * height may trail the chain before x/service files an automatic
+   * liveness system report against it (MsgSubmitCheckpoint). 0 disables
+   * liveness tracking for the type. When enabled, challenge_default_slash_bps
+   * MUST be > 0 (it is the proposed slash of the liveness report).
+   */
+  checkpointMaxLagBlocks: bigint;
 }
 export interface ServiceTypeConfigProtoMsg {
   typeUrl: "/sparkdream.service.v1.ServiceTypeConfig";
@@ -217,6 +241,30 @@ export interface ServiceTypeConfigAmino {
    * this field is just the starting proposal.
    */
   challenge_default_slash_bps?: number;
+  /**
+   * attestation_quorum is how many independent ACTIVE operators of this
+   * type must agree before clients accept an attestation as positive
+   * (for content scanners: "clean" for the same hash, see
+   * docs/content-scanning.md §4.4). 0 means operators of this type do not
+   * attest. Read by clients from the chain so every frontend shares one
+   * baseline; a frontend may require more.
+   */
+  attestation_quorum?: number;
+  /**
+   * elevated_attestation_quorum is the quorum for subjects from low-trust
+   * sources (content scanners: media authored by TRUST_LEVEL_NEW or
+   * TRUST_LEVEL_PROVISIONAL members, §9). 0 means attestation_quorum
+   * applies; otherwise MUST be >= attestation_quorum.
+   */
+  elevated_attestation_quorum?: number;
+  /**
+   * checkpoint_max_lag_blocks is how far an ACTIVE operator's checkpoint
+   * height may trail the chain before x/service files an automatic
+   * liveness system report against it (MsgSubmitCheckpoint). 0 disables
+   * liveness tracking for the type. When enabled, challenge_default_slash_bps
+   * MUST be > 0 (it is the proposed slash of the liveness report).
+   */
+  checkpoint_max_lag_blocks?: string;
 }
 export interface ServiceTypeConfigAminoMsg {
   type: "sparkdream/x/service/ServiceTypeConfig";
@@ -235,7 +283,10 @@ function createBaseServiceTypeConfig(): ServiceTypeConfig {
     underfundedGraceBlocks: BigInt(0),
     enabled: false,
     reportTimeoutAction: 0,
-    challengeDefaultSlashBps: 0
+    challengeDefaultSlashBps: 0,
+    attestationQuorum: 0,
+    elevatedAttestationQuorum: 0,
+    checkpointMaxLagBlocks: BigInt(0)
   };
 }
 /**
@@ -286,6 +337,15 @@ export const ServiceTypeConfig = {
     if (message.challengeDefaultSlashBps !== 0) {
       writer.uint32(96).uint32(message.challengeDefaultSlashBps);
     }
+    if (message.attestationQuorum !== 0) {
+      writer.uint32(104).uint32(message.attestationQuorum);
+    }
+    if (message.elevatedAttestationQuorum !== 0) {
+      writer.uint32(112).uint32(message.elevatedAttestationQuorum);
+    }
+    if (message.checkpointMaxLagBlocks !== BigInt(0)) {
+      writer.uint32(120).int64(message.checkpointMaxLagBlocks);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): ServiceTypeConfig {
@@ -331,6 +391,15 @@ export const ServiceTypeConfig = {
         case 12:
           message.challengeDefaultSlashBps = reader.uint32();
           break;
+        case 13:
+          message.attestationQuorum = reader.uint32();
+          break;
+        case 14:
+          message.elevatedAttestationQuorum = reader.uint32();
+          break;
+        case 15:
+          message.checkpointMaxLagBlocks = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -352,6 +421,9 @@ export const ServiceTypeConfig = {
     message.enabled = object.enabled ?? false;
     message.reportTimeoutAction = object.reportTimeoutAction ?? 0;
     message.challengeDefaultSlashBps = object.challengeDefaultSlashBps ?? 0;
+    message.attestationQuorum = object.attestationQuorum ?? 0;
+    message.elevatedAttestationQuorum = object.elevatedAttestationQuorum ?? 0;
+    message.checkpointMaxLagBlocks = object.checkpointMaxLagBlocks !== undefined && object.checkpointMaxLagBlocks !== null ? BigInt(object.checkpointMaxLagBlocks.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ServiceTypeConfigAmino): ServiceTypeConfig {
@@ -392,6 +464,15 @@ export const ServiceTypeConfig = {
     if (object.challenge_default_slash_bps !== undefined && object.challenge_default_slash_bps !== null) {
       message.challengeDefaultSlashBps = object.challenge_default_slash_bps;
     }
+    if (object.attestation_quorum !== undefined && object.attestation_quorum !== null) {
+      message.attestationQuorum = object.attestation_quorum;
+    }
+    if (object.elevated_attestation_quorum !== undefined && object.elevated_attestation_quorum !== null) {
+      message.elevatedAttestationQuorum = object.elevated_attestation_quorum;
+    }
+    if (object.checkpoint_max_lag_blocks !== undefined && object.checkpoint_max_lag_blocks !== null) {
+      message.checkpointMaxLagBlocks = BigInt(object.checkpoint_max_lag_blocks);
+    }
     return message;
   },
   toAmino(message: ServiceTypeConfig): ServiceTypeConfigAmino {
@@ -408,6 +489,9 @@ export const ServiceTypeConfig = {
     obj.enabled = message.enabled === false ? undefined : message.enabled;
     obj.report_timeout_action = message.reportTimeoutAction === 0 ? undefined : message.reportTimeoutAction;
     obj.challenge_default_slash_bps = message.challengeDefaultSlashBps === 0 ? undefined : message.challengeDefaultSlashBps;
+    obj.attestation_quorum = message.attestationQuorum === 0 ? undefined : message.attestationQuorum;
+    obj.elevated_attestation_quorum = message.elevatedAttestationQuorum === 0 ? undefined : message.elevatedAttestationQuorum;
+    obj.checkpoint_max_lag_blocks = message.checkpointMaxLagBlocks !== BigInt(0) ? message.checkpointMaxLagBlocks?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ServiceTypeConfigAminoMsg): ServiceTypeConfig {

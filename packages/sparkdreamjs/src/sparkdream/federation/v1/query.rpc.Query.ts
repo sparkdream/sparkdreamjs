@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetPeerRequest, QueryGetPeerResponse, QueryListPeersRequest, QueryListPeersResponse, QueryGetPeerPolicyRequest, QueryGetPeerPolicyResponse, QueryGetBridgeBindingRequest, QueryGetBridgeBindingResponse, QueryListBridgeBindingsRequest, QueryListBridgeBindingsResponse, QueryGetFederatedContentRequest, QueryGetFederatedContentResponse, QueryListFederatedContentRequest, QueryListFederatedContentResponse, QueryGetIdentityLinkRequest, QueryGetIdentityLinkResponse, QueryListIdentityLinksRequest, QueryListIdentityLinksResponse, QueryResolveRemoteIdentityRequest, QueryResolveRemoteIdentityResponse, QueryGetPendingIdentityChallengeRequest, QueryGetPendingIdentityChallengeResponse, QueryListPendingIdentityChallengesRequest, QueryListPendingIdentityChallengesResponse, QueryGetReputationAttestationRequest, QueryGetReputationAttestationResponse, QueryListOutboundAttestationsRequest, QueryListOutboundAttestationsResponse, QueryVerifierActivityRequest, QueryVerifierActivityResponse, QueryOperatorRewardPoolRequest, QueryOperatorRewardPoolResponse, QueryGetVerificationRecordRequest, QueryGetVerificationRecordResponse, QueryGetEscalatedChallengeRequest, QueryGetEscalatedChallengeResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetPeerRequest, QueryGetPeerResponse, QueryListPeersRequest, QueryListPeersResponse, QueryGetPeerPolicyRequest, QueryGetPeerPolicyResponse, QueryGetBridgeBindingRequest, QueryGetBridgeBindingResponse, QueryListBridgeBindingsRequest, QueryListBridgeBindingsResponse, QueryGetFederatedContentRequest, QueryGetFederatedContentResponse, QueryListFederatedContentRequest, QueryListFederatedContentResponse, QueryGetIdentityLinkRequest, QueryGetIdentityLinkResponse, QueryListIdentityLinksRequest, QueryListIdentityLinksResponse, QueryResolveRemoteIdentityRequest, QueryResolveRemoteIdentityResponse, QueryGetPendingIdentityChallengeRequest, QueryGetPendingIdentityChallengeResponse, QueryListPendingIdentityChallengesRequest, QueryListPendingIdentityChallengesResponse, QueryGetReputationAttestationRequest, QueryGetReputationAttestationResponse, QueryListOutboundAttestationsRequest, QueryListOutboundAttestationsResponse, QueryVerifierActivityRequest, QueryVerifierActivityResponse, QueryOperatorRewardPoolRequest, QueryOperatorRewardPoolResponse, QueryGetVerificationRecordRequest, QueryGetVerificationRecordResponse, QueryGetEscalatedChallengeRequest, QueryGetEscalatedChallengeResponse, QueryFederatedContentBodyRequest, QueryFederatedContentBodyResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   params(request?: QueryParamsRequest): Promise<QueryParamsResponse>;
@@ -37,6 +37,12 @@ export interface Query {
   operatorRewardPool(request?: QueryOperatorRewardPoolRequest): Promise<QueryOperatorRewardPoolResponse>;
   getVerificationRecord(request: QueryGetVerificationRecordRequest): Promise<QueryGetVerificationRecordResponse>;
   getEscalatedChallenge(request: QueryGetEscalatedChallengeRequest): Promise<QueryGetEscalatedChallengeResponse>;
+  /**
+   * FederatedContentBody returns the full body of one federated record. List
+   * and show queries return the body as "" whenever media_flags != 0
+   * (docs/content-scanning.md §3.4).
+   */
+  federatedContentBody(request: QueryFederatedContentBodyRequest): Promise<QueryFederatedContentBodyResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -172,6 +178,14 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.federation.v1.Query", "GetEscalatedChallenge", data);
     return promise.then(data => QueryGetEscalatedChallengeResponse.decode(new BinaryReader(data)));
   };
+  /* FederatedContentBody returns the full body of one federated record. List
+   and show queries return the body as "" whenever media_flags != 0
+   (docs/content-scanning.md §3.4). */
+  federatedContentBody = async (request: QueryFederatedContentBodyRequest): Promise<QueryFederatedContentBodyResponse> => {
+    const data = QueryFederatedContentBodyRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.federation.v1.Query", "FederatedContentBody", data);
+    return promise.then(data => QueryFederatedContentBodyResponse.decode(new BinaryReader(data)));
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);
@@ -233,6 +247,9 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     getEscalatedChallenge(request: QueryGetEscalatedChallengeRequest): Promise<QueryGetEscalatedChallengeResponse> {
       return queryService.getEscalatedChallenge(request);
+    },
+    federatedContentBody(request: QueryFederatedContentBodyRequest): Promise<QueryFederatedContentBodyResponse> {
+      return queryService.federatedContentBody(request);
     }
   };
 };

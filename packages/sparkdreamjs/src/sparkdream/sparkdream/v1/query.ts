@@ -56,6 +56,100 @@ export interface QueryParamsResponseAminoMsg {
   type: "/sparkdream.sparkdream.v1.QueryParamsResponse";
   value: QueryParamsResponseAmino;
 }
+/**
+ * QueryContentLicenseRequest is the request type for Query/ContentLicense.
+ * @name QueryContentLicenseRequest
+ * @package sparkdream.sparkdream.v1
+ * @see proto type: sparkdream.sparkdream.v1.QueryContentLicenseRequest
+ */
+export interface QueryContentLicenseRequest {}
+export interface QueryContentLicenseRequestProtoMsg {
+  typeUrl: "/sparkdream.sparkdream.v1.QueryContentLicenseRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryContentLicenseRequest is the request type for Query/ContentLicense.
+ * @name QueryContentLicenseRequestAmino
+ * @package sparkdream.sparkdream.v1
+ * @see proto type: sparkdream.sparkdream.v1.QueryContentLicenseRequest
+ */
+export interface QueryContentLicenseRequestAmino {}
+export interface QueryContentLicenseRequestAminoMsg {
+  type: "/sparkdream.sparkdream.v1.QueryContentLicenseRequest";
+  value: QueryContentLicenseRequestAmino;
+}
+/**
+ * QueryContentLicenseResponse is the response type for Query/ContentLicense.
+ * @name QueryContentLicenseResponse
+ * @package sparkdream.sparkdream.v1
+ * @see proto type: sparkdream.sparkdream.v1.QueryContentLicenseResponse
+ */
+export interface QueryContentLicenseResponse {
+  /**
+   * license is the SPDX id of the license all content is published under
+   * ("CC0-1.0").
+   */
+  license: string;
+  /**
+   * name is the license's display name.
+   */
+  name: string;
+  /**
+   * url links to the license's legal text.
+   */
+  url: string;
+  /**
+   * dedication is the statement a participant makes by submitting content.
+   * Clients should show it wherever content is composed.
+   */
+  dedication: string;
+  /**
+   * accepted_federated_licenses are the licenses content bridged in through
+   * x/federation must carry ("CC0-1.0", "PDM-1.0"); everything else is
+   * refused.
+   */
+  acceptedFederatedLicenses: string[];
+}
+export interface QueryContentLicenseResponseProtoMsg {
+  typeUrl: "/sparkdream.sparkdream.v1.QueryContentLicenseResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryContentLicenseResponse is the response type for Query/ContentLicense.
+ * @name QueryContentLicenseResponseAmino
+ * @package sparkdream.sparkdream.v1
+ * @see proto type: sparkdream.sparkdream.v1.QueryContentLicenseResponse
+ */
+export interface QueryContentLicenseResponseAmino {
+  /**
+   * license is the SPDX id of the license all content is published under
+   * ("CC0-1.0").
+   */
+  license?: string;
+  /**
+   * name is the license's display name.
+   */
+  name?: string;
+  /**
+   * url links to the license's legal text.
+   */
+  url?: string;
+  /**
+   * dedication is the statement a participant makes by submitting content.
+   * Clients should show it wherever content is composed.
+   */
+  dedication?: string;
+  /**
+   * accepted_federated_licenses are the licenses content bridged in through
+   * x/federation must carry ("CC0-1.0", "PDM-1.0"); everything else is
+   * refused.
+   */
+  accepted_federated_licenses?: string[];
+}
+export interface QueryContentLicenseResponseAminoMsg {
+  type: "/sparkdream.sparkdream.v1.QueryContentLicenseResponse";
+  value: QueryContentLicenseResponseAmino;
+}
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
 }
@@ -178,6 +272,181 @@ export const QueryParamsResponse = {
     return {
       typeUrl: "/sparkdream.sparkdream.v1.QueryParamsResponse",
       value: QueryParamsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryContentLicenseRequest(): QueryContentLicenseRequest {
+  return {};
+}
+/**
+ * QueryContentLicenseRequest is the request type for Query/ContentLicense.
+ * @name QueryContentLicenseRequest
+ * @package sparkdream.sparkdream.v1
+ * @see proto type: sparkdream.sparkdream.v1.QueryContentLicenseRequest
+ */
+export const QueryContentLicenseRequest = {
+  typeUrl: "/sparkdream.sparkdream.v1.QueryContentLicenseRequest",
+  encode(_: QueryContentLicenseRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryContentLicenseRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryContentLicenseRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<QueryContentLicenseRequest>): QueryContentLicenseRequest {
+    const message = createBaseQueryContentLicenseRequest();
+    return message;
+  },
+  fromAmino(_: QueryContentLicenseRequestAmino): QueryContentLicenseRequest {
+    const message = createBaseQueryContentLicenseRequest();
+    return message;
+  },
+  toAmino(_: QueryContentLicenseRequest): QueryContentLicenseRequestAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: QueryContentLicenseRequestAminoMsg): QueryContentLicenseRequest {
+    return QueryContentLicenseRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryContentLicenseRequestProtoMsg): QueryContentLicenseRequest {
+    return QueryContentLicenseRequest.decode(message.value);
+  },
+  toProto(message: QueryContentLicenseRequest): Uint8Array {
+    return QueryContentLicenseRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryContentLicenseRequest): QueryContentLicenseRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.sparkdream.v1.QueryContentLicenseRequest",
+      value: QueryContentLicenseRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryContentLicenseResponse(): QueryContentLicenseResponse {
+  return {
+    license: "",
+    name: "",
+    url: "",
+    dedication: "",
+    acceptedFederatedLicenses: []
+  };
+}
+/**
+ * QueryContentLicenseResponse is the response type for Query/ContentLicense.
+ * @name QueryContentLicenseResponse
+ * @package sparkdream.sparkdream.v1
+ * @see proto type: sparkdream.sparkdream.v1.QueryContentLicenseResponse
+ */
+export const QueryContentLicenseResponse = {
+  typeUrl: "/sparkdream.sparkdream.v1.QueryContentLicenseResponse",
+  encode(message: QueryContentLicenseResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.license !== "") {
+      writer.uint32(10).string(message.license);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.url !== "") {
+      writer.uint32(26).string(message.url);
+    }
+    if (message.dedication !== "") {
+      writer.uint32(34).string(message.dedication);
+    }
+    for (const v of message.acceptedFederatedLicenses) {
+      writer.uint32(42).string(v!);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryContentLicenseResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryContentLicenseResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.license = reader.string();
+          break;
+        case 2:
+          message.name = reader.string();
+          break;
+        case 3:
+          message.url = reader.string();
+          break;
+        case 4:
+          message.dedication = reader.string();
+          break;
+        case 5:
+          message.acceptedFederatedLicenses.push(reader.string());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryContentLicenseResponse>): QueryContentLicenseResponse {
+    const message = createBaseQueryContentLicenseResponse();
+    message.license = object.license ?? "";
+    message.name = object.name ?? "";
+    message.url = object.url ?? "";
+    message.dedication = object.dedication ?? "";
+    message.acceptedFederatedLicenses = object.acceptedFederatedLicenses?.map(e => e) || [];
+    return message;
+  },
+  fromAmino(object: QueryContentLicenseResponseAmino): QueryContentLicenseResponse {
+    const message = createBaseQueryContentLicenseResponse();
+    if (object.license !== undefined && object.license !== null) {
+      message.license = object.license;
+    }
+    if (object.name !== undefined && object.name !== null) {
+      message.name = object.name;
+    }
+    if (object.url !== undefined && object.url !== null) {
+      message.url = object.url;
+    }
+    if (object.dedication !== undefined && object.dedication !== null) {
+      message.dedication = object.dedication;
+    }
+    message.acceptedFederatedLicenses = object.accepted_federated_licenses?.map(e => e) || [];
+    return message;
+  },
+  toAmino(message: QueryContentLicenseResponse): QueryContentLicenseResponseAmino {
+    const obj: any = {};
+    obj.license = message.license === "" ? undefined : message.license;
+    obj.name = message.name === "" ? undefined : message.name;
+    obj.url = message.url === "" ? undefined : message.url;
+    obj.dedication = message.dedication === "" ? undefined : message.dedication;
+    if (message.acceptedFederatedLicenses) {
+      obj.accepted_federated_licenses = message.acceptedFederatedLicenses.map(e => e);
+    } else {
+      obj.accepted_federated_licenses = message.acceptedFederatedLicenses;
+    }
+    return obj;
+  },
+  fromAminoMsg(object: QueryContentLicenseResponseAminoMsg): QueryContentLicenseResponse {
+    return QueryContentLicenseResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryContentLicenseResponseProtoMsg): QueryContentLicenseResponse {
+    return QueryContentLicenseResponse.decode(message.value);
+  },
+  toProto(message: QueryContentLicenseResponse): Uint8Array {
+    return QueryContentLicenseResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryContentLicenseResponse): QueryContentLicenseResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.sparkdream.v1.QueryContentLicenseResponse",
+      value: QueryContentLicenseResponse.encode(message).finish()
     };
   }
 };

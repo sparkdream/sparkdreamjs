@@ -3,8 +3,9 @@ import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "
 import { Params, ParamsAmino } from "./params";
 import { Post, PostAmino } from "./post";
 import { Reply, ReplyAmino, ReactionCounts, ReactionCountsAmino, Reaction, ReactionAmino } from "./types";
+import { ContentType } from "../../common/v1/content_type";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /**
  * QueryParamsRequest is request type for the Query/Params RPC method.
  * @name QueryParamsRequest
@@ -682,6 +683,126 @@ export interface QueryListPostsByTagResponseAmino {
 export interface QueryListPostsByTagResponseAminoMsg {
   type: "/sparkdream.blog.v1.QueryListPostsByTagResponse";
   value: QueryListPostsByTagResponseAmino;
+}
+/**
+ * QueryPostBodyRequest defines the QueryPostBodyRequest message.
+ * @name QueryPostBodyRequest
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryPostBodyRequest
+ */
+export interface QueryPostBodyRequest {
+  id: bigint;
+}
+export interface QueryPostBodyRequestProtoMsg {
+  typeUrl: "/sparkdream.blog.v1.QueryPostBodyRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryPostBodyRequest defines the QueryPostBodyRequest message.
+ * @name QueryPostBodyRequestAmino
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryPostBodyRequest
+ */
+export interface QueryPostBodyRequestAmino {
+  id?: string;
+}
+export interface QueryPostBodyRequestAminoMsg {
+  type: "/sparkdream.blog.v1.QueryPostBodyRequest";
+  value: QueryPostBodyRequestAmino;
+}
+/**
+ * QueryPostBodyResponse carries the stored body with the labels a client
+ * needs to check it: body_hash must match sha256(body).
+ * @name QueryPostBodyResponse
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryPostBodyResponse
+ */
+export interface QueryPostBodyResponse {
+  body: string;
+  contentType: ContentType;
+  mediaFlags: number;
+  bodyHash: Uint8Array;
+}
+export interface QueryPostBodyResponseProtoMsg {
+  typeUrl: "/sparkdream.blog.v1.QueryPostBodyResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryPostBodyResponse carries the stored body with the labels a client
+ * needs to check it: body_hash must match sha256(body).
+ * @name QueryPostBodyResponseAmino
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryPostBodyResponse
+ */
+export interface QueryPostBodyResponseAmino {
+  body?: string;
+  content_type?: ContentType;
+  media_flags?: number;
+  body_hash?: string;
+}
+export interface QueryPostBodyResponseAminoMsg {
+  type: "/sparkdream.blog.v1.QueryPostBodyResponse";
+  value: QueryPostBodyResponseAmino;
+}
+/**
+ * QueryReplyBodyRequest defines the QueryReplyBodyRequest message.
+ * @name QueryReplyBodyRequest
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryReplyBodyRequest
+ */
+export interface QueryReplyBodyRequest {
+  id: bigint;
+}
+export interface QueryReplyBodyRequestProtoMsg {
+  typeUrl: "/sparkdream.blog.v1.QueryReplyBodyRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryReplyBodyRequest defines the QueryReplyBodyRequest message.
+ * @name QueryReplyBodyRequestAmino
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryReplyBodyRequest
+ */
+export interface QueryReplyBodyRequestAmino {
+  id?: string;
+}
+export interface QueryReplyBodyRequestAminoMsg {
+  type: "/sparkdream.blog.v1.QueryReplyBodyRequest";
+  value: QueryReplyBodyRequestAmino;
+}
+/**
+ * QueryReplyBodyResponse carries the stored body with the labels a client
+ * needs to check it: body_hash must match sha256(body).
+ * @name QueryReplyBodyResponse
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryReplyBodyResponse
+ */
+export interface QueryReplyBodyResponse {
+  body: string;
+  contentType: ContentType;
+  mediaFlags: number;
+  bodyHash: Uint8Array;
+}
+export interface QueryReplyBodyResponseProtoMsg {
+  typeUrl: "/sparkdream.blog.v1.QueryReplyBodyResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryReplyBodyResponse carries the stored body with the labels a client
+ * needs to check it: body_hash must match sha256(body).
+ * @name QueryReplyBodyResponseAmino
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryReplyBodyResponse
+ */
+export interface QueryReplyBodyResponseAmino {
+  body?: string;
+  content_type?: ContentType;
+  media_flags?: number;
+  body_hash?: string;
+}
+export interface QueryReplyBodyResponseAminoMsg {
+  type: "/sparkdream.blog.v1.QueryReplyBodyResponse";
+  value: QueryReplyBodyResponseAmino;
 }
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
@@ -2615,6 +2736,356 @@ export const QueryListPostsByTagResponse = {
     return {
       typeUrl: "/sparkdream.blog.v1.QueryListPostsByTagResponse",
       value: QueryListPostsByTagResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryPostBodyRequest(): QueryPostBodyRequest {
+  return {
+    id: BigInt(0)
+  };
+}
+/**
+ * QueryPostBodyRequest defines the QueryPostBodyRequest message.
+ * @name QueryPostBodyRequest
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryPostBodyRequest
+ */
+export const QueryPostBodyRequest = {
+  typeUrl: "/sparkdream.blog.v1.QueryPostBodyRequest",
+  encode(message: QueryPostBodyRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.id !== BigInt(0)) {
+      writer.uint32(8).uint64(message.id);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryPostBodyRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryPostBodyRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryPostBodyRequest>): QueryPostBodyRequest {
+    const message = createBaseQueryPostBodyRequest();
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryPostBodyRequestAmino): QueryPostBodyRequest {
+    const message = createBaseQueryPostBodyRequest();
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    return message;
+  },
+  toAmino(message: QueryPostBodyRequest): QueryPostBodyRequestAmino {
+    const obj: any = {};
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryPostBodyRequestAminoMsg): QueryPostBodyRequest {
+    return QueryPostBodyRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryPostBodyRequestProtoMsg): QueryPostBodyRequest {
+    return QueryPostBodyRequest.decode(message.value);
+  },
+  toProto(message: QueryPostBodyRequest): Uint8Array {
+    return QueryPostBodyRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryPostBodyRequest): QueryPostBodyRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.blog.v1.QueryPostBodyRequest",
+      value: QueryPostBodyRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryPostBodyResponse(): QueryPostBodyResponse {
+  return {
+    body: "",
+    contentType: 0,
+    mediaFlags: 0,
+    bodyHash: new Uint8Array()
+  };
+}
+/**
+ * QueryPostBodyResponse carries the stored body with the labels a client
+ * needs to check it: body_hash must match sha256(body).
+ * @name QueryPostBodyResponse
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryPostBodyResponse
+ */
+export const QueryPostBodyResponse = {
+  typeUrl: "/sparkdream.blog.v1.QueryPostBodyResponse",
+  encode(message: QueryPostBodyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.body !== "") {
+      writer.uint32(10).string(message.body);
+    }
+    if (message.contentType !== 0) {
+      writer.uint32(16).int32(message.contentType);
+    }
+    if (message.mediaFlags !== 0) {
+      writer.uint32(24).uint32(message.mediaFlags);
+    }
+    if (message.bodyHash.length !== 0) {
+      writer.uint32(34).bytes(message.bodyHash);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryPostBodyResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryPostBodyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.body = reader.string();
+          break;
+        case 2:
+          message.contentType = reader.int32() as any;
+          break;
+        case 3:
+          message.mediaFlags = reader.uint32();
+          break;
+        case 4:
+          message.bodyHash = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryPostBodyResponse>): QueryPostBodyResponse {
+    const message = createBaseQueryPostBodyResponse();
+    message.body = object.body ?? "";
+    message.contentType = object.contentType ?? 0;
+    message.mediaFlags = object.mediaFlags ?? 0;
+    message.bodyHash = object.bodyHash ?? new Uint8Array();
+    return message;
+  },
+  fromAmino(object: QueryPostBodyResponseAmino): QueryPostBodyResponse {
+    const message = createBaseQueryPostBodyResponse();
+    if (object.body !== undefined && object.body !== null) {
+      message.body = object.body;
+    }
+    if (object.content_type !== undefined && object.content_type !== null) {
+      message.contentType = object.content_type;
+    }
+    if (object.media_flags !== undefined && object.media_flags !== null) {
+      message.mediaFlags = object.media_flags;
+    }
+    if (object.body_hash !== undefined && object.body_hash !== null) {
+      message.bodyHash = bytesFromBase64(object.body_hash);
+    }
+    return message;
+  },
+  toAmino(message: QueryPostBodyResponse): QueryPostBodyResponseAmino {
+    const obj: any = {};
+    obj.body = message.body === "" ? undefined : message.body;
+    obj.content_type = message.contentType === 0 ? undefined : message.contentType;
+    obj.media_flags = message.mediaFlags === 0 ? undefined : message.mediaFlags;
+    obj.body_hash = message.bodyHash ? base64FromBytes(message.bodyHash) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryPostBodyResponseAminoMsg): QueryPostBodyResponse {
+    return QueryPostBodyResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryPostBodyResponseProtoMsg): QueryPostBodyResponse {
+    return QueryPostBodyResponse.decode(message.value);
+  },
+  toProto(message: QueryPostBodyResponse): Uint8Array {
+    return QueryPostBodyResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryPostBodyResponse): QueryPostBodyResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.blog.v1.QueryPostBodyResponse",
+      value: QueryPostBodyResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryReplyBodyRequest(): QueryReplyBodyRequest {
+  return {
+    id: BigInt(0)
+  };
+}
+/**
+ * QueryReplyBodyRequest defines the QueryReplyBodyRequest message.
+ * @name QueryReplyBodyRequest
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryReplyBodyRequest
+ */
+export const QueryReplyBodyRequest = {
+  typeUrl: "/sparkdream.blog.v1.QueryReplyBodyRequest",
+  encode(message: QueryReplyBodyRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.id !== BigInt(0)) {
+      writer.uint32(8).uint64(message.id);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryReplyBodyRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryReplyBodyRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryReplyBodyRequest>): QueryReplyBodyRequest {
+    const message = createBaseQueryReplyBodyRequest();
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryReplyBodyRequestAmino): QueryReplyBodyRequest {
+    const message = createBaseQueryReplyBodyRequest();
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    return message;
+  },
+  toAmino(message: QueryReplyBodyRequest): QueryReplyBodyRequestAmino {
+    const obj: any = {};
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryReplyBodyRequestAminoMsg): QueryReplyBodyRequest {
+    return QueryReplyBodyRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryReplyBodyRequestProtoMsg): QueryReplyBodyRequest {
+    return QueryReplyBodyRequest.decode(message.value);
+  },
+  toProto(message: QueryReplyBodyRequest): Uint8Array {
+    return QueryReplyBodyRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryReplyBodyRequest): QueryReplyBodyRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.blog.v1.QueryReplyBodyRequest",
+      value: QueryReplyBodyRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryReplyBodyResponse(): QueryReplyBodyResponse {
+  return {
+    body: "",
+    contentType: 0,
+    mediaFlags: 0,
+    bodyHash: new Uint8Array()
+  };
+}
+/**
+ * QueryReplyBodyResponse carries the stored body with the labels a client
+ * needs to check it: body_hash must match sha256(body).
+ * @name QueryReplyBodyResponse
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryReplyBodyResponse
+ */
+export const QueryReplyBodyResponse = {
+  typeUrl: "/sparkdream.blog.v1.QueryReplyBodyResponse",
+  encode(message: QueryReplyBodyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.body !== "") {
+      writer.uint32(10).string(message.body);
+    }
+    if (message.contentType !== 0) {
+      writer.uint32(16).int32(message.contentType);
+    }
+    if (message.mediaFlags !== 0) {
+      writer.uint32(24).uint32(message.mediaFlags);
+    }
+    if (message.bodyHash.length !== 0) {
+      writer.uint32(34).bytes(message.bodyHash);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryReplyBodyResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryReplyBodyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.body = reader.string();
+          break;
+        case 2:
+          message.contentType = reader.int32() as any;
+          break;
+        case 3:
+          message.mediaFlags = reader.uint32();
+          break;
+        case 4:
+          message.bodyHash = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryReplyBodyResponse>): QueryReplyBodyResponse {
+    const message = createBaseQueryReplyBodyResponse();
+    message.body = object.body ?? "";
+    message.contentType = object.contentType ?? 0;
+    message.mediaFlags = object.mediaFlags ?? 0;
+    message.bodyHash = object.bodyHash ?? new Uint8Array();
+    return message;
+  },
+  fromAmino(object: QueryReplyBodyResponseAmino): QueryReplyBodyResponse {
+    const message = createBaseQueryReplyBodyResponse();
+    if (object.body !== undefined && object.body !== null) {
+      message.body = object.body;
+    }
+    if (object.content_type !== undefined && object.content_type !== null) {
+      message.contentType = object.content_type;
+    }
+    if (object.media_flags !== undefined && object.media_flags !== null) {
+      message.mediaFlags = object.media_flags;
+    }
+    if (object.body_hash !== undefined && object.body_hash !== null) {
+      message.bodyHash = bytesFromBase64(object.body_hash);
+    }
+    return message;
+  },
+  toAmino(message: QueryReplyBodyResponse): QueryReplyBodyResponseAmino {
+    const obj: any = {};
+    obj.body = message.body === "" ? undefined : message.body;
+    obj.content_type = message.contentType === 0 ? undefined : message.contentType;
+    obj.media_flags = message.mediaFlags === 0 ? undefined : message.mediaFlags;
+    obj.body_hash = message.bodyHash ? base64FromBytes(message.bodyHash) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryReplyBodyResponseAminoMsg): QueryReplyBodyResponse {
+    return QueryReplyBodyResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryReplyBodyResponseProtoMsg): QueryReplyBodyResponse {
+    return QueryReplyBodyResponse.decode(message.value);
+  },
+  toProto(message: QueryReplyBodyResponse): Uint8Array {
+    return QueryReplyBodyResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryReplyBodyResponse): QueryReplyBodyResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.blog.v1.QueryReplyBodyResponse",
+      value: QueryReplyBodyResponse.encode(message).finish()
     };
   }
 };

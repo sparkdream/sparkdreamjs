@@ -69,6 +69,9 @@ export const createRPCQueryClient = async ({
       }
     },
     sparkdream: {
+      artifact: {
+        v1: (await import("./artifact/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
       blog: {
         v1: (await import("./blog/v1/query.rpc.Query")).createRpcQueryExtension(client)
       },

@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetPostRequest, QueryGetPostResponse, QueryAllPostRequest, QueryAllPostResponse, QueryGetUserRateLimitRequest, QueryGetUserRateLimitResponse, QueryAllUserRateLimitRequest, QueryAllUserRateLimitResponse, QueryGetUserReactionLimitRequest, QueryGetUserReactionLimitResponse, QueryAllUserReactionLimitRequest, QueryAllUserReactionLimitResponse, QueryGetSentinelActivityRequest, QueryGetSentinelActivityResponse, QueryAllSentinelActivityRequest, QueryAllSentinelActivityResponse, QueryGetHideRecordRequest, QueryGetHideRecordResponse, QueryAllHideRecordRequest, QueryAllHideRecordResponse, QueryGetThreadLockRecordRequest, QueryGetThreadLockRecordResponse, QueryAllThreadLockRecordRequest, QueryAllThreadLockRecordResponse, QueryGetThreadMoveRecordRequest, QueryGetThreadMoveRecordResponse, QueryAllThreadMoveRecordRequest, QueryAllThreadMoveRecordResponse, QueryGetPostFlagRequest, QueryGetPostFlagResponse, QueryAllPostFlagRequest, QueryAllPostFlagResponse, QueryGetBountyRequest, QueryGetBountyResponse, QueryAllBountyRequest, QueryAllBountyResponse, QueryGetThreadMetadataRequest, QueryGetThreadMetadataResponse, QueryAllThreadMetadataRequest, QueryAllThreadMetadataResponse, QueryGetThreadFollowRequest, QueryGetThreadFollowResponse, QueryAllThreadFollowRequest, QueryAllThreadFollowResponse, QueryGetThreadFollowCountRequest, QueryGetThreadFollowCountResponse, QueryAllThreadFollowCountRequest, QueryAllThreadFollowCountResponse, QueryGetArchiveMetadataRequest, QueryGetArchiveMetadataResponse, QueryAllArchiveMetadataRequest, QueryAllArchiveMetadataResponse, QueryPostsRequest, QueryPostsResponse, QueryThreadRequest, QueryThreadResponse, QueryUserPostsRequest, QueryUserPostsResponse, QueryArchiveCooldownRequest, QueryArchiveCooldownResponse, QueryForumStatusRequest, QueryForumStatusResponse, QueryAppealCooldownRequest, QueryAppealCooldownResponse, QueryPinnedPostsRequest, QueryPinnedPostsResponse, QueryLockedThreadsRequest, QueryLockedThreadsResponse, QueryThreadLockStatusRequest, QueryThreadLockStatusResponse, QueryTopPostsRequest, QueryTopPostsResponse, QueryThreadFollowersRequest, QueryThreadFollowersResponse, QueryUserFollowedThreadsRequest, QueryUserFollowedThreadsResponse, QueryIsFollowingThreadRequest, QueryIsFollowingThreadResponse, QueryBountyByThreadRequest, QueryBountyByThreadResponse, QueryActiveBountiesRequest, QueryActiveBountiesResponse, QueryUserBountiesRequest, QueryUserBountiesResponse, QueryBountyExpiringSoonRequest, QueryBountyExpiringSoonResponse, QueryPostFlagsRequest, QueryPostFlagsResponse, QueryFlagReviewQueueRequest, QueryFlagReviewQueueResponse, QueryGetPostConvictionStakeRequest, QueryGetPostConvictionStakeResponse, QueryPostConvictionStakesByStakerRequest, QueryPostConvictionStakesByStakerResponse, QueryPostConvictionStakesByPostRequest, QueryPostConvictionStakesByPostResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetPostRequest, QueryGetPostResponse, QueryAllPostRequest, QueryAllPostResponse, QueryGetUserRateLimitRequest, QueryGetUserRateLimitResponse, QueryAllUserRateLimitRequest, QueryAllUserRateLimitResponse, QueryGetUserReactionLimitRequest, QueryGetUserReactionLimitResponse, QueryAllUserReactionLimitRequest, QueryAllUserReactionLimitResponse, QueryGetSentinelActivityRequest, QueryGetSentinelActivityResponse, QueryAllSentinelActivityRequest, QueryAllSentinelActivityResponse, QueryGetHideRecordRequest, QueryGetHideRecordResponse, QueryAllHideRecordRequest, QueryAllHideRecordResponse, QueryGetThreadLockRecordRequest, QueryGetThreadLockRecordResponse, QueryAllThreadLockRecordRequest, QueryAllThreadLockRecordResponse, QueryGetThreadMoveRecordRequest, QueryGetThreadMoveRecordResponse, QueryAllThreadMoveRecordRequest, QueryAllThreadMoveRecordResponse, QueryGetPostFlagRequest, QueryGetPostFlagResponse, QueryAllPostFlagRequest, QueryAllPostFlagResponse, QueryGetBountyRequest, QueryGetBountyResponse, QueryAllBountyRequest, QueryAllBountyResponse, QueryGetThreadMetadataRequest, QueryGetThreadMetadataResponse, QueryAllThreadMetadataRequest, QueryAllThreadMetadataResponse, QueryGetThreadFollowRequest, QueryGetThreadFollowResponse, QueryAllThreadFollowRequest, QueryAllThreadFollowResponse, QueryGetThreadFollowCountRequest, QueryGetThreadFollowCountResponse, QueryAllThreadFollowCountRequest, QueryAllThreadFollowCountResponse, QueryGetArchiveMetadataRequest, QueryGetArchiveMetadataResponse, QueryAllArchiveMetadataRequest, QueryAllArchiveMetadataResponse, QueryPostsRequest, QueryPostsResponse, QueryThreadRequest, QueryThreadResponse, QueryUserPostsRequest, QueryUserPostsResponse, QueryArchiveCooldownRequest, QueryArchiveCooldownResponse, QueryForumStatusRequest, QueryForumStatusResponse, QueryAppealCooldownRequest, QueryAppealCooldownResponse, QueryPinnedPostsRequest, QueryPinnedPostsResponse, QueryLockedThreadsRequest, QueryLockedThreadsResponse, QueryThreadLockStatusRequest, QueryThreadLockStatusResponse, QueryTopPostsRequest, QueryTopPostsResponse, QueryThreadFollowersRequest, QueryThreadFollowersResponse, QueryUserFollowedThreadsRequest, QueryUserFollowedThreadsResponse, QueryIsFollowingThreadRequest, QueryIsFollowingThreadResponse, QueryBountyByThreadRequest, QueryBountyByThreadResponse, QueryActiveBountiesRequest, QueryActiveBountiesResponse, QueryUserBountiesRequest, QueryUserBountiesResponse, QueryBountyExpiringSoonRequest, QueryBountyExpiringSoonResponse, QueryPostFlagsRequest, QueryPostFlagsResponse, QueryFlagReviewQueueRequest, QueryFlagReviewQueueResponse, QueryGetPostConvictionStakeRequest, QueryGetPostConvictionStakeResponse, QueryPostConvictionStakesByStakerRequest, QueryPostConvictionStakesByStakerResponse, QueryPostConvictionStakesByPostRequest, QueryPostConvictionStakesByPostResponse, QueryPostContentRequest, QueryPostContentResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -108,6 +108,12 @@ export interface Query {
   postConvictionStakesByStaker(request: QueryPostConvictionStakesByStakerRequest): Promise<QueryPostConvictionStakesByStakerResponse>;
   /** PostConvictionStakesByPost lists all active stakes backing a post. */
   postConvictionStakesByPost(request: QueryPostConvictionStakesByPostRequest): Promise<QueryPostConvictionStakesByPostResponse>;
+  /**
+   * PostContent returns the full content of one post. List and show queries
+   * return content as "" whenever media_flags != 0; clients fetch it here once
+   * scanner verdicts say it is clean (docs/content-scanning.md §3.4).
+   */
+  postContent(request: QueryPostContentRequest): Promise<QueryPostContentResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -443,6 +449,14 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.forum.v1.Query", "PostConvictionStakesByPost", data);
     return promise.then(data => QueryPostConvictionStakesByPostResponse.decode(new BinaryReader(data)));
   };
+  /* PostContent returns the full content of one post. List and show queries
+   return content as "" whenever media_flags != 0; clients fetch it here once
+   scanner verdicts say it is clean (docs/content-scanning.md §3.4). */
+  postContent = async (request: QueryPostContentRequest): Promise<QueryPostContentResponse> => {
+    const data = QueryPostContentRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.forum.v1.Query", "PostContent", data);
+    return promise.then(data => QueryPostContentResponse.decode(new BinaryReader(data)));
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);
@@ -594,6 +608,9 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     postConvictionStakesByPost(request: QueryPostConvictionStakesByPostRequest): Promise<QueryPostConvictionStakesByPostResponse> {
       return queryService.postConvictionStakesByPost(request);
+    },
+    postContent(request: QueryPostContentRequest): Promise<QueryPostContentResponse> {
+      return queryService.postContent(request);
     }
   };
 };

@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetPeerRequest, QueryGetPeerResponse, QueryListPeersRequest, QueryListPeersResponse, QueryGetPeerPolicyRequest, QueryGetPeerPolicyResponse, QueryGetBridgeBindingRequest, QueryGetBridgeBindingResponse, QueryListBridgeBindingsRequest, QueryListBridgeBindingsResponse, QueryGetFederatedContentRequest, QueryGetFederatedContentResponse, QueryListFederatedContentRequest, QueryListFederatedContentResponse, QueryGetIdentityLinkRequest, QueryGetIdentityLinkResponse, QueryListIdentityLinksRequest, QueryListIdentityLinksResponse, QueryResolveRemoteIdentityRequest, QueryResolveRemoteIdentityResponse, QueryGetPendingIdentityChallengeRequest, QueryGetPendingIdentityChallengeResponse, QueryListPendingIdentityChallengesRequest, QueryListPendingIdentityChallengesResponse, QueryGetReputationAttestationRequest, QueryGetReputationAttestationResponse, QueryListOutboundAttestationsRequest, QueryListOutboundAttestationsResponse, QueryVerifierActivityRequest, QueryVerifierActivityResponse, QueryOperatorRewardPoolRequest, QueryOperatorRewardPoolResponse, QueryGetVerificationRecordRequest, QueryGetVerificationRecordResponse, QueryGetEscalatedChallengeRequest, QueryGetEscalatedChallengeResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetPeerRequest, QueryGetPeerResponse, QueryListPeersRequest, QueryListPeersResponse, QueryGetPeerPolicyRequest, QueryGetPeerPolicyResponse, QueryGetBridgeBindingRequest, QueryGetBridgeBindingResponse, QueryListBridgeBindingsRequest, QueryListBridgeBindingsResponse, QueryGetFederatedContentRequest, QueryGetFederatedContentResponse, QueryListFederatedContentRequest, QueryListFederatedContentResponse, QueryGetIdentityLinkRequest, QueryGetIdentityLinkResponse, QueryListIdentityLinksRequest, QueryListIdentityLinksResponse, QueryResolveRemoteIdentityRequest, QueryResolveRemoteIdentityResponse, QueryGetPendingIdentityChallengeRequest, QueryGetPendingIdentityChallengeResponse, QueryListPendingIdentityChallengesRequest, QueryListPendingIdentityChallengesResponse, QueryGetReputationAttestationRequest, QueryGetReputationAttestationResponse, QueryListOutboundAttestationsRequest, QueryListOutboundAttestationsResponse, QueryVerifierActivityRequest, QueryVerifierActivityResponse, QueryOperatorRewardPoolRequest, QueryOperatorRewardPoolResponse, QueryGetVerificationRecordRequest, QueryGetVerificationRecordResponse, QueryGetEscalatedChallengeRequest, QueryGetEscalatedChallengeResponse, QueryFederatedContentBodyRequest, QueryFederatedContentBodyResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -168,5 +168,12 @@ export class LCDQueryClient {
   getEscalatedChallenge = async (params: QueryGetEscalatedChallengeRequest): Promise<QueryGetEscalatedChallengeResponse> => {
     const endpoint = `sparkdream/federation/v1/get_escalated_challenge/${params.contentId}`;
     return await this.req.get<QueryGetEscalatedChallengeResponse>(endpoint);
+  };
+  /* FederatedContentBody returns the full body of one federated record. List
+   and show queries return the body as "" whenever media_flags != 0
+   (docs/content-scanning.md §3.4). */
+  federatedContentBody = async (params: QueryFederatedContentBodyRequest): Promise<QueryFederatedContentBodyResponse> => {
+    const endpoint = `sparkdream/federation/v1/federated_content_body/${params.id}`;
+    return await this.req.get<QueryFederatedContentBodyResponse>(endpoint);
   };
 }

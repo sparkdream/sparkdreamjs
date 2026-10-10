@@ -11,10 +11,14 @@ import { GovAppealStatus } from "./accountability";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 import { Decimal } from "@interchainjs/math";
+/**
+ * TransferPurpose selects which limits a MsgTransferDream is held to. Any
+ * other value is rejected. Bounties are not a transfer purpose: they are
+ * escrowed against an initiative with MsgFundInitiativeBounty.
+ */
 export enum TransferPurpose {
   TRANSFER_PURPOSE_TIP = 0,
   TRANSFER_PURPOSE_GIFT = 1,
-  TRANSFER_PURPOSE_BOUNTY = 2,
   UNRECOGNIZED = -1,
 }
 export const TransferPurposeAmino = TransferPurpose;
@@ -26,9 +30,6 @@ export function transferPurposeFromJSON(object: any): TransferPurpose {
     case 1:
     case "TRANSFER_PURPOSE_GIFT":
       return TransferPurpose.TRANSFER_PURPOSE_GIFT;
-    case 2:
-    case "TRANSFER_PURPOSE_BOUNTY":
-      return TransferPurpose.TRANSFER_PURPOSE_BOUNTY;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -41,8 +42,6 @@ export function transferPurposeToJSON(object: TransferPurpose): string {
       return "TRANSFER_PURPOSE_TIP";
     case TransferPurpose.TRANSFER_PURPOSE_GIFT:
       return "TRANSFER_PURPOSE_GIFT";
-    case TransferPurpose.TRANSFER_PURPOSE_BOUNTY:
-      return "TRANSFER_PURPOSE_BOUNTY";
     case TransferPurpose.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -241,6 +240,15 @@ export interface MsgInviteMemberResponseAminoMsg {
 export interface MsgAcceptInvitation {
   invitee: string;
   invitationId: bigint;
+  /**
+   * accepted_content_license is the invitee's agreement to the chain's
+   * open-content commitment: everything they publish is dedicated to the
+   * public domain. It must equal the chain's content license ("CC0-1.0",
+   * see Query/ContentLicense in x/sparkdream); anything else is refused, so
+   * no one becomes a member without signing the agreement, and a Ledger
+   * shows it on screen.
+   */
+  acceptedContentLicense: string;
 }
 export interface MsgAcceptInvitationProtoMsg {
   typeUrl: "/sparkdream.rep.v1.MsgAcceptInvitation";
@@ -255,6 +263,15 @@ export interface MsgAcceptInvitationProtoMsg {
 export interface MsgAcceptInvitationAmino {
   invitee?: string;
   invitation_id?: string;
+  /**
+   * accepted_content_license is the invitee's agreement to the chain's
+   * open-content commitment: everything they publish is dedicated to the
+   * public domain. It must equal the chain's content license ("CC0-1.0",
+   * see Query/ContentLicense in x/sparkdream); anything else is refused, so
+   * no one becomes a member without signing the agreement, and a Ledger
+   * shows it on screen.
+   */
+  accepted_content_license?: string;
 }
 export interface MsgAcceptInvitationAminoMsg {
   type: "sparkdream/x/rep/MsgAcceptInvitation";
@@ -3298,6 +3315,142 @@ export interface MsgReclaimReviewBountyResponseAminoMsg {
   type: "/sparkdream.rep.v1.MsgReclaimReviewBountyResponse";
   value: MsgReclaimReviewBountyResponseAmino;
 }
+/**
+ * MsgFundInitiativeBounty escrows DREAM against an OPEN or ASSIGNED initiative,
+ * paid to its assignee if it completes and refunded if it closes or is
+ * rejected.
+ * 
+ * The funder must not be affiliated with the initiative. The total bounty is
+ * capped at initiative_bounty_max_budget_ratio of the budget, and each funder
+ * at max_initiative_bounty_per_funder_epoch.
+ * @name MsgFundInitiativeBounty
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgFundInitiativeBounty
+ */
+export interface MsgFundInitiativeBounty {
+  funder: string;
+  initiativeId: bigint;
+  amount: string;
+}
+export interface MsgFundInitiativeBountyProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgFundInitiativeBounty";
+  value: Uint8Array;
+}
+/**
+ * MsgFundInitiativeBounty escrows DREAM against an OPEN or ASSIGNED initiative,
+ * paid to its assignee if it completes and refunded if it closes or is
+ * rejected.
+ * 
+ * The funder must not be affiliated with the initiative. The total bounty is
+ * capped at initiative_bounty_max_budget_ratio of the budget, and each funder
+ * at max_initiative_bounty_per_funder_epoch.
+ * @name MsgFundInitiativeBountyAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgFundInitiativeBounty
+ */
+export interface MsgFundInitiativeBountyAmino {
+  funder?: string;
+  initiative_id?: string;
+  amount?: string;
+}
+export interface MsgFundInitiativeBountyAminoMsg {
+  type: "sparkdream/x/rep/MsgFundInitiativeBounty";
+  value: MsgFundInitiativeBountyAmino;
+}
+/**
+ * MsgFundInitiativeBountyResponse defines the MsgFundInitiativeBounty response.
+ * @name MsgFundInitiativeBountyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgFundInitiativeBountyResponse
+ */
+export interface MsgFundInitiativeBountyResponse {
+  /**
+   * Total escrowed against the initiative after this contribution.
+   */
+  total: string;
+}
+export interface MsgFundInitiativeBountyResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgFundInitiativeBountyResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgFundInitiativeBountyResponse defines the MsgFundInitiativeBounty response.
+ * @name MsgFundInitiativeBountyResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgFundInitiativeBountyResponse
+ */
+export interface MsgFundInitiativeBountyResponseAmino {
+  /**
+   * Total escrowed against the initiative after this contribution.
+   */
+  total?: string;
+}
+export interface MsgFundInitiativeBountyResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgFundInitiativeBountyResponse";
+  value: MsgFundInitiativeBountyResponseAmino;
+}
+/**
+ * MsgReclaimInitiativeBounty returns a funder's own matured contributions.
+ * 
+ * Permitted only while the initiative is OPEN (unassigned) and only for
+ * contributions older than initiative_bounty_reclaim_delay blocks. Once someone
+ * is assigned they are working on the strength of the advertised bounty.
+ * @name MsgReclaimInitiativeBounty
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReclaimInitiativeBounty
+ */
+export interface MsgReclaimInitiativeBounty {
+  funder: string;
+  initiativeId: bigint;
+}
+export interface MsgReclaimInitiativeBountyProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgReclaimInitiativeBounty";
+  value: Uint8Array;
+}
+/**
+ * MsgReclaimInitiativeBounty returns a funder's own matured contributions.
+ * 
+ * Permitted only while the initiative is OPEN (unassigned) and only for
+ * contributions older than initiative_bounty_reclaim_delay blocks. Once someone
+ * is assigned they are working on the strength of the advertised bounty.
+ * @name MsgReclaimInitiativeBountyAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReclaimInitiativeBounty
+ */
+export interface MsgReclaimInitiativeBountyAmino {
+  funder?: string;
+  initiative_id?: string;
+}
+export interface MsgReclaimInitiativeBountyAminoMsg {
+  type: "sparkdream/x/rep/MsgReclaimInitiativeBounty";
+  value: MsgReclaimInitiativeBountyAmino;
+}
+/**
+ * MsgReclaimInitiativeBountyResponse defines the MsgReclaimInitiativeBounty response.
+ * @name MsgReclaimInitiativeBountyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReclaimInitiativeBountyResponse
+ */
+export interface MsgReclaimInitiativeBountyResponse {
+  refunded: string;
+}
+export interface MsgReclaimInitiativeBountyResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgReclaimInitiativeBountyResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgReclaimInitiativeBountyResponse defines the MsgReclaimInitiativeBounty response.
+ * @name MsgReclaimInitiativeBountyResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReclaimInitiativeBountyResponse
+ */
+export interface MsgReclaimInitiativeBountyResponseAmino {
+  refunded?: string;
+}
+export interface MsgReclaimInitiativeBountyResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgReclaimInitiativeBountyResponse";
+  value: MsgReclaimInitiativeBountyResponseAmino;
+}
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
     authority: "",
@@ -3761,7 +3914,8 @@ export const MsgInviteMemberResponse = {
 function createBaseMsgAcceptInvitation(): MsgAcceptInvitation {
   return {
     invitee: "",
-    invitationId: BigInt(0)
+    invitationId: BigInt(0),
+    acceptedContentLicense: ""
   };
 }
 /**
@@ -3780,6 +3934,9 @@ export const MsgAcceptInvitation = {
     if (message.invitationId !== BigInt(0)) {
       writer.uint32(16).uint64(message.invitationId);
     }
+    if (message.acceptedContentLicense !== "") {
+      writer.uint32(26).string(message.acceptedContentLicense);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgAcceptInvitation {
@@ -3795,6 +3952,9 @@ export const MsgAcceptInvitation = {
         case 2:
           message.invitationId = reader.uint64();
           break;
+        case 3:
+          message.acceptedContentLicense = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3806,6 +3966,7 @@ export const MsgAcceptInvitation = {
     const message = createBaseMsgAcceptInvitation();
     message.invitee = object.invitee ?? "";
     message.invitationId = object.invitationId !== undefined && object.invitationId !== null ? BigInt(object.invitationId.toString()) : BigInt(0);
+    message.acceptedContentLicense = object.acceptedContentLicense ?? "";
     return message;
   },
   fromAmino(object: MsgAcceptInvitationAmino): MsgAcceptInvitation {
@@ -3816,12 +3977,16 @@ export const MsgAcceptInvitation = {
     if (object.invitation_id !== undefined && object.invitation_id !== null) {
       message.invitationId = BigInt(object.invitation_id);
     }
+    if (object.accepted_content_license !== undefined && object.accepted_content_license !== null) {
+      message.acceptedContentLicense = object.accepted_content_license;
+    }
     return message;
   },
   toAmino(message: MsgAcceptInvitation): MsgAcceptInvitationAmino {
     const obj: any = {};
     obj.invitee = message.invitee === "" ? undefined : message.invitee;
     obj.invitation_id = message.invitationId !== BigInt(0) ? message.invitationId?.toString() : undefined;
+    obj.accepted_content_license = message.acceptedContentLicense === "" ? undefined : message.acceptedContentLicense;
     return obj;
   },
   fromAminoMsg(object: MsgAcceptInvitationAminoMsg): MsgAcceptInvitation {
@@ -12725,6 +12890,342 @@ export const MsgReclaimReviewBountyResponse = {
     return {
       typeUrl: "/sparkdream.rep.v1.MsgReclaimReviewBountyResponse",
       value: MsgReclaimReviewBountyResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgFundInitiativeBounty(): MsgFundInitiativeBounty {
+  return {
+    funder: "",
+    initiativeId: BigInt(0),
+    amount: ""
+  };
+}
+/**
+ * MsgFundInitiativeBounty escrows DREAM against an OPEN or ASSIGNED initiative,
+ * paid to its assignee if it completes and refunded if it closes or is
+ * rejected.
+ * 
+ * The funder must not be affiliated with the initiative. The total bounty is
+ * capped at initiative_bounty_max_budget_ratio of the budget, and each funder
+ * at max_initiative_bounty_per_funder_epoch.
+ * @name MsgFundInitiativeBounty
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgFundInitiativeBounty
+ */
+export const MsgFundInitiativeBounty = {
+  typeUrl: "/sparkdream.rep.v1.MsgFundInitiativeBounty",
+  aminoType: "sparkdream/x/rep/MsgFundInitiativeBounty",
+  encode(message: MsgFundInitiativeBounty, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.funder !== "") {
+      writer.uint32(10).string(message.funder);
+    }
+    if (message.initiativeId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.initiativeId);
+    }
+    if (message.amount !== "") {
+      writer.uint32(26).string(message.amount);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgFundInitiativeBounty {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgFundInitiativeBounty();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.funder = reader.string();
+          break;
+        case 2:
+          message.initiativeId = reader.uint64();
+          break;
+        case 3:
+          message.amount = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgFundInitiativeBounty>): MsgFundInitiativeBounty {
+    const message = createBaseMsgFundInitiativeBounty();
+    message.funder = object.funder ?? "";
+    message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
+    message.amount = object.amount ?? "";
+    return message;
+  },
+  fromAmino(object: MsgFundInitiativeBountyAmino): MsgFundInitiativeBounty {
+    const message = createBaseMsgFundInitiativeBounty();
+    if (object.funder !== undefined && object.funder !== null) {
+      message.funder = object.funder;
+    }
+    if (object.initiative_id !== undefined && object.initiative_id !== null) {
+      message.initiativeId = BigInt(object.initiative_id);
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = object.amount;
+    }
+    return message;
+  },
+  toAmino(message: MsgFundInitiativeBounty): MsgFundInitiativeBountyAmino {
+    const obj: any = {};
+    obj.funder = message.funder === "" ? undefined : message.funder;
+    obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
+    obj.amount = message.amount === "" ? undefined : message.amount;
+    return obj;
+  },
+  fromAminoMsg(object: MsgFundInitiativeBountyAminoMsg): MsgFundInitiativeBounty {
+    return MsgFundInitiativeBounty.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgFundInitiativeBounty): MsgFundInitiativeBountyAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgFundInitiativeBounty",
+      value: MsgFundInitiativeBounty.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgFundInitiativeBountyProtoMsg): MsgFundInitiativeBounty {
+    return MsgFundInitiativeBounty.decode(message.value);
+  },
+  toProto(message: MsgFundInitiativeBounty): Uint8Array {
+    return MsgFundInitiativeBounty.encode(message).finish();
+  },
+  toProtoMsg(message: MsgFundInitiativeBounty): MsgFundInitiativeBountyProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgFundInitiativeBounty",
+      value: MsgFundInitiativeBounty.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgFundInitiativeBountyResponse(): MsgFundInitiativeBountyResponse {
+  return {
+    total: ""
+  };
+}
+/**
+ * MsgFundInitiativeBountyResponse defines the MsgFundInitiativeBounty response.
+ * @name MsgFundInitiativeBountyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgFundInitiativeBountyResponse
+ */
+export const MsgFundInitiativeBountyResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgFundInitiativeBountyResponse",
+  encode(message: MsgFundInitiativeBountyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.total !== "") {
+      writer.uint32(10).string(message.total);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgFundInitiativeBountyResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgFundInitiativeBountyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.total = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgFundInitiativeBountyResponse>): MsgFundInitiativeBountyResponse {
+    const message = createBaseMsgFundInitiativeBountyResponse();
+    message.total = object.total ?? "";
+    return message;
+  },
+  fromAmino(object: MsgFundInitiativeBountyResponseAmino): MsgFundInitiativeBountyResponse {
+    const message = createBaseMsgFundInitiativeBountyResponse();
+    if (object.total !== undefined && object.total !== null) {
+      message.total = object.total;
+    }
+    return message;
+  },
+  toAmino(message: MsgFundInitiativeBountyResponse): MsgFundInitiativeBountyResponseAmino {
+    const obj: any = {};
+    obj.total = message.total === "" ? undefined : message.total;
+    return obj;
+  },
+  fromAminoMsg(object: MsgFundInitiativeBountyResponseAminoMsg): MsgFundInitiativeBountyResponse {
+    return MsgFundInitiativeBountyResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgFundInitiativeBountyResponseProtoMsg): MsgFundInitiativeBountyResponse {
+    return MsgFundInitiativeBountyResponse.decode(message.value);
+  },
+  toProto(message: MsgFundInitiativeBountyResponse): Uint8Array {
+    return MsgFundInitiativeBountyResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgFundInitiativeBountyResponse): MsgFundInitiativeBountyResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgFundInitiativeBountyResponse",
+      value: MsgFundInitiativeBountyResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgReclaimInitiativeBounty(): MsgReclaimInitiativeBounty {
+  return {
+    funder: "",
+    initiativeId: BigInt(0)
+  };
+}
+/**
+ * MsgReclaimInitiativeBounty returns a funder's own matured contributions.
+ * 
+ * Permitted only while the initiative is OPEN (unassigned) and only for
+ * contributions older than initiative_bounty_reclaim_delay blocks. Once someone
+ * is assigned they are working on the strength of the advertised bounty.
+ * @name MsgReclaimInitiativeBounty
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReclaimInitiativeBounty
+ */
+export const MsgReclaimInitiativeBounty = {
+  typeUrl: "/sparkdream.rep.v1.MsgReclaimInitiativeBounty",
+  aminoType: "sparkdream/x/rep/MsgReclaimInitiativeBounty",
+  encode(message: MsgReclaimInitiativeBounty, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.funder !== "") {
+      writer.uint32(10).string(message.funder);
+    }
+    if (message.initiativeId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.initiativeId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgReclaimInitiativeBounty {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgReclaimInitiativeBounty();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.funder = reader.string();
+          break;
+        case 2:
+          message.initiativeId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgReclaimInitiativeBounty>): MsgReclaimInitiativeBounty {
+    const message = createBaseMsgReclaimInitiativeBounty();
+    message.funder = object.funder ?? "";
+    message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgReclaimInitiativeBountyAmino): MsgReclaimInitiativeBounty {
+    const message = createBaseMsgReclaimInitiativeBounty();
+    if (object.funder !== undefined && object.funder !== null) {
+      message.funder = object.funder;
+    }
+    if (object.initiative_id !== undefined && object.initiative_id !== null) {
+      message.initiativeId = BigInt(object.initiative_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgReclaimInitiativeBounty): MsgReclaimInitiativeBountyAmino {
+    const obj: any = {};
+    obj.funder = message.funder === "" ? undefined : message.funder;
+    obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgReclaimInitiativeBountyAminoMsg): MsgReclaimInitiativeBounty {
+    return MsgReclaimInitiativeBounty.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgReclaimInitiativeBounty): MsgReclaimInitiativeBountyAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgReclaimInitiativeBounty",
+      value: MsgReclaimInitiativeBounty.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgReclaimInitiativeBountyProtoMsg): MsgReclaimInitiativeBounty {
+    return MsgReclaimInitiativeBounty.decode(message.value);
+  },
+  toProto(message: MsgReclaimInitiativeBounty): Uint8Array {
+    return MsgReclaimInitiativeBounty.encode(message).finish();
+  },
+  toProtoMsg(message: MsgReclaimInitiativeBounty): MsgReclaimInitiativeBountyProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgReclaimInitiativeBounty",
+      value: MsgReclaimInitiativeBounty.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgReclaimInitiativeBountyResponse(): MsgReclaimInitiativeBountyResponse {
+  return {
+    refunded: ""
+  };
+}
+/**
+ * MsgReclaimInitiativeBountyResponse defines the MsgReclaimInitiativeBounty response.
+ * @name MsgReclaimInitiativeBountyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgReclaimInitiativeBountyResponse
+ */
+export const MsgReclaimInitiativeBountyResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgReclaimInitiativeBountyResponse",
+  encode(message: MsgReclaimInitiativeBountyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.refunded !== "") {
+      writer.uint32(10).string(message.refunded);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgReclaimInitiativeBountyResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgReclaimInitiativeBountyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.refunded = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgReclaimInitiativeBountyResponse>): MsgReclaimInitiativeBountyResponse {
+    const message = createBaseMsgReclaimInitiativeBountyResponse();
+    message.refunded = object.refunded ?? "";
+    return message;
+  },
+  fromAmino(object: MsgReclaimInitiativeBountyResponseAmino): MsgReclaimInitiativeBountyResponse {
+    const message = createBaseMsgReclaimInitiativeBountyResponse();
+    if (object.refunded !== undefined && object.refunded !== null) {
+      message.refunded = object.refunded;
+    }
+    return message;
+  },
+  toAmino(message: MsgReclaimInitiativeBountyResponse): MsgReclaimInitiativeBountyResponseAmino {
+    const obj: any = {};
+    obj.refunded = message.refunded === "" ? undefined : message.refunded;
+    return obj;
+  },
+  fromAminoMsg(object: MsgReclaimInitiativeBountyResponseAminoMsg): MsgReclaimInitiativeBountyResponse {
+    return MsgReclaimInitiativeBountyResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgReclaimInitiativeBountyResponseProtoMsg): MsgReclaimInitiativeBountyResponse {
+    return MsgReclaimInitiativeBountyResponse.decode(message.value);
+  },
+  toProto(message: MsgReclaimInitiativeBountyResponse): Uint8Array {
+    return MsgReclaimInitiativeBountyResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgReclaimInitiativeBountyResponse): MsgReclaimInitiativeBountyResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgReclaimInitiativeBountyResponse",
+      value: MsgReclaimInitiativeBountyResponse.encode(message).finish()
     };
   }
 };

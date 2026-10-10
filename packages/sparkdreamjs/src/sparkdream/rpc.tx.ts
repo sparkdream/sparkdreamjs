@@ -57,6 +57,9 @@ export const createRPCMsgClient = async ({
     }
   },
   sparkdream: {
+    artifact: {
+      v1: new (await import("./artifact/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    },
     blog: {
       v1: new (await import("./blog/v1/tx.rpc.msg")).MsgClientImpl(rpc)
     },

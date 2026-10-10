@@ -387,6 +387,30 @@ export interface Collection {
    * count; bounded by Params.max_non_member_collaborators_per_collection.
    */
   nonMemberCollaboratorCount: number;
+  /**
+   * Anonymous owner claim, set only when the collection was created through
+   * x/shield (owner is the shield module account). The tag is the creation
+   * proof's nullifier over (anon_owner_domain, anon_owner_scope); only the
+   * creator's secret key reproduces it, so a NULLIFIER_MODE_OWNERSHIP shielded
+   * exec reproducing it proves the anonymous creator is managing the
+   * collection. anon_owner_sequence is bound into each ownership proof's
+   * message hash and advances after every one, so proofs can't be replayed.
+   */
+  anonOwnerDomain: number;
+  anonOwnerScope: bigint;
+  anonOwnerTag: Uint8Array;
+  anonOwnerSequence: bigint;
+  /**
+   * media_flags is the OR of sparkdream.common.v1.MediaFlag bits, computed by
+   * the chain on every write: EXTERNAL_URI when cover_uri is set. Collect
+   * records are never withheld (they hold URI strings, never media bytes;
+   * data URIs are rejected at write). See docs/content-scanning.md §3.
+   */
+  mediaFlags: number;
+  /**
+   * media_rules_version is the labelling rules version that produced media_flags.
+   */
+  mediaRulesVersion: number;
 }
 export interface CollectionProtoMsg {
   typeUrl: "/sparkdream.collect.v1.Collection";
@@ -441,6 +465,30 @@ export interface CollectionAmino {
    * count; bounded by Params.max_non_member_collaborators_per_collection.
    */
   non_member_collaborator_count?: number;
+  /**
+   * Anonymous owner claim, set only when the collection was created through
+   * x/shield (owner is the shield module account). The tag is the creation
+   * proof's nullifier over (anon_owner_domain, anon_owner_scope); only the
+   * creator's secret key reproduces it, so a NULLIFIER_MODE_OWNERSHIP shielded
+   * exec reproducing it proves the anonymous creator is managing the
+   * collection. anon_owner_sequence is bound into each ownership proof's
+   * message hash and advances after every one, so proofs can't be replayed.
+   */
+  anon_owner_domain?: number;
+  anon_owner_scope?: string;
+  anon_owner_tag?: string;
+  anon_owner_sequence?: string;
+  /**
+   * media_flags is the OR of sparkdream.common.v1.MediaFlag bits, computed by
+   * the chain on every write: EXTERNAL_URI when cover_uri is set. Collect
+   * records are never withheld (they hold URI strings, never media bytes;
+   * data URIs are rejected at write). See docs/content-scanning.md §3.
+   */
+  media_flags?: number;
+  /**
+   * media_rules_version is the labelling rules version that produced media_flags.
+   */
+  media_rules_version?: number;
 }
 export interface CollectionAminoMsg {
   type: "/sparkdream.collect.v1.Collection";
@@ -475,6 +523,16 @@ export interface Item {
   status: ItemStatus;
   upvoteCount: bigint;
   downvoteCount: bigint;
+  /**
+   * media_flags is the OR of sparkdream.common.v1.MediaFlag bits, computed by
+   * the chain on every write: EXTERNAL_URI when image_uri is set or
+   * reference_type is LINK or NFT. See docs/content-scanning.md §3.
+   */
+  mediaFlags: number;
+  /**
+   * media_rules_version is the labelling rules version that produced media_flags.
+   */
+  mediaRulesVersion: number;
 }
 export interface ItemProtoMsg {
   typeUrl: "/sparkdream.collect.v1.Item";
@@ -509,6 +567,16 @@ export interface ItemAmino {
   status?: ItemStatus;
   upvote_count?: string;
   downvote_count?: string;
+  /**
+   * media_flags is the OR of sparkdream.common.v1.MediaFlag bits, computed by
+   * the chain on every write: EXTERNAL_URI when image_uri is set or
+   * reference_type is LINK or NFT. See docs/content-scanning.md §3.
+   */
+  media_flags?: number;
+  /**
+   * media_rules_version is the labelling rules version that produced media_flags.
+   */
+  media_rules_version?: number;
 }
 export interface ItemAminoMsg {
   type: "/sparkdream.collect.v1.Item";
@@ -962,9 +1030,7 @@ export interface CollectOperationalParams {
   maxFlagReasonLength: number;
   sentinelCommitAmount: string;
   hideExpiryBlocks: bigint;
-  appealFee: string;
   appealCooldownBlocks: bigint;
-  appealDeadlineBlocks: bigint;
   endorsementCreationFee: string;
   endorsementDreamStake: string;
   endorsementStakeDuration: bigint;
@@ -1062,9 +1128,7 @@ export interface CollectOperationalParamsAmino {
   max_flag_reason_length?: number;
   sentinel_commit_amount?: string;
   hide_expiry_blocks?: string;
-  appeal_fee?: string;
   appeal_cooldown_blocks?: string;
-  appeal_deadline_blocks?: string;
   endorsement_creation_fee?: string;
   endorsement_dream_stake?: string;
   endorsement_stake_duration?: string;
@@ -1212,6 +1276,12 @@ export interface HideRecord {
    * hide/reversal cycle for authors with less rep than the penalty.
    */
   repPenaltyAmounts: string[];
+  /**
+   * The x/rep GovActionAppeal id (GOV_ACTION_TYPE_COLLECT_HIDE) once
+   * appealed. x/rep holds the appeal bond, seats the jury and owns the
+   * deadline; the verdict comes back through RepAppealTarget.
+   */
+  appealId: bigint;
 }
 export interface HideRecordProtoMsg {
   typeUrl: "/sparkdream.collect.v1.HideRecord";
@@ -1263,6 +1333,12 @@ export interface HideRecordAmino {
    * hide/reversal cycle for authors with less rep than the penalty.
    */
   rep_penalty_amounts?: string[];
+  /**
+   * The x/rep GovActionAppeal id (GOV_ACTION_TYPE_COLLECT_HIDE) once
+   * appealed. x/rep holds the appeal bond, seats the jury and owns the
+   * deadline; the verdict comes back through RepAppealTarget.
+   */
+  appeal_id?: string;
 }
 export interface HideRecordAminoMsg {
   type: "/sparkdream.collect.v1.HideRecord";
@@ -1335,7 +1411,13 @@ function createBaseCollection(): Collection {
     convictionSustained: false,
     initiativeId: BigInt(0),
     pinned: false,
-    nonMemberCollaboratorCount: 0
+    nonMemberCollaboratorCount: 0,
+    anonOwnerDomain: 0,
+    anonOwnerScope: BigInt(0),
+    anonOwnerTag: new Uint8Array(),
+    anonOwnerSequence: BigInt(0),
+    mediaFlags: 0,
+    mediaRulesVersion: 0
   };
 }
 /**
@@ -1437,6 +1519,24 @@ export const Collection = {
     if (message.nonMemberCollaboratorCount !== 0) {
       writer.uint32(240).uint32(message.nonMemberCollaboratorCount);
     }
+    if (message.anonOwnerDomain !== 0) {
+      writer.uint32(248).uint32(message.anonOwnerDomain);
+    }
+    if (message.anonOwnerScope !== BigInt(0)) {
+      writer.uint32(256).uint64(message.anonOwnerScope);
+    }
+    if (message.anonOwnerTag.length !== 0) {
+      writer.uint32(266).bytes(message.anonOwnerTag);
+    }
+    if (message.anonOwnerSequence !== BigInt(0)) {
+      writer.uint32(272).uint64(message.anonOwnerSequence);
+    }
+    if (message.mediaFlags !== 0) {
+      writer.uint32(280).uint32(message.mediaFlags);
+    }
+    if (message.mediaRulesVersion !== 0) {
+      writer.uint32(288).uint32(message.mediaRulesVersion);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Collection {
@@ -1536,6 +1636,24 @@ export const Collection = {
         case 30:
           message.nonMemberCollaboratorCount = reader.uint32();
           break;
+        case 31:
+          message.anonOwnerDomain = reader.uint32();
+          break;
+        case 32:
+          message.anonOwnerScope = reader.uint64();
+          break;
+        case 33:
+          message.anonOwnerTag = reader.bytes();
+          break;
+        case 34:
+          message.anonOwnerSequence = reader.uint64();
+          break;
+        case 35:
+          message.mediaFlags = reader.uint32();
+          break;
+        case 36:
+          message.mediaRulesVersion = reader.uint32();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1575,6 +1693,12 @@ export const Collection = {
     message.initiativeId = object.initiativeId !== undefined && object.initiativeId !== null ? BigInt(object.initiativeId.toString()) : BigInt(0);
     message.pinned = object.pinned ?? false;
     message.nonMemberCollaboratorCount = object.nonMemberCollaboratorCount ?? 0;
+    message.anonOwnerDomain = object.anonOwnerDomain ?? 0;
+    message.anonOwnerScope = object.anonOwnerScope !== undefined && object.anonOwnerScope !== null ? BigInt(object.anonOwnerScope.toString()) : BigInt(0);
+    message.anonOwnerTag = object.anonOwnerTag ?? new Uint8Array();
+    message.anonOwnerSequence = object.anonOwnerSequence !== undefined && object.anonOwnerSequence !== null ? BigInt(object.anonOwnerSequence.toString()) : BigInt(0);
+    message.mediaFlags = object.mediaFlags ?? 0;
+    message.mediaRulesVersion = object.mediaRulesVersion ?? 0;
     return message;
   },
   fromAmino(object: CollectionAmino): Collection {
@@ -1667,6 +1791,24 @@ export const Collection = {
     if (object.non_member_collaborator_count !== undefined && object.non_member_collaborator_count !== null) {
       message.nonMemberCollaboratorCount = object.non_member_collaborator_count;
     }
+    if (object.anon_owner_domain !== undefined && object.anon_owner_domain !== null) {
+      message.anonOwnerDomain = object.anon_owner_domain;
+    }
+    if (object.anon_owner_scope !== undefined && object.anon_owner_scope !== null) {
+      message.anonOwnerScope = BigInt(object.anon_owner_scope);
+    }
+    if (object.anon_owner_tag !== undefined && object.anon_owner_tag !== null) {
+      message.anonOwnerTag = bytesFromBase64(object.anon_owner_tag);
+    }
+    if (object.anon_owner_sequence !== undefined && object.anon_owner_sequence !== null) {
+      message.anonOwnerSequence = BigInt(object.anon_owner_sequence);
+    }
+    if (object.media_flags !== undefined && object.media_flags !== null) {
+      message.mediaFlags = object.media_flags;
+    }
+    if (object.media_rules_version !== undefined && object.media_rules_version !== null) {
+      message.mediaRulesVersion = object.media_rules_version;
+    }
     return message;
   },
   toAmino(message: Collection): CollectionAmino {
@@ -1705,6 +1847,12 @@ export const Collection = {
     obj.initiative_id = message.initiativeId !== BigInt(0) ? message.initiativeId?.toString() : undefined;
     obj.pinned = message.pinned === false ? undefined : message.pinned;
     obj.non_member_collaborator_count = message.nonMemberCollaboratorCount === 0 ? undefined : message.nonMemberCollaboratorCount;
+    obj.anon_owner_domain = message.anonOwnerDomain === 0 ? undefined : message.anonOwnerDomain;
+    obj.anon_owner_scope = message.anonOwnerScope !== BigInt(0) ? message.anonOwnerScope?.toString() : undefined;
+    obj.anon_owner_tag = message.anonOwnerTag ? base64FromBytes(message.anonOwnerTag) : undefined;
+    obj.anon_owner_sequence = message.anonOwnerSequence !== BigInt(0) ? message.anonOwnerSequence?.toString() : undefined;
+    obj.media_flags = message.mediaFlags === 0 ? undefined : message.mediaFlags;
+    obj.media_rules_version = message.mediaRulesVersion === 0 ? undefined : message.mediaRulesVersion;
     return obj;
   },
   fromAminoMsg(object: CollectionAminoMsg): Collection {
@@ -1742,7 +1890,9 @@ function createBaseItem(): Item {
     addedAt: BigInt(0),
     status: 0,
     upvoteCount: BigInt(0),
-    downvoteCount: BigInt(0)
+    downvoteCount: BigInt(0),
+    mediaFlags: 0,
+    mediaRulesVersion: 0
   };
 }
 /**
@@ -1808,6 +1958,12 @@ export const Item = {
     if (message.downvoteCount !== BigInt(0)) {
       writer.uint32(144).uint64(message.downvoteCount);
     }
+    if (message.mediaFlags !== 0) {
+      writer.uint32(152).uint32(message.mediaFlags);
+    }
+    if (message.mediaRulesVersion !== 0) {
+      writer.uint32(160).uint32(message.mediaRulesVersion);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Item {
@@ -1871,6 +2027,12 @@ export const Item = {
         case 18:
           message.downvoteCount = reader.uint64();
           break;
+        case 19:
+          message.mediaFlags = reader.uint32();
+          break;
+        case 20:
+          message.mediaRulesVersion = reader.uint32();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1898,6 +2060,8 @@ export const Item = {
     message.status = object.status ?? 0;
     message.upvoteCount = object.upvoteCount !== undefined && object.upvoteCount !== null ? BigInt(object.upvoteCount.toString()) : BigInt(0);
     message.downvoteCount = object.downvoteCount !== undefined && object.downvoteCount !== null ? BigInt(object.downvoteCount.toString()) : BigInt(0);
+    message.mediaFlags = object.mediaFlags ?? 0;
+    message.mediaRulesVersion = object.mediaRulesVersion ?? 0;
     return message;
   },
   fromAmino(object: ItemAmino): Item {
@@ -1954,6 +2118,12 @@ export const Item = {
     if (object.downvote_count !== undefined && object.downvote_count !== null) {
       message.downvoteCount = BigInt(object.downvote_count);
     }
+    if (object.media_flags !== undefined && object.media_flags !== null) {
+      message.mediaFlags = object.media_flags;
+    }
+    if (object.media_rules_version !== undefined && object.media_rules_version !== null) {
+      message.mediaRulesVersion = object.media_rules_version;
+    }
     return message;
   },
   toAmino(message: Item): ItemAmino {
@@ -1980,6 +2150,8 @@ export const Item = {
     obj.status = message.status === 0 ? undefined : message.status;
     obj.upvote_count = message.upvoteCount !== BigInt(0) ? message.upvoteCount?.toString() : undefined;
     obj.downvote_count = message.downvoteCount !== BigInt(0) ? message.downvoteCount?.toString() : undefined;
+    obj.media_flags = message.mediaFlags === 0 ? undefined : message.mediaFlags;
+    obj.media_rules_version = message.mediaRulesVersion === 0 ? undefined : message.mediaRulesVersion;
     return obj;
   },
   fromAminoMsg(object: ItemAminoMsg): Item {
@@ -3334,9 +3506,7 @@ function createBaseCollectOperationalParams(): CollectOperationalParams {
     maxFlagReasonLength: 0,
     sentinelCommitAmount: "",
     hideExpiryBlocks: BigInt(0),
-    appealFee: "",
     appealCooldownBlocks: BigInt(0),
-    appealDeadlineBlocks: BigInt(0),
     endorsementCreationFee: "",
     endorsementDreamStake: "",
     endorsementStakeDuration: BigInt(0),
@@ -3381,154 +3551,148 @@ export const CollectOperationalParams = {
       writer.uint32(26).string(message.perItemSpamTax);
     }
     if (message.sponsorFee !== "") {
-      writer.uint32(42).string(message.sponsorFee);
+      writer.uint32(34).string(message.sponsorFee);
     }
     if (message.minSponsorTrustLevel !== "") {
-      writer.uint32(50).string(message.minSponsorTrustLevel);
+      writer.uint32(42).string(message.minSponsorTrustLevel);
     }
     if (message.sponsorshipRequestTtlBlocks !== BigInt(0)) {
-      writer.uint32(56).int64(message.sponsorshipRequestTtlBlocks);
+      writer.uint32(48).int64(message.sponsorshipRequestTtlBlocks);
     }
     if (message.minCuratorBond !== "") {
-      writer.uint32(66).string(message.minCuratorBond);
+      writer.uint32(58).string(message.minCuratorBond);
     }
     if (message.minCuratorTrustLevel !== "") {
-      writer.uint32(74).string(message.minCuratorTrustLevel);
+      writer.uint32(66).string(message.minCuratorTrustLevel);
     }
     if (message.minCuratorAgeBlocks !== BigInt(0)) {
-      writer.uint32(80).int64(message.minCuratorAgeBlocks);
+      writer.uint32(72).int64(message.minCuratorAgeBlocks);
     }
     if (message.maxTagsPerReview !== 0) {
-      writer.uint32(88).uint32(message.maxTagsPerReview);
+      writer.uint32(80).uint32(message.maxTagsPerReview);
     }
     if (message.maxReviewCommentLength !== 0) {
-      writer.uint32(96).uint32(message.maxReviewCommentLength);
+      writer.uint32(88).uint32(message.maxReviewCommentLength);
     }
     if (message.maxReviewsPerCollection !== 0) {
-      writer.uint32(104).uint32(message.maxReviewsPerCollection);
+      writer.uint32(96).uint32(message.maxReviewsPerCollection);
     }
     if (message.curatorSlashFraction !== "") {
-      writer.uint32(114).string(Decimal.fromUserInput(message.curatorSlashFraction, 18).atomics);
+      writer.uint32(106).string(Decimal.fromUserInput(message.curatorSlashFraction, 18).atomics);
     }
     if (message.challengeWindowBlocks !== BigInt(0)) {
-      writer.uint32(120).int64(message.challengeWindowBlocks);
+      writer.uint32(112).int64(message.challengeWindowBlocks);
     }
     if (message.challengeDeposit !== "") {
-      writer.uint32(130).string(message.challengeDeposit);
+      writer.uint32(122).string(message.challengeDeposit);
     }
     if (message.maxChallengeReasonLength !== 0) {
-      writer.uint32(136).uint32(message.maxChallengeReasonLength);
+      writer.uint32(128).uint32(message.maxChallengeReasonLength);
     }
     if (message.challengeRewardFraction !== "") {
-      writer.uint32(146).string(Decimal.fromUserInput(message.challengeRewardFraction, 18).atomics);
+      writer.uint32(138).string(Decimal.fromUserInput(message.challengeRewardFraction, 18).atomics);
     }
     if (message.downvoteCost !== "") {
-      writer.uint32(154).string(message.downvoteCost);
+      writer.uint32(146).string(message.downvoteCost);
     }
     if (message.maxUpvotesPerDay !== 0) {
-      writer.uint32(160).uint32(message.maxUpvotesPerDay);
+      writer.uint32(152).uint32(message.maxUpvotesPerDay);
     }
     if (message.maxDownvotesPerDay !== 0) {
-      writer.uint32(168).uint32(message.maxDownvotesPerDay);
+      writer.uint32(160).uint32(message.maxDownvotesPerDay);
     }
     if (message.flagReviewThreshold !== 0) {
-      writer.uint32(176).uint32(message.flagReviewThreshold);
+      writer.uint32(168).uint32(message.flagReviewThreshold);
     }
     if (message.maxFlagsPerDay !== 0) {
-      writer.uint32(184).uint32(message.maxFlagsPerDay);
+      writer.uint32(176).uint32(message.maxFlagsPerDay);
     }
     if (message.maxFlaggersPerTarget !== 0) {
-      writer.uint32(192).uint32(message.maxFlaggersPerTarget);
+      writer.uint32(184).uint32(message.maxFlaggersPerTarget);
     }
     if (message.flagExpirationBlocks !== BigInt(0)) {
-      writer.uint32(200).int64(message.flagExpirationBlocks);
+      writer.uint32(192).int64(message.flagExpirationBlocks);
     }
     if (message.maxFlagReasonLength !== 0) {
-      writer.uint32(208).uint32(message.maxFlagReasonLength);
+      writer.uint32(200).uint32(message.maxFlagReasonLength);
     }
     if (message.sentinelCommitAmount !== "") {
-      writer.uint32(218).string(message.sentinelCommitAmount);
+      writer.uint32(210).string(message.sentinelCommitAmount);
     }
     if (message.hideExpiryBlocks !== BigInt(0)) {
-      writer.uint32(224).int64(message.hideExpiryBlocks);
-    }
-    if (message.appealFee !== "") {
-      writer.uint32(234).string(message.appealFee);
+      writer.uint32(216).int64(message.hideExpiryBlocks);
     }
     if (message.appealCooldownBlocks !== BigInt(0)) {
-      writer.uint32(240).int64(message.appealCooldownBlocks);
-    }
-    if (message.appealDeadlineBlocks !== BigInt(0)) {
-      writer.uint32(248).int64(message.appealDeadlineBlocks);
+      writer.uint32(224).int64(message.appealCooldownBlocks);
     }
     if (message.endorsementCreationFee !== "") {
-      writer.uint32(258).string(message.endorsementCreationFee);
+      writer.uint32(234).string(message.endorsementCreationFee);
     }
     if (message.endorsementDreamStake !== "") {
-      writer.uint32(266).string(message.endorsementDreamStake);
+      writer.uint32(242).string(message.endorsementDreamStake);
     }
     if (message.endorsementStakeDuration !== BigInt(0)) {
-      writer.uint32(272).int64(message.endorsementStakeDuration);
+      writer.uint32(248).int64(message.endorsementStakeDuration);
     }
     if (message.endorsementExpiryBlocks !== BigInt(0)) {
-      writer.uint32(280).int64(message.endorsementExpiryBlocks);
+      writer.uint32(256).int64(message.endorsementExpiryBlocks);
     }
     if (message.endorsementFeeEndorserShare !== "") {
-      writer.uint32(290).string(Decimal.fromUserInput(message.endorsementFeeEndorserShare, 18).atomics);
+      writer.uint32(266).string(Decimal.fromUserInput(message.endorsementFeeEndorserShare, 18).atomics);
     }
     if (message.endorsementDeletionBurnFraction !== "") {
-      writer.uint32(298).string(Decimal.fromUserInput(message.endorsementDeletionBurnFraction, 18).atomics);
+      writer.uint32(274).string(Decimal.fromUserInput(message.endorsementDeletionBurnFraction, 18).atomics);
     }
     if (message.convictionRenewalThreshold !== "") {
-      writer.uint32(306).string(Decimal.fromUserInput(message.convictionRenewalThreshold, 18).atomics);
+      writer.uint32(282).string(Decimal.fromUserInput(message.convictionRenewalThreshold, 18).atomics);
     }
     if (message.convictionRenewalPeriod !== BigInt(0)) {
-      writer.uint32(312).int64(message.convictionRenewalPeriod);
+      writer.uint32(288).int64(message.convictionRenewalPeriod);
     }
     if (message.pinMinTrustLevel !== 0) {
-      writer.uint32(344).uint32(message.pinMinTrustLevel);
+      writer.uint32(296).uint32(message.pinMinTrustLevel);
     }
     if (message.maxPinsPerDay !== 0) {
-      writer.uint32(352).uint32(message.maxPinsPerDay);
+      writer.uint32(304).uint32(message.maxPinsPerDay);
     }
     if (message.curatorDemotionCooldown !== BigInt(0)) {
-      writer.uint32(360).int64(message.curatorDemotionCooldown);
+      writer.uint32(312).int64(message.curatorDemotionCooldown);
     }
     if (message.curatorDemotionThreshold !== "") {
-      writer.uint32(370).string(message.curatorDemotionThreshold);
+      writer.uint32(322).string(message.curatorDemotionThreshold);
     }
     if (message.curatorOverturnDemotionStreak !== BigInt(0)) {
-      writer.uint32(376).uint64(message.curatorOverturnDemotionStreak);
+      writer.uint32(328).uint64(message.curatorOverturnDemotionStreak);
     }
     if (message.curatorUnbondCooldown !== BigInt(0)) {
-      writer.uint32(384).int64(message.curatorUnbondCooldown);
+      writer.uint32(336).int64(message.curatorUnbondCooldown);
     }
     if (message.makePermanentMinTrustLevel !== 0) {
-      writer.uint32(392).uint32(message.makePermanentMinTrustLevel);
+      writer.uint32(344).uint32(message.makePermanentMinTrustLevel);
     }
     if (message.maxMakePermanentPerDay !== 0) {
-      writer.uint32(440).uint32(message.maxMakePermanentPerDay);
+      writer.uint32(392).uint32(message.maxMakePermanentPerDay);
     }
     if (message.nonMemberCollabDreamStake !== "") {
-      writer.uint32(402).string(message.nonMemberCollabDreamStake);
+      writer.uint32(354).string(message.nonMemberCollabDreamStake);
     }
     if (message.nonMemberCollabBurnFraction !== "") {
-      writer.uint32(410).string(Decimal.fromUserInput(message.nonMemberCollabBurnFraction, 18).atomics);
+      writer.uint32(362).string(Decimal.fromUserInput(message.nonMemberCollabBurnFraction, 18).atomics);
     }
     if (message.endorserRepPenalty !== "") {
-      writer.uint32(418).string(Decimal.fromUserInput(message.endorserRepPenalty, 18).atomics);
+      writer.uint32(370).string(Decimal.fromUserInput(message.endorserRepPenalty, 18).atomics);
     }
     if (message.collabInviterRepPenalty !== "") {
-      writer.uint32(426).string(Decimal.fromUserInput(message.collabInviterRepPenalty, 18).atomics);
+      writer.uint32(378).string(Decimal.fromUserInput(message.collabInviterRepPenalty, 18).atomics);
     }
     if (message.authorRepPenalty !== "") {
-      writer.uint32(434).string(Decimal.fromUserInput(message.authorRepPenalty, 18).atomics);
+      writer.uint32(386).string(Decimal.fromUserInput(message.authorRepPenalty, 18).atomics);
     }
     if (message.sentinelUnhideWindowBlocks !== BigInt(0)) {
-      writer.uint32(448).int64(message.sentinelUnhideWindowBlocks);
+      writer.uint32(400).int64(message.sentinelUnhideWindowBlocks);
     }
     if (message.maxHidesPerSentinelPerDay !== 0) {
-      writer.uint32(456).uint32(message.maxHidesPerSentinelPerDay);
+      writer.uint32(408).uint32(message.maxHidesPerSentinelPerDay);
     }
     return writer;
   },
@@ -3548,154 +3712,148 @@ export const CollectOperationalParams = {
         case 3:
           message.perItemSpamTax = reader.string();
           break;
-        case 5:
+        case 4:
           message.sponsorFee = reader.string();
           break;
-        case 6:
+        case 5:
           message.minSponsorTrustLevel = reader.string();
           break;
-        case 7:
+        case 6:
           message.sponsorshipRequestTtlBlocks = reader.int64();
           break;
-        case 8:
+        case 7:
           message.minCuratorBond = reader.string();
           break;
-        case 9:
+        case 8:
           message.minCuratorTrustLevel = reader.string();
           break;
-        case 10:
+        case 9:
           message.minCuratorAgeBlocks = reader.int64();
           break;
-        case 11:
+        case 10:
           message.maxTagsPerReview = reader.uint32();
           break;
-        case 12:
+        case 11:
           message.maxReviewCommentLength = reader.uint32();
           break;
-        case 13:
+        case 12:
           message.maxReviewsPerCollection = reader.uint32();
           break;
-        case 14:
+        case 13:
           message.curatorSlashFraction = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 15:
+        case 14:
           message.challengeWindowBlocks = reader.int64();
           break;
-        case 16:
+        case 15:
           message.challengeDeposit = reader.string();
           break;
-        case 17:
+        case 16:
           message.maxChallengeReasonLength = reader.uint32();
           break;
-        case 18:
+        case 17:
           message.challengeRewardFraction = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 19:
+        case 18:
           message.downvoteCost = reader.string();
           break;
-        case 20:
+        case 19:
           message.maxUpvotesPerDay = reader.uint32();
           break;
-        case 21:
+        case 20:
           message.maxDownvotesPerDay = reader.uint32();
           break;
-        case 22:
+        case 21:
           message.flagReviewThreshold = reader.uint32();
           break;
-        case 23:
+        case 22:
           message.maxFlagsPerDay = reader.uint32();
           break;
-        case 24:
+        case 23:
           message.maxFlaggersPerTarget = reader.uint32();
           break;
-        case 25:
+        case 24:
           message.flagExpirationBlocks = reader.int64();
           break;
-        case 26:
+        case 25:
           message.maxFlagReasonLength = reader.uint32();
           break;
-        case 27:
+        case 26:
           message.sentinelCommitAmount = reader.string();
           break;
-        case 28:
+        case 27:
           message.hideExpiryBlocks = reader.int64();
           break;
-        case 29:
-          message.appealFee = reader.string();
-          break;
-        case 30:
+        case 28:
           message.appealCooldownBlocks = reader.int64();
           break;
-        case 31:
-          message.appealDeadlineBlocks = reader.int64();
-          break;
-        case 32:
+        case 29:
           message.endorsementCreationFee = reader.string();
           break;
-        case 33:
+        case 30:
           message.endorsementDreamStake = reader.string();
           break;
-        case 34:
+        case 31:
           message.endorsementStakeDuration = reader.int64();
           break;
-        case 35:
+        case 32:
           message.endorsementExpiryBlocks = reader.int64();
           break;
-        case 36:
+        case 33:
           message.endorsementFeeEndorserShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 37:
+        case 34:
           message.endorsementDeletionBurnFraction = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 38:
+        case 35:
           message.convictionRenewalThreshold = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 39:
+        case 36:
           message.convictionRenewalPeriod = reader.int64();
           break;
-        case 43:
+        case 37:
           message.pinMinTrustLevel = reader.uint32();
           break;
-        case 44:
+        case 38:
           message.maxPinsPerDay = reader.uint32();
           break;
-        case 45:
+        case 39:
           message.curatorDemotionCooldown = reader.int64();
           break;
-        case 46:
+        case 40:
           message.curatorDemotionThreshold = reader.string();
           break;
-        case 47:
+        case 41:
           message.curatorOverturnDemotionStreak = reader.uint64();
           break;
-        case 48:
+        case 42:
           message.curatorUnbondCooldown = reader.int64();
           break;
-        case 49:
+        case 43:
           message.makePermanentMinTrustLevel = reader.uint32();
           break;
-        case 55:
+        case 49:
           message.maxMakePermanentPerDay = reader.uint32();
           break;
-        case 50:
+        case 44:
           message.nonMemberCollabDreamStake = reader.string();
           break;
-        case 51:
+        case 45:
           message.nonMemberCollabBurnFraction = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 52:
+        case 46:
           message.endorserRepPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 53:
+        case 47:
           message.collabInviterRepPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 54:
+        case 48:
           message.authorRepPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 56:
+        case 50:
           message.sentinelUnhideWindowBlocks = reader.int64();
           break;
-        case 57:
+        case 51:
           message.maxHidesPerSentinelPerDay = reader.uint32();
           break;
         default:
@@ -3734,9 +3892,7 @@ export const CollectOperationalParams = {
     message.maxFlagReasonLength = object.maxFlagReasonLength ?? 0;
     message.sentinelCommitAmount = object.sentinelCommitAmount ?? "";
     message.hideExpiryBlocks = object.hideExpiryBlocks !== undefined && object.hideExpiryBlocks !== null ? BigInt(object.hideExpiryBlocks.toString()) : BigInt(0);
-    message.appealFee = object.appealFee ?? "";
     message.appealCooldownBlocks = object.appealCooldownBlocks !== undefined && object.appealCooldownBlocks !== null ? BigInt(object.appealCooldownBlocks.toString()) : BigInt(0);
-    message.appealDeadlineBlocks = object.appealDeadlineBlocks !== undefined && object.appealDeadlineBlocks !== null ? BigInt(object.appealDeadlineBlocks.toString()) : BigInt(0);
     message.endorsementCreationFee = object.endorsementCreationFee ?? "";
     message.endorsementDreamStake = object.endorsementDreamStake ?? "";
     message.endorsementStakeDuration = object.endorsementStakeDuration !== undefined && object.endorsementStakeDuration !== null ? BigInt(object.endorsementStakeDuration.toString()) : BigInt(0);
@@ -3845,14 +4001,8 @@ export const CollectOperationalParams = {
     if (object.hide_expiry_blocks !== undefined && object.hide_expiry_blocks !== null) {
       message.hideExpiryBlocks = BigInt(object.hide_expiry_blocks);
     }
-    if (object.appeal_fee !== undefined && object.appeal_fee !== null) {
-      message.appealFee = object.appeal_fee;
-    }
     if (object.appeal_cooldown_blocks !== undefined && object.appeal_cooldown_blocks !== null) {
       message.appealCooldownBlocks = BigInt(object.appeal_cooldown_blocks);
-    }
-    if (object.appeal_deadline_blocks !== undefined && object.appeal_deadline_blocks !== null) {
-      message.appealDeadlineBlocks = BigInt(object.appeal_deadline_blocks);
     }
     if (object.endorsement_creation_fee !== undefined && object.endorsement_creation_fee !== null) {
       message.endorsementCreationFee = object.endorsement_creation_fee;
@@ -3954,9 +4104,7 @@ export const CollectOperationalParams = {
     obj.max_flag_reason_length = message.maxFlagReasonLength === 0 ? undefined : message.maxFlagReasonLength;
     obj.sentinel_commit_amount = message.sentinelCommitAmount === "" ? undefined : message.sentinelCommitAmount;
     obj.hide_expiry_blocks = message.hideExpiryBlocks !== BigInt(0) ? message.hideExpiryBlocks?.toString() : undefined;
-    obj.appeal_fee = message.appealFee === "" ? undefined : message.appealFee;
     obj.appeal_cooldown_blocks = message.appealCooldownBlocks !== BigInt(0) ? message.appealCooldownBlocks?.toString() : undefined;
-    obj.appeal_deadline_blocks = message.appealDeadlineBlocks !== BigInt(0) ? message.appealDeadlineBlocks?.toString() : undefined;
     obj.endorsement_creation_fee = message.endorsementCreationFee === "" ? undefined : message.endorsementCreationFee;
     obj.endorsement_dream_stake = message.endorsementDreamStake === "" ? undefined : message.endorsementDreamStake;
     obj.endorsement_stake_duration = message.endorsementStakeDuration !== BigInt(0) ? message.endorsementStakeDuration?.toString() : undefined;
@@ -4158,7 +4306,8 @@ function createBaseHideRecord(): HideRecord {
     authorBondAmount: "",
     authorRepPenalty: "",
     repPenaltyTags: [],
-    repPenaltyAmounts: []
+    repPenaltyAmounts: [],
+    appealId: BigInt(0)
   };
 }
 /**
@@ -4218,6 +4367,9 @@ export const HideRecord = {
     for (const v of message.repPenaltyAmounts) {
       writer.uint32(130).string(v!);
     }
+    if (message.appealId !== BigInt(0)) {
+      writer.uint32(136).uint64(message.appealId);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): HideRecord {
@@ -4275,6 +4427,9 @@ export const HideRecord = {
         case 16:
           message.repPenaltyAmounts.push(reader.string());
           break;
+        case 17:
+          message.appealId = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4300,6 +4455,7 @@ export const HideRecord = {
     message.authorRepPenalty = object.authorRepPenalty ?? "";
     message.repPenaltyTags = object.repPenaltyTags?.map(e => e) || [];
     message.repPenaltyAmounts = object.repPenaltyAmounts?.map(e => e) || [];
+    message.appealId = object.appealId !== undefined && object.appealId !== null ? BigInt(object.appealId.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: HideRecordAmino): HideRecord {
@@ -4348,6 +4504,9 @@ export const HideRecord = {
     }
     message.repPenaltyTags = object.rep_penalty_tags?.map(e => e) || [];
     message.repPenaltyAmounts = object.rep_penalty_amounts?.map(e => e) || [];
+    if (object.appeal_id !== undefined && object.appeal_id !== null) {
+      message.appealId = BigInt(object.appeal_id);
+    }
     return message;
   },
   toAmino(message: HideRecord): HideRecordAmino {
@@ -4376,6 +4535,7 @@ export const HideRecord = {
     } else {
       obj.rep_penalty_amounts = message.repPenaltyAmounts;
     }
+    obj.appeal_id = message.appealId !== BigInt(0) ? message.appealId?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: HideRecordAminoMsg): HideRecord {

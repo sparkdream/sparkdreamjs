@@ -109,9 +109,17 @@ export interface Params {
    */
   unstakedDecayRate: string;
   transferTaxRate: string;
+  /**
+   * Tips are gratitude, so a token amount suffices: max_tip_amount per tip and
+   * max_tips_sent_per_epoch DREAM in total per sender per epoch.
+   */
   maxTipAmount: string;
-  maxTipsPerEpoch: number;
-  maxGiftAmount: string;
+  maxTipsSentPerEpoch: string;
+  /**
+   * Lifetime total a sender may gift each of their own invitees. A gift is a
+   * one-time seed to help an invitee get started.
+   */
+  maxGiftPerInvitee: string;
   giftOnlyToInvitees: boolean;
   /**
    * Initiative rewards
@@ -192,14 +200,14 @@ export interface Params {
    */
   challengeResponseDeadlineEpochs: bigint;
   /**
-   * Gift rate limiting
-   * Cooldown period in blocks before same sender can gift same recipient again
+   * Recipient-side transfer limits. DREAM an account may take in through tips
+   * and initiative bounty payouts per epoch and per season. Sender caps alone
+   * cannot bound a buyer, who can collect from any number of senders; these
+   * bound how fast any one position can be bought. Gifts are excluded: each
+   * member has one inviter, so max_gift_per_invitee already bounds them.
    */
-  giftCooldownBlocks: bigint;
-  /**
-   * Maximum total DREAM a sender can gift per epoch (across all recipients)
-   */
-  maxGiftsPerSenderEpoch: string;
+  maxTransferReceivedPerEpoch: string;
+  maxTransferReceivedPerSeason: string;
   /**
    * Content conviction staking
    */
@@ -839,6 +847,21 @@ export interface Params {
    */
   verifierDreamReward: string;
   maxVerifierDreamMintPerEpoch: string;
+  /**
+   * Initiative bounties: DREAM escrowed against an initiative, paid to the
+   * assignee on completion. Total bounty is capped at
+   * initiative_bounty_max_budget_ratio x budget (zero disables funding), each
+   * funder at max_initiative_bounty_per_funder_epoch, and contributions below
+   * min_initiative_bounty_contribution or beyond
+   * max_initiative_bounty_contributions are refused. A funder may reclaim a
+   * contribution older than initiative_bounty_reclaim_delay blocks while the
+   * initiative is unassigned.
+   */
+  initiativeBountyMaxBudgetRatio: string;
+  maxInitiativeBountyPerFunderEpoch: string;
+  minInitiativeBountyContribution: string;
+  maxInitiativeBountyContributions: number;
+  initiativeBountyReclaimDelay: bigint;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Params";
@@ -861,9 +884,17 @@ export interface ParamsAmino {
    */
   unstaked_decay_rate?: string;
   transfer_tax_rate?: string;
+  /**
+   * Tips are gratitude, so a token amount suffices: max_tip_amount per tip and
+   * max_tips_sent_per_epoch DREAM in total per sender per epoch.
+   */
   max_tip_amount?: string;
-  max_tips_per_epoch?: number;
-  max_gift_amount?: string;
+  max_tips_sent_per_epoch?: string;
+  /**
+   * Lifetime total a sender may gift each of their own invitees. A gift is a
+   * one-time seed to help an invitee get started.
+   */
+  max_gift_per_invitee?: string;
   gift_only_to_invitees?: boolean;
   /**
    * Initiative rewards
@@ -944,14 +975,14 @@ export interface ParamsAmino {
    */
   challenge_response_deadline_epochs?: string;
   /**
-   * Gift rate limiting
-   * Cooldown period in blocks before same sender can gift same recipient again
+   * Recipient-side transfer limits. DREAM an account may take in through tips
+   * and initiative bounty payouts per epoch and per season. Sender caps alone
+   * cannot bound a buyer, who can collect from any number of senders; these
+   * bound how fast any one position can be bought. Gifts are excluded: each
+   * member has one inviter, so max_gift_per_invitee already bounds them.
    */
-  gift_cooldown_blocks?: string;
-  /**
-   * Maximum total DREAM a sender can gift per epoch (across all recipients)
-   */
-  max_gifts_per_sender_epoch?: string;
+  max_transfer_received_per_epoch?: string;
+  max_transfer_received_per_season?: string;
   /**
    * Content conviction staking
    */
@@ -1591,6 +1622,21 @@ export interface ParamsAmino {
    */
   verifier_dream_reward?: string;
   max_verifier_dream_mint_per_epoch?: string;
+  /**
+   * Initiative bounties: DREAM escrowed against an initiative, paid to the
+   * assignee on completion. Total bounty is capped at
+   * initiative_bounty_max_budget_ratio x budget (zero disables funding), each
+   * funder at max_initiative_bounty_per_funder_epoch, and contributions below
+   * min_initiative_bounty_contribution or beyond
+   * max_initiative_bounty_contributions are refused. A funder may reclaim a
+   * contribution older than initiative_bounty_reclaim_delay blocks while the
+   * initiative is unassigned.
+   */
+  initiative_bounty_max_budget_ratio?: string;
+  max_initiative_bounty_per_funder_epoch?: string;
+  min_initiative_bounty_contribution?: string;
+  max_initiative_bounty_contributions?: number;
+  initiative_bounty_reclaim_delay?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/rep/Params";
@@ -1615,9 +1661,17 @@ export interface RepOperationalParams {
    */
   unstakedDecayRate: string;
   transferTaxRate: string;
+  /**
+   * Tips are gratitude, so a token amount suffices: max_tip_amount per tip and
+   * max_tips_sent_per_epoch DREAM in total per sender per epoch.
+   */
   maxTipAmount: string;
-  maxTipsPerEpoch: number;
-  maxGiftAmount: string;
+  maxTipsSentPerEpoch: string;
+  /**
+   * Lifetime total a sender may gift each of their own invitees. A gift is a
+   * one-time seed to help an invitee get started.
+   */
+  maxGiftPerInvitee: string;
   giftOnlyToInvitees: boolean;
   /**
    * Reputation
@@ -1671,10 +1725,14 @@ export interface RepOperationalParams {
    */
   challengeResponseDeadlineEpochs: bigint;
   /**
-   * Gift rate limiting
+   * Recipient-side transfer limits. DREAM an account may take in through tips
+   * and initiative bounty payouts per epoch and per season. Sender caps alone
+   * cannot bound a buyer, who can collect from any number of senders; these
+   * bound how fast any one position can be bought. Gifts are excluded: each
+   * member has one inviter, so max_gift_per_invitee already bounds them.
    */
-  giftCooldownBlocks: bigint;
-  maxGiftsPerSenderEpoch: string;
+  maxTransferReceivedPerEpoch: string;
+  maxTransferReceivedPerSeason: string;
   /**
    * Content conviction staking
    */
@@ -1914,6 +1972,21 @@ export interface RepOperationalParams {
   stakingPoolMintShare: string;
   stakingPoolCapBase: string;
   stakingPoolCapRate: string;
+  /**
+   * Initiative bounties: DREAM escrowed against an initiative, paid to the
+   * assignee on completion. Total bounty is capped at
+   * initiative_bounty_max_budget_ratio x budget (zero disables funding), each
+   * funder at max_initiative_bounty_per_funder_epoch, and contributions below
+   * min_initiative_bounty_contribution or beyond
+   * max_initiative_bounty_contributions are refused. A funder may reclaim a
+   * contribution older than initiative_bounty_reclaim_delay blocks while the
+   * initiative is unassigned.
+   */
+  initiativeBountyMaxBudgetRatio: string;
+  maxInitiativeBountyPerFunderEpoch: string;
+  minInitiativeBountyContribution: string;
+  maxInitiativeBountyContributions: number;
+  initiativeBountyReclaimDelay: bigint;
 }
 export interface RepOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.rep.v1.RepOperationalParams";
@@ -1938,9 +2011,17 @@ export interface RepOperationalParamsAmino {
    */
   unstaked_decay_rate?: string;
   transfer_tax_rate?: string;
+  /**
+   * Tips are gratitude, so a token amount suffices: max_tip_amount per tip and
+   * max_tips_sent_per_epoch DREAM in total per sender per epoch.
+   */
   max_tip_amount?: string;
-  max_tips_per_epoch?: number;
-  max_gift_amount?: string;
+  max_tips_sent_per_epoch?: string;
+  /**
+   * Lifetime total a sender may gift each of their own invitees. A gift is a
+   * one-time seed to help an invitee get started.
+   */
+  max_gift_per_invitee?: string;
   gift_only_to_invitees?: boolean;
   /**
    * Reputation
@@ -1994,10 +2075,14 @@ export interface RepOperationalParamsAmino {
    */
   challenge_response_deadline_epochs?: string;
   /**
-   * Gift rate limiting
+   * Recipient-side transfer limits. DREAM an account may take in through tips
+   * and initiative bounty payouts per epoch and per season. Sender caps alone
+   * cannot bound a buyer, who can collect from any number of senders; these
+   * bound how fast any one position can be bought. Gifts are excluded: each
+   * member has one inviter, so max_gift_per_invitee already bounds them.
    */
-  gift_cooldown_blocks?: string;
-  max_gifts_per_sender_epoch?: string;
+  max_transfer_received_per_epoch?: string;
+  max_transfer_received_per_season?: string;
   /**
    * Content conviction staking
    */
@@ -2237,6 +2322,21 @@ export interface RepOperationalParamsAmino {
   staking_pool_mint_share?: string;
   staking_pool_cap_base?: string;
   staking_pool_cap_rate?: string;
+  /**
+   * Initiative bounties: DREAM escrowed against an initiative, paid to the
+   * assignee on completion. Total bounty is capped at
+   * initiative_bounty_max_budget_ratio x budget (zero disables funding), each
+   * funder at max_initiative_bounty_per_funder_epoch, and contributions below
+   * min_initiative_bounty_contribution or beyond
+   * max_initiative_bounty_contributions are refused. A funder may reclaim a
+   * contribution older than initiative_bounty_reclaim_delay blocks while the
+   * initiative is unassigned.
+   */
+  initiative_bounty_max_budget_ratio?: string;
+  max_initiative_bounty_per_funder_epoch?: string;
+  min_initiative_bounty_contribution?: string;
+  max_initiative_bounty_contributions?: number;
+  initiative_bounty_reclaim_delay?: string;
 }
 export interface RepOperationalParamsAminoMsg {
   type: "sparkdream/x/rep/RepOperationalParams";
@@ -2567,8 +2667,8 @@ function createBaseParams(): Params {
     unstakedDecayRate: "",
     transferTaxRate: "",
     maxTipAmount: "",
-    maxTipsPerEpoch: 0,
-    maxGiftAmount: "",
+    maxTipsSentPerEpoch: "",
+    maxGiftPerInvitee: "",
     giftOnlyToInvitees: false,
     completerShare: "",
     treasuryShare: "",
@@ -2611,8 +2711,8 @@ function createBaseParams(): Params {
     minStakeDurationSeconds: BigInt(0),
     allowSelfMemberStake: false,
     challengeResponseDeadlineEpochs: BigInt(0),
-    giftCooldownBlocks: BigInt(0),
-    maxGiftsPerSenderEpoch: "",
+    maxTransferReceivedPerEpoch: "",
+    maxTransferReceivedPerSeason: "",
     contentConvictionHalfLifeEpochs: BigInt(0),
     maxContentStakePerMember: "",
     maxAuthorBondPerContent: "",
@@ -2704,7 +2804,12 @@ function createBaseParams(): Params {
     verifierAccuracyWindowEpochs: BigInt(0),
     minEpochVerifications: 0,
     verifierDreamReward: "",
-    maxVerifierDreamMintPerEpoch: ""
+    maxVerifierDreamMintPerEpoch: "",
+    initiativeBountyMaxBudgetRatio: "",
+    maxInitiativeBountyPerFunderEpoch: "",
+    minInitiativeBountyContribution: "",
+    maxInitiativeBountyContributions: 0,
+    initiativeBountyReclaimDelay: BigInt(0)
   };
 }
 /**
@@ -2732,11 +2837,11 @@ export const Params = {
     if (message.maxTipAmount !== "") {
       writer.uint32(42).string(message.maxTipAmount);
     }
-    if (message.maxTipsPerEpoch !== 0) {
-      writer.uint32(48).uint32(message.maxTipsPerEpoch);
+    if (message.maxTipsSentPerEpoch !== "") {
+      writer.uint32(50).string(message.maxTipsSentPerEpoch);
     }
-    if (message.maxGiftAmount !== "") {
-      writer.uint32(58).string(message.maxGiftAmount);
+    if (message.maxGiftPerInvitee !== "") {
+      writer.uint32(58).string(message.maxGiftPerInvitee);
     }
     if (message.giftOnlyToInvitees === true) {
       writer.uint32(64).bool(message.giftOnlyToInvitees);
@@ -2864,11 +2969,11 @@ export const Params = {
     if (message.challengeResponseDeadlineEpochs !== BigInt(0)) {
       writer.uint32(392).int64(message.challengeResponseDeadlineEpochs);
     }
-    if (message.giftCooldownBlocks !== BigInt(0)) {
-      writer.uint32(400).int64(message.giftCooldownBlocks);
+    if (message.maxTransferReceivedPerEpoch !== "") {
+      writer.uint32(402).string(message.maxTransferReceivedPerEpoch);
     }
-    if (message.maxGiftsPerSenderEpoch !== "") {
-      writer.uint32(410).string(message.maxGiftsPerSenderEpoch);
+    if (message.maxTransferReceivedPerSeason !== "") {
+      writer.uint32(410).string(message.maxTransferReceivedPerSeason);
     }
     if (message.contentConvictionHalfLifeEpochs !== BigInt(0)) {
       writer.uint32(416).int64(message.contentConvictionHalfLifeEpochs);
@@ -3146,6 +3251,21 @@ export const Params = {
     if (message.maxVerifierDreamMintPerEpoch !== "") {
       writer.uint32(1026).string(message.maxVerifierDreamMintPerEpoch);
     }
+    if (message.initiativeBountyMaxBudgetRatio !== "") {
+      writer.uint32(1154).string(Decimal.fromUserInput(message.initiativeBountyMaxBudgetRatio, 18).atomics);
+    }
+    if (message.maxInitiativeBountyPerFunderEpoch !== "") {
+      writer.uint32(1162).string(message.maxInitiativeBountyPerFunderEpoch);
+    }
+    if (message.minInitiativeBountyContribution !== "") {
+      writer.uint32(1170).string(message.minInitiativeBountyContribution);
+    }
+    if (message.maxInitiativeBountyContributions !== 0) {
+      writer.uint32(1176).uint32(message.maxInitiativeBountyContributions);
+    }
+    if (message.initiativeBountyReclaimDelay !== BigInt(0)) {
+      writer.uint32(1184).uint64(message.initiativeBountyReclaimDelay);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -3171,10 +3291,10 @@ export const Params = {
           message.maxTipAmount = reader.string();
           break;
         case 6:
-          message.maxTipsPerEpoch = reader.uint32();
+          message.maxTipsSentPerEpoch = reader.string();
           break;
         case 7:
-          message.maxGiftAmount = reader.string();
+          message.maxGiftPerInvitee = reader.string();
           break;
         case 8:
           message.giftOnlyToInvitees = reader.bool();
@@ -3303,10 +3423,10 @@ export const Params = {
           message.challengeResponseDeadlineEpochs = reader.int64();
           break;
         case 50:
-          message.giftCooldownBlocks = reader.int64();
+          message.maxTransferReceivedPerEpoch = reader.string();
           break;
         case 51:
-          message.maxGiftsPerSenderEpoch = reader.string();
+          message.maxTransferReceivedPerSeason = reader.string();
           break;
         case 52:
           message.contentConvictionHalfLifeEpochs = reader.int64();
@@ -3584,6 +3704,21 @@ export const Params = {
         case 128:
           message.maxVerifierDreamMintPerEpoch = reader.string();
           break;
+        case 144:
+          message.initiativeBountyMaxBudgetRatio = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 145:
+          message.maxInitiativeBountyPerFunderEpoch = reader.string();
+          break;
+        case 146:
+          message.minInitiativeBountyContribution = reader.string();
+          break;
+        case 147:
+          message.maxInitiativeBountyContributions = reader.uint32();
+          break;
+        case 148:
+          message.initiativeBountyReclaimDelay = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3598,8 +3733,8 @@ export const Params = {
     message.unstakedDecayRate = object.unstakedDecayRate ?? "";
     message.transferTaxRate = object.transferTaxRate ?? "";
     message.maxTipAmount = object.maxTipAmount ?? "";
-    message.maxTipsPerEpoch = object.maxTipsPerEpoch ?? 0;
-    message.maxGiftAmount = object.maxGiftAmount ?? "";
+    message.maxTipsSentPerEpoch = object.maxTipsSentPerEpoch ?? "";
+    message.maxGiftPerInvitee = object.maxGiftPerInvitee ?? "";
     message.giftOnlyToInvitees = object.giftOnlyToInvitees ?? false;
     message.completerShare = object.completerShare ?? "";
     message.treasuryShare = object.treasuryShare ?? "";
@@ -3642,8 +3777,8 @@ export const Params = {
     message.minStakeDurationSeconds = object.minStakeDurationSeconds !== undefined && object.minStakeDurationSeconds !== null ? BigInt(object.minStakeDurationSeconds.toString()) : BigInt(0);
     message.allowSelfMemberStake = object.allowSelfMemberStake ?? false;
     message.challengeResponseDeadlineEpochs = object.challengeResponseDeadlineEpochs !== undefined && object.challengeResponseDeadlineEpochs !== null ? BigInt(object.challengeResponseDeadlineEpochs.toString()) : BigInt(0);
-    message.giftCooldownBlocks = object.giftCooldownBlocks !== undefined && object.giftCooldownBlocks !== null ? BigInt(object.giftCooldownBlocks.toString()) : BigInt(0);
-    message.maxGiftsPerSenderEpoch = object.maxGiftsPerSenderEpoch ?? "";
+    message.maxTransferReceivedPerEpoch = object.maxTransferReceivedPerEpoch ?? "";
+    message.maxTransferReceivedPerSeason = object.maxTransferReceivedPerSeason ?? "";
     message.contentConvictionHalfLifeEpochs = object.contentConvictionHalfLifeEpochs !== undefined && object.contentConvictionHalfLifeEpochs !== null ? BigInt(object.contentConvictionHalfLifeEpochs.toString()) : BigInt(0);
     message.maxContentStakePerMember = object.maxContentStakePerMember ?? "";
     message.maxAuthorBondPerContent = object.maxAuthorBondPerContent ?? "";
@@ -3736,6 +3871,11 @@ export const Params = {
     message.minEpochVerifications = object.minEpochVerifications ?? 0;
     message.verifierDreamReward = object.verifierDreamReward ?? "";
     message.maxVerifierDreamMintPerEpoch = object.maxVerifierDreamMintPerEpoch ?? "";
+    message.initiativeBountyMaxBudgetRatio = object.initiativeBountyMaxBudgetRatio ?? "";
+    message.maxInitiativeBountyPerFunderEpoch = object.maxInitiativeBountyPerFunderEpoch ?? "";
+    message.minInitiativeBountyContribution = object.minInitiativeBountyContribution ?? "";
+    message.maxInitiativeBountyContributions = object.maxInitiativeBountyContributions ?? 0;
+    message.initiativeBountyReclaimDelay = object.initiativeBountyReclaimDelay !== undefined && object.initiativeBountyReclaimDelay !== null ? BigInt(object.initiativeBountyReclaimDelay.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -3755,11 +3895,11 @@ export const Params = {
     if (object.max_tip_amount !== undefined && object.max_tip_amount !== null) {
       message.maxTipAmount = object.max_tip_amount;
     }
-    if (object.max_tips_per_epoch !== undefined && object.max_tips_per_epoch !== null) {
-      message.maxTipsPerEpoch = object.max_tips_per_epoch;
+    if (object.max_tips_sent_per_epoch !== undefined && object.max_tips_sent_per_epoch !== null) {
+      message.maxTipsSentPerEpoch = object.max_tips_sent_per_epoch;
     }
-    if (object.max_gift_amount !== undefined && object.max_gift_amount !== null) {
-      message.maxGiftAmount = object.max_gift_amount;
+    if (object.max_gift_per_invitee !== undefined && object.max_gift_per_invitee !== null) {
+      message.maxGiftPerInvitee = object.max_gift_per_invitee;
     }
     if (object.gift_only_to_invitees !== undefined && object.gift_only_to_invitees !== null) {
       message.giftOnlyToInvitees = object.gift_only_to_invitees;
@@ -3887,11 +4027,11 @@ export const Params = {
     if (object.challenge_response_deadline_epochs !== undefined && object.challenge_response_deadline_epochs !== null) {
       message.challengeResponseDeadlineEpochs = BigInt(object.challenge_response_deadline_epochs);
     }
-    if (object.gift_cooldown_blocks !== undefined && object.gift_cooldown_blocks !== null) {
-      message.giftCooldownBlocks = BigInt(object.gift_cooldown_blocks);
+    if (object.max_transfer_received_per_epoch !== undefined && object.max_transfer_received_per_epoch !== null) {
+      message.maxTransferReceivedPerEpoch = object.max_transfer_received_per_epoch;
     }
-    if (object.max_gifts_per_sender_epoch !== undefined && object.max_gifts_per_sender_epoch !== null) {
-      message.maxGiftsPerSenderEpoch = object.max_gifts_per_sender_epoch;
+    if (object.max_transfer_received_per_season !== undefined && object.max_transfer_received_per_season !== null) {
+      message.maxTransferReceivedPerSeason = object.max_transfer_received_per_season;
     }
     if (object.content_conviction_half_life_epochs !== undefined && object.content_conviction_half_life_epochs !== null) {
       message.contentConvictionHalfLifeEpochs = BigInt(object.content_conviction_half_life_epochs);
@@ -4169,6 +4309,21 @@ export const Params = {
     if (object.max_verifier_dream_mint_per_epoch !== undefined && object.max_verifier_dream_mint_per_epoch !== null) {
       message.maxVerifierDreamMintPerEpoch = object.max_verifier_dream_mint_per_epoch;
     }
+    if (object.initiative_bounty_max_budget_ratio !== undefined && object.initiative_bounty_max_budget_ratio !== null) {
+      message.initiativeBountyMaxBudgetRatio = object.initiative_bounty_max_budget_ratio;
+    }
+    if (object.max_initiative_bounty_per_funder_epoch !== undefined && object.max_initiative_bounty_per_funder_epoch !== null) {
+      message.maxInitiativeBountyPerFunderEpoch = object.max_initiative_bounty_per_funder_epoch;
+    }
+    if (object.min_initiative_bounty_contribution !== undefined && object.min_initiative_bounty_contribution !== null) {
+      message.minInitiativeBountyContribution = object.min_initiative_bounty_contribution;
+    }
+    if (object.max_initiative_bounty_contributions !== undefined && object.max_initiative_bounty_contributions !== null) {
+      message.maxInitiativeBountyContributions = object.max_initiative_bounty_contributions;
+    }
+    if (object.initiative_bounty_reclaim_delay !== undefined && object.initiative_bounty_reclaim_delay !== null) {
+      message.initiativeBountyReclaimDelay = BigInt(object.initiative_bounty_reclaim_delay);
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -4178,8 +4333,8 @@ export const Params = {
     obj.unstaked_decay_rate = message.unstakedDecayRate === "" ? undefined : message.unstakedDecayRate;
     obj.transfer_tax_rate = message.transferTaxRate === "" ? undefined : message.transferTaxRate;
     obj.max_tip_amount = message.maxTipAmount === "" ? undefined : message.maxTipAmount;
-    obj.max_tips_per_epoch = message.maxTipsPerEpoch === 0 ? undefined : message.maxTipsPerEpoch;
-    obj.max_gift_amount = message.maxGiftAmount === "" ? undefined : message.maxGiftAmount;
+    obj.max_tips_sent_per_epoch = message.maxTipsSentPerEpoch === "" ? undefined : message.maxTipsSentPerEpoch;
+    obj.max_gift_per_invitee = message.maxGiftPerInvitee === "" ? undefined : message.maxGiftPerInvitee;
     obj.gift_only_to_invitees = message.giftOnlyToInvitees === false ? undefined : message.giftOnlyToInvitees;
     obj.completer_share = message.completerShare === "" ? undefined : message.completerShare;
     obj.treasury_share = message.treasuryShare === "" ? undefined : message.treasuryShare;
@@ -4222,8 +4377,8 @@ export const Params = {
     obj.min_stake_duration_seconds = message.minStakeDurationSeconds !== BigInt(0) ? message.minStakeDurationSeconds?.toString() : undefined;
     obj.allow_self_member_stake = message.allowSelfMemberStake === false ? undefined : message.allowSelfMemberStake;
     obj.challenge_response_deadline_epochs = message.challengeResponseDeadlineEpochs !== BigInt(0) ? message.challengeResponseDeadlineEpochs?.toString() : undefined;
-    obj.gift_cooldown_blocks = message.giftCooldownBlocks !== BigInt(0) ? message.giftCooldownBlocks?.toString() : undefined;
-    obj.max_gifts_per_sender_epoch = message.maxGiftsPerSenderEpoch === "" ? undefined : message.maxGiftsPerSenderEpoch;
+    obj.max_transfer_received_per_epoch = message.maxTransferReceivedPerEpoch === "" ? undefined : message.maxTransferReceivedPerEpoch;
+    obj.max_transfer_received_per_season = message.maxTransferReceivedPerSeason === "" ? undefined : message.maxTransferReceivedPerSeason;
     obj.content_conviction_half_life_epochs = message.contentConvictionHalfLifeEpochs !== BigInt(0) ? message.contentConvictionHalfLifeEpochs?.toString() : undefined;
     obj.max_content_stake_per_member = message.maxContentStakePerMember === "" ? undefined : message.maxContentStakePerMember;
     obj.max_author_bond_per_content = message.maxAuthorBondPerContent === "" ? undefined : message.maxAuthorBondPerContent;
@@ -4316,6 +4471,11 @@ export const Params = {
     obj.min_epoch_verifications = message.minEpochVerifications === 0 ? undefined : message.minEpochVerifications;
     obj.verifier_dream_reward = message.verifierDreamReward === "" ? undefined : message.verifierDreamReward;
     obj.max_verifier_dream_mint_per_epoch = message.maxVerifierDreamMintPerEpoch === "" ? undefined : message.maxVerifierDreamMintPerEpoch;
+    obj.initiative_bounty_max_budget_ratio = message.initiativeBountyMaxBudgetRatio === "" ? undefined : message.initiativeBountyMaxBudgetRatio;
+    obj.max_initiative_bounty_per_funder_epoch = message.maxInitiativeBountyPerFunderEpoch === "" ? undefined : message.maxInitiativeBountyPerFunderEpoch;
+    obj.min_initiative_bounty_contribution = message.minInitiativeBountyContribution === "" ? undefined : message.minInitiativeBountyContribution;
+    obj.max_initiative_bounty_contributions = message.maxInitiativeBountyContributions === 0 ? undefined : message.maxInitiativeBountyContributions;
+    obj.initiative_bounty_reclaim_delay = message.initiativeBountyReclaimDelay !== BigInt(0) ? message.initiativeBountyReclaimDelay?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {
@@ -4347,8 +4507,8 @@ function createBaseRepOperationalParams(): RepOperationalParams {
     unstakedDecayRate: "",
     transferTaxRate: "",
     maxTipAmount: "",
-    maxTipsPerEpoch: 0,
-    maxGiftAmount: "",
+    maxTipsSentPerEpoch: "",
+    maxGiftPerInvitee: "",
     giftOnlyToInvitees: false,
     minReputationMultiplier: "",
     defaultReviewPeriodEpochs: BigInt(0),
@@ -4377,8 +4537,8 @@ function createBaseRepOperationalParams(): RepOperationalParams {
     minStakeDurationSeconds: BigInt(0),
     allowSelfMemberStake: false,
     challengeResponseDeadlineEpochs: BigInt(0),
-    giftCooldownBlocks: BigInt(0),
-    maxGiftsPerSenderEpoch: "",
+    maxTransferReceivedPerEpoch: "",
+    maxTransferReceivedPerSeason: "",
     contentConvictionHalfLifeEpochs: BigInt(0),
     maxContentStakePerMember: "",
     maxAuthorBondPerContent: "",
@@ -4464,7 +4624,12 @@ function createBaseRepOperationalParams(): RepOperationalParams {
     stakingRewardYieldPerEpoch: "",
     stakingPoolMintShare: "",
     stakingPoolCapBase: "",
-    stakingPoolCapRate: ""
+    stakingPoolCapRate: "",
+    initiativeBountyMaxBudgetRatio: "",
+    maxInitiativeBountyPerFunderEpoch: "",
+    minInitiativeBountyContribution: "",
+    maxInitiativeBountyContributions: 0,
+    initiativeBountyReclaimDelay: BigInt(0)
   };
 }
 /**
@@ -4494,11 +4659,11 @@ export const RepOperationalParams = {
     if (message.maxTipAmount !== "") {
       writer.uint32(42).string(message.maxTipAmount);
     }
-    if (message.maxTipsPerEpoch !== 0) {
-      writer.uint32(48).uint32(message.maxTipsPerEpoch);
+    if (message.maxTipsSentPerEpoch !== "") {
+      writer.uint32(50).string(message.maxTipsSentPerEpoch);
     }
-    if (message.maxGiftAmount !== "") {
-      writer.uint32(58).string(message.maxGiftAmount);
+    if (message.maxGiftPerInvitee !== "") {
+      writer.uint32(58).string(message.maxGiftPerInvitee);
     }
     if (message.giftOnlyToInvitees === true) {
       writer.uint32(64).bool(message.giftOnlyToInvitees);
@@ -4584,11 +4749,11 @@ export const RepOperationalParams = {
     if (message.challengeResponseDeadlineEpochs !== BigInt(0)) {
       writer.uint32(280).int64(message.challengeResponseDeadlineEpochs);
     }
-    if (message.giftCooldownBlocks !== BigInt(0)) {
-      writer.uint32(288).int64(message.giftCooldownBlocks);
+    if (message.maxTransferReceivedPerEpoch !== "") {
+      writer.uint32(290).string(message.maxTransferReceivedPerEpoch);
     }
-    if (message.maxGiftsPerSenderEpoch !== "") {
-      writer.uint32(298).string(message.maxGiftsPerSenderEpoch);
+    if (message.maxTransferReceivedPerSeason !== "") {
+      writer.uint32(298).string(message.maxTransferReceivedPerSeason);
     }
     if (message.contentConvictionHalfLifeEpochs !== BigInt(0)) {
       writer.uint32(304).int64(message.contentConvictionHalfLifeEpochs);
@@ -4848,6 +5013,21 @@ export const RepOperationalParams = {
     if (message.stakingPoolCapRate !== "") {
       writer.uint32(954).string(Decimal.fromUserInput(message.stakingPoolCapRate, 18).atomics);
     }
+    if (message.initiativeBountyMaxBudgetRatio !== "") {
+      writer.uint32(994).string(Decimal.fromUserInput(message.initiativeBountyMaxBudgetRatio, 18).atomics);
+    }
+    if (message.maxInitiativeBountyPerFunderEpoch !== "") {
+      writer.uint32(1002).string(message.maxInitiativeBountyPerFunderEpoch);
+    }
+    if (message.minInitiativeBountyContribution !== "") {
+      writer.uint32(1010).string(message.minInitiativeBountyContribution);
+    }
+    if (message.maxInitiativeBountyContributions !== 0) {
+      writer.uint32(1016).uint32(message.maxInitiativeBountyContributions);
+    }
+    if (message.initiativeBountyReclaimDelay !== BigInt(0)) {
+      writer.uint32(1024).uint64(message.initiativeBountyReclaimDelay);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): RepOperationalParams {
@@ -4873,10 +5053,10 @@ export const RepOperationalParams = {
           message.maxTipAmount = reader.string();
           break;
         case 6:
-          message.maxTipsPerEpoch = reader.uint32();
+          message.maxTipsSentPerEpoch = reader.string();
           break;
         case 7:
-          message.maxGiftAmount = reader.string();
+          message.maxGiftPerInvitee = reader.string();
           break;
         case 8:
           message.giftOnlyToInvitees = reader.bool();
@@ -4963,10 +5143,10 @@ export const RepOperationalParams = {
           message.challengeResponseDeadlineEpochs = reader.int64();
           break;
         case 36:
-          message.giftCooldownBlocks = reader.int64();
+          message.maxTransferReceivedPerEpoch = reader.string();
           break;
         case 37:
-          message.maxGiftsPerSenderEpoch = reader.string();
+          message.maxTransferReceivedPerSeason = reader.string();
           break;
         case 38:
           message.contentConvictionHalfLifeEpochs = reader.int64();
@@ -5226,6 +5406,21 @@ export const RepOperationalParams = {
         case 119:
           message.stakingPoolCapRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
+        case 124:
+          message.initiativeBountyMaxBudgetRatio = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 125:
+          message.maxInitiativeBountyPerFunderEpoch = reader.string();
+          break;
+        case 126:
+          message.minInitiativeBountyContribution = reader.string();
+          break;
+        case 127:
+          message.maxInitiativeBountyContributions = reader.uint32();
+          break;
+        case 128:
+          message.initiativeBountyReclaimDelay = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -5240,8 +5435,8 @@ export const RepOperationalParams = {
     message.unstakedDecayRate = object.unstakedDecayRate ?? "";
     message.transferTaxRate = object.transferTaxRate ?? "";
     message.maxTipAmount = object.maxTipAmount ?? "";
-    message.maxTipsPerEpoch = object.maxTipsPerEpoch ?? 0;
-    message.maxGiftAmount = object.maxGiftAmount ?? "";
+    message.maxTipsSentPerEpoch = object.maxTipsSentPerEpoch ?? "";
+    message.maxGiftPerInvitee = object.maxGiftPerInvitee ?? "";
     message.giftOnlyToInvitees = object.giftOnlyToInvitees ?? false;
     message.minReputationMultiplier = object.minReputationMultiplier ?? "";
     message.defaultReviewPeriodEpochs = object.defaultReviewPeriodEpochs !== undefined && object.defaultReviewPeriodEpochs !== null ? BigInt(object.defaultReviewPeriodEpochs.toString()) : BigInt(0);
@@ -5270,8 +5465,8 @@ export const RepOperationalParams = {
     message.minStakeDurationSeconds = object.minStakeDurationSeconds !== undefined && object.minStakeDurationSeconds !== null ? BigInt(object.minStakeDurationSeconds.toString()) : BigInt(0);
     message.allowSelfMemberStake = object.allowSelfMemberStake ?? false;
     message.challengeResponseDeadlineEpochs = object.challengeResponseDeadlineEpochs !== undefined && object.challengeResponseDeadlineEpochs !== null ? BigInt(object.challengeResponseDeadlineEpochs.toString()) : BigInt(0);
-    message.giftCooldownBlocks = object.giftCooldownBlocks !== undefined && object.giftCooldownBlocks !== null ? BigInt(object.giftCooldownBlocks.toString()) : BigInt(0);
-    message.maxGiftsPerSenderEpoch = object.maxGiftsPerSenderEpoch ?? "";
+    message.maxTransferReceivedPerEpoch = object.maxTransferReceivedPerEpoch ?? "";
+    message.maxTransferReceivedPerSeason = object.maxTransferReceivedPerSeason ?? "";
     message.contentConvictionHalfLifeEpochs = object.contentConvictionHalfLifeEpochs !== undefined && object.contentConvictionHalfLifeEpochs !== null ? BigInt(object.contentConvictionHalfLifeEpochs.toString()) : BigInt(0);
     message.maxContentStakePerMember = object.maxContentStakePerMember ?? "";
     message.maxAuthorBondPerContent = object.maxAuthorBondPerContent ?? "";
@@ -5358,6 +5553,11 @@ export const RepOperationalParams = {
     message.stakingPoolMintShare = object.stakingPoolMintShare ?? "";
     message.stakingPoolCapBase = object.stakingPoolCapBase ?? "";
     message.stakingPoolCapRate = object.stakingPoolCapRate ?? "";
+    message.initiativeBountyMaxBudgetRatio = object.initiativeBountyMaxBudgetRatio ?? "";
+    message.maxInitiativeBountyPerFunderEpoch = object.maxInitiativeBountyPerFunderEpoch ?? "";
+    message.minInitiativeBountyContribution = object.minInitiativeBountyContribution ?? "";
+    message.maxInitiativeBountyContributions = object.maxInitiativeBountyContributions ?? 0;
+    message.initiativeBountyReclaimDelay = object.initiativeBountyReclaimDelay !== undefined && object.initiativeBountyReclaimDelay !== null ? BigInt(object.initiativeBountyReclaimDelay.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: RepOperationalParamsAmino): RepOperationalParams {
@@ -5377,11 +5577,11 @@ export const RepOperationalParams = {
     if (object.max_tip_amount !== undefined && object.max_tip_amount !== null) {
       message.maxTipAmount = object.max_tip_amount;
     }
-    if (object.max_tips_per_epoch !== undefined && object.max_tips_per_epoch !== null) {
-      message.maxTipsPerEpoch = object.max_tips_per_epoch;
+    if (object.max_tips_sent_per_epoch !== undefined && object.max_tips_sent_per_epoch !== null) {
+      message.maxTipsSentPerEpoch = object.max_tips_sent_per_epoch;
     }
-    if (object.max_gift_amount !== undefined && object.max_gift_amount !== null) {
-      message.maxGiftAmount = object.max_gift_amount;
+    if (object.max_gift_per_invitee !== undefined && object.max_gift_per_invitee !== null) {
+      message.maxGiftPerInvitee = object.max_gift_per_invitee;
     }
     if (object.gift_only_to_invitees !== undefined && object.gift_only_to_invitees !== null) {
       message.giftOnlyToInvitees = object.gift_only_to_invitees;
@@ -5467,11 +5667,11 @@ export const RepOperationalParams = {
     if (object.challenge_response_deadline_epochs !== undefined && object.challenge_response_deadline_epochs !== null) {
       message.challengeResponseDeadlineEpochs = BigInt(object.challenge_response_deadline_epochs);
     }
-    if (object.gift_cooldown_blocks !== undefined && object.gift_cooldown_blocks !== null) {
-      message.giftCooldownBlocks = BigInt(object.gift_cooldown_blocks);
+    if (object.max_transfer_received_per_epoch !== undefined && object.max_transfer_received_per_epoch !== null) {
+      message.maxTransferReceivedPerEpoch = object.max_transfer_received_per_epoch;
     }
-    if (object.max_gifts_per_sender_epoch !== undefined && object.max_gifts_per_sender_epoch !== null) {
-      message.maxGiftsPerSenderEpoch = object.max_gifts_per_sender_epoch;
+    if (object.max_transfer_received_per_season !== undefined && object.max_transfer_received_per_season !== null) {
+      message.maxTransferReceivedPerSeason = object.max_transfer_received_per_season;
     }
     if (object.content_conviction_half_life_epochs !== undefined && object.content_conviction_half_life_epochs !== null) {
       message.contentConvictionHalfLifeEpochs = BigInt(object.content_conviction_half_life_epochs);
@@ -5731,6 +5931,21 @@ export const RepOperationalParams = {
     if (object.staking_pool_cap_rate !== undefined && object.staking_pool_cap_rate !== null) {
       message.stakingPoolCapRate = object.staking_pool_cap_rate;
     }
+    if (object.initiative_bounty_max_budget_ratio !== undefined && object.initiative_bounty_max_budget_ratio !== null) {
+      message.initiativeBountyMaxBudgetRatio = object.initiative_bounty_max_budget_ratio;
+    }
+    if (object.max_initiative_bounty_per_funder_epoch !== undefined && object.max_initiative_bounty_per_funder_epoch !== null) {
+      message.maxInitiativeBountyPerFunderEpoch = object.max_initiative_bounty_per_funder_epoch;
+    }
+    if (object.min_initiative_bounty_contribution !== undefined && object.min_initiative_bounty_contribution !== null) {
+      message.minInitiativeBountyContribution = object.min_initiative_bounty_contribution;
+    }
+    if (object.max_initiative_bounty_contributions !== undefined && object.max_initiative_bounty_contributions !== null) {
+      message.maxInitiativeBountyContributions = object.max_initiative_bounty_contributions;
+    }
+    if (object.initiative_bounty_reclaim_delay !== undefined && object.initiative_bounty_reclaim_delay !== null) {
+      message.initiativeBountyReclaimDelay = BigInt(object.initiative_bounty_reclaim_delay);
+    }
     return message;
   },
   toAmino(message: RepOperationalParams): RepOperationalParamsAmino {
@@ -5740,8 +5955,8 @@ export const RepOperationalParams = {
     obj.unstaked_decay_rate = message.unstakedDecayRate === "" ? undefined : message.unstakedDecayRate;
     obj.transfer_tax_rate = message.transferTaxRate === "" ? undefined : message.transferTaxRate;
     obj.max_tip_amount = message.maxTipAmount === "" ? undefined : message.maxTipAmount;
-    obj.max_tips_per_epoch = message.maxTipsPerEpoch === 0 ? undefined : message.maxTipsPerEpoch;
-    obj.max_gift_amount = message.maxGiftAmount === "" ? undefined : message.maxGiftAmount;
+    obj.max_tips_sent_per_epoch = message.maxTipsSentPerEpoch === "" ? undefined : message.maxTipsSentPerEpoch;
+    obj.max_gift_per_invitee = message.maxGiftPerInvitee === "" ? undefined : message.maxGiftPerInvitee;
     obj.gift_only_to_invitees = message.giftOnlyToInvitees === false ? undefined : message.giftOnlyToInvitees;
     obj.min_reputation_multiplier = message.minReputationMultiplier === "" ? undefined : message.minReputationMultiplier;
     obj.default_review_period_epochs = message.defaultReviewPeriodEpochs !== BigInt(0) ? message.defaultReviewPeriodEpochs?.toString() : undefined;
@@ -5770,8 +5985,8 @@ export const RepOperationalParams = {
     obj.min_stake_duration_seconds = message.minStakeDurationSeconds !== BigInt(0) ? message.minStakeDurationSeconds?.toString() : undefined;
     obj.allow_self_member_stake = message.allowSelfMemberStake === false ? undefined : message.allowSelfMemberStake;
     obj.challenge_response_deadline_epochs = message.challengeResponseDeadlineEpochs !== BigInt(0) ? message.challengeResponseDeadlineEpochs?.toString() : undefined;
-    obj.gift_cooldown_blocks = message.giftCooldownBlocks !== BigInt(0) ? message.giftCooldownBlocks?.toString() : undefined;
-    obj.max_gifts_per_sender_epoch = message.maxGiftsPerSenderEpoch === "" ? undefined : message.maxGiftsPerSenderEpoch;
+    obj.max_transfer_received_per_epoch = message.maxTransferReceivedPerEpoch === "" ? undefined : message.maxTransferReceivedPerEpoch;
+    obj.max_transfer_received_per_season = message.maxTransferReceivedPerSeason === "" ? undefined : message.maxTransferReceivedPerSeason;
     obj.content_conviction_half_life_epochs = message.contentConvictionHalfLifeEpochs !== BigInt(0) ? message.contentConvictionHalfLifeEpochs?.toString() : undefined;
     obj.max_content_stake_per_member = message.maxContentStakePerMember === "" ? undefined : message.maxContentStakePerMember;
     obj.max_author_bond_per_content = message.maxAuthorBondPerContent === "" ? undefined : message.maxAuthorBondPerContent;
@@ -5858,6 +6073,11 @@ export const RepOperationalParams = {
     obj.staking_pool_mint_share = message.stakingPoolMintShare === "" ? undefined : message.stakingPoolMintShare;
     obj.staking_pool_cap_base = message.stakingPoolCapBase === "" ? undefined : message.stakingPoolCapBase;
     obj.staking_pool_cap_rate = message.stakingPoolCapRate === "" ? undefined : message.stakingPoolCapRate;
+    obj.initiative_bounty_max_budget_ratio = message.initiativeBountyMaxBudgetRatio === "" ? undefined : message.initiativeBountyMaxBudgetRatio;
+    obj.max_initiative_bounty_per_funder_epoch = message.maxInitiativeBountyPerFunderEpoch === "" ? undefined : message.maxInitiativeBountyPerFunderEpoch;
+    obj.min_initiative_bounty_contribution = message.minInitiativeBountyContribution === "" ? undefined : message.minInitiativeBountyContribution;
+    obj.max_initiative_bounty_contributions = message.maxInitiativeBountyContributions === 0 ? undefined : message.maxInitiativeBountyContributions;
+    obj.initiative_bounty_reclaim_delay = message.initiativeBountyReclaimDelay !== BigInt(0) ? message.initiativeBountyReclaimDelay?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: RepOperationalParamsAminoMsg): RepOperationalParams {

@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { MsgUpdateParams, MsgUpdateServiceTypeConfig, MsgRegisterOperator, MsgUpdateMetadata, MsgUnbondOperator, MsgClaimUnbondedBond, MsgTopUpBond, MsgReportOperator, MsgResolveReport, MsgContestSlash, MsgResolveReportByJury, MsgOpenControllerTransferCase, MsgFinalizeControllerTransfer } from "./tx";
+import { MsgUpdateParams, MsgUpdateServiceTypeConfig, MsgRegisterOperator, MsgUpdateMetadata, MsgUnbondOperator, MsgClaimUnbondedBond, MsgTopUpBond, MsgReportOperator, MsgResolveReport, MsgContestSlash, MsgResolveReportByJury, MsgOpenControllerTransferCase, MsgFinalizeControllerTransfer, MsgSubmitCheckpoint } from "./tx";
 export const AminoConverter = {
   "/sparkdream.service.v1.MsgUpdateParams": {
     aminoType: "sparkdream/x/service/MsgUpdateParams",
@@ -65,5 +65,10 @@ export const AminoConverter = {
     aminoType: "sparkdream/x/service/MsgFinalizeControllerTransfer",
     toAmino: MsgFinalizeControllerTransfer.toAmino,
     fromAmino: MsgFinalizeControllerTransfer.fromAmino
+  },
+  "/sparkdream.service.v1.MsgSubmitCheckpoint": {
+    aminoType: "sparkdream/x/service/MsgSubmitCheckpoint",
+    toAmino: MsgSubmitCheckpoint.toAmino,
+    fromAmino: MsgSubmitCheckpoint.fromAmino
   }
 };

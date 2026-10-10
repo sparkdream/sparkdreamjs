@@ -25,7 +25,7 @@ export enum ModerationReason {
   MODERATION_REASON_DUPLICATE = 9,
   /** MODERATION_REASON_SCAM - Fraudulent content, phishing attempts */
   MODERATION_REASON_SCAM = 10,
-  /** MODERATION_REASON_COPYRIGHT - Copyright infringement */
+  /** MODERATION_REASON_COPYRIGHT - Copyright infringement, incl. work the submitter could not dedicate to the public domain (docs/content-license.md) */
   MODERATION_REASON_COPYRIGHT = 11,
   /** MODERATION_REASON_OTHER - Requires custom reason field */
   MODERATION_REASON_OTHER = 12,

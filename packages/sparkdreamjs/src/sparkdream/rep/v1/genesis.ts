@@ -22,6 +22,7 @@ import { BondedRole, BondedRoleAmino, BondedRoleConfig, BondedRoleConfigAmino } 
 import { RoleActivity, RoleActivityAmino } from "./role_activity";
 import { InitiativeReview, InitiativeReviewAmino } from "./initiative_review";
 import { ReviewBounty, ReviewBountyAmino } from "./review_bounty";
+import { InitiativeBounty, InitiativeBountyAmino } from "./initiative_bounty";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -130,10 +131,15 @@ export interface GenesisState {
    */
   economicState?: EconomicState;
   /**
-   * Per-recipient gift cooldown records. Not exported meant a capped gift
-   * re-enabled itself across a restart.
+   * Per-(sender, invitee) lifetime gift ledgers. Not exporting them would
+   * re-open every invitee's lifetime gift allowance across a restart.
    */
   giftRecordList: GiftRecordEntry[];
+  /**
+   * Initiative bounties are a lock on each funder's DREAM; dropping them on
+   * import would strand the escrow with nothing able to pay or refund it.
+   */
+  initiativeBountyList: InitiativeBounty[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.rep.v1.GenesisState";
@@ -245,10 +251,15 @@ export interface GenesisStateAmino {
    */
   economic_state?: EconomicStateAmino;
   /**
-   * Per-recipient gift cooldown records. Not exported meant a capped gift
-   * re-enabled itself across a restart.
+   * Per-(sender, invitee) lifetime gift ledgers. Not exporting them would
+   * re-open every invitee's lifetime gift allowance across a restart.
    */
   gift_record_list?: GiftRecordEntryAmino[];
+  /**
+   * Initiative bounties are a lock on each funder's DREAM; dropping them on
+   * import would strand the escrow with nothing able to pay or refund it.
+   */
+  initiative_bounty_list?: InitiativeBountyAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.rep.v1.GenesisState";
@@ -323,7 +334,7 @@ export interface EconomicStateAminoMsg {
   value: EconomicStateAmino;
 }
 /**
- * GiftRecordEntry is one (sender, recipient) gift cooldown record, flattened
+ * GiftRecordEntry is one (sender, recipient) lifetime gift ledger, flattened
  * for genesis because the live collection is keyed by the pair.
  * @name GiftRecordEntry
  * @package sparkdream.rep.v1
@@ -339,7 +350,7 @@ export interface GiftRecordEntryProtoMsg {
   value: Uint8Array;
 }
 /**
- * GiftRecordEntry is one (sender, recipient) gift cooldown record, flattened
+ * GiftRecordEntry is one (sender, recipient) lifetime gift ledger, flattened
  * for genesis because the live collection is keyed by the pair.
  * @name GiftRecordEntryAmino
  * @package sparkdream.rep.v1
@@ -473,7 +484,8 @@ function createBaseGenesisState(): GenesisState {
     roleRewardDayFundingList: [],
     reviewBountyList: [],
     economicState: undefined,
-    giftRecordList: []
+    giftRecordList: [],
+    initiativeBountyList: []
   };
 }
 /**
@@ -618,6 +630,9 @@ export const GenesisState = {
     }
     for (const v of message.giftRecordList) {
       GiftRecordEntry.encode(v!, writer.uint32(354).fork()).ldelim();
+    }
+    for (const v of message.initiativeBountyList) {
+      InitiativeBounty.encode(v!, writer.uint32(362).fork()).ldelim();
     }
     return writer;
   },
@@ -767,6 +782,9 @@ export const GenesisState = {
         case 44:
           message.giftRecordList.push(GiftRecordEntry.decode(reader, reader.uint32()));
           break;
+        case 45:
+          message.initiativeBountyList.push(InitiativeBounty.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -820,6 +838,7 @@ export const GenesisState = {
     message.reviewBountyList = object.reviewBountyList?.map(e => ReviewBounty.fromPartial(e)) || [];
     message.economicState = object.economicState !== undefined && object.economicState !== null ? EconomicState.fromPartial(object.economicState) : undefined;
     message.giftRecordList = object.giftRecordList?.map(e => GiftRecordEntry.fromPartial(e)) || [];
+    message.initiativeBountyList = object.initiativeBountyList?.map(e => InitiativeBounty.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -896,6 +915,7 @@ export const GenesisState = {
       message.economicState = EconomicState.fromAmino(object.economic_state);
     }
     message.giftRecordList = object.gift_record_list?.map(e => GiftRecordEntry.fromAmino(e)) || [];
+    message.initiativeBountyList = object.initiative_bounty_list?.map(e => InitiativeBounty.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -1063,6 +1083,11 @@ export const GenesisState = {
       obj.gift_record_list = message.giftRecordList.map(e => e ? GiftRecordEntry.toAmino(e) : undefined);
     } else {
       obj.gift_record_list = message.giftRecordList;
+    }
+    if (message.initiativeBountyList) {
+      obj.initiative_bounty_list = message.initiativeBountyList.map(e => e ? InitiativeBounty.toAmino(e) : undefined);
+    } else {
+      obj.initiative_bounty_list = message.initiativeBountyList;
     }
     return obj;
   },
@@ -1329,7 +1354,7 @@ function createBaseGiftRecordEntry(): GiftRecordEntry {
   };
 }
 /**
- * GiftRecordEntry is one (sender, recipient) gift cooldown record, flattened
+ * GiftRecordEntry is one (sender, recipient) lifetime gift ledger, flattened
  * for genesis because the live collection is keyed by the pair.
  * @name GiftRecordEntry
  * @package sparkdream.rep.v1

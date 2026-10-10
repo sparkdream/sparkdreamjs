@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryShowPostRequest, QueryShowPostResponse, QueryListPostRequest, QueryListPostResponse, QueryShowReplyRequest, QueryShowReplyResponse, QueryListRepliesRequest, QueryListRepliesResponse, QueryListPostsByCreatorRequest, QueryListPostsByCreatorResponse, QueryReactionCountsRequest, QueryReactionCountsResponse, QueryUserReactionRequest, QueryUserReactionResponse, QueryListReactionsRequest, QueryListReactionsResponse, QueryListReactionsByCreatorRequest, QueryListReactionsByCreatorResponse, QueryListExpiringContentRequest, QueryListExpiringContentResponse, QueryListPostsByTagRequest, QueryListPostsByTagResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryShowPostRequest, QueryShowPostResponse, QueryListPostRequest, QueryListPostResponse, QueryShowReplyRequest, QueryShowReplyResponse, QueryListRepliesRequest, QueryListRepliesResponse, QueryListPostsByCreatorRequest, QueryListPostsByCreatorResponse, QueryReactionCountsRequest, QueryReactionCountsResponse, QueryUserReactionRequest, QueryUserReactionResponse, QueryListReactionsRequest, QueryListReactionsResponse, QueryListReactionsByCreatorRequest, QueryListReactionsByCreatorResponse, QueryListExpiringContentRequest, QueryListExpiringContentResponse, QueryListPostsByTagRequest, QueryListPostsByTagResponse, QueryPostBodyRequest, QueryPostBodyResponse, QueryReplyBodyRequest, QueryReplyBodyResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -29,6 +29,14 @@ export interface Query {
   listExpiringContent(request: QueryListExpiringContentRequest): Promise<QueryListExpiringContentResponse>;
   /** ListPostsByTag returns paginated posts that carry a given tag. */
   listPostsByTag(request: QueryListPostsByTagRequest): Promise<QueryListPostsByTagResponse>;
+  /**
+   * PostBody returns the full body of one post. List and show queries return
+   * the body as "" whenever media_flags != 0; clients fetch it here once
+   * scanner verdicts say it is clean (docs/content-scanning.md §3.4).
+   */
+  postBody(request: QueryPostBodyRequest): Promise<QueryPostBodyResponse>;
+  /** ReplyBody returns the full body of one reply (see PostBody). */
+  replyBody(request: QueryReplyBodyRequest): Promise<QueryReplyBodyResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -109,6 +117,20 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.blog.v1.Query", "ListPostsByTag", data);
     return promise.then(data => QueryListPostsByTagResponse.decode(new BinaryReader(data)));
   };
+  /* PostBody returns the full body of one post. List and show queries return
+   the body as "" whenever media_flags != 0; clients fetch it here once
+   scanner verdicts say it is clean (docs/content-scanning.md §3.4). */
+  postBody = async (request: QueryPostBodyRequest): Promise<QueryPostBodyResponse> => {
+    const data = QueryPostBodyRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.blog.v1.Query", "PostBody", data);
+    return promise.then(data => QueryPostBodyResponse.decode(new BinaryReader(data)));
+  };
+  /* ReplyBody returns the full body of one reply (see PostBody). */
+  replyBody = async (request: QueryReplyBodyRequest): Promise<QueryReplyBodyResponse> => {
+    const data = QueryReplyBodyRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.blog.v1.Query", "ReplyBody", data);
+    return promise.then(data => QueryReplyBodyResponse.decode(new BinaryReader(data)));
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);
@@ -149,6 +171,12 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     listPostsByTag(request: QueryListPostsByTagRequest): Promise<QueryListPostsByTagResponse> {
       return queryService.listPostsByTag(request);
+    },
+    postBody(request: QueryPostBodyRequest): Promise<QueryPostBodyResponse> {
+      return queryService.postBody(request);
+    },
+    replyBody(request: QueryReplyBodyRequest): Promise<QueryReplyBodyResponse> {
+      return queryService.replyBody(request);
     }
   };
 };

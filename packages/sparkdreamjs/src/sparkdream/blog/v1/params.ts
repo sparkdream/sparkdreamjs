@@ -114,6 +114,29 @@ export interface Params {
    * ephemeral to permanent is a distinct curator action with its own quota.
    */
   maxMakePermanentPerDay: number;
+  /**
+   * Media rules (docs/content-scanning.md §9). Apply to writes the chain
+   * labels as media (media_flags != 0); plain text is never affected.
+   * 
+   * media_min_trust_level is the trust level (0-4) an active member needs to
+   * post media without a bond (default 1 = PROVISIONAL). Anonymous
+   * (shield-routed) content can never carry media.
+   */
+  mediaMinTrustLevel: number;
+  /**
+   * media_author_bond_min is the DREAM author bond (micro-DREAM) that lets an
+   * active member below media_min_trust_level post media at creation. A
+   * confirmed abuse verdict costs the author this bond. 0 disables the bond
+   * path.
+   */
+  mediaAuthorBondMin: string;
+  /**
+   * media_scan_fee is a flat bond-denom fee, burned, charged on every write
+   * whose media labels are non-zero. It prices the off-chain scanning work
+   * media creates (and media spam); 0 disables it. Scanner pay itself comes
+   * from commons recurring spend (§8.5).
+   */
+  mediaScanFee: string;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.blog.v1.Params";
@@ -231,6 +254,29 @@ export interface ParamsAmino {
    * ephemeral to permanent is a distinct curator action with its own quota.
    */
   max_make_permanent_per_day?: number;
+  /**
+   * Media rules (docs/content-scanning.md §9). Apply to writes the chain
+   * labels as media (media_flags != 0); plain text is never affected.
+   * 
+   * media_min_trust_level is the trust level (0-4) an active member needs to
+   * post media without a bond (default 1 = PROVISIONAL). Anonymous
+   * (shield-routed) content can never carry media.
+   */
+  media_min_trust_level?: number;
+  /**
+   * media_author_bond_min is the DREAM author bond (micro-DREAM) that lets an
+   * active member below media_min_trust_level post media at creation. A
+   * confirmed abuse verdict costs the author this bond. 0 disables the bond
+   * path.
+   */
+  media_author_bond_min?: string;
+  /**
+   * media_scan_fee is a flat bond-denom fee, burned, charged on every write
+   * whose media labels are non-zero. It prices the off-chain scanning work
+   * media creates (and media spam); 0 disables it. Scanner pay itself comes
+   * from commons recurring spend (§8.5).
+   */
+  media_scan_fee?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/blog/Params";
@@ -393,7 +439,10 @@ function createBaseParams(): Params {
     maxTagLength: 0,
     maxPromotionsPerBlock: 0,
     makePermanentMinTrustLevel: 0,
-    maxMakePermanentPerDay: 0
+    maxMakePermanentPerDay: 0,
+    mediaMinTrustLevel: 0,
+    mediaAuthorBondMin: "",
+    mediaScanFee: ""
   };
 }
 /**
@@ -480,6 +529,15 @@ export const Params = {
     if (message.maxMakePermanentPerDay !== 0) {
       writer.uint32(232).uint32(message.maxMakePermanentPerDay);
     }
+    if (message.mediaMinTrustLevel !== 0) {
+      writer.uint32(240).uint32(message.mediaMinTrustLevel);
+    }
+    if (message.mediaAuthorBondMin !== "") {
+      writer.uint32(250).string(message.mediaAuthorBondMin);
+    }
+    if (message.mediaScanFee !== "") {
+      writer.uint32(258).string(message.mediaScanFee);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -561,6 +619,15 @@ export const Params = {
         case 29:
           message.maxMakePermanentPerDay = reader.uint32();
           break;
+        case 30:
+          message.mediaMinTrustLevel = reader.uint32();
+          break;
+        case 31:
+          message.mediaAuthorBondMin = reader.string();
+          break;
+        case 32:
+          message.mediaScanFee = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -594,6 +661,9 @@ export const Params = {
     message.maxPromotionsPerBlock = object.maxPromotionsPerBlock ?? 0;
     message.makePermanentMinTrustLevel = object.makePermanentMinTrustLevel ?? 0;
     message.maxMakePermanentPerDay = object.maxMakePermanentPerDay ?? 0;
+    message.mediaMinTrustLevel = object.mediaMinTrustLevel ?? 0;
+    message.mediaAuthorBondMin = object.mediaAuthorBondMin ?? "";
+    message.mediaScanFee = object.mediaScanFee ?? "";
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -670,6 +740,15 @@ export const Params = {
     if (object.max_make_permanent_per_day !== undefined && object.max_make_permanent_per_day !== null) {
       message.maxMakePermanentPerDay = object.max_make_permanent_per_day;
     }
+    if (object.media_min_trust_level !== undefined && object.media_min_trust_level !== null) {
+      message.mediaMinTrustLevel = object.media_min_trust_level;
+    }
+    if (object.media_author_bond_min !== undefined && object.media_author_bond_min !== null) {
+      message.mediaAuthorBondMin = object.media_author_bond_min;
+    }
+    if (object.media_scan_fee !== undefined && object.media_scan_fee !== null) {
+      message.mediaScanFee = object.media_scan_fee;
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -698,6 +777,9 @@ export const Params = {
     obj.max_promotions_per_block = message.maxPromotionsPerBlock === 0 ? undefined : message.maxPromotionsPerBlock;
     obj.make_permanent_min_trust_level = message.makePermanentMinTrustLevel === 0 ? undefined : message.makePermanentMinTrustLevel;
     obj.max_make_permanent_per_day = message.maxMakePermanentPerDay === 0 ? undefined : message.maxMakePermanentPerDay;
+    obj.media_min_trust_level = message.mediaMinTrustLevel === 0 ? undefined : message.mediaMinTrustLevel;
+    obj.media_author_bond_min = message.mediaAuthorBondMin === "" ? undefined : message.mediaAuthorBondMin;
+    obj.media_scan_fee = message.mediaScanFee === "" ? undefined : message.mediaScanFee;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {

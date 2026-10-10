@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponse, QueryShowPostRequest, QueryShowPostResponse, QueryListPostRequest, QueryListPostResponse, QueryShowReplyRequest, QueryShowReplyResponse, QueryListRepliesRequest, QueryListRepliesResponse, QueryListPostsByCreatorRequest, QueryListPostsByCreatorResponse, QueryReactionCountsRequest, QueryReactionCountsResponse, QueryUserReactionRequest, QueryUserReactionResponse, QueryListReactionsRequest, QueryListReactionsResponse, QueryListReactionsByCreatorRequest, QueryListReactionsByCreatorResponse, QueryListExpiringContentRequest, QueryListExpiringContentResponse, QueryListPostsByTagRequest, QueryListPostsByTagResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryShowPostRequest, QueryShowPostResponse, QueryListPostRequest, QueryListPostResponse, QueryShowReplyRequest, QueryShowReplyResponse, QueryListRepliesRequest, QueryListRepliesResponse, QueryListPostsByCreatorRequest, QueryListPostsByCreatorResponse, QueryReactionCountsRequest, QueryReactionCountsResponse, QueryUserReactionRequest, QueryUserReactionResponse, QueryListReactionsRequest, QueryListReactionsResponse, QueryListReactionsByCreatorRequest, QueryListReactionsByCreatorResponse, QueryListExpiringContentRequest, QueryListExpiringContentResponse, QueryListPostsByTagRequest, QueryListPostsByTagResponse, QueryPostBodyRequest, QueryPostBodyResponse, QueryReplyBodyRequest, QueryReplyBodyResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -147,5 +147,17 @@ export class LCDQueryClient {
     }
     const endpoint = `sparkdream/blog/v1/list_posts_by_tag/${params.tag}`;
     return await this.req.get<QueryListPostsByTagResponse>(endpoint, options);
+  };
+  /* PostBody returns the full body of one post. List and show queries return
+   the body as "" whenever media_flags != 0; clients fetch it here once
+   scanner verdicts say it is clean (docs/content-scanning.md §3.4). */
+  postBody = async (params: QueryPostBodyRequest): Promise<QueryPostBodyResponse> => {
+    const endpoint = `sparkdream/blog/v1/post_body/${params.id}`;
+    return await this.req.get<QueryPostBodyResponse>(endpoint);
+  };
+  /* ReplyBody returns the full body of one reply (see PostBody). */
+  replyBody = async (params: QueryReplyBodyRequest): Promise<QueryReplyBodyResponse> => {
+    const endpoint = `sparkdream/blog/v1/reply_body/${params.id}`;
+    return await this.req.get<QueryReplyBodyResponse>(endpoint);
   };
 }

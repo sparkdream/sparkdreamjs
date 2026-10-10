@@ -495,6 +495,15 @@ export interface MsgSubmitFederatedContent {
    * SUPERSEDED; one already past verification only gains the forward link.
    */
   supersedes?: ContentRef;
+  /**
+   * license is the license the source carries for this content, as an
+   * SPDX-style id. Only public-domain content enters the chain: "CC0-1.0"
+   * (the author's #cc0 dedication) or "PDM-1.0" (#publicdomain, the Public
+   * Domain Mark). Anything else is rejected. Verifiers re-check the claim
+   * against the fetched post; a record whose source does not carry the
+   * marker is never verified.
+   */
+  license: string;
 }
 export interface MsgSubmitFederatedContentProtoMsg {
   typeUrl: "/sparkdream.federation.v1.MsgSubmitFederatedContent";
@@ -525,6 +534,15 @@ export interface MsgSubmitFederatedContentAmino {
    * SUPERSEDED; one already past verification only gains the forward link.
    */
   supersedes?: ContentRefAmino;
+  /**
+   * license is the license the source carries for this content, as an
+   * SPDX-style id. Only public-domain content enters the chain: "CC0-1.0"
+   * (the author's #cc0 dedication) or "PDM-1.0" (#publicdomain, the Public
+   * Domain Mark). Anything else is rejected. Verifiers re-check the claim
+   * against the fetched post; a record whose source does not carry the
+   * marker is never verified.
+   */
+  license?: string;
 }
 export interface MsgSubmitFederatedContentAminoMsg {
   type: "sparkdream/x/federation/MsgSubmitFederatedContent";
@@ -2715,7 +2733,8 @@ function createBaseMsgSubmitFederatedContent(): MsgSubmitFederatedContent {
     protocolMetadata: new Uint8Array(),
     remoteCreatedAt: BigInt(0),
     contentHash: new Uint8Array(),
-    supersedes: undefined
+    supersedes: undefined,
+    license: ""
   };
 }
 /**
@@ -2766,6 +2785,9 @@ export const MsgSubmitFederatedContent = {
     if (message.supersedes !== undefined) {
       ContentRef.encode(message.supersedes, writer.uint32(106).fork()).ldelim();
     }
+    if (message.license !== "") {
+      writer.uint32(114).string(message.license);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgSubmitFederatedContent {
@@ -2814,6 +2836,9 @@ export const MsgSubmitFederatedContent = {
         case 13:
           message.supersedes = ContentRef.decode(reader, reader.uint32());
           break;
+        case 14:
+          message.license = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2836,6 +2861,7 @@ export const MsgSubmitFederatedContent = {
     message.remoteCreatedAt = object.remoteCreatedAt !== undefined && object.remoteCreatedAt !== null ? BigInt(object.remoteCreatedAt.toString()) : BigInt(0);
     message.contentHash = object.contentHash ?? new Uint8Array();
     message.supersedes = object.supersedes !== undefined && object.supersedes !== null ? ContentRef.fromPartial(object.supersedes) : undefined;
+    message.license = object.license ?? "";
     return message;
   },
   fromAmino(object: MsgSubmitFederatedContentAmino): MsgSubmitFederatedContent {
@@ -2879,6 +2905,9 @@ export const MsgSubmitFederatedContent = {
     if (object.supersedes !== undefined && object.supersedes !== null) {
       message.supersedes = ContentRef.fromAmino(object.supersedes);
     }
+    if (object.license !== undefined && object.license !== null) {
+      message.license = object.license;
+    }
     return message;
   },
   toAmino(message: MsgSubmitFederatedContent): MsgSubmitFederatedContentAmino {
@@ -2896,6 +2925,7 @@ export const MsgSubmitFederatedContent = {
     obj.remote_created_at = message.remoteCreatedAt !== BigInt(0) ? message.remoteCreatedAt?.toString() : undefined;
     obj.content_hash = message.contentHash ? base64FromBytes(message.contentHash) : undefined;
     obj.supersedes = message.supersedes ? ContentRef.toAmino(message.supersedes) : undefined;
+    obj.license = message.license === "" ? undefined : message.license;
     return obj;
   },
   fromAminoMsg(object: MsgSubmitFederatedContentAminoMsg): MsgSubmitFederatedContent {

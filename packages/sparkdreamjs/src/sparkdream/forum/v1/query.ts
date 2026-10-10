@@ -15,8 +15,9 @@ import { ThreadFollow, ThreadFollowAmino } from "./thread_follow";
 import { ThreadFollowCount, ThreadFollowCountAmino } from "./thread_follow_count";
 import { ArchiveMetadata, ArchiveMetadataAmino } from "./archive_metadata";
 import { PostConvictionStake, PostConvictionStakeAmino } from "./types";
+import { ContentType } from "../../common/v1/content_type";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /**
  * QueryParamsRequest is request type for the Query/Params RPC method.
  * @name QueryParamsRequest
@@ -2700,6 +2701,66 @@ export interface QueryPostConvictionStakesByPostResponseAmino {
 export interface QueryPostConvictionStakesByPostResponseAminoMsg {
   type: "/sparkdream.forum.v1.QueryPostConvictionStakesByPostResponse";
   value: QueryPostConvictionStakesByPostResponseAmino;
+}
+/**
+ * QueryPostContentRequest defines the QueryPostContentRequest message.
+ * @name QueryPostContentRequest
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryPostContentRequest
+ */
+export interface QueryPostContentRequest {
+  postId: bigint;
+}
+export interface QueryPostContentRequestProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.QueryPostContentRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryPostContentRequest defines the QueryPostContentRequest message.
+ * @name QueryPostContentRequestAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryPostContentRequest
+ */
+export interface QueryPostContentRequestAmino {
+  post_id?: string;
+}
+export interface QueryPostContentRequestAminoMsg {
+  type: "/sparkdream.forum.v1.QueryPostContentRequest";
+  value: QueryPostContentRequestAmino;
+}
+/**
+ * QueryPostContentResponse carries the stored content with the labels a
+ * client needs to check it: body_hash must match sha256(content).
+ * @name QueryPostContentResponse
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryPostContentResponse
+ */
+export interface QueryPostContentResponse {
+  content: string;
+  contentType: ContentType;
+  mediaFlags: number;
+  bodyHash: Uint8Array;
+}
+export interface QueryPostContentResponseProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.QueryPostContentResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryPostContentResponse carries the stored content with the labels a
+ * client needs to check it: body_hash must match sha256(content).
+ * @name QueryPostContentResponseAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryPostContentResponse
+ */
+export interface QueryPostContentResponseAmino {
+  content?: string;
+  content_type?: ContentType;
+  media_flags?: number;
+  body_hash?: string;
+}
+export interface QueryPostContentResponseAminoMsg {
+  type: "/sparkdream.forum.v1.QueryPostContentResponse";
+  value: QueryPostContentResponseAmino;
 }
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
@@ -10298,6 +10359,181 @@ export const QueryPostConvictionStakesByPostResponse = {
     return {
       typeUrl: "/sparkdream.forum.v1.QueryPostConvictionStakesByPostResponse",
       value: QueryPostConvictionStakesByPostResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryPostContentRequest(): QueryPostContentRequest {
+  return {
+    postId: BigInt(0)
+  };
+}
+/**
+ * QueryPostContentRequest defines the QueryPostContentRequest message.
+ * @name QueryPostContentRequest
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryPostContentRequest
+ */
+export const QueryPostContentRequest = {
+  typeUrl: "/sparkdream.forum.v1.QueryPostContentRequest",
+  encode(message: QueryPostContentRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.postId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.postId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryPostContentRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryPostContentRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.postId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryPostContentRequest>): QueryPostContentRequest {
+    const message = createBaseQueryPostContentRequest();
+    message.postId = object.postId !== undefined && object.postId !== null ? BigInt(object.postId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryPostContentRequestAmino): QueryPostContentRequest {
+    const message = createBaseQueryPostContentRequest();
+    if (object.post_id !== undefined && object.post_id !== null) {
+      message.postId = BigInt(object.post_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryPostContentRequest): QueryPostContentRequestAmino {
+    const obj: any = {};
+    obj.post_id = message.postId !== BigInt(0) ? message.postId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryPostContentRequestAminoMsg): QueryPostContentRequest {
+    return QueryPostContentRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryPostContentRequestProtoMsg): QueryPostContentRequest {
+    return QueryPostContentRequest.decode(message.value);
+  },
+  toProto(message: QueryPostContentRequest): Uint8Array {
+    return QueryPostContentRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryPostContentRequest): QueryPostContentRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.QueryPostContentRequest",
+      value: QueryPostContentRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryPostContentResponse(): QueryPostContentResponse {
+  return {
+    content: "",
+    contentType: 0,
+    mediaFlags: 0,
+    bodyHash: new Uint8Array()
+  };
+}
+/**
+ * QueryPostContentResponse carries the stored content with the labels a
+ * client needs to check it: body_hash must match sha256(content).
+ * @name QueryPostContentResponse
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.QueryPostContentResponse
+ */
+export const QueryPostContentResponse = {
+  typeUrl: "/sparkdream.forum.v1.QueryPostContentResponse",
+  encode(message: QueryPostContentResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.content !== "") {
+      writer.uint32(10).string(message.content);
+    }
+    if (message.contentType !== 0) {
+      writer.uint32(16).int32(message.contentType);
+    }
+    if (message.mediaFlags !== 0) {
+      writer.uint32(24).uint32(message.mediaFlags);
+    }
+    if (message.bodyHash.length !== 0) {
+      writer.uint32(34).bytes(message.bodyHash);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryPostContentResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryPostContentResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.content = reader.string();
+          break;
+        case 2:
+          message.contentType = reader.int32() as any;
+          break;
+        case 3:
+          message.mediaFlags = reader.uint32();
+          break;
+        case 4:
+          message.bodyHash = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryPostContentResponse>): QueryPostContentResponse {
+    const message = createBaseQueryPostContentResponse();
+    message.content = object.content ?? "";
+    message.contentType = object.contentType ?? 0;
+    message.mediaFlags = object.mediaFlags ?? 0;
+    message.bodyHash = object.bodyHash ?? new Uint8Array();
+    return message;
+  },
+  fromAmino(object: QueryPostContentResponseAmino): QueryPostContentResponse {
+    const message = createBaseQueryPostContentResponse();
+    if (object.content !== undefined && object.content !== null) {
+      message.content = object.content;
+    }
+    if (object.content_type !== undefined && object.content_type !== null) {
+      message.contentType = object.content_type;
+    }
+    if (object.media_flags !== undefined && object.media_flags !== null) {
+      message.mediaFlags = object.media_flags;
+    }
+    if (object.body_hash !== undefined && object.body_hash !== null) {
+      message.bodyHash = bytesFromBase64(object.body_hash);
+    }
+    return message;
+  },
+  toAmino(message: QueryPostContentResponse): QueryPostContentResponseAmino {
+    const obj: any = {};
+    obj.content = message.content === "" ? undefined : message.content;
+    obj.content_type = message.contentType === 0 ? undefined : message.contentType;
+    obj.media_flags = message.mediaFlags === 0 ? undefined : message.mediaFlags;
+    obj.body_hash = message.bodyHash ? base64FromBytes(message.bodyHash) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryPostContentResponseAminoMsg): QueryPostContentResponse {
+    return QueryPostContentResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryPostContentResponseProtoMsg): QueryPostContentResponse {
+    return QueryPostContentResponse.decode(message.value);
+  },
+  toProto(message: QueryPostContentResponse): Uint8Array {
+    return QueryPostContentResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryPostContentResponse): QueryPostContentResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.QueryPostContentResponse",
+      value: QueryPostContentResponse.encode(message).finish()
     };
   }
 };

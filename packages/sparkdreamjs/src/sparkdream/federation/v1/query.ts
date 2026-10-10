@@ -4,7 +4,7 @@ import { Params, ParamsAmino } from "./params";
 import { Peer, PeerAmino, PeerPolicy, PeerPolicyAmino, BridgeBinding, BridgeBindingAmino, FederatedContent, FederatedContentAmino, IdentityLink, IdentityLinkAmino, PendingIdentityChallenge, PendingIdentityChallengeAmino, ReputationAttestation, ReputationAttestationAmino, OutboundAttestation, OutboundAttestationAmino, VerificationRecord, VerificationRecordAmino, EscalatedChallenge, EscalatedChallengeAmino } from "./types";
 import { VerifierActivityView, VerifierActivityViewAmino } from "./verifier_activity";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 import { Decimal } from "@interchainjs/math";
 /**
  * --- Params ---
@@ -1041,6 +1041,62 @@ export interface QueryGetEscalatedChallengeResponseAmino {
 export interface QueryGetEscalatedChallengeResponseAminoMsg {
   type: "/sparkdream.federation.v1.QueryGetEscalatedChallengeResponse";
   value: QueryGetEscalatedChallengeResponseAmino;
+}
+/**
+ * --- Federated content body ---
+ * @name QueryFederatedContentBodyRequest
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.QueryFederatedContentBodyRequest
+ */
+export interface QueryFederatedContentBodyRequest {
+  id: bigint;
+}
+export interface QueryFederatedContentBodyRequestProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.QueryFederatedContentBodyRequest";
+  value: Uint8Array;
+}
+/**
+ * --- Federated content body ---
+ * @name QueryFederatedContentBodyRequestAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.QueryFederatedContentBodyRequest
+ */
+export interface QueryFederatedContentBodyRequestAmino {
+  id?: string;
+}
+export interface QueryFederatedContentBodyRequestAminoMsg {
+  type: "/sparkdream.federation.v1.QueryFederatedContentBodyRequest";
+  value: QueryFederatedContentBodyRequestAmino;
+}
+/**
+ * QueryFederatedContentBodyResponse carries the stored body with its labels.
+ * @name QueryFederatedContentBodyResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.QueryFederatedContentBodyResponse
+ */
+export interface QueryFederatedContentBodyResponse {
+  body: string;
+  mediaFlags: number;
+  contentHash: Uint8Array;
+}
+export interface QueryFederatedContentBodyResponseProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.QueryFederatedContentBodyResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryFederatedContentBodyResponse carries the stored body with its labels.
+ * @name QueryFederatedContentBodyResponseAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.QueryFederatedContentBodyResponse
+ */
+export interface QueryFederatedContentBodyResponseAmino {
+  body?: string;
+  media_flags?: number;
+  content_hash?: string;
+}
+export interface QueryFederatedContentBodyResponseAminoMsg {
+  type: "/sparkdream.federation.v1.QueryFederatedContentBodyResponse";
+  value: QueryFederatedContentBodyResponseAmino;
 }
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
@@ -3895,6 +3951,168 @@ export const QueryGetEscalatedChallengeResponse = {
     return {
       typeUrl: "/sparkdream.federation.v1.QueryGetEscalatedChallengeResponse",
       value: QueryGetEscalatedChallengeResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryFederatedContentBodyRequest(): QueryFederatedContentBodyRequest {
+  return {
+    id: BigInt(0)
+  };
+}
+/**
+ * --- Federated content body ---
+ * @name QueryFederatedContentBodyRequest
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.QueryFederatedContentBodyRequest
+ */
+export const QueryFederatedContentBodyRequest = {
+  typeUrl: "/sparkdream.federation.v1.QueryFederatedContentBodyRequest",
+  encode(message: QueryFederatedContentBodyRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.id !== BigInt(0)) {
+      writer.uint32(8).uint64(message.id);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryFederatedContentBodyRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryFederatedContentBodyRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryFederatedContentBodyRequest>): QueryFederatedContentBodyRequest {
+    const message = createBaseQueryFederatedContentBodyRequest();
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryFederatedContentBodyRequestAmino): QueryFederatedContentBodyRequest {
+    const message = createBaseQueryFederatedContentBodyRequest();
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    return message;
+  },
+  toAmino(message: QueryFederatedContentBodyRequest): QueryFederatedContentBodyRequestAmino {
+    const obj: any = {};
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryFederatedContentBodyRequestAminoMsg): QueryFederatedContentBodyRequest {
+    return QueryFederatedContentBodyRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryFederatedContentBodyRequestProtoMsg): QueryFederatedContentBodyRequest {
+    return QueryFederatedContentBodyRequest.decode(message.value);
+  },
+  toProto(message: QueryFederatedContentBodyRequest): Uint8Array {
+    return QueryFederatedContentBodyRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryFederatedContentBodyRequest): QueryFederatedContentBodyRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.QueryFederatedContentBodyRequest",
+      value: QueryFederatedContentBodyRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryFederatedContentBodyResponse(): QueryFederatedContentBodyResponse {
+  return {
+    body: "",
+    mediaFlags: 0,
+    contentHash: new Uint8Array()
+  };
+}
+/**
+ * QueryFederatedContentBodyResponse carries the stored body with its labels.
+ * @name QueryFederatedContentBodyResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.QueryFederatedContentBodyResponse
+ */
+export const QueryFederatedContentBodyResponse = {
+  typeUrl: "/sparkdream.federation.v1.QueryFederatedContentBodyResponse",
+  encode(message: QueryFederatedContentBodyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.body !== "") {
+      writer.uint32(10).string(message.body);
+    }
+    if (message.mediaFlags !== 0) {
+      writer.uint32(16).uint32(message.mediaFlags);
+    }
+    if (message.contentHash.length !== 0) {
+      writer.uint32(26).bytes(message.contentHash);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryFederatedContentBodyResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryFederatedContentBodyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.body = reader.string();
+          break;
+        case 2:
+          message.mediaFlags = reader.uint32();
+          break;
+        case 3:
+          message.contentHash = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryFederatedContentBodyResponse>): QueryFederatedContentBodyResponse {
+    const message = createBaseQueryFederatedContentBodyResponse();
+    message.body = object.body ?? "";
+    message.mediaFlags = object.mediaFlags ?? 0;
+    message.contentHash = object.contentHash ?? new Uint8Array();
+    return message;
+  },
+  fromAmino(object: QueryFederatedContentBodyResponseAmino): QueryFederatedContentBodyResponse {
+    const message = createBaseQueryFederatedContentBodyResponse();
+    if (object.body !== undefined && object.body !== null) {
+      message.body = object.body;
+    }
+    if (object.media_flags !== undefined && object.media_flags !== null) {
+      message.mediaFlags = object.media_flags;
+    }
+    if (object.content_hash !== undefined && object.content_hash !== null) {
+      message.contentHash = bytesFromBase64(object.content_hash);
+    }
+    return message;
+  },
+  toAmino(message: QueryFederatedContentBodyResponse): QueryFederatedContentBodyResponseAmino {
+    const obj: any = {};
+    obj.body = message.body === "" ? undefined : message.body;
+    obj.media_flags = message.mediaFlags === 0 ? undefined : message.mediaFlags;
+    obj.content_hash = message.contentHash ? base64FromBytes(message.contentHash) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryFederatedContentBodyResponseAminoMsg): QueryFederatedContentBodyResponse {
+    return QueryFederatedContentBodyResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryFederatedContentBodyResponseProtoMsg): QueryFederatedContentBodyResponse {
+    return QueryFederatedContentBodyResponse.decode(message.value);
+  },
+  toProto(message: QueryFederatedContentBodyResponse): Uint8Array {
+    return QueryFederatedContentBodyResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryFederatedContentBodyResponse): QueryFederatedContentBodyResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.QueryFederatedContentBodyResponse",
+      value: QueryFederatedContentBodyResponse.encode(message).finish()
     };
   }
 };
