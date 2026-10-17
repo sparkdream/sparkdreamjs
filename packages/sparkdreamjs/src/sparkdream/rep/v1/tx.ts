@@ -3451,6 +3451,58 @@ export interface MsgReclaimInitiativeBountyResponseAminoMsg {
   type: "/sparkdream.rep.v1.MsgReclaimInitiativeBountyResponse";
   value: MsgReclaimInitiativeBountyResponseAmino;
 }
+/**
+ * MsgRevokeInvitation withdraws a PENDING invitation. Only the inviter may
+ * revoke; an accepted, expired or already-revoked invitation is rejected.
+ * @name MsgRevokeInvitation
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRevokeInvitation
+ */
+export interface MsgRevokeInvitation {
+  inviter: string;
+  invitationId: bigint;
+}
+export interface MsgRevokeInvitationProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgRevokeInvitation";
+  value: Uint8Array;
+}
+/**
+ * MsgRevokeInvitation withdraws a PENDING invitation. Only the inviter may
+ * revoke; an accepted, expired or already-revoked invitation is rejected.
+ * @name MsgRevokeInvitationAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRevokeInvitation
+ */
+export interface MsgRevokeInvitationAmino {
+  inviter?: string;
+  invitation_id?: string;
+}
+export interface MsgRevokeInvitationAminoMsg {
+  type: "sparkdream/x/rep/MsgRevokeInvitation";
+  value: MsgRevokeInvitationAmino;
+}
+/**
+ * MsgRevokeInvitationResponse defines the MsgRevokeInvitationResponse message.
+ * @name MsgRevokeInvitationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRevokeInvitationResponse
+ */
+export interface MsgRevokeInvitationResponse {}
+export interface MsgRevokeInvitationResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgRevokeInvitationResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgRevokeInvitationResponse defines the MsgRevokeInvitationResponse message.
+ * @name MsgRevokeInvitationResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRevokeInvitationResponse
+ */
+export interface MsgRevokeInvitationResponseAmino {}
+export interface MsgRevokeInvitationResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgRevokeInvitationResponse";
+  value: MsgRevokeInvitationResponseAmino;
+}
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
     authority: "",
@@ -13226,6 +13278,151 @@ export const MsgReclaimInitiativeBountyResponse = {
     return {
       typeUrl: "/sparkdream.rep.v1.MsgReclaimInitiativeBountyResponse",
       value: MsgReclaimInitiativeBountyResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRevokeInvitation(): MsgRevokeInvitation {
+  return {
+    inviter: "",
+    invitationId: BigInt(0)
+  };
+}
+/**
+ * MsgRevokeInvitation withdraws a PENDING invitation. Only the inviter may
+ * revoke; an accepted, expired or already-revoked invitation is rejected.
+ * @name MsgRevokeInvitation
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRevokeInvitation
+ */
+export const MsgRevokeInvitation = {
+  typeUrl: "/sparkdream.rep.v1.MsgRevokeInvitation",
+  aminoType: "sparkdream/x/rep/MsgRevokeInvitation",
+  encode(message: MsgRevokeInvitation, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.inviter !== "") {
+      writer.uint32(10).string(message.inviter);
+    }
+    if (message.invitationId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.invitationId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRevokeInvitation {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRevokeInvitation();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.inviter = reader.string();
+          break;
+        case 2:
+          message.invitationId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgRevokeInvitation>): MsgRevokeInvitation {
+    const message = createBaseMsgRevokeInvitation();
+    message.inviter = object.inviter ?? "";
+    message.invitationId = object.invitationId !== undefined && object.invitationId !== null ? BigInt(object.invitationId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgRevokeInvitationAmino): MsgRevokeInvitation {
+    const message = createBaseMsgRevokeInvitation();
+    if (object.inviter !== undefined && object.inviter !== null) {
+      message.inviter = object.inviter;
+    }
+    if (object.invitation_id !== undefined && object.invitation_id !== null) {
+      message.invitationId = BigInt(object.invitation_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgRevokeInvitation): MsgRevokeInvitationAmino {
+    const obj: any = {};
+    obj.inviter = message.inviter === "" ? undefined : message.inviter;
+    obj.invitation_id = message.invitationId !== BigInt(0) ? message.invitationId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgRevokeInvitationAminoMsg): MsgRevokeInvitation {
+    return MsgRevokeInvitation.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRevokeInvitation): MsgRevokeInvitationAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgRevokeInvitation",
+      value: MsgRevokeInvitation.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgRevokeInvitationProtoMsg): MsgRevokeInvitation {
+    return MsgRevokeInvitation.decode(message.value);
+  },
+  toProto(message: MsgRevokeInvitation): Uint8Array {
+    return MsgRevokeInvitation.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRevokeInvitation): MsgRevokeInvitationProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgRevokeInvitation",
+      value: MsgRevokeInvitation.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRevokeInvitationResponse(): MsgRevokeInvitationResponse {
+  return {};
+}
+/**
+ * MsgRevokeInvitationResponse defines the MsgRevokeInvitationResponse message.
+ * @name MsgRevokeInvitationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRevokeInvitationResponse
+ */
+export const MsgRevokeInvitationResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgRevokeInvitationResponse",
+  encode(_: MsgRevokeInvitationResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRevokeInvitationResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRevokeInvitationResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgRevokeInvitationResponse>): MsgRevokeInvitationResponse {
+    const message = createBaseMsgRevokeInvitationResponse();
+    return message;
+  },
+  fromAmino(_: MsgRevokeInvitationResponseAmino): MsgRevokeInvitationResponse {
+    const message = createBaseMsgRevokeInvitationResponse();
+    return message;
+  },
+  toAmino(_: MsgRevokeInvitationResponse): MsgRevokeInvitationResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgRevokeInvitationResponseAminoMsg): MsgRevokeInvitationResponse {
+    return MsgRevokeInvitationResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgRevokeInvitationResponseProtoMsg): MsgRevokeInvitationResponse {
+    return MsgRevokeInvitationResponse.decode(message.value);
+  },
+  toProto(message: MsgRevokeInvitationResponse): Uint8Array {
+    return MsgRevokeInvitationResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRevokeInvitationResponse): MsgRevokeInvitationResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgRevokeInvitationResponse",
+      value: MsgRevokeInvitationResponse.encode(message).finish()
     };
   }
 };

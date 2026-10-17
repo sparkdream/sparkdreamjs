@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { Params, ParamsAmino, SeasonOperationalParams, SeasonOperationalParamsAmino } from "./params";
+import { QuestObjective, QuestObjectiveAmino } from "./quest";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -1174,6 +1175,11 @@ export interface MsgCreateQuest {
   requiredAchievement: string;
   prerequisiteQuest: string;
   questChain: string;
+  /**
+   * objectives the member must complete before claiming; each needs a type
+   * and a positive target. A quest with no objectives is claimable at once.
+   */
+  objectives: QuestObjective[];
 }
 export interface MsgCreateQuestProtoMsg {
   typeUrl: "/sparkdream.season.v1.MsgCreateQuest";
@@ -1203,6 +1209,11 @@ export interface MsgCreateQuestAmino {
   required_achievement?: string;
   prerequisite_quest?: string;
   quest_chain?: string;
+  /**
+   * objectives the member must complete before claiming; each needs a type
+   * and a positive target. A quest with no objectives is claimable at once.
+   */
+  objectives?: QuestObjectiveAmino[];
 }
 export interface MsgCreateQuestAminoMsg {
   type: "sparkdream/x/season/MsgCreateQuest";
@@ -2104,6 +2115,10 @@ export interface MsgUpdateQuest {
   prerequisiteQuest: string;
   questChain: string;
   active: boolean;
+  /**
+   * objectives replaces the quest's objective list when non-empty.
+   */
+  objectives: QuestObjective[];
 }
 export interface MsgUpdateQuestProtoMsg {
   typeUrl: "/sparkdream.season.v1.MsgUpdateQuest";
@@ -2135,6 +2150,10 @@ export interface MsgUpdateQuestAmino {
   prerequisite_quest?: string;
   quest_chain?: string;
   active?: boolean;
+  /**
+   * objectives replaces the quest's objective list when non-empty.
+   */
+  objectives?: QuestObjectiveAmino[];
 }
 export interface MsgUpdateQuestAminoMsg {
   type: "sparkdream/x/season/MsgUpdateQuest";
@@ -5747,7 +5766,8 @@ function createBaseMsgCreateQuest(): MsgCreateQuest {
     minLevel: BigInt(0),
     requiredAchievement: "",
     prerequisiteQuest: "",
-    questChain: ""
+    questChain: "",
+    objectives: []
   };
 }
 /**
@@ -5802,6 +5822,9 @@ export const MsgCreateQuest = {
     if (message.questChain !== "") {
       writer.uint32(114).string(message.questChain);
     }
+    for (const v of message.objectives) {
+      QuestObjective.encode(v!, writer.uint32(122).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgCreateQuest {
@@ -5853,6 +5876,9 @@ export const MsgCreateQuest = {
         case 14:
           message.questChain = reader.string();
           break;
+        case 15:
+          message.objectives.push(QuestObjective.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -5876,6 +5902,7 @@ export const MsgCreateQuest = {
     message.requiredAchievement = object.requiredAchievement ?? "";
     message.prerequisiteQuest = object.prerequisiteQuest ?? "";
     message.questChain = object.questChain ?? "";
+    message.objectives = object.objectives?.map(e => QuestObjective.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: MsgCreateQuestAmino): MsgCreateQuest {
@@ -5922,6 +5949,7 @@ export const MsgCreateQuest = {
     if (object.quest_chain !== undefined && object.quest_chain !== null) {
       message.questChain = object.quest_chain;
     }
+    message.objectives = object.objectives?.map(e => QuestObjective.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: MsgCreateQuest): MsgCreateQuestAmino {
@@ -5940,6 +5968,11 @@ export const MsgCreateQuest = {
     obj.required_achievement = message.requiredAchievement === "" ? undefined : message.requiredAchievement;
     obj.prerequisite_quest = message.prerequisiteQuest === "" ? undefined : message.prerequisiteQuest;
     obj.quest_chain = message.questChain === "" ? undefined : message.questChain;
+    if (message.objectives) {
+      obj.objectives = message.objectives.map(e => e ? QuestObjective.toAmino(e) : undefined);
+    } else {
+      obj.objectives = message.objectives;
+    }
     return obj;
   },
   fromAminoMsg(object: MsgCreateQuestAminoMsg): MsgCreateQuest {
@@ -8376,7 +8409,8 @@ function createBaseMsgUpdateQuest(): MsgUpdateQuest {
     requiredAchievement: "",
     prerequisiteQuest: "",
     questChain: "",
-    active: false
+    active: false,
+    objectives: []
   };
 }
 /**
@@ -8438,6 +8472,9 @@ export const MsgUpdateQuest = {
     if (message.active === true) {
       writer.uint32(120).bool(message.active);
     }
+    for (const v of message.objectives) {
+      QuestObjective.encode(v!, writer.uint32(130).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgUpdateQuest {
@@ -8492,6 +8529,9 @@ export const MsgUpdateQuest = {
         case 15:
           message.active = reader.bool();
           break;
+        case 16:
+          message.objectives.push(QuestObjective.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -8516,6 +8556,7 @@ export const MsgUpdateQuest = {
     message.prerequisiteQuest = object.prerequisiteQuest ?? "";
     message.questChain = object.questChain ?? "";
     message.active = object.active ?? false;
+    message.objectives = object.objectives?.map(e => QuestObjective.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: MsgUpdateQuestAmino): MsgUpdateQuest {
@@ -8565,6 +8606,7 @@ export const MsgUpdateQuest = {
     if (object.active !== undefined && object.active !== null) {
       message.active = object.active;
     }
+    message.objectives = object.objectives?.map(e => QuestObjective.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: MsgUpdateQuest): MsgUpdateQuestAmino {
@@ -8584,6 +8626,11 @@ export const MsgUpdateQuest = {
     obj.prerequisite_quest = message.prerequisiteQuest === "" ? undefined : message.prerequisiteQuest;
     obj.quest_chain = message.questChain === "" ? undefined : message.questChain;
     obj.active = message.active === false ? undefined : message.active;
+    if (message.objectives) {
+      obj.objectives = message.objectives.map(e => e ? QuestObjective.toAmino(e) : undefined);
+    } else {
+      obj.objectives = message.objectives;
+    }
     return obj;
   },
   fromAminoMsg(object: MsgUpdateQuestAminoMsg): MsgUpdateQuest {

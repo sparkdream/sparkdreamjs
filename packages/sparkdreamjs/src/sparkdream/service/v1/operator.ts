@@ -91,6 +91,21 @@ export interface Operator {
    * call for this operator; used by lazy accrual (§6.6).
    */
   lastBondBlockUpdateAt: bigint;
+  /**
+   * pending_withdraw_amount is the portion of bond_amount queued for
+   * partial withdrawal via MsgWithdrawBond (§3.5a); still inside
+   * bond_amount and slashable until claimed. Zero when nothing is queued.
+   * Cleared whenever the record leaves ACTIVE for UNBONDING or a terminal
+   * status, since the exit path returns or confiscates the whole bond.
+   */
+  pendingWithdrawAmount: string;
+  /**
+   * withdraw_complete_at is the height from which the queued partial
+   * withdrawal can be claimed with MsgClaimUnbondedBond; 0 when nothing
+   * is queued. Reset to now + unbonding_period_blocks on every
+   * MsgWithdrawBond.
+   */
+  withdrawCompleteAt: bigint;
 }
 export interface OperatorProtoMsg {
   typeUrl: "/sparkdream.service.v1.Operator";
@@ -185,6 +200,21 @@ export interface OperatorAmino {
    * call for this operator; used by lazy accrual (§6.6).
    */
   last_bond_block_update_at?: string;
+  /**
+   * pending_withdraw_amount is the portion of bond_amount queued for
+   * partial withdrawal via MsgWithdrawBond (§3.5a); still inside
+   * bond_amount and slashable until claimed. Zero when nothing is queued.
+   * Cleared whenever the record leaves ACTIVE for UNBONDING or a terminal
+   * status, since the exit path returns or confiscates the whole bond.
+   */
+  pending_withdraw_amount?: string;
+  /**
+   * withdraw_complete_at is the height from which the queued partial
+   * withdrawal can be claimed with MsgClaimUnbondedBond; 0 when nothing
+   * is queued. Reset to now + unbonding_period_blocks on every
+   * MsgWithdrawBond.
+   */
+  withdraw_complete_at?: string;
 }
 export interface OperatorAminoMsg {
   type: "sparkdream/x/service/Operator";
@@ -206,7 +236,9 @@ function createBaseOperator(): Operator {
     registeredAt: BigInt(0),
     retiredAt: BigInt(0),
     totalLifetimeBondBlocks: "",
-    lastBondBlockUpdateAt: BigInt(0)
+    lastBondBlockUpdateAt: BigInt(0),
+    pendingWithdrawAmount: "",
+    withdrawCompleteAt: BigInt(0)
   };
 }
 /**
@@ -268,6 +300,12 @@ export const Operator = {
     if (message.lastBondBlockUpdateAt !== BigInt(0)) {
       writer.uint32(120).int64(message.lastBondBlockUpdateAt);
     }
+    if (message.pendingWithdrawAmount !== "") {
+      writer.uint32(130).string(message.pendingWithdrawAmount);
+    }
+    if (message.withdrawCompleteAt !== BigInt(0)) {
+      writer.uint32(136).int64(message.withdrawCompleteAt);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Operator {
@@ -322,6 +360,12 @@ export const Operator = {
         case 15:
           message.lastBondBlockUpdateAt = reader.int64();
           break;
+        case 16:
+          message.pendingWithdrawAmount = reader.string();
+          break;
+        case 17:
+          message.withdrawCompleteAt = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -346,6 +390,8 @@ export const Operator = {
     message.retiredAt = object.retiredAt !== undefined && object.retiredAt !== null ? BigInt(object.retiredAt.toString()) : BigInt(0);
     message.totalLifetimeBondBlocks = object.totalLifetimeBondBlocks ?? "";
     message.lastBondBlockUpdateAt = object.lastBondBlockUpdateAt !== undefined && object.lastBondBlockUpdateAt !== null ? BigInt(object.lastBondBlockUpdateAt.toString()) : BigInt(0);
+    message.pendingWithdrawAmount = object.pendingWithdrawAmount ?? "";
+    message.withdrawCompleteAt = object.withdrawCompleteAt !== undefined && object.withdrawCompleteAt !== null ? BigInt(object.withdrawCompleteAt.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: OperatorAmino): Operator {
@@ -395,6 +441,12 @@ export const Operator = {
     if (object.last_bond_block_update_at !== undefined && object.last_bond_block_update_at !== null) {
       message.lastBondBlockUpdateAt = BigInt(object.last_bond_block_update_at);
     }
+    if (object.pending_withdraw_amount !== undefined && object.pending_withdraw_amount !== null) {
+      message.pendingWithdrawAmount = object.pending_withdraw_amount;
+    }
+    if (object.withdraw_complete_at !== undefined && object.withdraw_complete_at !== null) {
+      message.withdrawCompleteAt = BigInt(object.withdraw_complete_at);
+    }
     return message;
   },
   toAmino(message: Operator): OperatorAmino {
@@ -414,6 +466,8 @@ export const Operator = {
     obj.retired_at = message.retiredAt !== BigInt(0) ? message.retiredAt?.toString() : undefined;
     obj.total_lifetime_bond_blocks = message.totalLifetimeBondBlocks === "" ? undefined : message.totalLifetimeBondBlocks;
     obj.last_bond_block_update_at = message.lastBondBlockUpdateAt !== BigInt(0) ? message.lastBondBlockUpdateAt?.toString() : undefined;
+    obj.pending_withdraw_amount = message.pendingWithdrawAmount === "" ? undefined : message.pendingWithdrawAmount;
+    obj.withdraw_complete_at = message.withdrawCompleteAt !== BigInt(0) ? message.withdrawCompleteAt?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: OperatorAminoMsg): Operator {

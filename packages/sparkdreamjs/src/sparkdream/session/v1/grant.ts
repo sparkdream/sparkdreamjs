@@ -5,11 +5,12 @@ import { Any, AnyAmino } from "../../../google/protobuf/any";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { toTimestamp, fromTimestamp, DeepPartial } from "../../../helpers";
 /**
- * GrantType enumerates the four typed payload variants of the unified grant
+ * GrantType enumerates the typed payload variants of the unified grant
  * registry. The session-key variant preserves the legacy x/session model;
- * the other three are introduced by the delegated-authorization-registry
- * refactor and ship in subsequent phases (P3 RecurringPull, P4
- * SpendingAllowance, P5 ScheduledOneshot).
+ * RecurringPull, SpendingAllowance and ScheduledOneshot came with the
+ * delegated-authorization-registry refactor. SignIn is the one variant
+ * nothing on chain executes: it records permission for an off-chain
+ * service to let the grantee sign in as the granter.
  */
 export enum GrantType {
   GRANT_TYPE_UNSPECIFIED = 0,
@@ -17,6 +18,7 @@ export enum GrantType {
   GRANT_TYPE_RECURRING_PULL = 2,
   GRANT_TYPE_SPENDING_ALLOWANCE = 3,
   GRANT_TYPE_SCHEDULED_ONESHOT = 4,
+  GRANT_TYPE_SIGN_IN = 5,
   UNRECOGNIZED = -1,
 }
 export const GrantTypeAmino = GrantType;
@@ -37,6 +39,9 @@ export function grantTypeFromJSON(object: any): GrantType {
     case 4:
     case "GRANT_TYPE_SCHEDULED_ONESHOT":
       return GrantType.GRANT_TYPE_SCHEDULED_ONESHOT;
+    case 5:
+    case "GRANT_TYPE_SIGN_IN":
+      return GrantType.GRANT_TYPE_SIGN_IN;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -55,6 +60,8 @@ export function grantTypeToJSON(object: GrantType): string {
       return "GRANT_TYPE_SPENDING_ALLOWANCE";
     case GrantType.GRANT_TYPE_SCHEDULED_ONESHOT:
       return "GRANT_TYPE_SCHEDULED_ONESHOT";
+    case GrantType.GRANT_TYPE_SIGN_IN:
+      return "GRANT_TYPE_SIGN_IN";
     case GrantType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -129,7 +136,7 @@ export function grantStatusToJSON(object: GrantStatus): string {
 /**
  * Grant is the unified record for every delegated-authorization primitive
  * in x/session. One record carries the shared lifecycle fields (id,
- * granter, grantee, status, expires_at, note) and exactly one of the four
+ * granter, grantee, status, expires_at, note) and exactly one of the
  * typed payloads.
  * @name Grant
  * @package sparkdream.session.v1
@@ -151,6 +158,7 @@ export interface Grant {
   recurringPull?: RecurringPullPayload;
   spendingAllowance?: SpendingAllowancePayload;
   scheduledOneshot?: ScheduledOneshotPayload;
+  signIn?: SignInPayload;
 }
 export interface GrantProtoMsg {
   typeUrl: "/sparkdream.session.v1.Grant";
@@ -159,7 +167,7 @@ export interface GrantProtoMsg {
 /**
  * Grant is the unified record for every delegated-authorization primitive
  * in x/session. One record carries the shared lifecycle fields (id,
- * granter, grantee, status, expires_at, note) and exactly one of the four
+ * granter, grantee, status, expires_at, note) and exactly one of the
  * typed payloads.
  * @name GrantAmino
  * @package sparkdream.session.v1
@@ -181,6 +189,7 @@ export interface GrantAmino {
   recurring_pull?: RecurringPullPayloadAmino;
   spending_allowance?: SpendingAllowancePayloadAmino;
   scheduled_oneshot?: ScheduledOneshotPayloadAmino;
+  sign_in?: SignInPayloadAmino;
 }
 export interface GrantAminoMsg {
   type: "/sparkdream.session.v1.Grant";
@@ -460,6 +469,48 @@ export interface OneshotExecAminoMsg {
   type: "/sparkdream.session.v1.OneshotExec";
   value: OneshotExecAmino;
 }
+/**
+ * SignInPayload lets the grantee sign in to an off-chain service as the
+ * granter. The chain only records the permission: the service (e.g. a
+ * Spark Dream Mastodon instance's wallet login) reads active SIGN_IN grants
+ * to its own hostname and stops honouring one once it is revoked, declined
+ * or expired. Nothing on chain executes through it.
+ * @name SignInPayload
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.SignInPayload
+ */
+export interface SignInPayload {
+  /**
+   * Lowercase DNS hostname of the service the grantee may sign in to as the
+   * granter, e.g. "mstdn.sparkdream.io".
+   */
+  service: string;
+}
+export interface SignInPayloadProtoMsg {
+  typeUrl: "/sparkdream.session.v1.SignInPayload";
+  value: Uint8Array;
+}
+/**
+ * SignInPayload lets the grantee sign in to an off-chain service as the
+ * granter. The chain only records the permission: the service (e.g. a
+ * Spark Dream Mastodon instance's wallet login) reads active SIGN_IN grants
+ * to its own hostname and stops honouring one once it is revoked, declined
+ * or expired. Nothing on chain executes through it.
+ * @name SignInPayloadAmino
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.SignInPayload
+ */
+export interface SignInPayloadAmino {
+  /**
+   * Lowercase DNS hostname of the service the grantee may sign in to as the
+   * granter, e.g. "mstdn.sparkdream.io".
+   */
+  service?: string;
+}
+export interface SignInPayloadAminoMsg {
+  type: "/sparkdream.session.v1.SignInPayload";
+  value: SignInPayloadAmino;
+}
 function createBaseGrant(): Grant {
   return {
     id: BigInt(0),
@@ -473,13 +524,14 @@ function createBaseGrant(): Grant {
     sessionKey: undefined,
     recurringPull: undefined,
     spendingAllowance: undefined,
-    scheduledOneshot: undefined
+    scheduledOneshot: undefined,
+    signIn: undefined
   };
 }
 /**
  * Grant is the unified record for every delegated-authorization primitive
  * in x/session. One record carries the shared lifecycle fields (id,
- * granter, grantee, status, expires_at, note) and exactly one of the four
+ * granter, grantee, status, expires_at, note) and exactly one of the
  * typed payloads.
  * @name Grant
  * @package sparkdream.session.v1
@@ -523,6 +575,9 @@ export const Grant = {
     }
     if (message.scheduledOneshot !== undefined) {
       ScheduledOneshotPayload.encode(message.scheduledOneshot, writer.uint32(186).fork()).ldelim();
+    }
+    if (message.signIn !== undefined) {
+      SignInPayload.encode(message.signIn, writer.uint32(194).fork()).ldelim();
     }
     return writer;
   },
@@ -569,6 +624,9 @@ export const Grant = {
         case 23:
           message.scheduledOneshot = ScheduledOneshotPayload.decode(reader, reader.uint32());
           break;
+        case 24:
+          message.signIn = SignInPayload.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -590,6 +648,7 @@ export const Grant = {
     message.recurringPull = object.recurringPull !== undefined && object.recurringPull !== null ? RecurringPullPayload.fromPartial(object.recurringPull) : undefined;
     message.spendingAllowance = object.spendingAllowance !== undefined && object.spendingAllowance !== null ? SpendingAllowancePayload.fromPartial(object.spendingAllowance) : undefined;
     message.scheduledOneshot = object.scheduledOneshot !== undefined && object.scheduledOneshot !== null ? ScheduledOneshotPayload.fromPartial(object.scheduledOneshot) : undefined;
+    message.signIn = object.signIn !== undefined && object.signIn !== null ? SignInPayload.fromPartial(object.signIn) : undefined;
     return message;
   },
   fromAmino(object: GrantAmino): Grant {
@@ -630,6 +689,9 @@ export const Grant = {
     if (object.scheduled_oneshot !== undefined && object.scheduled_oneshot !== null) {
       message.scheduledOneshot = ScheduledOneshotPayload.fromAmino(object.scheduled_oneshot);
     }
+    if (object.sign_in !== undefined && object.sign_in !== null) {
+      message.signIn = SignInPayload.fromAmino(object.sign_in);
+    }
     return message;
   },
   toAmino(message: Grant): GrantAmino {
@@ -646,6 +708,7 @@ export const Grant = {
     obj.recurring_pull = message.recurringPull ? RecurringPullPayload.toAmino(message.recurringPull) : undefined;
     obj.spending_allowance = message.spendingAllowance ? SpendingAllowancePayload.toAmino(message.spendingAllowance) : undefined;
     obj.scheduled_oneshot = message.scheduledOneshot ? ScheduledOneshotPayload.toAmino(message.scheduledOneshot) : undefined;
+    obj.sign_in = message.signIn ? SignInPayload.toAmino(message.signIn) : undefined;
     return obj;
   },
   fromAminoMsg(object: GrantAminoMsg): Grant {
@@ -1345,6 +1408,79 @@ export const OneshotExec = {
     return {
       typeUrl: "/sparkdream.session.v1.OneshotExec",
       value: OneshotExec.encode(message).finish()
+    };
+  }
+};
+function createBaseSignInPayload(): SignInPayload {
+  return {
+    service: ""
+  };
+}
+/**
+ * SignInPayload lets the grantee sign in to an off-chain service as the
+ * granter. The chain only records the permission: the service (e.g. a
+ * Spark Dream Mastodon instance's wallet login) reads active SIGN_IN grants
+ * to its own hostname and stops honouring one once it is revoked, declined
+ * or expired. Nothing on chain executes through it.
+ * @name SignInPayload
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.SignInPayload
+ */
+export const SignInPayload = {
+  typeUrl: "/sparkdream.session.v1.SignInPayload",
+  encode(message: SignInPayload, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.service !== "") {
+      writer.uint32(10).string(message.service);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): SignInPayload {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSignInPayload();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.service = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<SignInPayload>): SignInPayload {
+    const message = createBaseSignInPayload();
+    message.service = object.service ?? "";
+    return message;
+  },
+  fromAmino(object: SignInPayloadAmino): SignInPayload {
+    const message = createBaseSignInPayload();
+    if (object.service !== undefined && object.service !== null) {
+      message.service = object.service;
+    }
+    return message;
+  },
+  toAmino(message: SignInPayload): SignInPayloadAmino {
+    const obj: any = {};
+    obj.service = message.service === "" ? undefined : message.service;
+    return obj;
+  },
+  fromAminoMsg(object: SignInPayloadAminoMsg): SignInPayload {
+    return SignInPayload.fromAmino(object.value);
+  },
+  fromProtoMsg(message: SignInPayloadProtoMsg): SignInPayload {
+    return SignInPayload.decode(message.value);
+  },
+  toProto(message: SignInPayload): Uint8Array {
+    return SignInPayload.encode(message).finish();
+  },
+  toProtoMsg(message: SignInPayload): SignInPayloadProtoMsg {
+    return {
+      typeUrl: "/sparkdream.session.v1.SignInPayload",
+      value: SignInPayload.encode(message).finish()
     };
   }
 };

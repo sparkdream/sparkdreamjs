@@ -199,8 +199,19 @@ export enum DKGPhase {
   DKG_PHASE_REGISTERING = 1,
   /** DKG_PHASE_CONTRIBUTING - Key registration closed; accepting Feldman DKG contributions */
   DKG_PHASE_CONTRIBUTING = 2,
-  /** DKG_PHASE_ACTIVE - DKG complete, master key available, encrypted batch enabled */
+  /** DKG_PHASE_ACTIVE - DKG complete, master key available */
   DKG_PHASE_ACTIVE = 3,
+  /**
+   * DKG_PHASE_COMPLAINING - Contributions closed; validators report dealers whose evaluation for
+   * them is missing, undecryptable or inconsistent with the commitments
+   */
+  DKG_PHASE_COMPLAINING = 4,
+  /**
+   * DKG_PHASE_JUSTIFYING - Complaints closed; accused dealers publish the disputed evaluations in
+   * clear. A dealer with an unjustified complaint at the deadline is
+   * disqualified from the key set.
+   */
+  DKG_PHASE_JUSTIFYING = 5,
   UNRECOGNIZED = -1,
 }
 export const DKGPhaseAmino = DKGPhase;
@@ -218,6 +229,12 @@ export function dKGPhaseFromJSON(object: any): DKGPhase {
     case 3:
     case "DKG_PHASE_ACTIVE":
       return DKGPhase.DKG_PHASE_ACTIVE;
+    case 4:
+    case "DKG_PHASE_COMPLAINING":
+      return DKGPhase.DKG_PHASE_COMPLAINING;
+    case 5:
+    case "DKG_PHASE_JUSTIFYING":
+      return DKGPhase.DKG_PHASE_JUSTIFYING;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -234,6 +251,10 @@ export function dKGPhaseToJSON(object: DKGPhase): string {
       return "DKG_PHASE_CONTRIBUTING";
     case DKGPhase.DKG_PHASE_ACTIVE:
       return "DKG_PHASE_ACTIVE";
+    case DKGPhase.DKG_PHASE_COMPLAINING:
+      return "DKG_PHASE_COMPLAINING";
+    case DKGPhase.DKG_PHASE_JUSTIFYING:
+      return "DKG_PHASE_JUSTIFYING";
     case DKGPhase.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -290,7 +311,8 @@ export interface ShieldedOpRegistration {
   /**
    * For NULLIFIER_SCOPE_EPOCH: the scope is current_epoch / epoch_window, so
    * each member gets one action per window of this many shield epochs instead
-   * of one per epoch. 0 or 1 = every epoch. Must be 0 for other scope types.
+   * of one per epoch. 0 or 1 = every epoch. Must be 0 or 1 for other scope
+   * types and for ownership ops.
    */
   epochWindow: bigint;
 }
@@ -349,7 +371,8 @@ export interface ShieldedOpRegistrationAmino {
   /**
    * For NULLIFIER_SCOPE_EPOCH: the scope is current_epoch / epoch_window, so
    * each member gets one action per window of this many shield epochs instead
-   * of one per epoch. 0 or 1 = every epoch. Must be 0 for other scope types.
+   * of one per epoch. 0 or 1 = every epoch. Must be 0 or 1 for other scope
+   * types and for ownership ops.
    */
   epoch_window?: string;
 }
@@ -393,7 +416,7 @@ export interface UsedNullifierAminoMsg {
 }
 /**
  * DayFunding tracks funding per day to enforce the daily cap.
- * Day is calculated as block_height / 14400 (at 6s/block = 1 day).
+ * Day is the UTC day of the block time (block_time / 86400).
  * @name DayFunding
  * @package sparkdream.shield.v1
  * @see proto type: sparkdream.shield.v1.DayFunding
@@ -408,7 +431,7 @@ export interface DayFundingProtoMsg {
 }
 /**
  * DayFunding tracks funding per day to enforce the daily cap.
- * Day is calculated as block_height / 14400 (at 6s/block = 1 day).
+ * Day is the UTC day of the block time (block_time / 86400).
  * @name DayFundingAmino
  * @package sparkdream.shield.v1
  * @see proto type: sparkdream.shield.v1.DayFunding
@@ -422,7 +445,8 @@ export interface DayFundingAminoMsg {
   value: DayFundingAmino;
 }
 /**
- * PendingShieldedOp is stored in queue until the shield epoch boundary triggers batch execution.
+ * PendingShieldedOp is stored in queue until its epoch has closed, its batch was
+ * demanded and the epoch key exists; it then executes in that block.
  * @name PendingShieldedOp
  * @package sparkdream.shield.v1
  * @see proto type: sparkdream.shield.v1.PendingShieldedOp
@@ -430,20 +454,32 @@ export interface DayFundingAminoMsg {
 export interface PendingShieldedOp {
   id: bigint;
   targetEpoch: bigint;
-  nullifier: Uint8Array;
+  /**
+   * Submission nullifier proven at submission: MiMC(secret, ScopeElement(
+   * BatchSubmissionDomain, BatchSubmissionScope(encrypted_payload))). One per
+   * payload and member; it deduplicates submissions and is unrelated to the
+   * operation's own nullifier, which travels inside the ciphertext.
+   */
+  submissionNullifier: Uint8Array;
   merkleRoot: Uint8Array;
   proofDomain: ProofDomain;
   minTrustLevel: number;
   encryptedPayload: Uint8Array;
   submittedAtHeight: bigint;
   submittedAtEpoch: bigint;
+  /**
+   * Rate-limit nullifier proven by the submission proof (same member, same
+   * epoch); the decrypted operation proof must reproduce it.
+   */
+  rateLimitNullifier: Uint8Array;
 }
 export interface PendingShieldedOpProtoMsg {
   typeUrl: "/sparkdream.shield.v1.PendingShieldedOp";
   value: Uint8Array;
 }
 /**
- * PendingShieldedOp is stored in queue until the shield epoch boundary triggers batch execution.
+ * PendingShieldedOp is stored in queue until its epoch has closed, its batch was
+ * demanded and the epoch key exists; it then executes in that block.
  * @name PendingShieldedOpAmino
  * @package sparkdream.shield.v1
  * @see proto type: sparkdream.shield.v1.PendingShieldedOp
@@ -451,13 +487,24 @@ export interface PendingShieldedOpProtoMsg {
 export interface PendingShieldedOpAmino {
   id?: string;
   target_epoch?: string;
-  nullifier?: string;
+  /**
+   * Submission nullifier proven at submission: MiMC(secret, ScopeElement(
+   * BatchSubmissionDomain, BatchSubmissionScope(encrypted_payload))). One per
+   * payload and member; it deduplicates submissions and is unrelated to the
+   * operation's own nullifier, which travels inside the ciphertext.
+   */
+  submission_nullifier?: string;
   merkle_root?: string;
   proof_domain?: ProofDomain;
   min_trust_level?: number;
   encrypted_payload?: string;
   submitted_at_height?: string;
   submitted_at_epoch?: string;
+  /**
+   * Rate-limit nullifier proven by the submission proof (same member, same
+   * epoch); the decrypted operation proof must reproduce it.
+   */
+  rate_limit_nullifier?: string;
 }
 export interface PendingShieldedOpAminoMsg {
   type: "/sparkdream.shield.v1.PendingShieldedOp";
@@ -586,6 +633,12 @@ export interface TLEKeySet {
   thresholdDenominator: bigint;
   validatorShares: TLEValidatorPublicShare[];
   createdAtHeight: bigint;
+  /**
+   * BN256 G2 point s*G2: what clients encrypt to (tools/tle). The G1 key
+   * above cannot be encrypted to on a type-3 pairing; it stays for share
+   * bookkeeping.
+   */
+  masterPublicKeyG2: Uint8Array;
 }
 export interface TLEKeySetProtoMsg {
   typeUrl: "/sparkdream.shield.v1.TLEKeySet";
@@ -612,6 +665,12 @@ export interface TLEKeySetAmino {
   threshold_denominator?: string;
   validator_shares?: TLEValidatorPublicShareAmino[];
   created_at_height?: string;
+  /**
+   * BN256 G2 point s*G2: what clients encrypt to (tools/tle). The G1 key
+   * above cannot be encrypted to on a type-3 pairing; it stays for share
+   * bookkeeping.
+   */
+  master_public_key_g2?: string;
 }
 export interface TLEKeySetAminoMsg {
   type: "/sparkdream.shield.v1.TLEKeySet";
@@ -700,13 +759,29 @@ export interface DKGState {
   thresholdNumerator: bigint;
   thresholdDenominator: bigint;
   /**
-   * Snapshot of bonded validator addresses at DKG start
+   * DKG participants, 1-based Shamir index = position + 1. Snapshot of the
+   * bonded set at open; narrowed to the validators that registered a key
+   * when CONTRIBUTING starts (a validator without a registered key could
+   * never receive its evaluations).
    */
   expectedValidators: string[];
   /**
    * Number of contributions received so far
    */
   contributionsReceived: bigint;
+  /**
+   * Block height when COMPLAINING ends and JUSTIFYING starts
+   */
+  complaintDeadline: bigint;
+  /**
+   * Block height when JUSTIFYING ends and the key set is aggregated
+   */
+  justificationDeadline: bigint;
+  /**
+   * Dealers excluded from aggregation: a complaint against them stood
+   * unjustified at the justification deadline.
+   */
+  disqualifiedDealers: string[];
 }
 export interface DKGStateProtoMsg {
   typeUrl: "/sparkdream.shield.v1.DKGState";
@@ -745,13 +820,29 @@ export interface DKGStateAmino {
   threshold_numerator?: string;
   threshold_denominator?: string;
   /**
-   * Snapshot of bonded validator addresses at DKG start
+   * DKG participants, 1-based Shamir index = position + 1. Snapshot of the
+   * bonded set at open; narrowed to the validators that registered a key
+   * when CONTRIBUTING starts (a validator without a registered key could
+   * never receive its evaluations).
    */
   expected_validators?: string[];
   /**
    * Number of contributions received so far
    */
   contributions_received?: string;
+  /**
+   * Block height when COMPLAINING ends and JUSTIFYING starts
+   */
+  complaint_deadline?: string;
+  /**
+   * Block height when JUSTIFYING ends and the key set is aggregated
+   */
+  justification_deadline?: string;
+  /**
+   * Dealers excluded from aggregation: a complaint against them stood
+   * unjustified at the justification deadline.
+   */
+  disqualified_dealers?: string[];
 }
 export interface DKGStateAminoMsg {
   type: "/sparkdream.shield.v1.DKGState";
@@ -960,6 +1051,18 @@ export interface DKGVoteExtension {
    * Epoch decryption share: secret_share_i * H_to_G1(epoch)
    */
   decryptionShare: Uint8Array;
+  /**
+   * --- COMPLAINING phase data ---
+   * 1-based indices of dealers whose evaluation for this validator is
+   * missing, does not decrypt, or does not match their commitments
+   */
+  complaints: number[];
+  /**
+   * --- JUSTIFYING phase data ---
+   * The dealer's answers to complaints against it: the disputed evaluations
+   * in clear, verifiable against its Feldman commitments
+   */
+  justifications: DKGJustification[];
 }
 export interface DKGVoteExtensionProtoMsg {
   typeUrl: "/sparkdream.shield.v1.DKGVoteExtension";
@@ -1016,10 +1119,104 @@ export interface DKGVoteExtensionAmino {
    * Epoch decryption share: secret_share_i * H_to_G1(epoch)
    */
   decryption_share?: string;
+  /**
+   * --- COMPLAINING phase data ---
+   * 1-based indices of dealers whose evaluation for this validator is
+   * missing, does not decrypt, or does not match their commitments
+   */
+  complaints?: number[];
+  /**
+   * --- JUSTIFYING phase data ---
+   * The dealer's answers to complaints against it: the disputed evaluations
+   * in clear, verifiable against its Feldman commitments
+   */
+  justifications?: DKGJustificationAmino[];
 }
 export interface DKGVoteExtensionAminoMsg {
   type: "/sparkdream.shield.v1.DKGVoteExtension";
   value: DKGVoteExtensionAmino;
+}
+/**
+ * DKGJustification is a dealer's public answer to a complaint: p_i(j) for the
+ * complaining validator j, which anyone checks against the dealer's Feldman
+ * commitments.
+ * @name DKGJustification
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.DKGJustification
+ */
+export interface DKGJustification {
+  /**
+   * 1-based index of the complaining validator
+   */
+  complainerIndex: number;
+  /**
+   * p_i(complainer_index) as a BN256 scalar
+   */
+  evaluation: Uint8Array;
+}
+export interface DKGJustificationProtoMsg {
+  typeUrl: "/sparkdream.shield.v1.DKGJustification";
+  value: Uint8Array;
+}
+/**
+ * DKGJustification is a dealer's public answer to a complaint: p_i(j) for the
+ * complaining validator j, which anyone checks against the dealer's Feldman
+ * commitments.
+ * @name DKGJustificationAmino
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.DKGJustification
+ */
+export interface DKGJustificationAmino {
+  /**
+   * 1-based index of the complaining validator
+   */
+  complainer_index?: number;
+  /**
+   * p_i(complainer_index) as a BN256 scalar
+   */
+  evaluation?: string;
+}
+export interface DKGJustificationAminoMsg {
+  type: "/sparkdream.shield.v1.DKGJustification";
+  value: DKGJustificationAmino;
+}
+/**
+ * DKGComplaint records a complaint by complainer_address against
+ * dealer_address in the current round and, once the dealer answers with a
+ * valid evaluation, that evaluation (the complainer uses it in place of the
+ * ciphertext it could not open).
+ * @name DKGComplaint
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.DKGComplaint
+ */
+export interface DKGComplaint {
+  dealerAddress: string;
+  complainerAddress: string;
+  justified: boolean;
+  evaluation: Uint8Array;
+}
+export interface DKGComplaintProtoMsg {
+  typeUrl: "/sparkdream.shield.v1.DKGComplaint";
+  value: Uint8Array;
+}
+/**
+ * DKGComplaint records a complaint by complainer_address against
+ * dealer_address in the current round and, once the dealer answers with a
+ * valid evaluation, that evaluation (the complainer uses it in place of the
+ * ciphertext it could not open).
+ * @name DKGComplaintAmino
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.DKGComplaint
+ */
+export interface DKGComplaintAmino {
+  dealer_address?: string;
+  complainer_address?: string;
+  justified?: boolean;
+  evaluation?: string;
+}
+export interface DKGComplaintAminoMsg {
+  type: "/sparkdream.shield.v1.DKGComplaint";
+  value: DKGComplaintAmino;
 }
 /**
  * InjectedDKGData is the aggregated shield data injected by the block proposer
@@ -1272,6 +1469,38 @@ export interface TLEMissCounterEntryAmino {
 export interface TLEMissCounterEntryAminoMsg {
   type: "/sparkdream.shield.v1.TLEMissCounterEntry";
   value: TLEMissCounterEntryAmino;
+}
+/**
+ * DecryptionDemandEntry records that the EndBlocker asked validators for
+ * decryption shares of a closed epoch (its batch became ready) at a height.
+ * TLE liveness for that epoch is judged one full epoch interval later.
+ * @name DecryptionDemandEntry
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.DecryptionDemandEntry
+ */
+export interface DecryptionDemandEntry {
+  epoch: bigint;
+  height: bigint;
+}
+export interface DecryptionDemandEntryProtoMsg {
+  typeUrl: "/sparkdream.shield.v1.DecryptionDemandEntry";
+  value: Uint8Array;
+}
+/**
+ * DecryptionDemandEntry records that the EndBlocker asked validators for
+ * decryption shares of a closed epoch (its batch became ready) at a height.
+ * TLE liveness for that epoch is judged one full epoch interval later.
+ * @name DecryptionDemandEntryAmino
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.DecryptionDemandEntry
+ */
+export interface DecryptionDemandEntryAmino {
+  epoch?: string;
+  height?: string;
+}
+export interface DecryptionDemandEntryAminoMsg {
+  type: "/sparkdream.shield.v1.DecryptionDemandEntry";
+  value: DecryptionDemandEntryAmino;
 }
 function createBaseShieldedOpRegistration(): ShieldedOpRegistration {
   return {
@@ -1564,7 +1793,7 @@ function createBaseDayFunding(): DayFunding {
 }
 /**
  * DayFunding tracks funding per day to enforce the daily cap.
- * Day is calculated as block_height / 14400 (at 6s/block = 1 day).
+ * Day is the UTC day of the block time (block_time / 86400).
  * @name DayFunding
  * @package sparkdream.shield.v1
  * @see proto type: sparkdream.shield.v1.DayFunding
@@ -1642,17 +1871,19 @@ function createBasePendingShieldedOp(): PendingShieldedOp {
   return {
     id: BigInt(0),
     targetEpoch: BigInt(0),
-    nullifier: new Uint8Array(),
+    submissionNullifier: new Uint8Array(),
     merkleRoot: new Uint8Array(),
     proofDomain: 0,
     minTrustLevel: 0,
     encryptedPayload: new Uint8Array(),
     submittedAtHeight: BigInt(0),
-    submittedAtEpoch: BigInt(0)
+    submittedAtEpoch: BigInt(0),
+    rateLimitNullifier: new Uint8Array()
   };
 }
 /**
- * PendingShieldedOp is stored in queue until the shield epoch boundary triggers batch execution.
+ * PendingShieldedOp is stored in queue until its epoch has closed, its batch was
+ * demanded and the epoch key exists; it then executes in that block.
  * @name PendingShieldedOp
  * @package sparkdream.shield.v1
  * @see proto type: sparkdream.shield.v1.PendingShieldedOp
@@ -1666,8 +1897,8 @@ export const PendingShieldedOp = {
     if (message.targetEpoch !== BigInt(0)) {
       writer.uint32(16).uint64(message.targetEpoch);
     }
-    if (message.nullifier.length !== 0) {
-      writer.uint32(26).bytes(message.nullifier);
+    if (message.submissionNullifier.length !== 0) {
+      writer.uint32(26).bytes(message.submissionNullifier);
     }
     if (message.merkleRoot.length !== 0) {
       writer.uint32(34).bytes(message.merkleRoot);
@@ -1687,6 +1918,9 @@ export const PendingShieldedOp = {
     if (message.submittedAtEpoch !== BigInt(0)) {
       writer.uint32(72).uint64(message.submittedAtEpoch);
     }
+    if (message.rateLimitNullifier.length !== 0) {
+      writer.uint32(82).bytes(message.rateLimitNullifier);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): PendingShieldedOp {
@@ -1703,7 +1937,7 @@ export const PendingShieldedOp = {
           message.targetEpoch = reader.uint64();
           break;
         case 3:
-          message.nullifier = reader.bytes();
+          message.submissionNullifier = reader.bytes();
           break;
         case 4:
           message.merkleRoot = reader.bytes();
@@ -1723,6 +1957,9 @@ export const PendingShieldedOp = {
         case 9:
           message.submittedAtEpoch = reader.uint64();
           break;
+        case 10:
+          message.rateLimitNullifier = reader.bytes();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1734,13 +1971,14 @@ export const PendingShieldedOp = {
     const message = createBasePendingShieldedOp();
     message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
     message.targetEpoch = object.targetEpoch !== undefined && object.targetEpoch !== null ? BigInt(object.targetEpoch.toString()) : BigInt(0);
-    message.nullifier = object.nullifier ?? new Uint8Array();
+    message.submissionNullifier = object.submissionNullifier ?? new Uint8Array();
     message.merkleRoot = object.merkleRoot ?? new Uint8Array();
     message.proofDomain = object.proofDomain ?? 0;
     message.minTrustLevel = object.minTrustLevel ?? 0;
     message.encryptedPayload = object.encryptedPayload ?? new Uint8Array();
     message.submittedAtHeight = object.submittedAtHeight !== undefined && object.submittedAtHeight !== null ? BigInt(object.submittedAtHeight.toString()) : BigInt(0);
     message.submittedAtEpoch = object.submittedAtEpoch !== undefined && object.submittedAtEpoch !== null ? BigInt(object.submittedAtEpoch.toString()) : BigInt(0);
+    message.rateLimitNullifier = object.rateLimitNullifier ?? new Uint8Array();
     return message;
   },
   fromAmino(object: PendingShieldedOpAmino): PendingShieldedOp {
@@ -1751,8 +1989,8 @@ export const PendingShieldedOp = {
     if (object.target_epoch !== undefined && object.target_epoch !== null) {
       message.targetEpoch = BigInt(object.target_epoch);
     }
-    if (object.nullifier !== undefined && object.nullifier !== null) {
-      message.nullifier = bytesFromBase64(object.nullifier);
+    if (object.submission_nullifier !== undefined && object.submission_nullifier !== null) {
+      message.submissionNullifier = bytesFromBase64(object.submission_nullifier);
     }
     if (object.merkle_root !== undefined && object.merkle_root !== null) {
       message.merkleRoot = bytesFromBase64(object.merkle_root);
@@ -1772,19 +2010,23 @@ export const PendingShieldedOp = {
     if (object.submitted_at_epoch !== undefined && object.submitted_at_epoch !== null) {
       message.submittedAtEpoch = BigInt(object.submitted_at_epoch);
     }
+    if (object.rate_limit_nullifier !== undefined && object.rate_limit_nullifier !== null) {
+      message.rateLimitNullifier = bytesFromBase64(object.rate_limit_nullifier);
+    }
     return message;
   },
   toAmino(message: PendingShieldedOp): PendingShieldedOpAmino {
     const obj: any = {};
     obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
     obj.target_epoch = message.targetEpoch !== BigInt(0) ? message.targetEpoch?.toString() : undefined;
-    obj.nullifier = message.nullifier ? base64FromBytes(message.nullifier) : undefined;
+    obj.submission_nullifier = message.submissionNullifier ? base64FromBytes(message.submissionNullifier) : undefined;
     obj.merkle_root = message.merkleRoot ? base64FromBytes(message.merkleRoot) : undefined;
     obj.proof_domain = message.proofDomain === 0 ? undefined : message.proofDomain;
     obj.min_trust_level = message.minTrustLevel === 0 ? undefined : message.minTrustLevel;
     obj.encrypted_payload = message.encryptedPayload ? base64FromBytes(message.encryptedPayload) : undefined;
     obj.submitted_at_height = message.submittedAtHeight !== BigInt(0) ? message.submittedAtHeight?.toString() : undefined;
     obj.submitted_at_epoch = message.submittedAtEpoch !== BigInt(0) ? message.submittedAtEpoch?.toString() : undefined;
+    obj.rate_limit_nullifier = message.rateLimitNullifier ? base64FromBytes(message.rateLimitNullifier) : undefined;
     return obj;
   },
   fromAminoMsg(object: PendingShieldedOpAminoMsg): PendingShieldedOp {
@@ -2088,7 +2330,8 @@ function createBaseTLEKeySet(): TLEKeySet {
     thresholdNumerator: BigInt(0),
     thresholdDenominator: BigInt(0),
     validatorShares: [],
-    createdAtHeight: BigInt(0)
+    createdAtHeight: BigInt(0),
+    masterPublicKeyG2: new Uint8Array()
   };
 }
 /**
@@ -2115,6 +2358,9 @@ export const TLEKeySet = {
     if (message.createdAtHeight !== BigInt(0)) {
       writer.uint32(40).int64(message.createdAtHeight);
     }
+    if (message.masterPublicKeyG2.length !== 0) {
+      writer.uint32(50).bytes(message.masterPublicKeyG2);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): TLEKeySet {
@@ -2139,6 +2385,9 @@ export const TLEKeySet = {
         case 5:
           message.createdAtHeight = reader.int64();
           break;
+        case 6:
+          message.masterPublicKeyG2 = reader.bytes();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2153,6 +2402,7 @@ export const TLEKeySet = {
     message.thresholdDenominator = object.thresholdDenominator !== undefined && object.thresholdDenominator !== null ? BigInt(object.thresholdDenominator.toString()) : BigInt(0);
     message.validatorShares = object.validatorShares?.map(e => TLEValidatorPublicShare.fromPartial(e)) || [];
     message.createdAtHeight = object.createdAtHeight !== undefined && object.createdAtHeight !== null ? BigInt(object.createdAtHeight.toString()) : BigInt(0);
+    message.masterPublicKeyG2 = object.masterPublicKeyG2 ?? new Uint8Array();
     return message;
   },
   fromAmino(object: TLEKeySetAmino): TLEKeySet {
@@ -2170,6 +2420,9 @@ export const TLEKeySet = {
     if (object.created_at_height !== undefined && object.created_at_height !== null) {
       message.createdAtHeight = BigInt(object.created_at_height);
     }
+    if (object.master_public_key_g2 !== undefined && object.master_public_key_g2 !== null) {
+      message.masterPublicKeyG2 = bytesFromBase64(object.master_public_key_g2);
+    }
     return message;
   },
   toAmino(message: TLEKeySet): TLEKeySetAmino {
@@ -2183,6 +2436,7 @@ export const TLEKeySet = {
       obj.validator_shares = message.validatorShares;
     }
     obj.created_at_height = message.createdAtHeight !== BigInt(0) ? message.createdAtHeight?.toString() : undefined;
+    obj.master_public_key_g2 = message.masterPublicKeyG2 ? base64FromBytes(message.masterPublicKeyG2) : undefined;
     return obj;
   },
   fromAminoMsg(object: TLEKeySetAminoMsg): TLEKeySet {
@@ -2316,7 +2570,10 @@ function createBaseDKGState(): DKGState {
     thresholdNumerator: BigInt(0),
     thresholdDenominator: BigInt(0),
     expectedValidators: [],
-    contributionsReceived: BigInt(0)
+    contributionsReceived: BigInt(0),
+    complaintDeadline: BigInt(0),
+    justificationDeadline: BigInt(0),
+    disqualifiedDealers: []
   };
 }
 /**
@@ -2355,6 +2612,15 @@ export const DKGState = {
     if (message.contributionsReceived !== BigInt(0)) {
       writer.uint32(72).uint64(message.contributionsReceived);
     }
+    if (message.complaintDeadline !== BigInt(0)) {
+      writer.uint32(80).int64(message.complaintDeadline);
+    }
+    if (message.justificationDeadline !== BigInt(0)) {
+      writer.uint32(88).int64(message.justificationDeadline);
+    }
+    for (const v of message.disqualifiedDealers) {
+      writer.uint32(98).string(v!);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): DKGState {
@@ -2391,6 +2657,15 @@ export const DKGState = {
         case 9:
           message.contributionsReceived = reader.uint64();
           break;
+        case 10:
+          message.complaintDeadline = reader.int64();
+          break;
+        case 11:
+          message.justificationDeadline = reader.int64();
+          break;
+        case 12:
+          message.disqualifiedDealers.push(reader.string());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2409,6 +2684,9 @@ export const DKGState = {
     message.thresholdDenominator = object.thresholdDenominator !== undefined && object.thresholdDenominator !== null ? BigInt(object.thresholdDenominator.toString()) : BigInt(0);
     message.expectedValidators = object.expectedValidators?.map(e => e) || [];
     message.contributionsReceived = object.contributionsReceived !== undefined && object.contributionsReceived !== null ? BigInt(object.contributionsReceived.toString()) : BigInt(0);
+    message.complaintDeadline = object.complaintDeadline !== undefined && object.complaintDeadline !== null ? BigInt(object.complaintDeadline.toString()) : BigInt(0);
+    message.justificationDeadline = object.justificationDeadline !== undefined && object.justificationDeadline !== null ? BigInt(object.justificationDeadline.toString()) : BigInt(0);
+    message.disqualifiedDealers = object.disqualifiedDealers?.map(e => e) || [];
     return message;
   },
   fromAmino(object: DKGStateAmino): DKGState {
@@ -2438,6 +2716,13 @@ export const DKGState = {
     if (object.contributions_received !== undefined && object.contributions_received !== null) {
       message.contributionsReceived = BigInt(object.contributions_received);
     }
+    if (object.complaint_deadline !== undefined && object.complaint_deadline !== null) {
+      message.complaintDeadline = BigInt(object.complaint_deadline);
+    }
+    if (object.justification_deadline !== undefined && object.justification_deadline !== null) {
+      message.justificationDeadline = BigInt(object.justification_deadline);
+    }
+    message.disqualifiedDealers = object.disqualified_dealers?.map(e => e) || [];
     return message;
   },
   toAmino(message: DKGState): DKGStateAmino {
@@ -2455,6 +2740,13 @@ export const DKGState = {
       obj.expected_validators = message.expectedValidators;
     }
     obj.contributions_received = message.contributionsReceived !== BigInt(0) ? message.contributionsReceived?.toString() : undefined;
+    obj.complaint_deadline = message.complaintDeadline !== BigInt(0) ? message.complaintDeadline?.toString() : undefined;
+    obj.justification_deadline = message.justificationDeadline !== BigInt(0) ? message.justificationDeadline?.toString() : undefined;
+    if (message.disqualifiedDealers) {
+      obj.disqualified_dealers = message.disqualifiedDealers.map(e => e);
+    } else {
+      obj.disqualified_dealers = message.disqualifiedDealers;
+    }
     return obj;
   },
   fromAminoMsg(object: DKGStateAminoMsg): DKGState {
@@ -2781,7 +3073,9 @@ function createBaseDKGVoteExtension(): DKGVoteExtension {
     contributionPop: new Uint8Array(),
     feldmanCommitmentsG2: [],
     decryptionEpoch: BigInt(0),
-    decryptionShare: new Uint8Array()
+    decryptionShare: new Uint8Array(),
+    complaints: [],
+    justifications: []
   };
 }
 /**
@@ -2824,6 +3118,14 @@ export const DKGVoteExtension = {
     if (message.decryptionShare.length !== 0) {
       writer.uint32(82).bytes(message.decryptionShare);
     }
+    writer.uint32(90).fork();
+    for (const v of message.complaints) {
+      writer.uint32(v);
+    }
+    writer.ldelim();
+    for (const v of message.justifications) {
+      DKGJustification.encode(v!, writer.uint32(98).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): DKGVoteExtension {
@@ -2863,6 +3165,19 @@ export const DKGVoteExtension = {
         case 10:
           message.decryptionShare = reader.bytes();
           break;
+        case 11:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.complaints.push(reader.uint32());
+            }
+          } else {
+            message.complaints.push(reader.uint32());
+          }
+          break;
+        case 12:
+          message.justifications.push(DKGJustification.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2882,6 +3197,8 @@ export const DKGVoteExtension = {
     message.feldmanCommitmentsG2 = object.feldmanCommitmentsG2?.map(e => e) || [];
     message.decryptionEpoch = object.decryptionEpoch !== undefined && object.decryptionEpoch !== null ? BigInt(object.decryptionEpoch.toString()) : BigInt(0);
     message.decryptionShare = object.decryptionShare ?? new Uint8Array();
+    message.complaints = object.complaints?.map(e => e) || [];
+    message.justifications = object.justifications?.map(e => DKGJustification.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: DKGVoteExtensionAmino): DKGVoteExtension {
@@ -2910,6 +3227,8 @@ export const DKGVoteExtension = {
     if (object.decryption_share !== undefined && object.decryption_share !== null) {
       message.decryptionShare = bytesFromBase64(object.decryption_share);
     }
+    message.complaints = object.complaints?.map(e => e) || [];
+    message.justifications = object.justifications?.map(e => DKGJustification.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: DKGVoteExtension): DKGVoteExtensionAmino {
@@ -2936,6 +3255,16 @@ export const DKGVoteExtension = {
     }
     obj.decryption_epoch = message.decryptionEpoch !== BigInt(0) ? message.decryptionEpoch?.toString() : undefined;
     obj.decryption_share = message.decryptionShare ? base64FromBytes(message.decryptionShare) : undefined;
+    if (message.complaints) {
+      obj.complaints = message.complaints.map(e => e);
+    } else {
+      obj.complaints = message.complaints;
+    }
+    if (message.justifications) {
+      obj.justifications = message.justifications.map(e => e ? DKGJustification.toAmino(e) : undefined);
+    } else {
+      obj.justifications = message.justifications;
+    }
     return obj;
   },
   fromAminoMsg(object: DKGVoteExtensionAminoMsg): DKGVoteExtension {
@@ -2951,6 +3280,197 @@ export const DKGVoteExtension = {
     return {
       typeUrl: "/sparkdream.shield.v1.DKGVoteExtension",
       value: DKGVoteExtension.encode(message).finish()
+    };
+  }
+};
+function createBaseDKGJustification(): DKGJustification {
+  return {
+    complainerIndex: 0,
+    evaluation: new Uint8Array()
+  };
+}
+/**
+ * DKGJustification is a dealer's public answer to a complaint: p_i(j) for the
+ * complaining validator j, which anyone checks against the dealer's Feldman
+ * commitments.
+ * @name DKGJustification
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.DKGJustification
+ */
+export const DKGJustification = {
+  typeUrl: "/sparkdream.shield.v1.DKGJustification",
+  encode(message: DKGJustification, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.complainerIndex !== 0) {
+      writer.uint32(8).uint32(message.complainerIndex);
+    }
+    if (message.evaluation.length !== 0) {
+      writer.uint32(18).bytes(message.evaluation);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): DKGJustification {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDKGJustification();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.complainerIndex = reader.uint32();
+          break;
+        case 2:
+          message.evaluation = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<DKGJustification>): DKGJustification {
+    const message = createBaseDKGJustification();
+    message.complainerIndex = object.complainerIndex ?? 0;
+    message.evaluation = object.evaluation ?? new Uint8Array();
+    return message;
+  },
+  fromAmino(object: DKGJustificationAmino): DKGJustification {
+    const message = createBaseDKGJustification();
+    if (object.complainer_index !== undefined && object.complainer_index !== null) {
+      message.complainerIndex = object.complainer_index;
+    }
+    if (object.evaluation !== undefined && object.evaluation !== null) {
+      message.evaluation = bytesFromBase64(object.evaluation);
+    }
+    return message;
+  },
+  toAmino(message: DKGJustification): DKGJustificationAmino {
+    const obj: any = {};
+    obj.complainer_index = message.complainerIndex === 0 ? undefined : message.complainerIndex;
+    obj.evaluation = message.evaluation ? base64FromBytes(message.evaluation) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: DKGJustificationAminoMsg): DKGJustification {
+    return DKGJustification.fromAmino(object.value);
+  },
+  fromProtoMsg(message: DKGJustificationProtoMsg): DKGJustification {
+    return DKGJustification.decode(message.value);
+  },
+  toProto(message: DKGJustification): Uint8Array {
+    return DKGJustification.encode(message).finish();
+  },
+  toProtoMsg(message: DKGJustification): DKGJustificationProtoMsg {
+    return {
+      typeUrl: "/sparkdream.shield.v1.DKGJustification",
+      value: DKGJustification.encode(message).finish()
+    };
+  }
+};
+function createBaseDKGComplaint(): DKGComplaint {
+  return {
+    dealerAddress: "",
+    complainerAddress: "",
+    justified: false,
+    evaluation: new Uint8Array()
+  };
+}
+/**
+ * DKGComplaint records a complaint by complainer_address against
+ * dealer_address in the current round and, once the dealer answers with a
+ * valid evaluation, that evaluation (the complainer uses it in place of the
+ * ciphertext it could not open).
+ * @name DKGComplaint
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.DKGComplaint
+ */
+export const DKGComplaint = {
+  typeUrl: "/sparkdream.shield.v1.DKGComplaint",
+  encode(message: DKGComplaint, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.dealerAddress !== "") {
+      writer.uint32(10).string(message.dealerAddress);
+    }
+    if (message.complainerAddress !== "") {
+      writer.uint32(18).string(message.complainerAddress);
+    }
+    if (message.justified === true) {
+      writer.uint32(24).bool(message.justified);
+    }
+    if (message.evaluation.length !== 0) {
+      writer.uint32(34).bytes(message.evaluation);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): DKGComplaint {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDKGComplaint();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.dealerAddress = reader.string();
+          break;
+        case 2:
+          message.complainerAddress = reader.string();
+          break;
+        case 3:
+          message.justified = reader.bool();
+          break;
+        case 4:
+          message.evaluation = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<DKGComplaint>): DKGComplaint {
+    const message = createBaseDKGComplaint();
+    message.dealerAddress = object.dealerAddress ?? "";
+    message.complainerAddress = object.complainerAddress ?? "";
+    message.justified = object.justified ?? false;
+    message.evaluation = object.evaluation ?? new Uint8Array();
+    return message;
+  },
+  fromAmino(object: DKGComplaintAmino): DKGComplaint {
+    const message = createBaseDKGComplaint();
+    if (object.dealer_address !== undefined && object.dealer_address !== null) {
+      message.dealerAddress = object.dealer_address;
+    }
+    if (object.complainer_address !== undefined && object.complainer_address !== null) {
+      message.complainerAddress = object.complainer_address;
+    }
+    if (object.justified !== undefined && object.justified !== null) {
+      message.justified = object.justified;
+    }
+    if (object.evaluation !== undefined && object.evaluation !== null) {
+      message.evaluation = bytesFromBase64(object.evaluation);
+    }
+    return message;
+  },
+  toAmino(message: DKGComplaint): DKGComplaintAmino {
+    const obj: any = {};
+    obj.dealer_address = message.dealerAddress === "" ? undefined : message.dealerAddress;
+    obj.complainer_address = message.complainerAddress === "" ? undefined : message.complainerAddress;
+    obj.justified = message.justified === false ? undefined : message.justified;
+    obj.evaluation = message.evaluation ? base64FromBytes(message.evaluation) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: DKGComplaintAminoMsg): DKGComplaint {
+    return DKGComplaint.fromAmino(object.value);
+  },
+  fromProtoMsg(message: DKGComplaintProtoMsg): DKGComplaint {
+    return DKGComplaint.decode(message.value);
+  },
+  toProto(message: DKGComplaint): Uint8Array {
+    return DKGComplaint.encode(message).finish();
+  },
+  toProtoMsg(message: DKGComplaint): DKGComplaintProtoMsg {
+    return {
+      typeUrl: "/sparkdream.shield.v1.DKGComplaint",
+      value: DKGComplaint.encode(message).finish()
     };
   }
 };
@@ -3505,6 +4025,89 @@ export const TLEMissCounterEntry = {
     return {
       typeUrl: "/sparkdream.shield.v1.TLEMissCounterEntry",
       value: TLEMissCounterEntry.encode(message).finish()
+    };
+  }
+};
+function createBaseDecryptionDemandEntry(): DecryptionDemandEntry {
+  return {
+    epoch: BigInt(0),
+    height: BigInt(0)
+  };
+}
+/**
+ * DecryptionDemandEntry records that the EndBlocker asked validators for
+ * decryption shares of a closed epoch (its batch became ready) at a height.
+ * TLE liveness for that epoch is judged one full epoch interval later.
+ * @name DecryptionDemandEntry
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.DecryptionDemandEntry
+ */
+export const DecryptionDemandEntry = {
+  typeUrl: "/sparkdream.shield.v1.DecryptionDemandEntry",
+  encode(message: DecryptionDemandEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.epoch !== BigInt(0)) {
+      writer.uint32(8).uint64(message.epoch);
+    }
+    if (message.height !== BigInt(0)) {
+      writer.uint32(16).int64(message.height);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): DecryptionDemandEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDecryptionDemandEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.epoch = reader.uint64();
+          break;
+        case 2:
+          message.height = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<DecryptionDemandEntry>): DecryptionDemandEntry {
+    const message = createBaseDecryptionDemandEntry();
+    message.epoch = object.epoch !== undefined && object.epoch !== null ? BigInt(object.epoch.toString()) : BigInt(0);
+    message.height = object.height !== undefined && object.height !== null ? BigInt(object.height.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: DecryptionDemandEntryAmino): DecryptionDemandEntry {
+    const message = createBaseDecryptionDemandEntry();
+    if (object.epoch !== undefined && object.epoch !== null) {
+      message.epoch = BigInt(object.epoch);
+    }
+    if (object.height !== undefined && object.height !== null) {
+      message.height = BigInt(object.height);
+    }
+    return message;
+  },
+  toAmino(message: DecryptionDemandEntry): DecryptionDemandEntryAmino {
+    const obj: any = {};
+    obj.epoch = message.epoch !== BigInt(0) ? message.epoch?.toString() : undefined;
+    obj.height = message.height !== BigInt(0) ? message.height?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: DecryptionDemandEntryAminoMsg): DecryptionDemandEntry {
+    return DecryptionDemandEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: DecryptionDemandEntryProtoMsg): DecryptionDemandEntry {
+    return DecryptionDemandEntry.decode(message.value);
+  },
+  toProto(message: DecryptionDemandEntry): Uint8Array {
+    return DecryptionDemandEntry.encode(message).finish();
+  },
+  toProtoMsg(message: DecryptionDemandEntry): DecryptionDemandEntryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.shield.v1.DecryptionDemandEntry",
+      value: DecryptionDemandEntry.encode(message).finish()
     };
   }
 };

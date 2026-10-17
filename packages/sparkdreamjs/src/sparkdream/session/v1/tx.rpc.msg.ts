@@ -31,7 +31,7 @@ export interface Msg {
   /** ExecSession executes messages using a session key. */
   execSession(request: MsgExecSession): Promise<MsgExecSessionResponse>;
   /**
-   * CreateGrant is the unified entrypoint that creates any of the four typed
+   * CreateGrant is the unified entrypoint that creates any of the typed
    * grants. Type is inferred from the payload oneof.
    */
   createGrant(request: MsgCreateGrant): Promise<MsgCreateGrantResponse>;
@@ -67,7 +67,7 @@ export interface Msg {
   revokeGrant(request: MsgRevokeGrant): Promise<MsgRevokeGrantResponse>;
   /**
    * DeclineGrant lets the grantee opt out of any active grant by id.
-   * Applies uniformly across all four grant types. For ScheduledOneshot
+   * Applies uniformly across all grant types. For ScheduledOneshot
    * this is a pre-fire veto: the grant transitions to DECLINED, the
    * EndBlocker skips it, and the held deposit is refunded to the
    * granter. Decline is one-way — the granter must Revoke + CreateGrant
@@ -118,7 +118,7 @@ export class MsgClientImpl implements Msg {
     const promise = this.rpc.request("sparkdream.session.v1.Msg", "ExecSession", data);
     return promise.then(data => MsgExecSessionResponse.decode(new BinaryReader(data)));
   };
-  /* CreateGrant is the unified entrypoint that creates any of the four typed
+  /* CreateGrant is the unified entrypoint that creates any of the typed
    grants. Type is inferred from the payload oneof. */
   createGrant = async (request: MsgCreateGrant): Promise<MsgCreateGrantResponse> => {
     const data = MsgCreateGrant.encode(request).finish();
@@ -164,7 +164,7 @@ export class MsgClientImpl implements Msg {
     return promise.then(data => MsgRevokeGrantResponse.decode(new BinaryReader(data)));
   };
   /* DeclineGrant lets the grantee opt out of any active grant by id.
-   Applies uniformly across all four grant types. For ScheduledOneshot
+   Applies uniformly across all grant types. For ScheduledOneshot
    this is a pre-fire veto: the grant transitions to DECLINED, the
    EndBlocker skips it, and the held deposit is refunded to the
    granter. Decline is one-way — the granter must Revoke + CreateGrant

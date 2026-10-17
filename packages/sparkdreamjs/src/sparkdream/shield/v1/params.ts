@@ -13,7 +13,7 @@ export interface Params {
    */
   enabled: boolean;
   /**
-   * Maximum uspark to skim from community pool per day (14400 blocks at 6s/block)
+   * Maximum bond-denom amount to draw from the community pool per UTC day (day = block time / 86400)
    */
   maxFundingPerDay: string;
   /**
@@ -73,7 +73,7 @@ export interface Params {
    */
   minTleValidators: number;
   /**
-   * Total DKG window in blocks (split: first half = key registration, second half = contributions)
+   * Total DKG window in blocks, split into four equal phases: key registration, dealing, complaints, justifications
    */
   dkgWindowBlocks: bigint;
   /**
@@ -89,6 +89,12 @@ export interface Params {
    * rejected before anything is paid.
    */
   maxFeePerExec: string;
+  /**
+   * Whether a completed DKG turns encrypted_batch_enabled on by itself.
+   * Off by default: governance enables batch mode explicitly once it is
+   * satisfied with the ceremony. A re-key always turns batch mode off.
+   */
+  enableBatchAfterDkg: boolean;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.shield.v1.Params";
@@ -106,7 +112,7 @@ export interface ParamsAmino {
    */
   enabled?: boolean;
   /**
-   * Maximum uspark to skim from community pool per day (14400 blocks at 6s/block)
+   * Maximum bond-denom amount to draw from the community pool per UTC day (day = block time / 86400)
    */
   max_funding_per_day?: string;
   /**
@@ -166,7 +172,7 @@ export interface ParamsAmino {
    */
   min_tle_validators?: number;
   /**
-   * Total DKG window in blocks (split: first half = key registration, second half = contributions)
+   * Total DKG window in blocks, split into four equal phases: key registration, dealing, complaints, justifications
    */
   dkg_window_blocks?: string;
   /**
@@ -182,6 +188,12 @@ export interface ParamsAmino {
    * rejected before anything is paid.
    */
   max_fee_per_exec?: string;
+  /**
+   * Whether a completed DKG turns encrypted_batch_enabled on by itself.
+   * Off by default: governance enables batch mode explicitly once it is
+   * satisfied with the ceremony. A re-key always turns batch mode off.
+   */
+  enable_batch_after_dkg?: boolean;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/shield/Params";
@@ -207,7 +219,8 @@ function createBaseParams(): Params {
     minTleValidators: 0,
     dkgWindowBlocks: BigInt(0),
     maxValidatorSetDrift: 0,
-    maxFeePerExec: ""
+    maxFeePerExec: "",
+    enableBatchAfterDkg: false
   };
 }
 /**
@@ -277,6 +290,9 @@ export const Params = {
     if (message.maxFeePerExec !== "") {
       writer.uint32(154).string(message.maxFeePerExec);
     }
+    if (message.enableBatchAfterDkg === true) {
+      writer.uint32(160).bool(message.enableBatchAfterDkg);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -343,6 +359,9 @@ export const Params = {
         case 19:
           message.maxFeePerExec = reader.string();
           break;
+        case 20:
+          message.enableBatchAfterDkg = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -371,6 +390,7 @@ export const Params = {
     message.dkgWindowBlocks = object.dkgWindowBlocks !== undefined && object.dkgWindowBlocks !== null ? BigInt(object.dkgWindowBlocks.toString()) : BigInt(0);
     message.maxValidatorSetDrift = object.maxValidatorSetDrift ?? 0;
     message.maxFeePerExec = object.maxFeePerExec ?? "";
+    message.enableBatchAfterDkg = object.enableBatchAfterDkg ?? false;
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -432,6 +452,9 @@ export const Params = {
     if (object.max_fee_per_exec !== undefined && object.max_fee_per_exec !== null) {
       message.maxFeePerExec = object.max_fee_per_exec;
     }
+    if (object.enable_batch_after_dkg !== undefined && object.enable_batch_after_dkg !== null) {
+      message.enableBatchAfterDkg = object.enable_batch_after_dkg;
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -455,6 +478,7 @@ export const Params = {
     obj.dkg_window_blocks = message.dkgWindowBlocks !== BigInt(0) ? message.dkgWindowBlocks?.toString() : undefined;
     obj.max_validator_set_drift = message.maxValidatorSetDrift === 0 ? undefined : message.maxValidatorSetDrift;
     obj.max_fee_per_exec = message.maxFeePerExec === "" ? undefined : message.maxFeePerExec;
+    obj.enable_batch_after_dkg = message.enableBatchAfterDkg === false ? undefined : message.enableBatchAfterDkg;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {

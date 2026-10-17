@@ -93,6 +93,13 @@ const fixtures: Record<string, { typeUrl: string; value: any }> = {
       },
     },
   },
+  create_sign_in: {
+    typeUrl: S + "MsgCreateGrant",
+    value: {
+      granter: GRANTER, grantee: GRANTEE, expiresAt: EXPIRES, note: "post from my desktop",
+      signIn: { service: "mstdn.sparkdream.io" },
+    },
+  },
   claim_recurring_pull: { typeUrl: S + "MsgClaimRecurringPull", value: { grantee: GRANTEE, grantId: BigInt(7) } },
   pull_allowance: {
     typeUrl: S + "MsgPullAllowance",

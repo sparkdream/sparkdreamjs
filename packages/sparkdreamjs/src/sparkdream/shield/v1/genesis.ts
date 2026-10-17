@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { Params, ParamsAmino } from "./params";
-import { ShieldedOpRegistration, ShieldedOpRegistrationAmino, UsedNullifier, UsedNullifierAmino, DayFunding, DayFundingAmino, VerificationKey, VerificationKeyAmino, TLEKeySet, TLEKeySetAmino, PendingShieldedOp, PendingShieldedOpAmino, ShieldEpochState, ShieldEpochStateAmino, ShieldEpochDecryptionKey, ShieldEpochDecryptionKeyAmino, IdentityRateLimitEntry, IdentityRateLimitEntryAmino, ShieldDecryptionShare, ShieldDecryptionShareAmino, TLEMissCounterEntry, TLEMissCounterEntryAmino, DKGState, DKGStateAmino, DKGContributionEntry, DKGContributionEntryAmino } from "./types";
+import { ShieldedOpRegistration, ShieldedOpRegistrationAmino, UsedNullifier, UsedNullifierAmino, DayFunding, DayFundingAmino, VerificationKey, VerificationKeyAmino, TLEKeySet, TLEKeySetAmino, PendingShieldedOp, PendingShieldedOpAmino, ShieldEpochState, ShieldEpochStateAmino, ShieldEpochDecryptionKey, ShieldEpochDecryptionKeyAmino, IdentityRateLimitEntry, IdentityRateLimitEntryAmino, ShieldDecryptionShare, ShieldDecryptionShareAmino, TLEMissCounterEntry, TLEMissCounterEntryAmino, DKGState, DKGStateAmino, DKGContributionEntry, DKGContributionEntryAmino, DecryptionDemandEntry, DecryptionDemandEntryAmino, DKGComplaint, DKGComplaintAmino } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -78,6 +78,14 @@ export interface GenesisState {
    * DKG registrations (pub keys from REGISTERING phase)
    */
   dkgRegistrations: DKGContributionEntry[];
+  /**
+   * Closed epochs whose decryption shares have been requested from validators
+   */
+  decryptionDemands: DecryptionDemandEntry[];
+  /**
+   * DKG complaints for the current round
+   */
+  dkgComplaints: DKGComplaint[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.shield.v1.GenesisState";
@@ -158,6 +166,14 @@ export interface GenesisStateAmino {
    * DKG registrations (pub keys from REGISTERING phase)
    */
   dkg_registrations?: DKGContributionEntryAmino[];
+  /**
+   * Closed epochs whose decryption shares have been requested from validators
+   */
+  decryption_demands?: DecryptionDemandEntryAmino[];
+  /**
+   * DKG complaints for the current round
+   */
+  dkg_complaints?: DKGComplaintAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.shield.v1.GenesisState";
@@ -181,7 +197,9 @@ function createBaseGenesisState(): GenesisState {
     tleMissCounters: [],
     dkgState: DKGState.fromPartial({}),
     dkgContributions: [],
-    dkgRegistrations: []
+    dkgRegistrations: [],
+    decryptionDemands: [],
+    dkgComplaints: []
   };
 }
 /**
@@ -244,6 +262,12 @@ export const GenesisState = {
     for (const v of message.dkgRegistrations) {
       DKGContributionEntry.encode(v!, writer.uint32(138).fork()).ldelim();
     }
+    for (const v of message.decryptionDemands) {
+      DecryptionDemandEntry.encode(v!, writer.uint32(146).fork()).ldelim();
+    }
+    for (const v of message.dkgComplaints) {
+      DKGComplaint.encode(v!, writer.uint32(154).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -304,6 +328,12 @@ export const GenesisState = {
         case 17:
           message.dkgRegistrations.push(DKGContributionEntry.decode(reader, reader.uint32()));
           break;
+        case 18:
+          message.decryptionDemands.push(DecryptionDemandEntry.decode(reader, reader.uint32()));
+          break;
+        case 19:
+          message.dkgComplaints.push(DKGComplaint.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -330,6 +360,8 @@ export const GenesisState = {
     message.dkgState = object.dkgState !== undefined && object.dkgState !== null ? DKGState.fromPartial(object.dkgState) : undefined;
     message.dkgContributions = object.dkgContributions?.map(e => DKGContributionEntry.fromPartial(e)) || [];
     message.dkgRegistrations = object.dkgRegistrations?.map(e => DKGContributionEntry.fromPartial(e)) || [];
+    message.decryptionDemands = object.decryptionDemands?.map(e => DecryptionDemandEntry.fromPartial(e)) || [];
+    message.dkgComplaints = object.dkgComplaints?.map(e => DKGComplaint.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -361,6 +393,8 @@ export const GenesisState = {
     }
     message.dkgContributions = object.dkg_contributions?.map(e => DKGContributionEntry.fromAmino(e)) || [];
     message.dkgRegistrations = object.dkg_registrations?.map(e => DKGContributionEntry.fromAmino(e)) || [];
+    message.decryptionDemands = object.decryption_demands?.map(e => DecryptionDemandEntry.fromAmino(e)) || [];
+    message.dkgComplaints = object.dkg_complaints?.map(e => DKGComplaint.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -429,6 +463,16 @@ export const GenesisState = {
       obj.dkg_registrations = message.dkgRegistrations.map(e => e ? DKGContributionEntry.toAmino(e) : undefined);
     } else {
       obj.dkg_registrations = message.dkgRegistrations;
+    }
+    if (message.decryptionDemands) {
+      obj.decryption_demands = message.decryptionDemands.map(e => e ? DecryptionDemandEntry.toAmino(e) : undefined);
+    } else {
+      obj.decryption_demands = message.decryptionDemands;
+    }
+    if (message.dkgComplaints) {
+      obj.dkg_complaints = message.dkgComplaints.map(e => e ? DKGComplaint.toAmino(e) : undefined);
+    } else {
+      obj.dkg_complaints = message.dkgComplaints;
     }
     return obj;
   },

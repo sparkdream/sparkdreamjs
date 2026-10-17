@@ -2,7 +2,7 @@
 import { Params, ParamsAmino } from "./params";
 import { NameRecord, NameRecordAmino } from "./name_record";
 import { OwnerInfo, OwnerInfoAmino } from "./owner_info";
-import { Dispute, DisputeAmino } from "./dispute";
+import { Dispute, DisputeAmino, DisputeStake, DisputeStakeAmino, ContestStake, ContestStakeAmino } from "./dispute";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -19,6 +19,17 @@ export interface GenesisState {
   nameRecords: NameRecord[];
   ownerInfos: OwnerInfo[];
   disputeMap: Dispute[];
+  /**
+   * dispute_stakes are the claimants' locked DREAM stakes for open disputes,
+   * keyed by challenge_id. Exported so a chain export/import does not strand
+   * locked funds.
+   */
+  disputeStakes: DisputeStake[];
+  /**
+   * contest_stakes are the owners' locked DREAM stakes for contested disputes,
+   * keyed by challenge_id.
+   */
+  contestStakes: ContestStake[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.name.v1.GenesisState";
@@ -38,6 +49,17 @@ export interface GenesisStateAmino {
   name_records?: NameRecordAmino[];
   owner_infos?: OwnerInfoAmino[];
   dispute_map?: DisputeAmino[];
+  /**
+   * dispute_stakes are the claimants' locked DREAM stakes for open disputes,
+   * keyed by challenge_id. Exported so a chain export/import does not strand
+   * locked funds.
+   */
+  dispute_stakes?: DisputeStakeAmino[];
+  /**
+   * contest_stakes are the owners' locked DREAM stakes for contested disputes,
+   * keyed by challenge_id.
+   */
+  contest_stakes?: ContestStakeAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.name.v1.GenesisState";
@@ -48,7 +70,9 @@ function createBaseGenesisState(): GenesisState {
     params: Params.fromPartial({}),
     nameRecords: [],
     ownerInfos: [],
-    disputeMap: []
+    disputeMap: [],
+    disputeStakes: [],
+    contestStakes: []
   };
 }
 /**
@@ -72,6 +96,12 @@ export const GenesisState = {
     for (const v of message.disputeMap) {
       Dispute.encode(v!, writer.uint32(34).fork()).ldelim();
     }
+    for (const v of message.disputeStakes) {
+      DisputeStake.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
+    for (const v of message.contestStakes) {
+      ContestStake.encode(v!, writer.uint32(50).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -93,6 +123,12 @@ export const GenesisState = {
         case 4:
           message.disputeMap.push(Dispute.decode(reader, reader.uint32()));
           break;
+        case 5:
+          message.disputeStakes.push(DisputeStake.decode(reader, reader.uint32()));
+          break;
+        case 6:
+          message.contestStakes.push(ContestStake.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -106,6 +142,8 @@ export const GenesisState = {
     message.nameRecords = object.nameRecords?.map(e => NameRecord.fromPartial(e)) || [];
     message.ownerInfos = object.ownerInfos?.map(e => OwnerInfo.fromPartial(e)) || [];
     message.disputeMap = object.disputeMap?.map(e => Dispute.fromPartial(e)) || [];
+    message.disputeStakes = object.disputeStakes?.map(e => DisputeStake.fromPartial(e)) || [];
+    message.contestStakes = object.contestStakes?.map(e => ContestStake.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -116,6 +154,8 @@ export const GenesisState = {
     message.nameRecords = object.name_records?.map(e => NameRecord.fromAmino(e)) || [];
     message.ownerInfos = object.owner_infos?.map(e => OwnerInfo.fromAmino(e)) || [];
     message.disputeMap = object.dispute_map?.map(e => Dispute.fromAmino(e)) || [];
+    message.disputeStakes = object.dispute_stakes?.map(e => DisputeStake.fromAmino(e)) || [];
+    message.contestStakes = object.contest_stakes?.map(e => ContestStake.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -135,6 +175,16 @@ export const GenesisState = {
       obj.dispute_map = message.disputeMap.map(e => e ? Dispute.toAmino(e) : undefined);
     } else {
       obj.dispute_map = message.disputeMap;
+    }
+    if (message.disputeStakes) {
+      obj.dispute_stakes = message.disputeStakes.map(e => e ? DisputeStake.toAmino(e) : undefined);
+    } else {
+      obj.dispute_stakes = message.disputeStakes;
+    }
+    if (message.contestStakes) {
+      obj.contest_stakes = message.contestStakes.map(e => e ? ContestStake.toAmino(e) : undefined);
+    } else {
+      obj.contest_stakes = message.contestStakes;
     }
     return obj;
   },

@@ -148,11 +148,15 @@ const scheduledOneshotFromAmino = (o: any) => {
   };
 };
 
+const signInToAmino = (p: any) => ({ service: str(p.service) });
+const signInFromAmino = (o: any) => ({ service: o.service ?? "" });
+
 const PAYLOADS = [
   ["sessionKey", "session_key", "sparkdream/session/SessionKeyPayload", sessionKeyToAmino, sessionKeyFromAmino],
   ["recurringPull", "recurring_pull", "sparkdream/session/RecurringPullPayload", recurringPullToAmino, recurringPullFromAmino],
   ["spendingAllowance", "spending_allowance", "sparkdream/session/SpendingAllowancePayload", spendingAllowanceToAmino, spendingAllowanceFromAmino],
   ["scheduledOneshot", "scheduled_oneshot", "sparkdream/session/ScheduledOneshotPayload", scheduledOneshotToAmino, scheduledOneshotFromAmino],
+  ["signIn", "sign_in", "sparkdream/session/SignInPayload", signInToAmino, signInFromAmino],
 ] as const;
 
 // ── Messages ────────────────────────────────────────────────────────────

@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { TelescopeGeneratedType } from "../../../types";
 import { Registry } from "@cosmjs/proto-signing";
-import { MsgUpdateParams, MsgUpdateServiceTypeConfig, MsgRegisterOperator, MsgUpdateMetadata, MsgUnbondOperator, MsgClaimUnbondedBond, MsgTopUpBond, MsgReportOperator, MsgResolveReport, MsgContestSlash, MsgResolveReportByJury, MsgOpenControllerTransferCase, MsgFinalizeControllerTransfer, MsgSubmitCheckpoint } from "./tx";
-export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.service.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.service.v1.MsgUpdateServiceTypeConfig", MsgUpdateServiceTypeConfig], ["/sparkdream.service.v1.MsgRegisterOperator", MsgRegisterOperator], ["/sparkdream.service.v1.MsgUpdateMetadata", MsgUpdateMetadata], ["/sparkdream.service.v1.MsgUnbondOperator", MsgUnbondOperator], ["/sparkdream.service.v1.MsgClaimUnbondedBond", MsgClaimUnbondedBond], ["/sparkdream.service.v1.MsgTopUpBond", MsgTopUpBond], ["/sparkdream.service.v1.MsgReportOperator", MsgReportOperator], ["/sparkdream.service.v1.MsgResolveReport", MsgResolveReport], ["/sparkdream.service.v1.MsgContestSlash", MsgContestSlash], ["/sparkdream.service.v1.MsgResolveReportByJury", MsgResolveReportByJury], ["/sparkdream.service.v1.MsgOpenControllerTransferCase", MsgOpenControllerTransferCase], ["/sparkdream.service.v1.MsgFinalizeControllerTransfer", MsgFinalizeControllerTransfer], ["/sparkdream.service.v1.MsgSubmitCheckpoint", MsgSubmitCheckpoint]];
+import { MsgUpdateParams, MsgUpdateServiceTypeConfig, MsgRegisterOperator, MsgUpdateMetadata, MsgUnbondOperator, MsgClaimUnbondedBond, MsgTopUpBond, MsgWithdrawBond, MsgReportOperator, MsgResolveReport, MsgContestSlash, MsgResolveReportByJury, MsgOpenControllerTransferCase, MsgFinalizeControllerTransfer, MsgSubmitCheckpoint } from "./tx";
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.service.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.service.v1.MsgUpdateServiceTypeConfig", MsgUpdateServiceTypeConfig], ["/sparkdream.service.v1.MsgRegisterOperator", MsgRegisterOperator], ["/sparkdream.service.v1.MsgUpdateMetadata", MsgUpdateMetadata], ["/sparkdream.service.v1.MsgUnbondOperator", MsgUnbondOperator], ["/sparkdream.service.v1.MsgClaimUnbondedBond", MsgClaimUnbondedBond], ["/sparkdream.service.v1.MsgTopUpBond", MsgTopUpBond], ["/sparkdream.service.v1.MsgWithdrawBond", MsgWithdrawBond], ["/sparkdream.service.v1.MsgReportOperator", MsgReportOperator], ["/sparkdream.service.v1.MsgResolveReport", MsgResolveReport], ["/sparkdream.service.v1.MsgContestSlash", MsgContestSlash], ["/sparkdream.service.v1.MsgResolveReportByJury", MsgResolveReportByJury], ["/sparkdream.service.v1.MsgOpenControllerTransferCase", MsgOpenControllerTransferCase], ["/sparkdream.service.v1.MsgFinalizeControllerTransfer", MsgFinalizeControllerTransfer], ["/sparkdream.service.v1.MsgSubmitCheckpoint", MsgSubmitCheckpoint]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -50,6 +50,12 @@ export const MessageComposer = {
       return {
         typeUrl: "/sparkdream.service.v1.MsgTopUpBond",
         value: MsgTopUpBond.encode(value).finish()
+      };
+    },
+    withdrawBond(value: MsgWithdrawBond) {
+      return {
+        typeUrl: "/sparkdream.service.v1.MsgWithdrawBond",
+        value: MsgWithdrawBond.encode(value).finish()
       };
     },
     reportOperator(value: MsgReportOperator) {
@@ -138,6 +144,12 @@ export const MessageComposer = {
         value
       };
     },
+    withdrawBond(value: MsgWithdrawBond) {
+      return {
+        typeUrl: "/sparkdream.service.v1.MsgWithdrawBond",
+        value
+      };
+    },
     reportOperator(value: MsgReportOperator) {
       return {
         typeUrl: "/sparkdream.service.v1.MsgReportOperator",
@@ -222,6 +234,12 @@ export const MessageComposer = {
       return {
         typeUrl: "/sparkdream.service.v1.MsgTopUpBond",
         value: MsgTopUpBond.fromPartial(value)
+      };
+    },
+    withdrawBond(value: MsgWithdrawBond) {
+      return {
+        typeUrl: "/sparkdream.service.v1.MsgWithdrawBond",
+        value: MsgWithdrawBond.fromPartial(value)
       };
     },
     reportOperator(value: MsgReportOperator) {

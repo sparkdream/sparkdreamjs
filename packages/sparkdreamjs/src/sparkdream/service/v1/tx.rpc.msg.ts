@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateServiceTypeConfig, MsgUpdateServiceTypeConfigResponse, MsgRegisterOperator, MsgRegisterOperatorResponse, MsgUpdateMetadata, MsgUpdateMetadataResponse, MsgUnbondOperator, MsgUnbondOperatorResponse, MsgClaimUnbondedBond, MsgClaimUnbondedBondResponse, MsgTopUpBond, MsgTopUpBondResponse, MsgReportOperator, MsgReportOperatorResponse, MsgResolveReport, MsgResolveReportResponse, MsgContestSlash, MsgContestSlashResponse, MsgResolveReportByJury, MsgResolveReportByJuryResponse, MsgOpenControllerTransferCase, MsgOpenControllerTransferCaseResponse, MsgFinalizeControllerTransfer, MsgFinalizeControllerTransferResponse, MsgSubmitCheckpoint, MsgSubmitCheckpointResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateServiceTypeConfig, MsgUpdateServiceTypeConfigResponse, MsgRegisterOperator, MsgRegisterOperatorResponse, MsgUpdateMetadata, MsgUpdateMetadataResponse, MsgUnbondOperator, MsgUnbondOperatorResponse, MsgClaimUnbondedBond, MsgClaimUnbondedBondResponse, MsgTopUpBond, MsgTopUpBondResponse, MsgWithdrawBond, MsgWithdrawBondResponse, MsgReportOperator, MsgReportOperatorResponse, MsgResolveReport, MsgResolveReportResponse, MsgContestSlash, MsgContestSlashResponse, MsgResolveReportByJury, MsgResolveReportByJuryResponse, MsgOpenControllerTransferCase, MsgOpenControllerTransferCaseResponse, MsgFinalizeControllerTransfer, MsgFinalizeControllerTransferResponse, MsgSubmitCheckpoint, MsgSubmitCheckpointResponse } from "./tx";
 /** Msg defines the Msg service for x/service. See x-service-spec.md §5. */
 export interface Msg {
   /** UpdateParams updates module-wide params (§4.2). Authority = x/gov. */
@@ -30,6 +30,14 @@ export interface Msg {
    * applicable.
    */
   topUpBond(request: MsgTopUpBond): Promise<MsgTopUpBondResponse>;
+  /**
+   * WithdrawBond queues a partial withdrawal of an ACTIVE operator's bond
+   * while keeping it ACTIVE: the staying bond must remain >= min_bond.
+   * The queued amount stays in the bond pool, slashable, for the
+   * service type's unbonding period and is then released through
+   * MsgClaimUnbondedBond (§3.5a). Not delegable.
+   */
+  withdrawBond(request: MsgWithdrawBond): Promise<MsgWithdrawBondResponse>;
   /**
    * ReportOperator files a new report; reporter posts `report_deposit`
    * escrow (§3.4.6).
@@ -119,6 +127,16 @@ export class MsgClientImpl implements Msg {
     const data = MsgTopUpBond.encode(request).finish();
     const promise = this.rpc.request("sparkdream.service.v1.Msg", "TopUpBond", data);
     return promise.then(data => MsgTopUpBondResponse.decode(new BinaryReader(data)));
+  };
+  /* WithdrawBond queues a partial withdrawal of an ACTIVE operator's bond
+   while keeping it ACTIVE: the staying bond must remain >= min_bond.
+   The queued amount stays in the bond pool, slashable, for the
+   service type's unbonding period and is then released through
+   MsgClaimUnbondedBond (§3.5a). Not delegable. */
+  withdrawBond = async (request: MsgWithdrawBond): Promise<MsgWithdrawBondResponse> => {
+    const data = MsgWithdrawBond.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.service.v1.Msg", "WithdrawBond", data);
+    return promise.then(data => MsgWithdrawBondResponse.decode(new BinaryReader(data)));
   };
   /* ReportOperator files a new report; reporter posts `report_deposit`
    escrow (§3.4.6). */

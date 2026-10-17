@@ -466,6 +466,10 @@ export interface QueryTLEMasterPublicKeyRequestAminoMsg {
  */
 export interface QueryTLEMasterPublicKeyResponse {
   masterPublicKey: Uint8Array;
+  /**
+   * The key clients encrypt batch payloads to (see tools/tle).
+   */
+  masterPublicKeyG2: Uint8Array;
 }
 export interface QueryTLEMasterPublicKeyResponseProtoMsg {
   typeUrl: "/sparkdream.shield.v1.QueryTLEMasterPublicKeyResponse";
@@ -478,6 +482,10 @@ export interface QueryTLEMasterPublicKeyResponseProtoMsg {
  */
 export interface QueryTLEMasterPublicKeyResponseAmino {
   master_public_key?: string;
+  /**
+   * The key clients encrypt batch payloads to (see tools/tle).
+   */
+  master_public_key_g2?: string;
 }
 export interface QueryTLEMasterPublicKeyResponseAminoMsg {
   type: "/sparkdream.shield.v1.QueryTLEMasterPublicKeyResponse";
@@ -2116,7 +2124,8 @@ export const QueryTLEMasterPublicKeyRequest = {
 };
 function createBaseQueryTLEMasterPublicKeyResponse(): QueryTLEMasterPublicKeyResponse {
   return {
-    masterPublicKey: new Uint8Array()
+    masterPublicKey: new Uint8Array(),
+    masterPublicKeyG2: new Uint8Array()
   };
 }
 /**
@@ -2130,6 +2139,9 @@ export const QueryTLEMasterPublicKeyResponse = {
     if (message.masterPublicKey.length !== 0) {
       writer.uint32(10).bytes(message.masterPublicKey);
     }
+    if (message.masterPublicKeyG2.length !== 0) {
+      writer.uint32(18).bytes(message.masterPublicKeyG2);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryTLEMasterPublicKeyResponse {
@@ -2142,6 +2154,9 @@ export const QueryTLEMasterPublicKeyResponse = {
         case 1:
           message.masterPublicKey = reader.bytes();
           break;
+        case 2:
+          message.masterPublicKeyG2 = reader.bytes();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2152,6 +2167,7 @@ export const QueryTLEMasterPublicKeyResponse = {
   fromPartial(object: DeepPartial<QueryTLEMasterPublicKeyResponse>): QueryTLEMasterPublicKeyResponse {
     const message = createBaseQueryTLEMasterPublicKeyResponse();
     message.masterPublicKey = object.masterPublicKey ?? new Uint8Array();
+    message.masterPublicKeyG2 = object.masterPublicKeyG2 ?? new Uint8Array();
     return message;
   },
   fromAmino(object: QueryTLEMasterPublicKeyResponseAmino): QueryTLEMasterPublicKeyResponse {
@@ -2159,11 +2175,15 @@ export const QueryTLEMasterPublicKeyResponse = {
     if (object.master_public_key !== undefined && object.master_public_key !== null) {
       message.masterPublicKey = bytesFromBase64(object.master_public_key);
     }
+    if (object.master_public_key_g2 !== undefined && object.master_public_key_g2 !== null) {
+      message.masterPublicKeyG2 = bytesFromBase64(object.master_public_key_g2);
+    }
     return message;
   },
   toAmino(message: QueryTLEMasterPublicKeyResponse): QueryTLEMasterPublicKeyResponseAmino {
     const obj: any = {};
     obj.master_public_key = message.masterPublicKey ? base64FromBytes(message.masterPublicKey) : undefined;
+    obj.master_public_key_g2 = message.masterPublicKeyG2 ? base64FromBytes(message.masterPublicKeyG2) : undefined;
     return obj;
   },
   fromAminoMsg(object: QueryTLEMasterPublicKeyResponseAminoMsg): QueryTLEMasterPublicKeyResponse {

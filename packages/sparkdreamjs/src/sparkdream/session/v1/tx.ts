@@ -3,7 +3,7 @@ import { Params, ParamsAmino, SessionOperationalParams, SessionOperationalParams
 import { Coin, CoinAmino } from "../../../cosmos/base/v1beta1/coin";
 import { Timestamp } from "../../../google/protobuf/timestamp";
 import { Any, AnyAmino } from "../../../google/protobuf/any";
-import { SessionKeyPayload, SessionKeyPayloadAmino, RecurringPullPayload, RecurringPullPayloadAmino, SpendingAllowancePayload, SpendingAllowancePayloadAmino, ScheduledOneshotPayload, ScheduledOneshotPayloadAmino } from "./grant";
+import { SessionKeyPayload, SessionKeyPayloadAmino, RecurringPullPayload, RecurringPullPayloadAmino, SpendingAllowancePayload, SpendingAllowancePayloadAmino, ScheduledOneshotPayload, ScheduledOneshotPayloadAmino, SignInPayload, SignInPayloadAmino } from "./grant";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial, toTimestamp, fromTimestamp } from "../../../helpers";
 /**
@@ -293,7 +293,7 @@ export interface MsgExecSessionResponseAminoMsg {
   value: MsgExecSessionResponseAmino;
 }
 /**
- * MsgCreateGrant is the unified entrypoint for creating any of the four
+ * MsgCreateGrant is the unified entrypoint for creating any of the
  * typed grants. The grant type is inferred from the payload oneof; the
  * handler dispatches to type-specific validation. Signed by the granter.
  * @name MsgCreateGrant
@@ -312,13 +312,14 @@ export interface MsgCreateGrant {
   recurringPull?: RecurringPullPayload;
   spendingAllowance?: SpendingAllowancePayload;
   scheduledOneshot?: ScheduledOneshotPayload;
+  signIn?: SignInPayload;
 }
 export interface MsgCreateGrantProtoMsg {
   typeUrl: "/sparkdream.session.v1.MsgCreateGrant";
   value: Uint8Array;
 }
 /**
- * MsgCreateGrant is the unified entrypoint for creating any of the four
+ * MsgCreateGrant is the unified entrypoint for creating any of the
  * typed grants. The grant type is inferred from the payload oneof; the
  * handler dispatches to type-specific validation. Signed by the granter.
  * @name MsgCreateGrantAmino
@@ -337,6 +338,7 @@ export interface MsgCreateGrantAmino {
   recurring_pull?: RecurringPullPayloadAmino;
   spending_allowance?: SpendingAllowancePayloadAmino;
   scheduled_oneshot?: ScheduledOneshotPayloadAmino;
+  sign_in?: SignInPayloadAmino;
 }
 export interface MsgCreateGrantAminoMsg {
   type: "sparkdream/x/session/MsgCreateGrant";
@@ -1509,11 +1511,12 @@ function createBaseMsgCreateGrant(): MsgCreateGrant {
     sessionKey: undefined,
     recurringPull: undefined,
     spendingAllowance: undefined,
-    scheduledOneshot: undefined
+    scheduledOneshot: undefined,
+    signIn: undefined
   };
 }
 /**
- * MsgCreateGrant is the unified entrypoint for creating any of the four
+ * MsgCreateGrant is the unified entrypoint for creating any of the
  * typed grants. The grant type is inferred from the payload oneof; the
  * handler dispatches to type-specific validation. Signed by the granter.
  * @name MsgCreateGrant
@@ -1548,6 +1551,9 @@ export const MsgCreateGrant = {
     if (message.scheduledOneshot !== undefined) {
       ScheduledOneshotPayload.encode(message.scheduledOneshot, writer.uint32(106).fork()).ldelim();
     }
+    if (message.signIn !== undefined) {
+      SignInPayload.encode(message.signIn, writer.uint32(114).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgCreateGrant {
@@ -1581,6 +1587,9 @@ export const MsgCreateGrant = {
         case 13:
           message.scheduledOneshot = ScheduledOneshotPayload.decode(reader, reader.uint32());
           break;
+        case 14:
+          message.signIn = SignInPayload.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1598,6 +1607,7 @@ export const MsgCreateGrant = {
     message.recurringPull = object.recurringPull !== undefined && object.recurringPull !== null ? RecurringPullPayload.fromPartial(object.recurringPull) : undefined;
     message.spendingAllowance = object.spendingAllowance !== undefined && object.spendingAllowance !== null ? SpendingAllowancePayload.fromPartial(object.spendingAllowance) : undefined;
     message.scheduledOneshot = object.scheduledOneshot !== undefined && object.scheduledOneshot !== null ? ScheduledOneshotPayload.fromPartial(object.scheduledOneshot) : undefined;
+    message.signIn = object.signIn !== undefined && object.signIn !== null ? SignInPayload.fromPartial(object.signIn) : undefined;
     return message;
   },
   fromAmino(object: MsgCreateGrantAmino): MsgCreateGrant {
@@ -1626,6 +1636,9 @@ export const MsgCreateGrant = {
     if (object.scheduled_oneshot !== undefined && object.scheduled_oneshot !== null) {
       message.scheduledOneshot = ScheduledOneshotPayload.fromAmino(object.scheduled_oneshot);
     }
+    if (object.sign_in !== undefined && object.sign_in !== null) {
+      message.signIn = SignInPayload.fromAmino(object.sign_in);
+    }
     return message;
   },
   toAmino(message: MsgCreateGrant): MsgCreateGrantAmino {
@@ -1638,6 +1651,7 @@ export const MsgCreateGrant = {
     obj.recurring_pull = message.recurringPull ? RecurringPullPayload.toAmino(message.recurringPull) : undefined;
     obj.spending_allowance = message.spendingAllowance ? SpendingAllowancePayload.toAmino(message.spendingAllowance) : undefined;
     obj.scheduled_oneshot = message.scheduledOneshot ? ScheduledOneshotPayload.toAmino(message.scheduledOneshot) : undefined;
+    obj.sign_in = message.signIn ? SignInPayload.toAmino(message.signIn) : undefined;
     return obj;
   },
   fromAminoMsg(object: MsgCreateGrantAminoMsg): MsgCreateGrant {

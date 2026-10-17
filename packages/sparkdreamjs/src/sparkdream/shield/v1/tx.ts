@@ -70,16 +70,22 @@ export interface MsgShieldedExec {
    */
   innerMessage?: Any;
   /**
-   * ZK proof bytes (Groth16 over BN254).
-   * REQUIRED for IMMEDIATE mode, EMPTY for ENCRYPTED_BATCH mode.
+   * ZK proof bytes (Groth16 over BN254), always required. IMMEDIATE: the
+   * operation proof, bound to inner_message. ENCRYPTED_BATCH: the submission
+   * proof, bound to encrypted_payload (MessageHash =
+   * ShieldMessageHash(BatchSubmissionTypeURL, encrypted_payload), Scope =
+   * ScopeElement(BatchSubmissionDomain, BatchSubmissionScope(payload))); the
+   * operation proof travels inside the ciphertext.
    */
   proof: Uint8Array;
   /**
-   * 32-byte nullifier (prevents replay)
+   * 32-byte nullifier. IMMEDIATE: the operation nullifier (prevents replay).
+   * ENCRYPTED_BATCH: the submission nullifier (one per payload and member;
+   * the operation nullifier is inside the ciphertext).
    */
   nullifier: Uint8Array;
   /**
-   * 32-byte rate-limit nullifier: H(secret, "rate_limit", epoch)
+   * 32-byte rate-limit nullifier: MiMC(secret_key, MaxUint64, epoch)
    */
   rateLimitNullifier: Uint8Array;
   /**
@@ -99,7 +105,8 @@ export interface MsgShieldedExec {
    */
   execMode: ShieldExecMode;
   /**
-   * IBE-encrypted payload containing (inner_message + proof)
+   * IBE-encrypted payload containing (inner_message + operation proof +
+   * operation nullifier), see tools/tle.EncodeExecFragment
    * REQUIRED for ENCRYPTED_BATCH mode, EMPTY for IMMEDIATE mode
    */
   encryptedPayload: Uint8Array;
@@ -130,16 +137,22 @@ export interface MsgShieldedExecAmino {
    */
   inner_message?: AnyAmino;
   /**
-   * ZK proof bytes (Groth16 over BN254).
-   * REQUIRED for IMMEDIATE mode, EMPTY for ENCRYPTED_BATCH mode.
+   * ZK proof bytes (Groth16 over BN254), always required. IMMEDIATE: the
+   * operation proof, bound to inner_message. ENCRYPTED_BATCH: the submission
+   * proof, bound to encrypted_payload (MessageHash =
+   * ShieldMessageHash(BatchSubmissionTypeURL, encrypted_payload), Scope =
+   * ScopeElement(BatchSubmissionDomain, BatchSubmissionScope(payload))); the
+   * operation proof travels inside the ciphertext.
    */
   proof?: string;
   /**
-   * 32-byte nullifier (prevents replay)
+   * 32-byte nullifier. IMMEDIATE: the operation nullifier (prevents replay).
+   * ENCRYPTED_BATCH: the submission nullifier (one per payload and member;
+   * the operation nullifier is inside the ciphertext).
    */
   nullifier?: string;
   /**
-   * 32-byte rate-limit nullifier: H(secret, "rate_limit", epoch)
+   * 32-byte rate-limit nullifier: MiMC(secret_key, MaxUint64, epoch)
    */
   rate_limit_nullifier?: string;
   /**
@@ -159,7 +172,8 @@ export interface MsgShieldedExecAmino {
    */
   exec_mode?: ShieldExecMode;
   /**
-   * IBE-encrypted payload containing (inner_message + proof)
+   * IBE-encrypted payload containing (inner_message + operation proof +
+   * operation nullifier), see tools/tle.EncodeExecFragment
    * REQUIRED for ENCRYPTED_BATCH mode, EMPTY for IMMEDIATE mode
    */
   encrypted_payload?: string;
@@ -218,7 +232,13 @@ export interface MsgShieldedExecResponseAminoMsg {
  */
 export interface MsgTriggerDkg {
   authority: string;
+  /**
+   * Optional threshold numerator (0 = default 2)
+   */
   thresholdNumerator: bigint;
+  /**
+   * Optional threshold denominator (0 = default 3)
+   */
   thresholdDenominator: bigint;
 }
 export interface MsgTriggerDkgProtoMsg {
@@ -233,7 +253,13 @@ export interface MsgTriggerDkgProtoMsg {
  */
 export interface MsgTriggerDkgAmino {
   authority?: string;
+  /**
+   * Optional threshold numerator (0 = default 2)
+   */
   threshold_numerator?: string;
+  /**
+   * Optional threshold denominator (0 = default 3)
+   */
   threshold_denominator?: string;
 }
 export interface MsgTriggerDkgAminoMsg {

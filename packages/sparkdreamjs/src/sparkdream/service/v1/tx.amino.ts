@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { MsgUpdateParams, MsgUpdateServiceTypeConfig, MsgRegisterOperator, MsgUpdateMetadata, MsgUnbondOperator, MsgClaimUnbondedBond, MsgTopUpBond, MsgReportOperator, MsgResolveReport, MsgContestSlash, MsgResolveReportByJury, MsgOpenControllerTransferCase, MsgFinalizeControllerTransfer, MsgSubmitCheckpoint } from "./tx";
+import { MsgUpdateParams, MsgUpdateServiceTypeConfig, MsgRegisterOperator, MsgUpdateMetadata, MsgUnbondOperator, MsgClaimUnbondedBond, MsgTopUpBond, MsgWithdrawBond, MsgReportOperator, MsgResolveReport, MsgContestSlash, MsgResolveReportByJury, MsgOpenControllerTransferCase, MsgFinalizeControllerTransfer, MsgSubmitCheckpoint } from "./tx";
 export const AminoConverter = {
   "/sparkdream.service.v1.MsgUpdateParams": {
     aminoType: "sparkdream/x/service/MsgUpdateParams",
@@ -35,6 +35,11 @@ export const AminoConverter = {
     aminoType: "sparkdream/x/service/MsgTopUpBond",
     toAmino: MsgTopUpBond.toAmino,
     fromAmino: MsgTopUpBond.fromAmino
+  },
+  "/sparkdream.service.v1.MsgWithdrawBond": {
+    aminoType: "sparkdream/x/service/MsgWithdrawBond",
+    toAmino: MsgWithdrawBond.toAmino,
+    fromAmino: MsgWithdrawBond.fromAmino
   },
   "/sparkdream.service.v1.MsgReportOperator": {
     aminoType: "sparkdream/x/service/MsgReportOperator",

@@ -393,6 +393,78 @@ export interface MsgTopUpBondResponseAminoMsg {
   value: MsgTopUpBondResponseAmino;
 }
 /**
+ * MsgWithdrawBond queues `amount` of the operator's bond for withdrawal
+ * without leaving the service (§3.5a). Allowed only for ACTIVE operators,
+ * and only while bond - pending_withdraw_amount - amount >= min_bond, so the
+ * operator never drops out of ACTIVE through its own withdrawal. Calls are
+ * incremental: a second call adds to pending_withdraw_amount and resets the
+ * single withdraw_complete_at clock to now + unbonding_period_blocks. The
+ * SPARK stays in the module bond pool and remains slashable until the
+ * operator claims it with MsgClaimUnbondedBond after the clock elapses.
+ * MUST be signed by `operator` directly (not delegable).
+ * @name MsgWithdrawBond
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.MsgWithdrawBond
+ */
+export interface MsgWithdrawBond {
+  operator: string;
+  serviceType: string;
+  /**
+   * Amount to queue for withdrawal in the chain's bond denom.
+   */
+  amount: string;
+}
+export interface MsgWithdrawBondProtoMsg {
+  typeUrl: "/sparkdream.service.v1.MsgWithdrawBond";
+  value: Uint8Array;
+}
+/**
+ * MsgWithdrawBond queues `amount` of the operator's bond for withdrawal
+ * without leaving the service (§3.5a). Allowed only for ACTIVE operators,
+ * and only while bond - pending_withdraw_amount - amount >= min_bond, so the
+ * operator never drops out of ACTIVE through its own withdrawal. Calls are
+ * incremental: a second call adds to pending_withdraw_amount and resets the
+ * single withdraw_complete_at clock to now + unbonding_period_blocks. The
+ * SPARK stays in the module bond pool and remains slashable until the
+ * operator claims it with MsgClaimUnbondedBond after the clock elapses.
+ * MUST be signed by `operator` directly (not delegable).
+ * @name MsgWithdrawBondAmino
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.MsgWithdrawBond
+ */
+export interface MsgWithdrawBondAmino {
+  operator?: string;
+  service_type?: string;
+  /**
+   * Amount to queue for withdrawal in the chain's bond denom.
+   */
+  amount?: string;
+}
+export interface MsgWithdrawBondAminoMsg {
+  type: "sparkdream/x/service/MsgWithdrawBond";
+  value: MsgWithdrawBondAmino;
+}
+/**
+ * @name MsgWithdrawBondResponse
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.MsgWithdrawBondResponse
+ */
+export interface MsgWithdrawBondResponse {}
+export interface MsgWithdrawBondResponseProtoMsg {
+  typeUrl: "/sparkdream.service.v1.MsgWithdrawBondResponse";
+  value: Uint8Array;
+}
+/**
+ * @name MsgWithdrawBondResponseAmino
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.MsgWithdrawBondResponse
+ */
+export interface MsgWithdrawBondResponseAmino {}
+export interface MsgWithdrawBondResponseAminoMsg {
+  type: "/sparkdream.service.v1.MsgWithdrawBondResponse";
+  value: MsgWithdrawBondResponseAmino;
+}
+/**
  * MsgReportOperator files a new report. Reporter posts `report_deposit`
  * escrow at filing (§3.4.6). Rate-limited per
  * (reporter, operator, service_type).
@@ -1863,6 +1935,169 @@ export const MsgTopUpBondResponse = {
     return {
       typeUrl: "/sparkdream.service.v1.MsgTopUpBondResponse",
       value: MsgTopUpBondResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgWithdrawBond(): MsgWithdrawBond {
+  return {
+    operator: "",
+    serviceType: "",
+    amount: ""
+  };
+}
+/**
+ * MsgWithdrawBond queues `amount` of the operator's bond for withdrawal
+ * without leaving the service (§3.5a). Allowed only for ACTIVE operators,
+ * and only while bond - pending_withdraw_amount - amount >= min_bond, so the
+ * operator never drops out of ACTIVE through its own withdrawal. Calls are
+ * incremental: a second call adds to pending_withdraw_amount and resets the
+ * single withdraw_complete_at clock to now + unbonding_period_blocks. The
+ * SPARK stays in the module bond pool and remains slashable until the
+ * operator claims it with MsgClaimUnbondedBond after the clock elapses.
+ * MUST be signed by `operator` directly (not delegable).
+ * @name MsgWithdrawBond
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.MsgWithdrawBond
+ */
+export const MsgWithdrawBond = {
+  typeUrl: "/sparkdream.service.v1.MsgWithdrawBond",
+  aminoType: "sparkdream/x/service/MsgWithdrawBond",
+  encode(message: MsgWithdrawBond, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.operator !== "") {
+      writer.uint32(10).string(message.operator);
+    }
+    if (message.serviceType !== "") {
+      writer.uint32(18).string(message.serviceType);
+    }
+    if (message.amount !== "") {
+      writer.uint32(26).string(message.amount);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgWithdrawBond {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgWithdrawBond();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.operator = reader.string();
+          break;
+        case 2:
+          message.serviceType = reader.string();
+          break;
+        case 3:
+          message.amount = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgWithdrawBond>): MsgWithdrawBond {
+    const message = createBaseMsgWithdrawBond();
+    message.operator = object.operator ?? "";
+    message.serviceType = object.serviceType ?? "";
+    message.amount = object.amount ?? "";
+    return message;
+  },
+  fromAmino(object: MsgWithdrawBondAmino): MsgWithdrawBond {
+    const message = createBaseMsgWithdrawBond();
+    if (object.operator !== undefined && object.operator !== null) {
+      message.operator = object.operator;
+    }
+    if (object.service_type !== undefined && object.service_type !== null) {
+      message.serviceType = object.service_type;
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = object.amount;
+    }
+    return message;
+  },
+  toAmino(message: MsgWithdrawBond): MsgWithdrawBondAmino {
+    const obj: any = {};
+    obj.operator = message.operator === "" ? undefined : message.operator;
+    obj.service_type = message.serviceType === "" ? undefined : message.serviceType;
+    obj.amount = message.amount === "" ? undefined : message.amount;
+    return obj;
+  },
+  fromAminoMsg(object: MsgWithdrawBondAminoMsg): MsgWithdrawBond {
+    return MsgWithdrawBond.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgWithdrawBond): MsgWithdrawBondAminoMsg {
+    return {
+      type: "sparkdream/x/service/MsgWithdrawBond",
+      value: MsgWithdrawBond.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgWithdrawBondProtoMsg): MsgWithdrawBond {
+    return MsgWithdrawBond.decode(message.value);
+  },
+  toProto(message: MsgWithdrawBond): Uint8Array {
+    return MsgWithdrawBond.encode(message).finish();
+  },
+  toProtoMsg(message: MsgWithdrawBond): MsgWithdrawBondProtoMsg {
+    return {
+      typeUrl: "/sparkdream.service.v1.MsgWithdrawBond",
+      value: MsgWithdrawBond.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgWithdrawBondResponse(): MsgWithdrawBondResponse {
+  return {};
+}
+/**
+ * @name MsgWithdrawBondResponse
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.MsgWithdrawBondResponse
+ */
+export const MsgWithdrawBondResponse = {
+  typeUrl: "/sparkdream.service.v1.MsgWithdrawBondResponse",
+  encode(_: MsgWithdrawBondResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgWithdrawBondResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgWithdrawBondResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgWithdrawBondResponse>): MsgWithdrawBondResponse {
+    const message = createBaseMsgWithdrawBondResponse();
+    return message;
+  },
+  fromAmino(_: MsgWithdrawBondResponseAmino): MsgWithdrawBondResponse {
+    const message = createBaseMsgWithdrawBondResponse();
+    return message;
+  },
+  toAmino(_: MsgWithdrawBondResponse): MsgWithdrawBondResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgWithdrawBondResponseAminoMsg): MsgWithdrawBondResponse {
+    return MsgWithdrawBondResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgWithdrawBondResponseProtoMsg): MsgWithdrawBondResponse {
+    return MsgWithdrawBondResponse.decode(message.value);
+  },
+  toProto(message: MsgWithdrawBondResponse): Uint8Array {
+    return MsgWithdrawBondResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgWithdrawBondResponse): MsgWithdrawBondResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.service.v1.MsgWithdrawBondResponse",
+      value: MsgWithdrawBondResponse.encode(message).finish()
     };
   }
 };

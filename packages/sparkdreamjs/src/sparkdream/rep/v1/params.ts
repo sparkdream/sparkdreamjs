@@ -862,6 +862,14 @@ export interface Params {
   minInitiativeBountyContribution: string;
   maxInitiativeBountyContributions: number;
   initiativeBountyReclaimDelay: bigint;
+  /**
+   * invitation_acceptance_epochs is how many epochs a PENDING invitation
+   * stays open. Once it passes, the epoch-end sweep marks it EXPIRED,
+   * unlocks the inviter's staked DREAM, restores the spent invitation
+   * credit and frees the invitee address for a new invitation. 0 disables
+   * expiry.
+   */
+  invitationAcceptanceEpochs: bigint;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Params";
@@ -1637,6 +1645,14 @@ export interface ParamsAmino {
   min_initiative_bounty_contribution?: string;
   max_initiative_bounty_contributions?: number;
   initiative_bounty_reclaim_delay?: string;
+  /**
+   * invitation_acceptance_epochs is how many epochs a PENDING invitation
+   * stays open. Once it passes, the epoch-end sweep marks it EXPIRED,
+   * unlocks the inviter's staked DREAM, restores the spent invitation
+   * credit and frees the invitee address for a new invitation. 0 disables
+   * expiry.
+   */
+  invitation_acceptance_epochs?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/rep/Params";
@@ -2809,7 +2825,8 @@ function createBaseParams(): Params {
     maxInitiativeBountyPerFunderEpoch: "",
     minInitiativeBountyContribution: "",
     maxInitiativeBountyContributions: 0,
-    initiativeBountyReclaimDelay: BigInt(0)
+    initiativeBountyReclaimDelay: BigInt(0),
+    invitationAcceptanceEpochs: BigInt(0)
   };
 }
 /**
@@ -3266,6 +3283,9 @@ export const Params = {
     if (message.initiativeBountyReclaimDelay !== BigInt(0)) {
       writer.uint32(1184).uint64(message.initiativeBountyReclaimDelay);
     }
+    if (message.invitationAcceptanceEpochs !== BigInt(0)) {
+      writer.uint32(1192).int64(message.invitationAcceptanceEpochs);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -3719,6 +3739,9 @@ export const Params = {
         case 148:
           message.initiativeBountyReclaimDelay = reader.uint64();
           break;
+        case 149:
+          message.invitationAcceptanceEpochs = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3876,6 +3899,7 @@ export const Params = {
     message.minInitiativeBountyContribution = object.minInitiativeBountyContribution ?? "";
     message.maxInitiativeBountyContributions = object.maxInitiativeBountyContributions ?? 0;
     message.initiativeBountyReclaimDelay = object.initiativeBountyReclaimDelay !== undefined && object.initiativeBountyReclaimDelay !== null ? BigInt(object.initiativeBountyReclaimDelay.toString()) : BigInt(0);
+    message.invitationAcceptanceEpochs = object.invitationAcceptanceEpochs !== undefined && object.invitationAcceptanceEpochs !== null ? BigInt(object.invitationAcceptanceEpochs.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -4324,6 +4348,9 @@ export const Params = {
     if (object.initiative_bounty_reclaim_delay !== undefined && object.initiative_bounty_reclaim_delay !== null) {
       message.initiativeBountyReclaimDelay = BigInt(object.initiative_bounty_reclaim_delay);
     }
+    if (object.invitation_acceptance_epochs !== undefined && object.invitation_acceptance_epochs !== null) {
+      message.invitationAcceptanceEpochs = BigInt(object.invitation_acceptance_epochs);
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -4476,6 +4503,7 @@ export const Params = {
     obj.min_initiative_bounty_contribution = message.minInitiativeBountyContribution === "" ? undefined : message.minInitiativeBountyContribution;
     obj.max_initiative_bounty_contributions = message.maxInitiativeBountyContributions === 0 ? undefined : message.maxInitiativeBountyContributions;
     obj.initiative_bounty_reclaim_delay = message.initiativeBountyReclaimDelay !== BigInt(0) ? message.initiativeBountyReclaimDelay?.toString() : undefined;
+    obj.invitation_acceptance_epochs = message.invitationAcceptanceEpochs !== BigInt(0) ? message.invitationAcceptanceEpochs?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {
