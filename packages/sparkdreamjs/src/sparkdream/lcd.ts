@@ -196,6 +196,11 @@ export const createLCDClient = async ({
         v1: new (await import("./split/v1/query.lcd")).LCDQueryClient({
           requestClient
         })
+      },
+      vault: {
+        v1: new (await import("./vault/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
       }
     }
   };

@@ -1,5 +1,27 @@
 //@ts-nocheck
+// HAND-WRITTEN OVERRIDE — overlaid on top of the Telescope-generated tx.amino.ts
+// by scripts/codegen.ts after each codegen run. Do not let codegen wipe this.
+//
+// Why: Telescope's auto-generated toAmino emits `[]` for empty repeated fields
+// (the `if (message.field)` check is truthy for `[]` in JS), but
+// cosmossdk.io/x/tx/signing/aminojson on the chain side omits them per
+// `omitempty`. Whenever a repeated field happens to be empty, the JS side signs
+// `"field":[]` and the chain reconstructs without the key — sign bytes differ,
+// surfacing as "signature verification failed" / "unauthorized".
+//
+// Every season message with a repeated field not marked
+// `(amino.dont_omitempty) = true` is patched here to mirror aminojson's
+// omitempty (return `undefined` when empty). The rest of the converters pass
+// straight through to the auto-generated toAmino/fromAmino.
+//
+// MAINTENANCE: this map REPLACES the generated one wholesale, so it must list
+// every message in tx.proto. A message added to the proto but not added here
+// ends up with no amino converter at all, and amino (Ledger) signing for it
+// fails at runtime. When syncing protos, diff the message list in
+// protos/sparkdream/season/v1/tx.proto against the keys below.
+
 import { MsgUpdateParams, MsgUpdateOperationalParams, MsgSetDisplayName, MsgSetUsername, MsgSetDisplayTitle, MsgCreateGuild, MsgJoinGuild, MsgLeaveGuild, MsgTransferGuildFounder, MsgDissolveGuild, MsgPromoteToOfficer, MsgDemoteOfficer, MsgInviteToGuild, MsgAcceptGuildInvite, MsgRevokeGuildInvite, MsgSetGuildInviteOnly, MsgUpdateGuildDescription, MsgKickFromGuild, MsgClaimGuildFounder, MsgStartQuest, MsgClaimQuestReward, MsgAbandonQuest, MsgCreateQuest, MsgDeactivateQuest, MsgExtendSeason, MsgSetNextSeasonInfo, MsgAbortSeasonTransition, MsgRetrySeasonTransition, MsgSkipTransitionPhase, MsgReportDisplayName, MsgAppealDisplayNameModeration, MsgCreateAchievement, MsgUpdateAchievement, MsgDeleteAchievement, MsgCreateTitle, MsgUpdateTitle, MsgDeleteTitle, MsgUpdateQuest, MsgResolveDisplayNameAppeal, MsgResolveUnappealedModeration, MsgNominate, MsgStakeNomination, MsgUnstakeNomination } from "./tx";
+import { QuestObjective } from "./quest";
 export const AminoConverter = {
   "/sparkdream.season.v1.MsgUpdateParams": {
     aminoType: "sparkdream/x/season/MsgUpdateParams",
@@ -113,7 +135,27 @@ export const AminoConverter = {
   },
   "/sparkdream.season.v1.MsgCreateQuest": {
     aminoType: "sparkdream/x/season/MsgCreateQuest",
-    toAmino: MsgCreateQuest.toAmino,
+    toAmino(message: any): any {
+      const obj: any = {};
+      obj.authority = message.authority === "" ? undefined : message.authority;
+      obj.quest_id = message.questId === "" ? undefined : message.questId;
+      obj.name = message.name === "" ? undefined : message.name;
+      obj.description = message.description === "" ? undefined : message.description;
+      obj.xp_reward = message.xpReward !== BigInt(0) ? message.xpReward?.toString() : undefined;
+      obj.repeatable = message.repeatable === false ? undefined : message.repeatable;
+      obj.cooldown_epochs = message.cooldownEpochs !== BigInt(0) ? message.cooldownEpochs?.toString() : undefined;
+      obj.season = message.season !== BigInt(0) ? message.season?.toString() : undefined;
+      obj.start_block = message.startBlock !== BigInt(0) ? message.startBlock?.toString() : undefined;
+      obj.end_block = message.endBlock !== BigInt(0) ? message.endBlock?.toString() : undefined;
+      obj.min_level = message.minLevel !== BigInt(0) ? message.minLevel?.toString() : undefined;
+      obj.required_achievement = message.requiredAchievement === "" ? undefined : message.requiredAchievement;
+      obj.prerequisite_quest = message.prerequisiteQuest === "" ? undefined : message.prerequisiteQuest;
+      obj.quest_chain = message.questChain === "" ? undefined : message.questChain;
+      obj.objectives = (message.objectives?.length ?? 0) > 0
+        ? message.objectives.map((e: any) => e ? QuestObjective.toAmino(e) : undefined)
+        : undefined;
+      return obj;
+    },
     fromAmino: MsgCreateQuest.fromAmino
   },
   "/sparkdream.season.v1.MsgDeactivateQuest": {
@@ -188,7 +230,28 @@ export const AminoConverter = {
   },
   "/sparkdream.season.v1.MsgUpdateQuest": {
     aminoType: "sparkdream/x/season/MsgUpdateQuest",
-    toAmino: MsgUpdateQuest.toAmino,
+    toAmino(message: any): any {
+      const obj: any = {};
+      obj.authority = message.authority === "" ? undefined : message.authority;
+      obj.quest_id = message.questId === "" ? undefined : message.questId;
+      obj.name = message.name === "" ? undefined : message.name;
+      obj.description = message.description === "" ? undefined : message.description;
+      obj.xp_reward = message.xpReward !== BigInt(0) ? message.xpReward?.toString() : undefined;
+      obj.repeatable = message.repeatable === false ? undefined : message.repeatable;
+      obj.cooldown_epochs = message.cooldownEpochs !== BigInt(0) ? message.cooldownEpochs?.toString() : undefined;
+      obj.season = message.season !== BigInt(0) ? message.season?.toString() : undefined;
+      obj.start_block = message.startBlock !== BigInt(0) ? message.startBlock?.toString() : undefined;
+      obj.end_block = message.endBlock !== BigInt(0) ? message.endBlock?.toString() : undefined;
+      obj.min_level = message.minLevel !== BigInt(0) ? message.minLevel?.toString() : undefined;
+      obj.required_achievement = message.requiredAchievement === "" ? undefined : message.requiredAchievement;
+      obj.prerequisite_quest = message.prerequisiteQuest === "" ? undefined : message.prerequisiteQuest;
+      obj.quest_chain = message.questChain === "" ? undefined : message.questChain;
+      obj.active = message.active === false ? undefined : message.active;
+      obj.objectives = (message.objectives?.length ?? 0) > 0
+        ? message.objectives.map((e: any) => e ? QuestObjective.toAmino(e) : undefined)
+        : undefined;
+      return obj;
+    },
     fromAmino: MsgUpdateQuest.fromAmino
   },
   "/sparkdream.season.v1.MsgResolveDisplayNameAppeal": {

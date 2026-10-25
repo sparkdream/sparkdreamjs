@@ -1,11 +1,12 @@
 //@ts-nocheck
 import { Params, ParamsAmino } from "./params";
-import { Class, ClassAmino, Token, TokenAmino, PublicMintCountEntry, PublicMintCountEntryAmino, ReceivePolicyEntry, ReceivePolicyEntryAmino, PendingTransfer, PendingTransferAmino, PendingMint, PendingMintAmino, Listing, ListingAmino, PendingClassOwner, PendingClassOwnerAmino, HideRecord, HideRecordAmino, QueueCursor, QueueCursorAmino, SentinelDailyHideEntry, SentinelDailyHideEntryAmino } from "./types";
+import { Class, ClassAmino, Token, TokenAmino, PublicMintCountEntry, PublicMintCountEntryAmino, ReceivePolicyEntry, ReceivePolicyEntryAmino, PendingTransfer, PendingTransferAmino, PendingMint, PendingMintAmino, Listing, ListingAmino, PendingClassOwner, PendingClassOwnerAmino, HideRecord, HideRecordAmino, QueueCursor, QueueCursorAmino, SentinelDailyHideEntry, SentinelDailyHideEntryAmino, MediaProposal, MediaProposalAmino, Edition, EditionAmino, Balance, BalanceAmino, PendingUnits, PendingUnitsAmino, UnitListing, UnitListingAmino, CraftRecipe, CraftRecipeAmino, Rental, RentalAmino, RentalOffer, RentalOfferAmino, Offer, OfferAmino, Auction, AuctionAmino } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
  * GenesisState defines the artifact module's genesis state. Derived indexes
- * (owner indexes, inbox/outbox, counters, expiry indexes) are rebuilt on
+ * (owner indexes, inbox/outbox, counters, expiry indexes, the Children
+ * index, Harberger due dates, initiative certificates) are rebuilt on
  * import and never exported.
  * @name GenesisState
  * @package sparkdream.artifact.v1
@@ -30,6 +31,21 @@ export interface GenesisState {
   classCancelQueue: QueueCursor[];
   classScrubQueue: QueueCursor[];
   sentinelDailyHides: SentinelDailyHideEntry[];
+  mediaProposals: MediaProposal[];
+  classReleaseQueue: QueueCursor[];
+  editions: Edition[];
+  balances: Balance[];
+  pendingUnitSeq: bigint;
+  pendingUnits: PendingUnits[];
+  unitListingSeq: bigint;
+  unitListings: UnitListing[];
+  craftRecipes: CraftRecipe[];
+  rentals: Rental[];
+  rentalOffers: RentalOffer[];
+  offerSeq: bigint;
+  offers: Offer[];
+  auctionSeq: bigint;
+  auctions: Auction[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.artifact.v1.GenesisState";
@@ -37,7 +53,8 @@ export interface GenesisStateProtoMsg {
 }
 /**
  * GenesisState defines the artifact module's genesis state. Derived indexes
- * (owner indexes, inbox/outbox, counters, expiry indexes) are rebuilt on
+ * (owner indexes, inbox/outbox, counters, expiry indexes, the Children
+ * index, Harberger due dates, initiative certificates) are rebuilt on
  * import and never exported.
  * @name GenesisStateAmino
  * @package sparkdream.artifact.v1
@@ -62,6 +79,21 @@ export interface GenesisStateAmino {
   class_cancel_queue?: QueueCursorAmino[];
   class_scrub_queue?: QueueCursorAmino[];
   sentinel_daily_hides?: SentinelDailyHideEntryAmino[];
+  media_proposals?: MediaProposalAmino[];
+  class_release_queue?: QueueCursorAmino[];
+  editions?: EditionAmino[];
+  balances?: BalanceAmino[];
+  pending_unit_seq?: string;
+  pending_units?: PendingUnitsAmino[];
+  unit_listing_seq?: string;
+  unit_listings?: UnitListingAmino[];
+  craft_recipes?: CraftRecipeAmino[];
+  rentals?: RentalAmino[];
+  rental_offers?: RentalOfferAmino[];
+  offer_seq?: string;
+  offers?: OfferAmino[];
+  auction_seq?: string;
+  auctions?: AuctionAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.artifact.v1.GenesisState";
@@ -83,12 +115,28 @@ function createBaseGenesisState(): GenesisState {
     hideRecords: [],
     classCancelQueue: [],
     classScrubQueue: [],
-    sentinelDailyHides: []
+    sentinelDailyHides: [],
+    mediaProposals: [],
+    classReleaseQueue: [],
+    editions: [],
+    balances: [],
+    pendingUnitSeq: BigInt(0),
+    pendingUnits: [],
+    unitListingSeq: BigInt(0),
+    unitListings: [],
+    craftRecipes: [],
+    rentals: [],
+    rentalOffers: [],
+    offerSeq: BigInt(0),
+    offers: [],
+    auctionSeq: BigInt(0),
+    auctions: []
   };
 }
 /**
  * GenesisState defines the artifact module's genesis state. Derived indexes
- * (owner indexes, inbox/outbox, counters, expiry indexes) are rebuilt on
+ * (owner indexes, inbox/outbox, counters, expiry indexes, the Children
+ * index, Harberger due dates, initiative certificates) are rebuilt on
  * import and never exported.
  * @name GenesisState
  * @package sparkdream.artifact.v1
@@ -141,6 +189,51 @@ export const GenesisState = {
     }
     for (const v of message.sentinelDailyHides) {
       SentinelDailyHideEntry.encode(v!, writer.uint32(122).fork()).ldelim();
+    }
+    for (const v of message.mediaProposals) {
+      MediaProposal.encode(v!, writer.uint32(130).fork()).ldelim();
+    }
+    for (const v of message.classReleaseQueue) {
+      QueueCursor.encode(v!, writer.uint32(138).fork()).ldelim();
+    }
+    for (const v of message.editions) {
+      Edition.encode(v!, writer.uint32(146).fork()).ldelim();
+    }
+    for (const v of message.balances) {
+      Balance.encode(v!, writer.uint32(154).fork()).ldelim();
+    }
+    if (message.pendingUnitSeq !== BigInt(0)) {
+      writer.uint32(160).uint64(message.pendingUnitSeq);
+    }
+    for (const v of message.pendingUnits) {
+      PendingUnits.encode(v!, writer.uint32(170).fork()).ldelim();
+    }
+    if (message.unitListingSeq !== BigInt(0)) {
+      writer.uint32(176).uint64(message.unitListingSeq);
+    }
+    for (const v of message.unitListings) {
+      UnitListing.encode(v!, writer.uint32(186).fork()).ldelim();
+    }
+    for (const v of message.craftRecipes) {
+      CraftRecipe.encode(v!, writer.uint32(194).fork()).ldelim();
+    }
+    for (const v of message.rentals) {
+      Rental.encode(v!, writer.uint32(202).fork()).ldelim();
+    }
+    for (const v of message.rentalOffers) {
+      RentalOffer.encode(v!, writer.uint32(210).fork()).ldelim();
+    }
+    if (message.offerSeq !== BigInt(0)) {
+      writer.uint32(216).uint64(message.offerSeq);
+    }
+    for (const v of message.offers) {
+      Offer.encode(v!, writer.uint32(226).fork()).ldelim();
+    }
+    if (message.auctionSeq !== BigInt(0)) {
+      writer.uint32(232).uint64(message.auctionSeq);
+    }
+    for (const v of message.auctions) {
+      Auction.encode(v!, writer.uint32(242).fork()).ldelim();
     }
     return writer;
   },
@@ -196,6 +289,51 @@ export const GenesisState = {
         case 15:
           message.sentinelDailyHides.push(SentinelDailyHideEntry.decode(reader, reader.uint32()));
           break;
+        case 16:
+          message.mediaProposals.push(MediaProposal.decode(reader, reader.uint32()));
+          break;
+        case 17:
+          message.classReleaseQueue.push(QueueCursor.decode(reader, reader.uint32()));
+          break;
+        case 18:
+          message.editions.push(Edition.decode(reader, reader.uint32()));
+          break;
+        case 19:
+          message.balances.push(Balance.decode(reader, reader.uint32()));
+          break;
+        case 20:
+          message.pendingUnitSeq = reader.uint64();
+          break;
+        case 21:
+          message.pendingUnits.push(PendingUnits.decode(reader, reader.uint32()));
+          break;
+        case 22:
+          message.unitListingSeq = reader.uint64();
+          break;
+        case 23:
+          message.unitListings.push(UnitListing.decode(reader, reader.uint32()));
+          break;
+        case 24:
+          message.craftRecipes.push(CraftRecipe.decode(reader, reader.uint32()));
+          break;
+        case 25:
+          message.rentals.push(Rental.decode(reader, reader.uint32()));
+          break;
+        case 26:
+          message.rentalOffers.push(RentalOffer.decode(reader, reader.uint32()));
+          break;
+        case 27:
+          message.offerSeq = reader.uint64();
+          break;
+        case 28:
+          message.offers.push(Offer.decode(reader, reader.uint32()));
+          break;
+        case 29:
+          message.auctionSeq = reader.uint64();
+          break;
+        case 30:
+          message.auctions.push(Auction.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -220,6 +358,21 @@ export const GenesisState = {
     message.classCancelQueue = object.classCancelQueue?.map(e => QueueCursor.fromPartial(e)) || [];
     message.classScrubQueue = object.classScrubQueue?.map(e => QueueCursor.fromPartial(e)) || [];
     message.sentinelDailyHides = object.sentinelDailyHides?.map(e => SentinelDailyHideEntry.fromPartial(e)) || [];
+    message.mediaProposals = object.mediaProposals?.map(e => MediaProposal.fromPartial(e)) || [];
+    message.classReleaseQueue = object.classReleaseQueue?.map(e => QueueCursor.fromPartial(e)) || [];
+    message.editions = object.editions?.map(e => Edition.fromPartial(e)) || [];
+    message.balances = object.balances?.map(e => Balance.fromPartial(e)) || [];
+    message.pendingUnitSeq = object.pendingUnitSeq !== undefined && object.pendingUnitSeq !== null ? BigInt(object.pendingUnitSeq.toString()) : BigInt(0);
+    message.pendingUnits = object.pendingUnits?.map(e => PendingUnits.fromPartial(e)) || [];
+    message.unitListingSeq = object.unitListingSeq !== undefined && object.unitListingSeq !== null ? BigInt(object.unitListingSeq.toString()) : BigInt(0);
+    message.unitListings = object.unitListings?.map(e => UnitListing.fromPartial(e)) || [];
+    message.craftRecipes = object.craftRecipes?.map(e => CraftRecipe.fromPartial(e)) || [];
+    message.rentals = object.rentals?.map(e => Rental.fromPartial(e)) || [];
+    message.rentalOffers = object.rentalOffers?.map(e => RentalOffer.fromPartial(e)) || [];
+    message.offerSeq = object.offerSeq !== undefined && object.offerSeq !== null ? BigInt(object.offerSeq.toString()) : BigInt(0);
+    message.offers = object.offers?.map(e => Offer.fromPartial(e)) || [];
+    message.auctionSeq = object.auctionSeq !== undefined && object.auctionSeq !== null ? BigInt(object.auctionSeq.toString()) : BigInt(0);
+    message.auctions = object.auctions?.map(e => Auction.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -245,6 +398,29 @@ export const GenesisState = {
     message.classCancelQueue = object.class_cancel_queue?.map(e => QueueCursor.fromAmino(e)) || [];
     message.classScrubQueue = object.class_scrub_queue?.map(e => QueueCursor.fromAmino(e)) || [];
     message.sentinelDailyHides = object.sentinel_daily_hides?.map(e => SentinelDailyHideEntry.fromAmino(e)) || [];
+    message.mediaProposals = object.media_proposals?.map(e => MediaProposal.fromAmino(e)) || [];
+    message.classReleaseQueue = object.class_release_queue?.map(e => QueueCursor.fromAmino(e)) || [];
+    message.editions = object.editions?.map(e => Edition.fromAmino(e)) || [];
+    message.balances = object.balances?.map(e => Balance.fromAmino(e)) || [];
+    if (object.pending_unit_seq !== undefined && object.pending_unit_seq !== null) {
+      message.pendingUnitSeq = BigInt(object.pending_unit_seq);
+    }
+    message.pendingUnits = object.pending_units?.map(e => PendingUnits.fromAmino(e)) || [];
+    if (object.unit_listing_seq !== undefined && object.unit_listing_seq !== null) {
+      message.unitListingSeq = BigInt(object.unit_listing_seq);
+    }
+    message.unitListings = object.unit_listings?.map(e => UnitListing.fromAmino(e)) || [];
+    message.craftRecipes = object.craft_recipes?.map(e => CraftRecipe.fromAmino(e)) || [];
+    message.rentals = object.rentals?.map(e => Rental.fromAmino(e)) || [];
+    message.rentalOffers = object.rental_offers?.map(e => RentalOffer.fromAmino(e)) || [];
+    if (object.offer_seq !== undefined && object.offer_seq !== null) {
+      message.offerSeq = BigInt(object.offer_seq);
+    }
+    message.offers = object.offers?.map(e => Offer.fromAmino(e)) || [];
+    if (object.auction_seq !== undefined && object.auction_seq !== null) {
+      message.auctionSeq = BigInt(object.auction_seq);
+    }
+    message.auctions = object.auctions?.map(e => Auction.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -311,6 +487,65 @@ export const GenesisState = {
       obj.sentinel_daily_hides = message.sentinelDailyHides.map(e => e ? SentinelDailyHideEntry.toAmino(e) : undefined);
     } else {
       obj.sentinel_daily_hides = message.sentinelDailyHides;
+    }
+    if (message.mediaProposals) {
+      obj.media_proposals = message.mediaProposals.map(e => e ? MediaProposal.toAmino(e) : undefined);
+    } else {
+      obj.media_proposals = message.mediaProposals;
+    }
+    if (message.classReleaseQueue) {
+      obj.class_release_queue = message.classReleaseQueue.map(e => e ? QueueCursor.toAmino(e) : undefined);
+    } else {
+      obj.class_release_queue = message.classReleaseQueue;
+    }
+    if (message.editions) {
+      obj.editions = message.editions.map(e => e ? Edition.toAmino(e) : undefined);
+    } else {
+      obj.editions = message.editions;
+    }
+    if (message.balances) {
+      obj.balances = message.balances.map(e => e ? Balance.toAmino(e) : undefined);
+    } else {
+      obj.balances = message.balances;
+    }
+    obj.pending_unit_seq = message.pendingUnitSeq !== BigInt(0) ? message.pendingUnitSeq?.toString() : undefined;
+    if (message.pendingUnits) {
+      obj.pending_units = message.pendingUnits.map(e => e ? PendingUnits.toAmino(e) : undefined);
+    } else {
+      obj.pending_units = message.pendingUnits;
+    }
+    obj.unit_listing_seq = message.unitListingSeq !== BigInt(0) ? message.unitListingSeq?.toString() : undefined;
+    if (message.unitListings) {
+      obj.unit_listings = message.unitListings.map(e => e ? UnitListing.toAmino(e) : undefined);
+    } else {
+      obj.unit_listings = message.unitListings;
+    }
+    if (message.craftRecipes) {
+      obj.craft_recipes = message.craftRecipes.map(e => e ? CraftRecipe.toAmino(e) : undefined);
+    } else {
+      obj.craft_recipes = message.craftRecipes;
+    }
+    if (message.rentals) {
+      obj.rentals = message.rentals.map(e => e ? Rental.toAmino(e) : undefined);
+    } else {
+      obj.rentals = message.rentals;
+    }
+    if (message.rentalOffers) {
+      obj.rental_offers = message.rentalOffers.map(e => e ? RentalOffer.toAmino(e) : undefined);
+    } else {
+      obj.rental_offers = message.rentalOffers;
+    }
+    obj.offer_seq = message.offerSeq !== BigInt(0) ? message.offerSeq?.toString() : undefined;
+    if (message.offers) {
+      obj.offers = message.offers.map(e => e ? Offer.toAmino(e) : undefined);
+    } else {
+      obj.offers = message.offers;
+    }
+    obj.auction_seq = message.auctionSeq !== BigInt(0) ? message.auctionSeq?.toString() : undefined;
+    if (message.auctions) {
+      obj.auctions = message.auctions.map(e => e ? Auction.toAmino(e) : undefined);
+    } else {
+      obj.auctions = message.auctions;
     }
     return obj;
   },

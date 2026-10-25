@@ -16,6 +16,7 @@ import {
   MsgIncreaseBounty, MsgCancelBounty, MsgAssignBountyToReply, MsgPinReply,
   MsgUnpinReply, MsgDisputePin, MsgMarkAcceptedReply, MsgConfirmProposedReply,
   MsgRejectProposedReply, MsgSetForumPaused, MsgSetModerationPaused,
+  MsgMakePostPermanent, MsgStakePostConviction, MsgReleasePostConviction, MsgSetThreadProposalsLock,
 } from "./tx";
 
 export const AminoConverter = {
@@ -221,5 +222,25 @@ export const AminoConverter = {
     aminoType: "sparkdream/x/forum/MsgSetModerationPaused",
     toAmino: MsgSetModerationPaused.toAmino,
     fromAmino: MsgSetModerationPaused.fromAmino,
+  },
+  "/sparkdream.forum.v1.MsgMakePostPermanent": {
+    aminoType: "sparkdream/x/forum/MsgMakePostPermanent",
+    toAmino: MsgMakePostPermanent.toAmino,
+    fromAmino: MsgMakePostPermanent.fromAmino,
+  },
+  "/sparkdream.forum.v1.MsgStakePostConviction": {
+    aminoType: "sparkdream/x/forum/MsgStakePostConviction",
+    toAmino: MsgStakePostConviction.toAmino,
+    fromAmino: MsgStakePostConviction.fromAmino,
+  },
+  "/sparkdream.forum.v1.MsgReleasePostConviction": {
+    aminoType: "sparkdream/x/forum/MsgReleasePostConviction",
+    toAmino: MsgReleasePostConviction.toAmino,
+    fromAmino: MsgReleasePostConviction.fromAmino,
+  },
+  "/sparkdream.forum.v1.MsgSetThreadProposalsLock": {
+    aminoType: "sparkdream/x/forum/MsgSetThreadProposalsLock",
+    toAmino: MsgSetThreadProposalsLock.toAmino,
+    fromAmino: MsgSetThreadProposalsLock.fromAmino,
   },
 };

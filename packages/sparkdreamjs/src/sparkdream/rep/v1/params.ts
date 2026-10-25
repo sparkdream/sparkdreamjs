@@ -870,6 +870,93 @@ export interface Params {
    * expiry.
    */
   invitationAcceptanceEpochs: bigint;
+  /**
+   * migration_enabled is the master switch for every migration path.
+   */
+  migrationEnabled: boolean;
+  /**
+   * key_path_enabled is the "Q-day switch": governance flips it off if the
+   * account signature scheme is considered broken. Recovery and council
+   * migrations keep working.
+   */
+  keyPathEnabled: boolean;
+  /**
+   * key_migration_delay is the seconds between the new address accepting a
+   * KEY migration and finalization (default 7 days).
+   */
+  keyMigrationDelay: bigint;
+  /**
+   * recovery_migration_delay is the same for RECOVERY migrations (default
+   * 2 days).
+   */
+  recoveryMigrationDelay: bigint;
+  /**
+   * council_migration_delay is the same for COUNCIL migrations (default 21
+   * days); the window in which the old address may object.
+   */
+  councilMigrationDelay: bigint;
+  /**
+   * migration_accept_window is the seconds the new address has to accept a
+   * requested migration before it expires (default 7 days, so a multisig
+   * can collect signatures).
+   */
+  migrationAcceptWindow: bigint;
+  /**
+   * migration_cooldown is the seconds after a migration before the member
+   * may request another KEY migration (default 30 days). Recovery and
+   * council migrations are exempt.
+   */
+  migrationCooldown: bigint;
+  /**
+   * max_key_migrations_per_window caps KEY migrations finalized within
+   * key_migration_window (default 2): a rolling window, not a lifetime cap.
+   */
+  maxKeyMigrationsPerWindow: number;
+  /**
+   * key_migration_window is the rolling window in seconds (default 365
+   * days). Validated >= 2 * migration_cooldown.
+   */
+  keyMigrationWindow: bigint;
+  /**
+   * recovery_change_delay is the seconds a commitment set, replaced or
+   * removed by an existing member waits before it takes effect (default
+   * 30 days). Longer than the KEY-path delay, so the recovery path can not
+   * be used as a faster key path by whoever holds the key.
+   */
+  recoveryChangeDelay: bigint;
+  /**
+   * recovery_reveal_min_blocks is the minimum age of the sealed commit at
+   * reveal (default 20 blocks): the front-running guard.
+   */
+  recoveryRevealMinBlocks: bigint;
+  /**
+   * recovery_commit_ttl is the seconds a sealed commit lives before it
+   * expires and its deposit is burned (default 7 days).
+   */
+  recoveryCommitTtl: bigint;
+  /**
+   * recovery_commit_deposit is the SPARK (micro-denom) locked with a sealed
+   * commit; refunded on a successful reveal, burned on expiry (default 1
+   * SPARK). MsgCommitRecovery is the only permissionless write on the
+   * path, so spam has to lock capital.
+   */
+  recoveryCommitDeposit: string;
+  /**
+   * migration_objection_bond is the SPARK (micro-denom) the old address
+   * posts with MsgObjectMigration (default 10 SPARK, the appeal bond). Paid
+   * to the new address if the jury upholds the migration, refunded if the
+   * objector wins; never burned, because on the stolen-key path it is the
+   * victim's SPARK.
+   */
+  migrationObjectionBond: string;
+  /**
+   * zk_key_activation_delay is the epochs a changed ZK public key waits
+   * before its leaf enters the trust tree (default 14). It must exceed every
+   * MESSAGE_FIELD action window (council voting periods, challenge and
+   * arbiter windows) so one member cannot act twice on one target with two
+   * keys. x/commons refuses voting periods longer than it.
+   */
+  zkKeyActivationDelay: bigint;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Params";
@@ -1653,6 +1740,93 @@ export interface ParamsAmino {
    * expiry.
    */
   invitation_acceptance_epochs?: string;
+  /**
+   * migration_enabled is the master switch for every migration path.
+   */
+  migration_enabled?: boolean;
+  /**
+   * key_path_enabled is the "Q-day switch": governance flips it off if the
+   * account signature scheme is considered broken. Recovery and council
+   * migrations keep working.
+   */
+  key_path_enabled?: boolean;
+  /**
+   * key_migration_delay is the seconds between the new address accepting a
+   * KEY migration and finalization (default 7 days).
+   */
+  key_migration_delay?: string;
+  /**
+   * recovery_migration_delay is the same for RECOVERY migrations (default
+   * 2 days).
+   */
+  recovery_migration_delay?: string;
+  /**
+   * council_migration_delay is the same for COUNCIL migrations (default 21
+   * days); the window in which the old address may object.
+   */
+  council_migration_delay?: string;
+  /**
+   * migration_accept_window is the seconds the new address has to accept a
+   * requested migration before it expires (default 7 days, so a multisig
+   * can collect signatures).
+   */
+  migration_accept_window?: string;
+  /**
+   * migration_cooldown is the seconds after a migration before the member
+   * may request another KEY migration (default 30 days). Recovery and
+   * council migrations are exempt.
+   */
+  migration_cooldown?: string;
+  /**
+   * max_key_migrations_per_window caps KEY migrations finalized within
+   * key_migration_window (default 2): a rolling window, not a lifetime cap.
+   */
+  max_key_migrations_per_window?: number;
+  /**
+   * key_migration_window is the rolling window in seconds (default 365
+   * days). Validated >= 2 * migration_cooldown.
+   */
+  key_migration_window?: string;
+  /**
+   * recovery_change_delay is the seconds a commitment set, replaced or
+   * removed by an existing member waits before it takes effect (default
+   * 30 days). Longer than the KEY-path delay, so the recovery path can not
+   * be used as a faster key path by whoever holds the key.
+   */
+  recovery_change_delay?: string;
+  /**
+   * recovery_reveal_min_blocks is the minimum age of the sealed commit at
+   * reveal (default 20 blocks): the front-running guard.
+   */
+  recovery_reveal_min_blocks?: string;
+  /**
+   * recovery_commit_ttl is the seconds a sealed commit lives before it
+   * expires and its deposit is burned (default 7 days).
+   */
+  recovery_commit_ttl?: string;
+  /**
+   * recovery_commit_deposit is the SPARK (micro-denom) locked with a sealed
+   * commit; refunded on a successful reveal, burned on expiry (default 1
+   * SPARK). MsgCommitRecovery is the only permissionless write on the
+   * path, so spam has to lock capital.
+   */
+  recovery_commit_deposit?: string;
+  /**
+   * migration_objection_bond is the SPARK (micro-denom) the old address
+   * posts with MsgObjectMigration (default 10 SPARK, the appeal bond). Paid
+   * to the new address if the jury upholds the migration, refunded if the
+   * objector wins; never burned, because on the stolen-key path it is the
+   * victim's SPARK.
+   */
+  migration_objection_bond?: string;
+  /**
+   * zk_key_activation_delay is the epochs a changed ZK public key waits
+   * before its leaf enters the trust tree (default 14). It must exceed every
+   * MESSAGE_FIELD action window (council voting periods, challenge and
+   * arbiter windows) so one member cannot act twice on one target with two
+   * keys. x/commons refuses voting periods longer than it.
+   */
+  zk_key_activation_delay?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/rep/Params";
@@ -2826,7 +3000,22 @@ function createBaseParams(): Params {
     minInitiativeBountyContribution: "",
     maxInitiativeBountyContributions: 0,
     initiativeBountyReclaimDelay: BigInt(0),
-    invitationAcceptanceEpochs: BigInt(0)
+    invitationAcceptanceEpochs: BigInt(0),
+    migrationEnabled: false,
+    keyPathEnabled: false,
+    keyMigrationDelay: BigInt(0),
+    recoveryMigrationDelay: BigInt(0),
+    councilMigrationDelay: BigInt(0),
+    migrationAcceptWindow: BigInt(0),
+    migrationCooldown: BigInt(0),
+    maxKeyMigrationsPerWindow: 0,
+    keyMigrationWindow: BigInt(0),
+    recoveryChangeDelay: BigInt(0),
+    recoveryRevealMinBlocks: BigInt(0),
+    recoveryCommitTtl: BigInt(0),
+    recoveryCommitDeposit: "",
+    migrationObjectionBond: "",
+    zkKeyActivationDelay: BigInt(0)
   };
 }
 /**
@@ -3286,6 +3475,51 @@ export const Params = {
     if (message.invitationAcceptanceEpochs !== BigInt(0)) {
       writer.uint32(1192).int64(message.invitationAcceptanceEpochs);
     }
+    if (message.migrationEnabled === true) {
+      writer.uint32(1200).bool(message.migrationEnabled);
+    }
+    if (message.keyPathEnabled === true) {
+      writer.uint32(1208).bool(message.keyPathEnabled);
+    }
+    if (message.keyMigrationDelay !== BigInt(0)) {
+      writer.uint32(1216).int64(message.keyMigrationDelay);
+    }
+    if (message.recoveryMigrationDelay !== BigInt(0)) {
+      writer.uint32(1224).int64(message.recoveryMigrationDelay);
+    }
+    if (message.councilMigrationDelay !== BigInt(0)) {
+      writer.uint32(1232).int64(message.councilMigrationDelay);
+    }
+    if (message.migrationAcceptWindow !== BigInt(0)) {
+      writer.uint32(1240).int64(message.migrationAcceptWindow);
+    }
+    if (message.migrationCooldown !== BigInt(0)) {
+      writer.uint32(1248).int64(message.migrationCooldown);
+    }
+    if (message.maxKeyMigrationsPerWindow !== 0) {
+      writer.uint32(1256).uint32(message.maxKeyMigrationsPerWindow);
+    }
+    if (message.keyMigrationWindow !== BigInt(0)) {
+      writer.uint32(1264).int64(message.keyMigrationWindow);
+    }
+    if (message.recoveryChangeDelay !== BigInt(0)) {
+      writer.uint32(1272).int64(message.recoveryChangeDelay);
+    }
+    if (message.recoveryRevealMinBlocks !== BigInt(0)) {
+      writer.uint32(1280).int64(message.recoveryRevealMinBlocks);
+    }
+    if (message.recoveryCommitTtl !== BigInt(0)) {
+      writer.uint32(1288).int64(message.recoveryCommitTtl);
+    }
+    if (message.recoveryCommitDeposit !== "") {
+      writer.uint32(1298).string(message.recoveryCommitDeposit);
+    }
+    if (message.migrationObjectionBond !== "") {
+      writer.uint32(1306).string(message.migrationObjectionBond);
+    }
+    if (message.zkKeyActivationDelay !== BigInt(0)) {
+      writer.uint32(1312).int64(message.zkKeyActivationDelay);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -3742,6 +3976,51 @@ export const Params = {
         case 149:
           message.invitationAcceptanceEpochs = reader.int64();
           break;
+        case 150:
+          message.migrationEnabled = reader.bool();
+          break;
+        case 151:
+          message.keyPathEnabled = reader.bool();
+          break;
+        case 152:
+          message.keyMigrationDelay = reader.int64();
+          break;
+        case 153:
+          message.recoveryMigrationDelay = reader.int64();
+          break;
+        case 154:
+          message.councilMigrationDelay = reader.int64();
+          break;
+        case 155:
+          message.migrationAcceptWindow = reader.int64();
+          break;
+        case 156:
+          message.migrationCooldown = reader.int64();
+          break;
+        case 157:
+          message.maxKeyMigrationsPerWindow = reader.uint32();
+          break;
+        case 158:
+          message.keyMigrationWindow = reader.int64();
+          break;
+        case 159:
+          message.recoveryChangeDelay = reader.int64();
+          break;
+        case 160:
+          message.recoveryRevealMinBlocks = reader.int64();
+          break;
+        case 161:
+          message.recoveryCommitTtl = reader.int64();
+          break;
+        case 162:
+          message.recoveryCommitDeposit = reader.string();
+          break;
+        case 163:
+          message.migrationObjectionBond = reader.string();
+          break;
+        case 164:
+          message.zkKeyActivationDelay = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3900,6 +4179,21 @@ export const Params = {
     message.maxInitiativeBountyContributions = object.maxInitiativeBountyContributions ?? 0;
     message.initiativeBountyReclaimDelay = object.initiativeBountyReclaimDelay !== undefined && object.initiativeBountyReclaimDelay !== null ? BigInt(object.initiativeBountyReclaimDelay.toString()) : BigInt(0);
     message.invitationAcceptanceEpochs = object.invitationAcceptanceEpochs !== undefined && object.invitationAcceptanceEpochs !== null ? BigInt(object.invitationAcceptanceEpochs.toString()) : BigInt(0);
+    message.migrationEnabled = object.migrationEnabled ?? false;
+    message.keyPathEnabled = object.keyPathEnabled ?? false;
+    message.keyMigrationDelay = object.keyMigrationDelay !== undefined && object.keyMigrationDelay !== null ? BigInt(object.keyMigrationDelay.toString()) : BigInt(0);
+    message.recoveryMigrationDelay = object.recoveryMigrationDelay !== undefined && object.recoveryMigrationDelay !== null ? BigInt(object.recoveryMigrationDelay.toString()) : BigInt(0);
+    message.councilMigrationDelay = object.councilMigrationDelay !== undefined && object.councilMigrationDelay !== null ? BigInt(object.councilMigrationDelay.toString()) : BigInt(0);
+    message.migrationAcceptWindow = object.migrationAcceptWindow !== undefined && object.migrationAcceptWindow !== null ? BigInt(object.migrationAcceptWindow.toString()) : BigInt(0);
+    message.migrationCooldown = object.migrationCooldown !== undefined && object.migrationCooldown !== null ? BigInt(object.migrationCooldown.toString()) : BigInt(0);
+    message.maxKeyMigrationsPerWindow = object.maxKeyMigrationsPerWindow ?? 0;
+    message.keyMigrationWindow = object.keyMigrationWindow !== undefined && object.keyMigrationWindow !== null ? BigInt(object.keyMigrationWindow.toString()) : BigInt(0);
+    message.recoveryChangeDelay = object.recoveryChangeDelay !== undefined && object.recoveryChangeDelay !== null ? BigInt(object.recoveryChangeDelay.toString()) : BigInt(0);
+    message.recoveryRevealMinBlocks = object.recoveryRevealMinBlocks !== undefined && object.recoveryRevealMinBlocks !== null ? BigInt(object.recoveryRevealMinBlocks.toString()) : BigInt(0);
+    message.recoveryCommitTtl = object.recoveryCommitTtl !== undefined && object.recoveryCommitTtl !== null ? BigInt(object.recoveryCommitTtl.toString()) : BigInt(0);
+    message.recoveryCommitDeposit = object.recoveryCommitDeposit ?? "";
+    message.migrationObjectionBond = object.migrationObjectionBond ?? "";
+    message.zkKeyActivationDelay = object.zkKeyActivationDelay !== undefined && object.zkKeyActivationDelay !== null ? BigInt(object.zkKeyActivationDelay.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -4351,6 +4645,51 @@ export const Params = {
     if (object.invitation_acceptance_epochs !== undefined && object.invitation_acceptance_epochs !== null) {
       message.invitationAcceptanceEpochs = BigInt(object.invitation_acceptance_epochs);
     }
+    if (object.migration_enabled !== undefined && object.migration_enabled !== null) {
+      message.migrationEnabled = object.migration_enabled;
+    }
+    if (object.key_path_enabled !== undefined && object.key_path_enabled !== null) {
+      message.keyPathEnabled = object.key_path_enabled;
+    }
+    if (object.key_migration_delay !== undefined && object.key_migration_delay !== null) {
+      message.keyMigrationDelay = BigInt(object.key_migration_delay);
+    }
+    if (object.recovery_migration_delay !== undefined && object.recovery_migration_delay !== null) {
+      message.recoveryMigrationDelay = BigInt(object.recovery_migration_delay);
+    }
+    if (object.council_migration_delay !== undefined && object.council_migration_delay !== null) {
+      message.councilMigrationDelay = BigInt(object.council_migration_delay);
+    }
+    if (object.migration_accept_window !== undefined && object.migration_accept_window !== null) {
+      message.migrationAcceptWindow = BigInt(object.migration_accept_window);
+    }
+    if (object.migration_cooldown !== undefined && object.migration_cooldown !== null) {
+      message.migrationCooldown = BigInt(object.migration_cooldown);
+    }
+    if (object.max_key_migrations_per_window !== undefined && object.max_key_migrations_per_window !== null) {
+      message.maxKeyMigrationsPerWindow = object.max_key_migrations_per_window;
+    }
+    if (object.key_migration_window !== undefined && object.key_migration_window !== null) {
+      message.keyMigrationWindow = BigInt(object.key_migration_window);
+    }
+    if (object.recovery_change_delay !== undefined && object.recovery_change_delay !== null) {
+      message.recoveryChangeDelay = BigInt(object.recovery_change_delay);
+    }
+    if (object.recovery_reveal_min_blocks !== undefined && object.recovery_reveal_min_blocks !== null) {
+      message.recoveryRevealMinBlocks = BigInt(object.recovery_reveal_min_blocks);
+    }
+    if (object.recovery_commit_ttl !== undefined && object.recovery_commit_ttl !== null) {
+      message.recoveryCommitTtl = BigInt(object.recovery_commit_ttl);
+    }
+    if (object.recovery_commit_deposit !== undefined && object.recovery_commit_deposit !== null) {
+      message.recoveryCommitDeposit = object.recovery_commit_deposit;
+    }
+    if (object.migration_objection_bond !== undefined && object.migration_objection_bond !== null) {
+      message.migrationObjectionBond = object.migration_objection_bond;
+    }
+    if (object.zk_key_activation_delay !== undefined && object.zk_key_activation_delay !== null) {
+      message.zkKeyActivationDelay = BigInt(object.zk_key_activation_delay);
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -4504,6 +4843,21 @@ export const Params = {
     obj.max_initiative_bounty_contributions = message.maxInitiativeBountyContributions === 0 ? undefined : message.maxInitiativeBountyContributions;
     obj.initiative_bounty_reclaim_delay = message.initiativeBountyReclaimDelay !== BigInt(0) ? message.initiativeBountyReclaimDelay?.toString() : undefined;
     obj.invitation_acceptance_epochs = message.invitationAcceptanceEpochs !== BigInt(0) ? message.invitationAcceptanceEpochs?.toString() : undefined;
+    obj.migration_enabled = message.migrationEnabled === false ? undefined : message.migrationEnabled;
+    obj.key_path_enabled = message.keyPathEnabled === false ? undefined : message.keyPathEnabled;
+    obj.key_migration_delay = message.keyMigrationDelay !== BigInt(0) ? message.keyMigrationDelay?.toString() : undefined;
+    obj.recovery_migration_delay = message.recoveryMigrationDelay !== BigInt(0) ? message.recoveryMigrationDelay?.toString() : undefined;
+    obj.council_migration_delay = message.councilMigrationDelay !== BigInt(0) ? message.councilMigrationDelay?.toString() : undefined;
+    obj.migration_accept_window = message.migrationAcceptWindow !== BigInt(0) ? message.migrationAcceptWindow?.toString() : undefined;
+    obj.migration_cooldown = message.migrationCooldown !== BigInt(0) ? message.migrationCooldown?.toString() : undefined;
+    obj.max_key_migrations_per_window = message.maxKeyMigrationsPerWindow === 0 ? undefined : message.maxKeyMigrationsPerWindow;
+    obj.key_migration_window = message.keyMigrationWindow !== BigInt(0) ? message.keyMigrationWindow?.toString() : undefined;
+    obj.recovery_change_delay = message.recoveryChangeDelay !== BigInt(0) ? message.recoveryChangeDelay?.toString() : undefined;
+    obj.recovery_reveal_min_blocks = message.recoveryRevealMinBlocks !== BigInt(0) ? message.recoveryRevealMinBlocks?.toString() : undefined;
+    obj.recovery_commit_ttl = message.recoveryCommitTtl !== BigInt(0) ? message.recoveryCommitTtl?.toString() : undefined;
+    obj.recovery_commit_deposit = message.recoveryCommitDeposit === "" ? undefined : message.recoveryCommitDeposit;
+    obj.migration_objection_bond = message.migrationObjectionBond === "" ? undefined : message.migrationObjectionBond;
+    obj.zk_key_activation_delay = message.zkKeyActivationDelay !== BigInt(0) ? message.zkKeyActivationDelay?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {

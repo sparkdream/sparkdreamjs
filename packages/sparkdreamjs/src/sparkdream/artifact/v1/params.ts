@@ -72,6 +72,51 @@ export interface Params {
    * DREAM reserved on the sentinel bond per hide.
    */
   sentinelHideCommitDream: string;
+  /**
+   * Recipients per MsgIssue.
+   */
+  maxIssueBatchSize: number;
+  /**
+   * Stages per token metadata schedule (0 disables schedules).
+   */
+  maxScheduleStages: number;
+  /**
+   * Open media proposals per token (0 disables proposals).
+   */
+  maxMediaProposalsPerToken: number;
+  /**
+   * Accepted media versions per token.
+   */
+  maxMediaVersionsPerToken: number;
+  /**
+   * Query-time renderer evaluation switch (operational).
+   */
+  renderersEnabled: boolean;
+  /**
+   * --- Waves 3 and 4 (governance) ---
+   * Levels a nested tree may have below its root.
+   */
+  maxNestDepth: number;
+  /**
+   * Tokens a nested tree may hold under its root.
+   */
+  maxNestedTokens: number;
+  /**
+   * Longest rental, in seconds.
+   */
+  maxRentalDuration: bigint;
+  /**
+   * Crafting recipes per class.
+   */
+  maxCraftRecipesPerClass: number;
+  /**
+   * Open escrowed offers per bidder.
+   */
+  maxOffersPerBidder: number;
+  /**
+   * Seconds a late bid pushes an auction's end out to (anti-sniping).
+   */
+  auctionExtension: bigint;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.artifact.v1.Params";
@@ -147,6 +192,51 @@ export interface ParamsAmino {
    * DREAM reserved on the sentinel bond per hide.
    */
   sentinel_hide_commit_dream?: string;
+  /**
+   * Recipients per MsgIssue.
+   */
+  max_issue_batch_size?: number;
+  /**
+   * Stages per token metadata schedule (0 disables schedules).
+   */
+  max_schedule_stages?: number;
+  /**
+   * Open media proposals per token (0 disables proposals).
+   */
+  max_media_proposals_per_token?: number;
+  /**
+   * Accepted media versions per token.
+   */
+  max_media_versions_per_token?: number;
+  /**
+   * Query-time renderer evaluation switch (operational).
+   */
+  renderers_enabled?: boolean;
+  /**
+   * --- Waves 3 and 4 (governance) ---
+   * Levels a nested tree may have below its root.
+   */
+  max_nest_depth?: number;
+  /**
+   * Tokens a nested tree may hold under its root.
+   */
+  max_nested_tokens?: number;
+  /**
+   * Longest rental, in seconds.
+   */
+  max_rental_duration?: string;
+  /**
+   * Crafting recipes per class.
+   */
+  max_craft_recipes_per_class?: number;
+  /**
+   * Open escrowed offers per bidder.
+   */
+  max_offers_per_bidder?: number;
+  /**
+   * Seconds a late bid pushes an auction's end out to (anti-sniping).
+   */
+  auction_extension?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/artifact/Params";
@@ -175,6 +265,7 @@ export interface ArtifactOperationalParams {
   sentinelUnhideWindowBlocks: bigint;
   hideExpiryBlocks: bigint;
   sentinelHideCommitDream: string;
+  renderersEnabled: boolean;
 }
 export interface ArtifactOperationalParamsProtoMsg {
   typeUrl: "/sparkdream.artifact.v1.ArtifactOperationalParams";
@@ -203,6 +294,7 @@ export interface ArtifactOperationalParamsAmino {
   sentinel_unhide_window_blocks?: string;
   hide_expiry_blocks?: string;
   sentinel_hide_commit_dream?: string;
+  renderers_enabled?: boolean;
 }
 export interface ArtifactOperationalParamsAminoMsg {
   type: "/sparkdream.artifact.v1.ArtifactOperationalParams";
@@ -238,7 +330,18 @@ function createBaseParams(): Params {
     maxHidesPerSentinelPerDay: 0,
     sentinelUnhideWindowBlocks: BigInt(0),
     hideExpiryBlocks: BigInt(0),
-    sentinelHideCommitDream: ""
+    sentinelHideCommitDream: "",
+    maxIssueBatchSize: 0,
+    maxScheduleStages: 0,
+    maxMediaProposalsPerToken: 0,
+    maxMediaVersionsPerToken: 0,
+    renderersEnabled: false,
+    maxNestDepth: 0,
+    maxNestedTokens: 0,
+    maxRentalDuration: BigInt(0),
+    maxCraftRecipesPerClass: 0,
+    maxOffersPerBidder: 0,
+    auctionExtension: BigInt(0)
   };
 }
 /**
@@ -340,6 +443,39 @@ export const Params = {
     if (message.sentinelHideCommitDream !== "") {
       writer.uint32(234).string(message.sentinelHideCommitDream);
     }
+    if (message.maxIssueBatchSize !== 0) {
+      writer.uint32(240).uint32(message.maxIssueBatchSize);
+    }
+    if (message.maxScheduleStages !== 0) {
+      writer.uint32(248).uint32(message.maxScheduleStages);
+    }
+    if (message.maxMediaProposalsPerToken !== 0) {
+      writer.uint32(256).uint32(message.maxMediaProposalsPerToken);
+    }
+    if (message.maxMediaVersionsPerToken !== 0) {
+      writer.uint32(264).uint32(message.maxMediaVersionsPerToken);
+    }
+    if (message.renderersEnabled === true) {
+      writer.uint32(272).bool(message.renderersEnabled);
+    }
+    if (message.maxNestDepth !== 0) {
+      writer.uint32(280).uint32(message.maxNestDepth);
+    }
+    if (message.maxNestedTokens !== 0) {
+      writer.uint32(288).uint32(message.maxNestedTokens);
+    }
+    if (message.maxRentalDuration !== BigInt(0)) {
+      writer.uint32(296).int64(message.maxRentalDuration);
+    }
+    if (message.maxCraftRecipesPerClass !== 0) {
+      writer.uint32(304).uint32(message.maxCraftRecipesPerClass);
+    }
+    if (message.maxOffersPerBidder !== 0) {
+      writer.uint32(312).uint32(message.maxOffersPerBidder);
+    }
+    if (message.auctionExtension !== BigInt(0)) {
+      writer.uint32(320).int64(message.auctionExtension);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -436,6 +572,39 @@ export const Params = {
         case 29:
           message.sentinelHideCommitDream = reader.string();
           break;
+        case 30:
+          message.maxIssueBatchSize = reader.uint32();
+          break;
+        case 31:
+          message.maxScheduleStages = reader.uint32();
+          break;
+        case 32:
+          message.maxMediaProposalsPerToken = reader.uint32();
+          break;
+        case 33:
+          message.maxMediaVersionsPerToken = reader.uint32();
+          break;
+        case 34:
+          message.renderersEnabled = reader.bool();
+          break;
+        case 35:
+          message.maxNestDepth = reader.uint32();
+          break;
+        case 36:
+          message.maxNestedTokens = reader.uint32();
+          break;
+        case 37:
+          message.maxRentalDuration = reader.int64();
+          break;
+        case 38:
+          message.maxCraftRecipesPerClass = reader.uint32();
+          break;
+        case 39:
+          message.maxOffersPerBidder = reader.uint32();
+          break;
+        case 40:
+          message.auctionExtension = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -474,6 +643,17 @@ export const Params = {
     message.sentinelUnhideWindowBlocks = object.sentinelUnhideWindowBlocks !== undefined && object.sentinelUnhideWindowBlocks !== null ? BigInt(object.sentinelUnhideWindowBlocks.toString()) : BigInt(0);
     message.hideExpiryBlocks = object.hideExpiryBlocks !== undefined && object.hideExpiryBlocks !== null ? BigInt(object.hideExpiryBlocks.toString()) : BigInt(0);
     message.sentinelHideCommitDream = object.sentinelHideCommitDream ?? "";
+    message.maxIssueBatchSize = object.maxIssueBatchSize ?? 0;
+    message.maxScheduleStages = object.maxScheduleStages ?? 0;
+    message.maxMediaProposalsPerToken = object.maxMediaProposalsPerToken ?? 0;
+    message.maxMediaVersionsPerToken = object.maxMediaVersionsPerToken ?? 0;
+    message.renderersEnabled = object.renderersEnabled ?? false;
+    message.maxNestDepth = object.maxNestDepth ?? 0;
+    message.maxNestedTokens = object.maxNestedTokens ?? 0;
+    message.maxRentalDuration = object.maxRentalDuration !== undefined && object.maxRentalDuration !== null ? BigInt(object.maxRentalDuration.toString()) : BigInt(0);
+    message.maxCraftRecipesPerClass = object.maxCraftRecipesPerClass ?? 0;
+    message.maxOffersPerBidder = object.maxOffersPerBidder ?? 0;
+    message.auctionExtension = object.auctionExtension !== undefined && object.auctionExtension !== null ? BigInt(object.auctionExtension.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -563,6 +743,39 @@ export const Params = {
     if (object.sentinel_hide_commit_dream !== undefined && object.sentinel_hide_commit_dream !== null) {
       message.sentinelHideCommitDream = object.sentinel_hide_commit_dream;
     }
+    if (object.max_issue_batch_size !== undefined && object.max_issue_batch_size !== null) {
+      message.maxIssueBatchSize = object.max_issue_batch_size;
+    }
+    if (object.max_schedule_stages !== undefined && object.max_schedule_stages !== null) {
+      message.maxScheduleStages = object.max_schedule_stages;
+    }
+    if (object.max_media_proposals_per_token !== undefined && object.max_media_proposals_per_token !== null) {
+      message.maxMediaProposalsPerToken = object.max_media_proposals_per_token;
+    }
+    if (object.max_media_versions_per_token !== undefined && object.max_media_versions_per_token !== null) {
+      message.maxMediaVersionsPerToken = object.max_media_versions_per_token;
+    }
+    if (object.renderers_enabled !== undefined && object.renderers_enabled !== null) {
+      message.renderersEnabled = object.renderers_enabled;
+    }
+    if (object.max_nest_depth !== undefined && object.max_nest_depth !== null) {
+      message.maxNestDepth = object.max_nest_depth;
+    }
+    if (object.max_nested_tokens !== undefined && object.max_nested_tokens !== null) {
+      message.maxNestedTokens = object.max_nested_tokens;
+    }
+    if (object.max_rental_duration !== undefined && object.max_rental_duration !== null) {
+      message.maxRentalDuration = BigInt(object.max_rental_duration);
+    }
+    if (object.max_craft_recipes_per_class !== undefined && object.max_craft_recipes_per_class !== null) {
+      message.maxCraftRecipesPerClass = object.max_craft_recipes_per_class;
+    }
+    if (object.max_offers_per_bidder !== undefined && object.max_offers_per_bidder !== null) {
+      message.maxOffersPerBidder = object.max_offers_per_bidder;
+    }
+    if (object.auction_extension !== undefined && object.auction_extension !== null) {
+      message.auctionExtension = BigInt(object.auction_extension);
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -600,6 +813,17 @@ export const Params = {
     obj.sentinel_unhide_window_blocks = message.sentinelUnhideWindowBlocks !== BigInt(0) ? message.sentinelUnhideWindowBlocks?.toString() : undefined;
     obj.hide_expiry_blocks = message.hideExpiryBlocks !== BigInt(0) ? message.hideExpiryBlocks?.toString() : undefined;
     obj.sentinel_hide_commit_dream = message.sentinelHideCommitDream === "" ? undefined : message.sentinelHideCommitDream;
+    obj.max_issue_batch_size = message.maxIssueBatchSize === 0 ? undefined : message.maxIssueBatchSize;
+    obj.max_schedule_stages = message.maxScheduleStages === 0 ? undefined : message.maxScheduleStages;
+    obj.max_media_proposals_per_token = message.maxMediaProposalsPerToken === 0 ? undefined : message.maxMediaProposalsPerToken;
+    obj.max_media_versions_per_token = message.maxMediaVersionsPerToken === 0 ? undefined : message.maxMediaVersionsPerToken;
+    obj.renderers_enabled = message.renderersEnabled === false ? undefined : message.renderersEnabled;
+    obj.max_nest_depth = message.maxNestDepth === 0 ? undefined : message.maxNestDepth;
+    obj.max_nested_tokens = message.maxNestedTokens === 0 ? undefined : message.maxNestedTokens;
+    obj.max_rental_duration = message.maxRentalDuration !== BigInt(0) ? message.maxRentalDuration?.toString() : undefined;
+    obj.max_craft_recipes_per_class = message.maxCraftRecipesPerClass === 0 ? undefined : message.maxCraftRecipesPerClass;
+    obj.max_offers_per_bidder = message.maxOffersPerBidder === 0 ? undefined : message.maxOffersPerBidder;
+    obj.auction_extension = message.auctionExtension !== BigInt(0) ? message.auctionExtension?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {
@@ -639,7 +863,8 @@ function createBaseArtifactOperationalParams(): ArtifactOperationalParams {
     maxHidesPerSentinelPerDay: 0,
     sentinelUnhideWindowBlocks: BigInt(0),
     hideExpiryBlocks: BigInt(0),
-    sentinelHideCommitDream: ""
+    sentinelHideCommitDream: "",
+    renderersEnabled: false
   };
 }
 /**
@@ -695,6 +920,9 @@ export const ArtifactOperationalParams = {
     if (message.sentinelHideCommitDream !== "") {
       writer.uint32(114).string(message.sentinelHideCommitDream);
     }
+    if (message.renderersEnabled === true) {
+      writer.uint32(120).bool(message.renderersEnabled);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): ArtifactOperationalParams {
@@ -746,6 +974,9 @@ export const ArtifactOperationalParams = {
         case 14:
           message.sentinelHideCommitDream = reader.string();
           break;
+        case 15:
+          message.renderersEnabled = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -769,6 +1000,7 @@ export const ArtifactOperationalParams = {
     message.sentinelUnhideWindowBlocks = object.sentinelUnhideWindowBlocks !== undefined && object.sentinelUnhideWindowBlocks !== null ? BigInt(object.sentinelUnhideWindowBlocks.toString()) : BigInt(0);
     message.hideExpiryBlocks = object.hideExpiryBlocks !== undefined && object.hideExpiryBlocks !== null ? BigInt(object.hideExpiryBlocks.toString()) : BigInt(0);
     message.sentinelHideCommitDream = object.sentinelHideCommitDream ?? "";
+    message.renderersEnabled = object.renderersEnabled ?? false;
     return message;
   },
   fromAmino(object: ArtifactOperationalParamsAmino): ArtifactOperationalParams {
@@ -815,6 +1047,9 @@ export const ArtifactOperationalParams = {
     if (object.sentinel_hide_commit_dream !== undefined && object.sentinel_hide_commit_dream !== null) {
       message.sentinelHideCommitDream = object.sentinel_hide_commit_dream;
     }
+    if (object.renderers_enabled !== undefined && object.renderers_enabled !== null) {
+      message.renderersEnabled = object.renderers_enabled;
+    }
     return message;
   },
   toAmino(message: ArtifactOperationalParams): ArtifactOperationalParamsAmino {
@@ -833,6 +1068,7 @@ export const ArtifactOperationalParams = {
     obj.sentinel_unhide_window_blocks = message.sentinelUnhideWindowBlocks !== BigInt(0) ? message.sentinelUnhideWindowBlocks?.toString() : undefined;
     obj.hide_expiry_blocks = message.hideExpiryBlocks !== BigInt(0) ? message.hideExpiryBlocks?.toString() : undefined;
     obj.sentinel_hide_commit_dream = message.sentinelHideCommitDream === "" ? undefined : message.sentinelHideCommitDream;
+    obj.renderers_enabled = message.renderersEnabled === false ? undefined : message.renderersEnabled;
     return obj;
   },
   fromAminoMsg(object: ArtifactOperationalParamsAminoMsg): ArtifactOperationalParams {

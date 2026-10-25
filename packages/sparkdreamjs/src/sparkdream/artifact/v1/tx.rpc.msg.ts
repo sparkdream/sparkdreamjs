@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgCreateClass, MsgCreateClassResponse, MsgUpdateClass, MsgUpdateClassResponse, MsgFreezeClassMetadata, MsgFreezeClassMetadataResponse, MsgSetMintPolicy, MsgSetMintPolicyResponse, MsgSetMinters, MsgSetMintersResponse, MsgSetMaxSupply, MsgSetMaxSupplyResponse, MsgCloseMinting, MsgCloseMintingResponse, MsgProposeClassOwner, MsgProposeClassOwnerResponse, MsgAcceptClassOwner, MsgAcceptClassOwnerResponse, MsgCancelClassOwner, MsgCancelClassOwnerResponse, MsgDeleteClass, MsgDeleteClassResponse, MsgMint, MsgMintResponse, MsgPublicMint, MsgPublicMintResponse, MsgTransfer, MsgTransferResponse, MsgAcceptIncoming, MsgAcceptIncomingResponse, MsgRejectIncoming, MsgRejectIncomingResponse, MsgCancelOutgoing, MsgCancelOutgoingResponse, MsgSetReceivePolicy, MsgSetReceivePolicyResponse, MsgBurn, MsgBurnResponse, MsgRevoke, MsgRevokeResponse, MsgUpdateToken, MsgUpdateTokenResponse, MsgFreezeTokenMetadata, MsgFreezeTokenMetadataResponse, MsgList, MsgListResponse, MsgUpdateListing, MsgUpdateListingResponse, MsgDelist, MsgDelistResponse, MsgBuy, MsgBuyResponse, MsgHideContent, MsgHideContentResponse, MsgUnhideContent, MsgUnhideContentResponse, MsgAppealHide, MsgAppealHideResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgCreateClass, MsgCreateClassResponse, MsgUpdateClass, MsgUpdateClassResponse, MsgFreezeClassMetadata, MsgFreezeClassMetadataResponse, MsgSetMintPolicy, MsgSetMintPolicyResponse, MsgSetMinters, MsgSetMintersResponse, MsgSetMaxSupply, MsgSetMaxSupplyResponse, MsgCloseMinting, MsgCloseMintingResponse, MsgProposeClassOwner, MsgProposeClassOwnerResponse, MsgAcceptClassOwner, MsgAcceptClassOwnerResponse, MsgCancelClassOwner, MsgCancelClassOwnerResponse, MsgDeleteClass, MsgDeleteClassResponse, MsgMint, MsgMintResponse, MsgPublicMint, MsgPublicMintResponse, MsgTransfer, MsgTransferResponse, MsgAcceptIncoming, MsgAcceptIncomingResponse, MsgRejectIncoming, MsgRejectIncomingResponse, MsgCancelOutgoing, MsgCancelOutgoingResponse, MsgSetReceivePolicy, MsgSetReceivePolicyResponse, MsgBurn, MsgBurnResponse, MsgRevoke, MsgRevokeResponse, MsgUpdateToken, MsgUpdateTokenResponse, MsgFreezeTokenMetadata, MsgFreezeTokenMetadataResponse, MsgList, MsgListResponse, MsgUpdateListing, MsgUpdateListingResponse, MsgDelist, MsgDelistResponse, MsgBuy, MsgBuyResponse, MsgHideContent, MsgHideContentResponse, MsgUnhideContent, MsgUnhideContentResponse, MsgAppealHide, MsgAppealHideResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgIssue, MsgIssueResponse, MsgRenew, MsgRenewResponse, MsgRedeem, MsgRedeemResponse, MsgLockRoyalty, MsgLockRoyaltyResponse, MsgReveal, MsgRevealResponse, MsgRevealSeed, MsgRevealSeedResponse, MsgProposeMedia, MsgProposeMediaResponse, MsgAcceptMedia, MsgAcceptMediaResponse, MsgRejectMedia, MsgRejectMediaResponse, MsgSetDisplayedMedia, MsgSetDisplayedMediaResponse, MsgCreateEdition, MsgCreateEditionResponse, MsgMintUnits, MsgMintUnitsResponse, MsgTransferUnits, MsgTransferUnitsResponse, MsgBurnUnits, MsgBurnUnitsResponse, MsgRevokeUnits, MsgRevokeUnitsResponse, MsgListUnits, MsgListUnitsResponse, MsgDelistUnits, MsgDelistUnitsResponse, MsgBuyUnits, MsgBuyUnitsResponse, MsgFundEdition, MsgFundEditionResponse, MsgClaimEditionRewards, MsgClaimEditionRewardsResponse, MsgAddCraftRecipe, MsgAddCraftRecipeResponse, MsgRemoveCraftRecipe, MsgRemoveCraftRecipeResponse, MsgCraft, MsgCraftResponse, MsgOfferRental, MsgOfferRentalResponse, MsgCancelRentalOffer, MsgCancelRentalOfferResponse, MsgAcceptRental, MsgAcceptRentalResponse, MsgEndRental, MsgEndRentalResponse, MsgNest, MsgNestResponse, MsgDetach, MsgDetachResponse, MsgSetHarbergerPrice, MsgSetHarbergerPriceResponse, MsgForceBuy, MsgForceBuyResponse, MsgUpdateUnitListing, MsgUpdateUnitListingResponse, MsgMakeOffer, MsgMakeOfferResponse, MsgCancelOffer, MsgCancelOfferResponse, MsgAcceptOffer, MsgAcceptOfferResponse, MsgStartAuction, MsgStartAuctionResponse, MsgBid, MsgBidResponse, MsgSettleAuction, MsgSettleAuctionResponse, MsgCancelAuction, MsgCancelAuctionResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
@@ -72,6 +72,102 @@ export interface Msg {
   appealHide(request: MsgAppealHide): Promise<MsgAppealHideResponse>;
   /** UpdateOperationalParams updates the operational parameter subset. */
   updateOperationalParams(request: MsgUpdateOperationalParams): Promise<MsgUpdateOperationalParamsResponse>;
+  /**
+   * Issue mints one shared metadata to many recipients (attendance and
+   * participation badges). Cheaper than MsgMint for large batches.
+   */
+  issue(request: MsgIssue): Promise<MsgIssueResponse>;
+  /**
+   * Renew extends an expiring token's term, by the holder (paying the
+   * class) or by the class owner or a listed minter (free).
+   */
+  renew(request: MsgRenew): Promise<MsgRenewResponse>;
+  /** Redeem marks tokens of a redeemable class as redeemed (one-way). */
+  redeem(request: MsgRedeem): Promise<MsgRedeemResponse>;
+  /** LockRoyalty freezes the class royalty split (irreversible). */
+  lockRoyalty(request: MsgLockRoyalty): Promise<MsgLockRoyaltyResponse>;
+  /**
+   * Reveal discloses a blind-minted token's metadata against the class
+   * commitment.
+   */
+  reveal(request: MsgReveal): Promise<MsgRevealResponse>;
+  /** RevealSeed discloses a generative class's seed secret. */
+  revealSeed(request: MsgRevealSeed): Promise<MsgRevealSeedResponse>;
+  /** ProposeMedia offers the holder an additional media version of a token. */
+  proposeMedia(request: MsgProposeMedia): Promise<MsgProposeMediaResponse>;
+  /** AcceptMedia adds a proposed media version to the token. */
+  acceptMedia(request: MsgAcceptMedia): Promise<MsgAcceptMediaResponse>;
+  /** RejectMedia discards a media proposal (holder or class owner). */
+  rejectMedia(request: MsgRejectMedia): Promise<MsgRejectMediaResponse>;
+  /** SetDisplayedMedia picks which accepted version the token shows. */
+  setDisplayedMedia(request: MsgSetDisplayedMedia): Promise<MsgSetDisplayedMediaResponse>;
+  /**
+   * CreateEdition adds an edition to an EDITIONS class; with a claim it is
+   * an impact certificate.
+   */
+  createEdition(request: MsgCreateEdition): Promise<MsgCreateEditionResponse>;
+  /** MintUnits mints units of an edition. */
+  mintUnits(request: MsgMintUnits): Promise<MsgMintUnitsResponse>;
+  /** TransferUnits moves edition units to recipients (or their inboxes). */
+  transferUnits(request: MsgTransferUnits): Promise<MsgTransferUnitsResponse>;
+  /** BurnUnits burns units the signer holds. */
+  burnUnits(request: MsgBurnUnits): Promise<MsgBurnUnitsResponse>;
+  /**
+   * RevokeUnits burns a holder's units as the class owner, when the class
+   * lets the issuer burn.
+   */
+  revokeUnits(request: MsgRevokeUnits): Promise<MsgRevokeUnitsResponse>;
+  /** ListUnits offers edition units at a fixed per-unit price. */
+  listUnits(request: MsgListUnits): Promise<MsgListUnitsResponse>;
+  /** DelistUnits cancels a unit listing. */
+  delistUnits(request: MsgDelistUnits): Promise<MsgDelistUnitsResponse>;
+  /** BuyUnits buys some or all of a unit listing. */
+  buyUnits(request: MsgBuyUnits): Promise<MsgBuyUnitsResponse>;
+  /**
+   * FundEdition pays SPARK to an edition's holders, pro rata (retroactive
+   * funding of an impact certificate).
+   */
+  fundEdition(request: MsgFundEdition): Promise<MsgFundEditionResponse>;
+  /** ClaimEditionRewards pays out accrued retro funding. */
+  claimEditionRewards(request: MsgClaimEditionRewards): Promise<MsgClaimEditionRewardsResponse>;
+  /** AddCraftRecipe adds a crafting recipe to a class (until its first craft). */
+  addCraftRecipe(request: MsgAddCraftRecipe): Promise<MsgAddCraftRecipeResponse>;
+  /** RemoveCraftRecipe removes a crafting recipe. */
+  removeCraftRecipe(request: MsgRemoveCraftRecipe): Promise<MsgRemoveCraftRecipeResponse>;
+  /** Craft burns a recipe's inputs and mints its output to the crafter. */
+  craft(request: MsgCraft): Promise<MsgCraftResponse>;
+  /** OfferRental offers a token's user right for rent. */
+  offerRental(request: MsgOfferRental): Promise<MsgOfferRentalResponse>;
+  /** CancelRentalOffer withdraws a rental offer. */
+  cancelRentalOffer(request: MsgCancelRentalOffer): Promise<MsgCancelRentalOfferResponse>;
+  /** AcceptRental rents a token, paying the offer's price. */
+  acceptRental(request: MsgAcceptRental): Promise<MsgAcceptRentalResponse>;
+  /** EndRental ends a rental. */
+  endRental(request: MsgEndRental): Promise<MsgEndRentalResponse>;
+  /** Nest places a token inside another token the signer owns. */
+  nest(request: MsgNest): Promise<MsgNestResponse>;
+  /** Detach takes a nested token out of its parent. */
+  detach(request: MsgDetach): Promise<MsgDetachResponse>;
+  /** SetHarbergerPrice self-assesses a Harberger token's price. */
+  setHarbergerPrice(request: MsgSetHarbergerPrice): Promise<MsgSetHarbergerPriceResponse>;
+  /** ForceBuy buys a Harberger token at its current price. */
+  forceBuy(request: MsgForceBuy): Promise<MsgForceBuyResponse>;
+  /** UpdateUnitListing changes a unit listing's quantity, price and duration. */
+  updateUnitListing(request: MsgUpdateUnitListing): Promise<MsgUpdateUnitListingResponse>;
+  /** MakeOffer escrows a SPARK offer for a token or any token of a class. */
+  makeOffer(request: MsgMakeOffer): Promise<MsgMakeOfferResponse>;
+  /** CancelOffer withdraws an offer and refunds its escrow. */
+  cancelOffer(request: MsgCancelOffer): Promise<MsgCancelOfferResponse>;
+  /** AcceptOffer sells a token to an offer's bidder. */
+  acceptOffer(request: MsgAcceptOffer): Promise<MsgAcceptOfferResponse>;
+  /** StartAuction puts a token up for an English auction. */
+  startAuction(request: MsgStartAuction): Promise<MsgStartAuctionResponse>;
+  /** Bid places an escrowed bid on an auction. */
+  bid(request: MsgBid): Promise<MsgBidResponse>;
+  /** SettleAuction settles an ended auction (anyone may sign). */
+  settleAuction(request: MsgSettleAuction): Promise<MsgSettleAuctionResponse>;
+  /** CancelAuction withdraws an auction nobody has bid on. */
+  cancelAuction(request: MsgCancelAuction): Promise<MsgCancelAuctionResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -265,6 +361,246 @@ export class MsgClientImpl implements Msg {
     const data = MsgUpdateOperationalParams.encode(request).finish();
     const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "UpdateOperationalParams", data);
     return promise.then(data => MsgUpdateOperationalParamsResponse.decode(new BinaryReader(data)));
+  };
+  /* Issue mints one shared metadata to many recipients (attendance and
+   participation badges). Cheaper than MsgMint for large batches. */
+  issue = async (request: MsgIssue): Promise<MsgIssueResponse> => {
+    const data = MsgIssue.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "Issue", data);
+    return promise.then(data => MsgIssueResponse.decode(new BinaryReader(data)));
+  };
+  /* Renew extends an expiring token's term, by the holder (paying the
+   class) or by the class owner or a listed minter (free). */
+  renew = async (request: MsgRenew): Promise<MsgRenewResponse> => {
+    const data = MsgRenew.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "Renew", data);
+    return promise.then(data => MsgRenewResponse.decode(new BinaryReader(data)));
+  };
+  /* Redeem marks tokens of a redeemable class as redeemed (one-way). */
+  redeem = async (request: MsgRedeem): Promise<MsgRedeemResponse> => {
+    const data = MsgRedeem.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "Redeem", data);
+    return promise.then(data => MsgRedeemResponse.decode(new BinaryReader(data)));
+  };
+  /* LockRoyalty freezes the class royalty split (irreversible). */
+  lockRoyalty = async (request: MsgLockRoyalty): Promise<MsgLockRoyaltyResponse> => {
+    const data = MsgLockRoyalty.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "LockRoyalty", data);
+    return promise.then(data => MsgLockRoyaltyResponse.decode(new BinaryReader(data)));
+  };
+  /* Reveal discloses a blind-minted token's metadata against the class
+   commitment. */
+  reveal = async (request: MsgReveal): Promise<MsgRevealResponse> => {
+    const data = MsgReveal.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "Reveal", data);
+    return promise.then(data => MsgRevealResponse.decode(new BinaryReader(data)));
+  };
+  /* RevealSeed discloses a generative class's seed secret. */
+  revealSeed = async (request: MsgRevealSeed): Promise<MsgRevealSeedResponse> => {
+    const data = MsgRevealSeed.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "RevealSeed", data);
+    return promise.then(data => MsgRevealSeedResponse.decode(new BinaryReader(data)));
+  };
+  /* ProposeMedia offers the holder an additional media version of a token. */
+  proposeMedia = async (request: MsgProposeMedia): Promise<MsgProposeMediaResponse> => {
+    const data = MsgProposeMedia.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "ProposeMedia", data);
+    return promise.then(data => MsgProposeMediaResponse.decode(new BinaryReader(data)));
+  };
+  /* AcceptMedia adds a proposed media version to the token. */
+  acceptMedia = async (request: MsgAcceptMedia): Promise<MsgAcceptMediaResponse> => {
+    const data = MsgAcceptMedia.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "AcceptMedia", data);
+    return promise.then(data => MsgAcceptMediaResponse.decode(new BinaryReader(data)));
+  };
+  /* RejectMedia discards a media proposal (holder or class owner). */
+  rejectMedia = async (request: MsgRejectMedia): Promise<MsgRejectMediaResponse> => {
+    const data = MsgRejectMedia.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "RejectMedia", data);
+    return promise.then(data => MsgRejectMediaResponse.decode(new BinaryReader(data)));
+  };
+  /* SetDisplayedMedia picks which accepted version the token shows. */
+  setDisplayedMedia = async (request: MsgSetDisplayedMedia): Promise<MsgSetDisplayedMediaResponse> => {
+    const data = MsgSetDisplayedMedia.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "SetDisplayedMedia", data);
+    return promise.then(data => MsgSetDisplayedMediaResponse.decode(new BinaryReader(data)));
+  };
+  /* CreateEdition adds an edition to an EDITIONS class; with a claim it is
+   an impact certificate. */
+  createEdition = async (request: MsgCreateEdition): Promise<MsgCreateEditionResponse> => {
+    const data = MsgCreateEdition.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "CreateEdition", data);
+    return promise.then(data => MsgCreateEditionResponse.decode(new BinaryReader(data)));
+  };
+  /* MintUnits mints units of an edition. */
+  mintUnits = async (request: MsgMintUnits): Promise<MsgMintUnitsResponse> => {
+    const data = MsgMintUnits.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "MintUnits", data);
+    return promise.then(data => MsgMintUnitsResponse.decode(new BinaryReader(data)));
+  };
+  /* TransferUnits moves edition units to recipients (or their inboxes). */
+  transferUnits = async (request: MsgTransferUnits): Promise<MsgTransferUnitsResponse> => {
+    const data = MsgTransferUnits.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "TransferUnits", data);
+    return promise.then(data => MsgTransferUnitsResponse.decode(new BinaryReader(data)));
+  };
+  /* BurnUnits burns units the signer holds. */
+  burnUnits = async (request: MsgBurnUnits): Promise<MsgBurnUnitsResponse> => {
+    const data = MsgBurnUnits.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "BurnUnits", data);
+    return promise.then(data => MsgBurnUnitsResponse.decode(new BinaryReader(data)));
+  };
+  /* RevokeUnits burns a holder's units as the class owner, when the class
+   lets the issuer burn. */
+  revokeUnits = async (request: MsgRevokeUnits): Promise<MsgRevokeUnitsResponse> => {
+    const data = MsgRevokeUnits.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "RevokeUnits", data);
+    return promise.then(data => MsgRevokeUnitsResponse.decode(new BinaryReader(data)));
+  };
+  /* ListUnits offers edition units at a fixed per-unit price. */
+  listUnits = async (request: MsgListUnits): Promise<MsgListUnitsResponse> => {
+    const data = MsgListUnits.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "ListUnits", data);
+    return promise.then(data => MsgListUnitsResponse.decode(new BinaryReader(data)));
+  };
+  /* DelistUnits cancels a unit listing. */
+  delistUnits = async (request: MsgDelistUnits): Promise<MsgDelistUnitsResponse> => {
+    const data = MsgDelistUnits.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "DelistUnits", data);
+    return promise.then(data => MsgDelistUnitsResponse.decode(new BinaryReader(data)));
+  };
+  /* BuyUnits buys some or all of a unit listing. */
+  buyUnits = async (request: MsgBuyUnits): Promise<MsgBuyUnitsResponse> => {
+    const data = MsgBuyUnits.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "BuyUnits", data);
+    return promise.then(data => MsgBuyUnitsResponse.decode(new BinaryReader(data)));
+  };
+  /* FundEdition pays SPARK to an edition's holders, pro rata (retroactive
+   funding of an impact certificate). */
+  fundEdition = async (request: MsgFundEdition): Promise<MsgFundEditionResponse> => {
+    const data = MsgFundEdition.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "FundEdition", data);
+    return promise.then(data => MsgFundEditionResponse.decode(new BinaryReader(data)));
+  };
+  /* ClaimEditionRewards pays out accrued retro funding. */
+  claimEditionRewards = async (request: MsgClaimEditionRewards): Promise<MsgClaimEditionRewardsResponse> => {
+    const data = MsgClaimEditionRewards.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "ClaimEditionRewards", data);
+    return promise.then(data => MsgClaimEditionRewardsResponse.decode(new BinaryReader(data)));
+  };
+  /* AddCraftRecipe adds a crafting recipe to a class (until its first craft). */
+  addCraftRecipe = async (request: MsgAddCraftRecipe): Promise<MsgAddCraftRecipeResponse> => {
+    const data = MsgAddCraftRecipe.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "AddCraftRecipe", data);
+    return promise.then(data => MsgAddCraftRecipeResponse.decode(new BinaryReader(data)));
+  };
+  /* RemoveCraftRecipe removes a crafting recipe. */
+  removeCraftRecipe = async (request: MsgRemoveCraftRecipe): Promise<MsgRemoveCraftRecipeResponse> => {
+    const data = MsgRemoveCraftRecipe.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "RemoveCraftRecipe", data);
+    return promise.then(data => MsgRemoveCraftRecipeResponse.decode(new BinaryReader(data)));
+  };
+  /* Craft burns a recipe's inputs and mints its output to the crafter. */
+  craft = async (request: MsgCraft): Promise<MsgCraftResponse> => {
+    const data = MsgCraft.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "Craft", data);
+    return promise.then(data => MsgCraftResponse.decode(new BinaryReader(data)));
+  };
+  /* OfferRental offers a token's user right for rent. */
+  offerRental = async (request: MsgOfferRental): Promise<MsgOfferRentalResponse> => {
+    const data = MsgOfferRental.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "OfferRental", data);
+    return promise.then(data => MsgOfferRentalResponse.decode(new BinaryReader(data)));
+  };
+  /* CancelRentalOffer withdraws a rental offer. */
+  cancelRentalOffer = async (request: MsgCancelRentalOffer): Promise<MsgCancelRentalOfferResponse> => {
+    const data = MsgCancelRentalOffer.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "CancelRentalOffer", data);
+    return promise.then(data => MsgCancelRentalOfferResponse.decode(new BinaryReader(data)));
+  };
+  /* AcceptRental rents a token, paying the offer's price. */
+  acceptRental = async (request: MsgAcceptRental): Promise<MsgAcceptRentalResponse> => {
+    const data = MsgAcceptRental.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "AcceptRental", data);
+    return promise.then(data => MsgAcceptRentalResponse.decode(new BinaryReader(data)));
+  };
+  /* EndRental ends a rental. */
+  endRental = async (request: MsgEndRental): Promise<MsgEndRentalResponse> => {
+    const data = MsgEndRental.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "EndRental", data);
+    return promise.then(data => MsgEndRentalResponse.decode(new BinaryReader(data)));
+  };
+  /* Nest places a token inside another token the signer owns. */
+  nest = async (request: MsgNest): Promise<MsgNestResponse> => {
+    const data = MsgNest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "Nest", data);
+    return promise.then(data => MsgNestResponse.decode(new BinaryReader(data)));
+  };
+  /* Detach takes a nested token out of its parent. */
+  detach = async (request: MsgDetach): Promise<MsgDetachResponse> => {
+    const data = MsgDetach.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "Detach", data);
+    return promise.then(data => MsgDetachResponse.decode(new BinaryReader(data)));
+  };
+  /* SetHarbergerPrice self-assesses a Harberger token's price. */
+  setHarbergerPrice = async (request: MsgSetHarbergerPrice): Promise<MsgSetHarbergerPriceResponse> => {
+    const data = MsgSetHarbergerPrice.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "SetHarbergerPrice", data);
+    return promise.then(data => MsgSetHarbergerPriceResponse.decode(new BinaryReader(data)));
+  };
+  /* ForceBuy buys a Harberger token at its current price. */
+  forceBuy = async (request: MsgForceBuy): Promise<MsgForceBuyResponse> => {
+    const data = MsgForceBuy.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "ForceBuy", data);
+    return promise.then(data => MsgForceBuyResponse.decode(new BinaryReader(data)));
+  };
+  /* UpdateUnitListing changes a unit listing's quantity, price and duration. */
+  updateUnitListing = async (request: MsgUpdateUnitListing): Promise<MsgUpdateUnitListingResponse> => {
+    const data = MsgUpdateUnitListing.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "UpdateUnitListing", data);
+    return promise.then(data => MsgUpdateUnitListingResponse.decode(new BinaryReader(data)));
+  };
+  /* MakeOffer escrows a SPARK offer for a token or any token of a class. */
+  makeOffer = async (request: MsgMakeOffer): Promise<MsgMakeOfferResponse> => {
+    const data = MsgMakeOffer.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "MakeOffer", data);
+    return promise.then(data => MsgMakeOfferResponse.decode(new BinaryReader(data)));
+  };
+  /* CancelOffer withdraws an offer and refunds its escrow. */
+  cancelOffer = async (request: MsgCancelOffer): Promise<MsgCancelOfferResponse> => {
+    const data = MsgCancelOffer.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "CancelOffer", data);
+    return promise.then(data => MsgCancelOfferResponse.decode(new BinaryReader(data)));
+  };
+  /* AcceptOffer sells a token to an offer's bidder. */
+  acceptOffer = async (request: MsgAcceptOffer): Promise<MsgAcceptOfferResponse> => {
+    const data = MsgAcceptOffer.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "AcceptOffer", data);
+    return promise.then(data => MsgAcceptOfferResponse.decode(new BinaryReader(data)));
+  };
+  /* StartAuction puts a token up for an English auction. */
+  startAuction = async (request: MsgStartAuction): Promise<MsgStartAuctionResponse> => {
+    const data = MsgStartAuction.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "StartAuction", data);
+    return promise.then(data => MsgStartAuctionResponse.decode(new BinaryReader(data)));
+  };
+  /* Bid places an escrowed bid on an auction. */
+  bid = async (request: MsgBid): Promise<MsgBidResponse> => {
+    const data = MsgBid.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "Bid", data);
+    return promise.then(data => MsgBidResponse.decode(new BinaryReader(data)));
+  };
+  /* SettleAuction settles an ended auction (anyone may sign). */
+  settleAuction = async (request: MsgSettleAuction): Promise<MsgSettleAuctionResponse> => {
+    const data = MsgSettleAuction.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "SettleAuction", data);
+    return promise.then(data => MsgSettleAuctionResponse.decode(new BinaryReader(data)));
+  };
+  /* CancelAuction withdraws an auction nobody has bid on. */
+  cancelAuction = async (request: MsgCancelAuction): Promise<MsgCancelAuctionResponse> => {
+    const data = MsgCancelAuction.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Msg", "CancelAuction", data);
+    return promise.then(data => MsgCancelAuctionResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

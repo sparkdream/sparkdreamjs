@@ -1,6 +1,7 @@
 //@ts-nocheck
 import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "../../../cosmos/base/query/v1beta1/pagination";
 import { RoleType, BondedRole, BondedRoleAmino, BondedRoleConfig, BondedRoleConfigAmino } from "./bonded_role";
+import { MigrationStatus, MigrationPath, MemberMigration, MemberMigrationAmino, RecoveryCommitmentSet, RecoveryCommitmentSetAmino } from "./migration";
 import { Params, ParamsAmino } from "./params";
 import { Member, MemberAmino, TrustLevel } from "./member";
 import { Invitation, InvitationAmino } from "./invitation";
@@ -5390,6 +5391,432 @@ export interface QueryTrustTreeResponseAmino {
 export interface QueryTrustTreeResponseAminoMsg {
   type: "/sparkdream.rep.v1.QueryTrustTreeResponse";
   value: QueryTrustTreeResponseAmino;
+}
+/**
+ * QueryCanonicalRequest defines the QueryCanonicalRequest message.
+ * @name QueryCanonicalRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryCanonicalRequest
+ */
+export interface QueryCanonicalRequest {
+  address: string;
+}
+export interface QueryCanonicalRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryCanonicalRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryCanonicalRequest defines the QueryCanonicalRequest message.
+ * @name QueryCanonicalRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryCanonicalRequest
+ */
+export interface QueryCanonicalRequestAmino {
+  address?: string;
+}
+export interface QueryCanonicalRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryCanonicalRequest";
+  value: QueryCanonicalRequestAmino;
+}
+/**
+ * QueryCanonicalResponse defines the QueryCanonicalResponse message.
+ * @name QueryCanonicalResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryCanonicalResponse
+ */
+export interface QueryCanonicalResponse {
+  /**
+   * canonical is the current address of the identity (address itself when it
+   * never migrated).
+   */
+  canonical: string;
+  /**
+   * tombstoned is true when address migrated away.
+   */
+  tombstoned: boolean;
+  /**
+   * path is the path of the migration that tombstoned address.
+   */
+  path: MigrationPath;
+}
+export interface QueryCanonicalResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryCanonicalResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryCanonicalResponse defines the QueryCanonicalResponse message.
+ * @name QueryCanonicalResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryCanonicalResponse
+ */
+export interface QueryCanonicalResponseAmino {
+  /**
+   * canonical is the current address of the identity (address itself when it
+   * never migrated).
+   */
+  canonical?: string;
+  /**
+   * tombstoned is true when address migrated away.
+   */
+  tombstoned?: boolean;
+  /**
+   * path is the path of the migration that tombstoned address.
+   */
+  path?: MigrationPath;
+}
+export interface QueryCanonicalResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryCanonicalResponse";
+  value: QueryCanonicalResponseAmino;
+}
+/**
+ * QueryAliasesRequest defines the QueryAliasesRequest message.
+ * @name QueryAliasesRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAliasesRequest
+ */
+export interface QueryAliasesRequest {
+  member: string;
+}
+export interface QueryAliasesRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAliasesRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryAliasesRequest defines the QueryAliasesRequest message.
+ * @name QueryAliasesRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAliasesRequest
+ */
+export interface QueryAliasesRequestAmino {
+  member?: string;
+}
+export interface QueryAliasesRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAliasesRequest";
+  value: QueryAliasesRequestAmino;
+}
+/**
+ * QueryAliasesResponse defines the QueryAliasesResponse message.
+ * @name QueryAliasesResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAliasesResponse
+ */
+export interface QueryAliasesResponse {
+  canonical: string;
+  addresses: string[];
+  recent: string[];
+}
+export interface QueryAliasesResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryAliasesResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryAliasesResponse defines the QueryAliasesResponse message.
+ * @name QueryAliasesResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAliasesResponse
+ */
+export interface QueryAliasesResponseAmino {
+  canonical?: string;
+  addresses?: string[];
+  recent?: string[];
+}
+export interface QueryAliasesResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryAliasesResponse";
+  value: QueryAliasesResponseAmino;
+}
+/**
+ * QueryMemberMigrationRequest defines the QueryMemberMigrationRequest message.
+ * @name QueryMemberMigrationRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberMigrationRequest
+ */
+export interface QueryMemberMigrationRequest {
+  id: bigint;
+}
+export interface QueryMemberMigrationRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberMigrationRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryMemberMigrationRequest defines the QueryMemberMigrationRequest message.
+ * @name QueryMemberMigrationRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberMigrationRequest
+ */
+export interface QueryMemberMigrationRequestAmino {
+  id?: string;
+}
+export interface QueryMemberMigrationRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryMemberMigrationRequest";
+  value: QueryMemberMigrationRequestAmino;
+}
+/**
+ * QueryMemberMigrationResponse defines the QueryMemberMigrationResponse message.
+ * @name QueryMemberMigrationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberMigrationResponse
+ */
+export interface QueryMemberMigrationResponse {
+  migration: MemberMigration;
+}
+export interface QueryMemberMigrationResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberMigrationResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryMemberMigrationResponse defines the QueryMemberMigrationResponse message.
+ * @name QueryMemberMigrationResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberMigrationResponse
+ */
+export interface QueryMemberMigrationResponseAmino {
+  migration?: MemberMigrationAmino;
+}
+export interface QueryMemberMigrationResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryMemberMigrationResponse";
+  value: QueryMemberMigrationResponseAmino;
+}
+/**
+ * QueryMemberMigrationsRequest defines the QueryMemberMigrationsRequest message.
+ * @name QueryMemberMigrationsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberMigrationsRequest
+ */
+export interface QueryMemberMigrationsRequest {
+  pagination?: PageRequest;
+  /**
+   * Optional filter; UNSPECIFIED returns every status. The REST gateway
+   * takes the enum by number.
+   */
+  status: MigrationStatus;
+  /**
+   * Optional filter: migrations whose from or to address is address.
+   */
+  address: string;
+}
+export interface QueryMemberMigrationsRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberMigrationsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryMemberMigrationsRequest defines the QueryMemberMigrationsRequest message.
+ * @name QueryMemberMigrationsRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberMigrationsRequest
+ */
+export interface QueryMemberMigrationsRequestAmino {
+  pagination?: PageRequestAmino;
+  /**
+   * Optional filter; UNSPECIFIED returns every status. The REST gateway
+   * takes the enum by number.
+   */
+  status?: MigrationStatus;
+  /**
+   * Optional filter: migrations whose from or to address is address.
+   */
+  address?: string;
+}
+export interface QueryMemberMigrationsRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryMemberMigrationsRequest";
+  value: QueryMemberMigrationsRequestAmino;
+}
+/**
+ * QueryMemberMigrationsResponse defines the QueryMemberMigrationsResponse message.
+ * @name QueryMemberMigrationsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberMigrationsResponse
+ */
+export interface QueryMemberMigrationsResponse {
+  migrations: MemberMigration[];
+  pagination?: PageResponse;
+}
+export interface QueryMemberMigrationsResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberMigrationsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryMemberMigrationsResponse defines the QueryMemberMigrationsResponse message.
+ * @name QueryMemberMigrationsResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberMigrationsResponse
+ */
+export interface QueryMemberMigrationsResponseAmino {
+  migrations?: MemberMigrationAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryMemberMigrationsResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryMemberMigrationsResponse";
+  value: QueryMemberMigrationsResponseAmino;
+}
+/**
+ * QueryPendingMigrationRequest defines the QueryPendingMigrationRequest message.
+ * @name QueryPendingMigrationRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryPendingMigrationRequest
+ */
+export interface QueryPendingMigrationRequest {
+  member: string;
+}
+export interface QueryPendingMigrationRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryPendingMigrationRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryPendingMigrationRequest defines the QueryPendingMigrationRequest message.
+ * @name QueryPendingMigrationRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryPendingMigrationRequest
+ */
+export interface QueryPendingMigrationRequestAmino {
+  member?: string;
+}
+export interface QueryPendingMigrationRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryPendingMigrationRequest";
+  value: QueryPendingMigrationRequestAmino;
+}
+/**
+ * QueryPendingMigrationResponse defines the QueryPendingMigrationResponse message.
+ * @name QueryPendingMigrationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryPendingMigrationResponse
+ */
+export interface QueryPendingMigrationResponse {
+  /**
+   * migration is the member's pending migration. The query returns NotFound
+   * when there is none.
+   */
+  migration: MemberMigration;
+}
+export interface QueryPendingMigrationResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryPendingMigrationResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryPendingMigrationResponse defines the QueryPendingMigrationResponse message.
+ * @name QueryPendingMigrationResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryPendingMigrationResponse
+ */
+export interface QueryPendingMigrationResponseAmino {
+  /**
+   * migration is the member's pending migration. The query returns NotFound
+   * when there is none.
+   */
+  migration?: MemberMigrationAmino;
+}
+export interface QueryPendingMigrationResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryPendingMigrationResponse";
+  value: QueryPendingMigrationResponseAmino;
+}
+/**
+ * QueryRecoveryCommitmentsRequest defines the QueryRecoveryCommitmentsRequest message.
+ * @name QueryRecoveryCommitmentsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRecoveryCommitmentsRequest
+ */
+export interface QueryRecoveryCommitmentsRequest {
+  member: string;
+}
+export interface QueryRecoveryCommitmentsRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryRecoveryCommitmentsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryRecoveryCommitmentsRequest defines the QueryRecoveryCommitmentsRequest message.
+ * @name QueryRecoveryCommitmentsRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRecoveryCommitmentsRequest
+ */
+export interface QueryRecoveryCommitmentsRequestAmino {
+  member?: string;
+}
+export interface QueryRecoveryCommitmentsRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryRecoveryCommitmentsRequest";
+  value: QueryRecoveryCommitmentsRequestAmino;
+}
+/**
+ * QueryRecoveryCommitmentsResponse defines the QueryRecoveryCommitmentsResponse message.
+ * @name QueryRecoveryCommitmentsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRecoveryCommitmentsResponse
+ */
+export interface QueryRecoveryCommitmentsResponse {
+  set: RecoveryCommitmentSet;
+}
+export interface QueryRecoveryCommitmentsResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryRecoveryCommitmentsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryRecoveryCommitmentsResponse defines the QueryRecoveryCommitmentsResponse message.
+ * @name QueryRecoveryCommitmentsResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRecoveryCommitmentsResponse
+ */
+export interface QueryRecoveryCommitmentsResponseAmino {
+  set?: RecoveryCommitmentSetAmino;
+}
+export interface QueryRecoveryCommitmentsResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryRecoveryCommitmentsResponse";
+  value: QueryRecoveryCommitmentsResponseAmino;
+}
+/**
+ * QueryPendingMigrationByTargetRequest defines the QueryPendingMigrationByTargetRequest message.
+ * @name QueryPendingMigrationByTargetRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryPendingMigrationByTargetRequest
+ */
+export interface QueryPendingMigrationByTargetRequest {
+  address: string;
+}
+export interface QueryPendingMigrationByTargetRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryPendingMigrationByTargetRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryPendingMigrationByTargetRequest defines the QueryPendingMigrationByTargetRequest message.
+ * @name QueryPendingMigrationByTargetRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryPendingMigrationByTargetRequest
+ */
+export interface QueryPendingMigrationByTargetRequestAmino {
+  address?: string;
+}
+export interface QueryPendingMigrationByTargetRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryPendingMigrationByTargetRequest";
+  value: QueryPendingMigrationByTargetRequestAmino;
+}
+/**
+ * QueryPendingMigrationByTargetResponse defines the QueryPendingMigrationByTargetResponse message.
+ * @name QueryPendingMigrationByTargetResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryPendingMigrationByTargetResponse
+ */
+export interface QueryPendingMigrationByTargetResponse {
+  /**
+   * migration is the pending migration targeting address.
+   */
+  migration: MemberMigration;
+}
+export interface QueryPendingMigrationByTargetResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryPendingMigrationByTargetResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryPendingMigrationByTargetResponse defines the QueryPendingMigrationByTargetResponse message.
+ * @name QueryPendingMigrationByTargetResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryPendingMigrationByTargetResponse
+ */
+export interface QueryPendingMigrationByTargetResponseAmino {
+  /**
+   * migration is the pending migration targeting address.
+   */
+  migration?: MemberMigrationAmino;
+}
+export interface QueryPendingMigrationByTargetResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryPendingMigrationByTargetResponse";
+  value: QueryPendingMigrationByTargetResponseAmino;
 }
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
@@ -19795,6 +20222,1062 @@ export const QueryTrustTreeResponse = {
     return {
       typeUrl: "/sparkdream.rep.v1.QueryTrustTreeResponse",
       value: QueryTrustTreeResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryCanonicalRequest(): QueryCanonicalRequest {
+  return {
+    address: ""
+  };
+}
+/**
+ * QueryCanonicalRequest defines the QueryCanonicalRequest message.
+ * @name QueryCanonicalRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryCanonicalRequest
+ */
+export const QueryCanonicalRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryCanonicalRequest",
+  encode(message: QueryCanonicalRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.address !== "") {
+      writer.uint32(10).string(message.address);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryCanonicalRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryCanonicalRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.address = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryCanonicalRequest>): QueryCanonicalRequest {
+    const message = createBaseQueryCanonicalRequest();
+    message.address = object.address ?? "";
+    return message;
+  },
+  fromAmino(object: QueryCanonicalRequestAmino): QueryCanonicalRequest {
+    const message = createBaseQueryCanonicalRequest();
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    }
+    return message;
+  },
+  toAmino(message: QueryCanonicalRequest): QueryCanonicalRequestAmino {
+    const obj: any = {};
+    obj.address = message.address === "" ? undefined : message.address;
+    return obj;
+  },
+  fromAminoMsg(object: QueryCanonicalRequestAminoMsg): QueryCanonicalRequest {
+    return QueryCanonicalRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryCanonicalRequestProtoMsg): QueryCanonicalRequest {
+    return QueryCanonicalRequest.decode(message.value);
+  },
+  toProto(message: QueryCanonicalRequest): Uint8Array {
+    return QueryCanonicalRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryCanonicalRequest): QueryCanonicalRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryCanonicalRequest",
+      value: QueryCanonicalRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryCanonicalResponse(): QueryCanonicalResponse {
+  return {
+    canonical: "",
+    tombstoned: false,
+    path: 0
+  };
+}
+/**
+ * QueryCanonicalResponse defines the QueryCanonicalResponse message.
+ * @name QueryCanonicalResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryCanonicalResponse
+ */
+export const QueryCanonicalResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryCanonicalResponse",
+  encode(message: QueryCanonicalResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.canonical !== "") {
+      writer.uint32(10).string(message.canonical);
+    }
+    if (message.tombstoned === true) {
+      writer.uint32(16).bool(message.tombstoned);
+    }
+    if (message.path !== 0) {
+      writer.uint32(24).int32(message.path);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryCanonicalResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryCanonicalResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.canonical = reader.string();
+          break;
+        case 2:
+          message.tombstoned = reader.bool();
+          break;
+        case 3:
+          message.path = reader.int32() as any;
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryCanonicalResponse>): QueryCanonicalResponse {
+    const message = createBaseQueryCanonicalResponse();
+    message.canonical = object.canonical ?? "";
+    message.tombstoned = object.tombstoned ?? false;
+    message.path = object.path ?? 0;
+    return message;
+  },
+  fromAmino(object: QueryCanonicalResponseAmino): QueryCanonicalResponse {
+    const message = createBaseQueryCanonicalResponse();
+    if (object.canonical !== undefined && object.canonical !== null) {
+      message.canonical = object.canonical;
+    }
+    if (object.tombstoned !== undefined && object.tombstoned !== null) {
+      message.tombstoned = object.tombstoned;
+    }
+    if (object.path !== undefined && object.path !== null) {
+      message.path = object.path;
+    }
+    return message;
+  },
+  toAmino(message: QueryCanonicalResponse): QueryCanonicalResponseAmino {
+    const obj: any = {};
+    obj.canonical = message.canonical === "" ? undefined : message.canonical;
+    obj.tombstoned = message.tombstoned === false ? undefined : message.tombstoned;
+    obj.path = message.path === 0 ? undefined : message.path;
+    return obj;
+  },
+  fromAminoMsg(object: QueryCanonicalResponseAminoMsg): QueryCanonicalResponse {
+    return QueryCanonicalResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryCanonicalResponseProtoMsg): QueryCanonicalResponse {
+    return QueryCanonicalResponse.decode(message.value);
+  },
+  toProto(message: QueryCanonicalResponse): Uint8Array {
+    return QueryCanonicalResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryCanonicalResponse): QueryCanonicalResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryCanonicalResponse",
+      value: QueryCanonicalResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAliasesRequest(): QueryAliasesRequest {
+  return {
+    member: ""
+  };
+}
+/**
+ * QueryAliasesRequest defines the QueryAliasesRequest message.
+ * @name QueryAliasesRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAliasesRequest
+ */
+export const QueryAliasesRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryAliasesRequest",
+  encode(message: QueryAliasesRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.member !== "") {
+      writer.uint32(10).string(message.member);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAliasesRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAliasesRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.member = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAliasesRequest>): QueryAliasesRequest {
+    const message = createBaseQueryAliasesRequest();
+    message.member = object.member ?? "";
+    return message;
+  },
+  fromAmino(object: QueryAliasesRequestAmino): QueryAliasesRequest {
+    const message = createBaseQueryAliasesRequest();
+    if (object.member !== undefined && object.member !== null) {
+      message.member = object.member;
+    }
+    return message;
+  },
+  toAmino(message: QueryAliasesRequest): QueryAliasesRequestAmino {
+    const obj: any = {};
+    obj.member = message.member === "" ? undefined : message.member;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAliasesRequestAminoMsg): QueryAliasesRequest {
+    return QueryAliasesRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAliasesRequestProtoMsg): QueryAliasesRequest {
+    return QueryAliasesRequest.decode(message.value);
+  },
+  toProto(message: QueryAliasesRequest): Uint8Array {
+    return QueryAliasesRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAliasesRequest): QueryAliasesRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAliasesRequest",
+      value: QueryAliasesRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAliasesResponse(): QueryAliasesResponse {
+  return {
+    canonical: "",
+    addresses: [],
+    recent: []
+  };
+}
+/**
+ * QueryAliasesResponse defines the QueryAliasesResponse message.
+ * @name QueryAliasesResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryAliasesResponse
+ */
+export const QueryAliasesResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryAliasesResponse",
+  encode(message: QueryAliasesResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.canonical !== "") {
+      writer.uint32(10).string(message.canonical);
+    }
+    for (const v of message.addresses) {
+      writer.uint32(18).string(v!);
+    }
+    for (const v of message.recent) {
+      writer.uint32(26).string(v!);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAliasesResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAliasesResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.canonical = reader.string();
+          break;
+        case 2:
+          message.addresses.push(reader.string());
+          break;
+        case 3:
+          message.recent.push(reader.string());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAliasesResponse>): QueryAliasesResponse {
+    const message = createBaseQueryAliasesResponse();
+    message.canonical = object.canonical ?? "";
+    message.addresses = object.addresses?.map(e => e) || [];
+    message.recent = object.recent?.map(e => e) || [];
+    return message;
+  },
+  fromAmino(object: QueryAliasesResponseAmino): QueryAliasesResponse {
+    const message = createBaseQueryAliasesResponse();
+    if (object.canonical !== undefined && object.canonical !== null) {
+      message.canonical = object.canonical;
+    }
+    message.addresses = object.addresses?.map(e => e) || [];
+    message.recent = object.recent?.map(e => e) || [];
+    return message;
+  },
+  toAmino(message: QueryAliasesResponse): QueryAliasesResponseAmino {
+    const obj: any = {};
+    obj.canonical = message.canonical === "" ? undefined : message.canonical;
+    if (message.addresses) {
+      obj.addresses = message.addresses.map(e => e);
+    } else {
+      obj.addresses = message.addresses;
+    }
+    if (message.recent) {
+      obj.recent = message.recent.map(e => e);
+    } else {
+      obj.recent = message.recent;
+    }
+    return obj;
+  },
+  fromAminoMsg(object: QueryAliasesResponseAminoMsg): QueryAliasesResponse {
+    return QueryAliasesResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAliasesResponseProtoMsg): QueryAliasesResponse {
+    return QueryAliasesResponse.decode(message.value);
+  },
+  toProto(message: QueryAliasesResponse): Uint8Array {
+    return QueryAliasesResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAliasesResponse): QueryAliasesResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryAliasesResponse",
+      value: QueryAliasesResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryMemberMigrationRequest(): QueryMemberMigrationRequest {
+  return {
+    id: BigInt(0)
+  };
+}
+/**
+ * QueryMemberMigrationRequest defines the QueryMemberMigrationRequest message.
+ * @name QueryMemberMigrationRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberMigrationRequest
+ */
+export const QueryMemberMigrationRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberMigrationRequest",
+  encode(message: QueryMemberMigrationRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.id !== BigInt(0)) {
+      writer.uint32(8).uint64(message.id);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryMemberMigrationRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryMemberMigrationRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryMemberMigrationRequest>): QueryMemberMigrationRequest {
+    const message = createBaseQueryMemberMigrationRequest();
+    message.id = object.id !== undefined && object.id !== null ? BigInt(object.id.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryMemberMigrationRequestAmino): QueryMemberMigrationRequest {
+    const message = createBaseQueryMemberMigrationRequest();
+    if (object.id !== undefined && object.id !== null) {
+      message.id = BigInt(object.id);
+    }
+    return message;
+  },
+  toAmino(message: QueryMemberMigrationRequest): QueryMemberMigrationRequestAmino {
+    const obj: any = {};
+    obj.id = message.id !== BigInt(0) ? message.id?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryMemberMigrationRequestAminoMsg): QueryMemberMigrationRequest {
+    return QueryMemberMigrationRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryMemberMigrationRequestProtoMsg): QueryMemberMigrationRequest {
+    return QueryMemberMigrationRequest.decode(message.value);
+  },
+  toProto(message: QueryMemberMigrationRequest): Uint8Array {
+    return QueryMemberMigrationRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryMemberMigrationRequest): QueryMemberMigrationRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryMemberMigrationRequest",
+      value: QueryMemberMigrationRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryMemberMigrationResponse(): QueryMemberMigrationResponse {
+  return {
+    migration: MemberMigration.fromPartial({})
+  };
+}
+/**
+ * QueryMemberMigrationResponse defines the QueryMemberMigrationResponse message.
+ * @name QueryMemberMigrationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberMigrationResponse
+ */
+export const QueryMemberMigrationResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberMigrationResponse",
+  encode(message: QueryMemberMigrationResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.migration !== undefined) {
+      MemberMigration.encode(message.migration, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryMemberMigrationResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryMemberMigrationResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.migration = MemberMigration.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryMemberMigrationResponse>): QueryMemberMigrationResponse {
+    const message = createBaseQueryMemberMigrationResponse();
+    message.migration = object.migration !== undefined && object.migration !== null ? MemberMigration.fromPartial(object.migration) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryMemberMigrationResponseAmino): QueryMemberMigrationResponse {
+    const message = createBaseQueryMemberMigrationResponse();
+    if (object.migration !== undefined && object.migration !== null) {
+      message.migration = MemberMigration.fromAmino(object.migration);
+    }
+    return message;
+  },
+  toAmino(message: QueryMemberMigrationResponse): QueryMemberMigrationResponseAmino {
+    const obj: any = {};
+    obj.migration = message.migration ? MemberMigration.toAmino(message.migration) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryMemberMigrationResponseAminoMsg): QueryMemberMigrationResponse {
+    return QueryMemberMigrationResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryMemberMigrationResponseProtoMsg): QueryMemberMigrationResponse {
+    return QueryMemberMigrationResponse.decode(message.value);
+  },
+  toProto(message: QueryMemberMigrationResponse): Uint8Array {
+    return QueryMemberMigrationResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryMemberMigrationResponse): QueryMemberMigrationResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryMemberMigrationResponse",
+      value: QueryMemberMigrationResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryMemberMigrationsRequest(): QueryMemberMigrationsRequest {
+  return {
+    pagination: undefined,
+    status: 0,
+    address: ""
+  };
+}
+/**
+ * QueryMemberMigrationsRequest defines the QueryMemberMigrationsRequest message.
+ * @name QueryMemberMigrationsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberMigrationsRequest
+ */
+export const QueryMemberMigrationsRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberMigrationsRequest",
+  encode(message: QueryMemberMigrationsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.status !== 0) {
+      writer.uint32(16).int32(message.status);
+    }
+    if (message.address !== "") {
+      writer.uint32(26).string(message.address);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryMemberMigrationsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryMemberMigrationsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.status = reader.int32() as any;
+          break;
+        case 3:
+          message.address = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryMemberMigrationsRequest>): QueryMemberMigrationsRequest {
+    const message = createBaseQueryMemberMigrationsRequest();
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    message.status = object.status ?? 0;
+    message.address = object.address ?? "";
+    return message;
+  },
+  fromAmino(object: QueryMemberMigrationsRequestAmino): QueryMemberMigrationsRequest {
+    const message = createBaseQueryMemberMigrationsRequest();
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    if (object.status !== undefined && object.status !== null) {
+      message.status = object.status;
+    }
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    }
+    return message;
+  },
+  toAmino(message: QueryMemberMigrationsRequest): QueryMemberMigrationsRequestAmino {
+    const obj: any = {};
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    obj.status = message.status === 0 ? undefined : message.status;
+    obj.address = message.address === "" ? undefined : message.address;
+    return obj;
+  },
+  fromAminoMsg(object: QueryMemberMigrationsRequestAminoMsg): QueryMemberMigrationsRequest {
+    return QueryMemberMigrationsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryMemberMigrationsRequestProtoMsg): QueryMemberMigrationsRequest {
+    return QueryMemberMigrationsRequest.decode(message.value);
+  },
+  toProto(message: QueryMemberMigrationsRequest): Uint8Array {
+    return QueryMemberMigrationsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryMemberMigrationsRequest): QueryMemberMigrationsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryMemberMigrationsRequest",
+      value: QueryMemberMigrationsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryMemberMigrationsResponse(): QueryMemberMigrationsResponse {
+  return {
+    migrations: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryMemberMigrationsResponse defines the QueryMemberMigrationsResponse message.
+ * @name QueryMemberMigrationsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryMemberMigrationsResponse
+ */
+export const QueryMemberMigrationsResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryMemberMigrationsResponse",
+  encode(message: QueryMemberMigrationsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.migrations) {
+      MemberMigration.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryMemberMigrationsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryMemberMigrationsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.migrations.push(MemberMigration.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryMemberMigrationsResponse>): QueryMemberMigrationsResponse {
+    const message = createBaseQueryMemberMigrationsResponse();
+    message.migrations = object.migrations?.map(e => MemberMigration.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryMemberMigrationsResponseAmino): QueryMemberMigrationsResponse {
+    const message = createBaseQueryMemberMigrationsResponse();
+    message.migrations = object.migrations?.map(e => MemberMigration.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryMemberMigrationsResponse): QueryMemberMigrationsResponseAmino {
+    const obj: any = {};
+    if (message.migrations) {
+      obj.migrations = message.migrations.map(e => e ? MemberMigration.toAmino(e) : undefined);
+    } else {
+      obj.migrations = message.migrations;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryMemberMigrationsResponseAminoMsg): QueryMemberMigrationsResponse {
+    return QueryMemberMigrationsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryMemberMigrationsResponseProtoMsg): QueryMemberMigrationsResponse {
+    return QueryMemberMigrationsResponse.decode(message.value);
+  },
+  toProto(message: QueryMemberMigrationsResponse): Uint8Array {
+    return QueryMemberMigrationsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryMemberMigrationsResponse): QueryMemberMigrationsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryMemberMigrationsResponse",
+      value: QueryMemberMigrationsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryPendingMigrationRequest(): QueryPendingMigrationRequest {
+  return {
+    member: ""
+  };
+}
+/**
+ * QueryPendingMigrationRequest defines the QueryPendingMigrationRequest message.
+ * @name QueryPendingMigrationRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryPendingMigrationRequest
+ */
+export const QueryPendingMigrationRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryPendingMigrationRequest",
+  encode(message: QueryPendingMigrationRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.member !== "") {
+      writer.uint32(10).string(message.member);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryPendingMigrationRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryPendingMigrationRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.member = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryPendingMigrationRequest>): QueryPendingMigrationRequest {
+    const message = createBaseQueryPendingMigrationRequest();
+    message.member = object.member ?? "";
+    return message;
+  },
+  fromAmino(object: QueryPendingMigrationRequestAmino): QueryPendingMigrationRequest {
+    const message = createBaseQueryPendingMigrationRequest();
+    if (object.member !== undefined && object.member !== null) {
+      message.member = object.member;
+    }
+    return message;
+  },
+  toAmino(message: QueryPendingMigrationRequest): QueryPendingMigrationRequestAmino {
+    const obj: any = {};
+    obj.member = message.member === "" ? undefined : message.member;
+    return obj;
+  },
+  fromAminoMsg(object: QueryPendingMigrationRequestAminoMsg): QueryPendingMigrationRequest {
+    return QueryPendingMigrationRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryPendingMigrationRequestProtoMsg): QueryPendingMigrationRequest {
+    return QueryPendingMigrationRequest.decode(message.value);
+  },
+  toProto(message: QueryPendingMigrationRequest): Uint8Array {
+    return QueryPendingMigrationRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryPendingMigrationRequest): QueryPendingMigrationRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryPendingMigrationRequest",
+      value: QueryPendingMigrationRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryPendingMigrationResponse(): QueryPendingMigrationResponse {
+  return {
+    migration: MemberMigration.fromPartial({})
+  };
+}
+/**
+ * QueryPendingMigrationResponse defines the QueryPendingMigrationResponse message.
+ * @name QueryPendingMigrationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryPendingMigrationResponse
+ */
+export const QueryPendingMigrationResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryPendingMigrationResponse",
+  encode(message: QueryPendingMigrationResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.migration !== undefined) {
+      MemberMigration.encode(message.migration, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryPendingMigrationResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryPendingMigrationResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.migration = MemberMigration.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryPendingMigrationResponse>): QueryPendingMigrationResponse {
+    const message = createBaseQueryPendingMigrationResponse();
+    message.migration = object.migration !== undefined && object.migration !== null ? MemberMigration.fromPartial(object.migration) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryPendingMigrationResponseAmino): QueryPendingMigrationResponse {
+    const message = createBaseQueryPendingMigrationResponse();
+    if (object.migration !== undefined && object.migration !== null) {
+      message.migration = MemberMigration.fromAmino(object.migration);
+    }
+    return message;
+  },
+  toAmino(message: QueryPendingMigrationResponse): QueryPendingMigrationResponseAmino {
+    const obj: any = {};
+    obj.migration = message.migration ? MemberMigration.toAmino(message.migration) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryPendingMigrationResponseAminoMsg): QueryPendingMigrationResponse {
+    return QueryPendingMigrationResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryPendingMigrationResponseProtoMsg): QueryPendingMigrationResponse {
+    return QueryPendingMigrationResponse.decode(message.value);
+  },
+  toProto(message: QueryPendingMigrationResponse): Uint8Array {
+    return QueryPendingMigrationResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryPendingMigrationResponse): QueryPendingMigrationResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryPendingMigrationResponse",
+      value: QueryPendingMigrationResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRecoveryCommitmentsRequest(): QueryRecoveryCommitmentsRequest {
+  return {
+    member: ""
+  };
+}
+/**
+ * QueryRecoveryCommitmentsRequest defines the QueryRecoveryCommitmentsRequest message.
+ * @name QueryRecoveryCommitmentsRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRecoveryCommitmentsRequest
+ */
+export const QueryRecoveryCommitmentsRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryRecoveryCommitmentsRequest",
+  encode(message: QueryRecoveryCommitmentsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.member !== "") {
+      writer.uint32(10).string(message.member);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRecoveryCommitmentsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRecoveryCommitmentsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.member = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryRecoveryCommitmentsRequest>): QueryRecoveryCommitmentsRequest {
+    const message = createBaseQueryRecoveryCommitmentsRequest();
+    message.member = object.member ?? "";
+    return message;
+  },
+  fromAmino(object: QueryRecoveryCommitmentsRequestAmino): QueryRecoveryCommitmentsRequest {
+    const message = createBaseQueryRecoveryCommitmentsRequest();
+    if (object.member !== undefined && object.member !== null) {
+      message.member = object.member;
+    }
+    return message;
+  },
+  toAmino(message: QueryRecoveryCommitmentsRequest): QueryRecoveryCommitmentsRequestAmino {
+    const obj: any = {};
+    obj.member = message.member === "" ? undefined : message.member;
+    return obj;
+  },
+  fromAminoMsg(object: QueryRecoveryCommitmentsRequestAminoMsg): QueryRecoveryCommitmentsRequest {
+    return QueryRecoveryCommitmentsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRecoveryCommitmentsRequestProtoMsg): QueryRecoveryCommitmentsRequest {
+    return QueryRecoveryCommitmentsRequest.decode(message.value);
+  },
+  toProto(message: QueryRecoveryCommitmentsRequest): Uint8Array {
+    return QueryRecoveryCommitmentsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRecoveryCommitmentsRequest): QueryRecoveryCommitmentsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryRecoveryCommitmentsRequest",
+      value: QueryRecoveryCommitmentsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRecoveryCommitmentsResponse(): QueryRecoveryCommitmentsResponse {
+  return {
+    set: RecoveryCommitmentSet.fromPartial({})
+  };
+}
+/**
+ * QueryRecoveryCommitmentsResponse defines the QueryRecoveryCommitmentsResponse message.
+ * @name QueryRecoveryCommitmentsResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRecoveryCommitmentsResponse
+ */
+export const QueryRecoveryCommitmentsResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryRecoveryCommitmentsResponse",
+  encode(message: QueryRecoveryCommitmentsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.set !== undefined) {
+      RecoveryCommitmentSet.encode(message.set, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRecoveryCommitmentsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRecoveryCommitmentsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.set = RecoveryCommitmentSet.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryRecoveryCommitmentsResponse>): QueryRecoveryCommitmentsResponse {
+    const message = createBaseQueryRecoveryCommitmentsResponse();
+    message.set = object.set !== undefined && object.set !== null ? RecoveryCommitmentSet.fromPartial(object.set) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryRecoveryCommitmentsResponseAmino): QueryRecoveryCommitmentsResponse {
+    const message = createBaseQueryRecoveryCommitmentsResponse();
+    if (object.set !== undefined && object.set !== null) {
+      message.set = RecoveryCommitmentSet.fromAmino(object.set);
+    }
+    return message;
+  },
+  toAmino(message: QueryRecoveryCommitmentsResponse): QueryRecoveryCommitmentsResponseAmino {
+    const obj: any = {};
+    obj.set = message.set ? RecoveryCommitmentSet.toAmino(message.set) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryRecoveryCommitmentsResponseAminoMsg): QueryRecoveryCommitmentsResponse {
+    return QueryRecoveryCommitmentsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRecoveryCommitmentsResponseProtoMsg): QueryRecoveryCommitmentsResponse {
+    return QueryRecoveryCommitmentsResponse.decode(message.value);
+  },
+  toProto(message: QueryRecoveryCommitmentsResponse): Uint8Array {
+    return QueryRecoveryCommitmentsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRecoveryCommitmentsResponse): QueryRecoveryCommitmentsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryRecoveryCommitmentsResponse",
+      value: QueryRecoveryCommitmentsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryPendingMigrationByTargetRequest(): QueryPendingMigrationByTargetRequest {
+  return {
+    address: ""
+  };
+}
+/**
+ * QueryPendingMigrationByTargetRequest defines the QueryPendingMigrationByTargetRequest message.
+ * @name QueryPendingMigrationByTargetRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryPendingMigrationByTargetRequest
+ */
+export const QueryPendingMigrationByTargetRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryPendingMigrationByTargetRequest",
+  encode(message: QueryPendingMigrationByTargetRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.address !== "") {
+      writer.uint32(10).string(message.address);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryPendingMigrationByTargetRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryPendingMigrationByTargetRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.address = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryPendingMigrationByTargetRequest>): QueryPendingMigrationByTargetRequest {
+    const message = createBaseQueryPendingMigrationByTargetRequest();
+    message.address = object.address ?? "";
+    return message;
+  },
+  fromAmino(object: QueryPendingMigrationByTargetRequestAmino): QueryPendingMigrationByTargetRequest {
+    const message = createBaseQueryPendingMigrationByTargetRequest();
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    }
+    return message;
+  },
+  toAmino(message: QueryPendingMigrationByTargetRequest): QueryPendingMigrationByTargetRequestAmino {
+    const obj: any = {};
+    obj.address = message.address === "" ? undefined : message.address;
+    return obj;
+  },
+  fromAminoMsg(object: QueryPendingMigrationByTargetRequestAminoMsg): QueryPendingMigrationByTargetRequest {
+    return QueryPendingMigrationByTargetRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryPendingMigrationByTargetRequestProtoMsg): QueryPendingMigrationByTargetRequest {
+    return QueryPendingMigrationByTargetRequest.decode(message.value);
+  },
+  toProto(message: QueryPendingMigrationByTargetRequest): Uint8Array {
+    return QueryPendingMigrationByTargetRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryPendingMigrationByTargetRequest): QueryPendingMigrationByTargetRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryPendingMigrationByTargetRequest",
+      value: QueryPendingMigrationByTargetRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryPendingMigrationByTargetResponse(): QueryPendingMigrationByTargetResponse {
+  return {
+    migration: MemberMigration.fromPartial({})
+  };
+}
+/**
+ * QueryPendingMigrationByTargetResponse defines the QueryPendingMigrationByTargetResponse message.
+ * @name QueryPendingMigrationByTargetResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryPendingMigrationByTargetResponse
+ */
+export const QueryPendingMigrationByTargetResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryPendingMigrationByTargetResponse",
+  encode(message: QueryPendingMigrationByTargetResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.migration !== undefined) {
+      MemberMigration.encode(message.migration, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryPendingMigrationByTargetResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryPendingMigrationByTargetResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.migration = MemberMigration.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryPendingMigrationByTargetResponse>): QueryPendingMigrationByTargetResponse {
+    const message = createBaseQueryPendingMigrationByTargetResponse();
+    message.migration = object.migration !== undefined && object.migration !== null ? MemberMigration.fromPartial(object.migration) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryPendingMigrationByTargetResponseAmino): QueryPendingMigrationByTargetResponse {
+    const message = createBaseQueryPendingMigrationByTargetResponse();
+    if (object.migration !== undefined && object.migration !== null) {
+      message.migration = MemberMigration.fromAmino(object.migration);
+    }
+    return message;
+  },
+  toAmino(message: QueryPendingMigrationByTargetResponse): QueryPendingMigrationByTargetResponseAmino {
+    const obj: any = {};
+    obj.migration = message.migration ? MemberMigration.toAmino(message.migration) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryPendingMigrationByTargetResponseAminoMsg): QueryPendingMigrationByTargetResponse {
+    return QueryPendingMigrationByTargetResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryPendingMigrationByTargetResponseProtoMsg): QueryPendingMigrationByTargetResponse {
+    return QueryPendingMigrationByTargetResponse.decode(message.value);
+  },
+  toProto(message: QueryPendingMigrationByTargetResponse): Uint8Array {
+    return QueryPendingMigrationByTargetResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryPendingMigrationByTargetResponse): QueryPendingMigrationByTargetResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryPendingMigrationByTargetResponse",
+      value: QueryPendingMigrationByTargetResponse.encode(message).finish()
     };
   }
 };

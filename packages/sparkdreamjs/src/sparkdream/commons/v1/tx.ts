@@ -1537,6 +1537,15 @@ export interface MsgClaimRecurringSpendAminoMsg {
 export interface MsgClaimRecurringSpendResponse {
   claimNumber: bigint;
   nextClaimTime: bigint;
+  /**
+   * The council could not cover the period: nothing moved and the schedule
+   * is paused until a later claim succeeds.
+   */
+  paused: boolean;
+  /**
+   * The schedule's window had closed: nothing moved and it is complete.
+   */
+  completed: boolean;
 }
 export interface MsgClaimRecurringSpendResponseProtoMsg {
   typeUrl: "/sparkdream.commons.v1.MsgClaimRecurringSpendResponse";
@@ -1553,6 +1562,15 @@ export interface MsgClaimRecurringSpendResponseProtoMsg {
 export interface MsgClaimRecurringSpendResponseAmino {
   claim_number?: string;
   next_claim_time?: string;
+  /**
+   * The council could not cover the period: nothing moved and the schedule
+   * is paused until a later claim succeeds.
+   */
+  paused?: boolean;
+  /**
+   * The schedule's window had closed: nothing moved and it is complete.
+   */
+  completed?: boolean;
 }
 export interface MsgClaimRecurringSpendResponseAminoMsg {
   type: "/sparkdream.commons.v1.MsgClaimRecurringSpendResponse";
@@ -5772,7 +5790,9 @@ export const MsgClaimRecurringSpend = {
 function createBaseMsgClaimRecurringSpendResponse(): MsgClaimRecurringSpendResponse {
   return {
     claimNumber: BigInt(0),
-    nextClaimTime: BigInt(0)
+    nextClaimTime: BigInt(0),
+    paused: false,
+    completed: false
   };
 }
 /**
@@ -5792,6 +5812,12 @@ export const MsgClaimRecurringSpendResponse = {
     if (message.nextClaimTime !== BigInt(0)) {
       writer.uint32(16).int64(message.nextClaimTime);
     }
+    if (message.paused === true) {
+      writer.uint32(24).bool(message.paused);
+    }
+    if (message.completed === true) {
+      writer.uint32(32).bool(message.completed);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgClaimRecurringSpendResponse {
@@ -5807,6 +5833,12 @@ export const MsgClaimRecurringSpendResponse = {
         case 2:
           message.nextClaimTime = reader.int64();
           break;
+        case 3:
+          message.paused = reader.bool();
+          break;
+        case 4:
+          message.completed = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -5818,6 +5850,8 @@ export const MsgClaimRecurringSpendResponse = {
     const message = createBaseMsgClaimRecurringSpendResponse();
     message.claimNumber = object.claimNumber !== undefined && object.claimNumber !== null ? BigInt(object.claimNumber.toString()) : BigInt(0);
     message.nextClaimTime = object.nextClaimTime !== undefined && object.nextClaimTime !== null ? BigInt(object.nextClaimTime.toString()) : BigInt(0);
+    message.paused = object.paused ?? false;
+    message.completed = object.completed ?? false;
     return message;
   },
   fromAmino(object: MsgClaimRecurringSpendResponseAmino): MsgClaimRecurringSpendResponse {
@@ -5828,12 +5862,20 @@ export const MsgClaimRecurringSpendResponse = {
     if (object.next_claim_time !== undefined && object.next_claim_time !== null) {
       message.nextClaimTime = BigInt(object.next_claim_time);
     }
+    if (object.paused !== undefined && object.paused !== null) {
+      message.paused = object.paused;
+    }
+    if (object.completed !== undefined && object.completed !== null) {
+      message.completed = object.completed;
+    }
     return message;
   },
   toAmino(message: MsgClaimRecurringSpendResponse): MsgClaimRecurringSpendResponseAmino {
     const obj: any = {};
     obj.claim_number = message.claimNumber !== BigInt(0) ? message.claimNumber?.toString() : undefined;
     obj.next_claim_time = message.nextClaimTime !== BigInt(0) ? message.nextClaimTime?.toString() : undefined;
+    obj.paused = message.paused === false ? undefined : message.paused;
+    obj.completed = message.completed === false ? undefined : message.completed;
     return obj;
   },
   fromAminoMsg(object: MsgClaimRecurringSpendResponseAminoMsg): MsgClaimRecurringSpendResponse {

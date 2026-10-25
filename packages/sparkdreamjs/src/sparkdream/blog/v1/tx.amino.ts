@@ -12,6 +12,7 @@ import {
   MsgDeletePost, MsgHidePost, MsgUnhidePost, MsgCreateReply, MsgUpdateReply,
   MsgDeleteReply, MsgHideReply, MsgUnhideReply, MsgReact, MsgRemoveReaction,
   MsgPinPost, MsgPinReply,
+  MsgUnpinPost, MsgUnpinReply, MsgMakePostPermanent, MsgMakeReplyPermanent,
 } from "./tx";
 
 export const AminoConverter = {
@@ -120,5 +121,25 @@ export const AminoConverter = {
     aminoType: "sparkdream/x/blog/MsgPinReply",
     toAmino: MsgPinReply.toAmino,
     fromAmino: MsgPinReply.fromAmino,
+  },
+  "/sparkdream.blog.v1.MsgUnpinPost": {
+    aminoType: "sparkdream/x/blog/MsgUnpinPost",
+    toAmino: MsgUnpinPost.toAmino,
+    fromAmino: MsgUnpinPost.fromAmino,
+  },
+  "/sparkdream.blog.v1.MsgUnpinReply": {
+    aminoType: "sparkdream/x/blog/MsgUnpinReply",
+    toAmino: MsgUnpinReply.toAmino,
+    fromAmino: MsgUnpinReply.fromAmino,
+  },
+  "/sparkdream.blog.v1.MsgMakePostPermanent": {
+    aminoType: "sparkdream/x/blog/MsgMakePostPermanent",
+    toAmino: MsgMakePostPermanent.toAmino,
+    fromAmino: MsgMakePostPermanent.fromAmino,
+  },
+  "/sparkdream.blog.v1.MsgMakeReplyPermanent": {
+    aminoType: "sparkdream/x/blog/MsgMakeReplyPermanent",
+    toAmino: MsgMakeReplyPermanent.toAmino,
+    fromAmino: MsgMakeReplyPermanent.fromAmino,
   },
 };

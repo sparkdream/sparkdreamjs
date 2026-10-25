@@ -249,6 +249,14 @@ export interface MsgAcceptInvitation {
    * shows it on screen.
    */
   acceptedContentLicense: string;
+  /**
+   * recovery_commitment optionally registers a recovery commitment
+   * (SHA-256("sparkdream/recovery/commit/v1" || preimage)) at onboarding.
+   * It is the only commitment that takes effect immediately: there is
+   * nothing to steal yet. Optional in the protocol, on by default in
+   * wallets. Empty means none.
+   */
+  recoveryCommitment: Uint8Array;
 }
 export interface MsgAcceptInvitationProtoMsg {
   typeUrl: "/sparkdream.rep.v1.MsgAcceptInvitation";
@@ -272,6 +280,14 @@ export interface MsgAcceptInvitationAmino {
    * shows it on screen.
    */
   accepted_content_license?: string;
+  /**
+   * recovery_commitment optionally registers a recovery commitment
+   * (SHA-256("sparkdream/recovery/commit/v1" || preimage)) at onboarding.
+   * It is the only commitment that takes effect immediately: there is
+   * nothing to steal yet. Optional in the protocol, on by default in
+   * wallets. Empty means none.
+   */
+  recovery_commitment?: string;
 }
 export interface MsgAcceptInvitationAminoMsg {
   type: "sparkdream/x/rep/MsgAcceptInvitation";
@@ -3503,6 +3519,696 @@ export interface MsgRevokeInvitationResponseAminoMsg {
   type: "/sparkdream.rep.v1.MsgRevokeInvitationResponse";
   value: MsgRevokeInvitationResponseAmino;
 }
+/**
+ * MsgRequestMigration opens a KEY-path migration of the signer's identity to
+ * new_address (member key migration, docs/x-rep-spec.md). Refused while the
+ * key path is disabled, the member is zeroed or tombstoned, a member report
+ * against them is open, the cooldown or the rolling-window cap applies, a
+ * migration of equal or higher precedence is pending, or new_address is not
+ * fresh. The new address must accept with MsgAcceptMigration within
+ * migration_accept_window. No fee: safety actions pay gas only.
+ * @name MsgRequestMigration
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRequestMigration
+ */
+export interface MsgRequestMigration {
+  member: string;
+  newAddress: string;
+}
+export interface MsgRequestMigrationProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgRequestMigration";
+  value: Uint8Array;
+}
+/**
+ * MsgRequestMigration opens a KEY-path migration of the signer's identity to
+ * new_address (member key migration, docs/x-rep-spec.md). Refused while the
+ * key path is disabled, the member is zeroed or tombstoned, a member report
+ * against them is open, the cooldown or the rolling-window cap applies, a
+ * migration of equal or higher precedence is pending, or new_address is not
+ * fresh. The new address must accept with MsgAcceptMigration within
+ * migration_accept_window. No fee: safety actions pay gas only.
+ * @name MsgRequestMigrationAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRequestMigration
+ */
+export interface MsgRequestMigrationAmino {
+  member?: string;
+  new_address?: string;
+}
+export interface MsgRequestMigrationAminoMsg {
+  type: "sparkdream/x/rep/MsgRequestMigration";
+  value: MsgRequestMigrationAmino;
+}
+/**
+ * MsgRequestMigrationResponse defines the MsgRequestMigrationResponse message.
+ * @name MsgRequestMigrationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRequestMigrationResponse
+ */
+export interface MsgRequestMigrationResponse {
+  migrationId: bigint;
+}
+export interface MsgRequestMigrationResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgRequestMigrationResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgRequestMigrationResponse defines the MsgRequestMigrationResponse message.
+ * @name MsgRequestMigrationResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRequestMigrationResponse
+ */
+export interface MsgRequestMigrationResponseAmino {
+  migration_id?: string;
+}
+export interface MsgRequestMigrationResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgRequestMigrationResponse";
+  value: MsgRequestMigrationResponseAmino;
+}
+/**
+ * MsgAcceptMigration is signed by the new address and completes every path
+ * (key, recovery, council): it proves control of the target so nobody
+ * migrates into a typo, starts the path's delay and enqueues finalization. A
+ * native multisig target multisigns it.
+ * @name MsgAcceptMigration
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAcceptMigration
+ */
+export interface MsgAcceptMigration {
+  newAddress: string;
+  migrationId: bigint;
+}
+export interface MsgAcceptMigrationProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgAcceptMigration";
+  value: Uint8Array;
+}
+/**
+ * MsgAcceptMigration is signed by the new address and completes every path
+ * (key, recovery, council): it proves control of the target so nobody
+ * migrates into a typo, starts the path's delay and enqueues finalization. A
+ * native multisig target multisigns it.
+ * @name MsgAcceptMigrationAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAcceptMigration
+ */
+export interface MsgAcceptMigrationAmino {
+  new_address?: string;
+  migration_id?: string;
+}
+export interface MsgAcceptMigrationAminoMsg {
+  type: "sparkdream/x/rep/MsgAcceptMigration";
+  value: MsgAcceptMigrationAmino;
+}
+/**
+ * MsgAcceptMigrationResponse defines the MsgAcceptMigrationResponse message.
+ * @name MsgAcceptMigrationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAcceptMigrationResponse
+ */
+export interface MsgAcceptMigrationResponse {}
+export interface MsgAcceptMigrationResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgAcceptMigrationResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgAcceptMigrationResponse defines the MsgAcceptMigrationResponse message.
+ * @name MsgAcceptMigrationResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAcceptMigrationResponse
+ */
+export interface MsgAcceptMigrationResponseAmino {}
+export interface MsgAcceptMigrationResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgAcceptMigrationResponse";
+  value: MsgAcceptMigrationResponseAmino;
+}
+/**
+ * MsgCancelMigration cancels a pending migration. The old or new address may
+ * cancel a KEY migration; the Commons HR committee policy may cancel KEY and
+ * COUNCIL migrations; governance may cancel any path and is the only
+ * authority over a RECOVERY migration.
+ * @name MsgCancelMigration
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCancelMigration
+ */
+export interface MsgCancelMigration {
+  signer: string;
+  migrationId: bigint;
+}
+export interface MsgCancelMigrationProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgCancelMigration";
+  value: Uint8Array;
+}
+/**
+ * MsgCancelMigration cancels a pending migration. The old or new address may
+ * cancel a KEY migration; the Commons HR committee policy may cancel KEY and
+ * COUNCIL migrations; governance may cancel any path and is the only
+ * authority over a RECOVERY migration.
+ * @name MsgCancelMigrationAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCancelMigration
+ */
+export interface MsgCancelMigrationAmino {
+  signer?: string;
+  migration_id?: string;
+}
+export interface MsgCancelMigrationAminoMsg {
+  type: "sparkdream/x/rep/MsgCancelMigration";
+  value: MsgCancelMigrationAmino;
+}
+/**
+ * MsgCancelMigrationResponse defines the MsgCancelMigrationResponse message.
+ * @name MsgCancelMigrationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCancelMigrationResponse
+ */
+export interface MsgCancelMigrationResponse {}
+export interface MsgCancelMigrationResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgCancelMigrationResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgCancelMigrationResponse defines the MsgCancelMigrationResponse message.
+ * @name MsgCancelMigrationResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCancelMigrationResponse
+ */
+export interface MsgCancelMigrationResponseAmino {}
+export interface MsgCancelMigrationResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgCancelMigrationResponse";
+  value: MsgCancelMigrationResponseAmino;
+}
+/**
+ * MsgSetRecoveryCommitment adds (or replaces) one of the member's recovery
+ * commitments, at most MaxRecoveryCommitments (4). It takes effect after
+ * recovery_change_delay, so whoever holds the key cannot swap in their own
+ * commitment or use the recovery path as a faster key path. The only
+ * immediate commitment is the one carried by MsgAcceptInvitation.
+ * @name MsgSetRecoveryCommitment
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSetRecoveryCommitment
+ */
+export interface MsgSetRecoveryCommitment {
+  member: string;
+  /**
+   * commitment = SHA-256("sparkdream/recovery/commit/v1" || preimage).
+   */
+  commitment: Uint8Array;
+  /**
+   * replaces optionally names an existing commitment to retire when the new
+   * one becomes active.
+   */
+  replaces: Uint8Array;
+}
+export interface MsgSetRecoveryCommitmentProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgSetRecoveryCommitment";
+  value: Uint8Array;
+}
+/**
+ * MsgSetRecoveryCommitment adds (or replaces) one of the member's recovery
+ * commitments, at most MaxRecoveryCommitments (4). It takes effect after
+ * recovery_change_delay, so whoever holds the key cannot swap in their own
+ * commitment or use the recovery path as a faster key path. The only
+ * immediate commitment is the one carried by MsgAcceptInvitation.
+ * @name MsgSetRecoveryCommitmentAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSetRecoveryCommitment
+ */
+export interface MsgSetRecoveryCommitmentAmino {
+  member?: string;
+  /**
+   * commitment = SHA-256("sparkdream/recovery/commit/v1" || preimage).
+   */
+  commitment?: string;
+  /**
+   * replaces optionally names an existing commitment to retire when the new
+   * one becomes active.
+   */
+  replaces?: string;
+}
+export interface MsgSetRecoveryCommitmentAminoMsg {
+  type: "sparkdream/x/rep/MsgSetRecoveryCommitment";
+  value: MsgSetRecoveryCommitmentAmino;
+}
+/**
+ * MsgSetRecoveryCommitmentResponse defines the MsgSetRecoveryCommitmentResponse message.
+ * @name MsgSetRecoveryCommitmentResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSetRecoveryCommitmentResponse
+ */
+export interface MsgSetRecoveryCommitmentResponse {}
+export interface MsgSetRecoveryCommitmentResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgSetRecoveryCommitmentResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgSetRecoveryCommitmentResponse defines the MsgSetRecoveryCommitmentResponse message.
+ * @name MsgSetRecoveryCommitmentResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSetRecoveryCommitmentResponse
+ */
+export interface MsgSetRecoveryCommitmentResponseAmino {}
+export interface MsgSetRecoveryCommitmentResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgSetRecoveryCommitmentResponse";
+  value: MsgSetRecoveryCommitmentResponseAmino;
+}
+/**
+ * MsgRemoveRecoveryCommitment schedules the removal of a commitment after
+ * recovery_change_delay; it stays usable for a reveal until then.
+ * @name MsgRemoveRecoveryCommitment
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRemoveRecoveryCommitment
+ */
+export interface MsgRemoveRecoveryCommitment {
+  member: string;
+  commitment: Uint8Array;
+}
+export interface MsgRemoveRecoveryCommitmentProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgRemoveRecoveryCommitment";
+  value: Uint8Array;
+}
+/**
+ * MsgRemoveRecoveryCommitment schedules the removal of a commitment after
+ * recovery_change_delay; it stays usable for a reveal until then.
+ * @name MsgRemoveRecoveryCommitmentAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRemoveRecoveryCommitment
+ */
+export interface MsgRemoveRecoveryCommitmentAmino {
+  member?: string;
+  commitment?: string;
+}
+export interface MsgRemoveRecoveryCommitmentAminoMsg {
+  type: "sparkdream/x/rep/MsgRemoveRecoveryCommitment";
+  value: MsgRemoveRecoveryCommitmentAmino;
+}
+/**
+ * MsgRemoveRecoveryCommitmentResponse defines the MsgRemoveRecoveryCommitmentResponse message.
+ * @name MsgRemoveRecoveryCommitmentResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRemoveRecoveryCommitmentResponse
+ */
+export interface MsgRemoveRecoveryCommitmentResponse {}
+export interface MsgRemoveRecoveryCommitmentResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgRemoveRecoveryCommitmentResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgRemoveRecoveryCommitmentResponse defines the MsgRemoveRecoveryCommitmentResponse message.
+ * @name MsgRemoveRecoveryCommitmentResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRemoveRecoveryCommitmentResponse
+ */
+export interface MsgRemoveRecoveryCommitmentResponseAmino {}
+export interface MsgRemoveRecoveryCommitmentResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgRemoveRecoveryCommitmentResponse";
+  value: MsgRemoveRecoveryCommitmentResponseAmino;
+}
+/**
+ * MsgCommitRecovery stores a sealed commit, the front-running guard of a
+ * reveal, against recovery_commit_deposit (refunded when a reveal consumes
+ * the seal, burned when it expires after recovery_commit_ttl). Any account
+ * may submit it; it reveals nothing about the member, the preimage or the
+ * target.
+ * @name MsgCommitRecovery
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCommitRecovery
+ */
+export interface MsgCommitRecovery {
+  submitter: string;
+  /**
+   * sealed = SHA-256("sparkdream/recovery/seal/v1" || preimage || old_address || new_address).
+   */
+  sealed: Uint8Array;
+}
+export interface MsgCommitRecoveryProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgCommitRecovery";
+  value: Uint8Array;
+}
+/**
+ * MsgCommitRecovery stores a sealed commit, the front-running guard of a
+ * reveal, against recovery_commit_deposit (refunded when a reveal consumes
+ * the seal, burned when it expires after recovery_commit_ttl). Any account
+ * may submit it; it reveals nothing about the member, the preimage or the
+ * target.
+ * @name MsgCommitRecoveryAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCommitRecovery
+ */
+export interface MsgCommitRecoveryAmino {
+  submitter?: string;
+  /**
+   * sealed = SHA-256("sparkdream/recovery/seal/v1" || preimage || old_address || new_address).
+   */
+  sealed?: string;
+}
+export interface MsgCommitRecoveryAminoMsg {
+  type: "sparkdream/x/rep/MsgCommitRecovery";
+  value: MsgCommitRecoveryAmino;
+}
+/**
+ * MsgCommitRecoveryResponse defines the MsgCommitRecoveryResponse message.
+ * @name MsgCommitRecoveryResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCommitRecoveryResponse
+ */
+export interface MsgCommitRecoveryResponse {}
+export interface MsgCommitRecoveryResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgCommitRecoveryResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgCommitRecoveryResponse defines the MsgCommitRecoveryResponse message.
+ * @name MsgCommitRecoveryResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCommitRecoveryResponse
+ */
+export interface MsgCommitRecoveryResponseAmino {}
+export interface MsgCommitRecoveryResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgCommitRecoveryResponse";
+  value: MsgCommitRecoveryResponseAmino;
+}
+/**
+ * MsgRevealRecovery opens a RECOVERY migration of member to new_address by
+ * revealing the preimage of one of member's active commitments. The sealed
+ * commit binding (preimage, member, new_address) must exist and have aged
+ * recovery_reveal_min_blocks. Signed by any account: the seal already binds
+ * the target, and new_address confirms control afterwards with
+ * MsgAcceptMigration. The matched commitment is consumed, pending commitment
+ * changes are voided and any pending KEY or COUNCIL migration is cancelled.
+ * @name MsgRevealRecovery
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRevealRecovery
+ */
+export interface MsgRevealRecovery {
+  revealer: string;
+  member: string;
+  newAddress: string;
+  preimage: Uint8Array;
+}
+export interface MsgRevealRecoveryProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgRevealRecovery";
+  value: Uint8Array;
+}
+/**
+ * MsgRevealRecovery opens a RECOVERY migration of member to new_address by
+ * revealing the preimage of one of member's active commitments. The sealed
+ * commit binding (preimage, member, new_address) must exist and have aged
+ * recovery_reveal_min_blocks. Signed by any account: the seal already binds
+ * the target, and new_address confirms control afterwards with
+ * MsgAcceptMigration. The matched commitment is consumed, pending commitment
+ * changes are voided and any pending KEY or COUNCIL migration is cancelled.
+ * @name MsgRevealRecoveryAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRevealRecovery
+ */
+export interface MsgRevealRecoveryAmino {
+  revealer?: string;
+  member?: string;
+  new_address?: string;
+  preimage?: string;
+}
+export interface MsgRevealRecoveryAminoMsg {
+  type: "sparkdream/x/rep/MsgRevealRecovery";
+  value: MsgRevealRecoveryAmino;
+}
+/**
+ * MsgRevealRecoveryResponse defines the MsgRevealRecoveryResponse message.
+ * @name MsgRevealRecoveryResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRevealRecoveryResponse
+ */
+export interface MsgRevealRecoveryResponse {
+  migrationId: bigint;
+}
+export interface MsgRevealRecoveryResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgRevealRecoveryResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgRevealRecoveryResponse defines the MsgRevealRecoveryResponse message.
+ * @name MsgRevealRecoveryResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRevealRecoveryResponse
+ */
+export interface MsgRevealRecoveryResponseAmino {
+  migration_id?: string;
+}
+export interface MsgRevealRecoveryResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgRevealRecoveryResponse";
+  value: MsgRevealRecoveryResponseAmino;
+}
+/**
+ * MsgObjectMigration lets the old address contest a COUNCIL migration
+ * during its delay. It does not cancel the migration: the objector posts
+ * migration_objection_bond and an x/rep jury decides. The bond is paid to
+ * the new address if the migration is upheld and refunded otherwise, never
+ * burned.
+ * @name MsgObjectMigration
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgObjectMigration
+ */
+export interface MsgObjectMigration {
+  member: string;
+  migrationId: bigint;
+  reason: string;
+}
+export interface MsgObjectMigrationProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgObjectMigration";
+  value: Uint8Array;
+}
+/**
+ * MsgObjectMigration lets the old address contest a COUNCIL migration
+ * during its delay. It does not cancel the migration: the objector posts
+ * migration_objection_bond and an x/rep jury decides. The bond is paid to
+ * the new address if the migration is upheld and refunded otherwise, never
+ * burned.
+ * @name MsgObjectMigrationAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgObjectMigration
+ */
+export interface MsgObjectMigrationAmino {
+  member?: string;
+  migration_id?: string;
+  reason?: string;
+}
+export interface MsgObjectMigrationAminoMsg {
+  type: "sparkdream/x/rep/MsgObjectMigration";
+  value: MsgObjectMigrationAmino;
+}
+/**
+ * MsgObjectMigrationResponse defines the MsgObjectMigrationResponse message.
+ * @name MsgObjectMigrationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgObjectMigrationResponse
+ */
+export interface MsgObjectMigrationResponse {}
+export interface MsgObjectMigrationResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgObjectMigrationResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgObjectMigrationResponse defines the MsgObjectMigrationResponse message.
+ * @name MsgObjectMigrationResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgObjectMigrationResponse
+ */
+export interface MsgObjectMigrationResponseAmino {}
+export interface MsgObjectMigrationResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgObjectMigrationResponse";
+  value: MsgObjectMigrationResponseAmino;
+}
+/**
+ * MsgSweepTombstone moves a tombstone's spendable SPARK to its canonical
+ * address, which signs. Unbonding completes to the old address outside the
+ * bank send restriction; on the recovery and council paths the old key may
+ * not MsgSend it, so this is how the member collects it.
+ * @name MsgSweepTombstone
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSweepTombstone
+ */
+export interface MsgSweepTombstone {
+  signer: string;
+  tombstone: string;
+}
+export interface MsgSweepTombstoneProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgSweepTombstone";
+  value: Uint8Array;
+}
+/**
+ * MsgSweepTombstone moves a tombstone's spendable SPARK to its canonical
+ * address, which signs. Unbonding completes to the old address outside the
+ * bank send restriction; on the recovery and council paths the old key may
+ * not MsgSend it, so this is how the member collects it.
+ * @name MsgSweepTombstoneAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSweepTombstone
+ */
+export interface MsgSweepTombstoneAmino {
+  signer?: string;
+  tombstone?: string;
+}
+export interface MsgSweepTombstoneAminoMsg {
+  type: "sparkdream/x/rep/MsgSweepTombstone";
+  value: MsgSweepTombstoneAmino;
+}
+/**
+ * MsgSweepTombstoneResponse defines the MsgSweepTombstoneResponse message.
+ * @name MsgSweepTombstoneResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSweepTombstoneResponse
+ */
+export interface MsgSweepTombstoneResponse {}
+export interface MsgSweepTombstoneResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgSweepTombstoneResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgSweepTombstoneResponse defines the MsgSweepTombstoneResponse message.
+ * @name MsgSweepTombstoneResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSweepTombstoneResponse
+ */
+export interface MsgSweepTombstoneResponseAmino {}
+export interface MsgSweepTombstoneResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgSweepTombstoneResponse";
+  value: MsgSweepTombstoneResponseAmino;
+}
+/**
+ * MsgForceMigration opens a COUNCIL migration of member to new_address on
+ * off-chain evidence (a lost key with no recovery commitment). The authority
+ * is the Commons HR (governance) committee policy or x/gov. new_address must
+ * still accept; the old address may object to a jury during
+ * council_migration_delay. An open member report does not block it.
+ * @name MsgForceMigration
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgForceMigration
+ */
+export interface MsgForceMigration {
+  authority: string;
+  member: string;
+  newAddress: string;
+  /**
+   * evidence_uri references the off-chain evidence (inviter attestation,
+   * guild officers' statements, prior federation links).
+   */
+  evidenceUri: string;
+}
+export interface MsgForceMigrationProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgForceMigration";
+  value: Uint8Array;
+}
+/**
+ * MsgForceMigration opens a COUNCIL migration of member to new_address on
+ * off-chain evidence (a lost key with no recovery commitment). The authority
+ * is the Commons HR (governance) committee policy or x/gov. new_address must
+ * still accept; the old address may object to a jury during
+ * council_migration_delay. An open member report does not block it.
+ * @name MsgForceMigrationAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgForceMigration
+ */
+export interface MsgForceMigrationAmino {
+  authority?: string;
+  member?: string;
+  new_address?: string;
+  /**
+   * evidence_uri references the off-chain evidence (inviter attestation,
+   * guild officers' statements, prior federation links).
+   */
+  evidence_uri?: string;
+}
+export interface MsgForceMigrationAminoMsg {
+  type: "sparkdream/x/rep/MsgForceMigration";
+  value: MsgForceMigrationAmino;
+}
+/**
+ * MsgForceMigrationResponse defines the MsgForceMigrationResponse message.
+ * @name MsgForceMigrationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgForceMigrationResponse
+ */
+export interface MsgForceMigrationResponse {
+  migrationId: bigint;
+}
+export interface MsgForceMigrationResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgForceMigrationResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgForceMigrationResponse defines the MsgForceMigrationResponse message.
+ * @name MsgForceMigrationResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgForceMigrationResponse
+ */
+export interface MsgForceMigrationResponseAmino {
+  migration_id?: string;
+}
+export interface MsgForceMigrationResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgForceMigrationResponse";
+  value: MsgForceMigrationResponseAmino;
+}
+/**
+ * MsgClearZkPublicKey zeroes the member's zk_public_key and any
+ * pending_zk_public_key at once and registers nothing in their place. It is
+ * the remedy for a leaked shield secret: unlike a key change it has no
+ * cooldown and no per-season limit, because zeroing can only take capability
+ * away. It sets zk_key_cleared, so the next MsgRegisterZkPublicKey is never
+ * immediate (it waits zk_key_activation_delay) and still honours the
+ * once-per-season change cap; clear-then-register is not a free key swap.
+ * Never session-delegable, never shield-compatible (rep identity list).
+ * @name MsgClearZkPublicKey
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgClearZkPublicKey
+ */
+export interface MsgClearZkPublicKey {
+  member: string;
+}
+export interface MsgClearZkPublicKeyProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgClearZkPublicKey";
+  value: Uint8Array;
+}
+/**
+ * MsgClearZkPublicKey zeroes the member's zk_public_key and any
+ * pending_zk_public_key at once and registers nothing in their place. It is
+ * the remedy for a leaked shield secret: unlike a key change it has no
+ * cooldown and no per-season limit, because zeroing can only take capability
+ * away. It sets zk_key_cleared, so the next MsgRegisterZkPublicKey is never
+ * immediate (it waits zk_key_activation_delay) and still honours the
+ * once-per-season change cap; clear-then-register is not a free key swap.
+ * Never session-delegable, never shield-compatible (rep identity list).
+ * @name MsgClearZkPublicKeyAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgClearZkPublicKey
+ */
+export interface MsgClearZkPublicKeyAmino {
+  member?: string;
+}
+export interface MsgClearZkPublicKeyAminoMsg {
+  type: "sparkdream/x/rep/MsgClearZkPublicKey";
+  value: MsgClearZkPublicKeyAmino;
+}
+/**
+ * MsgClearZkPublicKeyResponse defines the MsgClearZkPublicKeyResponse message.
+ * @name MsgClearZkPublicKeyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgClearZkPublicKeyResponse
+ */
+export interface MsgClearZkPublicKeyResponse {}
+export interface MsgClearZkPublicKeyResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgClearZkPublicKeyResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgClearZkPublicKeyResponse defines the MsgClearZkPublicKeyResponse message.
+ * @name MsgClearZkPublicKeyResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgClearZkPublicKeyResponse
+ */
+export interface MsgClearZkPublicKeyResponseAmino {}
+export interface MsgClearZkPublicKeyResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgClearZkPublicKeyResponse";
+  value: MsgClearZkPublicKeyResponseAmino;
+}
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
     authority: "",
@@ -3967,7 +4673,8 @@ function createBaseMsgAcceptInvitation(): MsgAcceptInvitation {
   return {
     invitee: "",
     invitationId: BigInt(0),
-    acceptedContentLicense: ""
+    acceptedContentLicense: "",
+    recoveryCommitment: new Uint8Array()
   };
 }
 /**
@@ -3989,6 +4696,9 @@ export const MsgAcceptInvitation = {
     if (message.acceptedContentLicense !== "") {
       writer.uint32(26).string(message.acceptedContentLicense);
     }
+    if (message.recoveryCommitment.length !== 0) {
+      writer.uint32(34).bytes(message.recoveryCommitment);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgAcceptInvitation {
@@ -4007,6 +4717,9 @@ export const MsgAcceptInvitation = {
         case 3:
           message.acceptedContentLicense = reader.string();
           break;
+        case 4:
+          message.recoveryCommitment = reader.bytes();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4019,6 +4732,7 @@ export const MsgAcceptInvitation = {
     message.invitee = object.invitee ?? "";
     message.invitationId = object.invitationId !== undefined && object.invitationId !== null ? BigInt(object.invitationId.toString()) : BigInt(0);
     message.acceptedContentLicense = object.acceptedContentLicense ?? "";
+    message.recoveryCommitment = object.recoveryCommitment ?? new Uint8Array();
     return message;
   },
   fromAmino(object: MsgAcceptInvitationAmino): MsgAcceptInvitation {
@@ -4032,6 +4746,9 @@ export const MsgAcceptInvitation = {
     if (object.accepted_content_license !== undefined && object.accepted_content_license !== null) {
       message.acceptedContentLicense = object.accepted_content_license;
     }
+    if (object.recovery_commitment !== undefined && object.recovery_commitment !== null) {
+      message.recoveryCommitment = bytesFromBase64(object.recovery_commitment);
+    }
     return message;
   },
   toAmino(message: MsgAcceptInvitation): MsgAcceptInvitationAmino {
@@ -4039,6 +4756,7 @@ export const MsgAcceptInvitation = {
     obj.invitee = message.invitee === "" ? undefined : message.invitee;
     obj.invitation_id = message.invitationId !== BigInt(0) ? message.invitationId?.toString() : undefined;
     obj.accepted_content_license = message.acceptedContentLicense === "" ? undefined : message.acceptedContentLicense;
+    obj.recovery_commitment = message.recoveryCommitment ? base64FromBytes(message.recoveryCommitment) : undefined;
     return obj;
   },
   fromAminoMsg(object: MsgAcceptInvitationAminoMsg): MsgAcceptInvitation {
@@ -13423,6 +14141,1734 @@ export const MsgRevokeInvitationResponse = {
     return {
       typeUrl: "/sparkdream.rep.v1.MsgRevokeInvitationResponse",
       value: MsgRevokeInvitationResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRequestMigration(): MsgRequestMigration {
+  return {
+    member: "",
+    newAddress: ""
+  };
+}
+/**
+ * MsgRequestMigration opens a KEY-path migration of the signer's identity to
+ * new_address (member key migration, docs/x-rep-spec.md). Refused while the
+ * key path is disabled, the member is zeroed or tombstoned, a member report
+ * against them is open, the cooldown or the rolling-window cap applies, a
+ * migration of equal or higher precedence is pending, or new_address is not
+ * fresh. The new address must accept with MsgAcceptMigration within
+ * migration_accept_window. No fee: safety actions pay gas only.
+ * @name MsgRequestMigration
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRequestMigration
+ */
+export const MsgRequestMigration = {
+  typeUrl: "/sparkdream.rep.v1.MsgRequestMigration",
+  aminoType: "sparkdream/x/rep/MsgRequestMigration",
+  encode(message: MsgRequestMigration, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.member !== "") {
+      writer.uint32(10).string(message.member);
+    }
+    if (message.newAddress !== "") {
+      writer.uint32(18).string(message.newAddress);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRequestMigration {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRequestMigration();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.member = reader.string();
+          break;
+        case 2:
+          message.newAddress = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgRequestMigration>): MsgRequestMigration {
+    const message = createBaseMsgRequestMigration();
+    message.member = object.member ?? "";
+    message.newAddress = object.newAddress ?? "";
+    return message;
+  },
+  fromAmino(object: MsgRequestMigrationAmino): MsgRequestMigration {
+    const message = createBaseMsgRequestMigration();
+    if (object.member !== undefined && object.member !== null) {
+      message.member = object.member;
+    }
+    if (object.new_address !== undefined && object.new_address !== null) {
+      message.newAddress = object.new_address;
+    }
+    return message;
+  },
+  toAmino(message: MsgRequestMigration): MsgRequestMigrationAmino {
+    const obj: any = {};
+    obj.member = message.member === "" ? undefined : message.member;
+    obj.new_address = message.newAddress === "" ? undefined : message.newAddress;
+    return obj;
+  },
+  fromAminoMsg(object: MsgRequestMigrationAminoMsg): MsgRequestMigration {
+    return MsgRequestMigration.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRequestMigration): MsgRequestMigrationAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgRequestMigration",
+      value: MsgRequestMigration.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgRequestMigrationProtoMsg): MsgRequestMigration {
+    return MsgRequestMigration.decode(message.value);
+  },
+  toProto(message: MsgRequestMigration): Uint8Array {
+    return MsgRequestMigration.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRequestMigration): MsgRequestMigrationProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgRequestMigration",
+      value: MsgRequestMigration.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRequestMigrationResponse(): MsgRequestMigrationResponse {
+  return {
+    migrationId: BigInt(0)
+  };
+}
+/**
+ * MsgRequestMigrationResponse defines the MsgRequestMigrationResponse message.
+ * @name MsgRequestMigrationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRequestMigrationResponse
+ */
+export const MsgRequestMigrationResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgRequestMigrationResponse",
+  encode(message: MsgRequestMigrationResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.migrationId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.migrationId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRequestMigrationResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRequestMigrationResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.migrationId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgRequestMigrationResponse>): MsgRequestMigrationResponse {
+    const message = createBaseMsgRequestMigrationResponse();
+    message.migrationId = object.migrationId !== undefined && object.migrationId !== null ? BigInt(object.migrationId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgRequestMigrationResponseAmino): MsgRequestMigrationResponse {
+    const message = createBaseMsgRequestMigrationResponse();
+    if (object.migration_id !== undefined && object.migration_id !== null) {
+      message.migrationId = BigInt(object.migration_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgRequestMigrationResponse): MsgRequestMigrationResponseAmino {
+    const obj: any = {};
+    obj.migration_id = message.migrationId !== BigInt(0) ? message.migrationId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgRequestMigrationResponseAminoMsg): MsgRequestMigrationResponse {
+    return MsgRequestMigrationResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgRequestMigrationResponseProtoMsg): MsgRequestMigrationResponse {
+    return MsgRequestMigrationResponse.decode(message.value);
+  },
+  toProto(message: MsgRequestMigrationResponse): Uint8Array {
+    return MsgRequestMigrationResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRequestMigrationResponse): MsgRequestMigrationResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgRequestMigrationResponse",
+      value: MsgRequestMigrationResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAcceptMigration(): MsgAcceptMigration {
+  return {
+    newAddress: "",
+    migrationId: BigInt(0)
+  };
+}
+/**
+ * MsgAcceptMigration is signed by the new address and completes every path
+ * (key, recovery, council): it proves control of the target so nobody
+ * migrates into a typo, starts the path's delay and enqueues finalization. A
+ * native multisig target multisigns it.
+ * @name MsgAcceptMigration
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAcceptMigration
+ */
+export const MsgAcceptMigration = {
+  typeUrl: "/sparkdream.rep.v1.MsgAcceptMigration",
+  aminoType: "sparkdream/x/rep/MsgAcceptMigration",
+  encode(message: MsgAcceptMigration, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.newAddress !== "") {
+      writer.uint32(10).string(message.newAddress);
+    }
+    if (message.migrationId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.migrationId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAcceptMigration {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAcceptMigration();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.newAddress = reader.string();
+          break;
+        case 2:
+          message.migrationId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgAcceptMigration>): MsgAcceptMigration {
+    const message = createBaseMsgAcceptMigration();
+    message.newAddress = object.newAddress ?? "";
+    message.migrationId = object.migrationId !== undefined && object.migrationId !== null ? BigInt(object.migrationId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgAcceptMigrationAmino): MsgAcceptMigration {
+    const message = createBaseMsgAcceptMigration();
+    if (object.new_address !== undefined && object.new_address !== null) {
+      message.newAddress = object.new_address;
+    }
+    if (object.migration_id !== undefined && object.migration_id !== null) {
+      message.migrationId = BigInt(object.migration_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgAcceptMigration): MsgAcceptMigrationAmino {
+    const obj: any = {};
+    obj.new_address = message.newAddress === "" ? undefined : message.newAddress;
+    obj.migration_id = message.migrationId !== BigInt(0) ? message.migrationId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgAcceptMigrationAminoMsg): MsgAcceptMigration {
+    return MsgAcceptMigration.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAcceptMigration): MsgAcceptMigrationAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgAcceptMigration",
+      value: MsgAcceptMigration.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgAcceptMigrationProtoMsg): MsgAcceptMigration {
+    return MsgAcceptMigration.decode(message.value);
+  },
+  toProto(message: MsgAcceptMigration): Uint8Array {
+    return MsgAcceptMigration.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAcceptMigration): MsgAcceptMigrationProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgAcceptMigration",
+      value: MsgAcceptMigration.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAcceptMigrationResponse(): MsgAcceptMigrationResponse {
+  return {};
+}
+/**
+ * MsgAcceptMigrationResponse defines the MsgAcceptMigrationResponse message.
+ * @name MsgAcceptMigrationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgAcceptMigrationResponse
+ */
+export const MsgAcceptMigrationResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgAcceptMigrationResponse",
+  encode(_: MsgAcceptMigrationResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAcceptMigrationResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAcceptMigrationResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgAcceptMigrationResponse>): MsgAcceptMigrationResponse {
+    const message = createBaseMsgAcceptMigrationResponse();
+    return message;
+  },
+  fromAmino(_: MsgAcceptMigrationResponseAmino): MsgAcceptMigrationResponse {
+    const message = createBaseMsgAcceptMigrationResponse();
+    return message;
+  },
+  toAmino(_: MsgAcceptMigrationResponse): MsgAcceptMigrationResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgAcceptMigrationResponseAminoMsg): MsgAcceptMigrationResponse {
+    return MsgAcceptMigrationResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgAcceptMigrationResponseProtoMsg): MsgAcceptMigrationResponse {
+    return MsgAcceptMigrationResponse.decode(message.value);
+  },
+  toProto(message: MsgAcceptMigrationResponse): Uint8Array {
+    return MsgAcceptMigrationResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAcceptMigrationResponse): MsgAcceptMigrationResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgAcceptMigrationResponse",
+      value: MsgAcceptMigrationResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCancelMigration(): MsgCancelMigration {
+  return {
+    signer: "",
+    migrationId: BigInt(0)
+  };
+}
+/**
+ * MsgCancelMigration cancels a pending migration. The old or new address may
+ * cancel a KEY migration; the Commons HR committee policy may cancel KEY and
+ * COUNCIL migrations; governance may cancel any path and is the only
+ * authority over a RECOVERY migration.
+ * @name MsgCancelMigration
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCancelMigration
+ */
+export const MsgCancelMigration = {
+  typeUrl: "/sparkdream.rep.v1.MsgCancelMigration",
+  aminoType: "sparkdream/x/rep/MsgCancelMigration",
+  encode(message: MsgCancelMigration, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.signer !== "") {
+      writer.uint32(10).string(message.signer);
+    }
+    if (message.migrationId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.migrationId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCancelMigration {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCancelMigration();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.signer = reader.string();
+          break;
+        case 2:
+          message.migrationId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCancelMigration>): MsgCancelMigration {
+    const message = createBaseMsgCancelMigration();
+    message.signer = object.signer ?? "";
+    message.migrationId = object.migrationId !== undefined && object.migrationId !== null ? BigInt(object.migrationId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgCancelMigrationAmino): MsgCancelMigration {
+    const message = createBaseMsgCancelMigration();
+    if (object.signer !== undefined && object.signer !== null) {
+      message.signer = object.signer;
+    }
+    if (object.migration_id !== undefined && object.migration_id !== null) {
+      message.migrationId = BigInt(object.migration_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgCancelMigration): MsgCancelMigrationAmino {
+    const obj: any = {};
+    obj.signer = message.signer === "" ? undefined : message.signer;
+    obj.migration_id = message.migrationId !== BigInt(0) ? message.migrationId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgCancelMigrationAminoMsg): MsgCancelMigration {
+    return MsgCancelMigration.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCancelMigration): MsgCancelMigrationAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgCancelMigration",
+      value: MsgCancelMigration.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgCancelMigrationProtoMsg): MsgCancelMigration {
+    return MsgCancelMigration.decode(message.value);
+  },
+  toProto(message: MsgCancelMigration): Uint8Array {
+    return MsgCancelMigration.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCancelMigration): MsgCancelMigrationProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgCancelMigration",
+      value: MsgCancelMigration.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCancelMigrationResponse(): MsgCancelMigrationResponse {
+  return {};
+}
+/**
+ * MsgCancelMigrationResponse defines the MsgCancelMigrationResponse message.
+ * @name MsgCancelMigrationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCancelMigrationResponse
+ */
+export const MsgCancelMigrationResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgCancelMigrationResponse",
+  encode(_: MsgCancelMigrationResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCancelMigrationResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCancelMigrationResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgCancelMigrationResponse>): MsgCancelMigrationResponse {
+    const message = createBaseMsgCancelMigrationResponse();
+    return message;
+  },
+  fromAmino(_: MsgCancelMigrationResponseAmino): MsgCancelMigrationResponse {
+    const message = createBaseMsgCancelMigrationResponse();
+    return message;
+  },
+  toAmino(_: MsgCancelMigrationResponse): MsgCancelMigrationResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgCancelMigrationResponseAminoMsg): MsgCancelMigrationResponse {
+    return MsgCancelMigrationResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgCancelMigrationResponseProtoMsg): MsgCancelMigrationResponse {
+    return MsgCancelMigrationResponse.decode(message.value);
+  },
+  toProto(message: MsgCancelMigrationResponse): Uint8Array {
+    return MsgCancelMigrationResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCancelMigrationResponse): MsgCancelMigrationResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgCancelMigrationResponse",
+      value: MsgCancelMigrationResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSetRecoveryCommitment(): MsgSetRecoveryCommitment {
+  return {
+    member: "",
+    commitment: new Uint8Array(),
+    replaces: new Uint8Array()
+  };
+}
+/**
+ * MsgSetRecoveryCommitment adds (or replaces) one of the member's recovery
+ * commitments, at most MaxRecoveryCommitments (4). It takes effect after
+ * recovery_change_delay, so whoever holds the key cannot swap in their own
+ * commitment or use the recovery path as a faster key path. The only
+ * immediate commitment is the one carried by MsgAcceptInvitation.
+ * @name MsgSetRecoveryCommitment
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSetRecoveryCommitment
+ */
+export const MsgSetRecoveryCommitment = {
+  typeUrl: "/sparkdream.rep.v1.MsgSetRecoveryCommitment",
+  aminoType: "sparkdream/x/rep/MsgSetRecoveryCommitment",
+  encode(message: MsgSetRecoveryCommitment, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.member !== "") {
+      writer.uint32(10).string(message.member);
+    }
+    if (message.commitment.length !== 0) {
+      writer.uint32(18).bytes(message.commitment);
+    }
+    if (message.replaces.length !== 0) {
+      writer.uint32(26).bytes(message.replaces);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSetRecoveryCommitment {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSetRecoveryCommitment();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.member = reader.string();
+          break;
+        case 2:
+          message.commitment = reader.bytes();
+          break;
+        case 3:
+          message.replaces = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgSetRecoveryCommitment>): MsgSetRecoveryCommitment {
+    const message = createBaseMsgSetRecoveryCommitment();
+    message.member = object.member ?? "";
+    message.commitment = object.commitment ?? new Uint8Array();
+    message.replaces = object.replaces ?? new Uint8Array();
+    return message;
+  },
+  fromAmino(object: MsgSetRecoveryCommitmentAmino): MsgSetRecoveryCommitment {
+    const message = createBaseMsgSetRecoveryCommitment();
+    if (object.member !== undefined && object.member !== null) {
+      message.member = object.member;
+    }
+    if (object.commitment !== undefined && object.commitment !== null) {
+      message.commitment = bytesFromBase64(object.commitment);
+    }
+    if (object.replaces !== undefined && object.replaces !== null) {
+      message.replaces = bytesFromBase64(object.replaces);
+    }
+    return message;
+  },
+  toAmino(message: MsgSetRecoveryCommitment): MsgSetRecoveryCommitmentAmino {
+    const obj: any = {};
+    obj.member = message.member === "" ? undefined : message.member;
+    obj.commitment = message.commitment ? base64FromBytes(message.commitment) : undefined;
+    obj.replaces = message.replaces ? base64FromBytes(message.replaces) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgSetRecoveryCommitmentAminoMsg): MsgSetRecoveryCommitment {
+    return MsgSetRecoveryCommitment.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSetRecoveryCommitment): MsgSetRecoveryCommitmentAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgSetRecoveryCommitment",
+      value: MsgSetRecoveryCommitment.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgSetRecoveryCommitmentProtoMsg): MsgSetRecoveryCommitment {
+    return MsgSetRecoveryCommitment.decode(message.value);
+  },
+  toProto(message: MsgSetRecoveryCommitment): Uint8Array {
+    return MsgSetRecoveryCommitment.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSetRecoveryCommitment): MsgSetRecoveryCommitmentProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgSetRecoveryCommitment",
+      value: MsgSetRecoveryCommitment.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSetRecoveryCommitmentResponse(): MsgSetRecoveryCommitmentResponse {
+  return {};
+}
+/**
+ * MsgSetRecoveryCommitmentResponse defines the MsgSetRecoveryCommitmentResponse message.
+ * @name MsgSetRecoveryCommitmentResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSetRecoveryCommitmentResponse
+ */
+export const MsgSetRecoveryCommitmentResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgSetRecoveryCommitmentResponse",
+  encode(_: MsgSetRecoveryCommitmentResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSetRecoveryCommitmentResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSetRecoveryCommitmentResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgSetRecoveryCommitmentResponse>): MsgSetRecoveryCommitmentResponse {
+    const message = createBaseMsgSetRecoveryCommitmentResponse();
+    return message;
+  },
+  fromAmino(_: MsgSetRecoveryCommitmentResponseAmino): MsgSetRecoveryCommitmentResponse {
+    const message = createBaseMsgSetRecoveryCommitmentResponse();
+    return message;
+  },
+  toAmino(_: MsgSetRecoveryCommitmentResponse): MsgSetRecoveryCommitmentResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgSetRecoveryCommitmentResponseAminoMsg): MsgSetRecoveryCommitmentResponse {
+    return MsgSetRecoveryCommitmentResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgSetRecoveryCommitmentResponseProtoMsg): MsgSetRecoveryCommitmentResponse {
+    return MsgSetRecoveryCommitmentResponse.decode(message.value);
+  },
+  toProto(message: MsgSetRecoveryCommitmentResponse): Uint8Array {
+    return MsgSetRecoveryCommitmentResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSetRecoveryCommitmentResponse): MsgSetRecoveryCommitmentResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgSetRecoveryCommitmentResponse",
+      value: MsgSetRecoveryCommitmentResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRemoveRecoveryCommitment(): MsgRemoveRecoveryCommitment {
+  return {
+    member: "",
+    commitment: new Uint8Array()
+  };
+}
+/**
+ * MsgRemoveRecoveryCommitment schedules the removal of a commitment after
+ * recovery_change_delay; it stays usable for a reveal until then.
+ * @name MsgRemoveRecoveryCommitment
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRemoveRecoveryCommitment
+ */
+export const MsgRemoveRecoveryCommitment = {
+  typeUrl: "/sparkdream.rep.v1.MsgRemoveRecoveryCommitment",
+  aminoType: "sparkdream/x/rep/MsgRemoveRecoveryCommitment",
+  encode(message: MsgRemoveRecoveryCommitment, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.member !== "") {
+      writer.uint32(10).string(message.member);
+    }
+    if (message.commitment.length !== 0) {
+      writer.uint32(18).bytes(message.commitment);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRemoveRecoveryCommitment {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRemoveRecoveryCommitment();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.member = reader.string();
+          break;
+        case 2:
+          message.commitment = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgRemoveRecoveryCommitment>): MsgRemoveRecoveryCommitment {
+    const message = createBaseMsgRemoveRecoveryCommitment();
+    message.member = object.member ?? "";
+    message.commitment = object.commitment ?? new Uint8Array();
+    return message;
+  },
+  fromAmino(object: MsgRemoveRecoveryCommitmentAmino): MsgRemoveRecoveryCommitment {
+    const message = createBaseMsgRemoveRecoveryCommitment();
+    if (object.member !== undefined && object.member !== null) {
+      message.member = object.member;
+    }
+    if (object.commitment !== undefined && object.commitment !== null) {
+      message.commitment = bytesFromBase64(object.commitment);
+    }
+    return message;
+  },
+  toAmino(message: MsgRemoveRecoveryCommitment): MsgRemoveRecoveryCommitmentAmino {
+    const obj: any = {};
+    obj.member = message.member === "" ? undefined : message.member;
+    obj.commitment = message.commitment ? base64FromBytes(message.commitment) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgRemoveRecoveryCommitmentAminoMsg): MsgRemoveRecoveryCommitment {
+    return MsgRemoveRecoveryCommitment.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRemoveRecoveryCommitment): MsgRemoveRecoveryCommitmentAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgRemoveRecoveryCommitment",
+      value: MsgRemoveRecoveryCommitment.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgRemoveRecoveryCommitmentProtoMsg): MsgRemoveRecoveryCommitment {
+    return MsgRemoveRecoveryCommitment.decode(message.value);
+  },
+  toProto(message: MsgRemoveRecoveryCommitment): Uint8Array {
+    return MsgRemoveRecoveryCommitment.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRemoveRecoveryCommitment): MsgRemoveRecoveryCommitmentProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgRemoveRecoveryCommitment",
+      value: MsgRemoveRecoveryCommitment.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRemoveRecoveryCommitmentResponse(): MsgRemoveRecoveryCommitmentResponse {
+  return {};
+}
+/**
+ * MsgRemoveRecoveryCommitmentResponse defines the MsgRemoveRecoveryCommitmentResponse message.
+ * @name MsgRemoveRecoveryCommitmentResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRemoveRecoveryCommitmentResponse
+ */
+export const MsgRemoveRecoveryCommitmentResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgRemoveRecoveryCommitmentResponse",
+  encode(_: MsgRemoveRecoveryCommitmentResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRemoveRecoveryCommitmentResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRemoveRecoveryCommitmentResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgRemoveRecoveryCommitmentResponse>): MsgRemoveRecoveryCommitmentResponse {
+    const message = createBaseMsgRemoveRecoveryCommitmentResponse();
+    return message;
+  },
+  fromAmino(_: MsgRemoveRecoveryCommitmentResponseAmino): MsgRemoveRecoveryCommitmentResponse {
+    const message = createBaseMsgRemoveRecoveryCommitmentResponse();
+    return message;
+  },
+  toAmino(_: MsgRemoveRecoveryCommitmentResponse): MsgRemoveRecoveryCommitmentResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgRemoveRecoveryCommitmentResponseAminoMsg): MsgRemoveRecoveryCommitmentResponse {
+    return MsgRemoveRecoveryCommitmentResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgRemoveRecoveryCommitmentResponseProtoMsg): MsgRemoveRecoveryCommitmentResponse {
+    return MsgRemoveRecoveryCommitmentResponse.decode(message.value);
+  },
+  toProto(message: MsgRemoveRecoveryCommitmentResponse): Uint8Array {
+    return MsgRemoveRecoveryCommitmentResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRemoveRecoveryCommitmentResponse): MsgRemoveRecoveryCommitmentResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgRemoveRecoveryCommitmentResponse",
+      value: MsgRemoveRecoveryCommitmentResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCommitRecovery(): MsgCommitRecovery {
+  return {
+    submitter: "",
+    sealed: new Uint8Array()
+  };
+}
+/**
+ * MsgCommitRecovery stores a sealed commit, the front-running guard of a
+ * reveal, against recovery_commit_deposit (refunded when a reveal consumes
+ * the seal, burned when it expires after recovery_commit_ttl). Any account
+ * may submit it; it reveals nothing about the member, the preimage or the
+ * target.
+ * @name MsgCommitRecovery
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCommitRecovery
+ */
+export const MsgCommitRecovery = {
+  typeUrl: "/sparkdream.rep.v1.MsgCommitRecovery",
+  aminoType: "sparkdream/x/rep/MsgCommitRecovery",
+  encode(message: MsgCommitRecovery, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.submitter !== "") {
+      writer.uint32(10).string(message.submitter);
+    }
+    if (message.sealed.length !== 0) {
+      writer.uint32(18).bytes(message.sealed);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCommitRecovery {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCommitRecovery();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.submitter = reader.string();
+          break;
+        case 2:
+          message.sealed = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCommitRecovery>): MsgCommitRecovery {
+    const message = createBaseMsgCommitRecovery();
+    message.submitter = object.submitter ?? "";
+    message.sealed = object.sealed ?? new Uint8Array();
+    return message;
+  },
+  fromAmino(object: MsgCommitRecoveryAmino): MsgCommitRecovery {
+    const message = createBaseMsgCommitRecovery();
+    if (object.submitter !== undefined && object.submitter !== null) {
+      message.submitter = object.submitter;
+    }
+    if (object.sealed !== undefined && object.sealed !== null) {
+      message.sealed = bytesFromBase64(object.sealed);
+    }
+    return message;
+  },
+  toAmino(message: MsgCommitRecovery): MsgCommitRecoveryAmino {
+    const obj: any = {};
+    obj.submitter = message.submitter === "" ? undefined : message.submitter;
+    obj.sealed = message.sealed ? base64FromBytes(message.sealed) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgCommitRecoveryAminoMsg): MsgCommitRecovery {
+    return MsgCommitRecovery.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCommitRecovery): MsgCommitRecoveryAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgCommitRecovery",
+      value: MsgCommitRecovery.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgCommitRecoveryProtoMsg): MsgCommitRecovery {
+    return MsgCommitRecovery.decode(message.value);
+  },
+  toProto(message: MsgCommitRecovery): Uint8Array {
+    return MsgCommitRecovery.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCommitRecovery): MsgCommitRecoveryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgCommitRecovery",
+      value: MsgCommitRecovery.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCommitRecoveryResponse(): MsgCommitRecoveryResponse {
+  return {};
+}
+/**
+ * MsgCommitRecoveryResponse defines the MsgCommitRecoveryResponse message.
+ * @name MsgCommitRecoveryResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCommitRecoveryResponse
+ */
+export const MsgCommitRecoveryResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgCommitRecoveryResponse",
+  encode(_: MsgCommitRecoveryResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCommitRecoveryResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCommitRecoveryResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgCommitRecoveryResponse>): MsgCommitRecoveryResponse {
+    const message = createBaseMsgCommitRecoveryResponse();
+    return message;
+  },
+  fromAmino(_: MsgCommitRecoveryResponseAmino): MsgCommitRecoveryResponse {
+    const message = createBaseMsgCommitRecoveryResponse();
+    return message;
+  },
+  toAmino(_: MsgCommitRecoveryResponse): MsgCommitRecoveryResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgCommitRecoveryResponseAminoMsg): MsgCommitRecoveryResponse {
+    return MsgCommitRecoveryResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgCommitRecoveryResponseProtoMsg): MsgCommitRecoveryResponse {
+    return MsgCommitRecoveryResponse.decode(message.value);
+  },
+  toProto(message: MsgCommitRecoveryResponse): Uint8Array {
+    return MsgCommitRecoveryResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCommitRecoveryResponse): MsgCommitRecoveryResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgCommitRecoveryResponse",
+      value: MsgCommitRecoveryResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRevealRecovery(): MsgRevealRecovery {
+  return {
+    revealer: "",
+    member: "",
+    newAddress: "",
+    preimage: new Uint8Array()
+  };
+}
+/**
+ * MsgRevealRecovery opens a RECOVERY migration of member to new_address by
+ * revealing the preimage of one of member's active commitments. The sealed
+ * commit binding (preimage, member, new_address) must exist and have aged
+ * recovery_reveal_min_blocks. Signed by any account: the seal already binds
+ * the target, and new_address confirms control afterwards with
+ * MsgAcceptMigration. The matched commitment is consumed, pending commitment
+ * changes are voided and any pending KEY or COUNCIL migration is cancelled.
+ * @name MsgRevealRecovery
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRevealRecovery
+ */
+export const MsgRevealRecovery = {
+  typeUrl: "/sparkdream.rep.v1.MsgRevealRecovery",
+  aminoType: "sparkdream/x/rep/MsgRevealRecovery",
+  encode(message: MsgRevealRecovery, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.revealer !== "") {
+      writer.uint32(10).string(message.revealer);
+    }
+    if (message.member !== "") {
+      writer.uint32(18).string(message.member);
+    }
+    if (message.newAddress !== "") {
+      writer.uint32(26).string(message.newAddress);
+    }
+    if (message.preimage.length !== 0) {
+      writer.uint32(34).bytes(message.preimage);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRevealRecovery {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRevealRecovery();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.revealer = reader.string();
+          break;
+        case 2:
+          message.member = reader.string();
+          break;
+        case 3:
+          message.newAddress = reader.string();
+          break;
+        case 4:
+          message.preimage = reader.bytes();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgRevealRecovery>): MsgRevealRecovery {
+    const message = createBaseMsgRevealRecovery();
+    message.revealer = object.revealer ?? "";
+    message.member = object.member ?? "";
+    message.newAddress = object.newAddress ?? "";
+    message.preimage = object.preimage ?? new Uint8Array();
+    return message;
+  },
+  fromAmino(object: MsgRevealRecoveryAmino): MsgRevealRecovery {
+    const message = createBaseMsgRevealRecovery();
+    if (object.revealer !== undefined && object.revealer !== null) {
+      message.revealer = object.revealer;
+    }
+    if (object.member !== undefined && object.member !== null) {
+      message.member = object.member;
+    }
+    if (object.new_address !== undefined && object.new_address !== null) {
+      message.newAddress = object.new_address;
+    }
+    if (object.preimage !== undefined && object.preimage !== null) {
+      message.preimage = bytesFromBase64(object.preimage);
+    }
+    return message;
+  },
+  toAmino(message: MsgRevealRecovery): MsgRevealRecoveryAmino {
+    const obj: any = {};
+    obj.revealer = message.revealer === "" ? undefined : message.revealer;
+    obj.member = message.member === "" ? undefined : message.member;
+    obj.new_address = message.newAddress === "" ? undefined : message.newAddress;
+    obj.preimage = message.preimage ? base64FromBytes(message.preimage) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgRevealRecoveryAminoMsg): MsgRevealRecovery {
+    return MsgRevealRecovery.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRevealRecovery): MsgRevealRecoveryAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgRevealRecovery",
+      value: MsgRevealRecovery.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgRevealRecoveryProtoMsg): MsgRevealRecovery {
+    return MsgRevealRecovery.decode(message.value);
+  },
+  toProto(message: MsgRevealRecovery): Uint8Array {
+    return MsgRevealRecovery.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRevealRecovery): MsgRevealRecoveryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgRevealRecovery",
+      value: MsgRevealRecovery.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRevealRecoveryResponse(): MsgRevealRecoveryResponse {
+  return {
+    migrationId: BigInt(0)
+  };
+}
+/**
+ * MsgRevealRecoveryResponse defines the MsgRevealRecoveryResponse message.
+ * @name MsgRevealRecoveryResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgRevealRecoveryResponse
+ */
+export const MsgRevealRecoveryResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgRevealRecoveryResponse",
+  encode(message: MsgRevealRecoveryResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.migrationId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.migrationId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRevealRecoveryResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRevealRecoveryResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.migrationId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgRevealRecoveryResponse>): MsgRevealRecoveryResponse {
+    const message = createBaseMsgRevealRecoveryResponse();
+    message.migrationId = object.migrationId !== undefined && object.migrationId !== null ? BigInt(object.migrationId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgRevealRecoveryResponseAmino): MsgRevealRecoveryResponse {
+    const message = createBaseMsgRevealRecoveryResponse();
+    if (object.migration_id !== undefined && object.migration_id !== null) {
+      message.migrationId = BigInt(object.migration_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgRevealRecoveryResponse): MsgRevealRecoveryResponseAmino {
+    const obj: any = {};
+    obj.migration_id = message.migrationId !== BigInt(0) ? message.migrationId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgRevealRecoveryResponseAminoMsg): MsgRevealRecoveryResponse {
+    return MsgRevealRecoveryResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgRevealRecoveryResponseProtoMsg): MsgRevealRecoveryResponse {
+    return MsgRevealRecoveryResponse.decode(message.value);
+  },
+  toProto(message: MsgRevealRecoveryResponse): Uint8Array {
+    return MsgRevealRecoveryResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRevealRecoveryResponse): MsgRevealRecoveryResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgRevealRecoveryResponse",
+      value: MsgRevealRecoveryResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgObjectMigration(): MsgObjectMigration {
+  return {
+    member: "",
+    migrationId: BigInt(0),
+    reason: ""
+  };
+}
+/**
+ * MsgObjectMigration lets the old address contest a COUNCIL migration
+ * during its delay. It does not cancel the migration: the objector posts
+ * migration_objection_bond and an x/rep jury decides. The bond is paid to
+ * the new address if the migration is upheld and refunded otherwise, never
+ * burned.
+ * @name MsgObjectMigration
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgObjectMigration
+ */
+export const MsgObjectMigration = {
+  typeUrl: "/sparkdream.rep.v1.MsgObjectMigration",
+  aminoType: "sparkdream/x/rep/MsgObjectMigration",
+  encode(message: MsgObjectMigration, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.member !== "") {
+      writer.uint32(10).string(message.member);
+    }
+    if (message.migrationId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.migrationId);
+    }
+    if (message.reason !== "") {
+      writer.uint32(26).string(message.reason);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgObjectMigration {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgObjectMigration();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.member = reader.string();
+          break;
+        case 2:
+          message.migrationId = reader.uint64();
+          break;
+        case 3:
+          message.reason = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgObjectMigration>): MsgObjectMigration {
+    const message = createBaseMsgObjectMigration();
+    message.member = object.member ?? "";
+    message.migrationId = object.migrationId !== undefined && object.migrationId !== null ? BigInt(object.migrationId.toString()) : BigInt(0);
+    message.reason = object.reason ?? "";
+    return message;
+  },
+  fromAmino(object: MsgObjectMigrationAmino): MsgObjectMigration {
+    const message = createBaseMsgObjectMigration();
+    if (object.member !== undefined && object.member !== null) {
+      message.member = object.member;
+    }
+    if (object.migration_id !== undefined && object.migration_id !== null) {
+      message.migrationId = BigInt(object.migration_id);
+    }
+    if (object.reason !== undefined && object.reason !== null) {
+      message.reason = object.reason;
+    }
+    return message;
+  },
+  toAmino(message: MsgObjectMigration): MsgObjectMigrationAmino {
+    const obj: any = {};
+    obj.member = message.member === "" ? undefined : message.member;
+    obj.migration_id = message.migrationId !== BigInt(0) ? message.migrationId?.toString() : undefined;
+    obj.reason = message.reason === "" ? undefined : message.reason;
+    return obj;
+  },
+  fromAminoMsg(object: MsgObjectMigrationAminoMsg): MsgObjectMigration {
+    return MsgObjectMigration.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgObjectMigration): MsgObjectMigrationAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgObjectMigration",
+      value: MsgObjectMigration.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgObjectMigrationProtoMsg): MsgObjectMigration {
+    return MsgObjectMigration.decode(message.value);
+  },
+  toProto(message: MsgObjectMigration): Uint8Array {
+    return MsgObjectMigration.encode(message).finish();
+  },
+  toProtoMsg(message: MsgObjectMigration): MsgObjectMigrationProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgObjectMigration",
+      value: MsgObjectMigration.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgObjectMigrationResponse(): MsgObjectMigrationResponse {
+  return {};
+}
+/**
+ * MsgObjectMigrationResponse defines the MsgObjectMigrationResponse message.
+ * @name MsgObjectMigrationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgObjectMigrationResponse
+ */
+export const MsgObjectMigrationResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgObjectMigrationResponse",
+  encode(_: MsgObjectMigrationResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgObjectMigrationResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgObjectMigrationResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgObjectMigrationResponse>): MsgObjectMigrationResponse {
+    const message = createBaseMsgObjectMigrationResponse();
+    return message;
+  },
+  fromAmino(_: MsgObjectMigrationResponseAmino): MsgObjectMigrationResponse {
+    const message = createBaseMsgObjectMigrationResponse();
+    return message;
+  },
+  toAmino(_: MsgObjectMigrationResponse): MsgObjectMigrationResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgObjectMigrationResponseAminoMsg): MsgObjectMigrationResponse {
+    return MsgObjectMigrationResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgObjectMigrationResponseProtoMsg): MsgObjectMigrationResponse {
+    return MsgObjectMigrationResponse.decode(message.value);
+  },
+  toProto(message: MsgObjectMigrationResponse): Uint8Array {
+    return MsgObjectMigrationResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgObjectMigrationResponse): MsgObjectMigrationResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgObjectMigrationResponse",
+      value: MsgObjectMigrationResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSweepTombstone(): MsgSweepTombstone {
+  return {
+    signer: "",
+    tombstone: ""
+  };
+}
+/**
+ * MsgSweepTombstone moves a tombstone's spendable SPARK to its canonical
+ * address, which signs. Unbonding completes to the old address outside the
+ * bank send restriction; on the recovery and council paths the old key may
+ * not MsgSend it, so this is how the member collects it.
+ * @name MsgSweepTombstone
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSweepTombstone
+ */
+export const MsgSweepTombstone = {
+  typeUrl: "/sparkdream.rep.v1.MsgSweepTombstone",
+  aminoType: "sparkdream/x/rep/MsgSweepTombstone",
+  encode(message: MsgSweepTombstone, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.signer !== "") {
+      writer.uint32(10).string(message.signer);
+    }
+    if (message.tombstone !== "") {
+      writer.uint32(18).string(message.tombstone);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSweepTombstone {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSweepTombstone();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.signer = reader.string();
+          break;
+        case 2:
+          message.tombstone = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgSweepTombstone>): MsgSweepTombstone {
+    const message = createBaseMsgSweepTombstone();
+    message.signer = object.signer ?? "";
+    message.tombstone = object.tombstone ?? "";
+    return message;
+  },
+  fromAmino(object: MsgSweepTombstoneAmino): MsgSweepTombstone {
+    const message = createBaseMsgSweepTombstone();
+    if (object.signer !== undefined && object.signer !== null) {
+      message.signer = object.signer;
+    }
+    if (object.tombstone !== undefined && object.tombstone !== null) {
+      message.tombstone = object.tombstone;
+    }
+    return message;
+  },
+  toAmino(message: MsgSweepTombstone): MsgSweepTombstoneAmino {
+    const obj: any = {};
+    obj.signer = message.signer === "" ? undefined : message.signer;
+    obj.tombstone = message.tombstone === "" ? undefined : message.tombstone;
+    return obj;
+  },
+  fromAminoMsg(object: MsgSweepTombstoneAminoMsg): MsgSweepTombstone {
+    return MsgSweepTombstone.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSweepTombstone): MsgSweepTombstoneAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgSweepTombstone",
+      value: MsgSweepTombstone.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgSweepTombstoneProtoMsg): MsgSweepTombstone {
+    return MsgSweepTombstone.decode(message.value);
+  },
+  toProto(message: MsgSweepTombstone): Uint8Array {
+    return MsgSweepTombstone.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSweepTombstone): MsgSweepTombstoneProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgSweepTombstone",
+      value: MsgSweepTombstone.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSweepTombstoneResponse(): MsgSweepTombstoneResponse {
+  return {};
+}
+/**
+ * MsgSweepTombstoneResponse defines the MsgSweepTombstoneResponse message.
+ * @name MsgSweepTombstoneResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgSweepTombstoneResponse
+ */
+export const MsgSweepTombstoneResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgSweepTombstoneResponse",
+  encode(_: MsgSweepTombstoneResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSweepTombstoneResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSweepTombstoneResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgSweepTombstoneResponse>): MsgSweepTombstoneResponse {
+    const message = createBaseMsgSweepTombstoneResponse();
+    return message;
+  },
+  fromAmino(_: MsgSweepTombstoneResponseAmino): MsgSweepTombstoneResponse {
+    const message = createBaseMsgSweepTombstoneResponse();
+    return message;
+  },
+  toAmino(_: MsgSweepTombstoneResponse): MsgSweepTombstoneResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgSweepTombstoneResponseAminoMsg): MsgSweepTombstoneResponse {
+    return MsgSweepTombstoneResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgSweepTombstoneResponseProtoMsg): MsgSweepTombstoneResponse {
+    return MsgSweepTombstoneResponse.decode(message.value);
+  },
+  toProto(message: MsgSweepTombstoneResponse): Uint8Array {
+    return MsgSweepTombstoneResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSweepTombstoneResponse): MsgSweepTombstoneResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgSweepTombstoneResponse",
+      value: MsgSweepTombstoneResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgForceMigration(): MsgForceMigration {
+  return {
+    authority: "",
+    member: "",
+    newAddress: "",
+    evidenceUri: ""
+  };
+}
+/**
+ * MsgForceMigration opens a COUNCIL migration of member to new_address on
+ * off-chain evidence (a lost key with no recovery commitment). The authority
+ * is the Commons HR (governance) committee policy or x/gov. new_address must
+ * still accept; the old address may object to a jury during
+ * council_migration_delay. An open member report does not block it.
+ * @name MsgForceMigration
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgForceMigration
+ */
+export const MsgForceMigration = {
+  typeUrl: "/sparkdream.rep.v1.MsgForceMigration",
+  aminoType: "sparkdream/x/rep/MsgForceMigration",
+  encode(message: MsgForceMigration, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.member !== "") {
+      writer.uint32(18).string(message.member);
+    }
+    if (message.newAddress !== "") {
+      writer.uint32(26).string(message.newAddress);
+    }
+    if (message.evidenceUri !== "") {
+      writer.uint32(34).string(message.evidenceUri);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgForceMigration {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgForceMigration();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+        case 2:
+          message.member = reader.string();
+          break;
+        case 3:
+          message.newAddress = reader.string();
+          break;
+        case 4:
+          message.evidenceUri = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgForceMigration>): MsgForceMigration {
+    const message = createBaseMsgForceMigration();
+    message.authority = object.authority ?? "";
+    message.member = object.member ?? "";
+    message.newAddress = object.newAddress ?? "";
+    message.evidenceUri = object.evidenceUri ?? "";
+    return message;
+  },
+  fromAmino(object: MsgForceMigrationAmino): MsgForceMigration {
+    const message = createBaseMsgForceMigration();
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
+    if (object.member !== undefined && object.member !== null) {
+      message.member = object.member;
+    }
+    if (object.new_address !== undefined && object.new_address !== null) {
+      message.newAddress = object.new_address;
+    }
+    if (object.evidence_uri !== undefined && object.evidence_uri !== null) {
+      message.evidenceUri = object.evidence_uri;
+    }
+    return message;
+  },
+  toAmino(message: MsgForceMigration): MsgForceMigrationAmino {
+    const obj: any = {};
+    obj.authority = message.authority === "" ? undefined : message.authority;
+    obj.member = message.member === "" ? undefined : message.member;
+    obj.new_address = message.newAddress === "" ? undefined : message.newAddress;
+    obj.evidence_uri = message.evidenceUri === "" ? undefined : message.evidenceUri;
+    return obj;
+  },
+  fromAminoMsg(object: MsgForceMigrationAminoMsg): MsgForceMigration {
+    return MsgForceMigration.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgForceMigration): MsgForceMigrationAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgForceMigration",
+      value: MsgForceMigration.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgForceMigrationProtoMsg): MsgForceMigration {
+    return MsgForceMigration.decode(message.value);
+  },
+  toProto(message: MsgForceMigration): Uint8Array {
+    return MsgForceMigration.encode(message).finish();
+  },
+  toProtoMsg(message: MsgForceMigration): MsgForceMigrationProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgForceMigration",
+      value: MsgForceMigration.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgForceMigrationResponse(): MsgForceMigrationResponse {
+  return {
+    migrationId: BigInt(0)
+  };
+}
+/**
+ * MsgForceMigrationResponse defines the MsgForceMigrationResponse message.
+ * @name MsgForceMigrationResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgForceMigrationResponse
+ */
+export const MsgForceMigrationResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgForceMigrationResponse",
+  encode(message: MsgForceMigrationResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.migrationId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.migrationId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgForceMigrationResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgForceMigrationResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.migrationId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgForceMigrationResponse>): MsgForceMigrationResponse {
+    const message = createBaseMsgForceMigrationResponse();
+    message.migrationId = object.migrationId !== undefined && object.migrationId !== null ? BigInt(object.migrationId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgForceMigrationResponseAmino): MsgForceMigrationResponse {
+    const message = createBaseMsgForceMigrationResponse();
+    if (object.migration_id !== undefined && object.migration_id !== null) {
+      message.migrationId = BigInt(object.migration_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgForceMigrationResponse): MsgForceMigrationResponseAmino {
+    const obj: any = {};
+    obj.migration_id = message.migrationId !== BigInt(0) ? message.migrationId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgForceMigrationResponseAminoMsg): MsgForceMigrationResponse {
+    return MsgForceMigrationResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgForceMigrationResponseProtoMsg): MsgForceMigrationResponse {
+    return MsgForceMigrationResponse.decode(message.value);
+  },
+  toProto(message: MsgForceMigrationResponse): Uint8Array {
+    return MsgForceMigrationResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgForceMigrationResponse): MsgForceMigrationResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgForceMigrationResponse",
+      value: MsgForceMigrationResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgClearZkPublicKey(): MsgClearZkPublicKey {
+  return {
+    member: ""
+  };
+}
+/**
+ * MsgClearZkPublicKey zeroes the member's zk_public_key and any
+ * pending_zk_public_key at once and registers nothing in their place. It is
+ * the remedy for a leaked shield secret: unlike a key change it has no
+ * cooldown and no per-season limit, because zeroing can only take capability
+ * away. It sets zk_key_cleared, so the next MsgRegisterZkPublicKey is never
+ * immediate (it waits zk_key_activation_delay) and still honours the
+ * once-per-season change cap; clear-then-register is not a free key swap.
+ * Never session-delegable, never shield-compatible (rep identity list).
+ * @name MsgClearZkPublicKey
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgClearZkPublicKey
+ */
+export const MsgClearZkPublicKey = {
+  typeUrl: "/sparkdream.rep.v1.MsgClearZkPublicKey",
+  aminoType: "sparkdream/x/rep/MsgClearZkPublicKey",
+  encode(message: MsgClearZkPublicKey, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.member !== "") {
+      writer.uint32(10).string(message.member);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgClearZkPublicKey {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgClearZkPublicKey();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.member = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgClearZkPublicKey>): MsgClearZkPublicKey {
+    const message = createBaseMsgClearZkPublicKey();
+    message.member = object.member ?? "";
+    return message;
+  },
+  fromAmino(object: MsgClearZkPublicKeyAmino): MsgClearZkPublicKey {
+    const message = createBaseMsgClearZkPublicKey();
+    if (object.member !== undefined && object.member !== null) {
+      message.member = object.member;
+    }
+    return message;
+  },
+  toAmino(message: MsgClearZkPublicKey): MsgClearZkPublicKeyAmino {
+    const obj: any = {};
+    obj.member = message.member === "" ? undefined : message.member;
+    return obj;
+  },
+  fromAminoMsg(object: MsgClearZkPublicKeyAminoMsg): MsgClearZkPublicKey {
+    return MsgClearZkPublicKey.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgClearZkPublicKey): MsgClearZkPublicKeyAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgClearZkPublicKey",
+      value: MsgClearZkPublicKey.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgClearZkPublicKeyProtoMsg): MsgClearZkPublicKey {
+    return MsgClearZkPublicKey.decode(message.value);
+  },
+  toProto(message: MsgClearZkPublicKey): Uint8Array {
+    return MsgClearZkPublicKey.encode(message).finish();
+  },
+  toProtoMsg(message: MsgClearZkPublicKey): MsgClearZkPublicKeyProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgClearZkPublicKey",
+      value: MsgClearZkPublicKey.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgClearZkPublicKeyResponse(): MsgClearZkPublicKeyResponse {
+  return {};
+}
+/**
+ * MsgClearZkPublicKeyResponse defines the MsgClearZkPublicKeyResponse message.
+ * @name MsgClearZkPublicKeyResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgClearZkPublicKeyResponse
+ */
+export const MsgClearZkPublicKeyResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgClearZkPublicKeyResponse",
+  encode(_: MsgClearZkPublicKeyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgClearZkPublicKeyResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgClearZkPublicKeyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgClearZkPublicKeyResponse>): MsgClearZkPublicKeyResponse {
+    const message = createBaseMsgClearZkPublicKeyResponse();
+    return message;
+  },
+  fromAmino(_: MsgClearZkPublicKeyResponseAmino): MsgClearZkPublicKeyResponse {
+    const message = createBaseMsgClearZkPublicKeyResponse();
+    return message;
+  },
+  toAmino(_: MsgClearZkPublicKeyResponse): MsgClearZkPublicKeyResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgClearZkPublicKeyResponseAminoMsg): MsgClearZkPublicKeyResponse {
+    return MsgClearZkPublicKeyResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgClearZkPublicKeyResponseProtoMsg): MsgClearZkPublicKeyResponse {
+    return MsgClearZkPublicKeyResponse.decode(message.value);
+  },
+  toProto(message: MsgClearZkPublicKeyResponse): Uint8Array {
+    return MsgClearZkPublicKeyResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgClearZkPublicKeyResponse): MsgClearZkPublicKeyResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgClearZkPublicKeyResponse",
+      value: MsgClearZkPublicKeyResponse.encode(message).finish()
     };
   }
 };

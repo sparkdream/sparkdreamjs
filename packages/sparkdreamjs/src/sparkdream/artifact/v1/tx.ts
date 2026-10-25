@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { Params, ParamsAmino, ArtifactOperationalParams, ArtifactOperationalParamsAmino } from "./params";
-import { ClassFlags, ClassFlagsAmino, MintPolicy, MintPolicyAmino, RoyaltyShare, RoyaltyShareAmino, TokenRef, TokenRefAmino, ReceivePolicy, TokenMetadata, TokenMetadataAmino, HideTargetKind } from "./types";
+import { ClassFlags, ClassFlagsAmino, MintPolicy, MintPolicyAmino, RoyaltyShare, RoyaltyShareAmino, ExpiryPolicy, ExpiryPolicyAmino, RevealPolicy, RevealPolicyAmino, Renderer, RendererAmino, TokenModel, HarbergerPolicy, HarbergerPolicyAmino, TokenRef, TokenRefAmino, ReceivePolicy, TokenMetadata, TokenMetadataAmino, HideTargetKind, ImpactClaim, ImpactClaimAmino, EditionRef, EditionRefAmino, CraftInput, CraftInputAmino, MetadataStage, MetadataStageAmino } from "./types";
 import { Coin, CoinAmino } from "../../../cosmos/base/v1beta1/coin";
 import { ModerationReason } from "../../common/v1/moderation_reason";
 import { BinaryReader, BinaryWriter } from "../../../binary";
@@ -100,6 +100,27 @@ export interface MsgCreateClass {
    * Must equal "CC0-1.0".
    */
   acceptedContentLicense: string;
+  /**
+   * Token expiry rules; fixed for the life of the class (mode NONE = never).
+   */
+  expiry: ExpiryPolicy;
+  /**
+   * Blind-mint or generative commit-reveal; fixed at creation (kind NONE =
+   * plain class). Only kind, commitment and deadline may be set.
+   */
+  reveal: RevealPolicy;
+  /**
+   * Query-time renderer; fixed at creation (empty pkg_path = none).
+   */
+  renderer: Renderer;
+  /**
+   * UNIQUE (default) or EDITIONS; fixed at creation.
+   */
+  tokenModel: TokenModel;
+  /**
+   * Harberger tokens; fixed at creation (tax_bps_per_year 0 = none).
+   */
+  harberger: HarbergerPolicy;
 }
 export interface MsgCreateClassProtoMsg {
   typeUrl: "/sparkdream.artifact.v1.MsgCreateClass";
@@ -136,6 +157,27 @@ export interface MsgCreateClassAmino {
    * Must equal "CC0-1.0".
    */
   accepted_content_license?: string;
+  /**
+   * Token expiry rules; fixed for the life of the class (mode NONE = never).
+   */
+  expiry: ExpiryPolicyAmino;
+  /**
+   * Blind-mint or generative commit-reveal; fixed at creation (kind NONE =
+   * plain class). Only kind, commitment and deadline may be set.
+   */
+  reveal: RevealPolicyAmino;
+  /**
+   * Query-time renderer; fixed at creation (empty pkg_path = none).
+   */
+  renderer: RendererAmino;
+  /**
+   * UNIQUE (default) or EDITIONS; fixed at creation.
+   */
+  token_model?: TokenModel;
+  /**
+   * Harberger tokens; fixed at creation (tax_bps_per_year 0 = none).
+   */
+  harberger: HarbergerPolicyAmino;
 }
 export interface MsgCreateClassAminoMsg {
   type: "sparkdream/x/artifact/MsgCreateClass";
@@ -409,6 +451,10 @@ export interface MsgSetMaxSupply {
   owner: string;
   classId: bigint;
   maxSupply: bigint;
+  /**
+   * 0 = the class cap; otherwise the unit cap of that edition.
+   */
+  editionId: bigint;
 }
 export interface MsgSetMaxSupplyProtoMsg {
   typeUrl: "/sparkdream.artifact.v1.MsgSetMaxSupply";
@@ -424,6 +470,10 @@ export interface MsgSetMaxSupplyAmino {
   owner?: string;
   class_id?: string;
   max_supply?: string;
+  /**
+   * 0 = the class cap; otherwise the unit cap of that edition.
+   */
+  edition_id?: string;
 }
 export interface MsgSetMaxSupplyAminoMsg {
   type: "sparkdream/x/artifact/MsgSetMaxSupply";
@@ -715,6 +765,12 @@ export interface MintEntry {
    */
   recipient: string;
   metadata: TokenMetadata;
+  /**
+   * Optional metadata schedule: later stages shown from from_time on.
+   * Strictly increasing from_time, all in the future, at most
+   * params.max_schedule_stages. Fixed at mint.
+   */
+  schedule: MetadataStage[];
 }
 export interface MintEntryProtoMsg {
   typeUrl: "/sparkdream.artifact.v1.MintEntry";
@@ -732,6 +788,12 @@ export interface MintEntryAmino {
    */
   recipient?: string;
   metadata: TokenMetadataAmino;
+  /**
+   * Optional metadata schedule: later stages shown from from_time on.
+   * Strictly increasing from_time, all in the future, at most
+   * params.max_schedule_stages. Fixed at mint.
+   */
+  schedule: MetadataStageAmino[];
 }
 export interface MintEntryAminoMsg {
   type: "/sparkdream.artifact.v1.MintEntry";
@@ -1669,6 +1731,11 @@ export interface MsgBuy {
    * Optional; must equal the token's current metadata hash if set.
    */
   expectedMetadataHash: string;
+  /**
+   * Required when the token holds nested tokens; must equal its contents
+   * hash (Children query).
+   */
+  expectedContentsHash: string;
 }
 export interface MsgBuyProtoMsg {
   typeUrl: "/sparkdream.artifact.v1.MsgBuy";
@@ -1690,6 +1757,11 @@ export interface MsgBuyAmino {
    * Optional; must equal the token's current metadata hash if set.
    */
   expected_metadata_hash?: string;
+  /**
+   * Required when the token holds nested tokens; must equal its contents
+   * hash (Children query).
+   */
+  expected_contents_hash?: string;
 }
 export interface MsgBuyAminoMsg {
   type: "sparkdream/x/artifact/MsgBuy";
@@ -1953,6 +2025,2604 @@ export interface MsgUpdateOperationalParamsResponseAminoMsg {
   type: "/sparkdream.artifact.v1.MsgUpdateOperationalParamsResponse";
   value: MsgUpdateOperationalParamsResponseAmino;
 }
+/**
+ * MsgIssue mints one shared metadata to a list of recipients as the class
+ * owner or a listed minter. Each recipient gets its own token under the
+ * usual receive-policy, inbox and deposit rules.
+ * @name MsgIssue
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgIssue
+ */
+export interface MsgIssue {
+  minter: string;
+  classId: bigint;
+  /**
+   * 1..max_issue_batch_size distinct recipients.
+   */
+  recipients: string[];
+  /**
+   * Metadata every issued token carries.
+   */
+  metadata: TokenMetadata;
+  /**
+   * Must equal "CC0-1.0".
+   */
+  acceptedContentLicense: string;
+}
+export interface MsgIssueProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgIssue";
+  value: Uint8Array;
+}
+/**
+ * MsgIssue mints one shared metadata to a list of recipients as the class
+ * owner or a listed minter. Each recipient gets its own token under the
+ * usual receive-policy, inbox and deposit rules.
+ * @name MsgIssueAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgIssue
+ */
+export interface MsgIssueAmino {
+  minter?: string;
+  class_id?: string;
+  /**
+   * 1..max_issue_batch_size distinct recipients.
+   */
+  recipients?: string[];
+  /**
+   * Metadata every issued token carries.
+   */
+  metadata: TokenMetadataAmino;
+  /**
+   * Must equal "CC0-1.0".
+   */
+  accepted_content_license?: string;
+}
+export interface MsgIssueAminoMsg {
+  type: "sparkdream/x/artifact/MsgIssue";
+  value: MsgIssueAmino;
+}
+/**
+ * MsgIssueResponse lists the issued tokens in recipient order.
+ * @name MsgIssueResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgIssueResponse
+ */
+export interface MsgIssueResponse {
+  results: MintResult[];
+}
+export interface MsgIssueResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgIssueResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgIssueResponse lists the issued tokens in recipient order.
+ * @name MsgIssueResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgIssueResponse
+ */
+export interface MsgIssueResponseAmino {
+  results?: MintResultAmino[];
+}
+export interface MsgIssueResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgIssueResponse";
+  value: MsgIssueResponseAmino;
+}
+/**
+ * MsgRenew extends an expiring token by the class term.
+ * @name MsgRenew
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRenew
+ */
+export interface MsgRenew {
+  /**
+   * The holder (pays renewal_price to the class) or the class owner or a
+   * listed minter (free).
+   */
+  signer: string;
+  classId: bigint;
+  tokenId: bigint;
+  /**
+   * Holder renewals: rejected if the class renewal_price is higher.
+   */
+  maxPrice: Coin;
+}
+export interface MsgRenewProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgRenew";
+  value: Uint8Array;
+}
+/**
+ * MsgRenew extends an expiring token by the class term.
+ * @name MsgRenewAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRenew
+ */
+export interface MsgRenewAmino {
+  /**
+   * The holder (pays renewal_price to the class) or the class owner or a
+   * listed minter (free).
+   */
+  signer?: string;
+  class_id?: string;
+  token_id?: string;
+  /**
+   * Holder renewals: rejected if the class renewal_price is higher.
+   */
+  max_price: CoinAmino;
+}
+export interface MsgRenewAminoMsg {
+  type: "sparkdream/x/artifact/MsgRenew";
+  value: MsgRenewAmino;
+}
+/**
+ * MsgRenewResponse carries the new expiry.
+ * @name MsgRenewResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRenewResponse
+ */
+export interface MsgRenewResponse {
+  expiresAt: bigint;
+}
+export interface MsgRenewResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgRenewResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgRenewResponse carries the new expiry.
+ * @name MsgRenewResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRenewResponse
+ */
+export interface MsgRenewResponseAmino {
+  expires_at?: string;
+}
+export interface MsgRenewResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgRenewResponse";
+  value: MsgRenewResponseAmino;
+}
+/**
+ * MsgRedeem marks tokens as redeemed. Signed by the class owner or a
+ * listed minter (the venue). Never moves ownership.
+ * @name MsgRedeem
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRedeem
+ */
+export interface MsgRedeem {
+  signer: string;
+  classId: bigint;
+  tokenIds: bigint[];
+}
+export interface MsgRedeemProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgRedeem";
+  value: Uint8Array;
+}
+/**
+ * MsgRedeem marks tokens as redeemed. Signed by the class owner or a
+ * listed minter (the venue). Never moves ownership.
+ * @name MsgRedeemAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRedeem
+ */
+export interface MsgRedeemAmino {
+  signer?: string;
+  class_id?: string;
+  token_ids?: string[];
+}
+export interface MsgRedeemAminoMsg {
+  type: "sparkdream/x/artifact/MsgRedeem";
+  value: MsgRedeemAmino;
+}
+/**
+ * MsgRedeemResponse is empty.
+ * @name MsgRedeemResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRedeemResponse
+ */
+export interface MsgRedeemResponse {}
+export interface MsgRedeemResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgRedeemResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgRedeemResponse is empty.
+ * @name MsgRedeemResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRedeemResponse
+ */
+export interface MsgRedeemResponseAmino {}
+export interface MsgRedeemResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgRedeemResponse";
+  value: MsgRedeemResponseAmino;
+}
+/**
+ * MsgLockRoyalty freezes royalty_bps and royalty_recipients forever.
+ * @name MsgLockRoyalty
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgLockRoyalty
+ */
+export interface MsgLockRoyalty {
+  owner: string;
+  classId: bigint;
+}
+export interface MsgLockRoyaltyProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgLockRoyalty";
+  value: Uint8Array;
+}
+/**
+ * MsgLockRoyalty freezes royalty_bps and royalty_recipients forever.
+ * @name MsgLockRoyaltyAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgLockRoyalty
+ */
+export interface MsgLockRoyaltyAmino {
+  owner?: string;
+  class_id?: string;
+}
+export interface MsgLockRoyaltyAminoMsg {
+  type: "sparkdream/x/artifact/MsgLockRoyalty";
+  value: MsgLockRoyaltyAmino;
+}
+/**
+ * MsgLockRoyaltyResponse is empty.
+ * @name MsgLockRoyaltyResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgLockRoyaltyResponse
+ */
+export interface MsgLockRoyaltyResponse {}
+export interface MsgLockRoyaltyResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgLockRoyaltyResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgLockRoyaltyResponse is empty.
+ * @name MsgLockRoyaltyResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgLockRoyaltyResponse
+ */
+export interface MsgLockRoyaltyResponseAmino {}
+export interface MsgLockRoyaltyResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgLockRoyaltyResponse";
+  value: MsgLockRoyaltyResponseAmino;
+}
+/**
+ * MsgReveal sets a blind-minted token's metadata. Signed by the class owner
+ * or a listed minter; the leaf built from (class, token, salt, metadata)
+ * must prove into the class commitment.
+ * @name MsgReveal
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgReveal
+ */
+export interface MsgReveal {
+  signer: string;
+  classId: bigint;
+  tokenId: bigint;
+  metadata: TokenMetadata;
+  /**
+   * Lowercase hex, 1..64 bytes.
+   */
+  salt: string;
+  /**
+   * Sibling hashes from the leaf up, lowercase hex, at most 32.
+   */
+  proof: string[];
+}
+export interface MsgRevealProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgReveal";
+  value: Uint8Array;
+}
+/**
+ * MsgReveal sets a blind-minted token's metadata. Signed by the class owner
+ * or a listed minter; the leaf built from (class, token, salt, metadata)
+ * must prove into the class commitment.
+ * @name MsgRevealAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgReveal
+ */
+export interface MsgRevealAmino {
+  signer?: string;
+  class_id?: string;
+  token_id?: string;
+  metadata: TokenMetadataAmino;
+  /**
+   * Lowercase hex, 1..64 bytes.
+   */
+  salt?: string;
+  /**
+   * Sibling hashes from the leaf up, lowercase hex, at most 32.
+   */
+  proof?: string[];
+}
+export interface MsgRevealAminoMsg {
+  type: "sparkdream/x/artifact/MsgReveal";
+  value: MsgRevealAmino;
+}
+/**
+ * MsgRevealResponse carries the revealed metadata hash.
+ * @name MsgRevealResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRevealResponse
+ */
+export interface MsgRevealResponse {
+  metadataHash: string;
+}
+export interface MsgRevealResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgRevealResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgRevealResponse carries the revealed metadata hash.
+ * @name MsgRevealResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRevealResponse
+ */
+export interface MsgRevealResponseAmino {
+  metadata_hash?: string;
+}
+export interface MsgRevealResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgRevealResponse";
+  value: MsgRevealResponseAmino;
+}
+/**
+ * MsgRevealSeed discloses the seed secret committed at class creation.
+ * @name MsgRevealSeed
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRevealSeed
+ */
+export interface MsgRevealSeed {
+  owner: string;
+  classId: bigint;
+  /**
+   * Lowercase hex, 1..64 bytes; SHA-256 must equal the commitment.
+   */
+  seed: string;
+}
+export interface MsgRevealSeedProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgRevealSeed";
+  value: Uint8Array;
+}
+/**
+ * MsgRevealSeed discloses the seed secret committed at class creation.
+ * @name MsgRevealSeedAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRevealSeed
+ */
+export interface MsgRevealSeedAmino {
+  owner?: string;
+  class_id?: string;
+  /**
+   * Lowercase hex, 1..64 bytes; SHA-256 must equal the commitment.
+   */
+  seed?: string;
+}
+export interface MsgRevealSeedAminoMsg {
+  type: "sparkdream/x/artifact/MsgRevealSeed";
+  value: MsgRevealSeedAmino;
+}
+/**
+ * MsgRevealSeedResponse is empty.
+ * @name MsgRevealSeedResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRevealSeedResponse
+ */
+export interface MsgRevealSeedResponse {}
+export interface MsgRevealSeedResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgRevealSeedResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgRevealSeedResponse is empty.
+ * @name MsgRevealSeedResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRevealSeedResponse
+ */
+export interface MsgRevealSeedResponseAmino {}
+export interface MsgRevealSeedResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgRevealSeedResponse";
+  value: MsgRevealSeedResponseAmino;
+}
+/**
+ * MsgProposeMedia offers the holder an additional media version.
+ * @name MsgProposeMedia
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgProposeMedia
+ */
+export interface MsgProposeMedia {
+  owner: string;
+  classId: bigint;
+  tokenId: bigint;
+  metadata: TokenMetadata;
+}
+export interface MsgProposeMediaProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgProposeMedia";
+  value: Uint8Array;
+}
+/**
+ * MsgProposeMedia offers the holder an additional media version.
+ * @name MsgProposeMediaAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgProposeMedia
+ */
+export interface MsgProposeMediaAmino {
+  owner?: string;
+  class_id?: string;
+  token_id?: string;
+  metadata: TokenMetadataAmino;
+}
+export interface MsgProposeMediaAminoMsg {
+  type: "sparkdream/x/artifact/MsgProposeMedia";
+  value: MsgProposeMediaAmino;
+}
+/**
+ * MsgProposeMediaResponse carries the proposal id.
+ * @name MsgProposeMediaResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgProposeMediaResponse
+ */
+export interface MsgProposeMediaResponse {
+  proposalId: bigint;
+}
+export interface MsgProposeMediaResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgProposeMediaResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgProposeMediaResponse carries the proposal id.
+ * @name MsgProposeMediaResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgProposeMediaResponse
+ */
+export interface MsgProposeMediaResponseAmino {
+  proposal_id?: string;
+}
+export interface MsgProposeMediaResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgProposeMediaResponse";
+  value: MsgProposeMediaResponseAmino;
+}
+/**
+ * MsgAcceptMedia moves a proposal into the token's accepted versions.
+ * @name MsgAcceptMedia
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAcceptMedia
+ */
+export interface MsgAcceptMedia {
+  owner: string;
+  classId: bigint;
+  tokenId: bigint;
+  proposalId: bigint;
+  /**
+   * true = also make it the displayed version.
+   */
+  display: boolean;
+}
+export interface MsgAcceptMediaProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgAcceptMedia";
+  value: Uint8Array;
+}
+/**
+ * MsgAcceptMedia moves a proposal into the token's accepted versions.
+ * @name MsgAcceptMediaAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAcceptMedia
+ */
+export interface MsgAcceptMediaAmino {
+  owner?: string;
+  class_id?: string;
+  token_id?: string;
+  proposal_id?: string;
+  /**
+   * true = also make it the displayed version.
+   */
+  display?: boolean;
+}
+export interface MsgAcceptMediaAminoMsg {
+  type: "sparkdream/x/artifact/MsgAcceptMedia";
+  value: MsgAcceptMediaAmino;
+}
+/**
+ * MsgAcceptMediaResponse carries the new version number (1-based).
+ * @name MsgAcceptMediaResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAcceptMediaResponse
+ */
+export interface MsgAcceptMediaResponse {
+  version: number;
+}
+export interface MsgAcceptMediaResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgAcceptMediaResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgAcceptMediaResponse carries the new version number (1-based).
+ * @name MsgAcceptMediaResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAcceptMediaResponse
+ */
+export interface MsgAcceptMediaResponseAmino {
+  version?: number;
+}
+export interface MsgAcceptMediaResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgAcceptMediaResponse";
+  value: MsgAcceptMediaResponseAmino;
+}
+/**
+ * MsgRejectMedia discards a proposal (holder) or withdraws it (class owner).
+ * @name MsgRejectMedia
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRejectMedia
+ */
+export interface MsgRejectMedia {
+  signer: string;
+  classId: bigint;
+  tokenId: bigint;
+  proposalId: bigint;
+}
+export interface MsgRejectMediaProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgRejectMedia";
+  value: Uint8Array;
+}
+/**
+ * MsgRejectMedia discards a proposal (holder) or withdraws it (class owner).
+ * @name MsgRejectMediaAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRejectMedia
+ */
+export interface MsgRejectMediaAmino {
+  signer?: string;
+  class_id?: string;
+  token_id?: string;
+  proposal_id?: string;
+}
+export interface MsgRejectMediaAminoMsg {
+  type: "sparkdream/x/artifact/MsgRejectMedia";
+  value: MsgRejectMediaAmino;
+}
+/**
+ * MsgRejectMediaResponse is empty.
+ * @name MsgRejectMediaResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRejectMediaResponse
+ */
+export interface MsgRejectMediaResponse {}
+export interface MsgRejectMediaResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgRejectMediaResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgRejectMediaResponse is empty.
+ * @name MsgRejectMediaResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRejectMediaResponse
+ */
+export interface MsgRejectMediaResponseAmino {}
+export interface MsgRejectMediaResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgRejectMediaResponse";
+  value: MsgRejectMediaResponseAmino;
+}
+/**
+ * MsgSetDisplayedMedia picks the displayed version: 0 = the stored
+ * metadata, n = media_versions[n-1].
+ * @name MsgSetDisplayedMedia
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgSetDisplayedMedia
+ */
+export interface MsgSetDisplayedMedia {
+  owner: string;
+  classId: bigint;
+  tokenId: bigint;
+  version: number;
+}
+export interface MsgSetDisplayedMediaProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgSetDisplayedMedia";
+  value: Uint8Array;
+}
+/**
+ * MsgSetDisplayedMedia picks the displayed version: 0 = the stored
+ * metadata, n = media_versions[n-1].
+ * @name MsgSetDisplayedMediaAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgSetDisplayedMedia
+ */
+export interface MsgSetDisplayedMediaAmino {
+  owner?: string;
+  class_id?: string;
+  token_id?: string;
+  version?: number;
+}
+export interface MsgSetDisplayedMediaAminoMsg {
+  type: "sparkdream/x/artifact/MsgSetDisplayedMedia";
+  value: MsgSetDisplayedMediaAmino;
+}
+/**
+ * MsgSetDisplayedMediaResponse is empty.
+ * @name MsgSetDisplayedMediaResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgSetDisplayedMediaResponse
+ */
+export interface MsgSetDisplayedMediaResponse {}
+export interface MsgSetDisplayedMediaResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgSetDisplayedMediaResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgSetDisplayedMediaResponse is empty.
+ * @name MsgSetDisplayedMediaResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgSetDisplayedMediaResponse
+ */
+export interface MsgSetDisplayedMediaResponseAmino {}
+export interface MsgSetDisplayedMediaResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgSetDisplayedMediaResponse";
+  value: MsgSetDisplayedMediaResponseAmino;
+}
+/**
+ * MsgCreateEdition creates an edition of an EDITIONS class (class owner or
+ * listed minter). With a claim it is an impact certificate.
+ * @name MsgCreateEdition
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCreateEdition
+ */
+export interface MsgCreateEdition {
+  minter: string;
+  classId: bigint;
+  metadata: TokenMetadata;
+  /**
+   * 0 = unlimited units.
+   */
+  maxSupply: bigint;
+  /**
+   * Optional impact claim (scope, contributors, period, initiative).
+   */
+  claim: ImpactClaim;
+  /**
+   * Must equal "CC0-1.0".
+   */
+  acceptedContentLicense: string;
+}
+export interface MsgCreateEditionProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgCreateEdition";
+  value: Uint8Array;
+}
+/**
+ * MsgCreateEdition creates an edition of an EDITIONS class (class owner or
+ * listed minter). With a claim it is an impact certificate.
+ * @name MsgCreateEditionAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCreateEdition
+ */
+export interface MsgCreateEditionAmino {
+  minter?: string;
+  class_id?: string;
+  metadata: TokenMetadataAmino;
+  /**
+   * 0 = unlimited units.
+   */
+  max_supply?: string;
+  /**
+   * Optional impact claim (scope, contributors, period, initiative).
+   */
+  claim: ImpactClaimAmino;
+  /**
+   * Must equal "CC0-1.0".
+   */
+  accepted_content_license?: string;
+}
+export interface MsgCreateEditionAminoMsg {
+  type: "sparkdream/x/artifact/MsgCreateEdition";
+  value: MsgCreateEditionAmino;
+}
+/**
+ * MsgCreateEditionResponse returns the new edition id.
+ * @name MsgCreateEditionResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCreateEditionResponse
+ */
+export interface MsgCreateEditionResponse {
+  editionId: bigint;
+}
+export interface MsgCreateEditionResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgCreateEditionResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgCreateEditionResponse returns the new edition id.
+ * @name MsgCreateEditionResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCreateEditionResponse
+ */
+export interface MsgCreateEditionResponseAmino {
+  edition_id?: string;
+}
+export interface MsgCreateEditionResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgCreateEditionResponse";
+  value: MsgCreateEditionResponseAmino;
+}
+/**
+ * UnitMintEntry is one recipient of a unit mint.
+ * @name UnitMintEntry
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.UnitMintEntry
+ */
+export interface UnitMintEntry {
+  /**
+   * Empty = the minter.
+   */
+  recipient: string;
+  amount: bigint;
+}
+export interface UnitMintEntryProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.UnitMintEntry";
+  value: Uint8Array;
+}
+/**
+ * UnitMintEntry is one recipient of a unit mint.
+ * @name UnitMintEntryAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.UnitMintEntry
+ */
+export interface UnitMintEntryAmino {
+  /**
+   * Empty = the minter.
+   */
+  recipient?: string;
+  amount?: string;
+}
+export interface UnitMintEntryAminoMsg {
+  type: "/sparkdream.artifact.v1.UnitMintEntry";
+  value: UnitMintEntryAmino;
+}
+/**
+ * UnitResult reports one unit delivery: delivered directly, or parked in
+ * the recipient's inbox as pending_id (inbox ref (0, pending_id)).
+ * @name UnitResult
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.UnitResult
+ */
+export interface UnitResult {
+  recipient: string;
+  amount: bigint;
+  delivered: boolean;
+  pendingId: bigint;
+}
+export interface UnitResultProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.UnitResult";
+  value: Uint8Array;
+}
+/**
+ * UnitResult reports one unit delivery: delivered directly, or parked in
+ * the recipient's inbox as pending_id (inbox ref (0, pending_id)).
+ * @name UnitResultAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.UnitResult
+ */
+export interface UnitResultAmino {
+  recipient?: string;
+  amount?: string;
+  delivered?: boolean;
+  pending_id?: string;
+}
+export interface UnitResultAminoMsg {
+  type: "/sparkdream.artifact.v1.UnitResult";
+  value: UnitResultAmino;
+}
+/**
+ * MsgMintUnits mints units of an edition (class owner or listed minter).
+ * @name MsgMintUnits
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgMintUnits
+ */
+export interface MsgMintUnits {
+  minter: string;
+  classId: bigint;
+  editionId: bigint;
+  entries: UnitMintEntry[];
+}
+export interface MsgMintUnitsProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgMintUnits";
+  value: Uint8Array;
+}
+/**
+ * MsgMintUnits mints units of an edition (class owner or listed minter).
+ * @name MsgMintUnitsAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgMintUnits
+ */
+export interface MsgMintUnitsAmino {
+  minter?: string;
+  class_id?: string;
+  edition_id?: string;
+  entries: UnitMintEntryAmino[];
+}
+export interface MsgMintUnitsAminoMsg {
+  type: "sparkdream/x/artifact/MsgMintUnits";
+  value: MsgMintUnitsAmino;
+}
+/**
+ * MsgMintUnitsResponse reports each entry.
+ * @name MsgMintUnitsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgMintUnitsResponse
+ */
+export interface MsgMintUnitsResponse {
+  results: UnitResult[];
+}
+export interface MsgMintUnitsResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgMintUnitsResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgMintUnitsResponse reports each entry.
+ * @name MsgMintUnitsResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgMintUnitsResponse
+ */
+export interface MsgMintUnitsResponseAmino {
+  results?: UnitResultAmino[];
+}
+export interface MsgMintUnitsResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgMintUnitsResponse";
+  value: MsgMintUnitsResponseAmino;
+}
+/**
+ * UnitTransferEntry moves units of one edition to one recipient.
+ * @name UnitTransferEntry
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.UnitTransferEntry
+ */
+export interface UnitTransferEntry {
+  classId: bigint;
+  editionId: bigint;
+  recipient: string;
+  amount: bigint;
+}
+export interface UnitTransferEntryProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.UnitTransferEntry";
+  value: Uint8Array;
+}
+/**
+ * UnitTransferEntry moves units of one edition to one recipient.
+ * @name UnitTransferEntryAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.UnitTransferEntry
+ */
+export interface UnitTransferEntryAmino {
+  class_id?: string;
+  edition_id?: string;
+  recipient?: string;
+  amount?: string;
+}
+export interface UnitTransferEntryAminoMsg {
+  type: "/sparkdream.artifact.v1.UnitTransferEntry";
+  value: UnitTransferEntryAmino;
+}
+/**
+ * MsgTransferUnits moves units to recipients (or their inboxes).
+ * @name MsgTransferUnits
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgTransferUnits
+ */
+export interface MsgTransferUnits {
+  sender: string;
+  entries: UnitTransferEntry[];
+}
+export interface MsgTransferUnitsProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgTransferUnits";
+  value: Uint8Array;
+}
+/**
+ * MsgTransferUnits moves units to recipients (or their inboxes).
+ * @name MsgTransferUnitsAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgTransferUnits
+ */
+export interface MsgTransferUnitsAmino {
+  sender?: string;
+  entries: UnitTransferEntryAmino[];
+}
+export interface MsgTransferUnitsAminoMsg {
+  type: "sparkdream/x/artifact/MsgTransferUnits";
+  value: MsgTransferUnitsAmino;
+}
+/**
+ * MsgTransferUnitsResponse reports each entry.
+ * @name MsgTransferUnitsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgTransferUnitsResponse
+ */
+export interface MsgTransferUnitsResponse {
+  results: UnitResult[];
+}
+export interface MsgTransferUnitsResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgTransferUnitsResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgTransferUnitsResponse reports each entry.
+ * @name MsgTransferUnitsResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgTransferUnitsResponse
+ */
+export interface MsgTransferUnitsResponseAmino {
+  results?: UnitResultAmino[];
+}
+export interface MsgTransferUnitsResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgTransferUnitsResponse";
+  value: MsgTransferUnitsResponseAmino;
+}
+/**
+ * MsgBurnUnits burns free units the signer holds.
+ * @name MsgBurnUnits
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgBurnUnits
+ */
+export interface MsgBurnUnits {
+  owner: string;
+  classId: bigint;
+  editionId: bigint;
+  amount: bigint;
+}
+export interface MsgBurnUnitsProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgBurnUnits";
+  value: Uint8Array;
+}
+/**
+ * MsgBurnUnits burns free units the signer holds.
+ * @name MsgBurnUnitsAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgBurnUnits
+ */
+export interface MsgBurnUnitsAmino {
+  owner?: string;
+  class_id?: string;
+  edition_id?: string;
+  amount?: string;
+}
+export interface MsgBurnUnitsAminoMsg {
+  type: "sparkdream/x/artifact/MsgBurnUnits";
+  value: MsgBurnUnitsAmino;
+}
+/**
+ * MsgBurnUnitsResponse is empty.
+ * @name MsgBurnUnitsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgBurnUnitsResponse
+ */
+export interface MsgBurnUnitsResponse {}
+export interface MsgBurnUnitsResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgBurnUnitsResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgBurnUnitsResponse is empty.
+ * @name MsgBurnUnitsResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgBurnUnitsResponse
+ */
+export interface MsgBurnUnitsResponseAmino {}
+export interface MsgBurnUnitsResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgBurnUnitsResponse";
+  value: MsgBurnUnitsResponseAmino;
+}
+/**
+ * MsgRevokeUnits burns a holder's units as the class owner, when the
+ * class's burn_authorization allows the issuer.
+ * @name MsgRevokeUnits
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRevokeUnits
+ */
+export interface MsgRevokeUnits {
+  owner: string;
+  classId: bigint;
+  editionId: bigint;
+  holder: string;
+  amount: bigint;
+  reason: string;
+}
+export interface MsgRevokeUnitsProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgRevokeUnits";
+  value: Uint8Array;
+}
+/**
+ * MsgRevokeUnits burns a holder's units as the class owner, when the
+ * class's burn_authorization allows the issuer.
+ * @name MsgRevokeUnitsAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRevokeUnits
+ */
+export interface MsgRevokeUnitsAmino {
+  owner?: string;
+  class_id?: string;
+  edition_id?: string;
+  holder?: string;
+  amount?: string;
+  reason?: string;
+}
+export interface MsgRevokeUnitsAminoMsg {
+  type: "sparkdream/x/artifact/MsgRevokeUnits";
+  value: MsgRevokeUnitsAmino;
+}
+/**
+ * MsgRevokeUnitsResponse is empty.
+ * @name MsgRevokeUnitsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRevokeUnitsResponse
+ */
+export interface MsgRevokeUnitsResponse {}
+export interface MsgRevokeUnitsResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgRevokeUnitsResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgRevokeUnitsResponse is empty.
+ * @name MsgRevokeUnitsResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRevokeUnitsResponse
+ */
+export interface MsgRevokeUnitsResponseAmino {}
+export interface MsgRevokeUnitsResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgRevokeUnitsResponse";
+  value: MsgRevokeUnitsResponseAmino;
+}
+/**
+ * MsgListUnits offers units at a fixed per-unit SPARK price.
+ * @name MsgListUnits
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgListUnits
+ */
+export interface MsgListUnits {
+  seller: string;
+  classId: bigint;
+  editionId: bigint;
+  quantity: bigint;
+  unitPrice: Coin;
+  /**
+   * Seconds.
+   */
+  duration: bigint;
+}
+export interface MsgListUnitsProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgListUnits";
+  value: Uint8Array;
+}
+/**
+ * MsgListUnits offers units at a fixed per-unit SPARK price.
+ * @name MsgListUnitsAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgListUnits
+ */
+export interface MsgListUnitsAmino {
+  seller?: string;
+  class_id?: string;
+  edition_id?: string;
+  quantity?: string;
+  unit_price: CoinAmino;
+  /**
+   * Seconds.
+   */
+  duration?: string;
+}
+export interface MsgListUnitsAminoMsg {
+  type: "sparkdream/x/artifact/MsgListUnits";
+  value: MsgListUnitsAmino;
+}
+/**
+ * MsgListUnitsResponse returns the listing id.
+ * @name MsgListUnitsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgListUnitsResponse
+ */
+export interface MsgListUnitsResponse {
+  listingId: bigint;
+}
+export interface MsgListUnitsResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgListUnitsResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgListUnitsResponse returns the listing id.
+ * @name MsgListUnitsResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgListUnitsResponse
+ */
+export interface MsgListUnitsResponseAmino {
+  listing_id?: string;
+}
+export interface MsgListUnitsResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgListUnitsResponse";
+  value: MsgListUnitsResponseAmino;
+}
+/**
+ * MsgDelistUnits cancels a unit listing and unlocks its units.
+ * @name MsgDelistUnits
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgDelistUnits
+ */
+export interface MsgDelistUnits {
+  seller: string;
+  listingId: bigint;
+}
+export interface MsgDelistUnitsProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgDelistUnits";
+  value: Uint8Array;
+}
+/**
+ * MsgDelistUnits cancels a unit listing and unlocks its units.
+ * @name MsgDelistUnitsAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgDelistUnits
+ */
+export interface MsgDelistUnitsAmino {
+  seller?: string;
+  listing_id?: string;
+}
+export interface MsgDelistUnitsAminoMsg {
+  type: "sparkdream/x/artifact/MsgDelistUnits";
+  value: MsgDelistUnitsAmino;
+}
+/**
+ * MsgDelistUnitsResponse is empty.
+ * @name MsgDelistUnitsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgDelistUnitsResponse
+ */
+export interface MsgDelistUnitsResponse {}
+export interface MsgDelistUnitsResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgDelistUnitsResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgDelistUnitsResponse is empty.
+ * @name MsgDelistUnitsResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgDelistUnitsResponse
+ */
+export interface MsgDelistUnitsResponseAmino {}
+export interface MsgDelistUnitsResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgDelistUnitsResponse";
+  value: MsgDelistUnitsResponseAmino;
+}
+/**
+ * MsgBuyUnits buys some or all of a unit listing.
+ * @name MsgBuyUnits
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgBuyUnits
+ */
+export interface MsgBuyUnits {
+  buyer: string;
+  listingId: bigint;
+  quantity: bigint;
+  /**
+   * Must equal the listing's unit price exactly.
+   */
+  expectedUnitPrice: Coin;
+  /**
+   * Optional; must equal the edition's current metadata hash if set.
+   */
+  expectedMetadataHash: string;
+}
+export interface MsgBuyUnitsProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgBuyUnits";
+  value: Uint8Array;
+}
+/**
+ * MsgBuyUnits buys some or all of a unit listing.
+ * @name MsgBuyUnitsAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgBuyUnits
+ */
+export interface MsgBuyUnitsAmino {
+  buyer?: string;
+  listing_id?: string;
+  quantity?: string;
+  /**
+   * Must equal the listing's unit price exactly.
+   */
+  expected_unit_price: CoinAmino;
+  /**
+   * Optional; must equal the edition's current metadata hash if set.
+   */
+  expected_metadata_hash?: string;
+}
+export interface MsgBuyUnitsAminoMsg {
+  type: "sparkdream/x/artifact/MsgBuyUnits";
+  value: MsgBuyUnitsAmino;
+}
+/**
+ * MsgBuyUnitsResponse reports the settlement split.
+ * @name MsgBuyUnitsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgBuyUnitsResponse
+ */
+export interface MsgBuyUnitsResponse {
+  fee: string;
+  royalty: string;
+  proceeds: string;
+}
+export interface MsgBuyUnitsResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgBuyUnitsResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgBuyUnitsResponse reports the settlement split.
+ * @name MsgBuyUnitsResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgBuyUnitsResponse
+ */
+export interface MsgBuyUnitsResponseAmino {
+  fee?: string;
+  royalty?: string;
+  proceeds?: string;
+}
+export interface MsgBuyUnitsResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgBuyUnitsResponse";
+  value: MsgBuyUnitsResponseAmino;
+}
+/**
+ * MsgFundEdition pays SPARK to an edition's current holders, pro rata to
+ * the units they hold (retroactive funding of an impact certificate).
+ * @name MsgFundEdition
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgFundEdition
+ */
+export interface MsgFundEdition {
+  funder: string;
+  classId: bigint;
+  editionId: bigint;
+  amount: Coin;
+}
+export interface MsgFundEditionProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgFundEdition";
+  value: Uint8Array;
+}
+/**
+ * MsgFundEdition pays SPARK to an edition's current holders, pro rata to
+ * the units they hold (retroactive funding of an impact certificate).
+ * @name MsgFundEditionAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgFundEdition
+ */
+export interface MsgFundEditionAmino {
+  funder?: string;
+  class_id?: string;
+  edition_id?: string;
+  amount: CoinAmino;
+}
+export interface MsgFundEditionAminoMsg {
+  type: "sparkdream/x/artifact/MsgFundEdition";
+  value: MsgFundEditionAmino;
+}
+/**
+ * MsgFundEditionResponse is empty.
+ * @name MsgFundEditionResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgFundEditionResponse
+ */
+export interface MsgFundEditionResponse {}
+export interface MsgFundEditionResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgFundEditionResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgFundEditionResponse is empty.
+ * @name MsgFundEditionResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgFundEditionResponse
+ */
+export interface MsgFundEditionResponseAmino {}
+export interface MsgFundEditionResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgFundEditionResponse";
+  value: MsgFundEditionResponseAmino;
+}
+/**
+ * MsgClaimEditionRewards pays out the signer's accrued retro funding.
+ * @name MsgClaimEditionRewards
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgClaimEditionRewards
+ */
+export interface MsgClaimEditionRewards {
+  holder: string;
+  refs: EditionRef[];
+}
+export interface MsgClaimEditionRewardsProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgClaimEditionRewards";
+  value: Uint8Array;
+}
+/**
+ * MsgClaimEditionRewards pays out the signer's accrued retro funding.
+ * @name MsgClaimEditionRewardsAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgClaimEditionRewards
+ */
+export interface MsgClaimEditionRewardsAmino {
+  holder?: string;
+  refs: EditionRefAmino[];
+}
+export interface MsgClaimEditionRewardsAminoMsg {
+  type: "sparkdream/x/artifact/MsgClaimEditionRewards";
+  value: MsgClaimEditionRewardsAmino;
+}
+/**
+ * MsgClaimEditionRewardsResponse returns the total paid.
+ * @name MsgClaimEditionRewardsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgClaimEditionRewardsResponse
+ */
+export interface MsgClaimEditionRewardsResponse {
+  claimed: string;
+}
+export interface MsgClaimEditionRewardsResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgClaimEditionRewardsResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgClaimEditionRewardsResponse returns the total paid.
+ * @name MsgClaimEditionRewardsResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgClaimEditionRewardsResponse
+ */
+export interface MsgClaimEditionRewardsResponseAmino {
+  claimed?: string;
+}
+export interface MsgClaimEditionRewardsResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgClaimEditionRewardsResponse";
+  value: MsgClaimEditionRewardsResponseAmino;
+}
+/**
+ * MsgAddCraftRecipe adds a crafting recipe to a class (owner only, until
+ * the class's first craft).
+ * @name MsgAddCraftRecipe
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAddCraftRecipe
+ */
+export interface MsgAddCraftRecipe {
+  owner: string;
+  classId: bigint;
+  inputs: CraftInput[];
+  outputMetadata: TokenMetadata;
+  outputEditionId: bigint;
+  outputQuantity: bigint;
+  /**
+   * Must equal "CC0-1.0" (the recipe carries the crafted token's content).
+   */
+  acceptedContentLicense: string;
+}
+export interface MsgAddCraftRecipeProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgAddCraftRecipe";
+  value: Uint8Array;
+}
+/**
+ * MsgAddCraftRecipe adds a crafting recipe to a class (owner only, until
+ * the class's first craft).
+ * @name MsgAddCraftRecipeAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAddCraftRecipe
+ */
+export interface MsgAddCraftRecipeAmino {
+  owner?: string;
+  class_id?: string;
+  inputs: CraftInputAmino[];
+  output_metadata: TokenMetadataAmino;
+  output_edition_id?: string;
+  output_quantity?: string;
+  /**
+   * Must equal "CC0-1.0" (the recipe carries the crafted token's content).
+   */
+  accepted_content_license?: string;
+}
+export interface MsgAddCraftRecipeAminoMsg {
+  type: "sparkdream/x/artifact/MsgAddCraftRecipe";
+  value: MsgAddCraftRecipeAmino;
+}
+/**
+ * MsgAddCraftRecipeResponse returns the recipe id.
+ * @name MsgAddCraftRecipeResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAddCraftRecipeResponse
+ */
+export interface MsgAddCraftRecipeResponse {
+  recipeId: bigint;
+}
+export interface MsgAddCraftRecipeResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgAddCraftRecipeResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgAddCraftRecipeResponse returns the recipe id.
+ * @name MsgAddCraftRecipeResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAddCraftRecipeResponse
+ */
+export interface MsgAddCraftRecipeResponseAmino {
+  recipe_id?: string;
+}
+export interface MsgAddCraftRecipeResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgAddCraftRecipeResponse";
+  value: MsgAddCraftRecipeResponseAmino;
+}
+/**
+ * MsgRemoveCraftRecipe removes a recipe (owner only, at any time).
+ * @name MsgRemoveCraftRecipe
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRemoveCraftRecipe
+ */
+export interface MsgRemoveCraftRecipe {
+  owner: string;
+  classId: bigint;
+  recipeId: bigint;
+}
+export interface MsgRemoveCraftRecipeProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgRemoveCraftRecipe";
+  value: Uint8Array;
+}
+/**
+ * MsgRemoveCraftRecipe removes a recipe (owner only, at any time).
+ * @name MsgRemoveCraftRecipeAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRemoveCraftRecipe
+ */
+export interface MsgRemoveCraftRecipeAmino {
+  owner?: string;
+  class_id?: string;
+  recipe_id?: string;
+}
+export interface MsgRemoveCraftRecipeAminoMsg {
+  type: "sparkdream/x/artifact/MsgRemoveCraftRecipe";
+  value: MsgRemoveCraftRecipeAmino;
+}
+/**
+ * MsgRemoveCraftRecipeResponse is empty.
+ * @name MsgRemoveCraftRecipeResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRemoveCraftRecipeResponse
+ */
+export interface MsgRemoveCraftRecipeResponse {}
+export interface MsgRemoveCraftRecipeResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgRemoveCraftRecipeResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgRemoveCraftRecipeResponse is empty.
+ * @name MsgRemoveCraftRecipeResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRemoveCraftRecipeResponse
+ */
+export interface MsgRemoveCraftRecipeResponseAmino {}
+export interface MsgRemoveCraftRecipeResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgRemoveCraftRecipeResponse";
+  value: MsgRemoveCraftRecipeResponseAmino;
+}
+/**
+ * MsgCraft burns a recipe's inputs and mints its output to the crafter.
+ * @name MsgCraft
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCraft
+ */
+export interface MsgCraft {
+  crafter: string;
+  classId: bigint;
+  recipeId: bigint;
+  /**
+   * The UNIQUE-class inputs, matching the recipe's quantities per class.
+   */
+  inputTokens: TokenRef[];
+}
+export interface MsgCraftProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgCraft";
+  value: Uint8Array;
+}
+/**
+ * MsgCraft burns a recipe's inputs and mints its output to the crafter.
+ * @name MsgCraftAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCraft
+ */
+export interface MsgCraftAmino {
+  crafter?: string;
+  class_id?: string;
+  recipe_id?: string;
+  /**
+   * The UNIQUE-class inputs, matching the recipe's quantities per class.
+   */
+  input_tokens?: TokenRefAmino[];
+}
+export interface MsgCraftAminoMsg {
+  type: "sparkdream/x/artifact/MsgCraft";
+  value: MsgCraftAmino;
+}
+/**
+ * MsgCraftResponse reports the output: the new token id (UNIQUE target) or
+ * the units credited (EDITIONS target).
+ * @name MsgCraftResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCraftResponse
+ */
+export interface MsgCraftResponse {
+  tokenId: bigint;
+  editionId: bigint;
+  amount: bigint;
+}
+export interface MsgCraftResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgCraftResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgCraftResponse reports the output: the new token id (UNIQUE target) or
+ * the units credited (EDITIONS target).
+ * @name MsgCraftResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCraftResponse
+ */
+export interface MsgCraftResponseAmino {
+  token_id?: string;
+  edition_id?: string;
+  amount?: string;
+}
+export interface MsgCraftResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgCraftResponse";
+  value: MsgCraftResponseAmino;
+}
+/**
+ * MsgOfferRental offers a token's user right for a period.
+ * @name MsgOfferRental
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgOfferRental
+ */
+export interface MsgOfferRental {
+  owner: string;
+  classId: bigint;
+  tokenId: bigint;
+  /**
+   * Who may accept; empty = anyone.
+   */
+  user: string;
+  price: Coin;
+  /**
+   * Seconds the rental lasts once accepted.
+   */
+  duration: bigint;
+  /**
+   * Whether the owner may end the rental early.
+   */
+  ownerMayEnd: boolean;
+  /**
+   * Seconds the offer stays open.
+   */
+  offerDuration: bigint;
+}
+export interface MsgOfferRentalProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgOfferRental";
+  value: Uint8Array;
+}
+/**
+ * MsgOfferRental offers a token's user right for a period.
+ * @name MsgOfferRentalAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgOfferRental
+ */
+export interface MsgOfferRentalAmino {
+  owner?: string;
+  class_id?: string;
+  token_id?: string;
+  /**
+   * Who may accept; empty = anyone.
+   */
+  user?: string;
+  price: CoinAmino;
+  /**
+   * Seconds the rental lasts once accepted.
+   */
+  duration?: string;
+  /**
+   * Whether the owner may end the rental early.
+   */
+  owner_may_end?: boolean;
+  /**
+   * Seconds the offer stays open.
+   */
+  offer_duration?: string;
+}
+export interface MsgOfferRentalAminoMsg {
+  type: "sparkdream/x/artifact/MsgOfferRental";
+  value: MsgOfferRentalAmino;
+}
+/**
+ * MsgOfferRentalResponse returns the offer nonce.
+ * @name MsgOfferRentalResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgOfferRentalResponse
+ */
+export interface MsgOfferRentalResponse {
+  nonce: bigint;
+}
+export interface MsgOfferRentalResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgOfferRentalResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgOfferRentalResponse returns the offer nonce.
+ * @name MsgOfferRentalResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgOfferRentalResponse
+ */
+export interface MsgOfferRentalResponseAmino {
+  nonce?: string;
+}
+export interface MsgOfferRentalResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgOfferRentalResponse";
+  value: MsgOfferRentalResponseAmino;
+}
+/**
+ * MsgCancelRentalOffer withdraws a rental offer.
+ * @name MsgCancelRentalOffer
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCancelRentalOffer
+ */
+export interface MsgCancelRentalOffer {
+  owner: string;
+  classId: bigint;
+  tokenId: bigint;
+}
+export interface MsgCancelRentalOfferProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgCancelRentalOffer";
+  value: Uint8Array;
+}
+/**
+ * MsgCancelRentalOffer withdraws a rental offer.
+ * @name MsgCancelRentalOfferAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCancelRentalOffer
+ */
+export interface MsgCancelRentalOfferAmino {
+  owner?: string;
+  class_id?: string;
+  token_id?: string;
+}
+export interface MsgCancelRentalOfferAminoMsg {
+  type: "sparkdream/x/artifact/MsgCancelRentalOffer";
+  value: MsgCancelRentalOfferAmino;
+}
+/**
+ * MsgCancelRentalOfferResponse is empty.
+ * @name MsgCancelRentalOfferResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCancelRentalOfferResponse
+ */
+export interface MsgCancelRentalOfferResponse {}
+export interface MsgCancelRentalOfferResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgCancelRentalOfferResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgCancelRentalOfferResponse is empty.
+ * @name MsgCancelRentalOfferResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCancelRentalOfferResponse
+ */
+export interface MsgCancelRentalOfferResponseAmino {}
+export interface MsgCancelRentalOfferResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgCancelRentalOfferResponse";
+  value: MsgCancelRentalOfferResponseAmino;
+}
+/**
+ * MsgAcceptRental accepts a rental offer, paying its price.
+ * @name MsgAcceptRental
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAcceptRental
+ */
+export interface MsgAcceptRental {
+  renter: string;
+  classId: bigint;
+  tokenId: bigint;
+  expectedPrice: Coin;
+  expectedNonce: bigint;
+  /**
+   * Optional; must equal the token's current metadata hash if set.
+   */
+  expectedMetadataHash: string;
+  /**
+   * Required when the token holds nested tokens; must equal its
+   * contents hash.
+   */
+  expectedContentsHash: string;
+}
+export interface MsgAcceptRentalProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgAcceptRental";
+  value: Uint8Array;
+}
+/**
+ * MsgAcceptRental accepts a rental offer, paying its price.
+ * @name MsgAcceptRentalAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAcceptRental
+ */
+export interface MsgAcceptRentalAmino {
+  renter?: string;
+  class_id?: string;
+  token_id?: string;
+  expected_price: CoinAmino;
+  expected_nonce?: string;
+  /**
+   * Optional; must equal the token's current metadata hash if set.
+   */
+  expected_metadata_hash?: string;
+  /**
+   * Required when the token holds nested tokens; must equal its
+   * contents hash.
+   */
+  expected_contents_hash?: string;
+}
+export interface MsgAcceptRentalAminoMsg {
+  type: "sparkdream/x/artifact/MsgAcceptRental";
+  value: MsgAcceptRentalAmino;
+}
+/**
+ * MsgAcceptRentalResponse returns the rental end.
+ * @name MsgAcceptRentalResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAcceptRentalResponse
+ */
+export interface MsgAcceptRentalResponse {
+  expiresAt: bigint;
+}
+export interface MsgAcceptRentalResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgAcceptRentalResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgAcceptRentalResponse returns the rental end.
+ * @name MsgAcceptRentalResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAcceptRentalResponse
+ */
+export interface MsgAcceptRentalResponseAmino {
+  expires_at?: string;
+}
+export interface MsgAcceptRentalResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgAcceptRentalResponse";
+  value: MsgAcceptRentalResponseAmino;
+}
+/**
+ * MsgEndRental ends a rental: the renter at any time, the owner when the
+ * offer allowed it or once it has expired.
+ * @name MsgEndRental
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgEndRental
+ */
+export interface MsgEndRental {
+  signer: string;
+  classId: bigint;
+  tokenId: bigint;
+}
+export interface MsgEndRentalProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgEndRental";
+  value: Uint8Array;
+}
+/**
+ * MsgEndRental ends a rental: the renter at any time, the owner when the
+ * offer allowed it or once it has expired.
+ * @name MsgEndRentalAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgEndRental
+ */
+export interface MsgEndRentalAmino {
+  signer?: string;
+  class_id?: string;
+  token_id?: string;
+}
+export interface MsgEndRentalAminoMsg {
+  type: "sparkdream/x/artifact/MsgEndRental";
+  value: MsgEndRentalAmino;
+}
+/**
+ * MsgEndRentalResponse is empty.
+ * @name MsgEndRentalResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgEndRentalResponse
+ */
+export interface MsgEndRentalResponse {}
+export interface MsgEndRentalResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgEndRentalResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgEndRentalResponse is empty.
+ * @name MsgEndRentalResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgEndRentalResponse
+ */
+export interface MsgEndRentalResponseAmino {}
+export interface MsgEndRentalResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgEndRentalResponse";
+  value: MsgEndRentalResponseAmino;
+}
+/**
+ * MsgNest places a token (with anything nested in it) inside another token
+ * the signer owns. The child is NESTED-locked and moves with its parent.
+ * @name MsgNest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgNest
+ */
+export interface MsgNest {
+  owner: string;
+  child: TokenRef;
+  parent: TokenRef;
+}
+export interface MsgNestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgNest";
+  value: Uint8Array;
+}
+/**
+ * MsgNest places a token (with anything nested in it) inside another token
+ * the signer owns. The child is NESTED-locked and moves with its parent.
+ * @name MsgNestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgNest
+ */
+export interface MsgNestAmino {
+  owner?: string;
+  child?: TokenRefAmino;
+  parent?: TokenRefAmino;
+}
+export interface MsgNestAminoMsg {
+  type: "sparkdream/x/artifact/MsgNest";
+  value: MsgNestAmino;
+}
+/**
+ * MsgNestResponse is empty.
+ * @name MsgNestResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgNestResponse
+ */
+export interface MsgNestResponse {}
+export interface MsgNestResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgNestResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgNestResponse is empty.
+ * @name MsgNestResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgNestResponse
+ */
+export interface MsgNestResponseAmino {}
+export interface MsgNestResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgNestResponse";
+  value: MsgNestResponseAmino;
+}
+/**
+ * MsgDetach takes a nested token (and its own children) out of its parent.
+ * @name MsgDetach
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgDetach
+ */
+export interface MsgDetach {
+  owner: string;
+  child: TokenRef;
+}
+export interface MsgDetachProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgDetach";
+  value: Uint8Array;
+}
+/**
+ * MsgDetach takes a nested token (and its own children) out of its parent.
+ * @name MsgDetachAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgDetach
+ */
+export interface MsgDetachAmino {
+  owner?: string;
+  child?: TokenRefAmino;
+}
+export interface MsgDetachAminoMsg {
+  type: "sparkdream/x/artifact/MsgDetach";
+  value: MsgDetachAmino;
+}
+/**
+ * MsgDetachResponse is empty.
+ * @name MsgDetachResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgDetachResponse
+ */
+export interface MsgDetachResponse {}
+export interface MsgDetachResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgDetachResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgDetachResponse is empty.
+ * @name MsgDetachResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgDetachResponse
+ */
+export interface MsgDetachResponseAmino {}
+export interface MsgDetachResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgDetachResponse";
+  value: MsgDetachResponseAmino;
+}
+/**
+ * MsgSetHarbergerPrice self-assesses a Harberger token's price and names
+ * the x/session RecurringPull that pays its tax.
+ * @name MsgSetHarbergerPrice
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgSetHarbergerPrice
+ */
+export interface MsgSetHarbergerPrice {
+  owner: string;
+  classId: bigint;
+  tokenId: bigint;
+  /**
+   * Bond denom; 0 abandons the token (anyone may take it for free).
+   */
+  price: string;
+  /**
+   * RecurringPull granted by the owner to the artifact module address,
+   * paying at least the tax per period; 0 with a zero price.
+   */
+  grantId: bigint;
+}
+export interface MsgSetHarbergerPriceProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgSetHarbergerPrice";
+  value: Uint8Array;
+}
+/**
+ * MsgSetHarbergerPrice self-assesses a Harberger token's price and names
+ * the x/session RecurringPull that pays its tax.
+ * @name MsgSetHarbergerPriceAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgSetHarbergerPrice
+ */
+export interface MsgSetHarbergerPriceAmino {
+  owner?: string;
+  class_id?: string;
+  token_id?: string;
+  /**
+   * Bond denom; 0 abandons the token (anyone may take it for free).
+   */
+  price?: string;
+  /**
+   * RecurringPull granted by the owner to the artifact module address,
+   * paying at least the tax per period; 0 with a zero price.
+   */
+  grant_id?: string;
+}
+export interface MsgSetHarbergerPriceAminoMsg {
+  type: "sparkdream/x/artifact/MsgSetHarbergerPrice";
+  value: MsgSetHarbergerPriceAmino;
+}
+/**
+ * MsgSetHarbergerPriceResponse returns the tax per period.
+ * @name MsgSetHarbergerPriceResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgSetHarbergerPriceResponse
+ */
+export interface MsgSetHarbergerPriceResponse {
+  taxPerPeriod: string;
+}
+export interface MsgSetHarbergerPriceResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgSetHarbergerPriceResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgSetHarbergerPriceResponse returns the tax per period.
+ * @name MsgSetHarbergerPriceResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgSetHarbergerPriceResponse
+ */
+export interface MsgSetHarbergerPriceResponseAmino {
+  tax_per_period?: string;
+}
+export interface MsgSetHarbergerPriceResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgSetHarbergerPriceResponse";
+  value: MsgSetHarbergerPriceResponseAmino;
+}
+/**
+ * MsgForceBuy buys a Harberger token at its current price, with or without
+ * the holder's consent.
+ * @name MsgForceBuy
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgForceBuy
+ */
+export interface MsgForceBuy {
+  buyer: string;
+  classId: bigint;
+  tokenId: bigint;
+  /**
+   * Reject if the current price is higher.
+   */
+  maxPrice: Coin;
+  /**
+   * Optional; must equal the token's current metadata hash if set.
+   */
+  expectedMetadataHash: string;
+}
+export interface MsgForceBuyProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgForceBuy";
+  value: Uint8Array;
+}
+/**
+ * MsgForceBuy buys a Harberger token at its current price, with or without
+ * the holder's consent.
+ * @name MsgForceBuyAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgForceBuy
+ */
+export interface MsgForceBuyAmino {
+  buyer?: string;
+  class_id?: string;
+  token_id?: string;
+  /**
+   * Reject if the current price is higher.
+   */
+  max_price: CoinAmino;
+  /**
+   * Optional; must equal the token's current metadata hash if set.
+   */
+  expected_metadata_hash?: string;
+}
+export interface MsgForceBuyAminoMsg {
+  type: "sparkdream/x/artifact/MsgForceBuy";
+  value: MsgForceBuyAmino;
+}
+/**
+ * MsgForceBuyResponse reports the settlement split.
+ * @name MsgForceBuyResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgForceBuyResponse
+ */
+export interface MsgForceBuyResponse {
+  price: string;
+  fee: string;
+  royalty: string;
+  proceeds: string;
+}
+export interface MsgForceBuyResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgForceBuyResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgForceBuyResponse reports the settlement split.
+ * @name MsgForceBuyResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgForceBuyResponse
+ */
+export interface MsgForceBuyResponseAmino {
+  price?: string;
+  fee?: string;
+  royalty?: string;
+  proceeds?: string;
+}
+export interface MsgForceBuyResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgForceBuyResponse";
+  value: MsgForceBuyResponseAmino;
+}
+/**
+ * MsgUpdateUnitListing changes a unit listing's price, quantity and
+ * duration. The listed units are re-locked to the new quantity.
+ * @name MsgUpdateUnitListing
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgUpdateUnitListing
+ */
+export interface MsgUpdateUnitListing {
+  seller: string;
+  listingId: bigint;
+  quantity: bigint;
+  unitPrice: Coin;
+  /**
+   * Seconds from now.
+   */
+  duration: bigint;
+}
+export interface MsgUpdateUnitListingProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgUpdateUnitListing";
+  value: Uint8Array;
+}
+/**
+ * MsgUpdateUnitListing changes a unit listing's price, quantity and
+ * duration. The listed units are re-locked to the new quantity.
+ * @name MsgUpdateUnitListingAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgUpdateUnitListing
+ */
+export interface MsgUpdateUnitListingAmino {
+  seller?: string;
+  listing_id?: string;
+  quantity?: string;
+  unit_price: CoinAmino;
+  /**
+   * Seconds from now.
+   */
+  duration?: string;
+}
+export interface MsgUpdateUnitListingAminoMsg {
+  type: "sparkdream/x/artifact/MsgUpdateUnitListing";
+  value: MsgUpdateUnitListingAmino;
+}
+/**
+ * MsgUpdateUnitListingResponse is empty.
+ * @name MsgUpdateUnitListingResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgUpdateUnitListingResponse
+ */
+export interface MsgUpdateUnitListingResponse {}
+export interface MsgUpdateUnitListingResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgUpdateUnitListingResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgUpdateUnitListingResponse is empty.
+ * @name MsgUpdateUnitListingResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgUpdateUnitListingResponse
+ */
+export interface MsgUpdateUnitListingResponseAmino {}
+export interface MsgUpdateUnitListingResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgUpdateUnitListingResponse";
+  value: MsgUpdateUnitListingResponseAmino;
+}
+/**
+ * MsgMakeOffer escrows a SPARK offer for a token (token_id set) or for any
+ * token of a class (token_id 0).
+ * @name MsgMakeOffer
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgMakeOffer
+ */
+export interface MsgMakeOffer {
+  bidder: string;
+  classId: bigint;
+  /**
+   * 0 = a collection offer: any token of the class.
+   */
+  tokenId: bigint;
+  price: Coin;
+  /**
+   * Seconds the offer stays open.
+   */
+  duration: bigint;
+  /**
+   * Token offers only, optional.
+   */
+  expectedMetadataHash: string;
+  /**
+   * Token offers only: required when the token holds nested tokens.
+   */
+  expectedContentsHash: string;
+}
+export interface MsgMakeOfferProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgMakeOffer";
+  value: Uint8Array;
+}
+/**
+ * MsgMakeOffer escrows a SPARK offer for a token (token_id set) or for any
+ * token of a class (token_id 0).
+ * @name MsgMakeOfferAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgMakeOffer
+ */
+export interface MsgMakeOfferAmino {
+  bidder?: string;
+  class_id?: string;
+  /**
+   * 0 = a collection offer: any token of the class.
+   */
+  token_id?: string;
+  price: CoinAmino;
+  /**
+   * Seconds the offer stays open.
+   */
+  duration?: string;
+  /**
+   * Token offers only, optional.
+   */
+  expected_metadata_hash?: string;
+  /**
+   * Token offers only: required when the token holds nested tokens.
+   */
+  expected_contents_hash?: string;
+}
+export interface MsgMakeOfferAminoMsg {
+  type: "sparkdream/x/artifact/MsgMakeOffer";
+  value: MsgMakeOfferAmino;
+}
+/**
+ * MsgMakeOfferResponse returns the offer id.
+ * @name MsgMakeOfferResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgMakeOfferResponse
+ */
+export interface MsgMakeOfferResponse {
+  offerId: bigint;
+}
+export interface MsgMakeOfferResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgMakeOfferResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgMakeOfferResponse returns the offer id.
+ * @name MsgMakeOfferResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgMakeOfferResponse
+ */
+export interface MsgMakeOfferResponseAmino {
+  offer_id?: string;
+}
+export interface MsgMakeOfferResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgMakeOfferResponse";
+  value: MsgMakeOfferResponseAmino;
+}
+/**
+ * MsgCancelOffer withdraws an offer and refunds its escrow.
+ * @name MsgCancelOffer
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCancelOffer
+ */
+export interface MsgCancelOffer {
+  bidder: string;
+  offerId: bigint;
+}
+export interface MsgCancelOfferProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgCancelOffer";
+  value: Uint8Array;
+}
+/**
+ * MsgCancelOffer withdraws an offer and refunds its escrow.
+ * @name MsgCancelOfferAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCancelOffer
+ */
+export interface MsgCancelOfferAmino {
+  bidder?: string;
+  offer_id?: string;
+}
+export interface MsgCancelOfferAminoMsg {
+  type: "sparkdream/x/artifact/MsgCancelOffer";
+  value: MsgCancelOfferAmino;
+}
+/**
+ * MsgCancelOfferResponse is empty.
+ * @name MsgCancelOfferResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCancelOfferResponse
+ */
+export interface MsgCancelOfferResponse {}
+export interface MsgCancelOfferResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgCancelOfferResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgCancelOfferResponse is empty.
+ * @name MsgCancelOfferResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCancelOfferResponse
+ */
+export interface MsgCancelOfferResponseAmino {}
+export interface MsgCancelOfferResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgCancelOfferResponse";
+  value: MsgCancelOfferResponseAmino;
+}
+/**
+ * MsgAcceptOffer sells a token the signer holds to an offer's bidder.
+ * @name MsgAcceptOffer
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAcceptOffer
+ */
+export interface MsgAcceptOffer {
+  seller: string;
+  offerId: bigint;
+  /**
+   * The token sold; required for a collection offer, and must match a
+   * token offer's token.
+   */
+  tokenId: bigint;
+  /**
+   * Must equal the offer's price exactly.
+   */
+  expectedPrice: Coin;
+}
+export interface MsgAcceptOfferProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgAcceptOffer";
+  value: Uint8Array;
+}
+/**
+ * MsgAcceptOffer sells a token the signer holds to an offer's bidder.
+ * @name MsgAcceptOfferAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAcceptOffer
+ */
+export interface MsgAcceptOfferAmino {
+  seller?: string;
+  offer_id?: string;
+  /**
+   * The token sold; required for a collection offer, and must match a
+   * token offer's token.
+   */
+  token_id?: string;
+  /**
+   * Must equal the offer's price exactly.
+   */
+  expected_price: CoinAmino;
+}
+export interface MsgAcceptOfferAminoMsg {
+  type: "sparkdream/x/artifact/MsgAcceptOffer";
+  value: MsgAcceptOfferAmino;
+}
+/**
+ * MsgAcceptOfferResponse reports the settlement split.
+ * @name MsgAcceptOfferResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAcceptOfferResponse
+ */
+export interface MsgAcceptOfferResponse {
+  fee: string;
+  royalty: string;
+  proceeds: string;
+}
+export interface MsgAcceptOfferResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgAcceptOfferResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgAcceptOfferResponse reports the settlement split.
+ * @name MsgAcceptOfferResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAcceptOfferResponse
+ */
+export interface MsgAcceptOfferResponseAmino {
+  fee?: string;
+  royalty?: string;
+  proceeds?: string;
+}
+export interface MsgAcceptOfferResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgAcceptOfferResponse";
+  value: MsgAcceptOfferResponseAmino;
+}
+/**
+ * MsgStartAuction puts a token up for an English auction.
+ * @name MsgStartAuction
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgStartAuction
+ */
+export interface MsgStartAuction {
+  seller: string;
+  classId: bigint;
+  tokenId: bigint;
+  reservePrice: Coin;
+  /**
+   * Basis points each bid must beat the last by; 0 = any higher bid.
+   */
+  minIncrementBps: number;
+  /**
+   * Seconds.
+   */
+  duration: bigint;
+}
+export interface MsgStartAuctionProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgStartAuction";
+  value: Uint8Array;
+}
+/**
+ * MsgStartAuction puts a token up for an English auction.
+ * @name MsgStartAuctionAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgStartAuction
+ */
+export interface MsgStartAuctionAmino {
+  seller?: string;
+  class_id?: string;
+  token_id?: string;
+  reserve_price: CoinAmino;
+  /**
+   * Basis points each bid must beat the last by; 0 = any higher bid.
+   */
+  min_increment_bps?: number;
+  /**
+   * Seconds.
+   */
+  duration?: string;
+}
+export interface MsgStartAuctionAminoMsg {
+  type: "sparkdream/x/artifact/MsgStartAuction";
+  value: MsgStartAuctionAmino;
+}
+/**
+ * MsgStartAuctionResponse returns the auction id.
+ * @name MsgStartAuctionResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgStartAuctionResponse
+ */
+export interface MsgStartAuctionResponse {
+  auctionId: bigint;
+}
+export interface MsgStartAuctionResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgStartAuctionResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgStartAuctionResponse returns the auction id.
+ * @name MsgStartAuctionResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgStartAuctionResponse
+ */
+export interface MsgStartAuctionResponseAmino {
+  auction_id?: string;
+}
+export interface MsgStartAuctionResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgStartAuctionResponse";
+  value: MsgStartAuctionResponseAmino;
+}
+/**
+ * MsgBid places an escrowed bid; the previous high bid is refunded.
+ * @name MsgBid
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgBid
+ */
+export interface MsgBid {
+  bidder: string;
+  auctionId: bigint;
+  amount: Coin;
+  /**
+   * Optional; must equal the token's current metadata hash if set.
+   */
+  expectedMetadataHash: string;
+  /**
+   * Required when the token holds nested tokens.
+   */
+  expectedContentsHash: string;
+}
+export interface MsgBidProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgBid";
+  value: Uint8Array;
+}
+/**
+ * MsgBid places an escrowed bid; the previous high bid is refunded.
+ * @name MsgBidAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgBid
+ */
+export interface MsgBidAmino {
+  bidder?: string;
+  auction_id?: string;
+  amount: CoinAmino;
+  /**
+   * Optional; must equal the token's current metadata hash if set.
+   */
+  expected_metadata_hash?: string;
+  /**
+   * Required when the token holds nested tokens.
+   */
+  expected_contents_hash?: string;
+}
+export interface MsgBidAminoMsg {
+  type: "sparkdream/x/artifact/MsgBid";
+  value: MsgBidAmino;
+}
+/**
+ * MsgBidResponse returns when the auction now ends.
+ * @name MsgBidResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgBidResponse
+ */
+export interface MsgBidResponse {
+  endsAt: bigint;
+}
+export interface MsgBidResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgBidResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgBidResponse returns when the auction now ends.
+ * @name MsgBidResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgBidResponse
+ */
+export interface MsgBidResponseAmino {
+  ends_at?: string;
+}
+export interface MsgBidResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgBidResponse";
+  value: MsgBidResponseAmino;
+}
+/**
+ * MsgSettleAuction settles an ended auction (anyone may sign).
+ * @name MsgSettleAuction
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgSettleAuction
+ */
+export interface MsgSettleAuction {
+  signer: string;
+  auctionId: bigint;
+}
+export interface MsgSettleAuctionProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgSettleAuction";
+  value: Uint8Array;
+}
+/**
+ * MsgSettleAuction settles an ended auction (anyone may sign).
+ * @name MsgSettleAuctionAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgSettleAuction
+ */
+export interface MsgSettleAuctionAmino {
+  signer?: string;
+  auction_id?: string;
+}
+export interface MsgSettleAuctionAminoMsg {
+  type: "sparkdream/x/artifact/MsgSettleAuction";
+  value: MsgSettleAuctionAmino;
+}
+/**
+ * MsgSettleAuctionResponse reports whether the token was sold.
+ * @name MsgSettleAuctionResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgSettleAuctionResponse
+ */
+export interface MsgSettleAuctionResponse {
+  sold: boolean;
+}
+export interface MsgSettleAuctionResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgSettleAuctionResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgSettleAuctionResponse reports whether the token was sold.
+ * @name MsgSettleAuctionResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgSettleAuctionResponse
+ */
+export interface MsgSettleAuctionResponseAmino {
+  sold?: boolean;
+}
+export interface MsgSettleAuctionResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgSettleAuctionResponse";
+  value: MsgSettleAuctionResponseAmino;
+}
+/**
+ * MsgCancelAuction withdraws an auction that has no bids.
+ * @name MsgCancelAuction
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCancelAuction
+ */
+export interface MsgCancelAuction {
+  seller: string;
+  auctionId: bigint;
+}
+export interface MsgCancelAuctionProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgCancelAuction";
+  value: Uint8Array;
+}
+/**
+ * MsgCancelAuction withdraws an auction that has no bids.
+ * @name MsgCancelAuctionAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCancelAuction
+ */
+export interface MsgCancelAuctionAmino {
+  seller?: string;
+  auction_id?: string;
+}
+export interface MsgCancelAuctionAminoMsg {
+  type: "sparkdream/x/artifact/MsgCancelAuction";
+  value: MsgCancelAuctionAmino;
+}
+/**
+ * MsgCancelAuctionResponse is empty.
+ * @name MsgCancelAuctionResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCancelAuctionResponse
+ */
+export interface MsgCancelAuctionResponse {}
+export interface MsgCancelAuctionResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.MsgCancelAuctionResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgCancelAuctionResponse is empty.
+ * @name MsgCancelAuctionResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCancelAuctionResponse
+ */
+export interface MsgCancelAuctionResponseAmino {}
+export interface MsgCancelAuctionResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.MsgCancelAuctionResponse";
+  value: MsgCancelAuctionResponseAmino;
+}
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
     authority: "",
@@ -2114,7 +4784,12 @@ function createBaseMsgCreateClass(): MsgCreateClass {
     royaltyBps: 0,
     royaltyRecipients: [],
     minters: [],
-    acceptedContentLicense: ""
+    acceptedContentLicense: "",
+    expiry: ExpiryPolicy.fromPartial({}),
+    reveal: RevealPolicy.fromPartial({}),
+    renderer: Renderer.fromPartial({}),
+    tokenModel: 0,
+    harberger: HarbergerPolicy.fromPartial({})
   };
 }
 /**
@@ -2172,6 +4847,21 @@ export const MsgCreateClass = {
     if (message.acceptedContentLicense !== "") {
       writer.uint32(122).string(message.acceptedContentLicense);
     }
+    if (message.expiry !== undefined) {
+      ExpiryPolicy.encode(message.expiry, writer.uint32(130).fork()).ldelim();
+    }
+    if (message.reveal !== undefined) {
+      RevealPolicy.encode(message.reveal, writer.uint32(138).fork()).ldelim();
+    }
+    if (message.renderer !== undefined) {
+      Renderer.encode(message.renderer, writer.uint32(146).fork()).ldelim();
+    }
+    if (message.tokenModel !== 0) {
+      writer.uint32(152).int32(message.tokenModel);
+    }
+    if (message.harberger !== undefined) {
+      HarbergerPolicy.encode(message.harberger, writer.uint32(162).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgCreateClass {
@@ -2226,6 +4916,21 @@ export const MsgCreateClass = {
         case 15:
           message.acceptedContentLicense = reader.string();
           break;
+        case 16:
+          message.expiry = ExpiryPolicy.decode(reader, reader.uint32());
+          break;
+        case 17:
+          message.reveal = RevealPolicy.decode(reader, reader.uint32());
+          break;
+        case 18:
+          message.renderer = Renderer.decode(reader, reader.uint32());
+          break;
+        case 19:
+          message.tokenModel = reader.int32() as any;
+          break;
+        case 20:
+          message.harberger = HarbergerPolicy.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2250,6 +4955,11 @@ export const MsgCreateClass = {
     message.royaltyRecipients = object.royaltyRecipients?.map(e => RoyaltyShare.fromPartial(e)) || [];
     message.minters = object.minters?.map(e => e) || [];
     message.acceptedContentLicense = object.acceptedContentLicense ?? "";
+    message.expiry = object.expiry !== undefined && object.expiry !== null ? ExpiryPolicy.fromPartial(object.expiry) : undefined;
+    message.reveal = object.reveal !== undefined && object.reveal !== null ? RevealPolicy.fromPartial(object.reveal) : undefined;
+    message.renderer = object.renderer !== undefined && object.renderer !== null ? Renderer.fromPartial(object.renderer) : undefined;
+    message.tokenModel = object.tokenModel ?? 0;
+    message.harberger = object.harberger !== undefined && object.harberger !== null ? HarbergerPolicy.fromPartial(object.harberger) : undefined;
     return message;
   },
   fromAmino(object: MsgCreateClassAmino): MsgCreateClass {
@@ -2295,6 +5005,21 @@ export const MsgCreateClass = {
     if (object.accepted_content_license !== undefined && object.accepted_content_license !== null) {
       message.acceptedContentLicense = object.accepted_content_license;
     }
+    if (object.expiry !== undefined && object.expiry !== null) {
+      message.expiry = ExpiryPolicy.fromAmino(object.expiry);
+    }
+    if (object.reveal !== undefined && object.reveal !== null) {
+      message.reveal = RevealPolicy.fromAmino(object.reveal);
+    }
+    if (object.renderer !== undefined && object.renderer !== null) {
+      message.renderer = Renderer.fromAmino(object.renderer);
+    }
+    if (object.token_model !== undefined && object.token_model !== null) {
+      message.tokenModel = object.token_model;
+    }
+    if (object.harberger !== undefined && object.harberger !== null) {
+      message.harberger = HarbergerPolicy.fromAmino(object.harberger);
+    }
     return message;
   },
   toAmino(message: MsgCreateClass): MsgCreateClassAmino {
@@ -2322,6 +5047,11 @@ export const MsgCreateClass = {
       obj.minters = message.minters;
     }
     obj.accepted_content_license = message.acceptedContentLicense === "" ? undefined : message.acceptedContentLicense;
+    obj.expiry = message.expiry ? ExpiryPolicy.toAmino(message.expiry) : ExpiryPolicy.toAmino(ExpiryPolicy.fromPartial({}));
+    obj.reveal = message.reveal ? RevealPolicy.toAmino(message.reveal) : RevealPolicy.toAmino(RevealPolicy.fromPartial({}));
+    obj.renderer = message.renderer ? Renderer.toAmino(message.renderer) : Renderer.toAmino(Renderer.fromPartial({}));
+    obj.token_model = message.tokenModel === 0 ? undefined : message.tokenModel;
+    obj.harberger = message.harberger ? HarbergerPolicy.toAmino(message.harberger) : HarbergerPolicy.toAmino(HarbergerPolicy.fromPartial({}));
     return obj;
   },
   fromAminoMsg(object: MsgCreateClassAminoMsg): MsgCreateClass {
@@ -3147,7 +5877,8 @@ function createBaseMsgSetMaxSupply(): MsgSetMaxSupply {
   return {
     owner: "",
     classId: BigInt(0),
-    maxSupply: BigInt(0)
+    maxSupply: BigInt(0),
+    editionId: BigInt(0)
   };
 }
 /**
@@ -3169,6 +5900,9 @@ export const MsgSetMaxSupply = {
     if (message.maxSupply !== BigInt(0)) {
       writer.uint32(24).uint64(message.maxSupply);
     }
+    if (message.editionId !== BigInt(0)) {
+      writer.uint32(32).uint64(message.editionId);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgSetMaxSupply {
@@ -3187,6 +5921,9 @@ export const MsgSetMaxSupply = {
         case 3:
           message.maxSupply = reader.uint64();
           break;
+        case 4:
+          message.editionId = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3199,6 +5936,7 @@ export const MsgSetMaxSupply = {
     message.owner = object.owner ?? "";
     message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
     message.maxSupply = object.maxSupply !== undefined && object.maxSupply !== null ? BigInt(object.maxSupply.toString()) : BigInt(0);
+    message.editionId = object.editionId !== undefined && object.editionId !== null ? BigInt(object.editionId.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: MsgSetMaxSupplyAmino): MsgSetMaxSupply {
@@ -3212,6 +5950,9 @@ export const MsgSetMaxSupply = {
     if (object.max_supply !== undefined && object.max_supply !== null) {
       message.maxSupply = BigInt(object.max_supply);
     }
+    if (object.edition_id !== undefined && object.edition_id !== null) {
+      message.editionId = BigInt(object.edition_id);
+    }
     return message;
   },
   toAmino(message: MsgSetMaxSupply): MsgSetMaxSupplyAmino {
@@ -3219,6 +5960,7 @@ export const MsgSetMaxSupply = {
     obj.owner = message.owner === "" ? undefined : message.owner;
     obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
     obj.max_supply = message.maxSupply !== BigInt(0) ? message.maxSupply?.toString() : undefined;
+    obj.edition_id = message.editionId !== BigInt(0) ? message.editionId?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: MsgSetMaxSupplyAminoMsg): MsgSetMaxSupply {
@@ -4034,7 +6776,8 @@ export const MsgDeleteClassResponse = {
 function createBaseMintEntry(): MintEntry {
   return {
     recipient: "",
-    metadata: TokenMetadata.fromPartial({})
+    metadata: TokenMetadata.fromPartial({}),
+    schedule: []
   };
 }
 /**
@@ -4052,6 +6795,9 @@ export const MintEntry = {
     if (message.metadata !== undefined) {
       TokenMetadata.encode(message.metadata, writer.uint32(18).fork()).ldelim();
     }
+    for (const v of message.schedule) {
+      MetadataStage.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MintEntry {
@@ -4067,6 +6813,9 @@ export const MintEntry = {
         case 2:
           message.metadata = TokenMetadata.decode(reader, reader.uint32());
           break;
+        case 3:
+          message.schedule.push(MetadataStage.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4078,6 +6827,7 @@ export const MintEntry = {
     const message = createBaseMintEntry();
     message.recipient = object.recipient ?? "";
     message.metadata = object.metadata !== undefined && object.metadata !== null ? TokenMetadata.fromPartial(object.metadata) : undefined;
+    message.schedule = object.schedule?.map(e => MetadataStage.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: MintEntryAmino): MintEntry {
@@ -4088,12 +6838,18 @@ export const MintEntry = {
     if (object.metadata !== undefined && object.metadata !== null) {
       message.metadata = TokenMetadata.fromAmino(object.metadata);
     }
+    message.schedule = object.schedule?.map(e => MetadataStage.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: MintEntry): MintEntryAmino {
     const obj: any = {};
     obj.recipient = message.recipient === "" ? undefined : message.recipient;
     obj.metadata = message.metadata ? TokenMetadata.toAmino(message.metadata) : TokenMetadata.toAmino(TokenMetadata.fromPartial({}));
+    if (message.schedule) {
+      obj.schedule = message.schedule.map(e => e ? MetadataStage.toAmino(e) : undefined);
+    } else {
+      obj.schedule = message.schedule;
+    }
     return obj;
   },
   fromAminoMsg(object: MintEntryAminoMsg): MintEntry {
@@ -6794,7 +9550,8 @@ function createBaseMsgBuy(): MsgBuy {
     tokenId: BigInt(0),
     expectedPrice: Coin.fromPartial({}),
     expectedNonce: BigInt(0),
-    expectedMetadataHash: ""
+    expectedMetadataHash: "",
+    expectedContentsHash: ""
   };
 }
 /**
@@ -6825,6 +9582,9 @@ export const MsgBuy = {
     if (message.expectedMetadataHash !== "") {
       writer.uint32(50).string(message.expectedMetadataHash);
     }
+    if (message.expectedContentsHash !== "") {
+      writer.uint32(58).string(message.expectedContentsHash);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgBuy {
@@ -6852,6 +9612,9 @@ export const MsgBuy = {
         case 6:
           message.expectedMetadataHash = reader.string();
           break;
+        case 7:
+          message.expectedContentsHash = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -6867,6 +9630,7 @@ export const MsgBuy = {
     message.expectedPrice = object.expectedPrice !== undefined && object.expectedPrice !== null ? Coin.fromPartial(object.expectedPrice) : undefined;
     message.expectedNonce = object.expectedNonce !== undefined && object.expectedNonce !== null ? BigInt(object.expectedNonce.toString()) : BigInt(0);
     message.expectedMetadataHash = object.expectedMetadataHash ?? "";
+    message.expectedContentsHash = object.expectedContentsHash ?? "";
     return message;
   },
   fromAmino(object: MsgBuyAmino): MsgBuy {
@@ -6889,6 +9653,9 @@ export const MsgBuy = {
     if (object.expected_metadata_hash !== undefined && object.expected_metadata_hash !== null) {
       message.expectedMetadataHash = object.expected_metadata_hash;
     }
+    if (object.expected_contents_hash !== undefined && object.expected_contents_hash !== null) {
+      message.expectedContentsHash = object.expected_contents_hash;
+    }
     return message;
   },
   toAmino(message: MsgBuy): MsgBuyAmino {
@@ -6899,6 +9666,7 @@ export const MsgBuy = {
     obj.expected_price = message.expectedPrice ? Coin.toAmino(message.expectedPrice) : Coin.toAmino(Coin.fromPartial({}));
     obj.expected_nonce = message.expectedNonce !== BigInt(0) ? message.expectedNonce?.toString() : undefined;
     obj.expected_metadata_hash = message.expectedMetadataHash === "" ? undefined : message.expectedMetadataHash;
+    obj.expected_contents_hash = message.expectedContentsHash === "" ? undefined : message.expectedContentsHash;
     return obj;
   },
   fromAminoMsg(object: MsgBuyAminoMsg): MsgBuy {
@@ -7677,6 +10445,7388 @@ export const MsgUpdateOperationalParamsResponse = {
     return {
       typeUrl: "/sparkdream.artifact.v1.MsgUpdateOperationalParamsResponse",
       value: MsgUpdateOperationalParamsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgIssue(): MsgIssue {
+  return {
+    minter: "",
+    classId: BigInt(0),
+    recipients: [],
+    metadata: TokenMetadata.fromPartial({}),
+    acceptedContentLicense: ""
+  };
+}
+/**
+ * MsgIssue mints one shared metadata to a list of recipients as the class
+ * owner or a listed minter. Each recipient gets its own token under the
+ * usual receive-policy, inbox and deposit rules.
+ * @name MsgIssue
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgIssue
+ */
+export const MsgIssue = {
+  typeUrl: "/sparkdream.artifact.v1.MsgIssue",
+  aminoType: "sparkdream/x/artifact/MsgIssue",
+  encode(message: MsgIssue, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.minter !== "") {
+      writer.uint32(10).string(message.minter);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    for (const v of message.recipients) {
+      writer.uint32(26).string(v!);
+    }
+    if (message.metadata !== undefined) {
+      TokenMetadata.encode(message.metadata, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.acceptedContentLicense !== "") {
+      writer.uint32(42).string(message.acceptedContentLicense);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgIssue {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgIssue();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.minter = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.recipients.push(reader.string());
+          break;
+        case 4:
+          message.metadata = TokenMetadata.decode(reader, reader.uint32());
+          break;
+        case 5:
+          message.acceptedContentLicense = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgIssue>): MsgIssue {
+    const message = createBaseMsgIssue();
+    message.minter = object.minter ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.recipients = object.recipients?.map(e => e) || [];
+    message.metadata = object.metadata !== undefined && object.metadata !== null ? TokenMetadata.fromPartial(object.metadata) : undefined;
+    message.acceptedContentLicense = object.acceptedContentLicense ?? "";
+    return message;
+  },
+  fromAmino(object: MsgIssueAmino): MsgIssue {
+    const message = createBaseMsgIssue();
+    if (object.minter !== undefined && object.minter !== null) {
+      message.minter = object.minter;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    message.recipients = object.recipients?.map(e => e) || [];
+    if (object.metadata !== undefined && object.metadata !== null) {
+      message.metadata = TokenMetadata.fromAmino(object.metadata);
+    }
+    if (object.accepted_content_license !== undefined && object.accepted_content_license !== null) {
+      message.acceptedContentLicense = object.accepted_content_license;
+    }
+    return message;
+  },
+  toAmino(message: MsgIssue): MsgIssueAmino {
+    const obj: any = {};
+    obj.minter = message.minter === "" ? undefined : message.minter;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    if (message.recipients) {
+      obj.recipients = message.recipients.map(e => e);
+    } else {
+      obj.recipients = message.recipients;
+    }
+    obj.metadata = message.metadata ? TokenMetadata.toAmino(message.metadata) : TokenMetadata.toAmino(TokenMetadata.fromPartial({}));
+    obj.accepted_content_license = message.acceptedContentLicense === "" ? undefined : message.acceptedContentLicense;
+    return obj;
+  },
+  fromAminoMsg(object: MsgIssueAminoMsg): MsgIssue {
+    return MsgIssue.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgIssue): MsgIssueAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgIssue",
+      value: MsgIssue.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgIssueProtoMsg): MsgIssue {
+    return MsgIssue.decode(message.value);
+  },
+  toProto(message: MsgIssue): Uint8Array {
+    return MsgIssue.encode(message).finish();
+  },
+  toProtoMsg(message: MsgIssue): MsgIssueProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgIssue",
+      value: MsgIssue.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgIssueResponse(): MsgIssueResponse {
+  return {
+    results: []
+  };
+}
+/**
+ * MsgIssueResponse lists the issued tokens in recipient order.
+ * @name MsgIssueResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgIssueResponse
+ */
+export const MsgIssueResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgIssueResponse",
+  encode(message: MsgIssueResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.results) {
+      MintResult.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgIssueResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgIssueResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.results.push(MintResult.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgIssueResponse>): MsgIssueResponse {
+    const message = createBaseMsgIssueResponse();
+    message.results = object.results?.map(e => MintResult.fromPartial(e)) || [];
+    return message;
+  },
+  fromAmino(object: MsgIssueResponseAmino): MsgIssueResponse {
+    const message = createBaseMsgIssueResponse();
+    message.results = object.results?.map(e => MintResult.fromAmino(e)) || [];
+    return message;
+  },
+  toAmino(message: MsgIssueResponse): MsgIssueResponseAmino {
+    const obj: any = {};
+    if (message.results) {
+      obj.results = message.results.map(e => e ? MintResult.toAmino(e) : undefined);
+    } else {
+      obj.results = message.results;
+    }
+    return obj;
+  },
+  fromAminoMsg(object: MsgIssueResponseAminoMsg): MsgIssueResponse {
+    return MsgIssueResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgIssueResponseProtoMsg): MsgIssueResponse {
+    return MsgIssueResponse.decode(message.value);
+  },
+  toProto(message: MsgIssueResponse): Uint8Array {
+    return MsgIssueResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgIssueResponse): MsgIssueResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgIssueResponse",
+      value: MsgIssueResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRenew(): MsgRenew {
+  return {
+    signer: "",
+    classId: BigInt(0),
+    tokenId: BigInt(0),
+    maxPrice: Coin.fromPartial({})
+  };
+}
+/**
+ * MsgRenew extends an expiring token by the class term.
+ * @name MsgRenew
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRenew
+ */
+export const MsgRenew = {
+  typeUrl: "/sparkdream.artifact.v1.MsgRenew",
+  aminoType: "sparkdream/x/artifact/MsgRenew",
+  encode(message: MsgRenew, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.signer !== "") {
+      writer.uint32(10).string(message.signer);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.tokenId);
+    }
+    if (message.maxPrice !== undefined) {
+      Coin.encode(message.maxPrice, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRenew {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRenew();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.signer = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.tokenId = reader.uint64();
+          break;
+        case 4:
+          message.maxPrice = Coin.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgRenew>): MsgRenew {
+    const message = createBaseMsgRenew();
+    message.signer = object.signer ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    message.maxPrice = object.maxPrice !== undefined && object.maxPrice !== null ? Coin.fromPartial(object.maxPrice) : undefined;
+    return message;
+  },
+  fromAmino(object: MsgRenewAmino): MsgRenew {
+    const message = createBaseMsgRenew();
+    if (object.signer !== undefined && object.signer !== null) {
+      message.signer = object.signer;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    if (object.max_price !== undefined && object.max_price !== null) {
+      message.maxPrice = Coin.fromAmino(object.max_price);
+    }
+    return message;
+  },
+  toAmino(message: MsgRenew): MsgRenewAmino {
+    const obj: any = {};
+    obj.signer = message.signer === "" ? undefined : message.signer;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    obj.max_price = message.maxPrice ? Coin.toAmino(message.maxPrice) : Coin.toAmino(Coin.fromPartial({}));
+    return obj;
+  },
+  fromAminoMsg(object: MsgRenewAminoMsg): MsgRenew {
+    return MsgRenew.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRenew): MsgRenewAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgRenew",
+      value: MsgRenew.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgRenewProtoMsg): MsgRenew {
+    return MsgRenew.decode(message.value);
+  },
+  toProto(message: MsgRenew): Uint8Array {
+    return MsgRenew.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRenew): MsgRenewProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgRenew",
+      value: MsgRenew.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRenewResponse(): MsgRenewResponse {
+  return {
+    expiresAt: BigInt(0)
+  };
+}
+/**
+ * MsgRenewResponse carries the new expiry.
+ * @name MsgRenewResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRenewResponse
+ */
+export const MsgRenewResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgRenewResponse",
+  encode(message: MsgRenewResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.expiresAt !== BigInt(0)) {
+      writer.uint32(8).int64(message.expiresAt);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRenewResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRenewResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.expiresAt = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgRenewResponse>): MsgRenewResponse {
+    const message = createBaseMsgRenewResponse();
+    message.expiresAt = object.expiresAt !== undefined && object.expiresAt !== null ? BigInt(object.expiresAt.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgRenewResponseAmino): MsgRenewResponse {
+    const message = createBaseMsgRenewResponse();
+    if (object.expires_at !== undefined && object.expires_at !== null) {
+      message.expiresAt = BigInt(object.expires_at);
+    }
+    return message;
+  },
+  toAmino(message: MsgRenewResponse): MsgRenewResponseAmino {
+    const obj: any = {};
+    obj.expires_at = message.expiresAt !== BigInt(0) ? message.expiresAt?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgRenewResponseAminoMsg): MsgRenewResponse {
+    return MsgRenewResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgRenewResponseProtoMsg): MsgRenewResponse {
+    return MsgRenewResponse.decode(message.value);
+  },
+  toProto(message: MsgRenewResponse): Uint8Array {
+    return MsgRenewResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRenewResponse): MsgRenewResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgRenewResponse",
+      value: MsgRenewResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRedeem(): MsgRedeem {
+  return {
+    signer: "",
+    classId: BigInt(0),
+    tokenIds: []
+  };
+}
+/**
+ * MsgRedeem marks tokens as redeemed. Signed by the class owner or a
+ * listed minter (the venue). Never moves ownership.
+ * @name MsgRedeem
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRedeem
+ */
+export const MsgRedeem = {
+  typeUrl: "/sparkdream.artifact.v1.MsgRedeem",
+  aminoType: "sparkdream/x/artifact/MsgRedeem",
+  encode(message: MsgRedeem, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.signer !== "") {
+      writer.uint32(10).string(message.signer);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    writer.uint32(26).fork();
+    for (const v of message.tokenIds) {
+      writer.uint64(v);
+    }
+    writer.ldelim();
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRedeem {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRedeem();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.signer = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.tokenIds.push(reader.uint64());
+            }
+          } else {
+            message.tokenIds.push(reader.uint64());
+          }
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgRedeem>): MsgRedeem {
+    const message = createBaseMsgRedeem();
+    message.signer = object.signer ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenIds = object.tokenIds?.map(e => BigInt(e.toString())) || [];
+    return message;
+  },
+  fromAmino(object: MsgRedeemAmino): MsgRedeem {
+    const message = createBaseMsgRedeem();
+    if (object.signer !== undefined && object.signer !== null) {
+      message.signer = object.signer;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    message.tokenIds = object.token_ids?.map(e => BigInt(e)) || [];
+    return message;
+  },
+  toAmino(message: MsgRedeem): MsgRedeemAmino {
+    const obj: any = {};
+    obj.signer = message.signer === "" ? undefined : message.signer;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    if (message.tokenIds) {
+      obj.token_ids = message.tokenIds.map(e => e.toString());
+    } else {
+      obj.token_ids = message.tokenIds;
+    }
+    return obj;
+  },
+  fromAminoMsg(object: MsgRedeemAminoMsg): MsgRedeem {
+    return MsgRedeem.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRedeem): MsgRedeemAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgRedeem",
+      value: MsgRedeem.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgRedeemProtoMsg): MsgRedeem {
+    return MsgRedeem.decode(message.value);
+  },
+  toProto(message: MsgRedeem): Uint8Array {
+    return MsgRedeem.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRedeem): MsgRedeemProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgRedeem",
+      value: MsgRedeem.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRedeemResponse(): MsgRedeemResponse {
+  return {};
+}
+/**
+ * MsgRedeemResponse is empty.
+ * @name MsgRedeemResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRedeemResponse
+ */
+export const MsgRedeemResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgRedeemResponse",
+  encode(_: MsgRedeemResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRedeemResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRedeemResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgRedeemResponse>): MsgRedeemResponse {
+    const message = createBaseMsgRedeemResponse();
+    return message;
+  },
+  fromAmino(_: MsgRedeemResponseAmino): MsgRedeemResponse {
+    const message = createBaseMsgRedeemResponse();
+    return message;
+  },
+  toAmino(_: MsgRedeemResponse): MsgRedeemResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgRedeemResponseAminoMsg): MsgRedeemResponse {
+    return MsgRedeemResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgRedeemResponseProtoMsg): MsgRedeemResponse {
+    return MsgRedeemResponse.decode(message.value);
+  },
+  toProto(message: MsgRedeemResponse): Uint8Array {
+    return MsgRedeemResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRedeemResponse): MsgRedeemResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgRedeemResponse",
+      value: MsgRedeemResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgLockRoyalty(): MsgLockRoyalty {
+  return {
+    owner: "",
+    classId: BigInt(0)
+  };
+}
+/**
+ * MsgLockRoyalty freezes royalty_bps and royalty_recipients forever.
+ * @name MsgLockRoyalty
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgLockRoyalty
+ */
+export const MsgLockRoyalty = {
+  typeUrl: "/sparkdream.artifact.v1.MsgLockRoyalty",
+  aminoType: "sparkdream/x/artifact/MsgLockRoyalty",
+  encode(message: MsgLockRoyalty, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.owner !== "") {
+      writer.uint32(10).string(message.owner);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgLockRoyalty {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgLockRoyalty();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.owner = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgLockRoyalty>): MsgLockRoyalty {
+    const message = createBaseMsgLockRoyalty();
+    message.owner = object.owner ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgLockRoyaltyAmino): MsgLockRoyalty {
+    const message = createBaseMsgLockRoyalty();
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = object.owner;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgLockRoyalty): MsgLockRoyaltyAmino {
+    const obj: any = {};
+    obj.owner = message.owner === "" ? undefined : message.owner;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgLockRoyaltyAminoMsg): MsgLockRoyalty {
+    return MsgLockRoyalty.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgLockRoyalty): MsgLockRoyaltyAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgLockRoyalty",
+      value: MsgLockRoyalty.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgLockRoyaltyProtoMsg): MsgLockRoyalty {
+    return MsgLockRoyalty.decode(message.value);
+  },
+  toProto(message: MsgLockRoyalty): Uint8Array {
+    return MsgLockRoyalty.encode(message).finish();
+  },
+  toProtoMsg(message: MsgLockRoyalty): MsgLockRoyaltyProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgLockRoyalty",
+      value: MsgLockRoyalty.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgLockRoyaltyResponse(): MsgLockRoyaltyResponse {
+  return {};
+}
+/**
+ * MsgLockRoyaltyResponse is empty.
+ * @name MsgLockRoyaltyResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgLockRoyaltyResponse
+ */
+export const MsgLockRoyaltyResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgLockRoyaltyResponse",
+  encode(_: MsgLockRoyaltyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgLockRoyaltyResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgLockRoyaltyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgLockRoyaltyResponse>): MsgLockRoyaltyResponse {
+    const message = createBaseMsgLockRoyaltyResponse();
+    return message;
+  },
+  fromAmino(_: MsgLockRoyaltyResponseAmino): MsgLockRoyaltyResponse {
+    const message = createBaseMsgLockRoyaltyResponse();
+    return message;
+  },
+  toAmino(_: MsgLockRoyaltyResponse): MsgLockRoyaltyResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgLockRoyaltyResponseAminoMsg): MsgLockRoyaltyResponse {
+    return MsgLockRoyaltyResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgLockRoyaltyResponseProtoMsg): MsgLockRoyaltyResponse {
+    return MsgLockRoyaltyResponse.decode(message.value);
+  },
+  toProto(message: MsgLockRoyaltyResponse): Uint8Array {
+    return MsgLockRoyaltyResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgLockRoyaltyResponse): MsgLockRoyaltyResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgLockRoyaltyResponse",
+      value: MsgLockRoyaltyResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgReveal(): MsgReveal {
+  return {
+    signer: "",
+    classId: BigInt(0),
+    tokenId: BigInt(0),
+    metadata: TokenMetadata.fromPartial({}),
+    salt: "",
+    proof: []
+  };
+}
+/**
+ * MsgReveal sets a blind-minted token's metadata. Signed by the class owner
+ * or a listed minter; the leaf built from (class, token, salt, metadata)
+ * must prove into the class commitment.
+ * @name MsgReveal
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgReveal
+ */
+export const MsgReveal = {
+  typeUrl: "/sparkdream.artifact.v1.MsgReveal",
+  aminoType: "sparkdream/x/artifact/MsgReveal",
+  encode(message: MsgReveal, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.signer !== "") {
+      writer.uint32(10).string(message.signer);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.tokenId);
+    }
+    if (message.metadata !== undefined) {
+      TokenMetadata.encode(message.metadata, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.salt !== "") {
+      writer.uint32(42).string(message.salt);
+    }
+    for (const v of message.proof) {
+      writer.uint32(50).string(v!);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgReveal {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgReveal();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.signer = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.tokenId = reader.uint64();
+          break;
+        case 4:
+          message.metadata = TokenMetadata.decode(reader, reader.uint32());
+          break;
+        case 5:
+          message.salt = reader.string();
+          break;
+        case 6:
+          message.proof.push(reader.string());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgReveal>): MsgReveal {
+    const message = createBaseMsgReveal();
+    message.signer = object.signer ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    message.metadata = object.metadata !== undefined && object.metadata !== null ? TokenMetadata.fromPartial(object.metadata) : undefined;
+    message.salt = object.salt ?? "";
+    message.proof = object.proof?.map(e => e) || [];
+    return message;
+  },
+  fromAmino(object: MsgRevealAmino): MsgReveal {
+    const message = createBaseMsgReveal();
+    if (object.signer !== undefined && object.signer !== null) {
+      message.signer = object.signer;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    if (object.metadata !== undefined && object.metadata !== null) {
+      message.metadata = TokenMetadata.fromAmino(object.metadata);
+    }
+    if (object.salt !== undefined && object.salt !== null) {
+      message.salt = object.salt;
+    }
+    message.proof = object.proof?.map(e => e) || [];
+    return message;
+  },
+  toAmino(message: MsgReveal): MsgRevealAmino {
+    const obj: any = {};
+    obj.signer = message.signer === "" ? undefined : message.signer;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    obj.metadata = message.metadata ? TokenMetadata.toAmino(message.metadata) : TokenMetadata.toAmino(TokenMetadata.fromPartial({}));
+    obj.salt = message.salt === "" ? undefined : message.salt;
+    if (message.proof) {
+      obj.proof = message.proof.map(e => e);
+    } else {
+      obj.proof = message.proof;
+    }
+    return obj;
+  },
+  fromAminoMsg(object: MsgRevealAminoMsg): MsgReveal {
+    return MsgReveal.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgReveal): MsgRevealAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgReveal",
+      value: MsgReveal.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgRevealProtoMsg): MsgReveal {
+    return MsgReveal.decode(message.value);
+  },
+  toProto(message: MsgReveal): Uint8Array {
+    return MsgReveal.encode(message).finish();
+  },
+  toProtoMsg(message: MsgReveal): MsgRevealProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgReveal",
+      value: MsgReveal.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRevealResponse(): MsgRevealResponse {
+  return {
+    metadataHash: ""
+  };
+}
+/**
+ * MsgRevealResponse carries the revealed metadata hash.
+ * @name MsgRevealResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRevealResponse
+ */
+export const MsgRevealResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgRevealResponse",
+  encode(message: MsgRevealResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.metadataHash !== "") {
+      writer.uint32(10).string(message.metadataHash);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRevealResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRevealResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.metadataHash = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgRevealResponse>): MsgRevealResponse {
+    const message = createBaseMsgRevealResponse();
+    message.metadataHash = object.metadataHash ?? "";
+    return message;
+  },
+  fromAmino(object: MsgRevealResponseAmino): MsgRevealResponse {
+    const message = createBaseMsgRevealResponse();
+    if (object.metadata_hash !== undefined && object.metadata_hash !== null) {
+      message.metadataHash = object.metadata_hash;
+    }
+    return message;
+  },
+  toAmino(message: MsgRevealResponse): MsgRevealResponseAmino {
+    const obj: any = {};
+    obj.metadata_hash = message.metadataHash === "" ? undefined : message.metadataHash;
+    return obj;
+  },
+  fromAminoMsg(object: MsgRevealResponseAminoMsg): MsgRevealResponse {
+    return MsgRevealResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgRevealResponseProtoMsg): MsgRevealResponse {
+    return MsgRevealResponse.decode(message.value);
+  },
+  toProto(message: MsgRevealResponse): Uint8Array {
+    return MsgRevealResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRevealResponse): MsgRevealResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgRevealResponse",
+      value: MsgRevealResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRevealSeed(): MsgRevealSeed {
+  return {
+    owner: "",
+    classId: BigInt(0),
+    seed: ""
+  };
+}
+/**
+ * MsgRevealSeed discloses the seed secret committed at class creation.
+ * @name MsgRevealSeed
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRevealSeed
+ */
+export const MsgRevealSeed = {
+  typeUrl: "/sparkdream.artifact.v1.MsgRevealSeed",
+  aminoType: "sparkdream/x/artifact/MsgRevealSeed",
+  encode(message: MsgRevealSeed, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.owner !== "") {
+      writer.uint32(10).string(message.owner);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.seed !== "") {
+      writer.uint32(26).string(message.seed);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRevealSeed {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRevealSeed();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.owner = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.seed = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgRevealSeed>): MsgRevealSeed {
+    const message = createBaseMsgRevealSeed();
+    message.owner = object.owner ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.seed = object.seed ?? "";
+    return message;
+  },
+  fromAmino(object: MsgRevealSeedAmino): MsgRevealSeed {
+    const message = createBaseMsgRevealSeed();
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = object.owner;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.seed !== undefined && object.seed !== null) {
+      message.seed = object.seed;
+    }
+    return message;
+  },
+  toAmino(message: MsgRevealSeed): MsgRevealSeedAmino {
+    const obj: any = {};
+    obj.owner = message.owner === "" ? undefined : message.owner;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.seed = message.seed === "" ? undefined : message.seed;
+    return obj;
+  },
+  fromAminoMsg(object: MsgRevealSeedAminoMsg): MsgRevealSeed {
+    return MsgRevealSeed.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRevealSeed): MsgRevealSeedAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgRevealSeed",
+      value: MsgRevealSeed.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgRevealSeedProtoMsg): MsgRevealSeed {
+    return MsgRevealSeed.decode(message.value);
+  },
+  toProto(message: MsgRevealSeed): Uint8Array {
+    return MsgRevealSeed.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRevealSeed): MsgRevealSeedProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgRevealSeed",
+      value: MsgRevealSeed.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRevealSeedResponse(): MsgRevealSeedResponse {
+  return {};
+}
+/**
+ * MsgRevealSeedResponse is empty.
+ * @name MsgRevealSeedResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRevealSeedResponse
+ */
+export const MsgRevealSeedResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgRevealSeedResponse",
+  encode(_: MsgRevealSeedResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRevealSeedResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRevealSeedResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgRevealSeedResponse>): MsgRevealSeedResponse {
+    const message = createBaseMsgRevealSeedResponse();
+    return message;
+  },
+  fromAmino(_: MsgRevealSeedResponseAmino): MsgRevealSeedResponse {
+    const message = createBaseMsgRevealSeedResponse();
+    return message;
+  },
+  toAmino(_: MsgRevealSeedResponse): MsgRevealSeedResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgRevealSeedResponseAminoMsg): MsgRevealSeedResponse {
+    return MsgRevealSeedResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgRevealSeedResponseProtoMsg): MsgRevealSeedResponse {
+    return MsgRevealSeedResponse.decode(message.value);
+  },
+  toProto(message: MsgRevealSeedResponse): Uint8Array {
+    return MsgRevealSeedResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRevealSeedResponse): MsgRevealSeedResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgRevealSeedResponse",
+      value: MsgRevealSeedResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgProposeMedia(): MsgProposeMedia {
+  return {
+    owner: "",
+    classId: BigInt(0),
+    tokenId: BigInt(0),
+    metadata: TokenMetadata.fromPartial({})
+  };
+}
+/**
+ * MsgProposeMedia offers the holder an additional media version.
+ * @name MsgProposeMedia
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgProposeMedia
+ */
+export const MsgProposeMedia = {
+  typeUrl: "/sparkdream.artifact.v1.MsgProposeMedia",
+  aminoType: "sparkdream/x/artifact/MsgProposeMedia",
+  encode(message: MsgProposeMedia, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.owner !== "") {
+      writer.uint32(10).string(message.owner);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.tokenId);
+    }
+    if (message.metadata !== undefined) {
+      TokenMetadata.encode(message.metadata, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgProposeMedia {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgProposeMedia();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.owner = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.tokenId = reader.uint64();
+          break;
+        case 4:
+          message.metadata = TokenMetadata.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgProposeMedia>): MsgProposeMedia {
+    const message = createBaseMsgProposeMedia();
+    message.owner = object.owner ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    message.metadata = object.metadata !== undefined && object.metadata !== null ? TokenMetadata.fromPartial(object.metadata) : undefined;
+    return message;
+  },
+  fromAmino(object: MsgProposeMediaAmino): MsgProposeMedia {
+    const message = createBaseMsgProposeMedia();
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = object.owner;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    if (object.metadata !== undefined && object.metadata !== null) {
+      message.metadata = TokenMetadata.fromAmino(object.metadata);
+    }
+    return message;
+  },
+  toAmino(message: MsgProposeMedia): MsgProposeMediaAmino {
+    const obj: any = {};
+    obj.owner = message.owner === "" ? undefined : message.owner;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    obj.metadata = message.metadata ? TokenMetadata.toAmino(message.metadata) : TokenMetadata.toAmino(TokenMetadata.fromPartial({}));
+    return obj;
+  },
+  fromAminoMsg(object: MsgProposeMediaAminoMsg): MsgProposeMedia {
+    return MsgProposeMedia.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgProposeMedia): MsgProposeMediaAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgProposeMedia",
+      value: MsgProposeMedia.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgProposeMediaProtoMsg): MsgProposeMedia {
+    return MsgProposeMedia.decode(message.value);
+  },
+  toProto(message: MsgProposeMedia): Uint8Array {
+    return MsgProposeMedia.encode(message).finish();
+  },
+  toProtoMsg(message: MsgProposeMedia): MsgProposeMediaProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgProposeMedia",
+      value: MsgProposeMedia.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgProposeMediaResponse(): MsgProposeMediaResponse {
+  return {
+    proposalId: BigInt(0)
+  };
+}
+/**
+ * MsgProposeMediaResponse carries the proposal id.
+ * @name MsgProposeMediaResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgProposeMediaResponse
+ */
+export const MsgProposeMediaResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgProposeMediaResponse",
+  encode(message: MsgProposeMediaResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.proposalId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.proposalId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgProposeMediaResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgProposeMediaResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.proposalId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgProposeMediaResponse>): MsgProposeMediaResponse {
+    const message = createBaseMsgProposeMediaResponse();
+    message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgProposeMediaResponseAmino): MsgProposeMediaResponse {
+    const message = createBaseMsgProposeMediaResponse();
+    if (object.proposal_id !== undefined && object.proposal_id !== null) {
+      message.proposalId = BigInt(object.proposal_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgProposeMediaResponse): MsgProposeMediaResponseAmino {
+    const obj: any = {};
+    obj.proposal_id = message.proposalId !== BigInt(0) ? message.proposalId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgProposeMediaResponseAminoMsg): MsgProposeMediaResponse {
+    return MsgProposeMediaResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgProposeMediaResponseProtoMsg): MsgProposeMediaResponse {
+    return MsgProposeMediaResponse.decode(message.value);
+  },
+  toProto(message: MsgProposeMediaResponse): Uint8Array {
+    return MsgProposeMediaResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgProposeMediaResponse): MsgProposeMediaResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgProposeMediaResponse",
+      value: MsgProposeMediaResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAcceptMedia(): MsgAcceptMedia {
+  return {
+    owner: "",
+    classId: BigInt(0),
+    tokenId: BigInt(0),
+    proposalId: BigInt(0),
+    display: false
+  };
+}
+/**
+ * MsgAcceptMedia moves a proposal into the token's accepted versions.
+ * @name MsgAcceptMedia
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAcceptMedia
+ */
+export const MsgAcceptMedia = {
+  typeUrl: "/sparkdream.artifact.v1.MsgAcceptMedia",
+  aminoType: "sparkdream/x/artifact/MsgAcceptMedia",
+  encode(message: MsgAcceptMedia, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.owner !== "") {
+      writer.uint32(10).string(message.owner);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.tokenId);
+    }
+    if (message.proposalId !== BigInt(0)) {
+      writer.uint32(32).uint64(message.proposalId);
+    }
+    if (message.display === true) {
+      writer.uint32(40).bool(message.display);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAcceptMedia {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAcceptMedia();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.owner = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.tokenId = reader.uint64();
+          break;
+        case 4:
+          message.proposalId = reader.uint64();
+          break;
+        case 5:
+          message.display = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgAcceptMedia>): MsgAcceptMedia {
+    const message = createBaseMsgAcceptMedia();
+    message.owner = object.owner ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
+    message.display = object.display ?? false;
+    return message;
+  },
+  fromAmino(object: MsgAcceptMediaAmino): MsgAcceptMedia {
+    const message = createBaseMsgAcceptMedia();
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = object.owner;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    if (object.proposal_id !== undefined && object.proposal_id !== null) {
+      message.proposalId = BigInt(object.proposal_id);
+    }
+    if (object.display !== undefined && object.display !== null) {
+      message.display = object.display;
+    }
+    return message;
+  },
+  toAmino(message: MsgAcceptMedia): MsgAcceptMediaAmino {
+    const obj: any = {};
+    obj.owner = message.owner === "" ? undefined : message.owner;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    obj.proposal_id = message.proposalId !== BigInt(0) ? message.proposalId?.toString() : undefined;
+    obj.display = message.display === false ? undefined : message.display;
+    return obj;
+  },
+  fromAminoMsg(object: MsgAcceptMediaAminoMsg): MsgAcceptMedia {
+    return MsgAcceptMedia.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAcceptMedia): MsgAcceptMediaAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgAcceptMedia",
+      value: MsgAcceptMedia.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgAcceptMediaProtoMsg): MsgAcceptMedia {
+    return MsgAcceptMedia.decode(message.value);
+  },
+  toProto(message: MsgAcceptMedia): Uint8Array {
+    return MsgAcceptMedia.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAcceptMedia): MsgAcceptMediaProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgAcceptMedia",
+      value: MsgAcceptMedia.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAcceptMediaResponse(): MsgAcceptMediaResponse {
+  return {
+    version: 0
+  };
+}
+/**
+ * MsgAcceptMediaResponse carries the new version number (1-based).
+ * @name MsgAcceptMediaResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAcceptMediaResponse
+ */
+export const MsgAcceptMediaResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgAcceptMediaResponse",
+  encode(message: MsgAcceptMediaResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.version !== 0) {
+      writer.uint32(8).uint32(message.version);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAcceptMediaResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAcceptMediaResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.version = reader.uint32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgAcceptMediaResponse>): MsgAcceptMediaResponse {
+    const message = createBaseMsgAcceptMediaResponse();
+    message.version = object.version ?? 0;
+    return message;
+  },
+  fromAmino(object: MsgAcceptMediaResponseAmino): MsgAcceptMediaResponse {
+    const message = createBaseMsgAcceptMediaResponse();
+    if (object.version !== undefined && object.version !== null) {
+      message.version = object.version;
+    }
+    return message;
+  },
+  toAmino(message: MsgAcceptMediaResponse): MsgAcceptMediaResponseAmino {
+    const obj: any = {};
+    obj.version = message.version === 0 ? undefined : message.version;
+    return obj;
+  },
+  fromAminoMsg(object: MsgAcceptMediaResponseAminoMsg): MsgAcceptMediaResponse {
+    return MsgAcceptMediaResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgAcceptMediaResponseProtoMsg): MsgAcceptMediaResponse {
+    return MsgAcceptMediaResponse.decode(message.value);
+  },
+  toProto(message: MsgAcceptMediaResponse): Uint8Array {
+    return MsgAcceptMediaResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAcceptMediaResponse): MsgAcceptMediaResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgAcceptMediaResponse",
+      value: MsgAcceptMediaResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRejectMedia(): MsgRejectMedia {
+  return {
+    signer: "",
+    classId: BigInt(0),
+    tokenId: BigInt(0),
+    proposalId: BigInt(0)
+  };
+}
+/**
+ * MsgRejectMedia discards a proposal (holder) or withdraws it (class owner).
+ * @name MsgRejectMedia
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRejectMedia
+ */
+export const MsgRejectMedia = {
+  typeUrl: "/sparkdream.artifact.v1.MsgRejectMedia",
+  aminoType: "sparkdream/x/artifact/MsgRejectMedia",
+  encode(message: MsgRejectMedia, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.signer !== "") {
+      writer.uint32(10).string(message.signer);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.tokenId);
+    }
+    if (message.proposalId !== BigInt(0)) {
+      writer.uint32(32).uint64(message.proposalId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRejectMedia {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRejectMedia();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.signer = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.tokenId = reader.uint64();
+          break;
+        case 4:
+          message.proposalId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgRejectMedia>): MsgRejectMedia {
+    const message = createBaseMsgRejectMedia();
+    message.signer = object.signer ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgRejectMediaAmino): MsgRejectMedia {
+    const message = createBaseMsgRejectMedia();
+    if (object.signer !== undefined && object.signer !== null) {
+      message.signer = object.signer;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    if (object.proposal_id !== undefined && object.proposal_id !== null) {
+      message.proposalId = BigInt(object.proposal_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgRejectMedia): MsgRejectMediaAmino {
+    const obj: any = {};
+    obj.signer = message.signer === "" ? undefined : message.signer;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    obj.proposal_id = message.proposalId !== BigInt(0) ? message.proposalId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgRejectMediaAminoMsg): MsgRejectMedia {
+    return MsgRejectMedia.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRejectMedia): MsgRejectMediaAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgRejectMedia",
+      value: MsgRejectMedia.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgRejectMediaProtoMsg): MsgRejectMedia {
+    return MsgRejectMedia.decode(message.value);
+  },
+  toProto(message: MsgRejectMedia): Uint8Array {
+    return MsgRejectMedia.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRejectMedia): MsgRejectMediaProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgRejectMedia",
+      value: MsgRejectMedia.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRejectMediaResponse(): MsgRejectMediaResponse {
+  return {};
+}
+/**
+ * MsgRejectMediaResponse is empty.
+ * @name MsgRejectMediaResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRejectMediaResponse
+ */
+export const MsgRejectMediaResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgRejectMediaResponse",
+  encode(_: MsgRejectMediaResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRejectMediaResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRejectMediaResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgRejectMediaResponse>): MsgRejectMediaResponse {
+    const message = createBaseMsgRejectMediaResponse();
+    return message;
+  },
+  fromAmino(_: MsgRejectMediaResponseAmino): MsgRejectMediaResponse {
+    const message = createBaseMsgRejectMediaResponse();
+    return message;
+  },
+  toAmino(_: MsgRejectMediaResponse): MsgRejectMediaResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgRejectMediaResponseAminoMsg): MsgRejectMediaResponse {
+    return MsgRejectMediaResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgRejectMediaResponseProtoMsg): MsgRejectMediaResponse {
+    return MsgRejectMediaResponse.decode(message.value);
+  },
+  toProto(message: MsgRejectMediaResponse): Uint8Array {
+    return MsgRejectMediaResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRejectMediaResponse): MsgRejectMediaResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgRejectMediaResponse",
+      value: MsgRejectMediaResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSetDisplayedMedia(): MsgSetDisplayedMedia {
+  return {
+    owner: "",
+    classId: BigInt(0),
+    tokenId: BigInt(0),
+    version: 0
+  };
+}
+/**
+ * MsgSetDisplayedMedia picks the displayed version: 0 = the stored
+ * metadata, n = media_versions[n-1].
+ * @name MsgSetDisplayedMedia
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgSetDisplayedMedia
+ */
+export const MsgSetDisplayedMedia = {
+  typeUrl: "/sparkdream.artifact.v1.MsgSetDisplayedMedia",
+  aminoType: "sparkdream/x/artifact/MsgSetDisplayedMedia",
+  encode(message: MsgSetDisplayedMedia, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.owner !== "") {
+      writer.uint32(10).string(message.owner);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.tokenId);
+    }
+    if (message.version !== 0) {
+      writer.uint32(32).uint32(message.version);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSetDisplayedMedia {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSetDisplayedMedia();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.owner = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.tokenId = reader.uint64();
+          break;
+        case 4:
+          message.version = reader.uint32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgSetDisplayedMedia>): MsgSetDisplayedMedia {
+    const message = createBaseMsgSetDisplayedMedia();
+    message.owner = object.owner ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    message.version = object.version ?? 0;
+    return message;
+  },
+  fromAmino(object: MsgSetDisplayedMediaAmino): MsgSetDisplayedMedia {
+    const message = createBaseMsgSetDisplayedMedia();
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = object.owner;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    if (object.version !== undefined && object.version !== null) {
+      message.version = object.version;
+    }
+    return message;
+  },
+  toAmino(message: MsgSetDisplayedMedia): MsgSetDisplayedMediaAmino {
+    const obj: any = {};
+    obj.owner = message.owner === "" ? undefined : message.owner;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    obj.version = message.version === 0 ? undefined : message.version;
+    return obj;
+  },
+  fromAminoMsg(object: MsgSetDisplayedMediaAminoMsg): MsgSetDisplayedMedia {
+    return MsgSetDisplayedMedia.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSetDisplayedMedia): MsgSetDisplayedMediaAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgSetDisplayedMedia",
+      value: MsgSetDisplayedMedia.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgSetDisplayedMediaProtoMsg): MsgSetDisplayedMedia {
+    return MsgSetDisplayedMedia.decode(message.value);
+  },
+  toProto(message: MsgSetDisplayedMedia): Uint8Array {
+    return MsgSetDisplayedMedia.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSetDisplayedMedia): MsgSetDisplayedMediaProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgSetDisplayedMedia",
+      value: MsgSetDisplayedMedia.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSetDisplayedMediaResponse(): MsgSetDisplayedMediaResponse {
+  return {};
+}
+/**
+ * MsgSetDisplayedMediaResponse is empty.
+ * @name MsgSetDisplayedMediaResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgSetDisplayedMediaResponse
+ */
+export const MsgSetDisplayedMediaResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgSetDisplayedMediaResponse",
+  encode(_: MsgSetDisplayedMediaResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSetDisplayedMediaResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSetDisplayedMediaResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgSetDisplayedMediaResponse>): MsgSetDisplayedMediaResponse {
+    const message = createBaseMsgSetDisplayedMediaResponse();
+    return message;
+  },
+  fromAmino(_: MsgSetDisplayedMediaResponseAmino): MsgSetDisplayedMediaResponse {
+    const message = createBaseMsgSetDisplayedMediaResponse();
+    return message;
+  },
+  toAmino(_: MsgSetDisplayedMediaResponse): MsgSetDisplayedMediaResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgSetDisplayedMediaResponseAminoMsg): MsgSetDisplayedMediaResponse {
+    return MsgSetDisplayedMediaResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgSetDisplayedMediaResponseProtoMsg): MsgSetDisplayedMediaResponse {
+    return MsgSetDisplayedMediaResponse.decode(message.value);
+  },
+  toProto(message: MsgSetDisplayedMediaResponse): Uint8Array {
+    return MsgSetDisplayedMediaResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSetDisplayedMediaResponse): MsgSetDisplayedMediaResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgSetDisplayedMediaResponse",
+      value: MsgSetDisplayedMediaResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCreateEdition(): MsgCreateEdition {
+  return {
+    minter: "",
+    classId: BigInt(0),
+    metadata: TokenMetadata.fromPartial({}),
+    maxSupply: BigInt(0),
+    claim: ImpactClaim.fromPartial({}),
+    acceptedContentLicense: ""
+  };
+}
+/**
+ * MsgCreateEdition creates an edition of an EDITIONS class (class owner or
+ * listed minter). With a claim it is an impact certificate.
+ * @name MsgCreateEdition
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCreateEdition
+ */
+export const MsgCreateEdition = {
+  typeUrl: "/sparkdream.artifact.v1.MsgCreateEdition",
+  aminoType: "sparkdream/x/artifact/MsgCreateEdition",
+  encode(message: MsgCreateEdition, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.minter !== "") {
+      writer.uint32(10).string(message.minter);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.metadata !== undefined) {
+      TokenMetadata.encode(message.metadata, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.maxSupply !== BigInt(0)) {
+      writer.uint32(32).uint64(message.maxSupply);
+    }
+    if (message.claim !== undefined) {
+      ImpactClaim.encode(message.claim, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.acceptedContentLicense !== "") {
+      writer.uint32(50).string(message.acceptedContentLicense);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCreateEdition {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCreateEdition();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.minter = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.metadata = TokenMetadata.decode(reader, reader.uint32());
+          break;
+        case 4:
+          message.maxSupply = reader.uint64();
+          break;
+        case 5:
+          message.claim = ImpactClaim.decode(reader, reader.uint32());
+          break;
+        case 6:
+          message.acceptedContentLicense = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCreateEdition>): MsgCreateEdition {
+    const message = createBaseMsgCreateEdition();
+    message.minter = object.minter ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.metadata = object.metadata !== undefined && object.metadata !== null ? TokenMetadata.fromPartial(object.metadata) : undefined;
+    message.maxSupply = object.maxSupply !== undefined && object.maxSupply !== null ? BigInt(object.maxSupply.toString()) : BigInt(0);
+    message.claim = object.claim !== undefined && object.claim !== null ? ImpactClaim.fromPartial(object.claim) : undefined;
+    message.acceptedContentLicense = object.acceptedContentLicense ?? "";
+    return message;
+  },
+  fromAmino(object: MsgCreateEditionAmino): MsgCreateEdition {
+    const message = createBaseMsgCreateEdition();
+    if (object.minter !== undefined && object.minter !== null) {
+      message.minter = object.minter;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.metadata !== undefined && object.metadata !== null) {
+      message.metadata = TokenMetadata.fromAmino(object.metadata);
+    }
+    if (object.max_supply !== undefined && object.max_supply !== null) {
+      message.maxSupply = BigInt(object.max_supply);
+    }
+    if (object.claim !== undefined && object.claim !== null) {
+      message.claim = ImpactClaim.fromAmino(object.claim);
+    }
+    if (object.accepted_content_license !== undefined && object.accepted_content_license !== null) {
+      message.acceptedContentLicense = object.accepted_content_license;
+    }
+    return message;
+  },
+  toAmino(message: MsgCreateEdition): MsgCreateEditionAmino {
+    const obj: any = {};
+    obj.minter = message.minter === "" ? undefined : message.minter;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.metadata = message.metadata ? TokenMetadata.toAmino(message.metadata) : TokenMetadata.toAmino(TokenMetadata.fromPartial({}));
+    obj.max_supply = message.maxSupply !== BigInt(0) ? message.maxSupply?.toString() : undefined;
+    obj.claim = message.claim ? ImpactClaim.toAmino(message.claim) : ImpactClaim.toAmino(ImpactClaim.fromPartial({}));
+    obj.accepted_content_license = message.acceptedContentLicense === "" ? undefined : message.acceptedContentLicense;
+    return obj;
+  },
+  fromAminoMsg(object: MsgCreateEditionAminoMsg): MsgCreateEdition {
+    return MsgCreateEdition.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCreateEdition): MsgCreateEditionAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgCreateEdition",
+      value: MsgCreateEdition.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgCreateEditionProtoMsg): MsgCreateEdition {
+    return MsgCreateEdition.decode(message.value);
+  },
+  toProto(message: MsgCreateEdition): Uint8Array {
+    return MsgCreateEdition.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCreateEdition): MsgCreateEditionProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgCreateEdition",
+      value: MsgCreateEdition.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCreateEditionResponse(): MsgCreateEditionResponse {
+  return {
+    editionId: BigInt(0)
+  };
+}
+/**
+ * MsgCreateEditionResponse returns the new edition id.
+ * @name MsgCreateEditionResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCreateEditionResponse
+ */
+export const MsgCreateEditionResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgCreateEditionResponse",
+  encode(message: MsgCreateEditionResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.editionId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.editionId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCreateEditionResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCreateEditionResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.editionId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCreateEditionResponse>): MsgCreateEditionResponse {
+    const message = createBaseMsgCreateEditionResponse();
+    message.editionId = object.editionId !== undefined && object.editionId !== null ? BigInt(object.editionId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgCreateEditionResponseAmino): MsgCreateEditionResponse {
+    const message = createBaseMsgCreateEditionResponse();
+    if (object.edition_id !== undefined && object.edition_id !== null) {
+      message.editionId = BigInt(object.edition_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgCreateEditionResponse): MsgCreateEditionResponseAmino {
+    const obj: any = {};
+    obj.edition_id = message.editionId !== BigInt(0) ? message.editionId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgCreateEditionResponseAminoMsg): MsgCreateEditionResponse {
+    return MsgCreateEditionResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgCreateEditionResponseProtoMsg): MsgCreateEditionResponse {
+    return MsgCreateEditionResponse.decode(message.value);
+  },
+  toProto(message: MsgCreateEditionResponse): Uint8Array {
+    return MsgCreateEditionResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCreateEditionResponse): MsgCreateEditionResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgCreateEditionResponse",
+      value: MsgCreateEditionResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseUnitMintEntry(): UnitMintEntry {
+  return {
+    recipient: "",
+    amount: BigInt(0)
+  };
+}
+/**
+ * UnitMintEntry is one recipient of a unit mint.
+ * @name UnitMintEntry
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.UnitMintEntry
+ */
+export const UnitMintEntry = {
+  typeUrl: "/sparkdream.artifact.v1.UnitMintEntry",
+  encode(message: UnitMintEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.recipient !== "") {
+      writer.uint32(10).string(message.recipient);
+    }
+    if (message.amount !== BigInt(0)) {
+      writer.uint32(16).uint64(message.amount);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): UnitMintEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUnitMintEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.recipient = reader.string();
+          break;
+        case 2:
+          message.amount = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<UnitMintEntry>): UnitMintEntry {
+    const message = createBaseUnitMintEntry();
+    message.recipient = object.recipient ?? "";
+    message.amount = object.amount !== undefined && object.amount !== null ? BigInt(object.amount.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: UnitMintEntryAmino): UnitMintEntry {
+    const message = createBaseUnitMintEntry();
+    if (object.recipient !== undefined && object.recipient !== null) {
+      message.recipient = object.recipient;
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = BigInt(object.amount);
+    }
+    return message;
+  },
+  toAmino(message: UnitMintEntry): UnitMintEntryAmino {
+    const obj: any = {};
+    obj.recipient = message.recipient === "" ? undefined : message.recipient;
+    obj.amount = message.amount !== BigInt(0) ? message.amount?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: UnitMintEntryAminoMsg): UnitMintEntry {
+    return UnitMintEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: UnitMintEntryProtoMsg): UnitMintEntry {
+    return UnitMintEntry.decode(message.value);
+  },
+  toProto(message: UnitMintEntry): Uint8Array {
+    return UnitMintEntry.encode(message).finish();
+  },
+  toProtoMsg(message: UnitMintEntry): UnitMintEntryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.UnitMintEntry",
+      value: UnitMintEntry.encode(message).finish()
+    };
+  }
+};
+function createBaseUnitResult(): UnitResult {
+  return {
+    recipient: "",
+    amount: BigInt(0),
+    delivered: false,
+    pendingId: BigInt(0)
+  };
+}
+/**
+ * UnitResult reports one unit delivery: delivered directly, or parked in
+ * the recipient's inbox as pending_id (inbox ref (0, pending_id)).
+ * @name UnitResult
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.UnitResult
+ */
+export const UnitResult = {
+  typeUrl: "/sparkdream.artifact.v1.UnitResult",
+  encode(message: UnitResult, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.recipient !== "") {
+      writer.uint32(10).string(message.recipient);
+    }
+    if (message.amount !== BigInt(0)) {
+      writer.uint32(16).uint64(message.amount);
+    }
+    if (message.delivered === true) {
+      writer.uint32(24).bool(message.delivered);
+    }
+    if (message.pendingId !== BigInt(0)) {
+      writer.uint32(32).uint64(message.pendingId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): UnitResult {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUnitResult();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.recipient = reader.string();
+          break;
+        case 2:
+          message.amount = reader.uint64();
+          break;
+        case 3:
+          message.delivered = reader.bool();
+          break;
+        case 4:
+          message.pendingId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<UnitResult>): UnitResult {
+    const message = createBaseUnitResult();
+    message.recipient = object.recipient ?? "";
+    message.amount = object.amount !== undefined && object.amount !== null ? BigInt(object.amount.toString()) : BigInt(0);
+    message.delivered = object.delivered ?? false;
+    message.pendingId = object.pendingId !== undefined && object.pendingId !== null ? BigInt(object.pendingId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: UnitResultAmino): UnitResult {
+    const message = createBaseUnitResult();
+    if (object.recipient !== undefined && object.recipient !== null) {
+      message.recipient = object.recipient;
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = BigInt(object.amount);
+    }
+    if (object.delivered !== undefined && object.delivered !== null) {
+      message.delivered = object.delivered;
+    }
+    if (object.pending_id !== undefined && object.pending_id !== null) {
+      message.pendingId = BigInt(object.pending_id);
+    }
+    return message;
+  },
+  toAmino(message: UnitResult): UnitResultAmino {
+    const obj: any = {};
+    obj.recipient = message.recipient === "" ? undefined : message.recipient;
+    obj.amount = message.amount !== BigInt(0) ? message.amount?.toString() : undefined;
+    obj.delivered = message.delivered === false ? undefined : message.delivered;
+    obj.pending_id = message.pendingId !== BigInt(0) ? message.pendingId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: UnitResultAminoMsg): UnitResult {
+    return UnitResult.fromAmino(object.value);
+  },
+  fromProtoMsg(message: UnitResultProtoMsg): UnitResult {
+    return UnitResult.decode(message.value);
+  },
+  toProto(message: UnitResult): Uint8Array {
+    return UnitResult.encode(message).finish();
+  },
+  toProtoMsg(message: UnitResult): UnitResultProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.UnitResult",
+      value: UnitResult.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgMintUnits(): MsgMintUnits {
+  return {
+    minter: "",
+    classId: BigInt(0),
+    editionId: BigInt(0),
+    entries: []
+  };
+}
+/**
+ * MsgMintUnits mints units of an edition (class owner or listed minter).
+ * @name MsgMintUnits
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgMintUnits
+ */
+export const MsgMintUnits = {
+  typeUrl: "/sparkdream.artifact.v1.MsgMintUnits",
+  aminoType: "sparkdream/x/artifact/MsgMintUnits",
+  encode(message: MsgMintUnits, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.minter !== "") {
+      writer.uint32(10).string(message.minter);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.editionId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.editionId);
+    }
+    for (const v of message.entries) {
+      UnitMintEntry.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgMintUnits {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgMintUnits();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.minter = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.editionId = reader.uint64();
+          break;
+        case 4:
+          message.entries.push(UnitMintEntry.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgMintUnits>): MsgMintUnits {
+    const message = createBaseMsgMintUnits();
+    message.minter = object.minter ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.editionId = object.editionId !== undefined && object.editionId !== null ? BigInt(object.editionId.toString()) : BigInt(0);
+    message.entries = object.entries?.map(e => UnitMintEntry.fromPartial(e)) || [];
+    return message;
+  },
+  fromAmino(object: MsgMintUnitsAmino): MsgMintUnits {
+    const message = createBaseMsgMintUnits();
+    if (object.minter !== undefined && object.minter !== null) {
+      message.minter = object.minter;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.edition_id !== undefined && object.edition_id !== null) {
+      message.editionId = BigInt(object.edition_id);
+    }
+    message.entries = object.entries?.map(e => UnitMintEntry.fromAmino(e)) || [];
+    return message;
+  },
+  toAmino(message: MsgMintUnits): MsgMintUnitsAmino {
+    const obj: any = {};
+    obj.minter = message.minter === "" ? undefined : message.minter;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.edition_id = message.editionId !== BigInt(0) ? message.editionId?.toString() : undefined;
+    if (message.entries) {
+      obj.entries = message.entries.map(e => e ? UnitMintEntry.toAmino(e) : undefined);
+    } else {
+      obj.entries = message.entries;
+    }
+    return obj;
+  },
+  fromAminoMsg(object: MsgMintUnitsAminoMsg): MsgMintUnits {
+    return MsgMintUnits.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgMintUnits): MsgMintUnitsAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgMintUnits",
+      value: MsgMintUnits.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgMintUnitsProtoMsg): MsgMintUnits {
+    return MsgMintUnits.decode(message.value);
+  },
+  toProto(message: MsgMintUnits): Uint8Array {
+    return MsgMintUnits.encode(message).finish();
+  },
+  toProtoMsg(message: MsgMintUnits): MsgMintUnitsProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgMintUnits",
+      value: MsgMintUnits.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgMintUnitsResponse(): MsgMintUnitsResponse {
+  return {
+    results: []
+  };
+}
+/**
+ * MsgMintUnitsResponse reports each entry.
+ * @name MsgMintUnitsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgMintUnitsResponse
+ */
+export const MsgMintUnitsResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgMintUnitsResponse",
+  encode(message: MsgMintUnitsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.results) {
+      UnitResult.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgMintUnitsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgMintUnitsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.results.push(UnitResult.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgMintUnitsResponse>): MsgMintUnitsResponse {
+    const message = createBaseMsgMintUnitsResponse();
+    message.results = object.results?.map(e => UnitResult.fromPartial(e)) || [];
+    return message;
+  },
+  fromAmino(object: MsgMintUnitsResponseAmino): MsgMintUnitsResponse {
+    const message = createBaseMsgMintUnitsResponse();
+    message.results = object.results?.map(e => UnitResult.fromAmino(e)) || [];
+    return message;
+  },
+  toAmino(message: MsgMintUnitsResponse): MsgMintUnitsResponseAmino {
+    const obj: any = {};
+    if (message.results) {
+      obj.results = message.results.map(e => e ? UnitResult.toAmino(e) : undefined);
+    } else {
+      obj.results = message.results;
+    }
+    return obj;
+  },
+  fromAminoMsg(object: MsgMintUnitsResponseAminoMsg): MsgMintUnitsResponse {
+    return MsgMintUnitsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgMintUnitsResponseProtoMsg): MsgMintUnitsResponse {
+    return MsgMintUnitsResponse.decode(message.value);
+  },
+  toProto(message: MsgMintUnitsResponse): Uint8Array {
+    return MsgMintUnitsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgMintUnitsResponse): MsgMintUnitsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgMintUnitsResponse",
+      value: MsgMintUnitsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseUnitTransferEntry(): UnitTransferEntry {
+  return {
+    classId: BigInt(0),
+    editionId: BigInt(0),
+    recipient: "",
+    amount: BigInt(0)
+  };
+}
+/**
+ * UnitTransferEntry moves units of one edition to one recipient.
+ * @name UnitTransferEntry
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.UnitTransferEntry
+ */
+export const UnitTransferEntry = {
+  typeUrl: "/sparkdream.artifact.v1.UnitTransferEntry",
+  encode(message: UnitTransferEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.classId);
+    }
+    if (message.editionId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.editionId);
+    }
+    if (message.recipient !== "") {
+      writer.uint32(26).string(message.recipient);
+    }
+    if (message.amount !== BigInt(0)) {
+      writer.uint32(32).uint64(message.amount);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): UnitTransferEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUnitTransferEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.classId = reader.uint64();
+          break;
+        case 2:
+          message.editionId = reader.uint64();
+          break;
+        case 3:
+          message.recipient = reader.string();
+          break;
+        case 4:
+          message.amount = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<UnitTransferEntry>): UnitTransferEntry {
+    const message = createBaseUnitTransferEntry();
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.editionId = object.editionId !== undefined && object.editionId !== null ? BigInt(object.editionId.toString()) : BigInt(0);
+    message.recipient = object.recipient ?? "";
+    message.amount = object.amount !== undefined && object.amount !== null ? BigInt(object.amount.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: UnitTransferEntryAmino): UnitTransferEntry {
+    const message = createBaseUnitTransferEntry();
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.edition_id !== undefined && object.edition_id !== null) {
+      message.editionId = BigInt(object.edition_id);
+    }
+    if (object.recipient !== undefined && object.recipient !== null) {
+      message.recipient = object.recipient;
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = BigInt(object.amount);
+    }
+    return message;
+  },
+  toAmino(message: UnitTransferEntry): UnitTransferEntryAmino {
+    const obj: any = {};
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.edition_id = message.editionId !== BigInt(0) ? message.editionId?.toString() : undefined;
+    obj.recipient = message.recipient === "" ? undefined : message.recipient;
+    obj.amount = message.amount !== BigInt(0) ? message.amount?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: UnitTransferEntryAminoMsg): UnitTransferEntry {
+    return UnitTransferEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: UnitTransferEntryProtoMsg): UnitTransferEntry {
+    return UnitTransferEntry.decode(message.value);
+  },
+  toProto(message: UnitTransferEntry): Uint8Array {
+    return UnitTransferEntry.encode(message).finish();
+  },
+  toProtoMsg(message: UnitTransferEntry): UnitTransferEntryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.UnitTransferEntry",
+      value: UnitTransferEntry.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgTransferUnits(): MsgTransferUnits {
+  return {
+    sender: "",
+    entries: []
+  };
+}
+/**
+ * MsgTransferUnits moves units to recipients (or their inboxes).
+ * @name MsgTransferUnits
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgTransferUnits
+ */
+export const MsgTransferUnits = {
+  typeUrl: "/sparkdream.artifact.v1.MsgTransferUnits",
+  aminoType: "sparkdream/x/artifact/MsgTransferUnits",
+  encode(message: MsgTransferUnits, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.sender !== "") {
+      writer.uint32(10).string(message.sender);
+    }
+    for (const v of message.entries) {
+      UnitTransferEntry.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgTransferUnits {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgTransferUnits();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.sender = reader.string();
+          break;
+        case 2:
+          message.entries.push(UnitTransferEntry.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgTransferUnits>): MsgTransferUnits {
+    const message = createBaseMsgTransferUnits();
+    message.sender = object.sender ?? "";
+    message.entries = object.entries?.map(e => UnitTransferEntry.fromPartial(e)) || [];
+    return message;
+  },
+  fromAmino(object: MsgTransferUnitsAmino): MsgTransferUnits {
+    const message = createBaseMsgTransferUnits();
+    if (object.sender !== undefined && object.sender !== null) {
+      message.sender = object.sender;
+    }
+    message.entries = object.entries?.map(e => UnitTransferEntry.fromAmino(e)) || [];
+    return message;
+  },
+  toAmino(message: MsgTransferUnits): MsgTransferUnitsAmino {
+    const obj: any = {};
+    obj.sender = message.sender === "" ? undefined : message.sender;
+    if (message.entries) {
+      obj.entries = message.entries.map(e => e ? UnitTransferEntry.toAmino(e) : undefined);
+    } else {
+      obj.entries = message.entries;
+    }
+    return obj;
+  },
+  fromAminoMsg(object: MsgTransferUnitsAminoMsg): MsgTransferUnits {
+    return MsgTransferUnits.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgTransferUnits): MsgTransferUnitsAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgTransferUnits",
+      value: MsgTransferUnits.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgTransferUnitsProtoMsg): MsgTransferUnits {
+    return MsgTransferUnits.decode(message.value);
+  },
+  toProto(message: MsgTransferUnits): Uint8Array {
+    return MsgTransferUnits.encode(message).finish();
+  },
+  toProtoMsg(message: MsgTransferUnits): MsgTransferUnitsProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgTransferUnits",
+      value: MsgTransferUnits.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgTransferUnitsResponse(): MsgTransferUnitsResponse {
+  return {
+    results: []
+  };
+}
+/**
+ * MsgTransferUnitsResponse reports each entry.
+ * @name MsgTransferUnitsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgTransferUnitsResponse
+ */
+export const MsgTransferUnitsResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgTransferUnitsResponse",
+  encode(message: MsgTransferUnitsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.results) {
+      UnitResult.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgTransferUnitsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgTransferUnitsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.results.push(UnitResult.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgTransferUnitsResponse>): MsgTransferUnitsResponse {
+    const message = createBaseMsgTransferUnitsResponse();
+    message.results = object.results?.map(e => UnitResult.fromPartial(e)) || [];
+    return message;
+  },
+  fromAmino(object: MsgTransferUnitsResponseAmino): MsgTransferUnitsResponse {
+    const message = createBaseMsgTransferUnitsResponse();
+    message.results = object.results?.map(e => UnitResult.fromAmino(e)) || [];
+    return message;
+  },
+  toAmino(message: MsgTransferUnitsResponse): MsgTransferUnitsResponseAmino {
+    const obj: any = {};
+    if (message.results) {
+      obj.results = message.results.map(e => e ? UnitResult.toAmino(e) : undefined);
+    } else {
+      obj.results = message.results;
+    }
+    return obj;
+  },
+  fromAminoMsg(object: MsgTransferUnitsResponseAminoMsg): MsgTransferUnitsResponse {
+    return MsgTransferUnitsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgTransferUnitsResponseProtoMsg): MsgTransferUnitsResponse {
+    return MsgTransferUnitsResponse.decode(message.value);
+  },
+  toProto(message: MsgTransferUnitsResponse): Uint8Array {
+    return MsgTransferUnitsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgTransferUnitsResponse): MsgTransferUnitsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgTransferUnitsResponse",
+      value: MsgTransferUnitsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgBurnUnits(): MsgBurnUnits {
+  return {
+    owner: "",
+    classId: BigInt(0),
+    editionId: BigInt(0),
+    amount: BigInt(0)
+  };
+}
+/**
+ * MsgBurnUnits burns free units the signer holds.
+ * @name MsgBurnUnits
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgBurnUnits
+ */
+export const MsgBurnUnits = {
+  typeUrl: "/sparkdream.artifact.v1.MsgBurnUnits",
+  aminoType: "sparkdream/x/artifact/MsgBurnUnits",
+  encode(message: MsgBurnUnits, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.owner !== "") {
+      writer.uint32(10).string(message.owner);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.editionId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.editionId);
+    }
+    if (message.amount !== BigInt(0)) {
+      writer.uint32(32).uint64(message.amount);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgBurnUnits {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgBurnUnits();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.owner = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.editionId = reader.uint64();
+          break;
+        case 4:
+          message.amount = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgBurnUnits>): MsgBurnUnits {
+    const message = createBaseMsgBurnUnits();
+    message.owner = object.owner ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.editionId = object.editionId !== undefined && object.editionId !== null ? BigInt(object.editionId.toString()) : BigInt(0);
+    message.amount = object.amount !== undefined && object.amount !== null ? BigInt(object.amount.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgBurnUnitsAmino): MsgBurnUnits {
+    const message = createBaseMsgBurnUnits();
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = object.owner;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.edition_id !== undefined && object.edition_id !== null) {
+      message.editionId = BigInt(object.edition_id);
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = BigInt(object.amount);
+    }
+    return message;
+  },
+  toAmino(message: MsgBurnUnits): MsgBurnUnitsAmino {
+    const obj: any = {};
+    obj.owner = message.owner === "" ? undefined : message.owner;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.edition_id = message.editionId !== BigInt(0) ? message.editionId?.toString() : undefined;
+    obj.amount = message.amount !== BigInt(0) ? message.amount?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgBurnUnitsAminoMsg): MsgBurnUnits {
+    return MsgBurnUnits.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgBurnUnits): MsgBurnUnitsAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgBurnUnits",
+      value: MsgBurnUnits.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgBurnUnitsProtoMsg): MsgBurnUnits {
+    return MsgBurnUnits.decode(message.value);
+  },
+  toProto(message: MsgBurnUnits): Uint8Array {
+    return MsgBurnUnits.encode(message).finish();
+  },
+  toProtoMsg(message: MsgBurnUnits): MsgBurnUnitsProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgBurnUnits",
+      value: MsgBurnUnits.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgBurnUnitsResponse(): MsgBurnUnitsResponse {
+  return {};
+}
+/**
+ * MsgBurnUnitsResponse is empty.
+ * @name MsgBurnUnitsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgBurnUnitsResponse
+ */
+export const MsgBurnUnitsResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgBurnUnitsResponse",
+  encode(_: MsgBurnUnitsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgBurnUnitsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgBurnUnitsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgBurnUnitsResponse>): MsgBurnUnitsResponse {
+    const message = createBaseMsgBurnUnitsResponse();
+    return message;
+  },
+  fromAmino(_: MsgBurnUnitsResponseAmino): MsgBurnUnitsResponse {
+    const message = createBaseMsgBurnUnitsResponse();
+    return message;
+  },
+  toAmino(_: MsgBurnUnitsResponse): MsgBurnUnitsResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgBurnUnitsResponseAminoMsg): MsgBurnUnitsResponse {
+    return MsgBurnUnitsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgBurnUnitsResponseProtoMsg): MsgBurnUnitsResponse {
+    return MsgBurnUnitsResponse.decode(message.value);
+  },
+  toProto(message: MsgBurnUnitsResponse): Uint8Array {
+    return MsgBurnUnitsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgBurnUnitsResponse): MsgBurnUnitsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgBurnUnitsResponse",
+      value: MsgBurnUnitsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRevokeUnits(): MsgRevokeUnits {
+  return {
+    owner: "",
+    classId: BigInt(0),
+    editionId: BigInt(0),
+    holder: "",
+    amount: BigInt(0),
+    reason: ""
+  };
+}
+/**
+ * MsgRevokeUnits burns a holder's units as the class owner, when the
+ * class's burn_authorization allows the issuer.
+ * @name MsgRevokeUnits
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRevokeUnits
+ */
+export const MsgRevokeUnits = {
+  typeUrl: "/sparkdream.artifact.v1.MsgRevokeUnits",
+  aminoType: "sparkdream/x/artifact/MsgRevokeUnits",
+  encode(message: MsgRevokeUnits, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.owner !== "") {
+      writer.uint32(10).string(message.owner);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.editionId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.editionId);
+    }
+    if (message.holder !== "") {
+      writer.uint32(34).string(message.holder);
+    }
+    if (message.amount !== BigInt(0)) {
+      writer.uint32(40).uint64(message.amount);
+    }
+    if (message.reason !== "") {
+      writer.uint32(50).string(message.reason);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRevokeUnits {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRevokeUnits();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.owner = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.editionId = reader.uint64();
+          break;
+        case 4:
+          message.holder = reader.string();
+          break;
+        case 5:
+          message.amount = reader.uint64();
+          break;
+        case 6:
+          message.reason = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgRevokeUnits>): MsgRevokeUnits {
+    const message = createBaseMsgRevokeUnits();
+    message.owner = object.owner ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.editionId = object.editionId !== undefined && object.editionId !== null ? BigInt(object.editionId.toString()) : BigInt(0);
+    message.holder = object.holder ?? "";
+    message.amount = object.amount !== undefined && object.amount !== null ? BigInt(object.amount.toString()) : BigInt(0);
+    message.reason = object.reason ?? "";
+    return message;
+  },
+  fromAmino(object: MsgRevokeUnitsAmino): MsgRevokeUnits {
+    const message = createBaseMsgRevokeUnits();
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = object.owner;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.edition_id !== undefined && object.edition_id !== null) {
+      message.editionId = BigInt(object.edition_id);
+    }
+    if (object.holder !== undefined && object.holder !== null) {
+      message.holder = object.holder;
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = BigInt(object.amount);
+    }
+    if (object.reason !== undefined && object.reason !== null) {
+      message.reason = object.reason;
+    }
+    return message;
+  },
+  toAmino(message: MsgRevokeUnits): MsgRevokeUnitsAmino {
+    const obj: any = {};
+    obj.owner = message.owner === "" ? undefined : message.owner;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.edition_id = message.editionId !== BigInt(0) ? message.editionId?.toString() : undefined;
+    obj.holder = message.holder === "" ? undefined : message.holder;
+    obj.amount = message.amount !== BigInt(0) ? message.amount?.toString() : undefined;
+    obj.reason = message.reason === "" ? undefined : message.reason;
+    return obj;
+  },
+  fromAminoMsg(object: MsgRevokeUnitsAminoMsg): MsgRevokeUnits {
+    return MsgRevokeUnits.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRevokeUnits): MsgRevokeUnitsAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgRevokeUnits",
+      value: MsgRevokeUnits.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgRevokeUnitsProtoMsg): MsgRevokeUnits {
+    return MsgRevokeUnits.decode(message.value);
+  },
+  toProto(message: MsgRevokeUnits): Uint8Array {
+    return MsgRevokeUnits.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRevokeUnits): MsgRevokeUnitsProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgRevokeUnits",
+      value: MsgRevokeUnits.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRevokeUnitsResponse(): MsgRevokeUnitsResponse {
+  return {};
+}
+/**
+ * MsgRevokeUnitsResponse is empty.
+ * @name MsgRevokeUnitsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRevokeUnitsResponse
+ */
+export const MsgRevokeUnitsResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgRevokeUnitsResponse",
+  encode(_: MsgRevokeUnitsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRevokeUnitsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRevokeUnitsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgRevokeUnitsResponse>): MsgRevokeUnitsResponse {
+    const message = createBaseMsgRevokeUnitsResponse();
+    return message;
+  },
+  fromAmino(_: MsgRevokeUnitsResponseAmino): MsgRevokeUnitsResponse {
+    const message = createBaseMsgRevokeUnitsResponse();
+    return message;
+  },
+  toAmino(_: MsgRevokeUnitsResponse): MsgRevokeUnitsResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgRevokeUnitsResponseAminoMsg): MsgRevokeUnitsResponse {
+    return MsgRevokeUnitsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgRevokeUnitsResponseProtoMsg): MsgRevokeUnitsResponse {
+    return MsgRevokeUnitsResponse.decode(message.value);
+  },
+  toProto(message: MsgRevokeUnitsResponse): Uint8Array {
+    return MsgRevokeUnitsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRevokeUnitsResponse): MsgRevokeUnitsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgRevokeUnitsResponse",
+      value: MsgRevokeUnitsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgListUnits(): MsgListUnits {
+  return {
+    seller: "",
+    classId: BigInt(0),
+    editionId: BigInt(0),
+    quantity: BigInt(0),
+    unitPrice: Coin.fromPartial({}),
+    duration: BigInt(0)
+  };
+}
+/**
+ * MsgListUnits offers units at a fixed per-unit SPARK price.
+ * @name MsgListUnits
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgListUnits
+ */
+export const MsgListUnits = {
+  typeUrl: "/sparkdream.artifact.v1.MsgListUnits",
+  aminoType: "sparkdream/x/artifact/MsgListUnits",
+  encode(message: MsgListUnits, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.seller !== "") {
+      writer.uint32(10).string(message.seller);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.editionId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.editionId);
+    }
+    if (message.quantity !== BigInt(0)) {
+      writer.uint32(32).uint64(message.quantity);
+    }
+    if (message.unitPrice !== undefined) {
+      Coin.encode(message.unitPrice, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.duration !== BigInt(0)) {
+      writer.uint32(48).int64(message.duration);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgListUnits {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgListUnits();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.seller = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.editionId = reader.uint64();
+          break;
+        case 4:
+          message.quantity = reader.uint64();
+          break;
+        case 5:
+          message.unitPrice = Coin.decode(reader, reader.uint32());
+          break;
+        case 6:
+          message.duration = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgListUnits>): MsgListUnits {
+    const message = createBaseMsgListUnits();
+    message.seller = object.seller ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.editionId = object.editionId !== undefined && object.editionId !== null ? BigInt(object.editionId.toString()) : BigInt(0);
+    message.quantity = object.quantity !== undefined && object.quantity !== null ? BigInt(object.quantity.toString()) : BigInt(0);
+    message.unitPrice = object.unitPrice !== undefined && object.unitPrice !== null ? Coin.fromPartial(object.unitPrice) : undefined;
+    message.duration = object.duration !== undefined && object.duration !== null ? BigInt(object.duration.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgListUnitsAmino): MsgListUnits {
+    const message = createBaseMsgListUnits();
+    if (object.seller !== undefined && object.seller !== null) {
+      message.seller = object.seller;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.edition_id !== undefined && object.edition_id !== null) {
+      message.editionId = BigInt(object.edition_id);
+    }
+    if (object.quantity !== undefined && object.quantity !== null) {
+      message.quantity = BigInt(object.quantity);
+    }
+    if (object.unit_price !== undefined && object.unit_price !== null) {
+      message.unitPrice = Coin.fromAmino(object.unit_price);
+    }
+    if (object.duration !== undefined && object.duration !== null) {
+      message.duration = BigInt(object.duration);
+    }
+    return message;
+  },
+  toAmino(message: MsgListUnits): MsgListUnitsAmino {
+    const obj: any = {};
+    obj.seller = message.seller === "" ? undefined : message.seller;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.edition_id = message.editionId !== BigInt(0) ? message.editionId?.toString() : undefined;
+    obj.quantity = message.quantity !== BigInt(0) ? message.quantity?.toString() : undefined;
+    obj.unit_price = message.unitPrice ? Coin.toAmino(message.unitPrice) : Coin.toAmino(Coin.fromPartial({}));
+    obj.duration = message.duration !== BigInt(0) ? message.duration?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgListUnitsAminoMsg): MsgListUnits {
+    return MsgListUnits.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgListUnits): MsgListUnitsAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgListUnits",
+      value: MsgListUnits.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgListUnitsProtoMsg): MsgListUnits {
+    return MsgListUnits.decode(message.value);
+  },
+  toProto(message: MsgListUnits): Uint8Array {
+    return MsgListUnits.encode(message).finish();
+  },
+  toProtoMsg(message: MsgListUnits): MsgListUnitsProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgListUnits",
+      value: MsgListUnits.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgListUnitsResponse(): MsgListUnitsResponse {
+  return {
+    listingId: BigInt(0)
+  };
+}
+/**
+ * MsgListUnitsResponse returns the listing id.
+ * @name MsgListUnitsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgListUnitsResponse
+ */
+export const MsgListUnitsResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgListUnitsResponse",
+  encode(message: MsgListUnitsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.listingId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.listingId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgListUnitsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgListUnitsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.listingId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgListUnitsResponse>): MsgListUnitsResponse {
+    const message = createBaseMsgListUnitsResponse();
+    message.listingId = object.listingId !== undefined && object.listingId !== null ? BigInt(object.listingId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgListUnitsResponseAmino): MsgListUnitsResponse {
+    const message = createBaseMsgListUnitsResponse();
+    if (object.listing_id !== undefined && object.listing_id !== null) {
+      message.listingId = BigInt(object.listing_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgListUnitsResponse): MsgListUnitsResponseAmino {
+    const obj: any = {};
+    obj.listing_id = message.listingId !== BigInt(0) ? message.listingId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgListUnitsResponseAminoMsg): MsgListUnitsResponse {
+    return MsgListUnitsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgListUnitsResponseProtoMsg): MsgListUnitsResponse {
+    return MsgListUnitsResponse.decode(message.value);
+  },
+  toProto(message: MsgListUnitsResponse): Uint8Array {
+    return MsgListUnitsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgListUnitsResponse): MsgListUnitsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgListUnitsResponse",
+      value: MsgListUnitsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgDelistUnits(): MsgDelistUnits {
+  return {
+    seller: "",
+    listingId: BigInt(0)
+  };
+}
+/**
+ * MsgDelistUnits cancels a unit listing and unlocks its units.
+ * @name MsgDelistUnits
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgDelistUnits
+ */
+export const MsgDelistUnits = {
+  typeUrl: "/sparkdream.artifact.v1.MsgDelistUnits",
+  aminoType: "sparkdream/x/artifact/MsgDelistUnits",
+  encode(message: MsgDelistUnits, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.seller !== "") {
+      writer.uint32(10).string(message.seller);
+    }
+    if (message.listingId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.listingId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgDelistUnits {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgDelistUnits();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.seller = reader.string();
+          break;
+        case 2:
+          message.listingId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgDelistUnits>): MsgDelistUnits {
+    const message = createBaseMsgDelistUnits();
+    message.seller = object.seller ?? "";
+    message.listingId = object.listingId !== undefined && object.listingId !== null ? BigInt(object.listingId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgDelistUnitsAmino): MsgDelistUnits {
+    const message = createBaseMsgDelistUnits();
+    if (object.seller !== undefined && object.seller !== null) {
+      message.seller = object.seller;
+    }
+    if (object.listing_id !== undefined && object.listing_id !== null) {
+      message.listingId = BigInt(object.listing_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgDelistUnits): MsgDelistUnitsAmino {
+    const obj: any = {};
+    obj.seller = message.seller === "" ? undefined : message.seller;
+    obj.listing_id = message.listingId !== BigInt(0) ? message.listingId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgDelistUnitsAminoMsg): MsgDelistUnits {
+    return MsgDelistUnits.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgDelistUnits): MsgDelistUnitsAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgDelistUnits",
+      value: MsgDelistUnits.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgDelistUnitsProtoMsg): MsgDelistUnits {
+    return MsgDelistUnits.decode(message.value);
+  },
+  toProto(message: MsgDelistUnits): Uint8Array {
+    return MsgDelistUnits.encode(message).finish();
+  },
+  toProtoMsg(message: MsgDelistUnits): MsgDelistUnitsProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgDelistUnits",
+      value: MsgDelistUnits.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgDelistUnitsResponse(): MsgDelistUnitsResponse {
+  return {};
+}
+/**
+ * MsgDelistUnitsResponse is empty.
+ * @name MsgDelistUnitsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgDelistUnitsResponse
+ */
+export const MsgDelistUnitsResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgDelistUnitsResponse",
+  encode(_: MsgDelistUnitsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgDelistUnitsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgDelistUnitsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgDelistUnitsResponse>): MsgDelistUnitsResponse {
+    const message = createBaseMsgDelistUnitsResponse();
+    return message;
+  },
+  fromAmino(_: MsgDelistUnitsResponseAmino): MsgDelistUnitsResponse {
+    const message = createBaseMsgDelistUnitsResponse();
+    return message;
+  },
+  toAmino(_: MsgDelistUnitsResponse): MsgDelistUnitsResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgDelistUnitsResponseAminoMsg): MsgDelistUnitsResponse {
+    return MsgDelistUnitsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgDelistUnitsResponseProtoMsg): MsgDelistUnitsResponse {
+    return MsgDelistUnitsResponse.decode(message.value);
+  },
+  toProto(message: MsgDelistUnitsResponse): Uint8Array {
+    return MsgDelistUnitsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgDelistUnitsResponse): MsgDelistUnitsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgDelistUnitsResponse",
+      value: MsgDelistUnitsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgBuyUnits(): MsgBuyUnits {
+  return {
+    buyer: "",
+    listingId: BigInt(0),
+    quantity: BigInt(0),
+    expectedUnitPrice: Coin.fromPartial({}),
+    expectedMetadataHash: ""
+  };
+}
+/**
+ * MsgBuyUnits buys some or all of a unit listing.
+ * @name MsgBuyUnits
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgBuyUnits
+ */
+export const MsgBuyUnits = {
+  typeUrl: "/sparkdream.artifact.v1.MsgBuyUnits",
+  aminoType: "sparkdream/x/artifact/MsgBuyUnits",
+  encode(message: MsgBuyUnits, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.buyer !== "") {
+      writer.uint32(10).string(message.buyer);
+    }
+    if (message.listingId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.listingId);
+    }
+    if (message.quantity !== BigInt(0)) {
+      writer.uint32(24).uint64(message.quantity);
+    }
+    if (message.expectedUnitPrice !== undefined) {
+      Coin.encode(message.expectedUnitPrice, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.expectedMetadataHash !== "") {
+      writer.uint32(42).string(message.expectedMetadataHash);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgBuyUnits {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgBuyUnits();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.buyer = reader.string();
+          break;
+        case 2:
+          message.listingId = reader.uint64();
+          break;
+        case 3:
+          message.quantity = reader.uint64();
+          break;
+        case 4:
+          message.expectedUnitPrice = Coin.decode(reader, reader.uint32());
+          break;
+        case 5:
+          message.expectedMetadataHash = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgBuyUnits>): MsgBuyUnits {
+    const message = createBaseMsgBuyUnits();
+    message.buyer = object.buyer ?? "";
+    message.listingId = object.listingId !== undefined && object.listingId !== null ? BigInt(object.listingId.toString()) : BigInt(0);
+    message.quantity = object.quantity !== undefined && object.quantity !== null ? BigInt(object.quantity.toString()) : BigInt(0);
+    message.expectedUnitPrice = object.expectedUnitPrice !== undefined && object.expectedUnitPrice !== null ? Coin.fromPartial(object.expectedUnitPrice) : undefined;
+    message.expectedMetadataHash = object.expectedMetadataHash ?? "";
+    return message;
+  },
+  fromAmino(object: MsgBuyUnitsAmino): MsgBuyUnits {
+    const message = createBaseMsgBuyUnits();
+    if (object.buyer !== undefined && object.buyer !== null) {
+      message.buyer = object.buyer;
+    }
+    if (object.listing_id !== undefined && object.listing_id !== null) {
+      message.listingId = BigInt(object.listing_id);
+    }
+    if (object.quantity !== undefined && object.quantity !== null) {
+      message.quantity = BigInt(object.quantity);
+    }
+    if (object.expected_unit_price !== undefined && object.expected_unit_price !== null) {
+      message.expectedUnitPrice = Coin.fromAmino(object.expected_unit_price);
+    }
+    if (object.expected_metadata_hash !== undefined && object.expected_metadata_hash !== null) {
+      message.expectedMetadataHash = object.expected_metadata_hash;
+    }
+    return message;
+  },
+  toAmino(message: MsgBuyUnits): MsgBuyUnitsAmino {
+    const obj: any = {};
+    obj.buyer = message.buyer === "" ? undefined : message.buyer;
+    obj.listing_id = message.listingId !== BigInt(0) ? message.listingId?.toString() : undefined;
+    obj.quantity = message.quantity !== BigInt(0) ? message.quantity?.toString() : undefined;
+    obj.expected_unit_price = message.expectedUnitPrice ? Coin.toAmino(message.expectedUnitPrice) : Coin.toAmino(Coin.fromPartial({}));
+    obj.expected_metadata_hash = message.expectedMetadataHash === "" ? undefined : message.expectedMetadataHash;
+    return obj;
+  },
+  fromAminoMsg(object: MsgBuyUnitsAminoMsg): MsgBuyUnits {
+    return MsgBuyUnits.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgBuyUnits): MsgBuyUnitsAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgBuyUnits",
+      value: MsgBuyUnits.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgBuyUnitsProtoMsg): MsgBuyUnits {
+    return MsgBuyUnits.decode(message.value);
+  },
+  toProto(message: MsgBuyUnits): Uint8Array {
+    return MsgBuyUnits.encode(message).finish();
+  },
+  toProtoMsg(message: MsgBuyUnits): MsgBuyUnitsProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgBuyUnits",
+      value: MsgBuyUnits.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgBuyUnitsResponse(): MsgBuyUnitsResponse {
+  return {
+    fee: "",
+    royalty: "",
+    proceeds: ""
+  };
+}
+/**
+ * MsgBuyUnitsResponse reports the settlement split.
+ * @name MsgBuyUnitsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgBuyUnitsResponse
+ */
+export const MsgBuyUnitsResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgBuyUnitsResponse",
+  encode(message: MsgBuyUnitsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.fee !== "") {
+      writer.uint32(10).string(message.fee);
+    }
+    if (message.royalty !== "") {
+      writer.uint32(18).string(message.royalty);
+    }
+    if (message.proceeds !== "") {
+      writer.uint32(26).string(message.proceeds);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgBuyUnitsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgBuyUnitsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.fee = reader.string();
+          break;
+        case 2:
+          message.royalty = reader.string();
+          break;
+        case 3:
+          message.proceeds = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgBuyUnitsResponse>): MsgBuyUnitsResponse {
+    const message = createBaseMsgBuyUnitsResponse();
+    message.fee = object.fee ?? "";
+    message.royalty = object.royalty ?? "";
+    message.proceeds = object.proceeds ?? "";
+    return message;
+  },
+  fromAmino(object: MsgBuyUnitsResponseAmino): MsgBuyUnitsResponse {
+    const message = createBaseMsgBuyUnitsResponse();
+    if (object.fee !== undefined && object.fee !== null) {
+      message.fee = object.fee;
+    }
+    if (object.royalty !== undefined && object.royalty !== null) {
+      message.royalty = object.royalty;
+    }
+    if (object.proceeds !== undefined && object.proceeds !== null) {
+      message.proceeds = object.proceeds;
+    }
+    return message;
+  },
+  toAmino(message: MsgBuyUnitsResponse): MsgBuyUnitsResponseAmino {
+    const obj: any = {};
+    obj.fee = message.fee === "" ? undefined : message.fee;
+    obj.royalty = message.royalty === "" ? undefined : message.royalty;
+    obj.proceeds = message.proceeds === "" ? undefined : message.proceeds;
+    return obj;
+  },
+  fromAminoMsg(object: MsgBuyUnitsResponseAminoMsg): MsgBuyUnitsResponse {
+    return MsgBuyUnitsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgBuyUnitsResponseProtoMsg): MsgBuyUnitsResponse {
+    return MsgBuyUnitsResponse.decode(message.value);
+  },
+  toProto(message: MsgBuyUnitsResponse): Uint8Array {
+    return MsgBuyUnitsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgBuyUnitsResponse): MsgBuyUnitsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgBuyUnitsResponse",
+      value: MsgBuyUnitsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgFundEdition(): MsgFundEdition {
+  return {
+    funder: "",
+    classId: BigInt(0),
+    editionId: BigInt(0),
+    amount: Coin.fromPartial({})
+  };
+}
+/**
+ * MsgFundEdition pays SPARK to an edition's current holders, pro rata to
+ * the units they hold (retroactive funding of an impact certificate).
+ * @name MsgFundEdition
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgFundEdition
+ */
+export const MsgFundEdition = {
+  typeUrl: "/sparkdream.artifact.v1.MsgFundEdition",
+  aminoType: "sparkdream/x/artifact/MsgFundEdition",
+  encode(message: MsgFundEdition, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.funder !== "") {
+      writer.uint32(10).string(message.funder);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.editionId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.editionId);
+    }
+    if (message.amount !== undefined) {
+      Coin.encode(message.amount, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgFundEdition {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgFundEdition();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.funder = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.editionId = reader.uint64();
+          break;
+        case 4:
+          message.amount = Coin.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgFundEdition>): MsgFundEdition {
+    const message = createBaseMsgFundEdition();
+    message.funder = object.funder ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.editionId = object.editionId !== undefined && object.editionId !== null ? BigInt(object.editionId.toString()) : BigInt(0);
+    message.amount = object.amount !== undefined && object.amount !== null ? Coin.fromPartial(object.amount) : undefined;
+    return message;
+  },
+  fromAmino(object: MsgFundEditionAmino): MsgFundEdition {
+    const message = createBaseMsgFundEdition();
+    if (object.funder !== undefined && object.funder !== null) {
+      message.funder = object.funder;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.edition_id !== undefined && object.edition_id !== null) {
+      message.editionId = BigInt(object.edition_id);
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = Coin.fromAmino(object.amount);
+    }
+    return message;
+  },
+  toAmino(message: MsgFundEdition): MsgFundEditionAmino {
+    const obj: any = {};
+    obj.funder = message.funder === "" ? undefined : message.funder;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.edition_id = message.editionId !== BigInt(0) ? message.editionId?.toString() : undefined;
+    obj.amount = message.amount ? Coin.toAmino(message.amount) : Coin.toAmino(Coin.fromPartial({}));
+    return obj;
+  },
+  fromAminoMsg(object: MsgFundEditionAminoMsg): MsgFundEdition {
+    return MsgFundEdition.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgFundEdition): MsgFundEditionAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgFundEdition",
+      value: MsgFundEdition.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgFundEditionProtoMsg): MsgFundEdition {
+    return MsgFundEdition.decode(message.value);
+  },
+  toProto(message: MsgFundEdition): Uint8Array {
+    return MsgFundEdition.encode(message).finish();
+  },
+  toProtoMsg(message: MsgFundEdition): MsgFundEditionProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgFundEdition",
+      value: MsgFundEdition.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgFundEditionResponse(): MsgFundEditionResponse {
+  return {};
+}
+/**
+ * MsgFundEditionResponse is empty.
+ * @name MsgFundEditionResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgFundEditionResponse
+ */
+export const MsgFundEditionResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgFundEditionResponse",
+  encode(_: MsgFundEditionResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgFundEditionResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgFundEditionResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgFundEditionResponse>): MsgFundEditionResponse {
+    const message = createBaseMsgFundEditionResponse();
+    return message;
+  },
+  fromAmino(_: MsgFundEditionResponseAmino): MsgFundEditionResponse {
+    const message = createBaseMsgFundEditionResponse();
+    return message;
+  },
+  toAmino(_: MsgFundEditionResponse): MsgFundEditionResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgFundEditionResponseAminoMsg): MsgFundEditionResponse {
+    return MsgFundEditionResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgFundEditionResponseProtoMsg): MsgFundEditionResponse {
+    return MsgFundEditionResponse.decode(message.value);
+  },
+  toProto(message: MsgFundEditionResponse): Uint8Array {
+    return MsgFundEditionResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgFundEditionResponse): MsgFundEditionResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgFundEditionResponse",
+      value: MsgFundEditionResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgClaimEditionRewards(): MsgClaimEditionRewards {
+  return {
+    holder: "",
+    refs: []
+  };
+}
+/**
+ * MsgClaimEditionRewards pays out the signer's accrued retro funding.
+ * @name MsgClaimEditionRewards
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgClaimEditionRewards
+ */
+export const MsgClaimEditionRewards = {
+  typeUrl: "/sparkdream.artifact.v1.MsgClaimEditionRewards",
+  aminoType: "sparkdream/x/artifact/MsgClaimEditionRewards",
+  encode(message: MsgClaimEditionRewards, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.holder !== "") {
+      writer.uint32(10).string(message.holder);
+    }
+    for (const v of message.refs) {
+      EditionRef.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgClaimEditionRewards {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgClaimEditionRewards();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.holder = reader.string();
+          break;
+        case 2:
+          message.refs.push(EditionRef.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgClaimEditionRewards>): MsgClaimEditionRewards {
+    const message = createBaseMsgClaimEditionRewards();
+    message.holder = object.holder ?? "";
+    message.refs = object.refs?.map(e => EditionRef.fromPartial(e)) || [];
+    return message;
+  },
+  fromAmino(object: MsgClaimEditionRewardsAmino): MsgClaimEditionRewards {
+    const message = createBaseMsgClaimEditionRewards();
+    if (object.holder !== undefined && object.holder !== null) {
+      message.holder = object.holder;
+    }
+    message.refs = object.refs?.map(e => EditionRef.fromAmino(e)) || [];
+    return message;
+  },
+  toAmino(message: MsgClaimEditionRewards): MsgClaimEditionRewardsAmino {
+    const obj: any = {};
+    obj.holder = message.holder === "" ? undefined : message.holder;
+    if (message.refs) {
+      obj.refs = message.refs.map(e => e ? EditionRef.toAmino(e) : undefined);
+    } else {
+      obj.refs = message.refs;
+    }
+    return obj;
+  },
+  fromAminoMsg(object: MsgClaimEditionRewardsAminoMsg): MsgClaimEditionRewards {
+    return MsgClaimEditionRewards.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgClaimEditionRewards): MsgClaimEditionRewardsAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgClaimEditionRewards",
+      value: MsgClaimEditionRewards.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgClaimEditionRewardsProtoMsg): MsgClaimEditionRewards {
+    return MsgClaimEditionRewards.decode(message.value);
+  },
+  toProto(message: MsgClaimEditionRewards): Uint8Array {
+    return MsgClaimEditionRewards.encode(message).finish();
+  },
+  toProtoMsg(message: MsgClaimEditionRewards): MsgClaimEditionRewardsProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgClaimEditionRewards",
+      value: MsgClaimEditionRewards.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgClaimEditionRewardsResponse(): MsgClaimEditionRewardsResponse {
+  return {
+    claimed: ""
+  };
+}
+/**
+ * MsgClaimEditionRewardsResponse returns the total paid.
+ * @name MsgClaimEditionRewardsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgClaimEditionRewardsResponse
+ */
+export const MsgClaimEditionRewardsResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgClaimEditionRewardsResponse",
+  encode(message: MsgClaimEditionRewardsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.claimed !== "") {
+      writer.uint32(10).string(message.claimed);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgClaimEditionRewardsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgClaimEditionRewardsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.claimed = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgClaimEditionRewardsResponse>): MsgClaimEditionRewardsResponse {
+    const message = createBaseMsgClaimEditionRewardsResponse();
+    message.claimed = object.claimed ?? "";
+    return message;
+  },
+  fromAmino(object: MsgClaimEditionRewardsResponseAmino): MsgClaimEditionRewardsResponse {
+    const message = createBaseMsgClaimEditionRewardsResponse();
+    if (object.claimed !== undefined && object.claimed !== null) {
+      message.claimed = object.claimed;
+    }
+    return message;
+  },
+  toAmino(message: MsgClaimEditionRewardsResponse): MsgClaimEditionRewardsResponseAmino {
+    const obj: any = {};
+    obj.claimed = message.claimed === "" ? undefined : message.claimed;
+    return obj;
+  },
+  fromAminoMsg(object: MsgClaimEditionRewardsResponseAminoMsg): MsgClaimEditionRewardsResponse {
+    return MsgClaimEditionRewardsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgClaimEditionRewardsResponseProtoMsg): MsgClaimEditionRewardsResponse {
+    return MsgClaimEditionRewardsResponse.decode(message.value);
+  },
+  toProto(message: MsgClaimEditionRewardsResponse): Uint8Array {
+    return MsgClaimEditionRewardsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgClaimEditionRewardsResponse): MsgClaimEditionRewardsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgClaimEditionRewardsResponse",
+      value: MsgClaimEditionRewardsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAddCraftRecipe(): MsgAddCraftRecipe {
+  return {
+    owner: "",
+    classId: BigInt(0),
+    inputs: [],
+    outputMetadata: TokenMetadata.fromPartial({}),
+    outputEditionId: BigInt(0),
+    outputQuantity: BigInt(0),
+    acceptedContentLicense: ""
+  };
+}
+/**
+ * MsgAddCraftRecipe adds a crafting recipe to a class (owner only, until
+ * the class's first craft).
+ * @name MsgAddCraftRecipe
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAddCraftRecipe
+ */
+export const MsgAddCraftRecipe = {
+  typeUrl: "/sparkdream.artifact.v1.MsgAddCraftRecipe",
+  aminoType: "sparkdream/x/artifact/MsgAddCraftRecipe",
+  encode(message: MsgAddCraftRecipe, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.owner !== "") {
+      writer.uint32(10).string(message.owner);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    for (const v of message.inputs) {
+      CraftInput.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.outputMetadata !== undefined) {
+      TokenMetadata.encode(message.outputMetadata, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.outputEditionId !== BigInt(0)) {
+      writer.uint32(40).uint64(message.outputEditionId);
+    }
+    if (message.outputQuantity !== BigInt(0)) {
+      writer.uint32(48).uint64(message.outputQuantity);
+    }
+    if (message.acceptedContentLicense !== "") {
+      writer.uint32(58).string(message.acceptedContentLicense);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAddCraftRecipe {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAddCraftRecipe();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.owner = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.inputs.push(CraftInput.decode(reader, reader.uint32()));
+          break;
+        case 4:
+          message.outputMetadata = TokenMetadata.decode(reader, reader.uint32());
+          break;
+        case 5:
+          message.outputEditionId = reader.uint64();
+          break;
+        case 6:
+          message.outputQuantity = reader.uint64();
+          break;
+        case 7:
+          message.acceptedContentLicense = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgAddCraftRecipe>): MsgAddCraftRecipe {
+    const message = createBaseMsgAddCraftRecipe();
+    message.owner = object.owner ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.inputs = object.inputs?.map(e => CraftInput.fromPartial(e)) || [];
+    message.outputMetadata = object.outputMetadata !== undefined && object.outputMetadata !== null ? TokenMetadata.fromPartial(object.outputMetadata) : undefined;
+    message.outputEditionId = object.outputEditionId !== undefined && object.outputEditionId !== null ? BigInt(object.outputEditionId.toString()) : BigInt(0);
+    message.outputQuantity = object.outputQuantity !== undefined && object.outputQuantity !== null ? BigInt(object.outputQuantity.toString()) : BigInt(0);
+    message.acceptedContentLicense = object.acceptedContentLicense ?? "";
+    return message;
+  },
+  fromAmino(object: MsgAddCraftRecipeAmino): MsgAddCraftRecipe {
+    const message = createBaseMsgAddCraftRecipe();
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = object.owner;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    message.inputs = object.inputs?.map(e => CraftInput.fromAmino(e)) || [];
+    if (object.output_metadata !== undefined && object.output_metadata !== null) {
+      message.outputMetadata = TokenMetadata.fromAmino(object.output_metadata);
+    }
+    if (object.output_edition_id !== undefined && object.output_edition_id !== null) {
+      message.outputEditionId = BigInt(object.output_edition_id);
+    }
+    if (object.output_quantity !== undefined && object.output_quantity !== null) {
+      message.outputQuantity = BigInt(object.output_quantity);
+    }
+    if (object.accepted_content_license !== undefined && object.accepted_content_license !== null) {
+      message.acceptedContentLicense = object.accepted_content_license;
+    }
+    return message;
+  },
+  toAmino(message: MsgAddCraftRecipe): MsgAddCraftRecipeAmino {
+    const obj: any = {};
+    obj.owner = message.owner === "" ? undefined : message.owner;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    if (message.inputs) {
+      obj.inputs = message.inputs.map(e => e ? CraftInput.toAmino(e) : undefined);
+    } else {
+      obj.inputs = message.inputs;
+    }
+    obj.output_metadata = message.outputMetadata ? TokenMetadata.toAmino(message.outputMetadata) : TokenMetadata.toAmino(TokenMetadata.fromPartial({}));
+    obj.output_edition_id = message.outputEditionId !== BigInt(0) ? message.outputEditionId?.toString() : undefined;
+    obj.output_quantity = message.outputQuantity !== BigInt(0) ? message.outputQuantity?.toString() : undefined;
+    obj.accepted_content_license = message.acceptedContentLicense === "" ? undefined : message.acceptedContentLicense;
+    return obj;
+  },
+  fromAminoMsg(object: MsgAddCraftRecipeAminoMsg): MsgAddCraftRecipe {
+    return MsgAddCraftRecipe.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAddCraftRecipe): MsgAddCraftRecipeAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgAddCraftRecipe",
+      value: MsgAddCraftRecipe.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgAddCraftRecipeProtoMsg): MsgAddCraftRecipe {
+    return MsgAddCraftRecipe.decode(message.value);
+  },
+  toProto(message: MsgAddCraftRecipe): Uint8Array {
+    return MsgAddCraftRecipe.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAddCraftRecipe): MsgAddCraftRecipeProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgAddCraftRecipe",
+      value: MsgAddCraftRecipe.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAddCraftRecipeResponse(): MsgAddCraftRecipeResponse {
+  return {
+    recipeId: BigInt(0)
+  };
+}
+/**
+ * MsgAddCraftRecipeResponse returns the recipe id.
+ * @name MsgAddCraftRecipeResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAddCraftRecipeResponse
+ */
+export const MsgAddCraftRecipeResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgAddCraftRecipeResponse",
+  encode(message: MsgAddCraftRecipeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.recipeId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.recipeId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAddCraftRecipeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAddCraftRecipeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.recipeId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgAddCraftRecipeResponse>): MsgAddCraftRecipeResponse {
+    const message = createBaseMsgAddCraftRecipeResponse();
+    message.recipeId = object.recipeId !== undefined && object.recipeId !== null ? BigInt(object.recipeId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgAddCraftRecipeResponseAmino): MsgAddCraftRecipeResponse {
+    const message = createBaseMsgAddCraftRecipeResponse();
+    if (object.recipe_id !== undefined && object.recipe_id !== null) {
+      message.recipeId = BigInt(object.recipe_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgAddCraftRecipeResponse): MsgAddCraftRecipeResponseAmino {
+    const obj: any = {};
+    obj.recipe_id = message.recipeId !== BigInt(0) ? message.recipeId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgAddCraftRecipeResponseAminoMsg): MsgAddCraftRecipeResponse {
+    return MsgAddCraftRecipeResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgAddCraftRecipeResponseProtoMsg): MsgAddCraftRecipeResponse {
+    return MsgAddCraftRecipeResponse.decode(message.value);
+  },
+  toProto(message: MsgAddCraftRecipeResponse): Uint8Array {
+    return MsgAddCraftRecipeResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAddCraftRecipeResponse): MsgAddCraftRecipeResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgAddCraftRecipeResponse",
+      value: MsgAddCraftRecipeResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRemoveCraftRecipe(): MsgRemoveCraftRecipe {
+  return {
+    owner: "",
+    classId: BigInt(0),
+    recipeId: BigInt(0)
+  };
+}
+/**
+ * MsgRemoveCraftRecipe removes a recipe (owner only, at any time).
+ * @name MsgRemoveCraftRecipe
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRemoveCraftRecipe
+ */
+export const MsgRemoveCraftRecipe = {
+  typeUrl: "/sparkdream.artifact.v1.MsgRemoveCraftRecipe",
+  aminoType: "sparkdream/x/artifact/MsgRemoveCraftRecipe",
+  encode(message: MsgRemoveCraftRecipe, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.owner !== "") {
+      writer.uint32(10).string(message.owner);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.recipeId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.recipeId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRemoveCraftRecipe {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRemoveCraftRecipe();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.owner = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.recipeId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgRemoveCraftRecipe>): MsgRemoveCraftRecipe {
+    const message = createBaseMsgRemoveCraftRecipe();
+    message.owner = object.owner ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.recipeId = object.recipeId !== undefined && object.recipeId !== null ? BigInt(object.recipeId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgRemoveCraftRecipeAmino): MsgRemoveCraftRecipe {
+    const message = createBaseMsgRemoveCraftRecipe();
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = object.owner;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.recipe_id !== undefined && object.recipe_id !== null) {
+      message.recipeId = BigInt(object.recipe_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgRemoveCraftRecipe): MsgRemoveCraftRecipeAmino {
+    const obj: any = {};
+    obj.owner = message.owner === "" ? undefined : message.owner;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.recipe_id = message.recipeId !== BigInt(0) ? message.recipeId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgRemoveCraftRecipeAminoMsg): MsgRemoveCraftRecipe {
+    return MsgRemoveCraftRecipe.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRemoveCraftRecipe): MsgRemoveCraftRecipeAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgRemoveCraftRecipe",
+      value: MsgRemoveCraftRecipe.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgRemoveCraftRecipeProtoMsg): MsgRemoveCraftRecipe {
+    return MsgRemoveCraftRecipe.decode(message.value);
+  },
+  toProto(message: MsgRemoveCraftRecipe): Uint8Array {
+    return MsgRemoveCraftRecipe.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRemoveCraftRecipe): MsgRemoveCraftRecipeProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgRemoveCraftRecipe",
+      value: MsgRemoveCraftRecipe.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRemoveCraftRecipeResponse(): MsgRemoveCraftRecipeResponse {
+  return {};
+}
+/**
+ * MsgRemoveCraftRecipeResponse is empty.
+ * @name MsgRemoveCraftRecipeResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgRemoveCraftRecipeResponse
+ */
+export const MsgRemoveCraftRecipeResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgRemoveCraftRecipeResponse",
+  encode(_: MsgRemoveCraftRecipeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRemoveCraftRecipeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRemoveCraftRecipeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgRemoveCraftRecipeResponse>): MsgRemoveCraftRecipeResponse {
+    const message = createBaseMsgRemoveCraftRecipeResponse();
+    return message;
+  },
+  fromAmino(_: MsgRemoveCraftRecipeResponseAmino): MsgRemoveCraftRecipeResponse {
+    const message = createBaseMsgRemoveCraftRecipeResponse();
+    return message;
+  },
+  toAmino(_: MsgRemoveCraftRecipeResponse): MsgRemoveCraftRecipeResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgRemoveCraftRecipeResponseAminoMsg): MsgRemoveCraftRecipeResponse {
+    return MsgRemoveCraftRecipeResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgRemoveCraftRecipeResponseProtoMsg): MsgRemoveCraftRecipeResponse {
+    return MsgRemoveCraftRecipeResponse.decode(message.value);
+  },
+  toProto(message: MsgRemoveCraftRecipeResponse): Uint8Array {
+    return MsgRemoveCraftRecipeResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRemoveCraftRecipeResponse): MsgRemoveCraftRecipeResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgRemoveCraftRecipeResponse",
+      value: MsgRemoveCraftRecipeResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCraft(): MsgCraft {
+  return {
+    crafter: "",
+    classId: BigInt(0),
+    recipeId: BigInt(0),
+    inputTokens: []
+  };
+}
+/**
+ * MsgCraft burns a recipe's inputs and mints its output to the crafter.
+ * @name MsgCraft
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCraft
+ */
+export const MsgCraft = {
+  typeUrl: "/sparkdream.artifact.v1.MsgCraft",
+  aminoType: "sparkdream/x/artifact/MsgCraft",
+  encode(message: MsgCraft, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.crafter !== "") {
+      writer.uint32(10).string(message.crafter);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.recipeId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.recipeId);
+    }
+    for (const v of message.inputTokens) {
+      TokenRef.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCraft {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCraft();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.crafter = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.recipeId = reader.uint64();
+          break;
+        case 4:
+          message.inputTokens.push(TokenRef.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCraft>): MsgCraft {
+    const message = createBaseMsgCraft();
+    message.crafter = object.crafter ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.recipeId = object.recipeId !== undefined && object.recipeId !== null ? BigInt(object.recipeId.toString()) : BigInt(0);
+    message.inputTokens = object.inputTokens?.map(e => TokenRef.fromPartial(e)) || [];
+    return message;
+  },
+  fromAmino(object: MsgCraftAmino): MsgCraft {
+    const message = createBaseMsgCraft();
+    if (object.crafter !== undefined && object.crafter !== null) {
+      message.crafter = object.crafter;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.recipe_id !== undefined && object.recipe_id !== null) {
+      message.recipeId = BigInt(object.recipe_id);
+    }
+    message.inputTokens = object.input_tokens?.map(e => TokenRef.fromAmino(e)) || [];
+    return message;
+  },
+  toAmino(message: MsgCraft): MsgCraftAmino {
+    const obj: any = {};
+    obj.crafter = message.crafter === "" ? undefined : message.crafter;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.recipe_id = message.recipeId !== BigInt(0) ? message.recipeId?.toString() : undefined;
+    if (message.inputTokens) {
+      obj.input_tokens = message.inputTokens.map(e => e ? TokenRef.toAmino(e) : undefined);
+    } else {
+      obj.input_tokens = message.inputTokens;
+    }
+    return obj;
+  },
+  fromAminoMsg(object: MsgCraftAminoMsg): MsgCraft {
+    return MsgCraft.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCraft): MsgCraftAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgCraft",
+      value: MsgCraft.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgCraftProtoMsg): MsgCraft {
+    return MsgCraft.decode(message.value);
+  },
+  toProto(message: MsgCraft): Uint8Array {
+    return MsgCraft.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCraft): MsgCraftProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgCraft",
+      value: MsgCraft.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCraftResponse(): MsgCraftResponse {
+  return {
+    tokenId: BigInt(0),
+    editionId: BigInt(0),
+    amount: BigInt(0)
+  };
+}
+/**
+ * MsgCraftResponse reports the output: the new token id (UNIQUE target) or
+ * the units credited (EDITIONS target).
+ * @name MsgCraftResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCraftResponse
+ */
+export const MsgCraftResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgCraftResponse",
+  encode(message: MsgCraftResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.tokenId);
+    }
+    if (message.editionId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.editionId);
+    }
+    if (message.amount !== BigInt(0)) {
+      writer.uint32(24).uint64(message.amount);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCraftResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCraftResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tokenId = reader.uint64();
+          break;
+        case 2:
+          message.editionId = reader.uint64();
+          break;
+        case 3:
+          message.amount = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCraftResponse>): MsgCraftResponse {
+    const message = createBaseMsgCraftResponse();
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    message.editionId = object.editionId !== undefined && object.editionId !== null ? BigInt(object.editionId.toString()) : BigInt(0);
+    message.amount = object.amount !== undefined && object.amount !== null ? BigInt(object.amount.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgCraftResponseAmino): MsgCraftResponse {
+    const message = createBaseMsgCraftResponse();
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    if (object.edition_id !== undefined && object.edition_id !== null) {
+      message.editionId = BigInt(object.edition_id);
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = BigInt(object.amount);
+    }
+    return message;
+  },
+  toAmino(message: MsgCraftResponse): MsgCraftResponseAmino {
+    const obj: any = {};
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    obj.edition_id = message.editionId !== BigInt(0) ? message.editionId?.toString() : undefined;
+    obj.amount = message.amount !== BigInt(0) ? message.amount?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgCraftResponseAminoMsg): MsgCraftResponse {
+    return MsgCraftResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgCraftResponseProtoMsg): MsgCraftResponse {
+    return MsgCraftResponse.decode(message.value);
+  },
+  toProto(message: MsgCraftResponse): Uint8Array {
+    return MsgCraftResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCraftResponse): MsgCraftResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgCraftResponse",
+      value: MsgCraftResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgOfferRental(): MsgOfferRental {
+  return {
+    owner: "",
+    classId: BigInt(0),
+    tokenId: BigInt(0),
+    user: "",
+    price: Coin.fromPartial({}),
+    duration: BigInt(0),
+    ownerMayEnd: false,
+    offerDuration: BigInt(0)
+  };
+}
+/**
+ * MsgOfferRental offers a token's user right for a period.
+ * @name MsgOfferRental
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgOfferRental
+ */
+export const MsgOfferRental = {
+  typeUrl: "/sparkdream.artifact.v1.MsgOfferRental",
+  aminoType: "sparkdream/x/artifact/MsgOfferRental",
+  encode(message: MsgOfferRental, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.owner !== "") {
+      writer.uint32(10).string(message.owner);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.tokenId);
+    }
+    if (message.user !== "") {
+      writer.uint32(34).string(message.user);
+    }
+    if (message.price !== undefined) {
+      Coin.encode(message.price, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.duration !== BigInt(0)) {
+      writer.uint32(48).int64(message.duration);
+    }
+    if (message.ownerMayEnd === true) {
+      writer.uint32(56).bool(message.ownerMayEnd);
+    }
+    if (message.offerDuration !== BigInt(0)) {
+      writer.uint32(64).int64(message.offerDuration);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgOfferRental {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgOfferRental();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.owner = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.tokenId = reader.uint64();
+          break;
+        case 4:
+          message.user = reader.string();
+          break;
+        case 5:
+          message.price = Coin.decode(reader, reader.uint32());
+          break;
+        case 6:
+          message.duration = reader.int64();
+          break;
+        case 7:
+          message.ownerMayEnd = reader.bool();
+          break;
+        case 8:
+          message.offerDuration = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgOfferRental>): MsgOfferRental {
+    const message = createBaseMsgOfferRental();
+    message.owner = object.owner ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    message.user = object.user ?? "";
+    message.price = object.price !== undefined && object.price !== null ? Coin.fromPartial(object.price) : undefined;
+    message.duration = object.duration !== undefined && object.duration !== null ? BigInt(object.duration.toString()) : BigInt(0);
+    message.ownerMayEnd = object.ownerMayEnd ?? false;
+    message.offerDuration = object.offerDuration !== undefined && object.offerDuration !== null ? BigInt(object.offerDuration.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgOfferRentalAmino): MsgOfferRental {
+    const message = createBaseMsgOfferRental();
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = object.owner;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    if (object.user !== undefined && object.user !== null) {
+      message.user = object.user;
+    }
+    if (object.price !== undefined && object.price !== null) {
+      message.price = Coin.fromAmino(object.price);
+    }
+    if (object.duration !== undefined && object.duration !== null) {
+      message.duration = BigInt(object.duration);
+    }
+    if (object.owner_may_end !== undefined && object.owner_may_end !== null) {
+      message.ownerMayEnd = object.owner_may_end;
+    }
+    if (object.offer_duration !== undefined && object.offer_duration !== null) {
+      message.offerDuration = BigInt(object.offer_duration);
+    }
+    return message;
+  },
+  toAmino(message: MsgOfferRental): MsgOfferRentalAmino {
+    const obj: any = {};
+    obj.owner = message.owner === "" ? undefined : message.owner;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    obj.user = message.user === "" ? undefined : message.user;
+    obj.price = message.price ? Coin.toAmino(message.price) : Coin.toAmino(Coin.fromPartial({}));
+    obj.duration = message.duration !== BigInt(0) ? message.duration?.toString() : undefined;
+    obj.owner_may_end = message.ownerMayEnd === false ? undefined : message.ownerMayEnd;
+    obj.offer_duration = message.offerDuration !== BigInt(0) ? message.offerDuration?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgOfferRentalAminoMsg): MsgOfferRental {
+    return MsgOfferRental.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgOfferRental): MsgOfferRentalAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgOfferRental",
+      value: MsgOfferRental.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgOfferRentalProtoMsg): MsgOfferRental {
+    return MsgOfferRental.decode(message.value);
+  },
+  toProto(message: MsgOfferRental): Uint8Array {
+    return MsgOfferRental.encode(message).finish();
+  },
+  toProtoMsg(message: MsgOfferRental): MsgOfferRentalProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgOfferRental",
+      value: MsgOfferRental.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgOfferRentalResponse(): MsgOfferRentalResponse {
+  return {
+    nonce: BigInt(0)
+  };
+}
+/**
+ * MsgOfferRentalResponse returns the offer nonce.
+ * @name MsgOfferRentalResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgOfferRentalResponse
+ */
+export const MsgOfferRentalResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgOfferRentalResponse",
+  encode(message: MsgOfferRentalResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.nonce !== BigInt(0)) {
+      writer.uint32(8).uint64(message.nonce);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgOfferRentalResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgOfferRentalResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.nonce = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgOfferRentalResponse>): MsgOfferRentalResponse {
+    const message = createBaseMsgOfferRentalResponse();
+    message.nonce = object.nonce !== undefined && object.nonce !== null ? BigInt(object.nonce.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgOfferRentalResponseAmino): MsgOfferRentalResponse {
+    const message = createBaseMsgOfferRentalResponse();
+    if (object.nonce !== undefined && object.nonce !== null) {
+      message.nonce = BigInt(object.nonce);
+    }
+    return message;
+  },
+  toAmino(message: MsgOfferRentalResponse): MsgOfferRentalResponseAmino {
+    const obj: any = {};
+    obj.nonce = message.nonce !== BigInt(0) ? message.nonce?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgOfferRentalResponseAminoMsg): MsgOfferRentalResponse {
+    return MsgOfferRentalResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgOfferRentalResponseProtoMsg): MsgOfferRentalResponse {
+    return MsgOfferRentalResponse.decode(message.value);
+  },
+  toProto(message: MsgOfferRentalResponse): Uint8Array {
+    return MsgOfferRentalResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgOfferRentalResponse): MsgOfferRentalResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgOfferRentalResponse",
+      value: MsgOfferRentalResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCancelRentalOffer(): MsgCancelRentalOffer {
+  return {
+    owner: "",
+    classId: BigInt(0),
+    tokenId: BigInt(0)
+  };
+}
+/**
+ * MsgCancelRentalOffer withdraws a rental offer.
+ * @name MsgCancelRentalOffer
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCancelRentalOffer
+ */
+export const MsgCancelRentalOffer = {
+  typeUrl: "/sparkdream.artifact.v1.MsgCancelRentalOffer",
+  aminoType: "sparkdream/x/artifact/MsgCancelRentalOffer",
+  encode(message: MsgCancelRentalOffer, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.owner !== "") {
+      writer.uint32(10).string(message.owner);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.tokenId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCancelRentalOffer {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCancelRentalOffer();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.owner = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.tokenId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCancelRentalOffer>): MsgCancelRentalOffer {
+    const message = createBaseMsgCancelRentalOffer();
+    message.owner = object.owner ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgCancelRentalOfferAmino): MsgCancelRentalOffer {
+    const message = createBaseMsgCancelRentalOffer();
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = object.owner;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgCancelRentalOffer): MsgCancelRentalOfferAmino {
+    const obj: any = {};
+    obj.owner = message.owner === "" ? undefined : message.owner;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgCancelRentalOfferAminoMsg): MsgCancelRentalOffer {
+    return MsgCancelRentalOffer.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCancelRentalOffer): MsgCancelRentalOfferAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgCancelRentalOffer",
+      value: MsgCancelRentalOffer.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgCancelRentalOfferProtoMsg): MsgCancelRentalOffer {
+    return MsgCancelRentalOffer.decode(message.value);
+  },
+  toProto(message: MsgCancelRentalOffer): Uint8Array {
+    return MsgCancelRentalOffer.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCancelRentalOffer): MsgCancelRentalOfferProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgCancelRentalOffer",
+      value: MsgCancelRentalOffer.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCancelRentalOfferResponse(): MsgCancelRentalOfferResponse {
+  return {};
+}
+/**
+ * MsgCancelRentalOfferResponse is empty.
+ * @name MsgCancelRentalOfferResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCancelRentalOfferResponse
+ */
+export const MsgCancelRentalOfferResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgCancelRentalOfferResponse",
+  encode(_: MsgCancelRentalOfferResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCancelRentalOfferResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCancelRentalOfferResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgCancelRentalOfferResponse>): MsgCancelRentalOfferResponse {
+    const message = createBaseMsgCancelRentalOfferResponse();
+    return message;
+  },
+  fromAmino(_: MsgCancelRentalOfferResponseAmino): MsgCancelRentalOfferResponse {
+    const message = createBaseMsgCancelRentalOfferResponse();
+    return message;
+  },
+  toAmino(_: MsgCancelRentalOfferResponse): MsgCancelRentalOfferResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgCancelRentalOfferResponseAminoMsg): MsgCancelRentalOfferResponse {
+    return MsgCancelRentalOfferResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgCancelRentalOfferResponseProtoMsg): MsgCancelRentalOfferResponse {
+    return MsgCancelRentalOfferResponse.decode(message.value);
+  },
+  toProto(message: MsgCancelRentalOfferResponse): Uint8Array {
+    return MsgCancelRentalOfferResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCancelRentalOfferResponse): MsgCancelRentalOfferResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgCancelRentalOfferResponse",
+      value: MsgCancelRentalOfferResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAcceptRental(): MsgAcceptRental {
+  return {
+    renter: "",
+    classId: BigInt(0),
+    tokenId: BigInt(0),
+    expectedPrice: Coin.fromPartial({}),
+    expectedNonce: BigInt(0),
+    expectedMetadataHash: "",
+    expectedContentsHash: ""
+  };
+}
+/**
+ * MsgAcceptRental accepts a rental offer, paying its price.
+ * @name MsgAcceptRental
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAcceptRental
+ */
+export const MsgAcceptRental = {
+  typeUrl: "/sparkdream.artifact.v1.MsgAcceptRental",
+  aminoType: "sparkdream/x/artifact/MsgAcceptRental",
+  encode(message: MsgAcceptRental, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.renter !== "") {
+      writer.uint32(10).string(message.renter);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.tokenId);
+    }
+    if (message.expectedPrice !== undefined) {
+      Coin.encode(message.expectedPrice, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.expectedNonce !== BigInt(0)) {
+      writer.uint32(40).uint64(message.expectedNonce);
+    }
+    if (message.expectedMetadataHash !== "") {
+      writer.uint32(50).string(message.expectedMetadataHash);
+    }
+    if (message.expectedContentsHash !== "") {
+      writer.uint32(58).string(message.expectedContentsHash);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAcceptRental {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAcceptRental();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.renter = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.tokenId = reader.uint64();
+          break;
+        case 4:
+          message.expectedPrice = Coin.decode(reader, reader.uint32());
+          break;
+        case 5:
+          message.expectedNonce = reader.uint64();
+          break;
+        case 6:
+          message.expectedMetadataHash = reader.string();
+          break;
+        case 7:
+          message.expectedContentsHash = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgAcceptRental>): MsgAcceptRental {
+    const message = createBaseMsgAcceptRental();
+    message.renter = object.renter ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    message.expectedPrice = object.expectedPrice !== undefined && object.expectedPrice !== null ? Coin.fromPartial(object.expectedPrice) : undefined;
+    message.expectedNonce = object.expectedNonce !== undefined && object.expectedNonce !== null ? BigInt(object.expectedNonce.toString()) : BigInt(0);
+    message.expectedMetadataHash = object.expectedMetadataHash ?? "";
+    message.expectedContentsHash = object.expectedContentsHash ?? "";
+    return message;
+  },
+  fromAmino(object: MsgAcceptRentalAmino): MsgAcceptRental {
+    const message = createBaseMsgAcceptRental();
+    if (object.renter !== undefined && object.renter !== null) {
+      message.renter = object.renter;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    if (object.expected_price !== undefined && object.expected_price !== null) {
+      message.expectedPrice = Coin.fromAmino(object.expected_price);
+    }
+    if (object.expected_nonce !== undefined && object.expected_nonce !== null) {
+      message.expectedNonce = BigInt(object.expected_nonce);
+    }
+    if (object.expected_metadata_hash !== undefined && object.expected_metadata_hash !== null) {
+      message.expectedMetadataHash = object.expected_metadata_hash;
+    }
+    if (object.expected_contents_hash !== undefined && object.expected_contents_hash !== null) {
+      message.expectedContentsHash = object.expected_contents_hash;
+    }
+    return message;
+  },
+  toAmino(message: MsgAcceptRental): MsgAcceptRentalAmino {
+    const obj: any = {};
+    obj.renter = message.renter === "" ? undefined : message.renter;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    obj.expected_price = message.expectedPrice ? Coin.toAmino(message.expectedPrice) : Coin.toAmino(Coin.fromPartial({}));
+    obj.expected_nonce = message.expectedNonce !== BigInt(0) ? message.expectedNonce?.toString() : undefined;
+    obj.expected_metadata_hash = message.expectedMetadataHash === "" ? undefined : message.expectedMetadataHash;
+    obj.expected_contents_hash = message.expectedContentsHash === "" ? undefined : message.expectedContentsHash;
+    return obj;
+  },
+  fromAminoMsg(object: MsgAcceptRentalAminoMsg): MsgAcceptRental {
+    return MsgAcceptRental.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAcceptRental): MsgAcceptRentalAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgAcceptRental",
+      value: MsgAcceptRental.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgAcceptRentalProtoMsg): MsgAcceptRental {
+    return MsgAcceptRental.decode(message.value);
+  },
+  toProto(message: MsgAcceptRental): Uint8Array {
+    return MsgAcceptRental.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAcceptRental): MsgAcceptRentalProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgAcceptRental",
+      value: MsgAcceptRental.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAcceptRentalResponse(): MsgAcceptRentalResponse {
+  return {
+    expiresAt: BigInt(0)
+  };
+}
+/**
+ * MsgAcceptRentalResponse returns the rental end.
+ * @name MsgAcceptRentalResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAcceptRentalResponse
+ */
+export const MsgAcceptRentalResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgAcceptRentalResponse",
+  encode(message: MsgAcceptRentalResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.expiresAt !== BigInt(0)) {
+      writer.uint32(8).int64(message.expiresAt);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAcceptRentalResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAcceptRentalResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.expiresAt = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgAcceptRentalResponse>): MsgAcceptRentalResponse {
+    const message = createBaseMsgAcceptRentalResponse();
+    message.expiresAt = object.expiresAt !== undefined && object.expiresAt !== null ? BigInt(object.expiresAt.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgAcceptRentalResponseAmino): MsgAcceptRentalResponse {
+    const message = createBaseMsgAcceptRentalResponse();
+    if (object.expires_at !== undefined && object.expires_at !== null) {
+      message.expiresAt = BigInt(object.expires_at);
+    }
+    return message;
+  },
+  toAmino(message: MsgAcceptRentalResponse): MsgAcceptRentalResponseAmino {
+    const obj: any = {};
+    obj.expires_at = message.expiresAt !== BigInt(0) ? message.expiresAt?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgAcceptRentalResponseAminoMsg): MsgAcceptRentalResponse {
+    return MsgAcceptRentalResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgAcceptRentalResponseProtoMsg): MsgAcceptRentalResponse {
+    return MsgAcceptRentalResponse.decode(message.value);
+  },
+  toProto(message: MsgAcceptRentalResponse): Uint8Array {
+    return MsgAcceptRentalResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAcceptRentalResponse): MsgAcceptRentalResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgAcceptRentalResponse",
+      value: MsgAcceptRentalResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgEndRental(): MsgEndRental {
+  return {
+    signer: "",
+    classId: BigInt(0),
+    tokenId: BigInt(0)
+  };
+}
+/**
+ * MsgEndRental ends a rental: the renter at any time, the owner when the
+ * offer allowed it or once it has expired.
+ * @name MsgEndRental
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgEndRental
+ */
+export const MsgEndRental = {
+  typeUrl: "/sparkdream.artifact.v1.MsgEndRental",
+  aminoType: "sparkdream/x/artifact/MsgEndRental",
+  encode(message: MsgEndRental, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.signer !== "") {
+      writer.uint32(10).string(message.signer);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.tokenId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgEndRental {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgEndRental();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.signer = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.tokenId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgEndRental>): MsgEndRental {
+    const message = createBaseMsgEndRental();
+    message.signer = object.signer ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgEndRentalAmino): MsgEndRental {
+    const message = createBaseMsgEndRental();
+    if (object.signer !== undefined && object.signer !== null) {
+      message.signer = object.signer;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgEndRental): MsgEndRentalAmino {
+    const obj: any = {};
+    obj.signer = message.signer === "" ? undefined : message.signer;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgEndRentalAminoMsg): MsgEndRental {
+    return MsgEndRental.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgEndRental): MsgEndRentalAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgEndRental",
+      value: MsgEndRental.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgEndRentalProtoMsg): MsgEndRental {
+    return MsgEndRental.decode(message.value);
+  },
+  toProto(message: MsgEndRental): Uint8Array {
+    return MsgEndRental.encode(message).finish();
+  },
+  toProtoMsg(message: MsgEndRental): MsgEndRentalProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgEndRental",
+      value: MsgEndRental.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgEndRentalResponse(): MsgEndRentalResponse {
+  return {};
+}
+/**
+ * MsgEndRentalResponse is empty.
+ * @name MsgEndRentalResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgEndRentalResponse
+ */
+export const MsgEndRentalResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgEndRentalResponse",
+  encode(_: MsgEndRentalResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgEndRentalResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgEndRentalResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgEndRentalResponse>): MsgEndRentalResponse {
+    const message = createBaseMsgEndRentalResponse();
+    return message;
+  },
+  fromAmino(_: MsgEndRentalResponseAmino): MsgEndRentalResponse {
+    const message = createBaseMsgEndRentalResponse();
+    return message;
+  },
+  toAmino(_: MsgEndRentalResponse): MsgEndRentalResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgEndRentalResponseAminoMsg): MsgEndRentalResponse {
+    return MsgEndRentalResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgEndRentalResponseProtoMsg): MsgEndRentalResponse {
+    return MsgEndRentalResponse.decode(message.value);
+  },
+  toProto(message: MsgEndRentalResponse): Uint8Array {
+    return MsgEndRentalResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgEndRentalResponse): MsgEndRentalResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgEndRentalResponse",
+      value: MsgEndRentalResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgNest(): MsgNest {
+  return {
+    owner: "",
+    child: TokenRef.fromPartial({}),
+    parent: TokenRef.fromPartial({})
+  };
+}
+/**
+ * MsgNest places a token (with anything nested in it) inside another token
+ * the signer owns. The child is NESTED-locked and moves with its parent.
+ * @name MsgNest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgNest
+ */
+export const MsgNest = {
+  typeUrl: "/sparkdream.artifact.v1.MsgNest",
+  aminoType: "sparkdream/x/artifact/MsgNest",
+  encode(message: MsgNest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.owner !== "") {
+      writer.uint32(10).string(message.owner);
+    }
+    if (message.child !== undefined) {
+      TokenRef.encode(message.child, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.parent !== undefined) {
+      TokenRef.encode(message.parent, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgNest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgNest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.owner = reader.string();
+          break;
+        case 2:
+          message.child = TokenRef.decode(reader, reader.uint32());
+          break;
+        case 3:
+          message.parent = TokenRef.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgNest>): MsgNest {
+    const message = createBaseMsgNest();
+    message.owner = object.owner ?? "";
+    message.child = object.child !== undefined && object.child !== null ? TokenRef.fromPartial(object.child) : undefined;
+    message.parent = object.parent !== undefined && object.parent !== null ? TokenRef.fromPartial(object.parent) : undefined;
+    return message;
+  },
+  fromAmino(object: MsgNestAmino): MsgNest {
+    const message = createBaseMsgNest();
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = object.owner;
+    }
+    if (object.child !== undefined && object.child !== null) {
+      message.child = TokenRef.fromAmino(object.child);
+    }
+    if (object.parent !== undefined && object.parent !== null) {
+      message.parent = TokenRef.fromAmino(object.parent);
+    }
+    return message;
+  },
+  toAmino(message: MsgNest): MsgNestAmino {
+    const obj: any = {};
+    obj.owner = message.owner === "" ? undefined : message.owner;
+    obj.child = message.child ? TokenRef.toAmino(message.child) : undefined;
+    obj.parent = message.parent ? TokenRef.toAmino(message.parent) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgNestAminoMsg): MsgNest {
+    return MsgNest.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgNest): MsgNestAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgNest",
+      value: MsgNest.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgNestProtoMsg): MsgNest {
+    return MsgNest.decode(message.value);
+  },
+  toProto(message: MsgNest): Uint8Array {
+    return MsgNest.encode(message).finish();
+  },
+  toProtoMsg(message: MsgNest): MsgNestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgNest",
+      value: MsgNest.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgNestResponse(): MsgNestResponse {
+  return {};
+}
+/**
+ * MsgNestResponse is empty.
+ * @name MsgNestResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgNestResponse
+ */
+export const MsgNestResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgNestResponse",
+  encode(_: MsgNestResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgNestResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgNestResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgNestResponse>): MsgNestResponse {
+    const message = createBaseMsgNestResponse();
+    return message;
+  },
+  fromAmino(_: MsgNestResponseAmino): MsgNestResponse {
+    const message = createBaseMsgNestResponse();
+    return message;
+  },
+  toAmino(_: MsgNestResponse): MsgNestResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgNestResponseAminoMsg): MsgNestResponse {
+    return MsgNestResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgNestResponseProtoMsg): MsgNestResponse {
+    return MsgNestResponse.decode(message.value);
+  },
+  toProto(message: MsgNestResponse): Uint8Array {
+    return MsgNestResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgNestResponse): MsgNestResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgNestResponse",
+      value: MsgNestResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgDetach(): MsgDetach {
+  return {
+    owner: "",
+    child: TokenRef.fromPartial({})
+  };
+}
+/**
+ * MsgDetach takes a nested token (and its own children) out of its parent.
+ * @name MsgDetach
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgDetach
+ */
+export const MsgDetach = {
+  typeUrl: "/sparkdream.artifact.v1.MsgDetach",
+  aminoType: "sparkdream/x/artifact/MsgDetach",
+  encode(message: MsgDetach, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.owner !== "") {
+      writer.uint32(10).string(message.owner);
+    }
+    if (message.child !== undefined) {
+      TokenRef.encode(message.child, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgDetach {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgDetach();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.owner = reader.string();
+          break;
+        case 2:
+          message.child = TokenRef.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgDetach>): MsgDetach {
+    const message = createBaseMsgDetach();
+    message.owner = object.owner ?? "";
+    message.child = object.child !== undefined && object.child !== null ? TokenRef.fromPartial(object.child) : undefined;
+    return message;
+  },
+  fromAmino(object: MsgDetachAmino): MsgDetach {
+    const message = createBaseMsgDetach();
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = object.owner;
+    }
+    if (object.child !== undefined && object.child !== null) {
+      message.child = TokenRef.fromAmino(object.child);
+    }
+    return message;
+  },
+  toAmino(message: MsgDetach): MsgDetachAmino {
+    const obj: any = {};
+    obj.owner = message.owner === "" ? undefined : message.owner;
+    obj.child = message.child ? TokenRef.toAmino(message.child) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgDetachAminoMsg): MsgDetach {
+    return MsgDetach.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgDetach): MsgDetachAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgDetach",
+      value: MsgDetach.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgDetachProtoMsg): MsgDetach {
+    return MsgDetach.decode(message.value);
+  },
+  toProto(message: MsgDetach): Uint8Array {
+    return MsgDetach.encode(message).finish();
+  },
+  toProtoMsg(message: MsgDetach): MsgDetachProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgDetach",
+      value: MsgDetach.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgDetachResponse(): MsgDetachResponse {
+  return {};
+}
+/**
+ * MsgDetachResponse is empty.
+ * @name MsgDetachResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgDetachResponse
+ */
+export const MsgDetachResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgDetachResponse",
+  encode(_: MsgDetachResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgDetachResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgDetachResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgDetachResponse>): MsgDetachResponse {
+    const message = createBaseMsgDetachResponse();
+    return message;
+  },
+  fromAmino(_: MsgDetachResponseAmino): MsgDetachResponse {
+    const message = createBaseMsgDetachResponse();
+    return message;
+  },
+  toAmino(_: MsgDetachResponse): MsgDetachResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgDetachResponseAminoMsg): MsgDetachResponse {
+    return MsgDetachResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgDetachResponseProtoMsg): MsgDetachResponse {
+    return MsgDetachResponse.decode(message.value);
+  },
+  toProto(message: MsgDetachResponse): Uint8Array {
+    return MsgDetachResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgDetachResponse): MsgDetachResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgDetachResponse",
+      value: MsgDetachResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSetHarbergerPrice(): MsgSetHarbergerPrice {
+  return {
+    owner: "",
+    classId: BigInt(0),
+    tokenId: BigInt(0),
+    price: "",
+    grantId: BigInt(0)
+  };
+}
+/**
+ * MsgSetHarbergerPrice self-assesses a Harberger token's price and names
+ * the x/session RecurringPull that pays its tax.
+ * @name MsgSetHarbergerPrice
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgSetHarbergerPrice
+ */
+export const MsgSetHarbergerPrice = {
+  typeUrl: "/sparkdream.artifact.v1.MsgSetHarbergerPrice",
+  aminoType: "sparkdream/x/artifact/MsgSetHarbergerPrice",
+  encode(message: MsgSetHarbergerPrice, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.owner !== "") {
+      writer.uint32(10).string(message.owner);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.tokenId);
+    }
+    if (message.price !== "") {
+      writer.uint32(34).string(message.price);
+    }
+    if (message.grantId !== BigInt(0)) {
+      writer.uint32(40).uint64(message.grantId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSetHarbergerPrice {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSetHarbergerPrice();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.owner = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.tokenId = reader.uint64();
+          break;
+        case 4:
+          message.price = reader.string();
+          break;
+        case 5:
+          message.grantId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgSetHarbergerPrice>): MsgSetHarbergerPrice {
+    const message = createBaseMsgSetHarbergerPrice();
+    message.owner = object.owner ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    message.price = object.price ?? "";
+    message.grantId = object.grantId !== undefined && object.grantId !== null ? BigInt(object.grantId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgSetHarbergerPriceAmino): MsgSetHarbergerPrice {
+    const message = createBaseMsgSetHarbergerPrice();
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = object.owner;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    if (object.price !== undefined && object.price !== null) {
+      message.price = object.price;
+    }
+    if (object.grant_id !== undefined && object.grant_id !== null) {
+      message.grantId = BigInt(object.grant_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgSetHarbergerPrice): MsgSetHarbergerPriceAmino {
+    const obj: any = {};
+    obj.owner = message.owner === "" ? undefined : message.owner;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    obj.price = message.price === "" ? undefined : message.price;
+    obj.grant_id = message.grantId !== BigInt(0) ? message.grantId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgSetHarbergerPriceAminoMsg): MsgSetHarbergerPrice {
+    return MsgSetHarbergerPrice.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSetHarbergerPrice): MsgSetHarbergerPriceAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgSetHarbergerPrice",
+      value: MsgSetHarbergerPrice.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgSetHarbergerPriceProtoMsg): MsgSetHarbergerPrice {
+    return MsgSetHarbergerPrice.decode(message.value);
+  },
+  toProto(message: MsgSetHarbergerPrice): Uint8Array {
+    return MsgSetHarbergerPrice.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSetHarbergerPrice): MsgSetHarbergerPriceProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgSetHarbergerPrice",
+      value: MsgSetHarbergerPrice.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSetHarbergerPriceResponse(): MsgSetHarbergerPriceResponse {
+  return {
+    taxPerPeriod: ""
+  };
+}
+/**
+ * MsgSetHarbergerPriceResponse returns the tax per period.
+ * @name MsgSetHarbergerPriceResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgSetHarbergerPriceResponse
+ */
+export const MsgSetHarbergerPriceResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgSetHarbergerPriceResponse",
+  encode(message: MsgSetHarbergerPriceResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.taxPerPeriod !== "") {
+      writer.uint32(10).string(message.taxPerPeriod);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSetHarbergerPriceResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSetHarbergerPriceResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.taxPerPeriod = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgSetHarbergerPriceResponse>): MsgSetHarbergerPriceResponse {
+    const message = createBaseMsgSetHarbergerPriceResponse();
+    message.taxPerPeriod = object.taxPerPeriod ?? "";
+    return message;
+  },
+  fromAmino(object: MsgSetHarbergerPriceResponseAmino): MsgSetHarbergerPriceResponse {
+    const message = createBaseMsgSetHarbergerPriceResponse();
+    if (object.tax_per_period !== undefined && object.tax_per_period !== null) {
+      message.taxPerPeriod = object.tax_per_period;
+    }
+    return message;
+  },
+  toAmino(message: MsgSetHarbergerPriceResponse): MsgSetHarbergerPriceResponseAmino {
+    const obj: any = {};
+    obj.tax_per_period = message.taxPerPeriod === "" ? undefined : message.taxPerPeriod;
+    return obj;
+  },
+  fromAminoMsg(object: MsgSetHarbergerPriceResponseAminoMsg): MsgSetHarbergerPriceResponse {
+    return MsgSetHarbergerPriceResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgSetHarbergerPriceResponseProtoMsg): MsgSetHarbergerPriceResponse {
+    return MsgSetHarbergerPriceResponse.decode(message.value);
+  },
+  toProto(message: MsgSetHarbergerPriceResponse): Uint8Array {
+    return MsgSetHarbergerPriceResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSetHarbergerPriceResponse): MsgSetHarbergerPriceResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgSetHarbergerPriceResponse",
+      value: MsgSetHarbergerPriceResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgForceBuy(): MsgForceBuy {
+  return {
+    buyer: "",
+    classId: BigInt(0),
+    tokenId: BigInt(0),
+    maxPrice: Coin.fromPartial({}),
+    expectedMetadataHash: ""
+  };
+}
+/**
+ * MsgForceBuy buys a Harberger token at its current price, with or without
+ * the holder's consent.
+ * @name MsgForceBuy
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgForceBuy
+ */
+export const MsgForceBuy = {
+  typeUrl: "/sparkdream.artifact.v1.MsgForceBuy",
+  aminoType: "sparkdream/x/artifact/MsgForceBuy",
+  encode(message: MsgForceBuy, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.buyer !== "") {
+      writer.uint32(10).string(message.buyer);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.tokenId);
+    }
+    if (message.maxPrice !== undefined) {
+      Coin.encode(message.maxPrice, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.expectedMetadataHash !== "") {
+      writer.uint32(42).string(message.expectedMetadataHash);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgForceBuy {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgForceBuy();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.buyer = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.tokenId = reader.uint64();
+          break;
+        case 4:
+          message.maxPrice = Coin.decode(reader, reader.uint32());
+          break;
+        case 5:
+          message.expectedMetadataHash = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgForceBuy>): MsgForceBuy {
+    const message = createBaseMsgForceBuy();
+    message.buyer = object.buyer ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    message.maxPrice = object.maxPrice !== undefined && object.maxPrice !== null ? Coin.fromPartial(object.maxPrice) : undefined;
+    message.expectedMetadataHash = object.expectedMetadataHash ?? "";
+    return message;
+  },
+  fromAmino(object: MsgForceBuyAmino): MsgForceBuy {
+    const message = createBaseMsgForceBuy();
+    if (object.buyer !== undefined && object.buyer !== null) {
+      message.buyer = object.buyer;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    if (object.max_price !== undefined && object.max_price !== null) {
+      message.maxPrice = Coin.fromAmino(object.max_price);
+    }
+    if (object.expected_metadata_hash !== undefined && object.expected_metadata_hash !== null) {
+      message.expectedMetadataHash = object.expected_metadata_hash;
+    }
+    return message;
+  },
+  toAmino(message: MsgForceBuy): MsgForceBuyAmino {
+    const obj: any = {};
+    obj.buyer = message.buyer === "" ? undefined : message.buyer;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    obj.max_price = message.maxPrice ? Coin.toAmino(message.maxPrice) : Coin.toAmino(Coin.fromPartial({}));
+    obj.expected_metadata_hash = message.expectedMetadataHash === "" ? undefined : message.expectedMetadataHash;
+    return obj;
+  },
+  fromAminoMsg(object: MsgForceBuyAminoMsg): MsgForceBuy {
+    return MsgForceBuy.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgForceBuy): MsgForceBuyAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgForceBuy",
+      value: MsgForceBuy.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgForceBuyProtoMsg): MsgForceBuy {
+    return MsgForceBuy.decode(message.value);
+  },
+  toProto(message: MsgForceBuy): Uint8Array {
+    return MsgForceBuy.encode(message).finish();
+  },
+  toProtoMsg(message: MsgForceBuy): MsgForceBuyProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgForceBuy",
+      value: MsgForceBuy.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgForceBuyResponse(): MsgForceBuyResponse {
+  return {
+    price: "",
+    fee: "",
+    royalty: "",
+    proceeds: ""
+  };
+}
+/**
+ * MsgForceBuyResponse reports the settlement split.
+ * @name MsgForceBuyResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgForceBuyResponse
+ */
+export const MsgForceBuyResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgForceBuyResponse",
+  encode(message: MsgForceBuyResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.price !== "") {
+      writer.uint32(10).string(message.price);
+    }
+    if (message.fee !== "") {
+      writer.uint32(18).string(message.fee);
+    }
+    if (message.royalty !== "") {
+      writer.uint32(26).string(message.royalty);
+    }
+    if (message.proceeds !== "") {
+      writer.uint32(34).string(message.proceeds);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgForceBuyResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgForceBuyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.price = reader.string();
+          break;
+        case 2:
+          message.fee = reader.string();
+          break;
+        case 3:
+          message.royalty = reader.string();
+          break;
+        case 4:
+          message.proceeds = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgForceBuyResponse>): MsgForceBuyResponse {
+    const message = createBaseMsgForceBuyResponse();
+    message.price = object.price ?? "";
+    message.fee = object.fee ?? "";
+    message.royalty = object.royalty ?? "";
+    message.proceeds = object.proceeds ?? "";
+    return message;
+  },
+  fromAmino(object: MsgForceBuyResponseAmino): MsgForceBuyResponse {
+    const message = createBaseMsgForceBuyResponse();
+    if (object.price !== undefined && object.price !== null) {
+      message.price = object.price;
+    }
+    if (object.fee !== undefined && object.fee !== null) {
+      message.fee = object.fee;
+    }
+    if (object.royalty !== undefined && object.royalty !== null) {
+      message.royalty = object.royalty;
+    }
+    if (object.proceeds !== undefined && object.proceeds !== null) {
+      message.proceeds = object.proceeds;
+    }
+    return message;
+  },
+  toAmino(message: MsgForceBuyResponse): MsgForceBuyResponseAmino {
+    const obj: any = {};
+    obj.price = message.price === "" ? undefined : message.price;
+    obj.fee = message.fee === "" ? undefined : message.fee;
+    obj.royalty = message.royalty === "" ? undefined : message.royalty;
+    obj.proceeds = message.proceeds === "" ? undefined : message.proceeds;
+    return obj;
+  },
+  fromAminoMsg(object: MsgForceBuyResponseAminoMsg): MsgForceBuyResponse {
+    return MsgForceBuyResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgForceBuyResponseProtoMsg): MsgForceBuyResponse {
+    return MsgForceBuyResponse.decode(message.value);
+  },
+  toProto(message: MsgForceBuyResponse): Uint8Array {
+    return MsgForceBuyResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgForceBuyResponse): MsgForceBuyResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgForceBuyResponse",
+      value: MsgForceBuyResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUpdateUnitListing(): MsgUpdateUnitListing {
+  return {
+    seller: "",
+    listingId: BigInt(0),
+    quantity: BigInt(0),
+    unitPrice: Coin.fromPartial({}),
+    duration: BigInt(0)
+  };
+}
+/**
+ * MsgUpdateUnitListing changes a unit listing's price, quantity and
+ * duration. The listed units are re-locked to the new quantity.
+ * @name MsgUpdateUnitListing
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgUpdateUnitListing
+ */
+export const MsgUpdateUnitListing = {
+  typeUrl: "/sparkdream.artifact.v1.MsgUpdateUnitListing",
+  aminoType: "sparkdream/x/artifact/MsgUpdateUnitListing",
+  encode(message: MsgUpdateUnitListing, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.seller !== "") {
+      writer.uint32(10).string(message.seller);
+    }
+    if (message.listingId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.listingId);
+    }
+    if (message.quantity !== BigInt(0)) {
+      writer.uint32(24).uint64(message.quantity);
+    }
+    if (message.unitPrice !== undefined) {
+      Coin.encode(message.unitPrice, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.duration !== BigInt(0)) {
+      writer.uint32(40).int64(message.duration);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUpdateUnitListing {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUpdateUnitListing();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.seller = reader.string();
+          break;
+        case 2:
+          message.listingId = reader.uint64();
+          break;
+        case 3:
+          message.quantity = reader.uint64();
+          break;
+        case 4:
+          message.unitPrice = Coin.decode(reader, reader.uint32());
+          break;
+        case 5:
+          message.duration = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgUpdateUnitListing>): MsgUpdateUnitListing {
+    const message = createBaseMsgUpdateUnitListing();
+    message.seller = object.seller ?? "";
+    message.listingId = object.listingId !== undefined && object.listingId !== null ? BigInt(object.listingId.toString()) : BigInt(0);
+    message.quantity = object.quantity !== undefined && object.quantity !== null ? BigInt(object.quantity.toString()) : BigInt(0);
+    message.unitPrice = object.unitPrice !== undefined && object.unitPrice !== null ? Coin.fromPartial(object.unitPrice) : undefined;
+    message.duration = object.duration !== undefined && object.duration !== null ? BigInt(object.duration.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgUpdateUnitListingAmino): MsgUpdateUnitListing {
+    const message = createBaseMsgUpdateUnitListing();
+    if (object.seller !== undefined && object.seller !== null) {
+      message.seller = object.seller;
+    }
+    if (object.listing_id !== undefined && object.listing_id !== null) {
+      message.listingId = BigInt(object.listing_id);
+    }
+    if (object.quantity !== undefined && object.quantity !== null) {
+      message.quantity = BigInt(object.quantity);
+    }
+    if (object.unit_price !== undefined && object.unit_price !== null) {
+      message.unitPrice = Coin.fromAmino(object.unit_price);
+    }
+    if (object.duration !== undefined && object.duration !== null) {
+      message.duration = BigInt(object.duration);
+    }
+    return message;
+  },
+  toAmino(message: MsgUpdateUnitListing): MsgUpdateUnitListingAmino {
+    const obj: any = {};
+    obj.seller = message.seller === "" ? undefined : message.seller;
+    obj.listing_id = message.listingId !== BigInt(0) ? message.listingId?.toString() : undefined;
+    obj.quantity = message.quantity !== BigInt(0) ? message.quantity?.toString() : undefined;
+    obj.unit_price = message.unitPrice ? Coin.toAmino(message.unitPrice) : Coin.toAmino(Coin.fromPartial({}));
+    obj.duration = message.duration !== BigInt(0) ? message.duration?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgUpdateUnitListingAminoMsg): MsgUpdateUnitListing {
+    return MsgUpdateUnitListing.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUpdateUnitListing): MsgUpdateUnitListingAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgUpdateUnitListing",
+      value: MsgUpdateUnitListing.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgUpdateUnitListingProtoMsg): MsgUpdateUnitListing {
+    return MsgUpdateUnitListing.decode(message.value);
+  },
+  toProto(message: MsgUpdateUnitListing): Uint8Array {
+    return MsgUpdateUnitListing.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUpdateUnitListing): MsgUpdateUnitListingProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgUpdateUnitListing",
+      value: MsgUpdateUnitListing.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUpdateUnitListingResponse(): MsgUpdateUnitListingResponse {
+  return {};
+}
+/**
+ * MsgUpdateUnitListingResponse is empty.
+ * @name MsgUpdateUnitListingResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgUpdateUnitListingResponse
+ */
+export const MsgUpdateUnitListingResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgUpdateUnitListingResponse",
+  encode(_: MsgUpdateUnitListingResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUpdateUnitListingResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUpdateUnitListingResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgUpdateUnitListingResponse>): MsgUpdateUnitListingResponse {
+    const message = createBaseMsgUpdateUnitListingResponse();
+    return message;
+  },
+  fromAmino(_: MsgUpdateUnitListingResponseAmino): MsgUpdateUnitListingResponse {
+    const message = createBaseMsgUpdateUnitListingResponse();
+    return message;
+  },
+  toAmino(_: MsgUpdateUnitListingResponse): MsgUpdateUnitListingResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgUpdateUnitListingResponseAminoMsg): MsgUpdateUnitListingResponse {
+    return MsgUpdateUnitListingResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgUpdateUnitListingResponseProtoMsg): MsgUpdateUnitListingResponse {
+    return MsgUpdateUnitListingResponse.decode(message.value);
+  },
+  toProto(message: MsgUpdateUnitListingResponse): Uint8Array {
+    return MsgUpdateUnitListingResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUpdateUnitListingResponse): MsgUpdateUnitListingResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgUpdateUnitListingResponse",
+      value: MsgUpdateUnitListingResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgMakeOffer(): MsgMakeOffer {
+  return {
+    bidder: "",
+    classId: BigInt(0),
+    tokenId: BigInt(0),
+    price: Coin.fromPartial({}),
+    duration: BigInt(0),
+    expectedMetadataHash: "",
+    expectedContentsHash: ""
+  };
+}
+/**
+ * MsgMakeOffer escrows a SPARK offer for a token (token_id set) or for any
+ * token of a class (token_id 0).
+ * @name MsgMakeOffer
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgMakeOffer
+ */
+export const MsgMakeOffer = {
+  typeUrl: "/sparkdream.artifact.v1.MsgMakeOffer",
+  aminoType: "sparkdream/x/artifact/MsgMakeOffer",
+  encode(message: MsgMakeOffer, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.bidder !== "") {
+      writer.uint32(10).string(message.bidder);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.tokenId);
+    }
+    if (message.price !== undefined) {
+      Coin.encode(message.price, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.duration !== BigInt(0)) {
+      writer.uint32(40).int64(message.duration);
+    }
+    if (message.expectedMetadataHash !== "") {
+      writer.uint32(50).string(message.expectedMetadataHash);
+    }
+    if (message.expectedContentsHash !== "") {
+      writer.uint32(58).string(message.expectedContentsHash);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgMakeOffer {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgMakeOffer();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.bidder = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.tokenId = reader.uint64();
+          break;
+        case 4:
+          message.price = Coin.decode(reader, reader.uint32());
+          break;
+        case 5:
+          message.duration = reader.int64();
+          break;
+        case 6:
+          message.expectedMetadataHash = reader.string();
+          break;
+        case 7:
+          message.expectedContentsHash = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgMakeOffer>): MsgMakeOffer {
+    const message = createBaseMsgMakeOffer();
+    message.bidder = object.bidder ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    message.price = object.price !== undefined && object.price !== null ? Coin.fromPartial(object.price) : undefined;
+    message.duration = object.duration !== undefined && object.duration !== null ? BigInt(object.duration.toString()) : BigInt(0);
+    message.expectedMetadataHash = object.expectedMetadataHash ?? "";
+    message.expectedContentsHash = object.expectedContentsHash ?? "";
+    return message;
+  },
+  fromAmino(object: MsgMakeOfferAmino): MsgMakeOffer {
+    const message = createBaseMsgMakeOffer();
+    if (object.bidder !== undefined && object.bidder !== null) {
+      message.bidder = object.bidder;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    if (object.price !== undefined && object.price !== null) {
+      message.price = Coin.fromAmino(object.price);
+    }
+    if (object.duration !== undefined && object.duration !== null) {
+      message.duration = BigInt(object.duration);
+    }
+    if (object.expected_metadata_hash !== undefined && object.expected_metadata_hash !== null) {
+      message.expectedMetadataHash = object.expected_metadata_hash;
+    }
+    if (object.expected_contents_hash !== undefined && object.expected_contents_hash !== null) {
+      message.expectedContentsHash = object.expected_contents_hash;
+    }
+    return message;
+  },
+  toAmino(message: MsgMakeOffer): MsgMakeOfferAmino {
+    const obj: any = {};
+    obj.bidder = message.bidder === "" ? undefined : message.bidder;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    obj.price = message.price ? Coin.toAmino(message.price) : Coin.toAmino(Coin.fromPartial({}));
+    obj.duration = message.duration !== BigInt(0) ? message.duration?.toString() : undefined;
+    obj.expected_metadata_hash = message.expectedMetadataHash === "" ? undefined : message.expectedMetadataHash;
+    obj.expected_contents_hash = message.expectedContentsHash === "" ? undefined : message.expectedContentsHash;
+    return obj;
+  },
+  fromAminoMsg(object: MsgMakeOfferAminoMsg): MsgMakeOffer {
+    return MsgMakeOffer.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgMakeOffer): MsgMakeOfferAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgMakeOffer",
+      value: MsgMakeOffer.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgMakeOfferProtoMsg): MsgMakeOffer {
+    return MsgMakeOffer.decode(message.value);
+  },
+  toProto(message: MsgMakeOffer): Uint8Array {
+    return MsgMakeOffer.encode(message).finish();
+  },
+  toProtoMsg(message: MsgMakeOffer): MsgMakeOfferProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgMakeOffer",
+      value: MsgMakeOffer.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgMakeOfferResponse(): MsgMakeOfferResponse {
+  return {
+    offerId: BigInt(0)
+  };
+}
+/**
+ * MsgMakeOfferResponse returns the offer id.
+ * @name MsgMakeOfferResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgMakeOfferResponse
+ */
+export const MsgMakeOfferResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgMakeOfferResponse",
+  encode(message: MsgMakeOfferResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.offerId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.offerId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgMakeOfferResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgMakeOfferResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.offerId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgMakeOfferResponse>): MsgMakeOfferResponse {
+    const message = createBaseMsgMakeOfferResponse();
+    message.offerId = object.offerId !== undefined && object.offerId !== null ? BigInt(object.offerId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgMakeOfferResponseAmino): MsgMakeOfferResponse {
+    const message = createBaseMsgMakeOfferResponse();
+    if (object.offer_id !== undefined && object.offer_id !== null) {
+      message.offerId = BigInt(object.offer_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgMakeOfferResponse): MsgMakeOfferResponseAmino {
+    const obj: any = {};
+    obj.offer_id = message.offerId !== BigInt(0) ? message.offerId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgMakeOfferResponseAminoMsg): MsgMakeOfferResponse {
+    return MsgMakeOfferResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgMakeOfferResponseProtoMsg): MsgMakeOfferResponse {
+    return MsgMakeOfferResponse.decode(message.value);
+  },
+  toProto(message: MsgMakeOfferResponse): Uint8Array {
+    return MsgMakeOfferResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgMakeOfferResponse): MsgMakeOfferResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgMakeOfferResponse",
+      value: MsgMakeOfferResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCancelOffer(): MsgCancelOffer {
+  return {
+    bidder: "",
+    offerId: BigInt(0)
+  };
+}
+/**
+ * MsgCancelOffer withdraws an offer and refunds its escrow.
+ * @name MsgCancelOffer
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCancelOffer
+ */
+export const MsgCancelOffer = {
+  typeUrl: "/sparkdream.artifact.v1.MsgCancelOffer",
+  aminoType: "sparkdream/x/artifact/MsgCancelOffer",
+  encode(message: MsgCancelOffer, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.bidder !== "") {
+      writer.uint32(10).string(message.bidder);
+    }
+    if (message.offerId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.offerId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCancelOffer {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCancelOffer();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.bidder = reader.string();
+          break;
+        case 2:
+          message.offerId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCancelOffer>): MsgCancelOffer {
+    const message = createBaseMsgCancelOffer();
+    message.bidder = object.bidder ?? "";
+    message.offerId = object.offerId !== undefined && object.offerId !== null ? BigInt(object.offerId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgCancelOfferAmino): MsgCancelOffer {
+    const message = createBaseMsgCancelOffer();
+    if (object.bidder !== undefined && object.bidder !== null) {
+      message.bidder = object.bidder;
+    }
+    if (object.offer_id !== undefined && object.offer_id !== null) {
+      message.offerId = BigInt(object.offer_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgCancelOffer): MsgCancelOfferAmino {
+    const obj: any = {};
+    obj.bidder = message.bidder === "" ? undefined : message.bidder;
+    obj.offer_id = message.offerId !== BigInt(0) ? message.offerId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgCancelOfferAminoMsg): MsgCancelOffer {
+    return MsgCancelOffer.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCancelOffer): MsgCancelOfferAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgCancelOffer",
+      value: MsgCancelOffer.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgCancelOfferProtoMsg): MsgCancelOffer {
+    return MsgCancelOffer.decode(message.value);
+  },
+  toProto(message: MsgCancelOffer): Uint8Array {
+    return MsgCancelOffer.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCancelOffer): MsgCancelOfferProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgCancelOffer",
+      value: MsgCancelOffer.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCancelOfferResponse(): MsgCancelOfferResponse {
+  return {};
+}
+/**
+ * MsgCancelOfferResponse is empty.
+ * @name MsgCancelOfferResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCancelOfferResponse
+ */
+export const MsgCancelOfferResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgCancelOfferResponse",
+  encode(_: MsgCancelOfferResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCancelOfferResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCancelOfferResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgCancelOfferResponse>): MsgCancelOfferResponse {
+    const message = createBaseMsgCancelOfferResponse();
+    return message;
+  },
+  fromAmino(_: MsgCancelOfferResponseAmino): MsgCancelOfferResponse {
+    const message = createBaseMsgCancelOfferResponse();
+    return message;
+  },
+  toAmino(_: MsgCancelOfferResponse): MsgCancelOfferResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgCancelOfferResponseAminoMsg): MsgCancelOfferResponse {
+    return MsgCancelOfferResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgCancelOfferResponseProtoMsg): MsgCancelOfferResponse {
+    return MsgCancelOfferResponse.decode(message.value);
+  },
+  toProto(message: MsgCancelOfferResponse): Uint8Array {
+    return MsgCancelOfferResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCancelOfferResponse): MsgCancelOfferResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgCancelOfferResponse",
+      value: MsgCancelOfferResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAcceptOffer(): MsgAcceptOffer {
+  return {
+    seller: "",
+    offerId: BigInt(0),
+    tokenId: BigInt(0),
+    expectedPrice: Coin.fromPartial({})
+  };
+}
+/**
+ * MsgAcceptOffer sells a token the signer holds to an offer's bidder.
+ * @name MsgAcceptOffer
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAcceptOffer
+ */
+export const MsgAcceptOffer = {
+  typeUrl: "/sparkdream.artifact.v1.MsgAcceptOffer",
+  aminoType: "sparkdream/x/artifact/MsgAcceptOffer",
+  encode(message: MsgAcceptOffer, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.seller !== "") {
+      writer.uint32(10).string(message.seller);
+    }
+    if (message.offerId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.offerId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.tokenId);
+    }
+    if (message.expectedPrice !== undefined) {
+      Coin.encode(message.expectedPrice, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAcceptOffer {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAcceptOffer();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.seller = reader.string();
+          break;
+        case 2:
+          message.offerId = reader.uint64();
+          break;
+        case 3:
+          message.tokenId = reader.uint64();
+          break;
+        case 4:
+          message.expectedPrice = Coin.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgAcceptOffer>): MsgAcceptOffer {
+    const message = createBaseMsgAcceptOffer();
+    message.seller = object.seller ?? "";
+    message.offerId = object.offerId !== undefined && object.offerId !== null ? BigInt(object.offerId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    message.expectedPrice = object.expectedPrice !== undefined && object.expectedPrice !== null ? Coin.fromPartial(object.expectedPrice) : undefined;
+    return message;
+  },
+  fromAmino(object: MsgAcceptOfferAmino): MsgAcceptOffer {
+    const message = createBaseMsgAcceptOffer();
+    if (object.seller !== undefined && object.seller !== null) {
+      message.seller = object.seller;
+    }
+    if (object.offer_id !== undefined && object.offer_id !== null) {
+      message.offerId = BigInt(object.offer_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    if (object.expected_price !== undefined && object.expected_price !== null) {
+      message.expectedPrice = Coin.fromAmino(object.expected_price);
+    }
+    return message;
+  },
+  toAmino(message: MsgAcceptOffer): MsgAcceptOfferAmino {
+    const obj: any = {};
+    obj.seller = message.seller === "" ? undefined : message.seller;
+    obj.offer_id = message.offerId !== BigInt(0) ? message.offerId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    obj.expected_price = message.expectedPrice ? Coin.toAmino(message.expectedPrice) : Coin.toAmino(Coin.fromPartial({}));
+    return obj;
+  },
+  fromAminoMsg(object: MsgAcceptOfferAminoMsg): MsgAcceptOffer {
+    return MsgAcceptOffer.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAcceptOffer): MsgAcceptOfferAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgAcceptOffer",
+      value: MsgAcceptOffer.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgAcceptOfferProtoMsg): MsgAcceptOffer {
+    return MsgAcceptOffer.decode(message.value);
+  },
+  toProto(message: MsgAcceptOffer): Uint8Array {
+    return MsgAcceptOffer.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAcceptOffer): MsgAcceptOfferProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgAcceptOffer",
+      value: MsgAcceptOffer.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAcceptOfferResponse(): MsgAcceptOfferResponse {
+  return {
+    fee: "",
+    royalty: "",
+    proceeds: ""
+  };
+}
+/**
+ * MsgAcceptOfferResponse reports the settlement split.
+ * @name MsgAcceptOfferResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgAcceptOfferResponse
+ */
+export const MsgAcceptOfferResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgAcceptOfferResponse",
+  encode(message: MsgAcceptOfferResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.fee !== "") {
+      writer.uint32(10).string(message.fee);
+    }
+    if (message.royalty !== "") {
+      writer.uint32(18).string(message.royalty);
+    }
+    if (message.proceeds !== "") {
+      writer.uint32(26).string(message.proceeds);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAcceptOfferResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAcceptOfferResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.fee = reader.string();
+          break;
+        case 2:
+          message.royalty = reader.string();
+          break;
+        case 3:
+          message.proceeds = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgAcceptOfferResponse>): MsgAcceptOfferResponse {
+    const message = createBaseMsgAcceptOfferResponse();
+    message.fee = object.fee ?? "";
+    message.royalty = object.royalty ?? "";
+    message.proceeds = object.proceeds ?? "";
+    return message;
+  },
+  fromAmino(object: MsgAcceptOfferResponseAmino): MsgAcceptOfferResponse {
+    const message = createBaseMsgAcceptOfferResponse();
+    if (object.fee !== undefined && object.fee !== null) {
+      message.fee = object.fee;
+    }
+    if (object.royalty !== undefined && object.royalty !== null) {
+      message.royalty = object.royalty;
+    }
+    if (object.proceeds !== undefined && object.proceeds !== null) {
+      message.proceeds = object.proceeds;
+    }
+    return message;
+  },
+  toAmino(message: MsgAcceptOfferResponse): MsgAcceptOfferResponseAmino {
+    const obj: any = {};
+    obj.fee = message.fee === "" ? undefined : message.fee;
+    obj.royalty = message.royalty === "" ? undefined : message.royalty;
+    obj.proceeds = message.proceeds === "" ? undefined : message.proceeds;
+    return obj;
+  },
+  fromAminoMsg(object: MsgAcceptOfferResponseAminoMsg): MsgAcceptOfferResponse {
+    return MsgAcceptOfferResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgAcceptOfferResponseProtoMsg): MsgAcceptOfferResponse {
+    return MsgAcceptOfferResponse.decode(message.value);
+  },
+  toProto(message: MsgAcceptOfferResponse): Uint8Array {
+    return MsgAcceptOfferResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAcceptOfferResponse): MsgAcceptOfferResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgAcceptOfferResponse",
+      value: MsgAcceptOfferResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgStartAuction(): MsgStartAuction {
+  return {
+    seller: "",
+    classId: BigInt(0),
+    tokenId: BigInt(0),
+    reservePrice: Coin.fromPartial({}),
+    minIncrementBps: 0,
+    duration: BigInt(0)
+  };
+}
+/**
+ * MsgStartAuction puts a token up for an English auction.
+ * @name MsgStartAuction
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgStartAuction
+ */
+export const MsgStartAuction = {
+  typeUrl: "/sparkdream.artifact.v1.MsgStartAuction",
+  aminoType: "sparkdream/x/artifact/MsgStartAuction",
+  encode(message: MsgStartAuction, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.seller !== "") {
+      writer.uint32(10).string(message.seller);
+    }
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.tokenId);
+    }
+    if (message.reservePrice !== undefined) {
+      Coin.encode(message.reservePrice, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.minIncrementBps !== 0) {
+      writer.uint32(40).uint32(message.minIncrementBps);
+    }
+    if (message.duration !== BigInt(0)) {
+      writer.uint32(48).int64(message.duration);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgStartAuction {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgStartAuction();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.seller = reader.string();
+          break;
+        case 2:
+          message.classId = reader.uint64();
+          break;
+        case 3:
+          message.tokenId = reader.uint64();
+          break;
+        case 4:
+          message.reservePrice = Coin.decode(reader, reader.uint32());
+          break;
+        case 5:
+          message.minIncrementBps = reader.uint32();
+          break;
+        case 6:
+          message.duration = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgStartAuction>): MsgStartAuction {
+    const message = createBaseMsgStartAuction();
+    message.seller = object.seller ?? "";
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    message.reservePrice = object.reservePrice !== undefined && object.reservePrice !== null ? Coin.fromPartial(object.reservePrice) : undefined;
+    message.minIncrementBps = object.minIncrementBps ?? 0;
+    message.duration = object.duration !== undefined && object.duration !== null ? BigInt(object.duration.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgStartAuctionAmino): MsgStartAuction {
+    const message = createBaseMsgStartAuction();
+    if (object.seller !== undefined && object.seller !== null) {
+      message.seller = object.seller;
+    }
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    if (object.reserve_price !== undefined && object.reserve_price !== null) {
+      message.reservePrice = Coin.fromAmino(object.reserve_price);
+    }
+    if (object.min_increment_bps !== undefined && object.min_increment_bps !== null) {
+      message.minIncrementBps = object.min_increment_bps;
+    }
+    if (object.duration !== undefined && object.duration !== null) {
+      message.duration = BigInt(object.duration);
+    }
+    return message;
+  },
+  toAmino(message: MsgStartAuction): MsgStartAuctionAmino {
+    const obj: any = {};
+    obj.seller = message.seller === "" ? undefined : message.seller;
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    obj.reserve_price = message.reservePrice ? Coin.toAmino(message.reservePrice) : Coin.toAmino(Coin.fromPartial({}));
+    obj.min_increment_bps = message.minIncrementBps === 0 ? undefined : message.minIncrementBps;
+    obj.duration = message.duration !== BigInt(0) ? message.duration?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgStartAuctionAminoMsg): MsgStartAuction {
+    return MsgStartAuction.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgStartAuction): MsgStartAuctionAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgStartAuction",
+      value: MsgStartAuction.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgStartAuctionProtoMsg): MsgStartAuction {
+    return MsgStartAuction.decode(message.value);
+  },
+  toProto(message: MsgStartAuction): Uint8Array {
+    return MsgStartAuction.encode(message).finish();
+  },
+  toProtoMsg(message: MsgStartAuction): MsgStartAuctionProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgStartAuction",
+      value: MsgStartAuction.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgStartAuctionResponse(): MsgStartAuctionResponse {
+  return {
+    auctionId: BigInt(0)
+  };
+}
+/**
+ * MsgStartAuctionResponse returns the auction id.
+ * @name MsgStartAuctionResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgStartAuctionResponse
+ */
+export const MsgStartAuctionResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgStartAuctionResponse",
+  encode(message: MsgStartAuctionResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.auctionId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.auctionId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgStartAuctionResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgStartAuctionResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.auctionId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgStartAuctionResponse>): MsgStartAuctionResponse {
+    const message = createBaseMsgStartAuctionResponse();
+    message.auctionId = object.auctionId !== undefined && object.auctionId !== null ? BigInt(object.auctionId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgStartAuctionResponseAmino): MsgStartAuctionResponse {
+    const message = createBaseMsgStartAuctionResponse();
+    if (object.auction_id !== undefined && object.auction_id !== null) {
+      message.auctionId = BigInt(object.auction_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgStartAuctionResponse): MsgStartAuctionResponseAmino {
+    const obj: any = {};
+    obj.auction_id = message.auctionId !== BigInt(0) ? message.auctionId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgStartAuctionResponseAminoMsg): MsgStartAuctionResponse {
+    return MsgStartAuctionResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgStartAuctionResponseProtoMsg): MsgStartAuctionResponse {
+    return MsgStartAuctionResponse.decode(message.value);
+  },
+  toProto(message: MsgStartAuctionResponse): Uint8Array {
+    return MsgStartAuctionResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgStartAuctionResponse): MsgStartAuctionResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgStartAuctionResponse",
+      value: MsgStartAuctionResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgBid(): MsgBid {
+  return {
+    bidder: "",
+    auctionId: BigInt(0),
+    amount: Coin.fromPartial({}),
+    expectedMetadataHash: "",
+    expectedContentsHash: ""
+  };
+}
+/**
+ * MsgBid places an escrowed bid; the previous high bid is refunded.
+ * @name MsgBid
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgBid
+ */
+export const MsgBid = {
+  typeUrl: "/sparkdream.artifact.v1.MsgBid",
+  aminoType: "sparkdream/x/artifact/MsgBid",
+  encode(message: MsgBid, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.bidder !== "") {
+      writer.uint32(10).string(message.bidder);
+    }
+    if (message.auctionId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.auctionId);
+    }
+    if (message.amount !== undefined) {
+      Coin.encode(message.amount, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.expectedMetadataHash !== "") {
+      writer.uint32(34).string(message.expectedMetadataHash);
+    }
+    if (message.expectedContentsHash !== "") {
+      writer.uint32(42).string(message.expectedContentsHash);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgBid {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgBid();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.bidder = reader.string();
+          break;
+        case 2:
+          message.auctionId = reader.uint64();
+          break;
+        case 3:
+          message.amount = Coin.decode(reader, reader.uint32());
+          break;
+        case 4:
+          message.expectedMetadataHash = reader.string();
+          break;
+        case 5:
+          message.expectedContentsHash = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgBid>): MsgBid {
+    const message = createBaseMsgBid();
+    message.bidder = object.bidder ?? "";
+    message.auctionId = object.auctionId !== undefined && object.auctionId !== null ? BigInt(object.auctionId.toString()) : BigInt(0);
+    message.amount = object.amount !== undefined && object.amount !== null ? Coin.fromPartial(object.amount) : undefined;
+    message.expectedMetadataHash = object.expectedMetadataHash ?? "";
+    message.expectedContentsHash = object.expectedContentsHash ?? "";
+    return message;
+  },
+  fromAmino(object: MsgBidAmino): MsgBid {
+    const message = createBaseMsgBid();
+    if (object.bidder !== undefined && object.bidder !== null) {
+      message.bidder = object.bidder;
+    }
+    if (object.auction_id !== undefined && object.auction_id !== null) {
+      message.auctionId = BigInt(object.auction_id);
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = Coin.fromAmino(object.amount);
+    }
+    if (object.expected_metadata_hash !== undefined && object.expected_metadata_hash !== null) {
+      message.expectedMetadataHash = object.expected_metadata_hash;
+    }
+    if (object.expected_contents_hash !== undefined && object.expected_contents_hash !== null) {
+      message.expectedContentsHash = object.expected_contents_hash;
+    }
+    return message;
+  },
+  toAmino(message: MsgBid): MsgBidAmino {
+    const obj: any = {};
+    obj.bidder = message.bidder === "" ? undefined : message.bidder;
+    obj.auction_id = message.auctionId !== BigInt(0) ? message.auctionId?.toString() : undefined;
+    obj.amount = message.amount ? Coin.toAmino(message.amount) : Coin.toAmino(Coin.fromPartial({}));
+    obj.expected_metadata_hash = message.expectedMetadataHash === "" ? undefined : message.expectedMetadataHash;
+    obj.expected_contents_hash = message.expectedContentsHash === "" ? undefined : message.expectedContentsHash;
+    return obj;
+  },
+  fromAminoMsg(object: MsgBidAminoMsg): MsgBid {
+    return MsgBid.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgBid): MsgBidAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgBid",
+      value: MsgBid.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgBidProtoMsg): MsgBid {
+    return MsgBid.decode(message.value);
+  },
+  toProto(message: MsgBid): Uint8Array {
+    return MsgBid.encode(message).finish();
+  },
+  toProtoMsg(message: MsgBid): MsgBidProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgBid",
+      value: MsgBid.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgBidResponse(): MsgBidResponse {
+  return {
+    endsAt: BigInt(0)
+  };
+}
+/**
+ * MsgBidResponse returns when the auction now ends.
+ * @name MsgBidResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgBidResponse
+ */
+export const MsgBidResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgBidResponse",
+  encode(message: MsgBidResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.endsAt !== BigInt(0)) {
+      writer.uint32(8).int64(message.endsAt);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgBidResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgBidResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.endsAt = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgBidResponse>): MsgBidResponse {
+    const message = createBaseMsgBidResponse();
+    message.endsAt = object.endsAt !== undefined && object.endsAt !== null ? BigInt(object.endsAt.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgBidResponseAmino): MsgBidResponse {
+    const message = createBaseMsgBidResponse();
+    if (object.ends_at !== undefined && object.ends_at !== null) {
+      message.endsAt = BigInt(object.ends_at);
+    }
+    return message;
+  },
+  toAmino(message: MsgBidResponse): MsgBidResponseAmino {
+    const obj: any = {};
+    obj.ends_at = message.endsAt !== BigInt(0) ? message.endsAt?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgBidResponseAminoMsg): MsgBidResponse {
+    return MsgBidResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgBidResponseProtoMsg): MsgBidResponse {
+    return MsgBidResponse.decode(message.value);
+  },
+  toProto(message: MsgBidResponse): Uint8Array {
+    return MsgBidResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgBidResponse): MsgBidResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgBidResponse",
+      value: MsgBidResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSettleAuction(): MsgSettleAuction {
+  return {
+    signer: "",
+    auctionId: BigInt(0)
+  };
+}
+/**
+ * MsgSettleAuction settles an ended auction (anyone may sign).
+ * @name MsgSettleAuction
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgSettleAuction
+ */
+export const MsgSettleAuction = {
+  typeUrl: "/sparkdream.artifact.v1.MsgSettleAuction",
+  aminoType: "sparkdream/x/artifact/MsgSettleAuction",
+  encode(message: MsgSettleAuction, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.signer !== "") {
+      writer.uint32(10).string(message.signer);
+    }
+    if (message.auctionId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.auctionId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSettleAuction {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSettleAuction();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.signer = reader.string();
+          break;
+        case 2:
+          message.auctionId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgSettleAuction>): MsgSettleAuction {
+    const message = createBaseMsgSettleAuction();
+    message.signer = object.signer ?? "";
+    message.auctionId = object.auctionId !== undefined && object.auctionId !== null ? BigInt(object.auctionId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgSettleAuctionAmino): MsgSettleAuction {
+    const message = createBaseMsgSettleAuction();
+    if (object.signer !== undefined && object.signer !== null) {
+      message.signer = object.signer;
+    }
+    if (object.auction_id !== undefined && object.auction_id !== null) {
+      message.auctionId = BigInt(object.auction_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgSettleAuction): MsgSettleAuctionAmino {
+    const obj: any = {};
+    obj.signer = message.signer === "" ? undefined : message.signer;
+    obj.auction_id = message.auctionId !== BigInt(0) ? message.auctionId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgSettleAuctionAminoMsg): MsgSettleAuction {
+    return MsgSettleAuction.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSettleAuction): MsgSettleAuctionAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgSettleAuction",
+      value: MsgSettleAuction.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgSettleAuctionProtoMsg): MsgSettleAuction {
+    return MsgSettleAuction.decode(message.value);
+  },
+  toProto(message: MsgSettleAuction): Uint8Array {
+    return MsgSettleAuction.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSettleAuction): MsgSettleAuctionProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgSettleAuction",
+      value: MsgSettleAuction.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgSettleAuctionResponse(): MsgSettleAuctionResponse {
+  return {
+    sold: false
+  };
+}
+/**
+ * MsgSettleAuctionResponse reports whether the token was sold.
+ * @name MsgSettleAuctionResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgSettleAuctionResponse
+ */
+export const MsgSettleAuctionResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgSettleAuctionResponse",
+  encode(message: MsgSettleAuctionResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.sold === true) {
+      writer.uint32(8).bool(message.sold);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSettleAuctionResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSettleAuctionResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.sold = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgSettleAuctionResponse>): MsgSettleAuctionResponse {
+    const message = createBaseMsgSettleAuctionResponse();
+    message.sold = object.sold ?? false;
+    return message;
+  },
+  fromAmino(object: MsgSettleAuctionResponseAmino): MsgSettleAuctionResponse {
+    const message = createBaseMsgSettleAuctionResponse();
+    if (object.sold !== undefined && object.sold !== null) {
+      message.sold = object.sold;
+    }
+    return message;
+  },
+  toAmino(message: MsgSettleAuctionResponse): MsgSettleAuctionResponseAmino {
+    const obj: any = {};
+    obj.sold = message.sold === false ? undefined : message.sold;
+    return obj;
+  },
+  fromAminoMsg(object: MsgSettleAuctionResponseAminoMsg): MsgSettleAuctionResponse {
+    return MsgSettleAuctionResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgSettleAuctionResponseProtoMsg): MsgSettleAuctionResponse {
+    return MsgSettleAuctionResponse.decode(message.value);
+  },
+  toProto(message: MsgSettleAuctionResponse): Uint8Array {
+    return MsgSettleAuctionResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSettleAuctionResponse): MsgSettleAuctionResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgSettleAuctionResponse",
+      value: MsgSettleAuctionResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCancelAuction(): MsgCancelAuction {
+  return {
+    seller: "",
+    auctionId: BigInt(0)
+  };
+}
+/**
+ * MsgCancelAuction withdraws an auction that has no bids.
+ * @name MsgCancelAuction
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCancelAuction
+ */
+export const MsgCancelAuction = {
+  typeUrl: "/sparkdream.artifact.v1.MsgCancelAuction",
+  aminoType: "sparkdream/x/artifact/MsgCancelAuction",
+  encode(message: MsgCancelAuction, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.seller !== "") {
+      writer.uint32(10).string(message.seller);
+    }
+    if (message.auctionId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.auctionId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCancelAuction {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCancelAuction();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.seller = reader.string();
+          break;
+        case 2:
+          message.auctionId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCancelAuction>): MsgCancelAuction {
+    const message = createBaseMsgCancelAuction();
+    message.seller = object.seller ?? "";
+    message.auctionId = object.auctionId !== undefined && object.auctionId !== null ? BigInt(object.auctionId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgCancelAuctionAmino): MsgCancelAuction {
+    const message = createBaseMsgCancelAuction();
+    if (object.seller !== undefined && object.seller !== null) {
+      message.seller = object.seller;
+    }
+    if (object.auction_id !== undefined && object.auction_id !== null) {
+      message.auctionId = BigInt(object.auction_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgCancelAuction): MsgCancelAuctionAmino {
+    const obj: any = {};
+    obj.seller = message.seller === "" ? undefined : message.seller;
+    obj.auction_id = message.auctionId !== BigInt(0) ? message.auctionId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgCancelAuctionAminoMsg): MsgCancelAuction {
+    return MsgCancelAuction.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCancelAuction): MsgCancelAuctionAminoMsg {
+    return {
+      type: "sparkdream/x/artifact/MsgCancelAuction",
+      value: MsgCancelAuction.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgCancelAuctionProtoMsg): MsgCancelAuction {
+    return MsgCancelAuction.decode(message.value);
+  },
+  toProto(message: MsgCancelAuction): Uint8Array {
+    return MsgCancelAuction.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCancelAuction): MsgCancelAuctionProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgCancelAuction",
+      value: MsgCancelAuction.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCancelAuctionResponse(): MsgCancelAuctionResponse {
+  return {};
+}
+/**
+ * MsgCancelAuctionResponse is empty.
+ * @name MsgCancelAuctionResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.MsgCancelAuctionResponse
+ */
+export const MsgCancelAuctionResponse = {
+  typeUrl: "/sparkdream.artifact.v1.MsgCancelAuctionResponse",
+  encode(_: MsgCancelAuctionResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCancelAuctionResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCancelAuctionResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgCancelAuctionResponse>): MsgCancelAuctionResponse {
+    const message = createBaseMsgCancelAuctionResponse();
+    return message;
+  },
+  fromAmino(_: MsgCancelAuctionResponseAmino): MsgCancelAuctionResponse {
+    const message = createBaseMsgCancelAuctionResponse();
+    return message;
+  },
+  toAmino(_: MsgCancelAuctionResponse): MsgCancelAuctionResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgCancelAuctionResponseAminoMsg): MsgCancelAuctionResponse {
+    return MsgCancelAuctionResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgCancelAuctionResponseProtoMsg): MsgCancelAuctionResponse {
+    return MsgCancelAuctionResponse.decode(message.value);
+  },
+  toProto(message: MsgCancelAuctionResponse): Uint8Array {
+    return MsgCancelAuctionResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCancelAuctionResponse): MsgCancelAuctionResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.MsgCancelAuctionResponse",
+      value: MsgCancelAuctionResponse.encode(message).finish()
     };
   }
 };

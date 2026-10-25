@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetMemberRequest, QueryGetMemberResponse, QueryAllMemberRequest, QueryAllMemberResponse, QueryGetInvitationRequest, QueryGetInvitationResponse, QueryAllInvitationRequest, QueryAllInvitationResponse, QueryGetProjectRequest, QueryGetProjectResponse, QueryAllProjectRequest, QueryAllProjectResponse, QueryGetInitiativeRequest, QueryGetInitiativeResponse, QueryAllInitiativeRequest, QueryAllInitiativeResponse, QueryGetStakeRequest, QueryGetStakeResponse, QueryAllStakeRequest, QueryAllStakeResponse, QueryGetChallengeRequest, QueryGetChallengeResponse, QueryAllChallengeRequest, QueryAllChallengeResponse, QueryGetJuryReviewRequest, QueryGetJuryReviewResponse, QueryAllJuryReviewRequest, QueryAllJuryReviewResponse, QueryJuryReviewsByJurorRequest, QueryJuryReviewsByJurorResponse, QueryRoleActivityRequest, QueryRoleActivityResponse, QueryGetInterimRequest, QueryGetInterimResponse, QueryAllInterimRequest, QueryAllInterimResponse, QueryMembersByTrustLevelRequest, QueryMembersByTrustLevelResponse, QueryInvitationsByInviterRequest, QueryInvitationsByInviterResponse, QueryInterimsByAssigneeRequest, QueryInterimsByAssigneeResponse, QueryInterimsByTypeRequest, QueryInterimsByTypeResponse, QueryInterimsByReferenceRequest, QueryInterimsByReferenceResponse, QueryProjectsByCouncilRequest, QueryProjectsByCouncilResponse, QueryInitiativesByProjectRequest, QueryInitiativesByProjectResponse, QueryInitiativesByAssigneeRequest, QueryInitiativesByAssigneeResponse, QueryInitiativesByCreatorRequest, QueryInitiativesByCreatorResponse, QueryProjectsByCreatorRequest, QueryProjectsByCreatorResponse, QueryAvailableInitiativesRequest, QueryAvailableInitiativesResponse, QueryStakesByStakerRequest, QueryStakesByStakerResponse, QueryStakesByTargetRequest, QueryStakesByTargetResponse, QueryInitiativeConvictionRequest, QueryInitiativeConvictionResponse, QueryChallengesByInitiativeRequest, QueryChallengesByInitiativeResponse, QueryReputationRequest, QueryReputationResponse, QueryPendingStakeRewardsRequest, QueryPendingStakeRewardsResponse, QueryGetMemberStakePoolRequest, QueryGetMemberStakePoolResponse, QueryGetTagStakePoolRequest, QueryGetTagStakePoolResponse, QueryListTagStakePoolsRequest, QueryListTagStakePoolsResponse, QueryGetProjectStakeInfoRequest, QueryGetProjectStakeInfoResponse, QueryContentConvictionRequest, QueryContentConvictionResponse, QueryAuthorBondRequest, QueryAuthorBondResponse, QueryGetContentChallengeRequest, QueryGetContentChallengeResponse, QueryAllContentChallengeRequest, QueryAllContentChallengeResponse, QueryContentChallengesByTargetRequest, QueryContentChallengesByTargetResponse, QueryContentByInitiativeRequest, QueryContentByInitiativeResponse, QueryDreamSupplyStatsRequest, QueryDreamSupplyStatsResponse, QueryMintBurnRatioRequest, QueryMintBurnRatioResponse, QueryEffectiveApyRequest, QueryEffectiveApyResponse, QueryTreasuryStatusRequest, QueryTreasuryStatusResponse, QueryGetTagRequest, QueryGetTagResponse, QueryAllTagRequest, QueryAllTagResponse, QueryGetReservedTagRequest, QueryGetReservedTagResponse, QueryAllReservedTagRequest, QueryAllReservedTagResponse, QueryTagExistsRequest, QueryTagExistsResponse, QueryGetTagReportRequest, QueryGetTagReportResponse, QueryAllTagReportRequest, QueryAllTagReportResponse, QueryTagReportsRequest, QueryTagReportsResponse, QueryGetTagBudgetRequest, QueryGetTagBudgetResponse, QueryAllTagBudgetRequest, QueryAllTagBudgetResponse, QueryGetTagBudgetAwardRequest, QueryGetTagBudgetAwardResponse, QueryAllTagBudgetAwardRequest, QueryAllTagBudgetAwardResponse, QueryTagBudgetByTagRequest, QueryTagBudgetByTagResponse, QueryTagBudgetsRequest, QueryTagBudgetsResponse, QueryTagBudgetAwardsRequest, QueryTagBudgetAwardsResponse, QueryBondedRoleRequest, QueryBondedRoleResponse, QueryBondedRolesByTypeRequest, QueryBondedRolesByTypeResponse, QueryBondedRoleConfigRequest, QueryBondedRoleConfigResponse, QueryGetMemberReportRequest, QueryGetMemberReportResponse, QueryAllMemberReportRequest, QueryAllMemberReportResponse, QueryGetMemberWarningRequest, QueryGetMemberWarningResponse, QueryAllMemberWarningRequest, QueryAllMemberWarningResponse, QueryGetGovActionAppealRequest, QueryGetGovActionAppealResponse, QueryAllGovActionAppealRequest, QueryAllGovActionAppealResponse, QueryGetJuryParticipationRequest, QueryGetJuryParticipationResponse, QueryAllJuryParticipationRequest, QueryAllJuryParticipationResponse, QueryMemberReportsRequest, QueryMemberReportsResponse, QueryMemberWarningsRequest, QueryMemberWarningsResponse, QueryMemberStandingRequest, QueryMemberStandingResponse, QueryRequiredInvitationStakeRequest, QueryRequiredInvitationStakeResponse, QueryAuthorBondsByTypeRequest, QueryAuthorBondsByTypeResponse, QueryInitiativeReviewsRequest, QueryInitiativeReviewsResponse, QueryReviewBountyRequest, QueryReviewBountyResponse, QueryEscalatedReviewsRequest, QueryEscalatedReviewsResponse, QueryRoleRewardPoolsRequest, QueryRoleRewardPoolsResponse, QueryInitiativeBountyRequest, QueryInitiativeBountyResponse, QueryTrustTreeRequest, QueryTrustTreeResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetMemberRequest, QueryGetMemberResponse, QueryAllMemberRequest, QueryAllMemberResponse, QueryGetInvitationRequest, QueryGetInvitationResponse, QueryAllInvitationRequest, QueryAllInvitationResponse, QueryGetProjectRequest, QueryGetProjectResponse, QueryAllProjectRequest, QueryAllProjectResponse, QueryGetInitiativeRequest, QueryGetInitiativeResponse, QueryAllInitiativeRequest, QueryAllInitiativeResponse, QueryGetStakeRequest, QueryGetStakeResponse, QueryAllStakeRequest, QueryAllStakeResponse, QueryGetChallengeRequest, QueryGetChallengeResponse, QueryAllChallengeRequest, QueryAllChallengeResponse, QueryGetJuryReviewRequest, QueryGetJuryReviewResponse, QueryAllJuryReviewRequest, QueryAllJuryReviewResponse, QueryJuryReviewsByJurorRequest, QueryJuryReviewsByJurorResponse, QueryRoleActivityRequest, QueryRoleActivityResponse, QueryGetInterimRequest, QueryGetInterimResponse, QueryAllInterimRequest, QueryAllInterimResponse, QueryMembersByTrustLevelRequest, QueryMembersByTrustLevelResponse, QueryInvitationsByInviterRequest, QueryInvitationsByInviterResponse, QueryInterimsByAssigneeRequest, QueryInterimsByAssigneeResponse, QueryInterimsByTypeRequest, QueryInterimsByTypeResponse, QueryInterimsByReferenceRequest, QueryInterimsByReferenceResponse, QueryProjectsByCouncilRequest, QueryProjectsByCouncilResponse, QueryInitiativesByProjectRequest, QueryInitiativesByProjectResponse, QueryInitiativesByAssigneeRequest, QueryInitiativesByAssigneeResponse, QueryInitiativesByCreatorRequest, QueryInitiativesByCreatorResponse, QueryProjectsByCreatorRequest, QueryProjectsByCreatorResponse, QueryAvailableInitiativesRequest, QueryAvailableInitiativesResponse, QueryStakesByStakerRequest, QueryStakesByStakerResponse, QueryStakesByTargetRequest, QueryStakesByTargetResponse, QueryInitiativeConvictionRequest, QueryInitiativeConvictionResponse, QueryChallengesByInitiativeRequest, QueryChallengesByInitiativeResponse, QueryReputationRequest, QueryReputationResponse, QueryPendingStakeRewardsRequest, QueryPendingStakeRewardsResponse, QueryGetMemberStakePoolRequest, QueryGetMemberStakePoolResponse, QueryGetTagStakePoolRequest, QueryGetTagStakePoolResponse, QueryListTagStakePoolsRequest, QueryListTagStakePoolsResponse, QueryGetProjectStakeInfoRequest, QueryGetProjectStakeInfoResponse, QueryContentConvictionRequest, QueryContentConvictionResponse, QueryAuthorBondRequest, QueryAuthorBondResponse, QueryGetContentChallengeRequest, QueryGetContentChallengeResponse, QueryAllContentChallengeRequest, QueryAllContentChallengeResponse, QueryContentChallengesByTargetRequest, QueryContentChallengesByTargetResponse, QueryContentByInitiativeRequest, QueryContentByInitiativeResponse, QueryDreamSupplyStatsRequest, QueryDreamSupplyStatsResponse, QueryMintBurnRatioRequest, QueryMintBurnRatioResponse, QueryEffectiveApyRequest, QueryEffectiveApyResponse, QueryTreasuryStatusRequest, QueryTreasuryStatusResponse, QueryGetTagRequest, QueryGetTagResponse, QueryAllTagRequest, QueryAllTagResponse, QueryGetReservedTagRequest, QueryGetReservedTagResponse, QueryAllReservedTagRequest, QueryAllReservedTagResponse, QueryTagExistsRequest, QueryTagExistsResponse, QueryGetTagReportRequest, QueryGetTagReportResponse, QueryAllTagReportRequest, QueryAllTagReportResponse, QueryTagReportsRequest, QueryTagReportsResponse, QueryGetTagBudgetRequest, QueryGetTagBudgetResponse, QueryAllTagBudgetRequest, QueryAllTagBudgetResponse, QueryGetTagBudgetAwardRequest, QueryGetTagBudgetAwardResponse, QueryAllTagBudgetAwardRequest, QueryAllTagBudgetAwardResponse, QueryTagBudgetByTagRequest, QueryTagBudgetByTagResponse, QueryTagBudgetsRequest, QueryTagBudgetsResponse, QueryTagBudgetAwardsRequest, QueryTagBudgetAwardsResponse, QueryBondedRoleRequest, QueryBondedRoleResponse, QueryBondedRolesByTypeRequest, QueryBondedRolesByTypeResponse, QueryBondedRoleConfigRequest, QueryBondedRoleConfigResponse, QueryGetMemberReportRequest, QueryGetMemberReportResponse, QueryAllMemberReportRequest, QueryAllMemberReportResponse, QueryGetMemberWarningRequest, QueryGetMemberWarningResponse, QueryAllMemberWarningRequest, QueryAllMemberWarningResponse, QueryGetGovActionAppealRequest, QueryGetGovActionAppealResponse, QueryAllGovActionAppealRequest, QueryAllGovActionAppealResponse, QueryGetJuryParticipationRequest, QueryGetJuryParticipationResponse, QueryAllJuryParticipationRequest, QueryAllJuryParticipationResponse, QueryMemberReportsRequest, QueryMemberReportsResponse, QueryMemberWarningsRequest, QueryMemberWarningsResponse, QueryMemberStandingRequest, QueryMemberStandingResponse, QueryRequiredInvitationStakeRequest, QueryRequiredInvitationStakeResponse, QueryAuthorBondsByTypeRequest, QueryAuthorBondsByTypeResponse, QueryInitiativeReviewsRequest, QueryInitiativeReviewsResponse, QueryReviewBountyRequest, QueryReviewBountyResponse, QueryEscalatedReviewsRequest, QueryEscalatedReviewsResponse, QueryRoleRewardPoolsRequest, QueryRoleRewardPoolsResponse, QueryInitiativeBountyRequest, QueryInitiativeBountyResponse, QueryTrustTreeRequest, QueryTrustTreeResponse, QueryCanonicalRequest, QueryCanonicalResponse, QueryAliasesRequest, QueryAliasesResponse, QueryMemberMigrationRequest, QueryMemberMigrationResponse, QueryMemberMigrationsRequest, QueryMemberMigrationsResponse, QueryPendingMigrationRequest, QueryPendingMigrationResponse, QueryRecoveryCommitmentsRequest, QueryRecoveryCommitmentsResponse, QueryPendingMigrationByTargetRequest, QueryPendingMigrationByTargetResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -213,6 +213,23 @@ export interface Query {
    * 32 zero bytes and are omitted.
    */
   trustTree(request?: QueryTrustTreeRequest): Promise<QueryTrustTreeResponse>;
+  /** Canonical Queries a list of Canonical items. */
+  canonical(request: QueryCanonicalRequest): Promise<QueryCanonicalResponse>;
+  /** Aliases Queries a list of Aliases items. */
+  aliases(request: QueryAliasesRequest): Promise<QueryAliasesResponse>;
+  /** MemberMigration Queries a list of MemberMigration items. */
+  memberMigration(request: QueryMemberMigrationRequest): Promise<QueryMemberMigrationResponse>;
+  /** MemberMigrations Queries a list of MemberMigrations items. */
+  memberMigrations(request: QueryMemberMigrationsRequest): Promise<QueryMemberMigrationsResponse>;
+  /** PendingMigration Queries a list of PendingMigration items. */
+  pendingMigration(request: QueryPendingMigrationRequest): Promise<QueryPendingMigrationResponse>;
+  /** RecoveryCommitments Queries a list of RecoveryCommitments items. */
+  recoveryCommitments(request: QueryRecoveryCommitmentsRequest): Promise<QueryRecoveryCommitmentsResponse>;
+  /**
+   * PendingMigrationByTarget returns the pending migration whose new address
+   * is address, so the new key can find the migration it must accept.
+   */
+  pendingMigrationByTarget(request: QueryPendingMigrationByTargetRequest): Promise<QueryPendingMigrationByTargetResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -801,6 +818,49 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.rep.v1.Query", "TrustTree", data);
     return promise.then(data => QueryTrustTreeResponse.decode(new BinaryReader(data)));
   };
+  /* Canonical Queries a list of Canonical items. */
+  canonical = async (request: QueryCanonicalRequest): Promise<QueryCanonicalResponse> => {
+    const data = QueryCanonicalRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "Canonical", data);
+    return promise.then(data => QueryCanonicalResponse.decode(new BinaryReader(data)));
+  };
+  /* Aliases Queries a list of Aliases items. */
+  aliases = async (request: QueryAliasesRequest): Promise<QueryAliasesResponse> => {
+    const data = QueryAliasesRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "Aliases", data);
+    return promise.then(data => QueryAliasesResponse.decode(new BinaryReader(data)));
+  };
+  /* MemberMigration Queries a list of MemberMigration items. */
+  memberMigration = async (request: QueryMemberMigrationRequest): Promise<QueryMemberMigrationResponse> => {
+    const data = QueryMemberMigrationRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "MemberMigration", data);
+    return promise.then(data => QueryMemberMigrationResponse.decode(new BinaryReader(data)));
+  };
+  /* MemberMigrations Queries a list of MemberMigrations items. */
+  memberMigrations = async (request: QueryMemberMigrationsRequest): Promise<QueryMemberMigrationsResponse> => {
+    const data = QueryMemberMigrationsRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "MemberMigrations", data);
+    return promise.then(data => QueryMemberMigrationsResponse.decode(new BinaryReader(data)));
+  };
+  /* PendingMigration Queries a list of PendingMigration items. */
+  pendingMigration = async (request: QueryPendingMigrationRequest): Promise<QueryPendingMigrationResponse> => {
+    const data = QueryPendingMigrationRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "PendingMigration", data);
+    return promise.then(data => QueryPendingMigrationResponse.decode(new BinaryReader(data)));
+  };
+  /* RecoveryCommitments Queries a list of RecoveryCommitments items. */
+  recoveryCommitments = async (request: QueryRecoveryCommitmentsRequest): Promise<QueryRecoveryCommitmentsResponse> => {
+    const data = QueryRecoveryCommitmentsRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "RecoveryCommitments", data);
+    return promise.then(data => QueryRecoveryCommitmentsResponse.decode(new BinaryReader(data)));
+  };
+  /* PendingMigrationByTarget returns the pending migration whose new address
+   is address, so the new key can find the migration it must accept. */
+  pendingMigrationByTarget = async (request: QueryPendingMigrationByTargetRequest): Promise<QueryPendingMigrationByTargetResponse> => {
+    const data = QueryPendingMigrationByTargetRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Query", "PendingMigrationByTarget", data);
+    return promise.then(data => QueryPendingMigrationByTargetResponse.decode(new BinaryReader(data)));
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);
@@ -1066,6 +1126,27 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     trustTree(request?: QueryTrustTreeRequest): Promise<QueryTrustTreeResponse> {
       return queryService.trustTree(request);
+    },
+    canonical(request: QueryCanonicalRequest): Promise<QueryCanonicalResponse> {
+      return queryService.canonical(request);
+    },
+    aliases(request: QueryAliasesRequest): Promise<QueryAliasesResponse> {
+      return queryService.aliases(request);
+    },
+    memberMigration(request: QueryMemberMigrationRequest): Promise<QueryMemberMigrationResponse> {
+      return queryService.memberMigration(request);
+    },
+    memberMigrations(request: QueryMemberMigrationsRequest): Promise<QueryMemberMigrationsResponse> {
+      return queryService.memberMigrations(request);
+    },
+    pendingMigration(request: QueryPendingMigrationRequest): Promise<QueryPendingMigrationResponse> {
+      return queryService.pendingMigration(request);
+    },
+    recoveryCommitments(request: QueryRecoveryCommitmentsRequest): Promise<QueryRecoveryCommitmentsResponse> {
+      return queryService.recoveryCommitments(request);
+    },
+    pendingMigrationByTarget(request: QueryPendingMigrationByTargetRequest): Promise<QueryPendingMigrationByTargetResponse> {
+      return queryService.pendingMigrationByTarget(request);
     }
   };
 };

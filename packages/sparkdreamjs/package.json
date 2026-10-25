@@ -1,6 +1,6 @@
 {
   "name": "@sparkdreamnft/sparkdreamjs",
-  "version": "0.0.45",
+  "version": "0.0.46",
   "author": "kob <kob@sparkdream.io>",
   "description": "Spark Dream blockchain TypeScript library",
   "main": "index.js",
@@ -20,7 +20,7 @@
     "url": "https://github.com/sparkdreamnft/sparkdreamjs/issues"
   },
   "scripts": {
-    "copy": "copyfiles -f ../../LICENSE README.md package.json dist",
+    "copy": "copyfiles -f ../../LICENSE README.md package.json dist && node scripts/strip-dist-scripts.js",
     "clean": "rimraf dist",
     "prepare": "npm run build",
     "download-protos": "ts-node scripts/download-protos.ts",

@@ -1,8 +1,9 @@
 //@ts-nocheck
 /**
  * Shared registry + helpers for amino-converting messages that embed a
- * `repeated google.protobuf.Any` field (`MsgSubmitProposal`,
- * `MsgSubmitAnonymousProposal`, `MsgExecSession`).
+ * `google.protobuf.Any` field (`MsgSubmitProposal`,
+ * `MsgSubmitAnonymousProposal`, `MsgExecSession`, vault `MsgPropose`,
+ * guardian `MsgExec`).
  *
  * The Telescope-generated `Any.toAmino` just emits `{type, value: Uint8Array}`,
  * which JSON.stringify turns into `{"0":N,"1":N,…}` — numeric keys that aren't
@@ -59,8 +60,9 @@ function requireCfg(): NestedAminoConfig {
     throw new Error(
       "@sparkdreamnft/sparkdreamjs: configureNestedAminoConverter({registry, aminoTypes}) " +
         "must be called before amino-signing a tx with MsgSubmitProposal / " +
-        "MsgSubmitAnonymousProposal / MsgExecSession (their `messages` / `msgs` " +
-        "field needs recursive Any conversion that Telescope can't generate)."
+        "MsgSubmitAnonymousProposal / MsgExecSession / vault MsgPropose / guardian " +
+        "MsgExec (their `messages` / `msgs` / `inner` field needs recursive Any " +
+        "conversion that Telescope can't generate)."
     );
   }
   return cfg;

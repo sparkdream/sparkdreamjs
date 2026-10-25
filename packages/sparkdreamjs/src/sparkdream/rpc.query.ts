@@ -125,6 +125,9 @@ export const createRPCQueryClient = async ({
       },
       split: {
         v1: (await import("./split/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
+      vault: {
+        v1: (await import("./vault/v1/query.rpc.Query")).createRpcQueryExtension(client)
       }
     }
   };

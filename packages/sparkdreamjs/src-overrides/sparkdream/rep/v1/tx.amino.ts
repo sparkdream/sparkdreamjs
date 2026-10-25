@@ -37,6 +37,10 @@ import {
   MsgAcceptJuryDuty, MsgSubmitInitiativeReview, MsgSetVerificationPolicy,
   MsgResolveReviewEscalation, MsgDeclineJuryDuty, MsgFundReviewBounty,
   MsgReclaimReviewBounty, MsgCancelUnbondRole, MsgCloseInitiative,
+  MsgRevokeInvitation, MsgFundInitiativeBounty, MsgReclaimInitiativeBounty,
+  MsgClearZkPublicKey, MsgSetRecoveryCommitment, MsgRemoveRecoveryCommitment,
+  MsgCommitRecovery, MsgRevealRecovery, MsgRequestMigration, MsgAcceptMigration,
+  MsgObjectMigration, MsgCancelMigration, MsgForceMigration, MsgSweepTombstone,
 } from "./tx";
 import { CriteriaVote } from "./jury_review";
 
@@ -434,5 +438,75 @@ export const AminoConverter = {
     aminoType: "sparkdream/x/rep/MsgCloseInitiative",
     toAmino: MsgCloseInitiative.toAmino,
     fromAmino: MsgCloseInitiative.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgRevokeInvitation": {
+    aminoType: "sparkdream/x/rep/MsgRevokeInvitation",
+    toAmino: MsgRevokeInvitation.toAmino,
+    fromAmino: MsgRevokeInvitation.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgFundInitiativeBounty": {
+    aminoType: "sparkdream/x/rep/MsgFundInitiativeBounty",
+    toAmino: MsgFundInitiativeBounty.toAmino,
+    fromAmino: MsgFundInitiativeBounty.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgReclaimInitiativeBounty": {
+    aminoType: "sparkdream/x/rep/MsgReclaimInitiativeBounty",
+    toAmino: MsgReclaimInitiativeBounty.toAmino,
+    fromAmino: MsgReclaimInitiativeBounty.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgClearZkPublicKey": {
+    aminoType: "sparkdream/x/rep/MsgClearZkPublicKey",
+    toAmino: MsgClearZkPublicKey.toAmino,
+    fromAmino: MsgClearZkPublicKey.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgSetRecoveryCommitment": {
+    aminoType: "sparkdream/x/rep/MsgSetRecoveryCommitment",
+    toAmino: MsgSetRecoveryCommitment.toAmino,
+    fromAmino: MsgSetRecoveryCommitment.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgRemoveRecoveryCommitment": {
+    aminoType: "sparkdream/x/rep/MsgRemoveRecoveryCommitment",
+    toAmino: MsgRemoveRecoveryCommitment.toAmino,
+    fromAmino: MsgRemoveRecoveryCommitment.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgCommitRecovery": {
+    aminoType: "sparkdream/x/rep/MsgCommitRecovery",
+    toAmino: MsgCommitRecovery.toAmino,
+    fromAmino: MsgCommitRecovery.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgRevealRecovery": {
+    aminoType: "sparkdream/x/rep/MsgRevealRecovery",
+    toAmino: MsgRevealRecovery.toAmino,
+    fromAmino: MsgRevealRecovery.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgRequestMigration": {
+    aminoType: "sparkdream/x/rep/MsgRequestMigration",
+    toAmino: MsgRequestMigration.toAmino,
+    fromAmino: MsgRequestMigration.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgAcceptMigration": {
+    aminoType: "sparkdream/x/rep/MsgAcceptMigration",
+    toAmino: MsgAcceptMigration.toAmino,
+    fromAmino: MsgAcceptMigration.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgObjectMigration": {
+    aminoType: "sparkdream/x/rep/MsgObjectMigration",
+    toAmino: MsgObjectMigration.toAmino,
+    fromAmino: MsgObjectMigration.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgCancelMigration": {
+    aminoType: "sparkdream/x/rep/MsgCancelMigration",
+    toAmino: MsgCancelMigration.toAmino,
+    fromAmino: MsgCancelMigration.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgForceMigration": {
+    aminoType: "sparkdream/x/rep/MsgForceMigration",
+    toAmino: MsgForceMigration.toAmino,
+    fromAmino: MsgForceMigration.fromAmino,
+  },
+  "/sparkdream.rep.v1.MsgSweepTombstone": {
+    aminoType: "sparkdream/x/rep/MsgSweepTombstone",
+    toAmino: MsgSweepTombstone.toAmino,
+    fromAmino: MsgSweepTombstone.fromAmino,
   },
 };

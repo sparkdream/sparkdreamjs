@@ -16,6 +16,7 @@ import {
   MsgUpdateOperationalParams, MsgUpvoteContent, MsgDownvoteContent,
   MsgFlagContent, MsgHideContent, MsgAppealHide, MsgEndorseCollection,
   MsgSetSeekingEndorsement, MsgPinCollection,
+  MsgUnpinCollection, MsgUnhideContent, MsgMakeCollectionPermanent,
 } from "./tx";
 import { NftReference, LinkReference, OnChainReference, CustomReference, KeyValuePair, AddItemEntry } from "./types";
 import { base64FromBytes } from "../../../helpers";
@@ -248,5 +249,20 @@ export const AminoConverter = {
     aminoType: "sparkdream/x/collect/MsgPinCollection",
     toAmino: MsgPinCollection.toAmino,
     fromAmino: MsgPinCollection.fromAmino,
+  },
+  "/sparkdream.collect.v1.MsgUnpinCollection": {
+    aminoType: "sparkdream/x/collect/MsgUnpinCollection",
+    toAmino: MsgUnpinCollection.toAmino,
+    fromAmino: MsgUnpinCollection.fromAmino,
+  },
+  "/sparkdream.collect.v1.MsgUnhideContent": {
+    aminoType: "sparkdream/x/collect/MsgUnhideContent",
+    toAmino: MsgUnhideContent.toAmino,
+    fromAmino: MsgUnhideContent.fromAmino,
+  },
+  "/sparkdream.collect.v1.MsgMakeCollectionPermanent": {
+    aminoType: "sparkdream/x/collect/MsgMakeCollectionPermanent",
+    toAmino: MsgMakeCollectionPermanent.toAmino,
+    fromAmino: MsgMakeCollectionPermanent.fromAmino,
   },
 };

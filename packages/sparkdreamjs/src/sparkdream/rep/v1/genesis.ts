@@ -23,6 +23,7 @@ import { RoleActivity, RoleActivityAmino } from "./role_activity";
 import { InitiativeReview, InitiativeReviewAmino } from "./initiative_review";
 import { ReviewBounty, ReviewBountyAmino } from "./review_bounty";
 import { InitiativeBounty, InitiativeBountyAmino } from "./initiative_bounty";
+import { Tombstone, TombstoneAmino, MemberMigration, MemberMigrationAmino, RecoveryCommitmentEntry, RecoveryCommitmentEntryAmino, RecoveryCommit, RecoveryCommitAmino } from "./migration";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -140,6 +141,15 @@ export interface GenesisState {
    * import would strand the escrow with nothing able to pay or refund it.
    */
   initiativeBountyList: InitiativeBounty[];
+  /**
+   * Member key migration. The queue, the per-member pending pointer and the
+   * reverse alias index are derived from these lists at InitGenesis.
+   */
+  tombstoneList: Tombstone[];
+  memberMigrationList: MemberMigration[];
+  memberMigrationCount: bigint;
+  recoveryCommitmentList: RecoveryCommitmentEntry[];
+  recoveryCommitList: RecoveryCommit[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.rep.v1.GenesisState";
@@ -260,6 +270,15 @@ export interface GenesisStateAmino {
    * import would strand the escrow with nothing able to pay or refund it.
    */
   initiative_bounty_list?: InitiativeBountyAmino[];
+  /**
+   * Member key migration. The queue, the per-member pending pointer and the
+   * reverse alias index are derived from these lists at InitGenesis.
+   */
+  tombstone_list?: TombstoneAmino[];
+  member_migration_list?: MemberMigrationAmino[];
+  member_migration_count?: string;
+  recovery_commitment_list?: RecoveryCommitmentEntryAmino[];
+  recovery_commit_list?: RecoveryCommitAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.rep.v1.GenesisState";
@@ -485,7 +504,12 @@ function createBaseGenesisState(): GenesisState {
     reviewBountyList: [],
     economicState: undefined,
     giftRecordList: [],
-    initiativeBountyList: []
+    initiativeBountyList: [],
+    tombstoneList: [],
+    memberMigrationList: [],
+    memberMigrationCount: BigInt(0),
+    recoveryCommitmentList: [],
+    recoveryCommitList: []
   };
 }
 /**
@@ -633,6 +657,21 @@ export const GenesisState = {
     }
     for (const v of message.initiativeBountyList) {
       InitiativeBounty.encode(v!, writer.uint32(362).fork()).ldelim();
+    }
+    for (const v of message.tombstoneList) {
+      Tombstone.encode(v!, writer.uint32(370).fork()).ldelim();
+    }
+    for (const v of message.memberMigrationList) {
+      MemberMigration.encode(v!, writer.uint32(378).fork()).ldelim();
+    }
+    if (message.memberMigrationCount !== BigInt(0)) {
+      writer.uint32(384).uint64(message.memberMigrationCount);
+    }
+    for (const v of message.recoveryCommitmentList) {
+      RecoveryCommitmentEntry.encode(v!, writer.uint32(394).fork()).ldelim();
+    }
+    for (const v of message.recoveryCommitList) {
+      RecoveryCommit.encode(v!, writer.uint32(402).fork()).ldelim();
     }
     return writer;
   },
@@ -785,6 +824,21 @@ export const GenesisState = {
         case 45:
           message.initiativeBountyList.push(InitiativeBounty.decode(reader, reader.uint32()));
           break;
+        case 46:
+          message.tombstoneList.push(Tombstone.decode(reader, reader.uint32()));
+          break;
+        case 47:
+          message.memberMigrationList.push(MemberMigration.decode(reader, reader.uint32()));
+          break;
+        case 48:
+          message.memberMigrationCount = reader.uint64();
+          break;
+        case 49:
+          message.recoveryCommitmentList.push(RecoveryCommitmentEntry.decode(reader, reader.uint32()));
+          break;
+        case 50:
+          message.recoveryCommitList.push(RecoveryCommit.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -839,6 +893,11 @@ export const GenesisState = {
     message.economicState = object.economicState !== undefined && object.economicState !== null ? EconomicState.fromPartial(object.economicState) : undefined;
     message.giftRecordList = object.giftRecordList?.map(e => GiftRecordEntry.fromPartial(e)) || [];
     message.initiativeBountyList = object.initiativeBountyList?.map(e => InitiativeBounty.fromPartial(e)) || [];
+    message.tombstoneList = object.tombstoneList?.map(e => Tombstone.fromPartial(e)) || [];
+    message.memberMigrationList = object.memberMigrationList?.map(e => MemberMigration.fromPartial(e)) || [];
+    message.memberMigrationCount = object.memberMigrationCount !== undefined && object.memberMigrationCount !== null ? BigInt(object.memberMigrationCount.toString()) : BigInt(0);
+    message.recoveryCommitmentList = object.recoveryCommitmentList?.map(e => RecoveryCommitmentEntry.fromPartial(e)) || [];
+    message.recoveryCommitList = object.recoveryCommitList?.map(e => RecoveryCommit.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -916,6 +975,13 @@ export const GenesisState = {
     }
     message.giftRecordList = object.gift_record_list?.map(e => GiftRecordEntry.fromAmino(e)) || [];
     message.initiativeBountyList = object.initiative_bounty_list?.map(e => InitiativeBounty.fromAmino(e)) || [];
+    message.tombstoneList = object.tombstone_list?.map(e => Tombstone.fromAmino(e)) || [];
+    message.memberMigrationList = object.member_migration_list?.map(e => MemberMigration.fromAmino(e)) || [];
+    if (object.member_migration_count !== undefined && object.member_migration_count !== null) {
+      message.memberMigrationCount = BigInt(object.member_migration_count);
+    }
+    message.recoveryCommitmentList = object.recovery_commitment_list?.map(e => RecoveryCommitmentEntry.fromAmino(e)) || [];
+    message.recoveryCommitList = object.recovery_commit_list?.map(e => RecoveryCommit.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -1088,6 +1154,27 @@ export const GenesisState = {
       obj.initiative_bounty_list = message.initiativeBountyList.map(e => e ? InitiativeBounty.toAmino(e) : undefined);
     } else {
       obj.initiative_bounty_list = message.initiativeBountyList;
+    }
+    if (message.tombstoneList) {
+      obj.tombstone_list = message.tombstoneList.map(e => e ? Tombstone.toAmino(e) : undefined);
+    } else {
+      obj.tombstone_list = message.tombstoneList;
+    }
+    if (message.memberMigrationList) {
+      obj.member_migration_list = message.memberMigrationList.map(e => e ? MemberMigration.toAmino(e) : undefined);
+    } else {
+      obj.member_migration_list = message.memberMigrationList;
+    }
+    obj.member_migration_count = message.memberMigrationCount !== BigInt(0) ? message.memberMigrationCount?.toString() : undefined;
+    if (message.recoveryCommitmentList) {
+      obj.recovery_commitment_list = message.recoveryCommitmentList.map(e => e ? RecoveryCommitmentEntry.toAmino(e) : undefined);
+    } else {
+      obj.recovery_commitment_list = message.recoveryCommitmentList;
+    }
+    if (message.recoveryCommitList) {
+      obj.recovery_commit_list = message.recoveryCommitList.map(e => e ? RecoveryCommit.toAmino(e) : undefined);
+    } else {
+      obj.recovery_commit_list = message.recoveryCommitList;
     }
     return obj;
   },

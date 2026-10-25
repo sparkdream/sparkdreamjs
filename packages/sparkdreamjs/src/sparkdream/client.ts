@@ -20,6 +20,7 @@ import * as sparkdreamSessionV1TxRegistry from "./session/v1/tx.registry";
 import * as sparkdreamShieldV1TxRegistry from "./shield/v1/tx.registry";
 import * as sparkdreamSparkdreamV1TxRegistry from "./sparkdream/v1/tx.registry";
 import * as sparkdreamSplitV1TxRegistry from "./split/v1/tx.registry";
+import * as sparkdreamVaultV1TxRegistry from "./vault/v1/tx.registry";
 import * as sparkdreamArtifactV1TxAmino from "./artifact/v1/tx.amino";
 import * as sparkdreamBlogV1TxAmino from "./blog/v1/tx.amino";
 import * as sparkdreamCollectV1TxAmino from "./collect/v1/tx.amino";
@@ -38,6 +39,7 @@ import * as sparkdreamSessionV1TxAmino from "./session/v1/tx.amino";
 import * as sparkdreamShieldV1TxAmino from "./shield/v1/tx.amino";
 import * as sparkdreamSparkdreamV1TxAmino from "./sparkdream/v1/tx.amino";
 import * as sparkdreamSplitV1TxAmino from "./split/v1/tx.amino";
+import * as sparkdreamVaultV1TxAmino from "./vault/v1/tx.amino";
 export const sparkdreamAminoConverters = {
   ...sparkdreamArtifactV1TxAmino.AminoConverter,
   ...sparkdreamBlogV1TxAmino.AminoConverter,
@@ -56,9 +58,10 @@ export const sparkdreamAminoConverters = {
   ...sparkdreamSessionV1TxAmino.AminoConverter,
   ...sparkdreamShieldV1TxAmino.AminoConverter,
   ...sparkdreamSparkdreamV1TxAmino.AminoConverter,
-  ...sparkdreamSplitV1TxAmino.AminoConverter
+  ...sparkdreamSplitV1TxAmino.AminoConverter,
+  ...sparkdreamVaultV1TxAmino.AminoConverter
 };
-export const sparkdreamProtoRegistry: ReadonlyArray<[string, GeneratedType]> = [...sparkdreamArtifactV1TxRegistry.registry, ...sparkdreamBlogV1TxRegistry.registry, ...sparkdreamCollectV1TxRegistry.registry, ...sparkdreamCommonsV1TxRegistry.registry, ...sparkdreamEcosystemV1TxRegistry.registry, ...sparkdreamFederationV1TxRegistry.registry, ...sparkdreamForumV1TxRegistry.registry, ...sparkdreamFutarchyV1TxRegistry.registry, ...sparkdreamGuardianV1TxRegistry.registry, ...sparkdreamNameV1TxRegistry.registry, ...sparkdreamRepV1TxRegistry.registry, ...sparkdreamRevealV1TxRegistry.registry, ...sparkdreamSeasonV1TxRegistry.registry, ...sparkdreamServiceV1TxRegistry.registry, ...sparkdreamSessionV1TxRegistry.registry, ...sparkdreamShieldV1TxRegistry.registry, ...sparkdreamSparkdreamV1TxRegistry.registry, ...sparkdreamSplitV1TxRegistry.registry];
+export const sparkdreamProtoRegistry: ReadonlyArray<[string, GeneratedType]> = [...sparkdreamArtifactV1TxRegistry.registry, ...sparkdreamBlogV1TxRegistry.registry, ...sparkdreamCollectV1TxRegistry.registry, ...sparkdreamCommonsV1TxRegistry.registry, ...sparkdreamEcosystemV1TxRegistry.registry, ...sparkdreamFederationV1TxRegistry.registry, ...sparkdreamForumV1TxRegistry.registry, ...sparkdreamFutarchyV1TxRegistry.registry, ...sparkdreamGuardianV1TxRegistry.registry, ...sparkdreamNameV1TxRegistry.registry, ...sparkdreamRepV1TxRegistry.registry, ...sparkdreamRevealV1TxRegistry.registry, ...sparkdreamSeasonV1TxRegistry.registry, ...sparkdreamServiceV1TxRegistry.registry, ...sparkdreamSessionV1TxRegistry.registry, ...sparkdreamShieldV1TxRegistry.registry, ...sparkdreamSparkdreamV1TxRegistry.registry, ...sparkdreamSplitV1TxRegistry.registry, ...sparkdreamVaultV1TxRegistry.registry];
 export const getSigningSparkdreamClientOptions = ({
   defaultTypes = defaultRegistryTypes
 }: {

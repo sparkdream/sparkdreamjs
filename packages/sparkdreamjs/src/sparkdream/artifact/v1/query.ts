@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "../../../cosmos/base/query/v1beta1/pagination";
 import { Params, ParamsAmino } from "./params";
-import { Class, ClassAmino, Token, TokenAmino, ContentStatus, InboxKind, TokenMetadata, TokenMetadataAmino, Listing, ListingAmino, ReceivePolicy, PendingClassOwner, PendingClassOwnerAmino, HideRecord, HideRecordAmino } from "./types";
+import { Class, ClassAmino, Token, TokenAmino, ContentStatus, TokenMetadata, TokenMetadataAmino, InboxKind, Listing, ListingAmino, Auction, AuctionAmino, ReceivePolicy, PendingClassOwner, PendingClassOwnerAmino, HideRecord, HideRecordAmino, MediaProposal, MediaProposalAmino, Edition, EditionAmino, Balance, BalanceAmino, UnitListing, UnitListingAmino, CraftRecipe, CraftRecipeAmino, Rental, RentalAmino, RentalOffer, RentalOfferAmino, TokenRef, TokenRefAmino, HarbergerState, HarbergerStateAmino, Offer, OfferAmino } from "./types";
 import { Coin, CoinAmino } from "../../../cosmos/base/v1beta1/coin";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
@@ -101,6 +101,42 @@ export interface TokenView {
   withheld: boolean;
   metadataHash: string;
   classStatus: ContentStatus;
+  /**
+   * What clients should show: the holder's displayed media version, the
+   * renderer output, the schedule stage in effect, or the stored metadata.
+   * Blank when withheld.
+   */
+  displayedMetadata: TokenMetadata;
+  /**
+   * "stored" | "schedule" | "media_version" | "renderer" | "unrevealed".
+   */
+  displaySource: string;
+  /**
+   * Why a renderer fell back to stored metadata, when it did.
+   */
+  renderError: string;
+  /**
+   * true when expires_at has passed.
+   */
+  expired: boolean;
+  /**
+   * GENERATIVE_SEED classes: the token seed (lowercase hex) once the class
+   * seed is revealed.
+   */
+  seed: string;
+  /**
+   * Single-token query, for a token holding nested tokens: the hash
+   * MsgBuy, MsgAcceptRental, offers and bids pin.
+   */
+  contentsHash: string;
+  /**
+   * Single-token query, while rented: the renter.
+   */
+  user: string;
+  /**
+   * Single-token query, Harberger tokens: what MsgForceBuy pays now.
+   */
+  harbergerPrice: string;
 }
 export interface TokenViewProtoMsg {
   typeUrl: "/sparkdream.artifact.v1.TokenView";
@@ -118,6 +154,42 @@ export interface TokenViewAmino {
   withheld?: boolean;
   metadata_hash?: string;
   class_status?: ContentStatus;
+  /**
+   * What clients should show: the holder's displayed media version, the
+   * renderer output, the schedule stage in effect, or the stored metadata.
+   * Blank when withheld.
+   */
+  displayed_metadata?: TokenMetadataAmino;
+  /**
+   * "stored" | "schedule" | "media_version" | "renderer" | "unrevealed".
+   */
+  display_source?: string;
+  /**
+   * Why a renderer fell back to stored metadata, when it did.
+   */
+  render_error?: string;
+  /**
+   * true when expires_at has passed.
+   */
+  expired?: boolean;
+  /**
+   * GENERATIVE_SEED classes: the token seed (lowercase hex) once the class
+   * seed is revealed.
+   */
+  seed?: string;
+  /**
+   * Single-token query, for a token holding nested tokens: the hash
+   * MsgBuy, MsgAcceptRental, offers and bids pin.
+   */
+  contents_hash?: string;
+  /**
+   * Single-token query, while rented: the renter.
+   */
+  user?: string;
+  /**
+   * Single-token query, Harberger tokens: what MsgForceBuy pays now.
+   */
+  harberger_price?: string;
 }
 export interface TokenViewAminoMsg {
   type: "/sparkdream.artifact.v1.TokenView";
@@ -146,6 +218,13 @@ export interface InboxItem {
   metadata: TokenMetadata;
   metadataHash: string;
   withheld: boolean;
+  /**
+   * Unit items (kind UNIT_*): class_id is 0 and token_id the pending id,
+   * which is the ref to accept, reject or cancel; these name the edition.
+   */
+  unitClassId: bigint;
+  editionId: bigint;
+  amount: bigint;
 }
 export interface InboxItemProtoMsg {
   typeUrl: "/sparkdream.artifact.v1.InboxItem";
@@ -174,6 +253,13 @@ export interface InboxItemAmino {
   metadata?: TokenMetadataAmino;
   metadata_hash?: string;
   withheld?: boolean;
+  /**
+   * Unit items (kind UNIT_*): class_id is 0 and token_id the pending id,
+   * which is the ref to accept, reject or cancel; these name the edition.
+   */
+  unit_class_id?: string;
+  edition_id?: string;
+  amount?: string;
 }
 export interface InboxItemAminoMsg {
   type: "/sparkdream.artifact.v1.InboxItem";
@@ -381,6 +467,10 @@ export interface QueryTokenResponse {
    * Set when the token is listed.
    */
   listing?: Listing;
+  /**
+   * Set while the token is up for auction.
+   */
+  auction?: Auction;
 }
 export interface QueryTokenResponseProtoMsg {
   typeUrl: "/sparkdream.artifact.v1.QueryTokenResponse";
@@ -398,6 +488,10 @@ export interface QueryTokenResponseAmino {
    * Set when the token is listed.
    */
   listing?: ListingAmino;
+  /**
+   * Set while the token is up for auction.
+   */
+  auction?: AuctionAmino;
 }
 export interface QueryTokenResponseAminoMsg {
   type: "/sparkdream.artifact.v1.QueryTokenResponse";
@@ -1202,6 +1296,14 @@ export interface QueryPublicMintQuoteResponse {
    * Why not, when available is false.
    */
   reason: string;
+  /**
+   * Price of the first token in this quote under the class price curve.
+   */
+  unitPrice: Coin;
+  /**
+   * Price of the most expensive token in this quote (what max_price must cover).
+   */
+  maxUnitPrice: Coin;
 }
 export interface QueryPublicMintQuoteResponseProtoMsg {
   typeUrl: "/sparkdream.artifact.v1.QueryPublicMintQuoteResponse";
@@ -1238,10 +1340,1318 @@ export interface QueryPublicMintQuoteResponseAmino {
    * Why not, when available is false.
    */
   reason?: string;
+  /**
+   * Price of the first token in this quote under the class price curve.
+   */
+  unit_price?: CoinAmino;
+  /**
+   * Price of the most expensive token in this quote (what max_price must cover).
+   */
+  max_unit_price?: CoinAmino;
 }
 export interface QueryPublicMintQuoteResponseAminoMsg {
   type: "/sparkdream.artifact.v1.QueryPublicMintQuoteResponse";
   value: QueryPublicMintQuoteResponseAmino;
+}
+/**
+ * QueryMediaProposalsRequest defines the QueryMediaProposalsRequest message.
+ * @name QueryMediaProposalsRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryMediaProposalsRequest
+ */
+export interface QueryMediaProposalsRequest {
+  classId: bigint;
+  tokenId: bigint;
+}
+export interface QueryMediaProposalsRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryMediaProposalsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryMediaProposalsRequest defines the QueryMediaProposalsRequest message.
+ * @name QueryMediaProposalsRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryMediaProposalsRequest
+ */
+export interface QueryMediaProposalsRequestAmino {
+  class_id?: string;
+  token_id?: string;
+}
+export interface QueryMediaProposalsRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryMediaProposalsRequest";
+  value: QueryMediaProposalsRequestAmino;
+}
+/**
+ * QueryMediaProposalsResponse defines the QueryMediaProposalsResponse message.
+ * @name QueryMediaProposalsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryMediaProposalsResponse
+ */
+export interface QueryMediaProposalsResponse {
+  proposals: MediaProposal[];
+}
+export interface QueryMediaProposalsResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryMediaProposalsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryMediaProposalsResponse defines the QueryMediaProposalsResponse message.
+ * @name QueryMediaProposalsResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryMediaProposalsResponse
+ */
+export interface QueryMediaProposalsResponseAmino {
+  proposals?: MediaProposalAmino[];
+}
+export interface QueryMediaProposalsResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryMediaProposalsResponse";
+  value: QueryMediaProposalsResponseAmino;
+}
+/**
+ * EditionView is an edition as served to clients. When withheld is true the
+ * metadata and claim scope are blanked because the edition or its class is
+ * hidden.
+ * @name EditionView
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.EditionView
+ */
+export interface EditionView {
+  edition: Edition;
+  withheld: boolean;
+  metadataHash: string;
+  classStatus: ContentStatus;
+}
+export interface EditionViewProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.EditionView";
+  value: Uint8Array;
+}
+/**
+ * EditionView is an edition as served to clients. When withheld is true the
+ * metadata and claim scope are blanked because the edition or its class is
+ * hidden.
+ * @name EditionViewAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.EditionView
+ */
+export interface EditionViewAmino {
+  edition?: EditionAmino;
+  withheld?: boolean;
+  metadata_hash?: string;
+  class_status?: ContentStatus;
+}
+export interface EditionViewAminoMsg {
+  type: "/sparkdream.artifact.v1.EditionView";
+  value: EditionViewAmino;
+}
+/**
+ * BalanceView is a balance with what its holder could claim now.
+ * @name BalanceView
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.BalanceView
+ */
+export interface BalanceView {
+  balance: Balance;
+  /**
+   * unclaimed plus rewards accrued since the last settlement.
+   */
+  claimable: string;
+}
+export interface BalanceViewProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.BalanceView";
+  value: Uint8Array;
+}
+/**
+ * BalanceView is a balance with what its holder could claim now.
+ * @name BalanceViewAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.BalanceView
+ */
+export interface BalanceViewAmino {
+  balance?: BalanceAmino;
+  /**
+   * unclaimed plus rewards accrued since the last settlement.
+   */
+  claimable?: string;
+}
+export interface BalanceViewAminoMsg {
+  type: "/sparkdream.artifact.v1.BalanceView";
+  value: BalanceViewAmino;
+}
+/**
+ * QueryEditionRequest defines the QueryEditionRequest message.
+ * @name QueryEditionRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryEditionRequest
+ */
+export interface QueryEditionRequest {
+  classId: bigint;
+  editionId: bigint;
+}
+export interface QueryEditionRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryEditionRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryEditionRequest defines the QueryEditionRequest message.
+ * @name QueryEditionRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryEditionRequest
+ */
+export interface QueryEditionRequestAmino {
+  class_id?: string;
+  edition_id?: string;
+}
+export interface QueryEditionRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryEditionRequest";
+  value: QueryEditionRequestAmino;
+}
+/**
+ * QueryEditionResponse defines the QueryEditionResponse message.
+ * @name QueryEditionResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryEditionResponse
+ */
+export interface QueryEditionResponse {
+  edition: EditionView;
+}
+export interface QueryEditionResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryEditionResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryEditionResponse defines the QueryEditionResponse message.
+ * @name QueryEditionResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryEditionResponse
+ */
+export interface QueryEditionResponseAmino {
+  edition?: EditionViewAmino;
+}
+export interface QueryEditionResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryEditionResponse";
+  value: QueryEditionResponseAmino;
+}
+/**
+ * QueryEditionsRequest defines the QueryEditionsRequest message.
+ * @name QueryEditionsRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryEditionsRequest
+ */
+export interface QueryEditionsRequest {
+  classId: bigint;
+  pagination?: PageRequest;
+}
+export interface QueryEditionsRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryEditionsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryEditionsRequest defines the QueryEditionsRequest message.
+ * @name QueryEditionsRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryEditionsRequest
+ */
+export interface QueryEditionsRequestAmino {
+  class_id?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryEditionsRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryEditionsRequest";
+  value: QueryEditionsRequestAmino;
+}
+/**
+ * QueryEditionsResponse defines the QueryEditionsResponse message.
+ * @name QueryEditionsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryEditionsResponse
+ */
+export interface QueryEditionsResponse {
+  editions: EditionView[];
+  pagination?: PageResponse;
+}
+export interface QueryEditionsResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryEditionsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryEditionsResponse defines the QueryEditionsResponse message.
+ * @name QueryEditionsResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryEditionsResponse
+ */
+export interface QueryEditionsResponseAmino {
+  editions?: EditionViewAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryEditionsResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryEditionsResponse";
+  value: QueryEditionsResponseAmino;
+}
+/**
+ * QueryBalanceRequest defines the QueryBalanceRequest message.
+ * @name QueryBalanceRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryBalanceRequest
+ */
+export interface QueryBalanceRequest {
+  classId: bigint;
+  editionId: bigint;
+  owner: string;
+}
+export interface QueryBalanceRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryBalanceRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryBalanceRequest defines the QueryBalanceRequest message.
+ * @name QueryBalanceRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryBalanceRequest
+ */
+export interface QueryBalanceRequestAmino {
+  class_id?: string;
+  edition_id?: string;
+  owner?: string;
+}
+export interface QueryBalanceRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryBalanceRequest";
+  value: QueryBalanceRequestAmino;
+}
+/**
+ * QueryBalanceResponse defines the QueryBalanceResponse message.
+ * @name QueryBalanceResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryBalanceResponse
+ */
+export interface QueryBalanceResponse {
+  balance: BalanceView;
+}
+export interface QueryBalanceResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryBalanceResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryBalanceResponse defines the QueryBalanceResponse message.
+ * @name QueryBalanceResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryBalanceResponse
+ */
+export interface QueryBalanceResponseAmino {
+  balance?: BalanceViewAmino;
+}
+export interface QueryBalanceResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryBalanceResponse";
+  value: QueryBalanceResponseAmino;
+}
+/**
+ * QueryBalancesByOwnerRequest defines the QueryBalancesByOwnerRequest message.
+ * @name QueryBalancesByOwnerRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryBalancesByOwnerRequest
+ */
+export interface QueryBalancesByOwnerRequest {
+  owner: string;
+  pagination?: PageRequest;
+}
+export interface QueryBalancesByOwnerRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryBalancesByOwnerRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryBalancesByOwnerRequest defines the QueryBalancesByOwnerRequest message.
+ * @name QueryBalancesByOwnerRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryBalancesByOwnerRequest
+ */
+export interface QueryBalancesByOwnerRequestAmino {
+  owner?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryBalancesByOwnerRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryBalancesByOwnerRequest";
+  value: QueryBalancesByOwnerRequestAmino;
+}
+/**
+ * QueryBalancesByOwnerResponse defines the QueryBalancesByOwnerResponse message.
+ * @name QueryBalancesByOwnerResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryBalancesByOwnerResponse
+ */
+export interface QueryBalancesByOwnerResponse {
+  balances: BalanceView[];
+  pagination?: PageResponse;
+}
+export interface QueryBalancesByOwnerResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryBalancesByOwnerResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryBalancesByOwnerResponse defines the QueryBalancesByOwnerResponse message.
+ * @name QueryBalancesByOwnerResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryBalancesByOwnerResponse
+ */
+export interface QueryBalancesByOwnerResponseAmino {
+  balances?: BalanceViewAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryBalancesByOwnerResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryBalancesByOwnerResponse";
+  value: QueryBalancesByOwnerResponseAmino;
+}
+/**
+ * QueryEditionHoldersRequest defines the QueryEditionHoldersRequest message.
+ * @name QueryEditionHoldersRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryEditionHoldersRequest
+ */
+export interface QueryEditionHoldersRequest {
+  classId: bigint;
+  editionId: bigint;
+  pagination?: PageRequest;
+}
+export interface QueryEditionHoldersRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryEditionHoldersRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryEditionHoldersRequest defines the QueryEditionHoldersRequest message.
+ * @name QueryEditionHoldersRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryEditionHoldersRequest
+ */
+export interface QueryEditionHoldersRequestAmino {
+  class_id?: string;
+  edition_id?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryEditionHoldersRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryEditionHoldersRequest";
+  value: QueryEditionHoldersRequestAmino;
+}
+/**
+ * QueryEditionHoldersResponse defines the QueryEditionHoldersResponse message.
+ * @name QueryEditionHoldersResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryEditionHoldersResponse
+ */
+export interface QueryEditionHoldersResponse {
+  balances: BalanceView[];
+  pagination?: PageResponse;
+}
+export interface QueryEditionHoldersResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryEditionHoldersResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryEditionHoldersResponse defines the QueryEditionHoldersResponse message.
+ * @name QueryEditionHoldersResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryEditionHoldersResponse
+ */
+export interface QueryEditionHoldersResponseAmino {
+  balances?: BalanceViewAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryEditionHoldersResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryEditionHoldersResponse";
+  value: QueryEditionHoldersResponseAmino;
+}
+/**
+ * QueryUnitListingRequest defines the QueryUnitListingRequest message.
+ * @name QueryUnitListingRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryUnitListingRequest
+ */
+export interface QueryUnitListingRequest {
+  listingId: bigint;
+}
+export interface QueryUnitListingRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryUnitListingRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryUnitListingRequest defines the QueryUnitListingRequest message.
+ * @name QueryUnitListingRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryUnitListingRequest
+ */
+export interface QueryUnitListingRequestAmino {
+  listing_id?: string;
+}
+export interface QueryUnitListingRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryUnitListingRequest";
+  value: QueryUnitListingRequestAmino;
+}
+/**
+ * QueryUnitListingResponse defines the QueryUnitListingResponse message.
+ * @name QueryUnitListingResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryUnitListingResponse
+ */
+export interface QueryUnitListingResponse {
+  listing: UnitListing;
+}
+export interface QueryUnitListingResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryUnitListingResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryUnitListingResponse defines the QueryUnitListingResponse message.
+ * @name QueryUnitListingResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryUnitListingResponse
+ */
+export interface QueryUnitListingResponseAmino {
+  listing?: UnitListingAmino;
+}
+export interface QueryUnitListingResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryUnitListingResponse";
+  value: QueryUnitListingResponseAmino;
+}
+/**
+ * QueryUnitListingsRequest defines the QueryUnitListingsRequest message.
+ * @name QueryUnitListingsRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryUnitListingsRequest
+ */
+export interface QueryUnitListingsRequest {
+  classId: bigint;
+  editionId: bigint;
+  pagination?: PageRequest;
+}
+export interface QueryUnitListingsRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryUnitListingsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryUnitListingsRequest defines the QueryUnitListingsRequest message.
+ * @name QueryUnitListingsRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryUnitListingsRequest
+ */
+export interface QueryUnitListingsRequestAmino {
+  class_id?: string;
+  edition_id?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryUnitListingsRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryUnitListingsRequest";
+  value: QueryUnitListingsRequestAmino;
+}
+/**
+ * QueryUnitListingsResponse defines the QueryUnitListingsResponse message.
+ * @name QueryUnitListingsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryUnitListingsResponse
+ */
+export interface QueryUnitListingsResponse {
+  listings: UnitListing[];
+  pagination?: PageResponse;
+}
+export interface QueryUnitListingsResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryUnitListingsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryUnitListingsResponse defines the QueryUnitListingsResponse message.
+ * @name QueryUnitListingsResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryUnitListingsResponse
+ */
+export interface QueryUnitListingsResponseAmino {
+  listings?: UnitListingAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryUnitListingsResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryUnitListingsResponse";
+  value: QueryUnitListingsResponseAmino;
+}
+/**
+ * QueryCraftRecipesRequest defines the QueryCraftRecipesRequest message.
+ * @name QueryCraftRecipesRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryCraftRecipesRequest
+ */
+export interface QueryCraftRecipesRequest {
+  classId: bigint;
+}
+export interface QueryCraftRecipesRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryCraftRecipesRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryCraftRecipesRequest defines the QueryCraftRecipesRequest message.
+ * @name QueryCraftRecipesRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryCraftRecipesRequest
+ */
+export interface QueryCraftRecipesRequestAmino {
+  class_id?: string;
+}
+export interface QueryCraftRecipesRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryCraftRecipesRequest";
+  value: QueryCraftRecipesRequestAmino;
+}
+/**
+ * QueryCraftRecipesResponse defines the QueryCraftRecipesResponse message.
+ * @name QueryCraftRecipesResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryCraftRecipesResponse
+ */
+export interface QueryCraftRecipesResponse {
+  recipes: CraftRecipe[];
+  /**
+   * true once the class has been crafted into: recipes can then only be
+   * removed.
+   */
+  locked: boolean;
+}
+export interface QueryCraftRecipesResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryCraftRecipesResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryCraftRecipesResponse defines the QueryCraftRecipesResponse message.
+ * @name QueryCraftRecipesResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryCraftRecipesResponse
+ */
+export interface QueryCraftRecipesResponseAmino {
+  recipes?: CraftRecipeAmino[];
+  /**
+   * true once the class has been crafted into: recipes can then only be
+   * removed.
+   */
+  locked?: boolean;
+}
+export interface QueryCraftRecipesResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryCraftRecipesResponse";
+  value: QueryCraftRecipesResponseAmino;
+}
+/**
+ * QueryRentalRequest defines the QueryRentalRequest message.
+ * @name QueryRentalRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalRequest
+ */
+export interface QueryRentalRequest {
+  classId: bigint;
+  tokenId: bigint;
+}
+export interface QueryRentalRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryRentalRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryRentalRequest defines the QueryRentalRequest message.
+ * @name QueryRentalRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalRequest
+ */
+export interface QueryRentalRequestAmino {
+  class_id?: string;
+  token_id?: string;
+}
+export interface QueryRentalRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryRentalRequest";
+  value: QueryRentalRequestAmino;
+}
+/**
+ * QueryRentalResponse defines the QueryRentalResponse message.
+ * @name QueryRentalResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalResponse
+ */
+export interface QueryRentalResponse {
+  rental: Rental;
+}
+export interface QueryRentalResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryRentalResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryRentalResponse defines the QueryRentalResponse message.
+ * @name QueryRentalResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalResponse
+ */
+export interface QueryRentalResponseAmino {
+  rental?: RentalAmino;
+}
+export interface QueryRentalResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryRentalResponse";
+  value: QueryRentalResponseAmino;
+}
+/**
+ * QueryRentalOfferRequest defines the QueryRentalOfferRequest message.
+ * @name QueryRentalOfferRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalOfferRequest
+ */
+export interface QueryRentalOfferRequest {
+  classId: bigint;
+  tokenId: bigint;
+}
+export interface QueryRentalOfferRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryRentalOfferRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryRentalOfferRequest defines the QueryRentalOfferRequest message.
+ * @name QueryRentalOfferRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalOfferRequest
+ */
+export interface QueryRentalOfferRequestAmino {
+  class_id?: string;
+  token_id?: string;
+}
+export interface QueryRentalOfferRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryRentalOfferRequest";
+  value: QueryRentalOfferRequestAmino;
+}
+/**
+ * QueryRentalOfferResponse defines the QueryRentalOfferResponse message.
+ * @name QueryRentalOfferResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalOfferResponse
+ */
+export interface QueryRentalOfferResponse {
+  offer: RentalOffer;
+}
+export interface QueryRentalOfferResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryRentalOfferResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryRentalOfferResponse defines the QueryRentalOfferResponse message.
+ * @name QueryRentalOfferResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalOfferResponse
+ */
+export interface QueryRentalOfferResponseAmino {
+  offer?: RentalOfferAmino;
+}
+export interface QueryRentalOfferResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryRentalOfferResponse";
+  value: QueryRentalOfferResponseAmino;
+}
+/**
+ * QueryRentalsByUserRequest defines the QueryRentalsByUserRequest message.
+ * @name QueryRentalsByUserRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalsByUserRequest
+ */
+export interface QueryRentalsByUserRequest {
+  user: string;
+  pagination?: PageRequest;
+}
+export interface QueryRentalsByUserRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryRentalsByUserRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryRentalsByUserRequest defines the QueryRentalsByUserRequest message.
+ * @name QueryRentalsByUserRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalsByUserRequest
+ */
+export interface QueryRentalsByUserRequestAmino {
+  user?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryRentalsByUserRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryRentalsByUserRequest";
+  value: QueryRentalsByUserRequestAmino;
+}
+/**
+ * QueryRentalsByUserResponse defines the QueryRentalsByUserResponse message.
+ * @name QueryRentalsByUserResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalsByUserResponse
+ */
+export interface QueryRentalsByUserResponse {
+  rentals: Rental[];
+  pagination?: PageResponse;
+}
+export interface QueryRentalsByUserResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryRentalsByUserResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryRentalsByUserResponse defines the QueryRentalsByUserResponse message.
+ * @name QueryRentalsByUserResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalsByUserResponse
+ */
+export interface QueryRentalsByUserResponseAmino {
+  rentals?: RentalAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryRentalsByUserResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryRentalsByUserResponse";
+  value: QueryRentalsByUserResponseAmino;
+}
+/**
+ * QueryChildrenRequest defines the QueryChildrenRequest message.
+ * @name QueryChildrenRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryChildrenRequest
+ */
+export interface QueryChildrenRequest {
+  classId: bigint;
+  tokenId: bigint;
+}
+export interface QueryChildrenRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryChildrenRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryChildrenRequest defines the QueryChildrenRequest message.
+ * @name QueryChildrenRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryChildrenRequest
+ */
+export interface QueryChildrenRequestAmino {
+  class_id?: string;
+  token_id?: string;
+}
+export interface QueryChildrenRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryChildrenRequest";
+  value: QueryChildrenRequestAmino;
+}
+/**
+ * QueryChildrenResponse defines the QueryChildrenResponse message.
+ * @name QueryChildrenResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryChildrenResponse
+ */
+export interface QueryChildrenResponse {
+  /**
+   * Direct children, in key order.
+   */
+  children: TokenRef[];
+  /**
+   * Hash over the whole tree under the token ("" when it holds nothing).
+   */
+  contentsHash: string;
+  /**
+   * Tokens nested under it at any depth.
+   */
+  descendants: number;
+}
+export interface QueryChildrenResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryChildrenResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryChildrenResponse defines the QueryChildrenResponse message.
+ * @name QueryChildrenResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryChildrenResponse
+ */
+export interface QueryChildrenResponseAmino {
+  /**
+   * Direct children, in key order.
+   */
+  children?: TokenRefAmino[];
+  /**
+   * Hash over the whole tree under the token ("" when it holds nothing).
+   */
+  contents_hash?: string;
+  /**
+   * Tokens nested under it at any depth.
+   */
+  descendants?: number;
+}
+export interface QueryChildrenResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryChildrenResponse";
+  value: QueryChildrenResponseAmino;
+}
+/**
+ * QueryHarbergerQuoteRequest defines the QueryHarbergerQuoteRequest message.
+ * @name QueryHarbergerQuoteRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryHarbergerQuoteRequest
+ */
+export interface QueryHarbergerQuoteRequest {
+  classId: bigint;
+  tokenId: bigint;
+}
+export interface QueryHarbergerQuoteRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryHarbergerQuoteRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryHarbergerQuoteRequest defines the QueryHarbergerQuoteRequest message.
+ * @name QueryHarbergerQuoteRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryHarbergerQuoteRequest
+ */
+export interface QueryHarbergerQuoteRequestAmino {
+  class_id?: string;
+  token_id?: string;
+}
+export interface QueryHarbergerQuoteRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryHarbergerQuoteRequest";
+  value: QueryHarbergerQuoteRequestAmino;
+}
+/**
+ * QueryHarbergerQuoteResponse defines the QueryHarbergerQuoteResponse message.
+ * @name QueryHarbergerQuoteResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryHarbergerQuoteResponse
+ */
+export interface QueryHarbergerQuoteResponse {
+  state: HarbergerState;
+  /**
+   * What MsgForceBuy would pay now (falls during foreclosure).
+   */
+  currentPrice: string;
+  /**
+   * Tax per period on the assessed price.
+   */
+  taxPerPeriod: string;
+  foreclosed: boolean;
+  /**
+   * false while the token cannot be bought (a zero price inside the grace
+   * period, or a hidden token or class).
+   */
+  forSale: boolean;
+}
+export interface QueryHarbergerQuoteResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryHarbergerQuoteResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryHarbergerQuoteResponse defines the QueryHarbergerQuoteResponse message.
+ * @name QueryHarbergerQuoteResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryHarbergerQuoteResponse
+ */
+export interface QueryHarbergerQuoteResponseAmino {
+  state?: HarbergerStateAmino;
+  /**
+   * What MsgForceBuy would pay now (falls during foreclosure).
+   */
+  current_price?: string;
+  /**
+   * Tax per period on the assessed price.
+   */
+  tax_per_period?: string;
+  foreclosed?: boolean;
+  /**
+   * false while the token cannot be bought (a zero price inside the grace
+   * period, or a hidden token or class).
+   */
+  for_sale?: boolean;
+}
+export interface QueryHarbergerQuoteResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryHarbergerQuoteResponse";
+  value: QueryHarbergerQuoteResponseAmino;
+}
+/**
+ * QueryOfferRequest defines the QueryOfferRequest message.
+ * @name QueryOfferRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryOfferRequest
+ */
+export interface QueryOfferRequest {
+  offerId: bigint;
+}
+export interface QueryOfferRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryOfferRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryOfferRequest defines the QueryOfferRequest message.
+ * @name QueryOfferRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryOfferRequest
+ */
+export interface QueryOfferRequestAmino {
+  offer_id?: string;
+}
+export interface QueryOfferRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryOfferRequest";
+  value: QueryOfferRequestAmino;
+}
+/**
+ * QueryOfferResponse defines the QueryOfferResponse message.
+ * @name QueryOfferResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryOfferResponse
+ */
+export interface QueryOfferResponse {
+  offer: Offer;
+}
+export interface QueryOfferResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryOfferResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryOfferResponse defines the QueryOfferResponse message.
+ * @name QueryOfferResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryOfferResponse
+ */
+export interface QueryOfferResponseAmino {
+  offer?: OfferAmino;
+}
+export interface QueryOfferResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryOfferResponse";
+  value: QueryOfferResponseAmino;
+}
+/**
+ * QueryOffersRequest lists the open offers on a token, or (token_id 0) the
+ * collection offers on a class.
+ * @name QueryOffersRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryOffersRequest
+ */
+export interface QueryOffersRequest {
+  classId: bigint;
+  tokenId: bigint;
+  pagination?: PageRequest;
+}
+export interface QueryOffersRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryOffersRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryOffersRequest lists the open offers on a token, or (token_id 0) the
+ * collection offers on a class.
+ * @name QueryOffersRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryOffersRequest
+ */
+export interface QueryOffersRequestAmino {
+  class_id?: string;
+  token_id?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryOffersRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryOffersRequest";
+  value: QueryOffersRequestAmino;
+}
+/**
+ * QueryOffersResponse defines the QueryOffersResponse message.
+ * @name QueryOffersResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryOffersResponse
+ */
+export interface QueryOffersResponse {
+  offers: Offer[];
+  pagination?: PageResponse;
+}
+export interface QueryOffersResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryOffersResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryOffersResponse defines the QueryOffersResponse message.
+ * @name QueryOffersResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryOffersResponse
+ */
+export interface QueryOffersResponseAmino {
+  offers?: OfferAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryOffersResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryOffersResponse";
+  value: QueryOffersResponseAmino;
+}
+/**
+ * QueryOffersByBidderRequest defines the QueryOffersByBidderRequest message.
+ * @name QueryOffersByBidderRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryOffersByBidderRequest
+ */
+export interface QueryOffersByBidderRequest {
+  bidder: string;
+  pagination?: PageRequest;
+}
+export interface QueryOffersByBidderRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryOffersByBidderRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryOffersByBidderRequest defines the QueryOffersByBidderRequest message.
+ * @name QueryOffersByBidderRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryOffersByBidderRequest
+ */
+export interface QueryOffersByBidderRequestAmino {
+  bidder?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryOffersByBidderRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryOffersByBidderRequest";
+  value: QueryOffersByBidderRequestAmino;
+}
+/**
+ * QueryOffersByBidderResponse defines the QueryOffersByBidderResponse message.
+ * @name QueryOffersByBidderResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryOffersByBidderResponse
+ */
+export interface QueryOffersByBidderResponse {
+  offers: Offer[];
+  pagination?: PageResponse;
+}
+export interface QueryOffersByBidderResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryOffersByBidderResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryOffersByBidderResponse defines the QueryOffersByBidderResponse message.
+ * @name QueryOffersByBidderResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryOffersByBidderResponse
+ */
+export interface QueryOffersByBidderResponseAmino {
+  offers?: OfferAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryOffersByBidderResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryOffersByBidderResponse";
+  value: QueryOffersByBidderResponseAmino;
+}
+/**
+ * QueryAuctionRequest defines the QueryAuctionRequest message.
+ * @name QueryAuctionRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryAuctionRequest
+ */
+export interface QueryAuctionRequest {
+  auctionId: bigint;
+}
+export interface QueryAuctionRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryAuctionRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryAuctionRequest defines the QueryAuctionRequest message.
+ * @name QueryAuctionRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryAuctionRequest
+ */
+export interface QueryAuctionRequestAmino {
+  auction_id?: string;
+}
+export interface QueryAuctionRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryAuctionRequest";
+  value: QueryAuctionRequestAmino;
+}
+/**
+ * QueryAuctionResponse defines the QueryAuctionResponse message.
+ * @name QueryAuctionResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryAuctionResponse
+ */
+export interface QueryAuctionResponse {
+  auction: Auction;
+  /**
+   * The lowest bid MsgBid accepts now.
+   */
+  minNextBid: string;
+}
+export interface QueryAuctionResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryAuctionResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryAuctionResponse defines the QueryAuctionResponse message.
+ * @name QueryAuctionResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryAuctionResponse
+ */
+export interface QueryAuctionResponseAmino {
+  auction?: AuctionAmino;
+  /**
+   * The lowest bid MsgBid accepts now.
+   */
+  min_next_bid?: string;
+}
+export interface QueryAuctionResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryAuctionResponse";
+  value: QueryAuctionResponseAmino;
+}
+/**
+ * QueryAuctionsRequest lists open auctions (class_id 0 = every class).
+ * @name QueryAuctionsRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryAuctionsRequest
+ */
+export interface QueryAuctionsRequest {
+  classId: bigint;
+  pagination?: PageRequest;
+}
+export interface QueryAuctionsRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryAuctionsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryAuctionsRequest lists open auctions (class_id 0 = every class).
+ * @name QueryAuctionsRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryAuctionsRequest
+ */
+export interface QueryAuctionsRequestAmino {
+  class_id?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryAuctionsRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryAuctionsRequest";
+  value: QueryAuctionsRequestAmino;
+}
+/**
+ * QueryAuctionsResponse defines the QueryAuctionsResponse message.
+ * @name QueryAuctionsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryAuctionsResponse
+ */
+export interface QueryAuctionsResponse {
+  auctions: Auction[];
+  pagination?: PageResponse;
+}
+export interface QueryAuctionsResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryAuctionsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryAuctionsResponse defines the QueryAuctionsResponse message.
+ * @name QueryAuctionsResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryAuctionsResponse
+ */
+export interface QueryAuctionsResponseAmino {
+  auctions?: AuctionAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryAuctionsResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryAuctionsResponse";
+  value: QueryAuctionsResponseAmino;
+}
+/**
+ * QueryAuctionsBySellerRequest defines the QueryAuctionsBySellerRequest message.
+ * @name QueryAuctionsBySellerRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryAuctionsBySellerRequest
+ */
+export interface QueryAuctionsBySellerRequest {
+  seller: string;
+  pagination?: PageRequest;
+}
+export interface QueryAuctionsBySellerRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryAuctionsBySellerRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryAuctionsBySellerRequest defines the QueryAuctionsBySellerRequest message.
+ * @name QueryAuctionsBySellerRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryAuctionsBySellerRequest
+ */
+export interface QueryAuctionsBySellerRequestAmino {
+  seller?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryAuctionsBySellerRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryAuctionsBySellerRequest";
+  value: QueryAuctionsBySellerRequestAmino;
+}
+/**
+ * QueryAuctionsBySellerResponse defines the QueryAuctionsBySellerResponse message.
+ * @name QueryAuctionsBySellerResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryAuctionsBySellerResponse
+ */
+export interface QueryAuctionsBySellerResponse {
+  auctions: Auction[];
+  pagination?: PageResponse;
+}
+export interface QueryAuctionsBySellerResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryAuctionsBySellerResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryAuctionsBySellerResponse defines the QueryAuctionsBySellerResponse message.
+ * @name QueryAuctionsBySellerResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryAuctionsBySellerResponse
+ */
+export interface QueryAuctionsBySellerResponseAmino {
+  auctions?: AuctionAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryAuctionsBySellerResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryAuctionsBySellerResponse";
+  value: QueryAuctionsBySellerResponseAmino;
+}
+/**
+ * QueryRentalOffersRequest defines the QueryRentalOffersRequest message.
+ * @name QueryRentalOffersRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalOffersRequest
+ */
+export interface QueryRentalOffersRequest {
+  /**
+   * Optional; empty lists every unexpired offer.
+   */
+  user: string;
+  pagination?: PageRequest;
+}
+export interface QueryRentalOffersRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryRentalOffersRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryRentalOffersRequest defines the QueryRentalOffersRequest message.
+ * @name QueryRentalOffersRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalOffersRequest
+ */
+export interface QueryRentalOffersRequestAmino {
+  /**
+   * Optional; empty lists every unexpired offer.
+   */
+  user?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryRentalOffersRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryRentalOffersRequest";
+  value: QueryRentalOffersRequestAmino;
+}
+/**
+ * QueryRentalOffersResponse defines the QueryRentalOffersResponse message.
+ * @name QueryRentalOffersResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalOffersResponse
+ */
+export interface QueryRentalOffersResponse {
+  offers: RentalOffer[];
+  pagination?: PageResponse;
+}
+export interface QueryRentalOffersResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryRentalOffersResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryRentalOffersResponse defines the QueryRentalOffersResponse message.
+ * @name QueryRentalOffersResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalOffersResponse
+ */
+export interface QueryRentalOffersResponseAmino {
+  offers?: RentalOfferAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryRentalOffersResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryRentalOffersResponse";
+  value: QueryRentalOffersResponseAmino;
 }
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
@@ -1455,7 +2865,15 @@ function createBaseTokenView(): TokenView {
     token: Token.fromPartial({}),
     withheld: false,
     metadataHash: "",
-    classStatus: 0
+    classStatus: 0,
+    displayedMetadata: TokenMetadata.fromPartial({}),
+    displaySource: "",
+    renderError: "",
+    expired: false,
+    seed: "",
+    contentsHash: "",
+    user: "",
+    harbergerPrice: ""
   };
 }
 /**
@@ -1480,6 +2898,30 @@ export const TokenView = {
     if (message.classStatus !== 0) {
       writer.uint32(32).int32(message.classStatus);
     }
+    if (message.displayedMetadata !== undefined) {
+      TokenMetadata.encode(message.displayedMetadata, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.displaySource !== "") {
+      writer.uint32(50).string(message.displaySource);
+    }
+    if (message.renderError !== "") {
+      writer.uint32(58).string(message.renderError);
+    }
+    if (message.expired === true) {
+      writer.uint32(64).bool(message.expired);
+    }
+    if (message.seed !== "") {
+      writer.uint32(74).string(message.seed);
+    }
+    if (message.contentsHash !== "") {
+      writer.uint32(82).string(message.contentsHash);
+    }
+    if (message.user !== "") {
+      writer.uint32(90).string(message.user);
+    }
+    if (message.harbergerPrice !== "") {
+      writer.uint32(98).string(message.harbergerPrice);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): TokenView {
@@ -1501,6 +2943,30 @@ export const TokenView = {
         case 4:
           message.classStatus = reader.int32() as any;
           break;
+        case 5:
+          message.displayedMetadata = TokenMetadata.decode(reader, reader.uint32());
+          break;
+        case 6:
+          message.displaySource = reader.string();
+          break;
+        case 7:
+          message.renderError = reader.string();
+          break;
+        case 8:
+          message.expired = reader.bool();
+          break;
+        case 9:
+          message.seed = reader.string();
+          break;
+        case 10:
+          message.contentsHash = reader.string();
+          break;
+        case 11:
+          message.user = reader.string();
+          break;
+        case 12:
+          message.harbergerPrice = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1514,6 +2980,14 @@ export const TokenView = {
     message.withheld = object.withheld ?? false;
     message.metadataHash = object.metadataHash ?? "";
     message.classStatus = object.classStatus ?? 0;
+    message.displayedMetadata = object.displayedMetadata !== undefined && object.displayedMetadata !== null ? TokenMetadata.fromPartial(object.displayedMetadata) : undefined;
+    message.displaySource = object.displaySource ?? "";
+    message.renderError = object.renderError ?? "";
+    message.expired = object.expired ?? false;
+    message.seed = object.seed ?? "";
+    message.contentsHash = object.contentsHash ?? "";
+    message.user = object.user ?? "";
+    message.harbergerPrice = object.harbergerPrice ?? "";
     return message;
   },
   fromAmino(object: TokenViewAmino): TokenView {
@@ -1530,6 +3004,30 @@ export const TokenView = {
     if (object.class_status !== undefined && object.class_status !== null) {
       message.classStatus = object.class_status;
     }
+    if (object.displayed_metadata !== undefined && object.displayed_metadata !== null) {
+      message.displayedMetadata = TokenMetadata.fromAmino(object.displayed_metadata);
+    }
+    if (object.display_source !== undefined && object.display_source !== null) {
+      message.displaySource = object.display_source;
+    }
+    if (object.render_error !== undefined && object.render_error !== null) {
+      message.renderError = object.render_error;
+    }
+    if (object.expired !== undefined && object.expired !== null) {
+      message.expired = object.expired;
+    }
+    if (object.seed !== undefined && object.seed !== null) {
+      message.seed = object.seed;
+    }
+    if (object.contents_hash !== undefined && object.contents_hash !== null) {
+      message.contentsHash = object.contents_hash;
+    }
+    if (object.user !== undefined && object.user !== null) {
+      message.user = object.user;
+    }
+    if (object.harberger_price !== undefined && object.harberger_price !== null) {
+      message.harbergerPrice = object.harberger_price;
+    }
     return message;
   },
   toAmino(message: TokenView): TokenViewAmino {
@@ -1538,6 +3036,14 @@ export const TokenView = {
     obj.withheld = message.withheld === false ? undefined : message.withheld;
     obj.metadata_hash = message.metadataHash === "" ? undefined : message.metadataHash;
     obj.class_status = message.classStatus === 0 ? undefined : message.classStatus;
+    obj.displayed_metadata = message.displayedMetadata ? TokenMetadata.toAmino(message.displayedMetadata) : undefined;
+    obj.display_source = message.displaySource === "" ? undefined : message.displaySource;
+    obj.render_error = message.renderError === "" ? undefined : message.renderError;
+    obj.expired = message.expired === false ? undefined : message.expired;
+    obj.seed = message.seed === "" ? undefined : message.seed;
+    obj.contents_hash = message.contentsHash === "" ? undefined : message.contentsHash;
+    obj.user = message.user === "" ? undefined : message.user;
+    obj.harberger_price = message.harbergerPrice === "" ? undefined : message.harbergerPrice;
     return obj;
   },
   fromAminoMsg(object: TokenViewAminoMsg): TokenView {
@@ -1567,7 +3073,10 @@ function createBaseInboxItem(): InboxItem {
     expiresAt: BigInt(0),
     metadata: TokenMetadata.fromPartial({}),
     metadataHash: "",
-    withheld: false
+    withheld: false,
+    unitClassId: BigInt(0),
+    editionId: BigInt(0),
+    amount: BigInt(0)
   };
 }
 /**
@@ -1609,6 +3118,15 @@ export const InboxItem = {
     if (message.withheld === true) {
       writer.uint32(80).bool(message.withheld);
     }
+    if (message.unitClassId !== BigInt(0)) {
+      writer.uint32(88).uint64(message.unitClassId);
+    }
+    if (message.editionId !== BigInt(0)) {
+      writer.uint32(96).uint64(message.editionId);
+    }
+    if (message.amount !== BigInt(0)) {
+      writer.uint32(104).uint64(message.amount);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): InboxItem {
@@ -1648,6 +3166,15 @@ export const InboxItem = {
         case 10:
           message.withheld = reader.bool();
           break;
+        case 11:
+          message.unitClassId = reader.uint64();
+          break;
+        case 12:
+          message.editionId = reader.uint64();
+          break;
+        case 13:
+          message.amount = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1667,6 +3194,9 @@ export const InboxItem = {
     message.metadata = object.metadata !== undefined && object.metadata !== null ? TokenMetadata.fromPartial(object.metadata) : undefined;
     message.metadataHash = object.metadataHash ?? "";
     message.withheld = object.withheld ?? false;
+    message.unitClassId = object.unitClassId !== undefined && object.unitClassId !== null ? BigInt(object.unitClassId.toString()) : BigInt(0);
+    message.editionId = object.editionId !== undefined && object.editionId !== null ? BigInt(object.editionId.toString()) : BigInt(0);
+    message.amount = object.amount !== undefined && object.amount !== null ? BigInt(object.amount.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: InboxItemAmino): InboxItem {
@@ -1701,6 +3231,15 @@ export const InboxItem = {
     if (object.withheld !== undefined && object.withheld !== null) {
       message.withheld = object.withheld;
     }
+    if (object.unit_class_id !== undefined && object.unit_class_id !== null) {
+      message.unitClassId = BigInt(object.unit_class_id);
+    }
+    if (object.edition_id !== undefined && object.edition_id !== null) {
+      message.editionId = BigInt(object.edition_id);
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = BigInt(object.amount);
+    }
     return message;
   },
   toAmino(message: InboxItem): InboxItemAmino {
@@ -1715,6 +3254,9 @@ export const InboxItem = {
     obj.metadata = message.metadata ? TokenMetadata.toAmino(message.metadata) : undefined;
     obj.metadata_hash = message.metadataHash === "" ? undefined : message.metadataHash;
     obj.withheld = message.withheld === false ? undefined : message.withheld;
+    obj.unit_class_id = message.unitClassId !== BigInt(0) ? message.unitClassId?.toString() : undefined;
+    obj.edition_id = message.editionId !== BigInt(0) ? message.editionId?.toString() : undefined;
+    obj.amount = message.amount !== BigInt(0) ? message.amount?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: InboxItemAminoMsg): InboxItem {
@@ -2271,7 +3813,8 @@ export const QueryTokenRequest = {
 function createBaseQueryTokenResponse(): QueryTokenResponse {
   return {
     token: TokenView.fromPartial({}),
-    listing: undefined
+    listing: undefined,
+    auction: undefined
   };
 }
 /**
@@ -2289,6 +3832,9 @@ export const QueryTokenResponse = {
     if (message.listing !== undefined) {
       Listing.encode(message.listing, writer.uint32(18).fork()).ldelim();
     }
+    if (message.auction !== undefined) {
+      Auction.encode(message.auction, writer.uint32(26).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryTokenResponse {
@@ -2304,6 +3850,9 @@ export const QueryTokenResponse = {
         case 2:
           message.listing = Listing.decode(reader, reader.uint32());
           break;
+        case 3:
+          message.auction = Auction.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2315,6 +3864,7 @@ export const QueryTokenResponse = {
     const message = createBaseQueryTokenResponse();
     message.token = object.token !== undefined && object.token !== null ? TokenView.fromPartial(object.token) : undefined;
     message.listing = object.listing !== undefined && object.listing !== null ? Listing.fromPartial(object.listing) : undefined;
+    message.auction = object.auction !== undefined && object.auction !== null ? Auction.fromPartial(object.auction) : undefined;
     return message;
   },
   fromAmino(object: QueryTokenResponseAmino): QueryTokenResponse {
@@ -2325,12 +3875,16 @@ export const QueryTokenResponse = {
     if (object.listing !== undefined && object.listing !== null) {
       message.listing = Listing.fromAmino(object.listing);
     }
+    if (object.auction !== undefined && object.auction !== null) {
+      message.auction = Auction.fromAmino(object.auction);
+    }
     return message;
   },
   toAmino(message: QueryTokenResponse): QueryTokenResponseAmino {
     const obj: any = {};
     obj.token = message.token ? TokenView.toAmino(message.token) : undefined;
     obj.listing = message.listing ? Listing.toAmino(message.listing) : undefined;
+    obj.auction = message.auction ? Auction.toAmino(message.auction) : undefined;
     return obj;
   },
   fromAminoMsg(object: QueryTokenResponseAminoMsg): QueryTokenResponse {
@@ -4521,7 +6075,9 @@ function createBaseQueryPublicMintQuoteResponse(): QueryPublicMintQuoteResponse 
     deposit: Coin.fromPartial({}),
     remainingAllowance: BigInt(0),
     available: false,
-    reason: ""
+    reason: "",
+    unitPrice: Coin.fromPartial({}),
+    maxUnitPrice: Coin.fromPartial({})
   };
 }
 /**
@@ -4551,6 +6107,12 @@ export const QueryPublicMintQuoteResponse = {
     if (message.reason !== "") {
       writer.uint32(50).string(message.reason);
     }
+    if (message.unitPrice !== undefined) {
+      Coin.encode(message.unitPrice, writer.uint32(58).fork()).ldelim();
+    }
+    if (message.maxUnitPrice !== undefined) {
+      Coin.encode(message.maxUnitPrice, writer.uint32(66).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryPublicMintQuoteResponse {
@@ -4578,6 +6140,12 @@ export const QueryPublicMintQuoteResponse = {
         case 6:
           message.reason = reader.string();
           break;
+        case 7:
+          message.unitPrice = Coin.decode(reader, reader.uint32());
+          break;
+        case 8:
+          message.maxUnitPrice = Coin.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4593,6 +6161,8 @@ export const QueryPublicMintQuoteResponse = {
     message.remainingAllowance = object.remainingAllowance !== undefined && object.remainingAllowance !== null ? BigInt(object.remainingAllowance.toString()) : BigInt(0);
     message.available = object.available ?? false;
     message.reason = object.reason ?? "";
+    message.unitPrice = object.unitPrice !== undefined && object.unitPrice !== null ? Coin.fromPartial(object.unitPrice) : undefined;
+    message.maxUnitPrice = object.maxUnitPrice !== undefined && object.maxUnitPrice !== null ? Coin.fromPartial(object.maxUnitPrice) : undefined;
     return message;
   },
   fromAmino(object: QueryPublicMintQuoteResponseAmino): QueryPublicMintQuoteResponse {
@@ -4615,6 +6185,12 @@ export const QueryPublicMintQuoteResponse = {
     if (object.reason !== undefined && object.reason !== null) {
       message.reason = object.reason;
     }
+    if (object.unit_price !== undefined && object.unit_price !== null) {
+      message.unitPrice = Coin.fromAmino(object.unit_price);
+    }
+    if (object.max_unit_price !== undefined && object.max_unit_price !== null) {
+      message.maxUnitPrice = Coin.fromAmino(object.max_unit_price);
+    }
     return message;
   },
   toAmino(message: QueryPublicMintQuoteResponse): QueryPublicMintQuoteResponseAmino {
@@ -4625,6 +6201,8 @@ export const QueryPublicMintQuoteResponse = {
     obj.remaining_allowance = message.remainingAllowance !== BigInt(0) ? message.remainingAllowance?.toString() : undefined;
     obj.available = message.available === false ? undefined : message.available;
     obj.reason = message.reason === "" ? undefined : message.reason;
+    obj.unit_price = message.unitPrice ? Coin.toAmino(message.unitPrice) : undefined;
+    obj.max_unit_price = message.maxUnitPrice ? Coin.toAmino(message.maxUnitPrice) : undefined;
     return obj;
   },
   fromAminoMsg(object: QueryPublicMintQuoteResponseAminoMsg): QueryPublicMintQuoteResponse {
@@ -4640,6 +6218,3587 @@ export const QueryPublicMintQuoteResponse = {
     return {
       typeUrl: "/sparkdream.artifact.v1.QueryPublicMintQuoteResponse",
       value: QueryPublicMintQuoteResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryMediaProposalsRequest(): QueryMediaProposalsRequest {
+  return {
+    classId: BigInt(0),
+    tokenId: BigInt(0)
+  };
+}
+/**
+ * QueryMediaProposalsRequest defines the QueryMediaProposalsRequest message.
+ * @name QueryMediaProposalsRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryMediaProposalsRequest
+ */
+export const QueryMediaProposalsRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryMediaProposalsRequest",
+  encode(message: QueryMediaProposalsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.tokenId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryMediaProposalsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryMediaProposalsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.classId = reader.uint64();
+          break;
+        case 2:
+          message.tokenId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryMediaProposalsRequest>): QueryMediaProposalsRequest {
+    const message = createBaseQueryMediaProposalsRequest();
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryMediaProposalsRequestAmino): QueryMediaProposalsRequest {
+    const message = createBaseQueryMediaProposalsRequest();
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryMediaProposalsRequest): QueryMediaProposalsRequestAmino {
+    const obj: any = {};
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryMediaProposalsRequestAminoMsg): QueryMediaProposalsRequest {
+    return QueryMediaProposalsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryMediaProposalsRequestProtoMsg): QueryMediaProposalsRequest {
+    return QueryMediaProposalsRequest.decode(message.value);
+  },
+  toProto(message: QueryMediaProposalsRequest): Uint8Array {
+    return QueryMediaProposalsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryMediaProposalsRequest): QueryMediaProposalsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryMediaProposalsRequest",
+      value: QueryMediaProposalsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryMediaProposalsResponse(): QueryMediaProposalsResponse {
+  return {
+    proposals: []
+  };
+}
+/**
+ * QueryMediaProposalsResponse defines the QueryMediaProposalsResponse message.
+ * @name QueryMediaProposalsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryMediaProposalsResponse
+ */
+export const QueryMediaProposalsResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryMediaProposalsResponse",
+  encode(message: QueryMediaProposalsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.proposals) {
+      MediaProposal.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryMediaProposalsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryMediaProposalsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.proposals.push(MediaProposal.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryMediaProposalsResponse>): QueryMediaProposalsResponse {
+    const message = createBaseQueryMediaProposalsResponse();
+    message.proposals = object.proposals?.map(e => MediaProposal.fromPartial(e)) || [];
+    return message;
+  },
+  fromAmino(object: QueryMediaProposalsResponseAmino): QueryMediaProposalsResponse {
+    const message = createBaseQueryMediaProposalsResponse();
+    message.proposals = object.proposals?.map(e => MediaProposal.fromAmino(e)) || [];
+    return message;
+  },
+  toAmino(message: QueryMediaProposalsResponse): QueryMediaProposalsResponseAmino {
+    const obj: any = {};
+    if (message.proposals) {
+      obj.proposals = message.proposals.map(e => e ? MediaProposal.toAmino(e) : undefined);
+    } else {
+      obj.proposals = message.proposals;
+    }
+    return obj;
+  },
+  fromAminoMsg(object: QueryMediaProposalsResponseAminoMsg): QueryMediaProposalsResponse {
+    return QueryMediaProposalsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryMediaProposalsResponseProtoMsg): QueryMediaProposalsResponse {
+    return QueryMediaProposalsResponse.decode(message.value);
+  },
+  toProto(message: QueryMediaProposalsResponse): Uint8Array {
+    return QueryMediaProposalsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryMediaProposalsResponse): QueryMediaProposalsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryMediaProposalsResponse",
+      value: QueryMediaProposalsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseEditionView(): EditionView {
+  return {
+    edition: Edition.fromPartial({}),
+    withheld: false,
+    metadataHash: "",
+    classStatus: 0
+  };
+}
+/**
+ * EditionView is an edition as served to clients. When withheld is true the
+ * metadata and claim scope are blanked because the edition or its class is
+ * hidden.
+ * @name EditionView
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.EditionView
+ */
+export const EditionView = {
+  typeUrl: "/sparkdream.artifact.v1.EditionView",
+  encode(message: EditionView, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.edition !== undefined) {
+      Edition.encode(message.edition, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.withheld === true) {
+      writer.uint32(16).bool(message.withheld);
+    }
+    if (message.metadataHash !== "") {
+      writer.uint32(26).string(message.metadataHash);
+    }
+    if (message.classStatus !== 0) {
+      writer.uint32(32).int32(message.classStatus);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): EditionView {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEditionView();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.edition = Edition.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.withheld = reader.bool();
+          break;
+        case 3:
+          message.metadataHash = reader.string();
+          break;
+        case 4:
+          message.classStatus = reader.int32() as any;
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<EditionView>): EditionView {
+    const message = createBaseEditionView();
+    message.edition = object.edition !== undefined && object.edition !== null ? Edition.fromPartial(object.edition) : undefined;
+    message.withheld = object.withheld ?? false;
+    message.metadataHash = object.metadataHash ?? "";
+    message.classStatus = object.classStatus ?? 0;
+    return message;
+  },
+  fromAmino(object: EditionViewAmino): EditionView {
+    const message = createBaseEditionView();
+    if (object.edition !== undefined && object.edition !== null) {
+      message.edition = Edition.fromAmino(object.edition);
+    }
+    if (object.withheld !== undefined && object.withheld !== null) {
+      message.withheld = object.withheld;
+    }
+    if (object.metadata_hash !== undefined && object.metadata_hash !== null) {
+      message.metadataHash = object.metadata_hash;
+    }
+    if (object.class_status !== undefined && object.class_status !== null) {
+      message.classStatus = object.class_status;
+    }
+    return message;
+  },
+  toAmino(message: EditionView): EditionViewAmino {
+    const obj: any = {};
+    obj.edition = message.edition ? Edition.toAmino(message.edition) : undefined;
+    obj.withheld = message.withheld === false ? undefined : message.withheld;
+    obj.metadata_hash = message.metadataHash === "" ? undefined : message.metadataHash;
+    obj.class_status = message.classStatus === 0 ? undefined : message.classStatus;
+    return obj;
+  },
+  fromAminoMsg(object: EditionViewAminoMsg): EditionView {
+    return EditionView.fromAmino(object.value);
+  },
+  fromProtoMsg(message: EditionViewProtoMsg): EditionView {
+    return EditionView.decode(message.value);
+  },
+  toProto(message: EditionView): Uint8Array {
+    return EditionView.encode(message).finish();
+  },
+  toProtoMsg(message: EditionView): EditionViewProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.EditionView",
+      value: EditionView.encode(message).finish()
+    };
+  }
+};
+function createBaseBalanceView(): BalanceView {
+  return {
+    balance: Balance.fromPartial({}),
+    claimable: ""
+  };
+}
+/**
+ * BalanceView is a balance with what its holder could claim now.
+ * @name BalanceView
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.BalanceView
+ */
+export const BalanceView = {
+  typeUrl: "/sparkdream.artifact.v1.BalanceView",
+  encode(message: BalanceView, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.balance !== undefined) {
+      Balance.encode(message.balance, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.claimable !== "") {
+      writer.uint32(18).string(message.claimable);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): BalanceView {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBalanceView();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.balance = Balance.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.claimable = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<BalanceView>): BalanceView {
+    const message = createBaseBalanceView();
+    message.balance = object.balance !== undefined && object.balance !== null ? Balance.fromPartial(object.balance) : undefined;
+    message.claimable = object.claimable ?? "";
+    return message;
+  },
+  fromAmino(object: BalanceViewAmino): BalanceView {
+    const message = createBaseBalanceView();
+    if (object.balance !== undefined && object.balance !== null) {
+      message.balance = Balance.fromAmino(object.balance);
+    }
+    if (object.claimable !== undefined && object.claimable !== null) {
+      message.claimable = object.claimable;
+    }
+    return message;
+  },
+  toAmino(message: BalanceView): BalanceViewAmino {
+    const obj: any = {};
+    obj.balance = message.balance ? Balance.toAmino(message.balance) : undefined;
+    obj.claimable = message.claimable === "" ? undefined : message.claimable;
+    return obj;
+  },
+  fromAminoMsg(object: BalanceViewAminoMsg): BalanceView {
+    return BalanceView.fromAmino(object.value);
+  },
+  fromProtoMsg(message: BalanceViewProtoMsg): BalanceView {
+    return BalanceView.decode(message.value);
+  },
+  toProto(message: BalanceView): Uint8Array {
+    return BalanceView.encode(message).finish();
+  },
+  toProtoMsg(message: BalanceView): BalanceViewProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.BalanceView",
+      value: BalanceView.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryEditionRequest(): QueryEditionRequest {
+  return {
+    classId: BigInt(0),
+    editionId: BigInt(0)
+  };
+}
+/**
+ * QueryEditionRequest defines the QueryEditionRequest message.
+ * @name QueryEditionRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryEditionRequest
+ */
+export const QueryEditionRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryEditionRequest",
+  encode(message: QueryEditionRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.classId);
+    }
+    if (message.editionId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.editionId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryEditionRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryEditionRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.classId = reader.uint64();
+          break;
+        case 2:
+          message.editionId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryEditionRequest>): QueryEditionRequest {
+    const message = createBaseQueryEditionRequest();
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.editionId = object.editionId !== undefined && object.editionId !== null ? BigInt(object.editionId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryEditionRequestAmino): QueryEditionRequest {
+    const message = createBaseQueryEditionRequest();
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.edition_id !== undefined && object.edition_id !== null) {
+      message.editionId = BigInt(object.edition_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryEditionRequest): QueryEditionRequestAmino {
+    const obj: any = {};
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.edition_id = message.editionId !== BigInt(0) ? message.editionId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryEditionRequestAminoMsg): QueryEditionRequest {
+    return QueryEditionRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryEditionRequestProtoMsg): QueryEditionRequest {
+    return QueryEditionRequest.decode(message.value);
+  },
+  toProto(message: QueryEditionRequest): Uint8Array {
+    return QueryEditionRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryEditionRequest): QueryEditionRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryEditionRequest",
+      value: QueryEditionRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryEditionResponse(): QueryEditionResponse {
+  return {
+    edition: EditionView.fromPartial({})
+  };
+}
+/**
+ * QueryEditionResponse defines the QueryEditionResponse message.
+ * @name QueryEditionResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryEditionResponse
+ */
+export const QueryEditionResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryEditionResponse",
+  encode(message: QueryEditionResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.edition !== undefined) {
+      EditionView.encode(message.edition, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryEditionResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryEditionResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.edition = EditionView.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryEditionResponse>): QueryEditionResponse {
+    const message = createBaseQueryEditionResponse();
+    message.edition = object.edition !== undefined && object.edition !== null ? EditionView.fromPartial(object.edition) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryEditionResponseAmino): QueryEditionResponse {
+    const message = createBaseQueryEditionResponse();
+    if (object.edition !== undefined && object.edition !== null) {
+      message.edition = EditionView.fromAmino(object.edition);
+    }
+    return message;
+  },
+  toAmino(message: QueryEditionResponse): QueryEditionResponseAmino {
+    const obj: any = {};
+    obj.edition = message.edition ? EditionView.toAmino(message.edition) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryEditionResponseAminoMsg): QueryEditionResponse {
+    return QueryEditionResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryEditionResponseProtoMsg): QueryEditionResponse {
+    return QueryEditionResponse.decode(message.value);
+  },
+  toProto(message: QueryEditionResponse): Uint8Array {
+    return QueryEditionResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryEditionResponse): QueryEditionResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryEditionResponse",
+      value: QueryEditionResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryEditionsRequest(): QueryEditionsRequest {
+  return {
+    classId: BigInt(0),
+    pagination: undefined
+  };
+}
+/**
+ * QueryEditionsRequest defines the QueryEditionsRequest message.
+ * @name QueryEditionsRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryEditionsRequest
+ */
+export const QueryEditionsRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryEditionsRequest",
+  encode(message: QueryEditionsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.classId);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryEditionsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryEditionsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.classId = reader.uint64();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryEditionsRequest>): QueryEditionsRequest {
+    const message = createBaseQueryEditionsRequest();
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryEditionsRequestAmino): QueryEditionsRequest {
+    const message = createBaseQueryEditionsRequest();
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryEditionsRequest): QueryEditionsRequestAmino {
+    const obj: any = {};
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryEditionsRequestAminoMsg): QueryEditionsRequest {
+    return QueryEditionsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryEditionsRequestProtoMsg): QueryEditionsRequest {
+    return QueryEditionsRequest.decode(message.value);
+  },
+  toProto(message: QueryEditionsRequest): Uint8Array {
+    return QueryEditionsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryEditionsRequest): QueryEditionsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryEditionsRequest",
+      value: QueryEditionsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryEditionsResponse(): QueryEditionsResponse {
+  return {
+    editions: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryEditionsResponse defines the QueryEditionsResponse message.
+ * @name QueryEditionsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryEditionsResponse
+ */
+export const QueryEditionsResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryEditionsResponse",
+  encode(message: QueryEditionsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.editions) {
+      EditionView.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryEditionsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryEditionsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.editions.push(EditionView.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryEditionsResponse>): QueryEditionsResponse {
+    const message = createBaseQueryEditionsResponse();
+    message.editions = object.editions?.map(e => EditionView.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryEditionsResponseAmino): QueryEditionsResponse {
+    const message = createBaseQueryEditionsResponse();
+    message.editions = object.editions?.map(e => EditionView.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryEditionsResponse): QueryEditionsResponseAmino {
+    const obj: any = {};
+    if (message.editions) {
+      obj.editions = message.editions.map(e => e ? EditionView.toAmino(e) : undefined);
+    } else {
+      obj.editions = message.editions;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryEditionsResponseAminoMsg): QueryEditionsResponse {
+    return QueryEditionsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryEditionsResponseProtoMsg): QueryEditionsResponse {
+    return QueryEditionsResponse.decode(message.value);
+  },
+  toProto(message: QueryEditionsResponse): Uint8Array {
+    return QueryEditionsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryEditionsResponse): QueryEditionsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryEditionsResponse",
+      value: QueryEditionsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryBalanceRequest(): QueryBalanceRequest {
+  return {
+    classId: BigInt(0),
+    editionId: BigInt(0),
+    owner: ""
+  };
+}
+/**
+ * QueryBalanceRequest defines the QueryBalanceRequest message.
+ * @name QueryBalanceRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryBalanceRequest
+ */
+export const QueryBalanceRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryBalanceRequest",
+  encode(message: QueryBalanceRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.classId);
+    }
+    if (message.editionId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.editionId);
+    }
+    if (message.owner !== "") {
+      writer.uint32(26).string(message.owner);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryBalanceRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryBalanceRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.classId = reader.uint64();
+          break;
+        case 2:
+          message.editionId = reader.uint64();
+          break;
+        case 3:
+          message.owner = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryBalanceRequest>): QueryBalanceRequest {
+    const message = createBaseQueryBalanceRequest();
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.editionId = object.editionId !== undefined && object.editionId !== null ? BigInt(object.editionId.toString()) : BigInt(0);
+    message.owner = object.owner ?? "";
+    return message;
+  },
+  fromAmino(object: QueryBalanceRequestAmino): QueryBalanceRequest {
+    const message = createBaseQueryBalanceRequest();
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.edition_id !== undefined && object.edition_id !== null) {
+      message.editionId = BigInt(object.edition_id);
+    }
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = object.owner;
+    }
+    return message;
+  },
+  toAmino(message: QueryBalanceRequest): QueryBalanceRequestAmino {
+    const obj: any = {};
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.edition_id = message.editionId !== BigInt(0) ? message.editionId?.toString() : undefined;
+    obj.owner = message.owner === "" ? undefined : message.owner;
+    return obj;
+  },
+  fromAminoMsg(object: QueryBalanceRequestAminoMsg): QueryBalanceRequest {
+    return QueryBalanceRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryBalanceRequestProtoMsg): QueryBalanceRequest {
+    return QueryBalanceRequest.decode(message.value);
+  },
+  toProto(message: QueryBalanceRequest): Uint8Array {
+    return QueryBalanceRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryBalanceRequest): QueryBalanceRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryBalanceRequest",
+      value: QueryBalanceRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryBalanceResponse(): QueryBalanceResponse {
+  return {
+    balance: BalanceView.fromPartial({})
+  };
+}
+/**
+ * QueryBalanceResponse defines the QueryBalanceResponse message.
+ * @name QueryBalanceResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryBalanceResponse
+ */
+export const QueryBalanceResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryBalanceResponse",
+  encode(message: QueryBalanceResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.balance !== undefined) {
+      BalanceView.encode(message.balance, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryBalanceResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryBalanceResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.balance = BalanceView.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryBalanceResponse>): QueryBalanceResponse {
+    const message = createBaseQueryBalanceResponse();
+    message.balance = object.balance !== undefined && object.balance !== null ? BalanceView.fromPartial(object.balance) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryBalanceResponseAmino): QueryBalanceResponse {
+    const message = createBaseQueryBalanceResponse();
+    if (object.balance !== undefined && object.balance !== null) {
+      message.balance = BalanceView.fromAmino(object.balance);
+    }
+    return message;
+  },
+  toAmino(message: QueryBalanceResponse): QueryBalanceResponseAmino {
+    const obj: any = {};
+    obj.balance = message.balance ? BalanceView.toAmino(message.balance) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryBalanceResponseAminoMsg): QueryBalanceResponse {
+    return QueryBalanceResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryBalanceResponseProtoMsg): QueryBalanceResponse {
+    return QueryBalanceResponse.decode(message.value);
+  },
+  toProto(message: QueryBalanceResponse): Uint8Array {
+    return QueryBalanceResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryBalanceResponse): QueryBalanceResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryBalanceResponse",
+      value: QueryBalanceResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryBalancesByOwnerRequest(): QueryBalancesByOwnerRequest {
+  return {
+    owner: "",
+    pagination: undefined
+  };
+}
+/**
+ * QueryBalancesByOwnerRequest defines the QueryBalancesByOwnerRequest message.
+ * @name QueryBalancesByOwnerRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryBalancesByOwnerRequest
+ */
+export const QueryBalancesByOwnerRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryBalancesByOwnerRequest",
+  encode(message: QueryBalancesByOwnerRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.owner !== "") {
+      writer.uint32(10).string(message.owner);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryBalancesByOwnerRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryBalancesByOwnerRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.owner = reader.string();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryBalancesByOwnerRequest>): QueryBalancesByOwnerRequest {
+    const message = createBaseQueryBalancesByOwnerRequest();
+    message.owner = object.owner ?? "";
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryBalancesByOwnerRequestAmino): QueryBalancesByOwnerRequest {
+    const message = createBaseQueryBalancesByOwnerRequest();
+    if (object.owner !== undefined && object.owner !== null) {
+      message.owner = object.owner;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryBalancesByOwnerRequest): QueryBalancesByOwnerRequestAmino {
+    const obj: any = {};
+    obj.owner = message.owner === "" ? undefined : message.owner;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryBalancesByOwnerRequestAminoMsg): QueryBalancesByOwnerRequest {
+    return QueryBalancesByOwnerRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryBalancesByOwnerRequestProtoMsg): QueryBalancesByOwnerRequest {
+    return QueryBalancesByOwnerRequest.decode(message.value);
+  },
+  toProto(message: QueryBalancesByOwnerRequest): Uint8Array {
+    return QueryBalancesByOwnerRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryBalancesByOwnerRequest): QueryBalancesByOwnerRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryBalancesByOwnerRequest",
+      value: QueryBalancesByOwnerRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryBalancesByOwnerResponse(): QueryBalancesByOwnerResponse {
+  return {
+    balances: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryBalancesByOwnerResponse defines the QueryBalancesByOwnerResponse message.
+ * @name QueryBalancesByOwnerResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryBalancesByOwnerResponse
+ */
+export const QueryBalancesByOwnerResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryBalancesByOwnerResponse",
+  encode(message: QueryBalancesByOwnerResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.balances) {
+      BalanceView.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryBalancesByOwnerResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryBalancesByOwnerResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.balances.push(BalanceView.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryBalancesByOwnerResponse>): QueryBalancesByOwnerResponse {
+    const message = createBaseQueryBalancesByOwnerResponse();
+    message.balances = object.balances?.map(e => BalanceView.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryBalancesByOwnerResponseAmino): QueryBalancesByOwnerResponse {
+    const message = createBaseQueryBalancesByOwnerResponse();
+    message.balances = object.balances?.map(e => BalanceView.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryBalancesByOwnerResponse): QueryBalancesByOwnerResponseAmino {
+    const obj: any = {};
+    if (message.balances) {
+      obj.balances = message.balances.map(e => e ? BalanceView.toAmino(e) : undefined);
+    } else {
+      obj.balances = message.balances;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryBalancesByOwnerResponseAminoMsg): QueryBalancesByOwnerResponse {
+    return QueryBalancesByOwnerResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryBalancesByOwnerResponseProtoMsg): QueryBalancesByOwnerResponse {
+    return QueryBalancesByOwnerResponse.decode(message.value);
+  },
+  toProto(message: QueryBalancesByOwnerResponse): Uint8Array {
+    return QueryBalancesByOwnerResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryBalancesByOwnerResponse): QueryBalancesByOwnerResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryBalancesByOwnerResponse",
+      value: QueryBalancesByOwnerResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryEditionHoldersRequest(): QueryEditionHoldersRequest {
+  return {
+    classId: BigInt(0),
+    editionId: BigInt(0),
+    pagination: undefined
+  };
+}
+/**
+ * QueryEditionHoldersRequest defines the QueryEditionHoldersRequest message.
+ * @name QueryEditionHoldersRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryEditionHoldersRequest
+ */
+export const QueryEditionHoldersRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryEditionHoldersRequest",
+  encode(message: QueryEditionHoldersRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.classId);
+    }
+    if (message.editionId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.editionId);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryEditionHoldersRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryEditionHoldersRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.classId = reader.uint64();
+          break;
+        case 2:
+          message.editionId = reader.uint64();
+          break;
+        case 3:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryEditionHoldersRequest>): QueryEditionHoldersRequest {
+    const message = createBaseQueryEditionHoldersRequest();
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.editionId = object.editionId !== undefined && object.editionId !== null ? BigInt(object.editionId.toString()) : BigInt(0);
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryEditionHoldersRequestAmino): QueryEditionHoldersRequest {
+    const message = createBaseQueryEditionHoldersRequest();
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.edition_id !== undefined && object.edition_id !== null) {
+      message.editionId = BigInt(object.edition_id);
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryEditionHoldersRequest): QueryEditionHoldersRequestAmino {
+    const obj: any = {};
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.edition_id = message.editionId !== BigInt(0) ? message.editionId?.toString() : undefined;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryEditionHoldersRequestAminoMsg): QueryEditionHoldersRequest {
+    return QueryEditionHoldersRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryEditionHoldersRequestProtoMsg): QueryEditionHoldersRequest {
+    return QueryEditionHoldersRequest.decode(message.value);
+  },
+  toProto(message: QueryEditionHoldersRequest): Uint8Array {
+    return QueryEditionHoldersRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryEditionHoldersRequest): QueryEditionHoldersRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryEditionHoldersRequest",
+      value: QueryEditionHoldersRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryEditionHoldersResponse(): QueryEditionHoldersResponse {
+  return {
+    balances: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryEditionHoldersResponse defines the QueryEditionHoldersResponse message.
+ * @name QueryEditionHoldersResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryEditionHoldersResponse
+ */
+export const QueryEditionHoldersResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryEditionHoldersResponse",
+  encode(message: QueryEditionHoldersResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.balances) {
+      BalanceView.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryEditionHoldersResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryEditionHoldersResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.balances.push(BalanceView.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryEditionHoldersResponse>): QueryEditionHoldersResponse {
+    const message = createBaseQueryEditionHoldersResponse();
+    message.balances = object.balances?.map(e => BalanceView.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryEditionHoldersResponseAmino): QueryEditionHoldersResponse {
+    const message = createBaseQueryEditionHoldersResponse();
+    message.balances = object.balances?.map(e => BalanceView.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryEditionHoldersResponse): QueryEditionHoldersResponseAmino {
+    const obj: any = {};
+    if (message.balances) {
+      obj.balances = message.balances.map(e => e ? BalanceView.toAmino(e) : undefined);
+    } else {
+      obj.balances = message.balances;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryEditionHoldersResponseAminoMsg): QueryEditionHoldersResponse {
+    return QueryEditionHoldersResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryEditionHoldersResponseProtoMsg): QueryEditionHoldersResponse {
+    return QueryEditionHoldersResponse.decode(message.value);
+  },
+  toProto(message: QueryEditionHoldersResponse): Uint8Array {
+    return QueryEditionHoldersResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryEditionHoldersResponse): QueryEditionHoldersResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryEditionHoldersResponse",
+      value: QueryEditionHoldersResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryUnitListingRequest(): QueryUnitListingRequest {
+  return {
+    listingId: BigInt(0)
+  };
+}
+/**
+ * QueryUnitListingRequest defines the QueryUnitListingRequest message.
+ * @name QueryUnitListingRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryUnitListingRequest
+ */
+export const QueryUnitListingRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryUnitListingRequest",
+  encode(message: QueryUnitListingRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.listingId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.listingId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryUnitListingRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryUnitListingRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.listingId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryUnitListingRequest>): QueryUnitListingRequest {
+    const message = createBaseQueryUnitListingRequest();
+    message.listingId = object.listingId !== undefined && object.listingId !== null ? BigInt(object.listingId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryUnitListingRequestAmino): QueryUnitListingRequest {
+    const message = createBaseQueryUnitListingRequest();
+    if (object.listing_id !== undefined && object.listing_id !== null) {
+      message.listingId = BigInt(object.listing_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryUnitListingRequest): QueryUnitListingRequestAmino {
+    const obj: any = {};
+    obj.listing_id = message.listingId !== BigInt(0) ? message.listingId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryUnitListingRequestAminoMsg): QueryUnitListingRequest {
+    return QueryUnitListingRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryUnitListingRequestProtoMsg): QueryUnitListingRequest {
+    return QueryUnitListingRequest.decode(message.value);
+  },
+  toProto(message: QueryUnitListingRequest): Uint8Array {
+    return QueryUnitListingRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryUnitListingRequest): QueryUnitListingRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryUnitListingRequest",
+      value: QueryUnitListingRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryUnitListingResponse(): QueryUnitListingResponse {
+  return {
+    listing: UnitListing.fromPartial({})
+  };
+}
+/**
+ * QueryUnitListingResponse defines the QueryUnitListingResponse message.
+ * @name QueryUnitListingResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryUnitListingResponse
+ */
+export const QueryUnitListingResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryUnitListingResponse",
+  encode(message: QueryUnitListingResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.listing !== undefined) {
+      UnitListing.encode(message.listing, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryUnitListingResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryUnitListingResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.listing = UnitListing.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryUnitListingResponse>): QueryUnitListingResponse {
+    const message = createBaseQueryUnitListingResponse();
+    message.listing = object.listing !== undefined && object.listing !== null ? UnitListing.fromPartial(object.listing) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryUnitListingResponseAmino): QueryUnitListingResponse {
+    const message = createBaseQueryUnitListingResponse();
+    if (object.listing !== undefined && object.listing !== null) {
+      message.listing = UnitListing.fromAmino(object.listing);
+    }
+    return message;
+  },
+  toAmino(message: QueryUnitListingResponse): QueryUnitListingResponseAmino {
+    const obj: any = {};
+    obj.listing = message.listing ? UnitListing.toAmino(message.listing) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryUnitListingResponseAminoMsg): QueryUnitListingResponse {
+    return QueryUnitListingResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryUnitListingResponseProtoMsg): QueryUnitListingResponse {
+    return QueryUnitListingResponse.decode(message.value);
+  },
+  toProto(message: QueryUnitListingResponse): Uint8Array {
+    return QueryUnitListingResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryUnitListingResponse): QueryUnitListingResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryUnitListingResponse",
+      value: QueryUnitListingResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryUnitListingsRequest(): QueryUnitListingsRequest {
+  return {
+    classId: BigInt(0),
+    editionId: BigInt(0),
+    pagination: undefined
+  };
+}
+/**
+ * QueryUnitListingsRequest defines the QueryUnitListingsRequest message.
+ * @name QueryUnitListingsRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryUnitListingsRequest
+ */
+export const QueryUnitListingsRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryUnitListingsRequest",
+  encode(message: QueryUnitListingsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.classId);
+    }
+    if (message.editionId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.editionId);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryUnitListingsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryUnitListingsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.classId = reader.uint64();
+          break;
+        case 2:
+          message.editionId = reader.uint64();
+          break;
+        case 3:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryUnitListingsRequest>): QueryUnitListingsRequest {
+    const message = createBaseQueryUnitListingsRequest();
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.editionId = object.editionId !== undefined && object.editionId !== null ? BigInt(object.editionId.toString()) : BigInt(0);
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryUnitListingsRequestAmino): QueryUnitListingsRequest {
+    const message = createBaseQueryUnitListingsRequest();
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.edition_id !== undefined && object.edition_id !== null) {
+      message.editionId = BigInt(object.edition_id);
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryUnitListingsRequest): QueryUnitListingsRequestAmino {
+    const obj: any = {};
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.edition_id = message.editionId !== BigInt(0) ? message.editionId?.toString() : undefined;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryUnitListingsRequestAminoMsg): QueryUnitListingsRequest {
+    return QueryUnitListingsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryUnitListingsRequestProtoMsg): QueryUnitListingsRequest {
+    return QueryUnitListingsRequest.decode(message.value);
+  },
+  toProto(message: QueryUnitListingsRequest): Uint8Array {
+    return QueryUnitListingsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryUnitListingsRequest): QueryUnitListingsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryUnitListingsRequest",
+      value: QueryUnitListingsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryUnitListingsResponse(): QueryUnitListingsResponse {
+  return {
+    listings: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryUnitListingsResponse defines the QueryUnitListingsResponse message.
+ * @name QueryUnitListingsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryUnitListingsResponse
+ */
+export const QueryUnitListingsResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryUnitListingsResponse",
+  encode(message: QueryUnitListingsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.listings) {
+      UnitListing.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryUnitListingsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryUnitListingsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.listings.push(UnitListing.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryUnitListingsResponse>): QueryUnitListingsResponse {
+    const message = createBaseQueryUnitListingsResponse();
+    message.listings = object.listings?.map(e => UnitListing.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryUnitListingsResponseAmino): QueryUnitListingsResponse {
+    const message = createBaseQueryUnitListingsResponse();
+    message.listings = object.listings?.map(e => UnitListing.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryUnitListingsResponse): QueryUnitListingsResponseAmino {
+    const obj: any = {};
+    if (message.listings) {
+      obj.listings = message.listings.map(e => e ? UnitListing.toAmino(e) : undefined);
+    } else {
+      obj.listings = message.listings;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryUnitListingsResponseAminoMsg): QueryUnitListingsResponse {
+    return QueryUnitListingsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryUnitListingsResponseProtoMsg): QueryUnitListingsResponse {
+    return QueryUnitListingsResponse.decode(message.value);
+  },
+  toProto(message: QueryUnitListingsResponse): Uint8Array {
+    return QueryUnitListingsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryUnitListingsResponse): QueryUnitListingsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryUnitListingsResponse",
+      value: QueryUnitListingsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryCraftRecipesRequest(): QueryCraftRecipesRequest {
+  return {
+    classId: BigInt(0)
+  };
+}
+/**
+ * QueryCraftRecipesRequest defines the QueryCraftRecipesRequest message.
+ * @name QueryCraftRecipesRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryCraftRecipesRequest
+ */
+export const QueryCraftRecipesRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryCraftRecipesRequest",
+  encode(message: QueryCraftRecipesRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.classId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryCraftRecipesRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryCraftRecipesRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.classId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryCraftRecipesRequest>): QueryCraftRecipesRequest {
+    const message = createBaseQueryCraftRecipesRequest();
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryCraftRecipesRequestAmino): QueryCraftRecipesRequest {
+    const message = createBaseQueryCraftRecipesRequest();
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryCraftRecipesRequest): QueryCraftRecipesRequestAmino {
+    const obj: any = {};
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryCraftRecipesRequestAminoMsg): QueryCraftRecipesRequest {
+    return QueryCraftRecipesRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryCraftRecipesRequestProtoMsg): QueryCraftRecipesRequest {
+    return QueryCraftRecipesRequest.decode(message.value);
+  },
+  toProto(message: QueryCraftRecipesRequest): Uint8Array {
+    return QueryCraftRecipesRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryCraftRecipesRequest): QueryCraftRecipesRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryCraftRecipesRequest",
+      value: QueryCraftRecipesRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryCraftRecipesResponse(): QueryCraftRecipesResponse {
+  return {
+    recipes: [],
+    locked: false
+  };
+}
+/**
+ * QueryCraftRecipesResponse defines the QueryCraftRecipesResponse message.
+ * @name QueryCraftRecipesResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryCraftRecipesResponse
+ */
+export const QueryCraftRecipesResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryCraftRecipesResponse",
+  encode(message: QueryCraftRecipesResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.recipes) {
+      CraftRecipe.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.locked === true) {
+      writer.uint32(16).bool(message.locked);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryCraftRecipesResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryCraftRecipesResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.recipes.push(CraftRecipe.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.locked = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryCraftRecipesResponse>): QueryCraftRecipesResponse {
+    const message = createBaseQueryCraftRecipesResponse();
+    message.recipes = object.recipes?.map(e => CraftRecipe.fromPartial(e)) || [];
+    message.locked = object.locked ?? false;
+    return message;
+  },
+  fromAmino(object: QueryCraftRecipesResponseAmino): QueryCraftRecipesResponse {
+    const message = createBaseQueryCraftRecipesResponse();
+    message.recipes = object.recipes?.map(e => CraftRecipe.fromAmino(e)) || [];
+    if (object.locked !== undefined && object.locked !== null) {
+      message.locked = object.locked;
+    }
+    return message;
+  },
+  toAmino(message: QueryCraftRecipesResponse): QueryCraftRecipesResponseAmino {
+    const obj: any = {};
+    if (message.recipes) {
+      obj.recipes = message.recipes.map(e => e ? CraftRecipe.toAmino(e) : undefined);
+    } else {
+      obj.recipes = message.recipes;
+    }
+    obj.locked = message.locked === false ? undefined : message.locked;
+    return obj;
+  },
+  fromAminoMsg(object: QueryCraftRecipesResponseAminoMsg): QueryCraftRecipesResponse {
+    return QueryCraftRecipesResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryCraftRecipesResponseProtoMsg): QueryCraftRecipesResponse {
+    return QueryCraftRecipesResponse.decode(message.value);
+  },
+  toProto(message: QueryCraftRecipesResponse): Uint8Array {
+    return QueryCraftRecipesResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryCraftRecipesResponse): QueryCraftRecipesResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryCraftRecipesResponse",
+      value: QueryCraftRecipesResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRentalRequest(): QueryRentalRequest {
+  return {
+    classId: BigInt(0),
+    tokenId: BigInt(0)
+  };
+}
+/**
+ * QueryRentalRequest defines the QueryRentalRequest message.
+ * @name QueryRentalRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalRequest
+ */
+export const QueryRentalRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryRentalRequest",
+  encode(message: QueryRentalRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.tokenId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRentalRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRentalRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.classId = reader.uint64();
+          break;
+        case 2:
+          message.tokenId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryRentalRequest>): QueryRentalRequest {
+    const message = createBaseQueryRentalRequest();
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryRentalRequestAmino): QueryRentalRequest {
+    const message = createBaseQueryRentalRequest();
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryRentalRequest): QueryRentalRequestAmino {
+    const obj: any = {};
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryRentalRequestAminoMsg): QueryRentalRequest {
+    return QueryRentalRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRentalRequestProtoMsg): QueryRentalRequest {
+    return QueryRentalRequest.decode(message.value);
+  },
+  toProto(message: QueryRentalRequest): Uint8Array {
+    return QueryRentalRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRentalRequest): QueryRentalRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryRentalRequest",
+      value: QueryRentalRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRentalResponse(): QueryRentalResponse {
+  return {
+    rental: Rental.fromPartial({})
+  };
+}
+/**
+ * QueryRentalResponse defines the QueryRentalResponse message.
+ * @name QueryRentalResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalResponse
+ */
+export const QueryRentalResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryRentalResponse",
+  encode(message: QueryRentalResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.rental !== undefined) {
+      Rental.encode(message.rental, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRentalResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRentalResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.rental = Rental.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryRentalResponse>): QueryRentalResponse {
+    const message = createBaseQueryRentalResponse();
+    message.rental = object.rental !== undefined && object.rental !== null ? Rental.fromPartial(object.rental) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryRentalResponseAmino): QueryRentalResponse {
+    const message = createBaseQueryRentalResponse();
+    if (object.rental !== undefined && object.rental !== null) {
+      message.rental = Rental.fromAmino(object.rental);
+    }
+    return message;
+  },
+  toAmino(message: QueryRentalResponse): QueryRentalResponseAmino {
+    const obj: any = {};
+    obj.rental = message.rental ? Rental.toAmino(message.rental) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryRentalResponseAminoMsg): QueryRentalResponse {
+    return QueryRentalResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRentalResponseProtoMsg): QueryRentalResponse {
+    return QueryRentalResponse.decode(message.value);
+  },
+  toProto(message: QueryRentalResponse): Uint8Array {
+    return QueryRentalResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRentalResponse): QueryRentalResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryRentalResponse",
+      value: QueryRentalResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRentalOfferRequest(): QueryRentalOfferRequest {
+  return {
+    classId: BigInt(0),
+    tokenId: BigInt(0)
+  };
+}
+/**
+ * QueryRentalOfferRequest defines the QueryRentalOfferRequest message.
+ * @name QueryRentalOfferRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalOfferRequest
+ */
+export const QueryRentalOfferRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryRentalOfferRequest",
+  encode(message: QueryRentalOfferRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.tokenId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRentalOfferRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRentalOfferRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.classId = reader.uint64();
+          break;
+        case 2:
+          message.tokenId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryRentalOfferRequest>): QueryRentalOfferRequest {
+    const message = createBaseQueryRentalOfferRequest();
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryRentalOfferRequestAmino): QueryRentalOfferRequest {
+    const message = createBaseQueryRentalOfferRequest();
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryRentalOfferRequest): QueryRentalOfferRequestAmino {
+    const obj: any = {};
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryRentalOfferRequestAminoMsg): QueryRentalOfferRequest {
+    return QueryRentalOfferRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRentalOfferRequestProtoMsg): QueryRentalOfferRequest {
+    return QueryRentalOfferRequest.decode(message.value);
+  },
+  toProto(message: QueryRentalOfferRequest): Uint8Array {
+    return QueryRentalOfferRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRentalOfferRequest): QueryRentalOfferRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryRentalOfferRequest",
+      value: QueryRentalOfferRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRentalOfferResponse(): QueryRentalOfferResponse {
+  return {
+    offer: RentalOffer.fromPartial({})
+  };
+}
+/**
+ * QueryRentalOfferResponse defines the QueryRentalOfferResponse message.
+ * @name QueryRentalOfferResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalOfferResponse
+ */
+export const QueryRentalOfferResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryRentalOfferResponse",
+  encode(message: QueryRentalOfferResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.offer !== undefined) {
+      RentalOffer.encode(message.offer, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRentalOfferResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRentalOfferResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.offer = RentalOffer.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryRentalOfferResponse>): QueryRentalOfferResponse {
+    const message = createBaseQueryRentalOfferResponse();
+    message.offer = object.offer !== undefined && object.offer !== null ? RentalOffer.fromPartial(object.offer) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryRentalOfferResponseAmino): QueryRentalOfferResponse {
+    const message = createBaseQueryRentalOfferResponse();
+    if (object.offer !== undefined && object.offer !== null) {
+      message.offer = RentalOffer.fromAmino(object.offer);
+    }
+    return message;
+  },
+  toAmino(message: QueryRentalOfferResponse): QueryRentalOfferResponseAmino {
+    const obj: any = {};
+    obj.offer = message.offer ? RentalOffer.toAmino(message.offer) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryRentalOfferResponseAminoMsg): QueryRentalOfferResponse {
+    return QueryRentalOfferResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRentalOfferResponseProtoMsg): QueryRentalOfferResponse {
+    return QueryRentalOfferResponse.decode(message.value);
+  },
+  toProto(message: QueryRentalOfferResponse): Uint8Array {
+    return QueryRentalOfferResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRentalOfferResponse): QueryRentalOfferResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryRentalOfferResponse",
+      value: QueryRentalOfferResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRentalsByUserRequest(): QueryRentalsByUserRequest {
+  return {
+    user: "",
+    pagination: undefined
+  };
+}
+/**
+ * QueryRentalsByUserRequest defines the QueryRentalsByUserRequest message.
+ * @name QueryRentalsByUserRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalsByUserRequest
+ */
+export const QueryRentalsByUserRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryRentalsByUserRequest",
+  encode(message: QueryRentalsByUserRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.user !== "") {
+      writer.uint32(10).string(message.user);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRentalsByUserRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRentalsByUserRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.user = reader.string();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryRentalsByUserRequest>): QueryRentalsByUserRequest {
+    const message = createBaseQueryRentalsByUserRequest();
+    message.user = object.user ?? "";
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryRentalsByUserRequestAmino): QueryRentalsByUserRequest {
+    const message = createBaseQueryRentalsByUserRequest();
+    if (object.user !== undefined && object.user !== null) {
+      message.user = object.user;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryRentalsByUserRequest): QueryRentalsByUserRequestAmino {
+    const obj: any = {};
+    obj.user = message.user === "" ? undefined : message.user;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryRentalsByUserRequestAminoMsg): QueryRentalsByUserRequest {
+    return QueryRentalsByUserRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRentalsByUserRequestProtoMsg): QueryRentalsByUserRequest {
+    return QueryRentalsByUserRequest.decode(message.value);
+  },
+  toProto(message: QueryRentalsByUserRequest): Uint8Array {
+    return QueryRentalsByUserRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRentalsByUserRequest): QueryRentalsByUserRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryRentalsByUserRequest",
+      value: QueryRentalsByUserRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRentalsByUserResponse(): QueryRentalsByUserResponse {
+  return {
+    rentals: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryRentalsByUserResponse defines the QueryRentalsByUserResponse message.
+ * @name QueryRentalsByUserResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalsByUserResponse
+ */
+export const QueryRentalsByUserResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryRentalsByUserResponse",
+  encode(message: QueryRentalsByUserResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.rentals) {
+      Rental.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRentalsByUserResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRentalsByUserResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.rentals.push(Rental.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryRentalsByUserResponse>): QueryRentalsByUserResponse {
+    const message = createBaseQueryRentalsByUserResponse();
+    message.rentals = object.rentals?.map(e => Rental.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryRentalsByUserResponseAmino): QueryRentalsByUserResponse {
+    const message = createBaseQueryRentalsByUserResponse();
+    message.rentals = object.rentals?.map(e => Rental.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryRentalsByUserResponse): QueryRentalsByUserResponseAmino {
+    const obj: any = {};
+    if (message.rentals) {
+      obj.rentals = message.rentals.map(e => e ? Rental.toAmino(e) : undefined);
+    } else {
+      obj.rentals = message.rentals;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryRentalsByUserResponseAminoMsg): QueryRentalsByUserResponse {
+    return QueryRentalsByUserResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRentalsByUserResponseProtoMsg): QueryRentalsByUserResponse {
+    return QueryRentalsByUserResponse.decode(message.value);
+  },
+  toProto(message: QueryRentalsByUserResponse): Uint8Array {
+    return QueryRentalsByUserResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRentalsByUserResponse): QueryRentalsByUserResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryRentalsByUserResponse",
+      value: QueryRentalsByUserResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryChildrenRequest(): QueryChildrenRequest {
+  return {
+    classId: BigInt(0),
+    tokenId: BigInt(0)
+  };
+}
+/**
+ * QueryChildrenRequest defines the QueryChildrenRequest message.
+ * @name QueryChildrenRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryChildrenRequest
+ */
+export const QueryChildrenRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryChildrenRequest",
+  encode(message: QueryChildrenRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.tokenId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryChildrenRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryChildrenRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.classId = reader.uint64();
+          break;
+        case 2:
+          message.tokenId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryChildrenRequest>): QueryChildrenRequest {
+    const message = createBaseQueryChildrenRequest();
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryChildrenRequestAmino): QueryChildrenRequest {
+    const message = createBaseQueryChildrenRequest();
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryChildrenRequest): QueryChildrenRequestAmino {
+    const obj: any = {};
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryChildrenRequestAminoMsg): QueryChildrenRequest {
+    return QueryChildrenRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryChildrenRequestProtoMsg): QueryChildrenRequest {
+    return QueryChildrenRequest.decode(message.value);
+  },
+  toProto(message: QueryChildrenRequest): Uint8Array {
+    return QueryChildrenRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryChildrenRequest): QueryChildrenRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryChildrenRequest",
+      value: QueryChildrenRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryChildrenResponse(): QueryChildrenResponse {
+  return {
+    children: [],
+    contentsHash: "",
+    descendants: 0
+  };
+}
+/**
+ * QueryChildrenResponse defines the QueryChildrenResponse message.
+ * @name QueryChildrenResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryChildrenResponse
+ */
+export const QueryChildrenResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryChildrenResponse",
+  encode(message: QueryChildrenResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.children) {
+      TokenRef.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.contentsHash !== "") {
+      writer.uint32(18).string(message.contentsHash);
+    }
+    if (message.descendants !== 0) {
+      writer.uint32(24).uint32(message.descendants);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryChildrenResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryChildrenResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.children.push(TokenRef.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.contentsHash = reader.string();
+          break;
+        case 3:
+          message.descendants = reader.uint32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryChildrenResponse>): QueryChildrenResponse {
+    const message = createBaseQueryChildrenResponse();
+    message.children = object.children?.map(e => TokenRef.fromPartial(e)) || [];
+    message.contentsHash = object.contentsHash ?? "";
+    message.descendants = object.descendants ?? 0;
+    return message;
+  },
+  fromAmino(object: QueryChildrenResponseAmino): QueryChildrenResponse {
+    const message = createBaseQueryChildrenResponse();
+    message.children = object.children?.map(e => TokenRef.fromAmino(e)) || [];
+    if (object.contents_hash !== undefined && object.contents_hash !== null) {
+      message.contentsHash = object.contents_hash;
+    }
+    if (object.descendants !== undefined && object.descendants !== null) {
+      message.descendants = object.descendants;
+    }
+    return message;
+  },
+  toAmino(message: QueryChildrenResponse): QueryChildrenResponseAmino {
+    const obj: any = {};
+    if (message.children) {
+      obj.children = message.children.map(e => e ? TokenRef.toAmino(e) : undefined);
+    } else {
+      obj.children = message.children;
+    }
+    obj.contents_hash = message.contentsHash === "" ? undefined : message.contentsHash;
+    obj.descendants = message.descendants === 0 ? undefined : message.descendants;
+    return obj;
+  },
+  fromAminoMsg(object: QueryChildrenResponseAminoMsg): QueryChildrenResponse {
+    return QueryChildrenResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryChildrenResponseProtoMsg): QueryChildrenResponse {
+    return QueryChildrenResponse.decode(message.value);
+  },
+  toProto(message: QueryChildrenResponse): Uint8Array {
+    return QueryChildrenResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryChildrenResponse): QueryChildrenResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryChildrenResponse",
+      value: QueryChildrenResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryHarbergerQuoteRequest(): QueryHarbergerQuoteRequest {
+  return {
+    classId: BigInt(0),
+    tokenId: BigInt(0)
+  };
+}
+/**
+ * QueryHarbergerQuoteRequest defines the QueryHarbergerQuoteRequest message.
+ * @name QueryHarbergerQuoteRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryHarbergerQuoteRequest
+ */
+export const QueryHarbergerQuoteRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryHarbergerQuoteRequest",
+  encode(message: QueryHarbergerQuoteRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.tokenId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryHarbergerQuoteRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryHarbergerQuoteRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.classId = reader.uint64();
+          break;
+        case 2:
+          message.tokenId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryHarbergerQuoteRequest>): QueryHarbergerQuoteRequest {
+    const message = createBaseQueryHarbergerQuoteRequest();
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryHarbergerQuoteRequestAmino): QueryHarbergerQuoteRequest {
+    const message = createBaseQueryHarbergerQuoteRequest();
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryHarbergerQuoteRequest): QueryHarbergerQuoteRequestAmino {
+    const obj: any = {};
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryHarbergerQuoteRequestAminoMsg): QueryHarbergerQuoteRequest {
+    return QueryHarbergerQuoteRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryHarbergerQuoteRequestProtoMsg): QueryHarbergerQuoteRequest {
+    return QueryHarbergerQuoteRequest.decode(message.value);
+  },
+  toProto(message: QueryHarbergerQuoteRequest): Uint8Array {
+    return QueryHarbergerQuoteRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryHarbergerQuoteRequest): QueryHarbergerQuoteRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryHarbergerQuoteRequest",
+      value: QueryHarbergerQuoteRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryHarbergerQuoteResponse(): QueryHarbergerQuoteResponse {
+  return {
+    state: HarbergerState.fromPartial({}),
+    currentPrice: "",
+    taxPerPeriod: "",
+    foreclosed: false,
+    forSale: false
+  };
+}
+/**
+ * QueryHarbergerQuoteResponse defines the QueryHarbergerQuoteResponse message.
+ * @name QueryHarbergerQuoteResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryHarbergerQuoteResponse
+ */
+export const QueryHarbergerQuoteResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryHarbergerQuoteResponse",
+  encode(message: QueryHarbergerQuoteResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.state !== undefined) {
+      HarbergerState.encode(message.state, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.currentPrice !== "") {
+      writer.uint32(18).string(message.currentPrice);
+    }
+    if (message.taxPerPeriod !== "") {
+      writer.uint32(26).string(message.taxPerPeriod);
+    }
+    if (message.foreclosed === true) {
+      writer.uint32(32).bool(message.foreclosed);
+    }
+    if (message.forSale === true) {
+      writer.uint32(40).bool(message.forSale);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryHarbergerQuoteResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryHarbergerQuoteResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.state = HarbergerState.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.currentPrice = reader.string();
+          break;
+        case 3:
+          message.taxPerPeriod = reader.string();
+          break;
+        case 4:
+          message.foreclosed = reader.bool();
+          break;
+        case 5:
+          message.forSale = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryHarbergerQuoteResponse>): QueryHarbergerQuoteResponse {
+    const message = createBaseQueryHarbergerQuoteResponse();
+    message.state = object.state !== undefined && object.state !== null ? HarbergerState.fromPartial(object.state) : undefined;
+    message.currentPrice = object.currentPrice ?? "";
+    message.taxPerPeriod = object.taxPerPeriod ?? "";
+    message.foreclosed = object.foreclosed ?? false;
+    message.forSale = object.forSale ?? false;
+    return message;
+  },
+  fromAmino(object: QueryHarbergerQuoteResponseAmino): QueryHarbergerQuoteResponse {
+    const message = createBaseQueryHarbergerQuoteResponse();
+    if (object.state !== undefined && object.state !== null) {
+      message.state = HarbergerState.fromAmino(object.state);
+    }
+    if (object.current_price !== undefined && object.current_price !== null) {
+      message.currentPrice = object.current_price;
+    }
+    if (object.tax_per_period !== undefined && object.tax_per_period !== null) {
+      message.taxPerPeriod = object.tax_per_period;
+    }
+    if (object.foreclosed !== undefined && object.foreclosed !== null) {
+      message.foreclosed = object.foreclosed;
+    }
+    if (object.for_sale !== undefined && object.for_sale !== null) {
+      message.forSale = object.for_sale;
+    }
+    return message;
+  },
+  toAmino(message: QueryHarbergerQuoteResponse): QueryHarbergerQuoteResponseAmino {
+    const obj: any = {};
+    obj.state = message.state ? HarbergerState.toAmino(message.state) : undefined;
+    obj.current_price = message.currentPrice === "" ? undefined : message.currentPrice;
+    obj.tax_per_period = message.taxPerPeriod === "" ? undefined : message.taxPerPeriod;
+    obj.foreclosed = message.foreclosed === false ? undefined : message.foreclosed;
+    obj.for_sale = message.forSale === false ? undefined : message.forSale;
+    return obj;
+  },
+  fromAminoMsg(object: QueryHarbergerQuoteResponseAminoMsg): QueryHarbergerQuoteResponse {
+    return QueryHarbergerQuoteResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryHarbergerQuoteResponseProtoMsg): QueryHarbergerQuoteResponse {
+    return QueryHarbergerQuoteResponse.decode(message.value);
+  },
+  toProto(message: QueryHarbergerQuoteResponse): Uint8Array {
+    return QueryHarbergerQuoteResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryHarbergerQuoteResponse): QueryHarbergerQuoteResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryHarbergerQuoteResponse",
+      value: QueryHarbergerQuoteResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryOfferRequest(): QueryOfferRequest {
+  return {
+    offerId: BigInt(0)
+  };
+}
+/**
+ * QueryOfferRequest defines the QueryOfferRequest message.
+ * @name QueryOfferRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryOfferRequest
+ */
+export const QueryOfferRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryOfferRequest",
+  encode(message: QueryOfferRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.offerId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.offerId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryOfferRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryOfferRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.offerId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryOfferRequest>): QueryOfferRequest {
+    const message = createBaseQueryOfferRequest();
+    message.offerId = object.offerId !== undefined && object.offerId !== null ? BigInt(object.offerId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryOfferRequestAmino): QueryOfferRequest {
+    const message = createBaseQueryOfferRequest();
+    if (object.offer_id !== undefined && object.offer_id !== null) {
+      message.offerId = BigInt(object.offer_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryOfferRequest): QueryOfferRequestAmino {
+    const obj: any = {};
+    obj.offer_id = message.offerId !== BigInt(0) ? message.offerId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryOfferRequestAminoMsg): QueryOfferRequest {
+    return QueryOfferRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryOfferRequestProtoMsg): QueryOfferRequest {
+    return QueryOfferRequest.decode(message.value);
+  },
+  toProto(message: QueryOfferRequest): Uint8Array {
+    return QueryOfferRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryOfferRequest): QueryOfferRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryOfferRequest",
+      value: QueryOfferRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryOfferResponse(): QueryOfferResponse {
+  return {
+    offer: Offer.fromPartial({})
+  };
+}
+/**
+ * QueryOfferResponse defines the QueryOfferResponse message.
+ * @name QueryOfferResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryOfferResponse
+ */
+export const QueryOfferResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryOfferResponse",
+  encode(message: QueryOfferResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.offer !== undefined) {
+      Offer.encode(message.offer, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryOfferResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryOfferResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.offer = Offer.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryOfferResponse>): QueryOfferResponse {
+    const message = createBaseQueryOfferResponse();
+    message.offer = object.offer !== undefined && object.offer !== null ? Offer.fromPartial(object.offer) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryOfferResponseAmino): QueryOfferResponse {
+    const message = createBaseQueryOfferResponse();
+    if (object.offer !== undefined && object.offer !== null) {
+      message.offer = Offer.fromAmino(object.offer);
+    }
+    return message;
+  },
+  toAmino(message: QueryOfferResponse): QueryOfferResponseAmino {
+    const obj: any = {};
+    obj.offer = message.offer ? Offer.toAmino(message.offer) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryOfferResponseAminoMsg): QueryOfferResponse {
+    return QueryOfferResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryOfferResponseProtoMsg): QueryOfferResponse {
+    return QueryOfferResponse.decode(message.value);
+  },
+  toProto(message: QueryOfferResponse): Uint8Array {
+    return QueryOfferResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryOfferResponse): QueryOfferResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryOfferResponse",
+      value: QueryOfferResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryOffersRequest(): QueryOffersRequest {
+  return {
+    classId: BigInt(0),
+    tokenId: BigInt(0),
+    pagination: undefined
+  };
+}
+/**
+ * QueryOffersRequest lists the open offers on a token, or (token_id 0) the
+ * collection offers on a class.
+ * @name QueryOffersRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryOffersRequest
+ */
+export const QueryOffersRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryOffersRequest",
+  encode(message: QueryOffersRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.classId);
+    }
+    if (message.tokenId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.tokenId);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryOffersRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryOffersRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.classId = reader.uint64();
+          break;
+        case 2:
+          message.tokenId = reader.uint64();
+          break;
+        case 3:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryOffersRequest>): QueryOffersRequest {
+    const message = createBaseQueryOffersRequest();
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.tokenId = object.tokenId !== undefined && object.tokenId !== null ? BigInt(object.tokenId.toString()) : BigInt(0);
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryOffersRequestAmino): QueryOffersRequest {
+    const message = createBaseQueryOffersRequest();
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.token_id !== undefined && object.token_id !== null) {
+      message.tokenId = BigInt(object.token_id);
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryOffersRequest): QueryOffersRequestAmino {
+    const obj: any = {};
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.token_id = message.tokenId !== BigInt(0) ? message.tokenId?.toString() : undefined;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryOffersRequestAminoMsg): QueryOffersRequest {
+    return QueryOffersRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryOffersRequestProtoMsg): QueryOffersRequest {
+    return QueryOffersRequest.decode(message.value);
+  },
+  toProto(message: QueryOffersRequest): Uint8Array {
+    return QueryOffersRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryOffersRequest): QueryOffersRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryOffersRequest",
+      value: QueryOffersRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryOffersResponse(): QueryOffersResponse {
+  return {
+    offers: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryOffersResponse defines the QueryOffersResponse message.
+ * @name QueryOffersResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryOffersResponse
+ */
+export const QueryOffersResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryOffersResponse",
+  encode(message: QueryOffersResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.offers) {
+      Offer.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryOffersResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryOffersResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.offers.push(Offer.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryOffersResponse>): QueryOffersResponse {
+    const message = createBaseQueryOffersResponse();
+    message.offers = object.offers?.map(e => Offer.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryOffersResponseAmino): QueryOffersResponse {
+    const message = createBaseQueryOffersResponse();
+    message.offers = object.offers?.map(e => Offer.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryOffersResponse): QueryOffersResponseAmino {
+    const obj: any = {};
+    if (message.offers) {
+      obj.offers = message.offers.map(e => e ? Offer.toAmino(e) : undefined);
+    } else {
+      obj.offers = message.offers;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryOffersResponseAminoMsg): QueryOffersResponse {
+    return QueryOffersResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryOffersResponseProtoMsg): QueryOffersResponse {
+    return QueryOffersResponse.decode(message.value);
+  },
+  toProto(message: QueryOffersResponse): Uint8Array {
+    return QueryOffersResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryOffersResponse): QueryOffersResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryOffersResponse",
+      value: QueryOffersResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryOffersByBidderRequest(): QueryOffersByBidderRequest {
+  return {
+    bidder: "",
+    pagination: undefined
+  };
+}
+/**
+ * QueryOffersByBidderRequest defines the QueryOffersByBidderRequest message.
+ * @name QueryOffersByBidderRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryOffersByBidderRequest
+ */
+export const QueryOffersByBidderRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryOffersByBidderRequest",
+  encode(message: QueryOffersByBidderRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.bidder !== "") {
+      writer.uint32(10).string(message.bidder);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryOffersByBidderRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryOffersByBidderRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.bidder = reader.string();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryOffersByBidderRequest>): QueryOffersByBidderRequest {
+    const message = createBaseQueryOffersByBidderRequest();
+    message.bidder = object.bidder ?? "";
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryOffersByBidderRequestAmino): QueryOffersByBidderRequest {
+    const message = createBaseQueryOffersByBidderRequest();
+    if (object.bidder !== undefined && object.bidder !== null) {
+      message.bidder = object.bidder;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryOffersByBidderRequest): QueryOffersByBidderRequestAmino {
+    const obj: any = {};
+    obj.bidder = message.bidder === "" ? undefined : message.bidder;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryOffersByBidderRequestAminoMsg): QueryOffersByBidderRequest {
+    return QueryOffersByBidderRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryOffersByBidderRequestProtoMsg): QueryOffersByBidderRequest {
+    return QueryOffersByBidderRequest.decode(message.value);
+  },
+  toProto(message: QueryOffersByBidderRequest): Uint8Array {
+    return QueryOffersByBidderRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryOffersByBidderRequest): QueryOffersByBidderRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryOffersByBidderRequest",
+      value: QueryOffersByBidderRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryOffersByBidderResponse(): QueryOffersByBidderResponse {
+  return {
+    offers: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryOffersByBidderResponse defines the QueryOffersByBidderResponse message.
+ * @name QueryOffersByBidderResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryOffersByBidderResponse
+ */
+export const QueryOffersByBidderResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryOffersByBidderResponse",
+  encode(message: QueryOffersByBidderResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.offers) {
+      Offer.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryOffersByBidderResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryOffersByBidderResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.offers.push(Offer.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryOffersByBidderResponse>): QueryOffersByBidderResponse {
+    const message = createBaseQueryOffersByBidderResponse();
+    message.offers = object.offers?.map(e => Offer.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryOffersByBidderResponseAmino): QueryOffersByBidderResponse {
+    const message = createBaseQueryOffersByBidderResponse();
+    message.offers = object.offers?.map(e => Offer.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryOffersByBidderResponse): QueryOffersByBidderResponseAmino {
+    const obj: any = {};
+    if (message.offers) {
+      obj.offers = message.offers.map(e => e ? Offer.toAmino(e) : undefined);
+    } else {
+      obj.offers = message.offers;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryOffersByBidderResponseAminoMsg): QueryOffersByBidderResponse {
+    return QueryOffersByBidderResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryOffersByBidderResponseProtoMsg): QueryOffersByBidderResponse {
+    return QueryOffersByBidderResponse.decode(message.value);
+  },
+  toProto(message: QueryOffersByBidderResponse): Uint8Array {
+    return QueryOffersByBidderResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryOffersByBidderResponse): QueryOffersByBidderResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryOffersByBidderResponse",
+      value: QueryOffersByBidderResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAuctionRequest(): QueryAuctionRequest {
+  return {
+    auctionId: BigInt(0)
+  };
+}
+/**
+ * QueryAuctionRequest defines the QueryAuctionRequest message.
+ * @name QueryAuctionRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryAuctionRequest
+ */
+export const QueryAuctionRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryAuctionRequest",
+  encode(message: QueryAuctionRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.auctionId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.auctionId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAuctionRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAuctionRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.auctionId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAuctionRequest>): QueryAuctionRequest {
+    const message = createBaseQueryAuctionRequest();
+    message.auctionId = object.auctionId !== undefined && object.auctionId !== null ? BigInt(object.auctionId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryAuctionRequestAmino): QueryAuctionRequest {
+    const message = createBaseQueryAuctionRequest();
+    if (object.auction_id !== undefined && object.auction_id !== null) {
+      message.auctionId = BigInt(object.auction_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryAuctionRequest): QueryAuctionRequestAmino {
+    const obj: any = {};
+    obj.auction_id = message.auctionId !== BigInt(0) ? message.auctionId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAuctionRequestAminoMsg): QueryAuctionRequest {
+    return QueryAuctionRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAuctionRequestProtoMsg): QueryAuctionRequest {
+    return QueryAuctionRequest.decode(message.value);
+  },
+  toProto(message: QueryAuctionRequest): Uint8Array {
+    return QueryAuctionRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAuctionRequest): QueryAuctionRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryAuctionRequest",
+      value: QueryAuctionRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAuctionResponse(): QueryAuctionResponse {
+  return {
+    auction: Auction.fromPartial({}),
+    minNextBid: ""
+  };
+}
+/**
+ * QueryAuctionResponse defines the QueryAuctionResponse message.
+ * @name QueryAuctionResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryAuctionResponse
+ */
+export const QueryAuctionResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryAuctionResponse",
+  encode(message: QueryAuctionResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.auction !== undefined) {
+      Auction.encode(message.auction, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.minNextBid !== "") {
+      writer.uint32(18).string(message.minNextBid);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAuctionResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAuctionResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.auction = Auction.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.minNextBid = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAuctionResponse>): QueryAuctionResponse {
+    const message = createBaseQueryAuctionResponse();
+    message.auction = object.auction !== undefined && object.auction !== null ? Auction.fromPartial(object.auction) : undefined;
+    message.minNextBid = object.minNextBid ?? "";
+    return message;
+  },
+  fromAmino(object: QueryAuctionResponseAmino): QueryAuctionResponse {
+    const message = createBaseQueryAuctionResponse();
+    if (object.auction !== undefined && object.auction !== null) {
+      message.auction = Auction.fromAmino(object.auction);
+    }
+    if (object.min_next_bid !== undefined && object.min_next_bid !== null) {
+      message.minNextBid = object.min_next_bid;
+    }
+    return message;
+  },
+  toAmino(message: QueryAuctionResponse): QueryAuctionResponseAmino {
+    const obj: any = {};
+    obj.auction = message.auction ? Auction.toAmino(message.auction) : undefined;
+    obj.min_next_bid = message.minNextBid === "" ? undefined : message.minNextBid;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAuctionResponseAminoMsg): QueryAuctionResponse {
+    return QueryAuctionResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAuctionResponseProtoMsg): QueryAuctionResponse {
+    return QueryAuctionResponse.decode(message.value);
+  },
+  toProto(message: QueryAuctionResponse): Uint8Array {
+    return QueryAuctionResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAuctionResponse): QueryAuctionResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryAuctionResponse",
+      value: QueryAuctionResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAuctionsRequest(): QueryAuctionsRequest {
+  return {
+    classId: BigInt(0),
+    pagination: undefined
+  };
+}
+/**
+ * QueryAuctionsRequest lists open auctions (class_id 0 = every class).
+ * @name QueryAuctionsRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryAuctionsRequest
+ */
+export const QueryAuctionsRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryAuctionsRequest",
+  encode(message: QueryAuctionsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.classId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.classId);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAuctionsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAuctionsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.classId = reader.uint64();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAuctionsRequest>): QueryAuctionsRequest {
+    const message = createBaseQueryAuctionsRequest();
+    message.classId = object.classId !== undefined && object.classId !== null ? BigInt(object.classId.toString()) : BigInt(0);
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAuctionsRequestAmino): QueryAuctionsRequest {
+    const message = createBaseQueryAuctionsRequest();
+    if (object.class_id !== undefined && object.class_id !== null) {
+      message.classId = BigInt(object.class_id);
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAuctionsRequest): QueryAuctionsRequestAmino {
+    const obj: any = {};
+    obj.class_id = message.classId !== BigInt(0) ? message.classId?.toString() : undefined;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAuctionsRequestAminoMsg): QueryAuctionsRequest {
+    return QueryAuctionsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAuctionsRequestProtoMsg): QueryAuctionsRequest {
+    return QueryAuctionsRequest.decode(message.value);
+  },
+  toProto(message: QueryAuctionsRequest): Uint8Array {
+    return QueryAuctionsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAuctionsRequest): QueryAuctionsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryAuctionsRequest",
+      value: QueryAuctionsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAuctionsResponse(): QueryAuctionsResponse {
+  return {
+    auctions: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryAuctionsResponse defines the QueryAuctionsResponse message.
+ * @name QueryAuctionsResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryAuctionsResponse
+ */
+export const QueryAuctionsResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryAuctionsResponse",
+  encode(message: QueryAuctionsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.auctions) {
+      Auction.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAuctionsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAuctionsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.auctions.push(Auction.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAuctionsResponse>): QueryAuctionsResponse {
+    const message = createBaseQueryAuctionsResponse();
+    message.auctions = object.auctions?.map(e => Auction.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAuctionsResponseAmino): QueryAuctionsResponse {
+    const message = createBaseQueryAuctionsResponse();
+    message.auctions = object.auctions?.map(e => Auction.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAuctionsResponse): QueryAuctionsResponseAmino {
+    const obj: any = {};
+    if (message.auctions) {
+      obj.auctions = message.auctions.map(e => e ? Auction.toAmino(e) : undefined);
+    } else {
+      obj.auctions = message.auctions;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAuctionsResponseAminoMsg): QueryAuctionsResponse {
+    return QueryAuctionsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAuctionsResponseProtoMsg): QueryAuctionsResponse {
+    return QueryAuctionsResponse.decode(message.value);
+  },
+  toProto(message: QueryAuctionsResponse): Uint8Array {
+    return QueryAuctionsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAuctionsResponse): QueryAuctionsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryAuctionsResponse",
+      value: QueryAuctionsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAuctionsBySellerRequest(): QueryAuctionsBySellerRequest {
+  return {
+    seller: "",
+    pagination: undefined
+  };
+}
+/**
+ * QueryAuctionsBySellerRequest defines the QueryAuctionsBySellerRequest message.
+ * @name QueryAuctionsBySellerRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryAuctionsBySellerRequest
+ */
+export const QueryAuctionsBySellerRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryAuctionsBySellerRequest",
+  encode(message: QueryAuctionsBySellerRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.seller !== "") {
+      writer.uint32(10).string(message.seller);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAuctionsBySellerRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAuctionsBySellerRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.seller = reader.string();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAuctionsBySellerRequest>): QueryAuctionsBySellerRequest {
+    const message = createBaseQueryAuctionsBySellerRequest();
+    message.seller = object.seller ?? "";
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAuctionsBySellerRequestAmino): QueryAuctionsBySellerRequest {
+    const message = createBaseQueryAuctionsBySellerRequest();
+    if (object.seller !== undefined && object.seller !== null) {
+      message.seller = object.seller;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAuctionsBySellerRequest): QueryAuctionsBySellerRequestAmino {
+    const obj: any = {};
+    obj.seller = message.seller === "" ? undefined : message.seller;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAuctionsBySellerRequestAminoMsg): QueryAuctionsBySellerRequest {
+    return QueryAuctionsBySellerRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAuctionsBySellerRequestProtoMsg): QueryAuctionsBySellerRequest {
+    return QueryAuctionsBySellerRequest.decode(message.value);
+  },
+  toProto(message: QueryAuctionsBySellerRequest): Uint8Array {
+    return QueryAuctionsBySellerRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAuctionsBySellerRequest): QueryAuctionsBySellerRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryAuctionsBySellerRequest",
+      value: QueryAuctionsBySellerRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryAuctionsBySellerResponse(): QueryAuctionsBySellerResponse {
+  return {
+    auctions: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryAuctionsBySellerResponse defines the QueryAuctionsBySellerResponse message.
+ * @name QueryAuctionsBySellerResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryAuctionsBySellerResponse
+ */
+export const QueryAuctionsBySellerResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryAuctionsBySellerResponse",
+  encode(message: QueryAuctionsBySellerResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.auctions) {
+      Auction.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryAuctionsBySellerResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAuctionsBySellerResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.auctions.push(Auction.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryAuctionsBySellerResponse>): QueryAuctionsBySellerResponse {
+    const message = createBaseQueryAuctionsBySellerResponse();
+    message.auctions = object.auctions?.map(e => Auction.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryAuctionsBySellerResponseAmino): QueryAuctionsBySellerResponse {
+    const message = createBaseQueryAuctionsBySellerResponse();
+    message.auctions = object.auctions?.map(e => Auction.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryAuctionsBySellerResponse): QueryAuctionsBySellerResponseAmino {
+    const obj: any = {};
+    if (message.auctions) {
+      obj.auctions = message.auctions.map(e => e ? Auction.toAmino(e) : undefined);
+    } else {
+      obj.auctions = message.auctions;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryAuctionsBySellerResponseAminoMsg): QueryAuctionsBySellerResponse {
+    return QueryAuctionsBySellerResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryAuctionsBySellerResponseProtoMsg): QueryAuctionsBySellerResponse {
+    return QueryAuctionsBySellerResponse.decode(message.value);
+  },
+  toProto(message: QueryAuctionsBySellerResponse): Uint8Array {
+    return QueryAuctionsBySellerResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryAuctionsBySellerResponse): QueryAuctionsBySellerResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryAuctionsBySellerResponse",
+      value: QueryAuctionsBySellerResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRentalOffersRequest(): QueryRentalOffersRequest {
+  return {
+    user: "",
+    pagination: undefined
+  };
+}
+/**
+ * QueryRentalOffersRequest defines the QueryRentalOffersRequest message.
+ * @name QueryRentalOffersRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalOffersRequest
+ */
+export const QueryRentalOffersRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryRentalOffersRequest",
+  encode(message: QueryRentalOffersRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.user !== "") {
+      writer.uint32(10).string(message.user);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRentalOffersRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRentalOffersRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.user = reader.string();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryRentalOffersRequest>): QueryRentalOffersRequest {
+    const message = createBaseQueryRentalOffersRequest();
+    message.user = object.user ?? "";
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryRentalOffersRequestAmino): QueryRentalOffersRequest {
+    const message = createBaseQueryRentalOffersRequest();
+    if (object.user !== undefined && object.user !== null) {
+      message.user = object.user;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryRentalOffersRequest): QueryRentalOffersRequestAmino {
+    const obj: any = {};
+    obj.user = message.user === "" ? undefined : message.user;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryRentalOffersRequestAminoMsg): QueryRentalOffersRequest {
+    return QueryRentalOffersRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRentalOffersRequestProtoMsg): QueryRentalOffersRequest {
+    return QueryRentalOffersRequest.decode(message.value);
+  },
+  toProto(message: QueryRentalOffersRequest): Uint8Array {
+    return QueryRentalOffersRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRentalOffersRequest): QueryRentalOffersRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryRentalOffersRequest",
+      value: QueryRentalOffersRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRentalOffersResponse(): QueryRentalOffersResponse {
+  return {
+    offers: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryRentalOffersResponse defines the QueryRentalOffersResponse message.
+ * @name QueryRentalOffersResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryRentalOffersResponse
+ */
+export const QueryRentalOffersResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryRentalOffersResponse",
+  encode(message: QueryRentalOffersResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.offers) {
+      RentalOffer.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRentalOffersResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRentalOffersResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.offers.push(RentalOffer.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryRentalOffersResponse>): QueryRentalOffersResponse {
+    const message = createBaseQueryRentalOffersResponse();
+    message.offers = object.offers?.map(e => RentalOffer.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryRentalOffersResponseAmino): QueryRentalOffersResponse {
+    const message = createBaseQueryRentalOffersResponse();
+    message.offers = object.offers?.map(e => RentalOffer.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryRentalOffersResponse): QueryRentalOffersResponseAmino {
+    const obj: any = {};
+    if (message.offers) {
+      obj.offers = message.offers.map(e => e ? RentalOffer.toAmino(e) : undefined);
+    } else {
+      obj.offers = message.offers;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryRentalOffersResponseAminoMsg): QueryRentalOffersResponse {
+    return QueryRentalOffersResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRentalOffersResponseProtoMsg): QueryRentalOffersResponse {
+    return QueryRentalOffersResponse.decode(message.value);
+  },
+  toProto(message: QueryRentalOffersResponse): Uint8Array {
+    return QueryRentalOffersResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRentalOffersResponse): QueryRentalOffersResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryRentalOffersResponse",
+      value: QueryRentalOffersResponse.encode(message).finish()
     };
   }
 };

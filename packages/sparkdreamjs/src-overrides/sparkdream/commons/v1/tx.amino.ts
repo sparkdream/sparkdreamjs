@@ -22,6 +22,8 @@ import {
   MsgSubmitProposal, MsgVoteProposal, MsgExecuteProposal,
   MsgSubmitAnonymousProposal, MsgAnonymousVoteProposal,
   MsgCreateCategory, MsgDeleteCategory,
+  MsgScheduleRecurringSpend, MsgClaimRecurringSpend, MsgCancelRecurringSpend,
+  MsgDeclineRecurringSpend,
 } from "./tx";
 import { Coin } from "../../../cosmos/base/v1beta1/coin";
 import { anyToAmino, aminoToAny } from "../../../nested-amino";
@@ -244,5 +246,37 @@ export const AminoConverter = {
     aminoType: "sparkdream/x/commons/MsgDeleteCategory",
     toAmino: MsgDeleteCategory.toAmino,
     fromAmino: MsgDeleteCategory.fromAmino,
+  },
+  "/sparkdream.commons.v1.MsgScheduleRecurringSpend": {
+    aminoType: "sparkdream/x/commons/MsgScheduleRecurringSpend",
+    toAmino(message: any): any {
+      const obj: any = {};
+      obj.authority = message.authority === "" ? undefined : message.authority;
+      obj.recipient = message.recipient === "" ? undefined : message.recipient;
+      obj.amount_per_period = (message.amountPerPeriod?.length ?? 0) > 0
+        ? message.amountPerPeriod.map((e: any) => e ? Coin.toAmino(e) : undefined)
+        : undefined;
+      obj.period_seconds = message.periodSeconds !== BigInt(0) ? message.periodSeconds?.toString() : undefined;
+      obj.start_time = message.startTime !== BigInt(0) ? message.startTime?.toString() : undefined;
+      obj.end_time = message.endTime !== BigInt(0) ? message.endTime?.toString() : undefined;
+      obj.note = message.note === "" ? undefined : message.note;
+      return obj;
+    },
+    fromAmino: MsgScheduleRecurringSpend.fromAmino,
+  },
+  "/sparkdream.commons.v1.MsgClaimRecurringSpend": {
+    aminoType: "sparkdream/x/commons/MsgClaimRecurringSpend",
+    toAmino: MsgClaimRecurringSpend.toAmino,
+    fromAmino: MsgClaimRecurringSpend.fromAmino,
+  },
+  "/sparkdream.commons.v1.MsgCancelRecurringSpend": {
+    aminoType: "sparkdream/x/commons/MsgCancelRecurringSpend",
+    toAmino: MsgCancelRecurringSpend.toAmino,
+    fromAmino: MsgCancelRecurringSpend.fromAmino,
+  },
+  "/sparkdream.commons.v1.MsgDeclineRecurringSpend": {
+    aminoType: "sparkdream/x/commons/MsgDeclineRecurringSpend",
+    toAmino: MsgDeclineRecurringSpend.toAmino,
+    fromAmino: MsgDeclineRecurringSpend.fromAmino,
   },
 };

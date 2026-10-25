@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgInviteMember, MsgInviteMemberResponse, MsgAcceptInvitation, MsgAcceptInvitationResponse, MsgTransferDream, MsgTransferDreamResponse, MsgCreateInterim, MsgCreateInterimResponse, MsgAssignInterim, MsgAssignInterimResponse, MsgSubmitInterimWork, MsgSubmitInterimWorkResponse, MsgApproveInterim, MsgApproveInterimResponse, MsgAbandonInterim, MsgAbandonInterimResponse, MsgCompleteInterim, MsgCompleteInterimResponse, MsgProposeProject, MsgProposeProjectResponse, MsgApproveProjectBudget, MsgApproveProjectBudgetResponse, MsgCancelProject, MsgCancelProjectResponse, MsgCreateInitiative, MsgCreateInitiativeResponse, MsgAssignInitiative, MsgAssignInitiativeResponse, MsgSubmitInitiativeWork, MsgSubmitInitiativeWorkResponse, MsgApproveInitiative, MsgApproveInitiativeResponse, MsgUnassignInitiative, MsgUnassignInitiativeResponse, MsgCompleteInitiative, MsgCompleteInitiativeResponse, MsgStake, MsgStakeResponse, MsgUnstake, MsgUnstakeResponse, MsgClaimStakingRewards, MsgClaimStakingRewardsResponse, MsgCompoundStakingRewards, MsgCompoundStakingRewardsResponse, MsgCreateChallenge, MsgCreateChallengeResponse, MsgRespondToChallenge, MsgRespondToChallengeResponse, MsgSubmitJurorVote, MsgSubmitJurorVoteResponse, MsgAcceptJuryDuty, MsgAcceptJuryDutyResponse, MsgSubmitInitiativeReview, MsgSubmitInitiativeReviewResponse, MsgSetVerificationPolicy, MsgSetVerificationPolicyResponse, MsgResolveReviewEscalation, MsgResolveReviewEscalationResponse, MsgDeclineJuryDuty, MsgDeclineJuryDutyResponse, MsgFundReviewBounty, MsgFundReviewBountyResponse, MsgReclaimReviewBounty, MsgReclaimReviewBountyResponse, MsgSubmitExpertTestimony, MsgSubmitExpertTestimonyResponse, MsgChallengeContent, MsgChallengeContentResponse, MsgRespondToContentChallenge, MsgRespondToContentChallengeResponse, MsgRegisterZkPublicKey, MsgRegisterZkPublicKeyResponse, MsgCreateTag, MsgCreateTagResponse, MsgReportTag, MsgReportTagResponse, MsgResolveTagReport, MsgResolveTagReportResponse, MsgCreateTagBudget, MsgCreateTagBudgetResponse, MsgAwardFromTagBudget, MsgAwardFromTagBudgetResponse, MsgTopUpTagBudget, MsgTopUpTagBudgetResponse, MsgToggleTagBudget, MsgToggleTagBudgetResponse, MsgWithdrawTagBudget, MsgWithdrawTagBudgetResponse, MsgBondRole, MsgBondRoleResponse, MsgUnbondRole, MsgUnbondRoleResponse, MsgCancelUnbondRole, MsgCancelUnbondRoleResponse, MsgReportMember, MsgReportMemberResponse, MsgCosignMemberReport, MsgCosignMemberReportResponse, MsgResolveMemberReport, MsgResolveMemberReportResponse, MsgDefendMemberReport, MsgDefendMemberReportResponse, MsgAppealGovAction, MsgAppealGovActionResponse, MsgResolveGovActionAppeal, MsgResolveGovActionAppealResponse, MsgCloseInitiative, MsgCloseInitiativeResponse, MsgFundInitiativeBounty, MsgFundInitiativeBountyResponse, MsgReclaimInitiativeBounty, MsgReclaimInitiativeBountyResponse, MsgRevokeInvitation, MsgRevokeInvitationResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgInviteMember, MsgInviteMemberResponse, MsgAcceptInvitation, MsgAcceptInvitationResponse, MsgTransferDream, MsgTransferDreamResponse, MsgCreateInterim, MsgCreateInterimResponse, MsgAssignInterim, MsgAssignInterimResponse, MsgSubmitInterimWork, MsgSubmitInterimWorkResponse, MsgApproveInterim, MsgApproveInterimResponse, MsgAbandonInterim, MsgAbandonInterimResponse, MsgCompleteInterim, MsgCompleteInterimResponse, MsgProposeProject, MsgProposeProjectResponse, MsgApproveProjectBudget, MsgApproveProjectBudgetResponse, MsgCancelProject, MsgCancelProjectResponse, MsgCreateInitiative, MsgCreateInitiativeResponse, MsgAssignInitiative, MsgAssignInitiativeResponse, MsgSubmitInitiativeWork, MsgSubmitInitiativeWorkResponse, MsgApproveInitiative, MsgApproveInitiativeResponse, MsgUnassignInitiative, MsgUnassignInitiativeResponse, MsgCompleteInitiative, MsgCompleteInitiativeResponse, MsgStake, MsgStakeResponse, MsgUnstake, MsgUnstakeResponse, MsgClaimStakingRewards, MsgClaimStakingRewardsResponse, MsgCompoundStakingRewards, MsgCompoundStakingRewardsResponse, MsgCreateChallenge, MsgCreateChallengeResponse, MsgRespondToChallenge, MsgRespondToChallengeResponse, MsgSubmitJurorVote, MsgSubmitJurorVoteResponse, MsgAcceptJuryDuty, MsgAcceptJuryDutyResponse, MsgSubmitInitiativeReview, MsgSubmitInitiativeReviewResponse, MsgSetVerificationPolicy, MsgSetVerificationPolicyResponse, MsgResolveReviewEscalation, MsgResolveReviewEscalationResponse, MsgDeclineJuryDuty, MsgDeclineJuryDutyResponse, MsgFundReviewBounty, MsgFundReviewBountyResponse, MsgReclaimReviewBounty, MsgReclaimReviewBountyResponse, MsgSubmitExpertTestimony, MsgSubmitExpertTestimonyResponse, MsgChallengeContent, MsgChallengeContentResponse, MsgRespondToContentChallenge, MsgRespondToContentChallengeResponse, MsgRegisterZkPublicKey, MsgRegisterZkPublicKeyResponse, MsgCreateTag, MsgCreateTagResponse, MsgReportTag, MsgReportTagResponse, MsgResolveTagReport, MsgResolveTagReportResponse, MsgCreateTagBudget, MsgCreateTagBudgetResponse, MsgAwardFromTagBudget, MsgAwardFromTagBudgetResponse, MsgTopUpTagBudget, MsgTopUpTagBudgetResponse, MsgToggleTagBudget, MsgToggleTagBudgetResponse, MsgWithdrawTagBudget, MsgWithdrawTagBudgetResponse, MsgBondRole, MsgBondRoleResponse, MsgUnbondRole, MsgUnbondRoleResponse, MsgCancelUnbondRole, MsgCancelUnbondRoleResponse, MsgReportMember, MsgReportMemberResponse, MsgCosignMemberReport, MsgCosignMemberReportResponse, MsgResolveMemberReport, MsgResolveMemberReportResponse, MsgDefendMemberReport, MsgDefendMemberReportResponse, MsgAppealGovAction, MsgAppealGovActionResponse, MsgResolveGovActionAppeal, MsgResolveGovActionAppealResponse, MsgCloseInitiative, MsgCloseInitiativeResponse, MsgFundInitiativeBounty, MsgFundInitiativeBountyResponse, MsgReclaimInitiativeBounty, MsgReclaimInitiativeBountyResponse, MsgRevokeInvitation, MsgRevokeInvitationResponse, MsgRequestMigration, MsgRequestMigrationResponse, MsgAcceptMigration, MsgAcceptMigrationResponse, MsgCancelMigration, MsgCancelMigrationResponse, MsgSetRecoveryCommitment, MsgSetRecoveryCommitmentResponse, MsgRemoveRecoveryCommitment, MsgRemoveRecoveryCommitmentResponse, MsgCommitRecovery, MsgCommitRecoveryResponse, MsgRevealRecovery, MsgRevealRecoveryResponse, MsgObjectMigration, MsgObjectMigrationResponse, MsgSweepTombstone, MsgSweepTombstoneResponse, MsgForceMigration, MsgForceMigrationResponse, MsgClearZkPublicKey, MsgClearZkPublicKeyResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
@@ -148,6 +148,28 @@ export interface Msg {
    * address is freed. The record is kept with status REVOKED.
    */
   revokeInvitation(request: MsgRevokeInvitation): Promise<MsgRevokeInvitationResponse>;
+  /** RequestMigration defines the RequestMigration RPC. */
+  requestMigration(request: MsgRequestMigration): Promise<MsgRequestMigrationResponse>;
+  /** AcceptMigration defines the AcceptMigration RPC. */
+  acceptMigration(request: MsgAcceptMigration): Promise<MsgAcceptMigrationResponse>;
+  /** CancelMigration defines the CancelMigration RPC. */
+  cancelMigration(request: MsgCancelMigration): Promise<MsgCancelMigrationResponse>;
+  /** SetRecoveryCommitment defines the SetRecoveryCommitment RPC. */
+  setRecoveryCommitment(request: MsgSetRecoveryCommitment): Promise<MsgSetRecoveryCommitmentResponse>;
+  /** RemoveRecoveryCommitment defines the RemoveRecoveryCommitment RPC. */
+  removeRecoveryCommitment(request: MsgRemoveRecoveryCommitment): Promise<MsgRemoveRecoveryCommitmentResponse>;
+  /** CommitRecovery defines the CommitRecovery RPC. */
+  commitRecovery(request: MsgCommitRecovery): Promise<MsgCommitRecoveryResponse>;
+  /** RevealRecovery defines the RevealRecovery RPC. */
+  revealRecovery(request: MsgRevealRecovery): Promise<MsgRevealRecoveryResponse>;
+  /** ObjectMigration defines the ObjectMigration RPC. */
+  objectMigration(request: MsgObjectMigration): Promise<MsgObjectMigrationResponse>;
+  /** SweepTombstone defines the SweepTombstone RPC. */
+  sweepTombstone(request: MsgSweepTombstone): Promise<MsgSweepTombstoneResponse>;
+  /** ForceMigration defines the ForceMigration RPC (COUNCIL path). */
+  forceMigration(request: MsgForceMigration): Promise<MsgForceMigrationResponse>;
+  /** ClearZkPublicKey zeroes the member's ZK key at once (leaked shield secret). */
+  clearZkPublicKey(request: MsgClearZkPublicKey): Promise<MsgClearZkPublicKeyResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -519,6 +541,72 @@ export class MsgClientImpl implements Msg {
     const data = MsgRevokeInvitation.encode(request).finish();
     const promise = this.rpc.request("sparkdream.rep.v1.Msg", "RevokeInvitation", data);
     return promise.then(data => MsgRevokeInvitationResponse.decode(new BinaryReader(data)));
+  };
+  /* RequestMigration defines the RequestMigration RPC. */
+  requestMigration = async (request: MsgRequestMigration): Promise<MsgRequestMigrationResponse> => {
+    const data = MsgRequestMigration.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "RequestMigration", data);
+    return promise.then(data => MsgRequestMigrationResponse.decode(new BinaryReader(data)));
+  };
+  /* AcceptMigration defines the AcceptMigration RPC. */
+  acceptMigration = async (request: MsgAcceptMigration): Promise<MsgAcceptMigrationResponse> => {
+    const data = MsgAcceptMigration.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "AcceptMigration", data);
+    return promise.then(data => MsgAcceptMigrationResponse.decode(new BinaryReader(data)));
+  };
+  /* CancelMigration defines the CancelMigration RPC. */
+  cancelMigration = async (request: MsgCancelMigration): Promise<MsgCancelMigrationResponse> => {
+    const data = MsgCancelMigration.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "CancelMigration", data);
+    return promise.then(data => MsgCancelMigrationResponse.decode(new BinaryReader(data)));
+  };
+  /* SetRecoveryCommitment defines the SetRecoveryCommitment RPC. */
+  setRecoveryCommitment = async (request: MsgSetRecoveryCommitment): Promise<MsgSetRecoveryCommitmentResponse> => {
+    const data = MsgSetRecoveryCommitment.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "SetRecoveryCommitment", data);
+    return promise.then(data => MsgSetRecoveryCommitmentResponse.decode(new BinaryReader(data)));
+  };
+  /* RemoveRecoveryCommitment defines the RemoveRecoveryCommitment RPC. */
+  removeRecoveryCommitment = async (request: MsgRemoveRecoveryCommitment): Promise<MsgRemoveRecoveryCommitmentResponse> => {
+    const data = MsgRemoveRecoveryCommitment.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "RemoveRecoveryCommitment", data);
+    return promise.then(data => MsgRemoveRecoveryCommitmentResponse.decode(new BinaryReader(data)));
+  };
+  /* CommitRecovery defines the CommitRecovery RPC. */
+  commitRecovery = async (request: MsgCommitRecovery): Promise<MsgCommitRecoveryResponse> => {
+    const data = MsgCommitRecovery.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "CommitRecovery", data);
+    return promise.then(data => MsgCommitRecoveryResponse.decode(new BinaryReader(data)));
+  };
+  /* RevealRecovery defines the RevealRecovery RPC. */
+  revealRecovery = async (request: MsgRevealRecovery): Promise<MsgRevealRecoveryResponse> => {
+    const data = MsgRevealRecovery.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "RevealRecovery", data);
+    return promise.then(data => MsgRevealRecoveryResponse.decode(new BinaryReader(data)));
+  };
+  /* ObjectMigration defines the ObjectMigration RPC. */
+  objectMigration = async (request: MsgObjectMigration): Promise<MsgObjectMigrationResponse> => {
+    const data = MsgObjectMigration.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "ObjectMigration", data);
+    return promise.then(data => MsgObjectMigrationResponse.decode(new BinaryReader(data)));
+  };
+  /* SweepTombstone defines the SweepTombstone RPC. */
+  sweepTombstone = async (request: MsgSweepTombstone): Promise<MsgSweepTombstoneResponse> => {
+    const data = MsgSweepTombstone.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "SweepTombstone", data);
+    return promise.then(data => MsgSweepTombstoneResponse.decode(new BinaryReader(data)));
+  };
+  /* ForceMigration defines the ForceMigration RPC (COUNCIL path). */
+  forceMigration = async (request: MsgForceMigration): Promise<MsgForceMigrationResponse> => {
+    const data = MsgForceMigration.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "ForceMigration", data);
+    return promise.then(data => MsgForceMigrationResponse.decode(new BinaryReader(data)));
+  };
+  /* ClearZkPublicKey zeroes the member's ZK key at once (leaked shield secret). */
+  clearZkPublicKey = async (request: MsgClearZkPublicKey): Promise<MsgClearZkPublicKeyResponse> => {
+    const data = MsgClearZkPublicKey.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.rep.v1.Msg", "ClearZkPublicKey", data);
+    return promise.then(data => MsgClearZkPublicKeyResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

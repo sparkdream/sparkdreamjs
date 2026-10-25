@@ -394,6 +394,52 @@ export interface Member {
    * joined_at / joined_at_height.
    */
   contentLicense: string;
+  /**
+   * key_migration_times are the finalization times of the KEY-path
+   * migrations still inside key_migration_window, oldest first. At most
+   * max_key_migrations_per_window entries; older ones are dropped when the
+   * next is recorded. Travels with the record, so a migration cannot reset
+   * the rolling-window cap.
+   */
+  keyMigrationTimes: bigint[];
+  /**
+   * last_migrated_at is the finalization time of the most recent migration
+   * into this address, on any path. The KEY-path cooldown counts from it.
+   */
+  lastMigratedAt: bigint;
+  /**
+   * ZK key change discipline (member-key-migration plan, section 9). A
+   * change of an existing zk_public_key does not take effect at once: the
+   * old leaf is zeroed immediately and the new key waits in
+   * pending_zk_public_key until zk_key_activates_at_epoch, so an old-key
+   * action and a new-key action can never land on the same target. First
+   * registration is immediate.
+   */
+  pendingZkPublicKey: Uint8Array;
+  zkKeyActivatesAtEpoch: bigint;
+  /**
+   * last_zk_key_change_season / zk_key_changed implement the once-per-season
+   * change cooldown: a change is refused while zk_key_changed is true and
+   * last_zk_key_change_season equals the current season.
+   */
+  lastZkKeyChangeSeason: bigint;
+  zkKeyChanged: boolean;
+  /**
+   * zk_key_cooldown_exempt is set when a RECOVERY or COUNCIL migration
+   * cleared the key at finalization. The next registration still waits out
+   * the activation delay but is exempt from the season cooldown, so a
+   * recovery never leaves a member without anonymous access for the rest of
+   * the season. Consumed by that registration.
+   */
+  zkKeyCooldownExempt: boolean;
+  /**
+   * zk_key_cleared is set by MsgClearZkPublicKey (leaked shield secret). While
+   * set, MsgRegisterZkPublicKey never takes the immediate first-registration
+   * path: the new key waits out zk_key_activation_delay and the once-per-season
+   * change cap still applies, so clear-then-register cannot become a free key
+   * swap. Cleared when a key activates.
+   */
+  zkKeyCleared: boolean;
 }
 export interface MemberProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Member";
@@ -576,6 +622,52 @@ export interface MemberAmino {
    * joined_at / joined_at_height.
    */
   content_license?: string;
+  /**
+   * key_migration_times are the finalization times of the KEY-path
+   * migrations still inside key_migration_window, oldest first. At most
+   * max_key_migrations_per_window entries; older ones are dropped when the
+   * next is recorded. Travels with the record, so a migration cannot reset
+   * the rolling-window cap.
+   */
+  key_migration_times?: string[];
+  /**
+   * last_migrated_at is the finalization time of the most recent migration
+   * into this address, on any path. The KEY-path cooldown counts from it.
+   */
+  last_migrated_at?: string;
+  /**
+   * ZK key change discipline (member-key-migration plan, section 9). A
+   * change of an existing zk_public_key does not take effect at once: the
+   * old leaf is zeroed immediately and the new key waits in
+   * pending_zk_public_key until zk_key_activates_at_epoch, so an old-key
+   * action and a new-key action can never land on the same target. First
+   * registration is immediate.
+   */
+  pending_zk_public_key?: string;
+  zk_key_activates_at_epoch?: string;
+  /**
+   * last_zk_key_change_season / zk_key_changed implement the once-per-season
+   * change cooldown: a change is refused while zk_key_changed is true and
+   * last_zk_key_change_season equals the current season.
+   */
+  last_zk_key_change_season?: string;
+  zk_key_changed?: boolean;
+  /**
+   * zk_key_cooldown_exempt is set when a RECOVERY or COUNCIL migration
+   * cleared the key at finalization. The next registration still waits out
+   * the activation delay but is exempt from the season cooldown, so a
+   * recovery never leaves a member without anonymous access for the rest of
+   * the season. Consumed by that registration.
+   */
+  zk_key_cooldown_exempt?: boolean;
+  /**
+   * zk_key_cleared is set by MsgClearZkPublicKey (leaked shield secret). While
+   * set, MsgRegisterZkPublicKey never takes the immediate first-registration
+   * path: the new key waits out zk_key_activation_delay and the once-per-season
+   * change cap still applies, so clear-then-register cannot become a free key
+   * swap. Cleared when a key activates.
+   */
+  zk_key_cleared?: boolean;
 }
 export interface MemberAminoMsg {
   type: "/sparkdream.rep.v1.Member";
@@ -1022,7 +1114,15 @@ function createBaseMember(): Member {
     lastTransferReceivedSeason: BigInt(0),
     initiativeBountyFundedThisEpoch: "",
     lastInitiativeBountyEpoch: BigInt(0),
-    contentLicense: ""
+    contentLicense: "",
+    keyMigrationTimes: [],
+    lastMigratedAt: BigInt(0),
+    pendingZkPublicKey: new Uint8Array(),
+    zkKeyActivatesAtEpoch: BigInt(0),
+    lastZkKeyChangeSeason: BigInt(0),
+    zkKeyChanged: false,
+    zkKeyCooldownExempt: false,
+    zkKeyCleared: false
   };
 }
 /**
@@ -1166,6 +1266,32 @@ export const Member = {
     if (message.contentLicense !== "") {
       writer.uint32(314).string(message.contentLicense);
     }
+    writer.uint32(322).fork();
+    for (const v of message.keyMigrationTimes) {
+      writer.int64(v);
+    }
+    writer.ldelim();
+    if (message.lastMigratedAt !== BigInt(0)) {
+      writer.uint32(328).int64(message.lastMigratedAt);
+    }
+    if (message.pendingZkPublicKey.length !== 0) {
+      writer.uint32(338).bytes(message.pendingZkPublicKey);
+    }
+    if (message.zkKeyActivatesAtEpoch !== BigInt(0)) {
+      writer.uint32(344).int64(message.zkKeyActivatesAtEpoch);
+    }
+    if (message.lastZkKeyChangeSeason !== BigInt(0)) {
+      writer.uint32(352).int64(message.lastZkKeyChangeSeason);
+    }
+    if (message.zkKeyChanged === true) {
+      writer.uint32(360).bool(message.zkKeyChanged);
+    }
+    if (message.zkKeyCooldownExempt === true) {
+      writer.uint32(368).bool(message.zkKeyCooldownExempt);
+    }
+    if (message.zkKeyCleared === true) {
+      writer.uint32(376).bool(message.zkKeyCleared);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Member {
@@ -1307,6 +1433,37 @@ export const Member = {
         case 39:
           message.contentLicense = reader.string();
           break;
+        case 40:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.keyMigrationTimes.push(reader.int64());
+            }
+          } else {
+            message.keyMigrationTimes.push(reader.int64());
+          }
+          break;
+        case 41:
+          message.lastMigratedAt = reader.int64();
+          break;
+        case 42:
+          message.pendingZkPublicKey = reader.bytes();
+          break;
+        case 43:
+          message.zkKeyActivatesAtEpoch = reader.int64();
+          break;
+        case 44:
+          message.lastZkKeyChangeSeason = reader.int64();
+          break;
+        case 45:
+          message.zkKeyChanged = reader.bool();
+          break;
+        case 46:
+          message.zkKeyCooldownExempt = reader.bool();
+          break;
+        case 47:
+          message.zkKeyCleared = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1390,6 +1547,14 @@ export const Member = {
     message.initiativeBountyFundedThisEpoch = object.initiativeBountyFundedThisEpoch ?? "";
     message.lastInitiativeBountyEpoch = object.lastInitiativeBountyEpoch !== undefined && object.lastInitiativeBountyEpoch !== null ? BigInt(object.lastInitiativeBountyEpoch.toString()) : BigInt(0);
     message.contentLicense = object.contentLicense ?? "";
+    message.keyMigrationTimes = object.keyMigrationTimes?.map(e => BigInt(e.toString())) || [];
+    message.lastMigratedAt = object.lastMigratedAt !== undefined && object.lastMigratedAt !== null ? BigInt(object.lastMigratedAt.toString()) : BigInt(0);
+    message.pendingZkPublicKey = object.pendingZkPublicKey ?? new Uint8Array();
+    message.zkKeyActivatesAtEpoch = object.zkKeyActivatesAtEpoch !== undefined && object.zkKeyActivatesAtEpoch !== null ? BigInt(object.zkKeyActivatesAtEpoch.toString()) : BigInt(0);
+    message.lastZkKeyChangeSeason = object.lastZkKeyChangeSeason !== undefined && object.lastZkKeyChangeSeason !== null ? BigInt(object.lastZkKeyChangeSeason.toString()) : BigInt(0);
+    message.zkKeyChanged = object.zkKeyChanged ?? false;
+    message.zkKeyCooldownExempt = object.zkKeyCooldownExempt ?? false;
+    message.zkKeyCleared = object.zkKeyCleared ?? false;
     return message;
   },
   fromAmino(object: MemberAmino): Member {
@@ -1534,6 +1699,28 @@ export const Member = {
     if (object.content_license !== undefined && object.content_license !== null) {
       message.contentLicense = object.content_license;
     }
+    message.keyMigrationTimes = object.key_migration_times?.map(e => BigInt(e)) || [];
+    if (object.last_migrated_at !== undefined && object.last_migrated_at !== null) {
+      message.lastMigratedAt = BigInt(object.last_migrated_at);
+    }
+    if (object.pending_zk_public_key !== undefined && object.pending_zk_public_key !== null) {
+      message.pendingZkPublicKey = bytesFromBase64(object.pending_zk_public_key);
+    }
+    if (object.zk_key_activates_at_epoch !== undefined && object.zk_key_activates_at_epoch !== null) {
+      message.zkKeyActivatesAtEpoch = BigInt(object.zk_key_activates_at_epoch);
+    }
+    if (object.last_zk_key_change_season !== undefined && object.last_zk_key_change_season !== null) {
+      message.lastZkKeyChangeSeason = BigInt(object.last_zk_key_change_season);
+    }
+    if (object.zk_key_changed !== undefined && object.zk_key_changed !== null) {
+      message.zkKeyChanged = object.zk_key_changed;
+    }
+    if (object.zk_key_cooldown_exempt !== undefined && object.zk_key_cooldown_exempt !== null) {
+      message.zkKeyCooldownExempt = object.zk_key_cooldown_exempt;
+    }
+    if (object.zk_key_cleared !== undefined && object.zk_key_cleared !== null) {
+      message.zkKeyCleared = object.zk_key_cleared;
+    }
     return message;
   },
   toAmino(message: Member): MemberAmino {
@@ -1606,6 +1793,18 @@ export const Member = {
     obj.initiative_bounty_funded_this_epoch = message.initiativeBountyFundedThisEpoch === "" ? undefined : message.initiativeBountyFundedThisEpoch;
     obj.last_initiative_bounty_epoch = message.lastInitiativeBountyEpoch !== BigInt(0) ? message.lastInitiativeBountyEpoch?.toString() : undefined;
     obj.content_license = message.contentLicense === "" ? undefined : message.contentLicense;
+    if (message.keyMigrationTimes) {
+      obj.key_migration_times = message.keyMigrationTimes.map(e => e.toString());
+    } else {
+      obj.key_migration_times = message.keyMigrationTimes;
+    }
+    obj.last_migrated_at = message.lastMigratedAt !== BigInt(0) ? message.lastMigratedAt?.toString() : undefined;
+    obj.pending_zk_public_key = message.pendingZkPublicKey ? base64FromBytes(message.pendingZkPublicKey) : undefined;
+    obj.zk_key_activates_at_epoch = message.zkKeyActivatesAtEpoch !== BigInt(0) ? message.zkKeyActivatesAtEpoch?.toString() : undefined;
+    obj.last_zk_key_change_season = message.lastZkKeyChangeSeason !== BigInt(0) ? message.lastZkKeyChangeSeason?.toString() : undefined;
+    obj.zk_key_changed = message.zkKeyChanged === false ? undefined : message.zkKeyChanged;
+    obj.zk_key_cooldown_exempt = message.zkKeyCooldownExempt === false ? undefined : message.zkKeyCooldownExempt;
+    obj.zk_key_cleared = message.zkKeyCleared === false ? undefined : message.zkKeyCleared;
     return obj;
   },
   fromAminoMsg(object: MemberAminoMsg): Member {

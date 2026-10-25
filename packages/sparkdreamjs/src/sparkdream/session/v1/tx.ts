@@ -418,6 +418,16 @@ export interface MsgClaimRecurringPullResponse {
    * Unix timestamp at which the next claim becomes eligible.
    */
   nextClaimTime: bigint;
+  /**
+   * true when the granter could not cover the period: nothing moved and the
+   * grant is now PAUSED_INSUFFICIENT_FUNDS (a later claim resumes it).
+   */
+  paused: boolean;
+  /**
+   * true when the grant's window had closed: nothing moved and the grant
+   * is now COMPLETED.
+   */
+  completed: boolean;
 }
 export interface MsgClaimRecurringPullResponseProtoMsg {
   typeUrl: "/sparkdream.session.v1.MsgClaimRecurringPullResponse";
@@ -437,6 +447,16 @@ export interface MsgClaimRecurringPullResponseAmino {
    * Unix timestamp at which the next claim becomes eligible.
    */
   next_claim_time?: string;
+  /**
+   * true when the granter could not cover the period: nothing moved and the
+   * grant is now PAUSED_INSUFFICIENT_FUNDS (a later claim resumes it).
+   */
+  paused?: boolean;
+  /**
+   * true when the grant's window had closed: nothing moved and the grant
+   * is now COMPLETED.
+   */
+  completed?: boolean;
 }
 export interface MsgClaimRecurringPullResponseAminoMsg {
   type: "/sparkdream.session.v1.MsgClaimRecurringPullResponse";
@@ -492,6 +512,11 @@ export interface MsgPullAllowanceResponse {
    * Total spent in the current rolling-window period after this pull.
    */
   spentInPeriod: Coin;
+  /**
+   * true when the granter could not cover the pull: nothing moved and the
+   * grant is now PAUSED_INSUFFICIENT_FUNDS (a later pull resumes it).
+   */
+  paused: boolean;
 }
 export interface MsgPullAllowanceResponseProtoMsg {
   typeUrl: "/sparkdream.session.v1.MsgPullAllowanceResponse";
@@ -513,6 +538,11 @@ export interface MsgPullAllowanceResponseAmino {
    * Total spent in the current rolling-window period after this pull.
    */
   spent_in_period?: CoinAmino;
+  /**
+   * true when the granter could not cover the pull: nothing moved and the
+   * grant is now PAUSED_INSUFFICIENT_FUNDS (a later pull resumes it).
+   */
+  paused?: boolean;
 }
 export interface MsgPullAllowanceResponseAminoMsg {
   type: "/sparkdream.session.v1.MsgPullAllowanceResponse";
@@ -1836,7 +1866,9 @@ export const MsgClaimRecurringPull = {
 function createBaseMsgClaimRecurringPullResponse(): MsgClaimRecurringPullResponse {
   return {
     claimNumber: BigInt(0),
-    nextClaimTime: BigInt(0)
+    nextClaimTime: BigInt(0),
+    paused: false,
+    completed: false
   };
 }
 /**
@@ -1853,6 +1885,12 @@ export const MsgClaimRecurringPullResponse = {
     if (message.nextClaimTime !== BigInt(0)) {
       writer.uint32(16).int64(message.nextClaimTime);
     }
+    if (message.paused === true) {
+      writer.uint32(24).bool(message.paused);
+    }
+    if (message.completed === true) {
+      writer.uint32(32).bool(message.completed);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgClaimRecurringPullResponse {
@@ -1868,6 +1906,12 @@ export const MsgClaimRecurringPullResponse = {
         case 2:
           message.nextClaimTime = reader.int64();
           break;
+        case 3:
+          message.paused = reader.bool();
+          break;
+        case 4:
+          message.completed = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1879,6 +1923,8 @@ export const MsgClaimRecurringPullResponse = {
     const message = createBaseMsgClaimRecurringPullResponse();
     message.claimNumber = object.claimNumber !== undefined && object.claimNumber !== null ? BigInt(object.claimNumber.toString()) : BigInt(0);
     message.nextClaimTime = object.nextClaimTime !== undefined && object.nextClaimTime !== null ? BigInt(object.nextClaimTime.toString()) : BigInt(0);
+    message.paused = object.paused ?? false;
+    message.completed = object.completed ?? false;
     return message;
   },
   fromAmino(object: MsgClaimRecurringPullResponseAmino): MsgClaimRecurringPullResponse {
@@ -1889,12 +1935,20 @@ export const MsgClaimRecurringPullResponse = {
     if (object.next_claim_time !== undefined && object.next_claim_time !== null) {
       message.nextClaimTime = BigInt(object.next_claim_time);
     }
+    if (object.paused !== undefined && object.paused !== null) {
+      message.paused = object.paused;
+    }
+    if (object.completed !== undefined && object.completed !== null) {
+      message.completed = object.completed;
+    }
     return message;
   },
   toAmino(message: MsgClaimRecurringPullResponse): MsgClaimRecurringPullResponseAmino {
     const obj: any = {};
     obj.claim_number = message.claimNumber !== BigInt(0) ? message.claimNumber?.toString() : undefined;
     obj.next_claim_time = message.nextClaimTime !== BigInt(0) ? message.nextClaimTime?.toString() : undefined;
+    obj.paused = message.paused === false ? undefined : message.paused;
+    obj.completed = message.completed === false ? undefined : message.completed;
     return obj;
   },
   fromAminoMsg(object: MsgClaimRecurringPullResponseAminoMsg): MsgClaimRecurringPullResponse {
@@ -2029,7 +2083,8 @@ export const MsgPullAllowance = {
 function createBaseMsgPullAllowanceResponse(): MsgPullAllowanceResponse {
   return {
     transferred: Coin.fromPartial({}),
-    spentInPeriod: Coin.fromPartial({})
+    spentInPeriod: Coin.fromPartial({}),
+    paused: false
   };
 }
 /**
@@ -2046,6 +2101,9 @@ export const MsgPullAllowanceResponse = {
     if (message.spentInPeriod !== undefined) {
       Coin.encode(message.spentInPeriod, writer.uint32(18).fork()).ldelim();
     }
+    if (message.paused === true) {
+      writer.uint32(24).bool(message.paused);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgPullAllowanceResponse {
@@ -2061,6 +2119,9 @@ export const MsgPullAllowanceResponse = {
         case 2:
           message.spentInPeriod = Coin.decode(reader, reader.uint32());
           break;
+        case 3:
+          message.paused = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2072,6 +2133,7 @@ export const MsgPullAllowanceResponse = {
     const message = createBaseMsgPullAllowanceResponse();
     message.transferred = object.transferred !== undefined && object.transferred !== null ? Coin.fromPartial(object.transferred) : undefined;
     message.spentInPeriod = object.spentInPeriod !== undefined && object.spentInPeriod !== null ? Coin.fromPartial(object.spentInPeriod) : undefined;
+    message.paused = object.paused ?? false;
     return message;
   },
   fromAmino(object: MsgPullAllowanceResponseAmino): MsgPullAllowanceResponse {
@@ -2082,12 +2144,16 @@ export const MsgPullAllowanceResponse = {
     if (object.spent_in_period !== undefined && object.spent_in_period !== null) {
       message.spentInPeriod = Coin.fromAmino(object.spent_in_period);
     }
+    if (object.paused !== undefined && object.paused !== null) {
+      message.paused = object.paused;
+    }
     return message;
   },
   toAmino(message: MsgPullAllowanceResponse): MsgPullAllowanceResponseAmino {
     const obj: any = {};
     obj.transferred = message.transferred ? Coin.toAmino(message.transferred) : undefined;
     obj.spent_in_period = message.spentInPeriod ? Coin.toAmino(message.spentInPeriod) : undefined;
+    obj.paused = message.paused === false ? undefined : message.paused;
     return obj;
   },
   fromAminoMsg(object: MsgPullAllowanceResponseAminoMsg): MsgPullAllowanceResponse {
