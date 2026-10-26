@@ -1,64 +1,18 @@
 //@ts-nocheck
-import { MsgUpdateParams, MsgUpdateOperationalParams, MsgRegisterName, MsgSetPrimary, MsgFileDispute, MsgContestDispute, MsgResolveDispute, MsgUpdateName, MsgSetDisplayName, MsgSetTarget, MsgAcceptTarget, MsgTransferName } from "./tx";
-export const AminoConverter = {
-  "/sparkdream.name.v1.MsgUpdateParams": {
-    aminoType: "sparkdream/x/name/MsgUpdateParams",
-    toAmino: MsgUpdateParams.toAmino,
-    fromAmino: MsgUpdateParams.fromAmino
-  },
-  "/sparkdream.name.v1.MsgUpdateOperationalParams": {
-    aminoType: "sparkdream/x/name/MsgUpdateOperationalParams",
-    toAmino: MsgUpdateOperationalParams.toAmino,
-    fromAmino: MsgUpdateOperationalParams.fromAmino
-  },
-  "/sparkdream.name.v1.MsgRegisterName": {
-    aminoType: "sparkdream/x/name/MsgRegisterName",
-    toAmino: MsgRegisterName.toAmino,
-    fromAmino: MsgRegisterName.fromAmino
-  },
-  "/sparkdream.name.v1.MsgSetPrimary": {
-    aminoType: "sparkdream/x/name/MsgSetPrimary",
-    toAmino: MsgSetPrimary.toAmino,
-    fromAmino: MsgSetPrimary.fromAmino
-  },
-  "/sparkdream.name.v1.MsgFileDispute": {
-    aminoType: "sparkdream/x/name/MsgFileDispute",
-    toAmino: MsgFileDispute.toAmino,
-    fromAmino: MsgFileDispute.fromAmino
-  },
-  "/sparkdream.name.v1.MsgContestDispute": {
-    aminoType: "sparkdream/x/name/MsgContestDispute",
-    toAmino: MsgContestDispute.toAmino,
-    fromAmino: MsgContestDispute.fromAmino
-  },
-  "/sparkdream.name.v1.MsgResolveDispute": {
-    aminoType: "sparkdream/x/name/MsgResolveDispute",
-    toAmino: MsgResolveDispute.toAmino,
-    fromAmino: MsgResolveDispute.fromAmino
-  },
-  "/sparkdream.name.v1.MsgUpdateName": {
-    aminoType: "sparkdream/x/name/MsgUpdateName",
-    toAmino: MsgUpdateName.toAmino,
-    fromAmino: MsgUpdateName.fromAmino
-  },
-  "/sparkdream.name.v1.MsgSetDisplayName": {
-    aminoType: "sparkdream/x/name/MsgSetDisplayName",
-    toAmino: MsgSetDisplayName.toAmino,
-    fromAmino: MsgSetDisplayName.fromAmino
-  },
-  "/sparkdream.name.v1.MsgSetTarget": {
-    aminoType: "sparkdream/x/name/MsgSetTarget",
-    toAmino: MsgSetTarget.toAmino,
-    fromAmino: MsgSetTarget.fromAmino
-  },
-  "/sparkdream.name.v1.MsgAcceptTarget": {
-    aminoType: "sparkdream/x/name/MsgAcceptTarget",
-    toAmino: MsgAcceptTarget.toAmino,
-    fromAmino: MsgAcceptTarget.fromAmino
-  },
-  "/sparkdream.name.v1.MsgTransferName": {
-    aminoType: "sparkdream/x/name/MsgTransferName",
-    toAmino: MsgTransferName.toAmino,
-    fromAmino: MsgTransferName.fromAmino
-  }
-};
+// HAND-WRITTEN OVERRIDE — overlaid on top of the Telescope-generated tx.amino.ts
+// by scripts/codegen.ts after each codegen run. Do not let codegen wipe this.
+//
+// Why: Telescope's generated converters (and the per-message overrides that
+// used to patch them) disagree with the chain's aminojson on empty lists,
+// empty bytes, Dec strings, oneofs and non-nullable messages, and went stale
+// whenever a proto changed. Every Msg of x/name is converted by the
+// schema-driven engine in chain-amino.ts instead, which renders amino JSON
+// from the protobuf bytes exactly as the chain does.
+//
+// MAINTENANCE: none per message. The schema (amino-schema.ts, regenerated from
+// the chain on every proto sync) lists every Msg; __tests__/amino-golden.test.ts
+// checks them all against the chain's encoder.
+import * as tx from "./tx";
+import { chainAminoConverters } from "../../../chain-amino";
+
+export const AminoConverter = chainAminoConverters("sparkdream.name.v1", tx);

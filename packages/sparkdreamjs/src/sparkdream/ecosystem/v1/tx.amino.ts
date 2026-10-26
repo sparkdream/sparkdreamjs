@@ -1,30 +1,18 @@
 //@ts-nocheck
-// HAND-WRITTEN OVERRIDE — overlaid by scripts/codegen.ts after telescope.
-// See ../../commons/v1/tx.amino.ts for the broader rationale.
+// HAND-WRITTEN OVERRIDE — overlaid on top of the Telescope-generated tx.amino.ts
+// by scripts/codegen.ts after each codegen run. Do not let codegen wipe this.
 //
-// MsgSpend has `repeated cosmos.base.v1beta1.Coin amount` which the
-// auto-generated toAmino emits as `[]` when empty, mismatching the chain.
+// Why: Telescope's generated converters (and the per-message overrides that
+// used to patch them) disagree with the chain's aminojson on empty lists,
+// empty bytes, Dec strings, oneofs and non-nullable messages, and went stale
+// whenever a proto changed. Every Msg of x/ecosystem is converted by the
+// schema-driven engine in chain-amino.ts instead, which renders amino JSON
+// from the protobuf bytes exactly as the chain does.
+//
+// MAINTENANCE: none per message. The schema (amino-schema.ts, regenerated from
+// the chain on every proto sync) lists every Msg; __tests__/amino-golden.test.ts
+// checks them all against the chain's encoder.
+import * as tx from "./tx";
+import { chainAminoConverters } from "../../../chain-amino";
 
-import { MsgUpdateParams, MsgSpend } from "./tx";
-import { Coin } from "../../../cosmos/base/v1beta1/coin";
-
-export const AminoConverter = {
-  "/sparkdream.ecosystem.v1.MsgUpdateParams": {
-    aminoType: "sparkdream/x/ecosystem/MsgUpdateParams",
-    toAmino: MsgUpdateParams.toAmino,
-    fromAmino: MsgUpdateParams.fromAmino,
-  },
-  "/sparkdream.ecosystem.v1.MsgSpend": {
-    aminoType: "sparkdream/x/ecosystem/MsgSpend",
-    toAmino(message: any): any {
-      const obj: any = {};
-      obj.authority = message.authority === "" ? undefined : message.authority;
-      obj.recipient = message.recipient === "" ? undefined : message.recipient;
-      obj.amount = (message.amount?.length ?? 0) > 0
-        ? message.amount.map((e: any) => e ? Coin.toAmino(e) : undefined)
-        : undefined;
-      return obj;
-    },
-    fromAmino: MsgSpend.fromAmino,
-  },
-};
+export const AminoConverter = chainAminoConverters("sparkdream.ecosystem.v1", tx);

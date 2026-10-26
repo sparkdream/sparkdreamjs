@@ -3,7 +3,9 @@
  * Shared registry + helpers for amino-converting messages that embed a
  * `google.protobuf.Any` field (`MsgSubmitProposal`,
  * `MsgSubmitAnonymousProposal`, `MsgExecSession`, vault `MsgPropose`,
- * guardian `MsgExec`).
+ * guardian `MsgExec`). chain-amino.ts renders sparkdream inner messages
+ * itself and uses this configuration only for inner types it doesn't know
+ * (cosmos-sdk messages inside a proposal).
  *
  * The Telescope-generated `Any.toAmino` just emits `{type, value: Uint8Array}`,
  * which JSON.stringify turns into `{"0":N,"1":N,…}` — numeric keys that aren't
@@ -53,6 +55,11 @@ let cfg: NestedAminoConfig | null = null;
 
 export function configureNestedAminoConverter(next: NestedAminoConfig): void {
   cfg = next;
+}
+
+/** The configured registry and AminoTypes, or null before configureNestedAminoConverter. */
+export function getNestedAminoConfig(): NestedAminoConfig | null {
+  return cfg;
 }
 
 function requireCfg(): NestedAminoConfig {

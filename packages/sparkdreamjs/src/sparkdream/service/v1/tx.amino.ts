@@ -1,79 +1,18 @@
 //@ts-nocheck
-import { MsgUpdateParams, MsgUpdateServiceTypeConfig, MsgRegisterOperator, MsgUpdateMetadata, MsgUnbondOperator, MsgClaimUnbondedBond, MsgTopUpBond, MsgWithdrawBond, MsgReportOperator, MsgResolveReport, MsgContestSlash, MsgResolveReportByJury, MsgOpenControllerTransferCase, MsgFinalizeControllerTransfer, MsgSubmitCheckpoint } from "./tx";
-export const AminoConverter = {
-  "/sparkdream.service.v1.MsgUpdateParams": {
-    aminoType: "sparkdream/x/service/MsgUpdateParams",
-    toAmino: MsgUpdateParams.toAmino,
-    fromAmino: MsgUpdateParams.fromAmino
-  },
-  "/sparkdream.service.v1.MsgUpdateServiceTypeConfig": {
-    aminoType: "sparkdream/x/service/MsgUpdateServiceTypeConfig",
-    toAmino: MsgUpdateServiceTypeConfig.toAmino,
-    fromAmino: MsgUpdateServiceTypeConfig.fromAmino
-  },
-  "/sparkdream.service.v1.MsgRegisterOperator": {
-    aminoType: "sparkdream/x/service/MsgRegisterOperator",
-    toAmino: MsgRegisterOperator.toAmino,
-    fromAmino: MsgRegisterOperator.fromAmino
-  },
-  "/sparkdream.service.v1.MsgUpdateMetadata": {
-    aminoType: "sparkdream/x/service/MsgUpdateMetadata",
-    toAmino: MsgUpdateMetadata.toAmino,
-    fromAmino: MsgUpdateMetadata.fromAmino
-  },
-  "/sparkdream.service.v1.MsgUnbondOperator": {
-    aminoType: "sparkdream/x/service/MsgUnbondOperator",
-    toAmino: MsgUnbondOperator.toAmino,
-    fromAmino: MsgUnbondOperator.fromAmino
-  },
-  "/sparkdream.service.v1.MsgClaimUnbondedBond": {
-    aminoType: "sparkdream/x/service/MsgClaimUnbondedBond",
-    toAmino: MsgClaimUnbondedBond.toAmino,
-    fromAmino: MsgClaimUnbondedBond.fromAmino
-  },
-  "/sparkdream.service.v1.MsgTopUpBond": {
-    aminoType: "sparkdream/x/service/MsgTopUpBond",
-    toAmino: MsgTopUpBond.toAmino,
-    fromAmino: MsgTopUpBond.fromAmino
-  },
-  "/sparkdream.service.v1.MsgWithdrawBond": {
-    aminoType: "sparkdream/x/service/MsgWithdrawBond",
-    toAmino: MsgWithdrawBond.toAmino,
-    fromAmino: MsgWithdrawBond.fromAmino
-  },
-  "/sparkdream.service.v1.MsgReportOperator": {
-    aminoType: "sparkdream/x/service/MsgReportOperator",
-    toAmino: MsgReportOperator.toAmino,
-    fromAmino: MsgReportOperator.fromAmino
-  },
-  "/sparkdream.service.v1.MsgResolveReport": {
-    aminoType: "sparkdream/x/service/MsgResolveReport",
-    toAmino: MsgResolveReport.toAmino,
-    fromAmino: MsgResolveReport.fromAmino
-  },
-  "/sparkdream.service.v1.MsgContestSlash": {
-    aminoType: "sparkdream/x/service/MsgContestSlash",
-    toAmino: MsgContestSlash.toAmino,
-    fromAmino: MsgContestSlash.fromAmino
-  },
-  "/sparkdream.service.v1.MsgResolveReportByJury": {
-    aminoType: "sparkdream/x/service/MsgResolveReportByJury",
-    toAmino: MsgResolveReportByJury.toAmino,
-    fromAmino: MsgResolveReportByJury.fromAmino
-  },
-  "/sparkdream.service.v1.MsgOpenControllerTransferCase": {
-    aminoType: "sparkdream/x/service/MsgOpenControllerTransferCase",
-    toAmino: MsgOpenControllerTransferCase.toAmino,
-    fromAmino: MsgOpenControllerTransferCase.fromAmino
-  },
-  "/sparkdream.service.v1.MsgFinalizeControllerTransfer": {
-    aminoType: "sparkdream/x/service/MsgFinalizeControllerTransfer",
-    toAmino: MsgFinalizeControllerTransfer.toAmino,
-    fromAmino: MsgFinalizeControllerTransfer.fromAmino
-  },
-  "/sparkdream.service.v1.MsgSubmitCheckpoint": {
-    aminoType: "sparkdream/x/service/MsgSubmitCheckpoint",
-    toAmino: MsgSubmitCheckpoint.toAmino,
-    fromAmino: MsgSubmitCheckpoint.fromAmino
-  }
-};
+// HAND-WRITTEN OVERRIDE — overlaid on top of the Telescope-generated tx.amino.ts
+// by scripts/codegen.ts after each codegen run. Do not let codegen wipe this.
+//
+// Why: Telescope's generated converters (and the per-message overrides that
+// used to patch them) disagree with the chain's aminojson on empty lists,
+// empty bytes, Dec strings, oneofs and non-nullable messages, and went stale
+// whenever a proto changed. Every Msg of x/service is converted by the
+// schema-driven engine in chain-amino.ts instead, which renders amino JSON
+// from the protobuf bytes exactly as the chain does.
+//
+// MAINTENANCE: none per message. The schema (amino-schema.ts, regenerated from
+// the chain on every proto sync) lists every Msg; __tests__/amino-golden.test.ts
+// checks them all against the chain's encoder.
+import * as tx from "./tx";
+import { chainAminoConverters } from "../../../chain-amino";
+
+export const AminoConverter = chainAminoConverters("sparkdream.service.v1", tx);

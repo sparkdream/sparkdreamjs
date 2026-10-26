@@ -212,34 +212,33 @@ const fee: StdFee = {
 const response = await stargateClient.signAndBroadcast(address, [msg], fee);
 ```
 
-### Amino signing of `MsgSubmitProposal` (and other Any-wrapping messages)
+### Amino signing (Keplr + Ledger)
 
-`sparkdream.commons.v1.MsgSubmitProposal`, `MsgSubmitAnonymousProposal`, and
-`sparkdream.session.v1.MsgExecSession` each embed a `repeated google.protobuf.Any`
-field. Telescope's auto-generated amino converters can't recursively decode and
-re-encode those inner messages, so amino-signing (Ledger users hit this) fails
-with either Keplr's *"Data is invalid: JSON Dictionaries are not sorted"* or
-the chain's *"signature verification failed"*.
+Every sparkdream `Msg` is amino-converted by one schema-driven engine
+(`src-overrides/chain-amino.ts`) instead of per-message converters. It renders
+amino JSON from the message's protobuf bytes with the same rules as the
+chain's `cosmossdk.io/x/tx/signing/aminojson`, so sign bytes match the chain
+byte for byte, and `fromAmino` is its exact inverse. The schema it reads
+(`src-overrides/amino-schema.ts`) is exported by the chain repo, and
+`__tests__/amino-golden.test.ts` checks every Msg against the chain's own
+encoder.
 
-These three converters are hand-overridden in `src-overrides/` and need a
-one-time wiring step from the consumer — after you've built your proto
-`Registry` and your stargate `AminoTypes`, register them so the patched
-converters can decode each inner `Any.value` and look up its amino form:
+Messages that wrap inner messages in a `google.protobuf.Any`
+(`MsgSubmitProposal`, `MsgExecSession`, vault `MsgPropose`, guardian `MsgExec`,
+...) render sparkdream inner messages by themselves. For inner cosmos-sdk
+messages (a `MsgSend` in a proposal, say) register your proto `Registry` and
+stargate `AminoTypes` once:
 
 ```ts
-import { configureNestedAminoConverter } from '@sparkdreamnft/sparkdreamjs/sparkdream/commons/v1/tx.amino';
+import { configureNestedAminoConverter } from '@sparkdreamnft/sparkdreamjs/nested-amino';
 
 const registry = new Registry(/* … all module proto types … */);
 const aminoTypes = new AminoTypes({ /* … all module amino converters … */ });
 
 configureNestedAminoConverter({ registry, aminoTypes });
-
-// now SigningStargateClient.signAndBroadcast can amino-sign proposals
 ```
 
-If you forget the call, you'll get a clear error from
-`configureNestedAminoConverter() must be called before amino-signing…` the
-first time one of these messages goes through `toAmino`.
+If an inner type can't be resolved, `toAmino` throws an error naming it.
 
 ## Advanced Usage
 
