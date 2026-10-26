@@ -121,6 +121,13 @@ export interface MsgCreateClass {
    * Harberger tokens; fixed at creation (tax_bps_per_year 0 = none).
    */
   harberger: HarbergerPolicy;
+  /**
+   * Optional: the id the client expects the class to get (NextClassId). When
+   * set, the tx fails unless the class gets exactly this id. A blind-mint
+   * commitment binds the class id into every leaf, so a class created under
+   * another id could never reveal; failing is the safe outcome. 0 = any id.
+   */
+  expectedClassId: bigint;
 }
 export interface MsgCreateClassProtoMsg {
   typeUrl: "/sparkdream.artifact.v1.MsgCreateClass";
@@ -178,6 +185,13 @@ export interface MsgCreateClassAmino {
    * Harberger tokens; fixed at creation (tax_bps_per_year 0 = none).
    */
   harberger: HarbergerPolicyAmino;
+  /**
+   * Optional: the id the client expects the class to get (NextClassId). When
+   * set, the tx fails unless the class gets exactly this id. A blind-mint
+   * commitment binds the class id into every leaf, so a class created under
+   * another id could never reveal; failing is the safe outcome. 0 = any id.
+   */
+  expected_class_id?: string;
 }
 export interface MsgCreateClassAminoMsg {
   type: "sparkdream/x/artifact/MsgCreateClass";
@@ -4789,7 +4803,8 @@ function createBaseMsgCreateClass(): MsgCreateClass {
     reveal: RevealPolicy.fromPartial({}),
     renderer: Renderer.fromPartial({}),
     tokenModel: 0,
-    harberger: HarbergerPolicy.fromPartial({})
+    harberger: HarbergerPolicy.fromPartial({}),
+    expectedClassId: BigInt(0)
   };
 }
 /**
@@ -4862,6 +4877,9 @@ export const MsgCreateClass = {
     if (message.harberger !== undefined) {
       HarbergerPolicy.encode(message.harberger, writer.uint32(162).fork()).ldelim();
     }
+    if (message.expectedClassId !== BigInt(0)) {
+      writer.uint32(168).uint64(message.expectedClassId);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgCreateClass {
@@ -4931,6 +4949,9 @@ export const MsgCreateClass = {
         case 20:
           message.harberger = HarbergerPolicy.decode(reader, reader.uint32());
           break;
+        case 21:
+          message.expectedClassId = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4960,6 +4981,7 @@ export const MsgCreateClass = {
     message.renderer = object.renderer !== undefined && object.renderer !== null ? Renderer.fromPartial(object.renderer) : undefined;
     message.tokenModel = object.tokenModel ?? 0;
     message.harberger = object.harberger !== undefined && object.harberger !== null ? HarbergerPolicy.fromPartial(object.harberger) : undefined;
+    message.expectedClassId = object.expectedClassId !== undefined && object.expectedClassId !== null ? BigInt(object.expectedClassId.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: MsgCreateClassAmino): MsgCreateClass {
@@ -5020,6 +5042,9 @@ export const MsgCreateClass = {
     if (object.harberger !== undefined && object.harberger !== null) {
       message.harberger = HarbergerPolicy.fromAmino(object.harberger);
     }
+    if (object.expected_class_id !== undefined && object.expected_class_id !== null) {
+      message.expectedClassId = BigInt(object.expected_class_id);
+    }
     return message;
   },
   toAmino(message: MsgCreateClass): MsgCreateClassAmino {
@@ -5052,6 +5077,7 @@ export const MsgCreateClass = {
     obj.renderer = message.renderer ? Renderer.toAmino(message.renderer) : Renderer.toAmino(Renderer.fromPartial({}));
     obj.token_model = message.tokenModel === 0 ? undefined : message.tokenModel;
     obj.harberger = message.harberger ? HarbergerPolicy.toAmino(message.harberger) : HarbergerPolicy.toAmino(HarbergerPolicy.fromPartial({}));
+    obj.expected_class_id = message.expectedClassId !== BigInt(0) ? message.expectedClassId?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: MsgCreateClassAminoMsg): MsgCreateClass {

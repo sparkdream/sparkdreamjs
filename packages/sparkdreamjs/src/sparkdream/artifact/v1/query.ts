@@ -2653,6 +2653,54 @@ export interface QueryRentalOffersResponseAminoMsg {
   type: "/sparkdream.artifact.v1.QueryRentalOffersResponse";
   value: QueryRentalOffersResponseAmino;
 }
+/**
+ * QueryNextClassIdRequest defines the QueryNextClassIdRequest message.
+ * @name QueryNextClassIdRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryNextClassIdRequest
+ */
+export interface QueryNextClassIdRequest {}
+export interface QueryNextClassIdRequestProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryNextClassIdRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryNextClassIdRequest defines the QueryNextClassIdRequest message.
+ * @name QueryNextClassIdRequestAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryNextClassIdRequest
+ */
+export interface QueryNextClassIdRequestAmino {}
+export interface QueryNextClassIdRequestAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryNextClassIdRequest";
+  value: QueryNextClassIdRequestAmino;
+}
+/**
+ * QueryNextClassIdResponse defines the QueryNextClassIdResponse message.
+ * @name QueryNextClassIdResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryNextClassIdResponse
+ */
+export interface QueryNextClassIdResponse {
+  nextClassId: bigint;
+}
+export interface QueryNextClassIdResponseProtoMsg {
+  typeUrl: "/sparkdream.artifact.v1.QueryNextClassIdResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryNextClassIdResponse defines the QueryNextClassIdResponse message.
+ * @name QueryNextClassIdResponseAmino
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryNextClassIdResponse
+ */
+export interface QueryNextClassIdResponseAmino {
+  next_class_id?: string;
+}
+export interface QueryNextClassIdResponseAminoMsg {
+  type: "/sparkdream.artifact.v1.QueryNextClassIdResponse";
+  value: QueryNextClassIdResponseAmino;
+}
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
 }
@@ -9799,6 +9847,131 @@ export const QueryRentalOffersResponse = {
     return {
       typeUrl: "/sparkdream.artifact.v1.QueryRentalOffersResponse",
       value: QueryRentalOffersResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryNextClassIdRequest(): QueryNextClassIdRequest {
+  return {};
+}
+/**
+ * QueryNextClassIdRequest defines the QueryNextClassIdRequest message.
+ * @name QueryNextClassIdRequest
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryNextClassIdRequest
+ */
+export const QueryNextClassIdRequest = {
+  typeUrl: "/sparkdream.artifact.v1.QueryNextClassIdRequest",
+  encode(_: QueryNextClassIdRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryNextClassIdRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryNextClassIdRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<QueryNextClassIdRequest>): QueryNextClassIdRequest {
+    const message = createBaseQueryNextClassIdRequest();
+    return message;
+  },
+  fromAmino(_: QueryNextClassIdRequestAmino): QueryNextClassIdRequest {
+    const message = createBaseQueryNextClassIdRequest();
+    return message;
+  },
+  toAmino(_: QueryNextClassIdRequest): QueryNextClassIdRequestAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: QueryNextClassIdRequestAminoMsg): QueryNextClassIdRequest {
+    return QueryNextClassIdRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryNextClassIdRequestProtoMsg): QueryNextClassIdRequest {
+    return QueryNextClassIdRequest.decode(message.value);
+  },
+  toProto(message: QueryNextClassIdRequest): Uint8Array {
+    return QueryNextClassIdRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryNextClassIdRequest): QueryNextClassIdRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryNextClassIdRequest",
+      value: QueryNextClassIdRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryNextClassIdResponse(): QueryNextClassIdResponse {
+  return {
+    nextClassId: BigInt(0)
+  };
+}
+/**
+ * QueryNextClassIdResponse defines the QueryNextClassIdResponse message.
+ * @name QueryNextClassIdResponse
+ * @package sparkdream.artifact.v1
+ * @see proto type: sparkdream.artifact.v1.QueryNextClassIdResponse
+ */
+export const QueryNextClassIdResponse = {
+  typeUrl: "/sparkdream.artifact.v1.QueryNextClassIdResponse",
+  encode(message: QueryNextClassIdResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.nextClassId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.nextClassId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryNextClassIdResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryNextClassIdResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.nextClassId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryNextClassIdResponse>): QueryNextClassIdResponse {
+    const message = createBaseQueryNextClassIdResponse();
+    message.nextClassId = object.nextClassId !== undefined && object.nextClassId !== null ? BigInt(object.nextClassId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryNextClassIdResponseAmino): QueryNextClassIdResponse {
+    const message = createBaseQueryNextClassIdResponse();
+    if (object.next_class_id !== undefined && object.next_class_id !== null) {
+      message.nextClassId = BigInt(object.next_class_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryNextClassIdResponse): QueryNextClassIdResponseAmino {
+    const obj: any = {};
+    obj.next_class_id = message.nextClassId !== BigInt(0) ? message.nextClassId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryNextClassIdResponseAminoMsg): QueryNextClassIdResponse {
+    return QueryNextClassIdResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryNextClassIdResponseProtoMsg): QueryNextClassIdResponse {
+    return QueryNextClassIdResponse.decode(message.value);
+  },
+  toProto(message: QueryNextClassIdResponse): Uint8Array {
+    return QueryNextClassIdResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryNextClassIdResponse): QueryNextClassIdResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.artifact.v1.QueryNextClassIdResponse",
+      value: QueryNextClassIdResponse.encode(message).finish()
     };
   }
 };

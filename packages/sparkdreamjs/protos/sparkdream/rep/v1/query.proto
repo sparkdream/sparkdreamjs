@@ -525,6 +525,19 @@ service Query {
   rpc PendingMigrationByTarget(QueryPendingMigrationByTargetRequest) returns (QueryPendingMigrationByTargetResponse) {
     option (google.api.http).get = "/sparkdream/rep/v1/pending_migration_by_target/{address}";
   }
+
+  // RecoveryCommit returns an unexpired sealed recovery commit by its seal
+  // (hex), so a recovering member can check its height and expiry from any
+  // device.
+  rpc RecoveryCommit(QueryRecoveryCommitRequest) returns (QueryRecoveryCommitResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/recovery_commit/{sealed_hex}";
+  }
+
+  // RecoveryCommitsBySubmitter lists the unexpired sealed recovery commits an
+  // address submitted.
+  rpc RecoveryCommitsBySubmitter(QueryRecoveryCommitsBySubmitterRequest) returns (QueryRecoveryCommitsBySubmitterResponse) {
+    option (google.api.http).get = "/sparkdream/rep/v1/recovery_commits_by_submitter/{submitter}";
+  }
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -1821,8 +1834,10 @@ message QueryCanonicalResponse {
   // canonical is the current address of the identity (address itself when it
   // never migrated).
   string canonical = 1;
+
   // tombstoned is true when address migrated away.
   bool tombstoned = 2;
+
   // path is the path of the migration that tombstoned address.
   MigrationPath path = 3;
 }
@@ -1898,4 +1913,27 @@ message QueryPendingMigrationByTargetRequest {
 message QueryPendingMigrationByTargetResponse {
   // migration is the pending migration targeting address.
   MemberMigration migration = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryRecoveryCommitRequest defines the QueryRecoveryCommitRequest message.
+message QueryRecoveryCommitRequest {
+  // The 32-byte seal, hex-encoded.
+  string sealed_hex = 1;
+}
+
+// QueryRecoveryCommitResponse defines the QueryRecoveryCommitResponse message.
+message QueryRecoveryCommitResponse {
+  RecoveryCommit commit = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryRecoveryCommitsBySubmitterRequest defines the QueryRecoveryCommitsBySubmitterRequest message.
+message QueryRecoveryCommitsBySubmitterRequest {
+  string submitter = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// QueryRecoveryCommitsBySubmitterResponse defines the QueryRecoveryCommitsBySubmitterResponse message.
+message QueryRecoveryCommitsBySubmitterResponse {
+  repeated RecoveryCommit commits = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }

@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "../../../cosmos/base/query/v1beta1/pagination";
 import { RoleType, BondedRole, BondedRoleAmino, BondedRoleConfig, BondedRoleConfigAmino } from "./bonded_role";
-import { MigrationStatus, MigrationPath, MemberMigration, MemberMigrationAmino, RecoveryCommitmentSet, RecoveryCommitmentSetAmino } from "./migration";
+import { MigrationStatus, MigrationPath, MemberMigration, MemberMigrationAmino, RecoveryCommitmentSet, RecoveryCommitmentSetAmino, RecoveryCommit, RecoveryCommitAmino } from "./migration";
 import { Params, ParamsAmino } from "./params";
 import { Member, MemberAmino, TrustLevel } from "./member";
 import { Invitation, InvitationAmino } from "./invitation";
@@ -5817,6 +5817,120 @@ export interface QueryPendingMigrationByTargetResponseAmino {
 export interface QueryPendingMigrationByTargetResponseAminoMsg {
   type: "/sparkdream.rep.v1.QueryPendingMigrationByTargetResponse";
   value: QueryPendingMigrationByTargetResponseAmino;
+}
+/**
+ * QueryRecoveryCommitRequest defines the QueryRecoveryCommitRequest message.
+ * @name QueryRecoveryCommitRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRecoveryCommitRequest
+ */
+export interface QueryRecoveryCommitRequest {
+  /**
+   * The 32-byte seal, hex-encoded.
+   */
+  sealedHex: string;
+}
+export interface QueryRecoveryCommitRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryRecoveryCommitRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryRecoveryCommitRequest defines the QueryRecoveryCommitRequest message.
+ * @name QueryRecoveryCommitRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRecoveryCommitRequest
+ */
+export interface QueryRecoveryCommitRequestAmino {
+  /**
+   * The 32-byte seal, hex-encoded.
+   */
+  sealed_hex?: string;
+}
+export interface QueryRecoveryCommitRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryRecoveryCommitRequest";
+  value: QueryRecoveryCommitRequestAmino;
+}
+/**
+ * QueryRecoveryCommitResponse defines the QueryRecoveryCommitResponse message.
+ * @name QueryRecoveryCommitResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRecoveryCommitResponse
+ */
+export interface QueryRecoveryCommitResponse {
+  commit: RecoveryCommit;
+}
+export interface QueryRecoveryCommitResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryRecoveryCommitResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryRecoveryCommitResponse defines the QueryRecoveryCommitResponse message.
+ * @name QueryRecoveryCommitResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRecoveryCommitResponse
+ */
+export interface QueryRecoveryCommitResponseAmino {
+  commit?: RecoveryCommitAmino;
+}
+export interface QueryRecoveryCommitResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryRecoveryCommitResponse";
+  value: QueryRecoveryCommitResponseAmino;
+}
+/**
+ * QueryRecoveryCommitsBySubmitterRequest defines the QueryRecoveryCommitsBySubmitterRequest message.
+ * @name QueryRecoveryCommitsBySubmitterRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRecoveryCommitsBySubmitterRequest
+ */
+export interface QueryRecoveryCommitsBySubmitterRequest {
+  submitter: string;
+  pagination?: PageRequest;
+}
+export interface QueryRecoveryCommitsBySubmitterRequestProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryRecoveryCommitsBySubmitterRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryRecoveryCommitsBySubmitterRequest defines the QueryRecoveryCommitsBySubmitterRequest message.
+ * @name QueryRecoveryCommitsBySubmitterRequestAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRecoveryCommitsBySubmitterRequest
+ */
+export interface QueryRecoveryCommitsBySubmitterRequestAmino {
+  submitter?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryRecoveryCommitsBySubmitterRequestAminoMsg {
+  type: "/sparkdream.rep.v1.QueryRecoveryCommitsBySubmitterRequest";
+  value: QueryRecoveryCommitsBySubmitterRequestAmino;
+}
+/**
+ * QueryRecoveryCommitsBySubmitterResponse defines the QueryRecoveryCommitsBySubmitterResponse message.
+ * @name QueryRecoveryCommitsBySubmitterResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRecoveryCommitsBySubmitterResponse
+ */
+export interface QueryRecoveryCommitsBySubmitterResponse {
+  commits: RecoveryCommit[];
+  pagination?: PageResponse;
+}
+export interface QueryRecoveryCommitsBySubmitterResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.QueryRecoveryCommitsBySubmitterResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryRecoveryCommitsBySubmitterResponse defines the QueryRecoveryCommitsBySubmitterResponse message.
+ * @name QueryRecoveryCommitsBySubmitterResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRecoveryCommitsBySubmitterResponse
+ */
+export interface QueryRecoveryCommitsBySubmitterResponseAmino {
+  commits?: RecoveryCommitAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryRecoveryCommitsBySubmitterResponseAminoMsg {
+  type: "/sparkdream.rep.v1.QueryRecoveryCommitsBySubmitterResponse";
+  value: QueryRecoveryCommitsBySubmitterResponseAmino;
 }
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
@@ -21278,6 +21392,308 @@ export const QueryPendingMigrationByTargetResponse = {
     return {
       typeUrl: "/sparkdream.rep.v1.QueryPendingMigrationByTargetResponse",
       value: QueryPendingMigrationByTargetResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRecoveryCommitRequest(): QueryRecoveryCommitRequest {
+  return {
+    sealedHex: ""
+  };
+}
+/**
+ * QueryRecoveryCommitRequest defines the QueryRecoveryCommitRequest message.
+ * @name QueryRecoveryCommitRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRecoveryCommitRequest
+ */
+export const QueryRecoveryCommitRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryRecoveryCommitRequest",
+  encode(message: QueryRecoveryCommitRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.sealedHex !== "") {
+      writer.uint32(10).string(message.sealedHex);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRecoveryCommitRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRecoveryCommitRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.sealedHex = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryRecoveryCommitRequest>): QueryRecoveryCommitRequest {
+    const message = createBaseQueryRecoveryCommitRequest();
+    message.sealedHex = object.sealedHex ?? "";
+    return message;
+  },
+  fromAmino(object: QueryRecoveryCommitRequestAmino): QueryRecoveryCommitRequest {
+    const message = createBaseQueryRecoveryCommitRequest();
+    if (object.sealed_hex !== undefined && object.sealed_hex !== null) {
+      message.sealedHex = object.sealed_hex;
+    }
+    return message;
+  },
+  toAmino(message: QueryRecoveryCommitRequest): QueryRecoveryCommitRequestAmino {
+    const obj: any = {};
+    obj.sealed_hex = message.sealedHex === "" ? undefined : message.sealedHex;
+    return obj;
+  },
+  fromAminoMsg(object: QueryRecoveryCommitRequestAminoMsg): QueryRecoveryCommitRequest {
+    return QueryRecoveryCommitRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRecoveryCommitRequestProtoMsg): QueryRecoveryCommitRequest {
+    return QueryRecoveryCommitRequest.decode(message.value);
+  },
+  toProto(message: QueryRecoveryCommitRequest): Uint8Array {
+    return QueryRecoveryCommitRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRecoveryCommitRequest): QueryRecoveryCommitRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryRecoveryCommitRequest",
+      value: QueryRecoveryCommitRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRecoveryCommitResponse(): QueryRecoveryCommitResponse {
+  return {
+    commit: RecoveryCommit.fromPartial({})
+  };
+}
+/**
+ * QueryRecoveryCommitResponse defines the QueryRecoveryCommitResponse message.
+ * @name QueryRecoveryCommitResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRecoveryCommitResponse
+ */
+export const QueryRecoveryCommitResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryRecoveryCommitResponse",
+  encode(message: QueryRecoveryCommitResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.commit !== undefined) {
+      RecoveryCommit.encode(message.commit, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRecoveryCommitResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRecoveryCommitResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.commit = RecoveryCommit.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryRecoveryCommitResponse>): QueryRecoveryCommitResponse {
+    const message = createBaseQueryRecoveryCommitResponse();
+    message.commit = object.commit !== undefined && object.commit !== null ? RecoveryCommit.fromPartial(object.commit) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryRecoveryCommitResponseAmino): QueryRecoveryCommitResponse {
+    const message = createBaseQueryRecoveryCommitResponse();
+    if (object.commit !== undefined && object.commit !== null) {
+      message.commit = RecoveryCommit.fromAmino(object.commit);
+    }
+    return message;
+  },
+  toAmino(message: QueryRecoveryCommitResponse): QueryRecoveryCommitResponseAmino {
+    const obj: any = {};
+    obj.commit = message.commit ? RecoveryCommit.toAmino(message.commit) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryRecoveryCommitResponseAminoMsg): QueryRecoveryCommitResponse {
+    return QueryRecoveryCommitResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRecoveryCommitResponseProtoMsg): QueryRecoveryCommitResponse {
+    return QueryRecoveryCommitResponse.decode(message.value);
+  },
+  toProto(message: QueryRecoveryCommitResponse): Uint8Array {
+    return QueryRecoveryCommitResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRecoveryCommitResponse): QueryRecoveryCommitResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryRecoveryCommitResponse",
+      value: QueryRecoveryCommitResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRecoveryCommitsBySubmitterRequest(): QueryRecoveryCommitsBySubmitterRequest {
+  return {
+    submitter: "",
+    pagination: undefined
+  };
+}
+/**
+ * QueryRecoveryCommitsBySubmitterRequest defines the QueryRecoveryCommitsBySubmitterRequest message.
+ * @name QueryRecoveryCommitsBySubmitterRequest
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRecoveryCommitsBySubmitterRequest
+ */
+export const QueryRecoveryCommitsBySubmitterRequest = {
+  typeUrl: "/sparkdream.rep.v1.QueryRecoveryCommitsBySubmitterRequest",
+  encode(message: QueryRecoveryCommitsBySubmitterRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.submitter !== "") {
+      writer.uint32(10).string(message.submitter);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRecoveryCommitsBySubmitterRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRecoveryCommitsBySubmitterRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.submitter = reader.string();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryRecoveryCommitsBySubmitterRequest>): QueryRecoveryCommitsBySubmitterRequest {
+    const message = createBaseQueryRecoveryCommitsBySubmitterRequest();
+    message.submitter = object.submitter ?? "";
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryRecoveryCommitsBySubmitterRequestAmino): QueryRecoveryCommitsBySubmitterRequest {
+    const message = createBaseQueryRecoveryCommitsBySubmitterRequest();
+    if (object.submitter !== undefined && object.submitter !== null) {
+      message.submitter = object.submitter;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryRecoveryCommitsBySubmitterRequest): QueryRecoveryCommitsBySubmitterRequestAmino {
+    const obj: any = {};
+    obj.submitter = message.submitter === "" ? undefined : message.submitter;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryRecoveryCommitsBySubmitterRequestAminoMsg): QueryRecoveryCommitsBySubmitterRequest {
+    return QueryRecoveryCommitsBySubmitterRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRecoveryCommitsBySubmitterRequestProtoMsg): QueryRecoveryCommitsBySubmitterRequest {
+    return QueryRecoveryCommitsBySubmitterRequest.decode(message.value);
+  },
+  toProto(message: QueryRecoveryCommitsBySubmitterRequest): Uint8Array {
+    return QueryRecoveryCommitsBySubmitterRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRecoveryCommitsBySubmitterRequest): QueryRecoveryCommitsBySubmitterRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryRecoveryCommitsBySubmitterRequest",
+      value: QueryRecoveryCommitsBySubmitterRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryRecoveryCommitsBySubmitterResponse(): QueryRecoveryCommitsBySubmitterResponse {
+  return {
+    commits: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryRecoveryCommitsBySubmitterResponse defines the QueryRecoveryCommitsBySubmitterResponse message.
+ * @name QueryRecoveryCommitsBySubmitterResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.QueryRecoveryCommitsBySubmitterResponse
+ */
+export const QueryRecoveryCommitsBySubmitterResponse = {
+  typeUrl: "/sparkdream.rep.v1.QueryRecoveryCommitsBySubmitterResponse",
+  encode(message: QueryRecoveryCommitsBySubmitterResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.commits) {
+      RecoveryCommit.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryRecoveryCommitsBySubmitterResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryRecoveryCommitsBySubmitterResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.commits.push(RecoveryCommit.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryRecoveryCommitsBySubmitterResponse>): QueryRecoveryCommitsBySubmitterResponse {
+    const message = createBaseQueryRecoveryCommitsBySubmitterResponse();
+    message.commits = object.commits?.map(e => RecoveryCommit.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryRecoveryCommitsBySubmitterResponseAmino): QueryRecoveryCommitsBySubmitterResponse {
+    const message = createBaseQueryRecoveryCommitsBySubmitterResponse();
+    message.commits = object.commits?.map(e => RecoveryCommit.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryRecoveryCommitsBySubmitterResponse): QueryRecoveryCommitsBySubmitterResponseAmino {
+    const obj: any = {};
+    if (message.commits) {
+      obj.commits = message.commits.map(e => e ? RecoveryCommit.toAmino(e) : undefined);
+    } else {
+      obj.commits = message.commits;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryRecoveryCommitsBySubmitterResponseAminoMsg): QueryRecoveryCommitsBySubmitterResponse {
+    return QueryRecoveryCommitsBySubmitterResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryRecoveryCommitsBySubmitterResponseProtoMsg): QueryRecoveryCommitsBySubmitterResponse {
+    return QueryRecoveryCommitsBySubmitterResponse.decode(message.value);
+  },
+  toProto(message: QueryRecoveryCommitsBySubmitterResponse): Uint8Array {
+    return QueryRecoveryCommitsBySubmitterResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryRecoveryCommitsBySubmitterResponse): QueryRecoveryCommitsBySubmitterResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.QueryRecoveryCommitsBySubmitterResponse",
+      value: QueryRecoveryCommitsBySubmitterResponse.encode(message).finish()
     };
   }
 };

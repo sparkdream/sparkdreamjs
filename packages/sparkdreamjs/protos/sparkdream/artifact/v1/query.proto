@@ -218,6 +218,13 @@ service Query {
   rpc RentalOffers(QueryRentalOffersRequest) returns (QueryRentalOffersResponse) {
     option (google.api.http).get = "/sparkdream/artifact/v1/rental_offers";
   }
+
+  // NextClassId returns the id the next created class will get. Clients that
+  // bind the id into data before creating (blind-mint commitments) pass it as
+  // MsgCreateClass.expected_class_id.
+  rpc NextClassId(QueryNextClassIdRequest) returns (QueryNextClassIdResponse) {
+    option (google.api.http).get = "/sparkdream/artifact/v1/next_class_id";
+  }
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -825,4 +832,12 @@ message QueryRentalOffersRequest {
 message QueryRentalOffersResponse {
   repeated RentalOffer offers = 1 [(gogoproto.nullable) = false];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryNextClassIdRequest defines the QueryNextClassIdRequest message.
+message QueryNextClassIdRequest {}
+
+// QueryNextClassIdResponse defines the QueryNextClassIdResponse message.
+message QueryNextClassIdResponse {
+  uint64 next_class_id = 1;
 }

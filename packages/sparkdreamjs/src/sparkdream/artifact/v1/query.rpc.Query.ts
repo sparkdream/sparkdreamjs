@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryClassRequest, QueryClassResponse, QueryClassesRequest, QueryClassesResponse, QueryClassesByOwnerRequest, QueryClassesByOwnerResponse, QueryTokenRequest, QueryTokenResponse, QueryTokensRequest, QueryTokensResponse, QueryTokensByOwnerRequest, QueryTokensByOwnerResponse, QueryOwnerRequest, QueryOwnerResponse, QuerySupplyRequest, QuerySupplyResponse, QueryListingRequest, QueryListingResponse, QueryListingsRequest, QueryListingsResponse, QueryListingsBySellerRequest, QueryListingsBySellerResponse, QueryInboxRequest, QueryInboxResponse, QueryOutboxRequest, QueryOutboxResponse, QueryReceivePolicyRequest, QueryReceivePolicyResponse, QueryPendingClassOwnerRequest, QueryPendingClassOwnerResponse, QueryHideRecordRequest, QueryHideRecordResponse, QueryHideRecordsByTargetRequest, QueryHideRecordsByTargetResponse, QueryMediaProposalsRequest, QueryMediaProposalsResponse, QueryPublicMintQuoteRequest, QueryPublicMintQuoteResponse, QueryEditionRequest, QueryEditionResponse, QueryEditionsRequest, QueryEditionsResponse, QueryBalanceRequest, QueryBalanceResponse, QueryBalancesByOwnerRequest, QueryBalancesByOwnerResponse, QueryEditionHoldersRequest, QueryEditionHoldersResponse, QueryUnitListingRequest, QueryUnitListingResponse, QueryUnitListingsRequest, QueryUnitListingsResponse, QueryCraftRecipesRequest, QueryCraftRecipesResponse, QueryRentalRequest, QueryRentalResponse, QueryRentalOfferRequest, QueryRentalOfferResponse, QueryRentalsByUserRequest, QueryRentalsByUserResponse, QueryChildrenRequest, QueryChildrenResponse, QueryHarbergerQuoteRequest, QueryHarbergerQuoteResponse, QueryOfferRequest, QueryOfferResponse, QueryOffersRequest, QueryOffersResponse, QueryOffersByBidderRequest, QueryOffersByBidderResponse, QueryAuctionRequest, QueryAuctionResponse, QueryAuctionsRequest, QueryAuctionsResponse, QueryAuctionsBySellerRequest, QueryAuctionsBySellerResponse, QueryRentalOffersRequest, QueryRentalOffersResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryClassRequest, QueryClassResponse, QueryClassesRequest, QueryClassesResponse, QueryClassesByOwnerRequest, QueryClassesByOwnerResponse, QueryTokenRequest, QueryTokenResponse, QueryTokensRequest, QueryTokensResponse, QueryTokensByOwnerRequest, QueryTokensByOwnerResponse, QueryOwnerRequest, QueryOwnerResponse, QuerySupplyRequest, QuerySupplyResponse, QueryListingRequest, QueryListingResponse, QueryListingsRequest, QueryListingsResponse, QueryListingsBySellerRequest, QueryListingsBySellerResponse, QueryInboxRequest, QueryInboxResponse, QueryOutboxRequest, QueryOutboxResponse, QueryReceivePolicyRequest, QueryReceivePolicyResponse, QueryPendingClassOwnerRequest, QueryPendingClassOwnerResponse, QueryHideRecordRequest, QueryHideRecordResponse, QueryHideRecordsByTargetRequest, QueryHideRecordsByTargetResponse, QueryMediaProposalsRequest, QueryMediaProposalsResponse, QueryPublicMintQuoteRequest, QueryPublicMintQuoteResponse, QueryEditionRequest, QueryEditionResponse, QueryEditionsRequest, QueryEditionsResponse, QueryBalanceRequest, QueryBalanceResponse, QueryBalancesByOwnerRequest, QueryBalancesByOwnerResponse, QueryEditionHoldersRequest, QueryEditionHoldersResponse, QueryUnitListingRequest, QueryUnitListingResponse, QueryUnitListingsRequest, QueryUnitListingsResponse, QueryCraftRecipesRequest, QueryCraftRecipesResponse, QueryRentalRequest, QueryRentalResponse, QueryRentalOfferRequest, QueryRentalOfferResponse, QueryRentalsByUserRequest, QueryRentalsByUserResponse, QueryChildrenRequest, QueryChildrenResponse, QueryHarbergerQuoteRequest, QueryHarbergerQuoteResponse, QueryOfferRequest, QueryOfferResponse, QueryOffersRequest, QueryOffersResponse, QueryOffersByBidderRequest, QueryOffersByBidderResponse, QueryAuctionRequest, QueryAuctionResponse, QueryAuctionsRequest, QueryAuctionsResponse, QueryAuctionsBySellerRequest, QueryAuctionsBySellerResponse, QueryRentalOffersRequest, QueryRentalOffersResponse, QueryNextClassIdRequest, QueryNextClassIdResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -98,6 +98,12 @@ export interface Query {
    * offer, including the open ones anyone may accept.
    */
   rentalOffers(request: QueryRentalOffersRequest): Promise<QueryRentalOffersResponse>;
+  /**
+   * NextClassId returns the id the next created class will get. Clients that
+   * bind the id into data before creating (blind-mint commitments) pass it as
+   * MsgCreateClass.expected_class_id.
+   */
+  nextClassId(request?: QueryNextClassIdRequest): Promise<QueryNextClassIdResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -351,6 +357,14 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.artifact.v1.Query", "RentalOffers", data);
     return promise.then(data => QueryRentalOffersResponse.decode(new BinaryReader(data)));
   };
+  /* NextClassId returns the id the next created class will get. Clients that
+   bind the id into data before creating (blind-mint commitments) pass it as
+   MsgCreateClass.expected_class_id. */
+  nextClassId = async (request: QueryNextClassIdRequest = {}): Promise<QueryNextClassIdResponse> => {
+    const data = QueryNextClassIdRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.artifact.v1.Query", "NextClassId", data);
+    return promise.then(data => QueryNextClassIdResponse.decode(new BinaryReader(data)));
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);
@@ -475,6 +489,9 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     rentalOffers(request: QueryRentalOffersRequest): Promise<QueryRentalOffersResponse> {
       return queryService.rentalOffers(request);
+    },
+    nextClassId(request?: QueryNextClassIdRequest): Promise<QueryNextClassIdResponse> {
+      return queryService.nextClassId(request);
     }
   };
 };
