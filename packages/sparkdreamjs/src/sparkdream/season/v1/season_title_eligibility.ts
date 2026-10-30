@@ -50,7 +50,10 @@ export interface TitleGrantAminoMsg {
   value: TitleGrantAmino;
 }
 /**
- * SeasonTitleEligibility tracks title grants for a season.
+ * SeasonTitleEligibility tracks the ranked (TOP_XP) title grants for a
+ * season. It is built incrementally across the SNAPSHOT batches and holds at
+ * most the title's threshold (capped) members per grant; threshold titles are
+ * recorded per member on MemberSeasonSnapshot.eligible_title_ids.
  * @name SeasonTitleEligibility
  * @package sparkdream.season.v1
  * @see proto type: sparkdream.season.v1.SeasonTitleEligibility
@@ -74,7 +77,10 @@ export interface SeasonTitleEligibilityProtoMsg {
   value: Uint8Array;
 }
 /**
- * SeasonTitleEligibility tracks title grants for a season.
+ * SeasonTitleEligibility tracks the ranked (TOP_XP) title grants for a
+ * season. It is built incrementally across the SNAPSHOT batches and holds at
+ * most the title's threshold (capped) members per grant; threshold titles are
+ * recorded per member on MemberSeasonSnapshot.eligible_title_ids.
  * @name SeasonTitleEligibilityAmino
  * @package sparkdream.season.v1
  * @see proto type: sparkdream.season.v1.SeasonTitleEligibility
@@ -200,7 +206,10 @@ function createBaseSeasonTitleEligibility(): SeasonTitleEligibility {
   };
 }
 /**
- * SeasonTitleEligibility tracks title grants for a season.
+ * SeasonTitleEligibility tracks the ranked (TOP_XP) title grants for a
+ * season. It is built incrementally across the SNAPSHOT batches and holds at
+ * most the title's threshold (capped) members per grant; threshold titles are
+ * recorded per member on MemberSeasonSnapshot.eligible_title_ids.
  * @name SeasonTitleEligibility
  * @package sparkdream.season.v1
  * @see proto type: sparkdream.season.v1.SeasonTitleEligibility

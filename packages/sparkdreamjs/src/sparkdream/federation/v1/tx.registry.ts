@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { TelescopeGeneratedType } from "../../../types";
 import { Registry } from "@cosmjs/proto-signing";
-import { MsgUpdateParams, MsgRegisterPeer, MsgRemovePeer, MsgSuspendPeer, MsgResumePeer, MsgUpdatePeerPolicy, MsgRegisterBridge, MsgUpdateBridge, MsgSubmitFederatedContent, MsgFederateContent, MsgAttestOutbound, MsgModerateContent, MsgLinkIdentity, MsgUnlinkIdentity, MsgConfirmIdentityLink, MsgRequestReputationAttestation, MsgVerifyContent, MsgChallengeVerification, MsgSubmitArbiterHash, MsgEscalateChallenge, MsgResolveEscalatedChallenge, MsgUpdateOperationalParams, MsgUpdatePeerController, MsgResyncBridgeCount, MsgPruneOrphanBindings } from "./tx";
-export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.federation.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.federation.v1.MsgRegisterPeer", MsgRegisterPeer], ["/sparkdream.federation.v1.MsgRemovePeer", MsgRemovePeer], ["/sparkdream.federation.v1.MsgSuspendPeer", MsgSuspendPeer], ["/sparkdream.federation.v1.MsgResumePeer", MsgResumePeer], ["/sparkdream.federation.v1.MsgUpdatePeerPolicy", MsgUpdatePeerPolicy], ["/sparkdream.federation.v1.MsgRegisterBridge", MsgRegisterBridge], ["/sparkdream.federation.v1.MsgUpdateBridge", MsgUpdateBridge], ["/sparkdream.federation.v1.MsgSubmitFederatedContent", MsgSubmitFederatedContent], ["/sparkdream.federation.v1.MsgFederateContent", MsgFederateContent], ["/sparkdream.federation.v1.MsgAttestOutbound", MsgAttestOutbound], ["/sparkdream.federation.v1.MsgModerateContent", MsgModerateContent], ["/sparkdream.federation.v1.MsgLinkIdentity", MsgLinkIdentity], ["/sparkdream.federation.v1.MsgUnlinkIdentity", MsgUnlinkIdentity], ["/sparkdream.federation.v1.MsgConfirmIdentityLink", MsgConfirmIdentityLink], ["/sparkdream.federation.v1.MsgRequestReputationAttestation", MsgRequestReputationAttestation], ["/sparkdream.federation.v1.MsgVerifyContent", MsgVerifyContent], ["/sparkdream.federation.v1.MsgChallengeVerification", MsgChallengeVerification], ["/sparkdream.federation.v1.MsgSubmitArbiterHash", MsgSubmitArbiterHash], ["/sparkdream.federation.v1.MsgEscalateChallenge", MsgEscalateChallenge], ["/sparkdream.federation.v1.MsgResolveEscalatedChallenge", MsgResolveEscalatedChallenge], ["/sparkdream.federation.v1.MsgUpdateOperationalParams", MsgUpdateOperationalParams], ["/sparkdream.federation.v1.MsgUpdatePeerController", MsgUpdatePeerController], ["/sparkdream.federation.v1.MsgResyncBridgeCount", MsgResyncBridgeCount], ["/sparkdream.federation.v1.MsgPruneOrphanBindings", MsgPruneOrphanBindings]];
+import { MsgUpdateParams, MsgRegisterPeer, MsgRemovePeer, MsgSuspendPeer, MsgResumePeer, MsgUpdatePeerPolicy, MsgRegisterBridge, MsgUpdateBridge, MsgSubmitFederatedContent, MsgFederateContent, MsgAttestOutbound, MsgModerateContent, MsgLinkIdentity, MsgUnlinkIdentity, MsgConfirmIdentityLink, MsgAttestIdentityLink, MsgRequestReputationAttestation, MsgVerifyContent, MsgChallengeVerification, MsgSubmitArbiterHash, MsgEscalateChallenge, MsgResolveEscalatedChallenge, MsgUpdateOperationalParams, MsgUpdatePeerController, MsgResyncBridgeCount, MsgPruneOrphanBindings } from "./tx";
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.federation.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.federation.v1.MsgRegisterPeer", MsgRegisterPeer], ["/sparkdream.federation.v1.MsgRemovePeer", MsgRemovePeer], ["/sparkdream.federation.v1.MsgSuspendPeer", MsgSuspendPeer], ["/sparkdream.federation.v1.MsgResumePeer", MsgResumePeer], ["/sparkdream.federation.v1.MsgUpdatePeerPolicy", MsgUpdatePeerPolicy], ["/sparkdream.federation.v1.MsgRegisterBridge", MsgRegisterBridge], ["/sparkdream.federation.v1.MsgUpdateBridge", MsgUpdateBridge], ["/sparkdream.federation.v1.MsgSubmitFederatedContent", MsgSubmitFederatedContent], ["/sparkdream.federation.v1.MsgFederateContent", MsgFederateContent], ["/sparkdream.federation.v1.MsgAttestOutbound", MsgAttestOutbound], ["/sparkdream.federation.v1.MsgModerateContent", MsgModerateContent], ["/sparkdream.federation.v1.MsgLinkIdentity", MsgLinkIdentity], ["/sparkdream.federation.v1.MsgUnlinkIdentity", MsgUnlinkIdentity], ["/sparkdream.federation.v1.MsgConfirmIdentityLink", MsgConfirmIdentityLink], ["/sparkdream.federation.v1.MsgAttestIdentityLink", MsgAttestIdentityLink], ["/sparkdream.federation.v1.MsgRequestReputationAttestation", MsgRequestReputationAttestation], ["/sparkdream.federation.v1.MsgVerifyContent", MsgVerifyContent], ["/sparkdream.federation.v1.MsgChallengeVerification", MsgChallengeVerification], ["/sparkdream.federation.v1.MsgSubmitArbiterHash", MsgSubmitArbiterHash], ["/sparkdream.federation.v1.MsgEscalateChallenge", MsgEscalateChallenge], ["/sparkdream.federation.v1.MsgResolveEscalatedChallenge", MsgResolveEscalatedChallenge], ["/sparkdream.federation.v1.MsgUpdateOperationalParams", MsgUpdateOperationalParams], ["/sparkdream.federation.v1.MsgUpdatePeerController", MsgUpdatePeerController], ["/sparkdream.federation.v1.MsgResyncBridgeCount", MsgResyncBridgeCount], ["/sparkdream.federation.v1.MsgPruneOrphanBindings", MsgPruneOrphanBindings]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -98,6 +98,12 @@ export const MessageComposer = {
       return {
         typeUrl: "/sparkdream.federation.v1.MsgConfirmIdentityLink",
         value: MsgConfirmIdentityLink.encode(value).finish()
+      };
+    },
+    attestIdentityLink(value: MsgAttestIdentityLink) {
+      return {
+        typeUrl: "/sparkdream.federation.v1.MsgAttestIdentityLink",
+        value: MsgAttestIdentityLink.encode(value).finish()
       };
     },
     requestReputationAttestation(value: MsgRequestReputationAttestation) {
@@ -252,6 +258,12 @@ export const MessageComposer = {
         value
       };
     },
+    attestIdentityLink(value: MsgAttestIdentityLink) {
+      return {
+        typeUrl: "/sparkdream.federation.v1.MsgAttestIdentityLink",
+        value
+      };
+    },
     requestReputationAttestation(value: MsgRequestReputationAttestation) {
       return {
         typeUrl: "/sparkdream.federation.v1.MsgRequestReputationAttestation",
@@ -402,6 +414,12 @@ export const MessageComposer = {
       return {
         typeUrl: "/sparkdream.federation.v1.MsgConfirmIdentityLink",
         value: MsgConfirmIdentityLink.fromPartial(value)
+      };
+    },
+    attestIdentityLink(value: MsgAttestIdentityLink) {
+      return {
+        typeUrl: "/sparkdream.federation.v1.MsgAttestIdentityLink",
+        value: MsgAttestIdentityLink.fromPartial(value)
       };
     },
     requestReputationAttestation(value: MsgRequestReputationAttestation) {

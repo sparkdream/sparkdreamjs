@@ -30,6 +30,11 @@ export enum StakeTargetType {
    * make post N and reply N collide (one-bond-per-target, queries, challenges).
    */
   STAKE_TARGET_BLOG_REPLY_AUTHOR_BOND = 10,
+  /**
+   * STAKE_TARGET_BLOG_REPLY_CONTENT - Content conviction on x/blog replies. Replies have their own id sequence,
+   * so sharing BLOG_CONTENT would let conviction on post N keep reply N alive.
+   */
+  STAKE_TARGET_BLOG_REPLY_CONTENT = 11,
   UNRECOGNIZED = -1,
 }
 export const StakeTargetTypeAmino = StakeTargetType;
@@ -68,6 +73,9 @@ export function stakeTargetTypeFromJSON(object: any): StakeTargetType {
     case 10:
     case "STAKE_TARGET_BLOG_REPLY_AUTHOR_BOND":
       return StakeTargetType.STAKE_TARGET_BLOG_REPLY_AUTHOR_BOND;
+    case 11:
+    case "STAKE_TARGET_BLOG_REPLY_CONTENT":
+      return StakeTargetType.STAKE_TARGET_BLOG_REPLY_CONTENT;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -98,6 +106,8 @@ export function stakeTargetTypeToJSON(object: StakeTargetType): string {
       return "STAKE_TARGET_COLLECTION_AUTHOR_BOND";
     case StakeTargetType.STAKE_TARGET_BLOG_REPLY_AUTHOR_BOND:
       return "STAKE_TARGET_BLOG_REPLY_AUTHOR_BOND";
+    case StakeTargetType.STAKE_TARGET_BLOG_REPLY_CONTENT:
+      return "STAKE_TARGET_BLOG_REPLY_CONTENT";
     case StakeTargetType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";

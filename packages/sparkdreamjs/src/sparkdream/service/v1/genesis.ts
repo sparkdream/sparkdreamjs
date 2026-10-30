@@ -9,8 +9,9 @@ import { ReporterRateLimit, ReporterRateLimitAmino } from "./reporter_rate_limit
 import { RefileCooldown, RefileCooldownAmino } from "./refile_cooldown";
 import { Tier1LastSlash, Tier1LastSlashAmino } from "./tier1_last_slash";
 import { Checkpoint, CheckpointAmino } from "./checkpoint";
+import { SystemReportRateLimit, SystemReportRateLimitAmino } from "./system_report_rate_limit";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /**
  * GenesisState defines the service module's genesis state. See
  * x-service-spec.md §7 for full validation rules.
@@ -84,6 +85,17 @@ export interface GenesisState {
    * at import.
    */
   checkpoints: Checkpoint[];
+  /**
+   * system_report_dedup is the OpenSystemReport idempotency index
+   * (caller_module, dedupe_key) -> report_id. Without it a caller retry
+   * after an export/import would open a duplicate report.
+   */
+  systemReportDedup: SystemReportDedupEntry[];
+  /**
+   * system_report_rate_limits is the per-caller-module sliding-window
+   * ring buffer for OpenSystemReport.
+   */
+  systemReportRateLimits: SystemReportRateLimit[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.service.v1.GenesisState";
@@ -162,10 +174,51 @@ export interface GenesisStateAmino {
    * at import.
    */
   checkpoints?: CheckpointAmino[];
+  /**
+   * system_report_dedup is the OpenSystemReport idempotency index
+   * (caller_module, dedupe_key) -> report_id. Without it a caller retry
+   * after an export/import would open a duplicate report.
+   */
+  system_report_dedup?: SystemReportDedupEntryAmino[];
+  /**
+   * system_report_rate_limits is the per-caller-module sliding-window
+   * ring buffer for OpenSystemReport.
+   */
+  system_report_rate_limits?: SystemReportRateLimitAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.service.v1.GenesisState";
   value: GenesisStateAmino;
+}
+/**
+ * SystemReportDedupEntry is one SystemReportDedup map entry.
+ * @name SystemReportDedupEntry
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.SystemReportDedupEntry
+ */
+export interface SystemReportDedupEntry {
+  callerModule: string;
+  dedupeKey: Uint8Array;
+  reportId: bigint;
+}
+export interface SystemReportDedupEntryProtoMsg {
+  typeUrl: "/sparkdream.service.v1.SystemReportDedupEntry";
+  value: Uint8Array;
+}
+/**
+ * SystemReportDedupEntry is one SystemReportDedup map entry.
+ * @name SystemReportDedupEntryAmino
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.SystemReportDedupEntry
+ */
+export interface SystemReportDedupEntryAmino {
+  caller_module?: string;
+  dedupe_key?: string;
+  report_id?: string;
+}
+export interface SystemReportDedupEntryAminoMsg {
+  type: "/sparkdream.service.v1.SystemReportDedupEntry";
+  value: SystemReportDedupEntryAmino;
 }
 function createBaseGenesisState(): GenesisState {
   return {
@@ -181,7 +234,9 @@ function createBaseGenesisState(): GenesisState {
     tier1LastSlash: [],
     nextReportId: BigInt(0),
     nextEscrowId: BigInt(0),
-    checkpoints: []
+    checkpoints: [],
+    systemReportDedup: [],
+    systemReportRateLimits: []
   };
 }
 /**
@@ -233,6 +288,12 @@ export const GenesisState = {
     for (const v of message.checkpoints) {
       Checkpoint.encode(v!, writer.uint32(106).fork()).ldelim();
     }
+    for (const v of message.systemReportDedup) {
+      SystemReportDedupEntry.encode(v!, writer.uint32(114).fork()).ldelim();
+    }
+    for (const v of message.systemReportRateLimits) {
+      SystemReportRateLimit.encode(v!, writer.uint32(122).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -281,6 +342,12 @@ export const GenesisState = {
         case 13:
           message.checkpoints.push(Checkpoint.decode(reader, reader.uint32()));
           break;
+        case 14:
+          message.systemReportDedup.push(SystemReportDedupEntry.decode(reader, reader.uint32()));
+          break;
+        case 15:
+          message.systemReportRateLimits.push(SystemReportRateLimit.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -303,6 +370,8 @@ export const GenesisState = {
     message.nextReportId = object.nextReportId !== undefined && object.nextReportId !== null ? BigInt(object.nextReportId.toString()) : BigInt(0);
     message.nextEscrowId = object.nextEscrowId !== undefined && object.nextEscrowId !== null ? BigInt(object.nextEscrowId.toString()) : BigInt(0);
     message.checkpoints = object.checkpoints?.map(e => Checkpoint.fromPartial(e)) || [];
+    message.systemReportDedup = object.systemReportDedup?.map(e => SystemReportDedupEntry.fromPartial(e)) || [];
+    message.systemReportRateLimits = object.systemReportRateLimits?.map(e => SystemReportRateLimit.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -326,6 +395,8 @@ export const GenesisState = {
       message.nextEscrowId = BigInt(object.next_escrow_id);
     }
     message.checkpoints = object.checkpoints?.map(e => Checkpoint.fromAmino(e)) || [];
+    message.systemReportDedup = object.system_report_dedup?.map(e => SystemReportDedupEntry.fromAmino(e)) || [];
+    message.systemReportRateLimits = object.system_report_rate_limits?.map(e => SystemReportRateLimit.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -383,6 +454,16 @@ export const GenesisState = {
     } else {
       obj.checkpoints = message.checkpoints;
     }
+    if (message.systemReportDedup) {
+      obj.system_report_dedup = message.systemReportDedup.map(e => e ? SystemReportDedupEntry.toAmino(e) : undefined);
+    } else {
+      obj.system_report_dedup = message.systemReportDedup;
+    }
+    if (message.systemReportRateLimits) {
+      obj.system_report_rate_limits = message.systemReportRateLimits.map(e => e ? SystemReportRateLimit.toAmino(e) : undefined);
+    } else {
+      obj.system_report_rate_limits = message.systemReportRateLimits;
+    }
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {
@@ -398,6 +479,99 @@ export const GenesisState = {
     return {
       typeUrl: "/sparkdream.service.v1.GenesisState",
       value: GenesisState.encode(message).finish()
+    };
+  }
+};
+function createBaseSystemReportDedupEntry(): SystemReportDedupEntry {
+  return {
+    callerModule: "",
+    dedupeKey: new Uint8Array(),
+    reportId: BigInt(0)
+  };
+}
+/**
+ * SystemReportDedupEntry is one SystemReportDedup map entry.
+ * @name SystemReportDedupEntry
+ * @package sparkdream.service.v1
+ * @see proto type: sparkdream.service.v1.SystemReportDedupEntry
+ */
+export const SystemReportDedupEntry = {
+  typeUrl: "/sparkdream.service.v1.SystemReportDedupEntry",
+  encode(message: SystemReportDedupEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.callerModule !== "") {
+      writer.uint32(10).string(message.callerModule);
+    }
+    if (message.dedupeKey.length !== 0) {
+      writer.uint32(18).bytes(message.dedupeKey);
+    }
+    if (message.reportId !== BigInt(0)) {
+      writer.uint32(24).uint64(message.reportId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): SystemReportDedupEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSystemReportDedupEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.callerModule = reader.string();
+          break;
+        case 2:
+          message.dedupeKey = reader.bytes();
+          break;
+        case 3:
+          message.reportId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<SystemReportDedupEntry>): SystemReportDedupEntry {
+    const message = createBaseSystemReportDedupEntry();
+    message.callerModule = object.callerModule ?? "";
+    message.dedupeKey = object.dedupeKey ?? new Uint8Array();
+    message.reportId = object.reportId !== undefined && object.reportId !== null ? BigInt(object.reportId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: SystemReportDedupEntryAmino): SystemReportDedupEntry {
+    const message = createBaseSystemReportDedupEntry();
+    if (object.caller_module !== undefined && object.caller_module !== null) {
+      message.callerModule = object.caller_module;
+    }
+    if (object.dedupe_key !== undefined && object.dedupe_key !== null) {
+      message.dedupeKey = bytesFromBase64(object.dedupe_key);
+    }
+    if (object.report_id !== undefined && object.report_id !== null) {
+      message.reportId = BigInt(object.report_id);
+    }
+    return message;
+  },
+  toAmino(message: SystemReportDedupEntry): SystemReportDedupEntryAmino {
+    const obj: any = {};
+    obj.caller_module = message.callerModule === "" ? undefined : message.callerModule;
+    obj.dedupe_key = message.dedupeKey ? base64FromBytes(message.dedupeKey) : undefined;
+    obj.report_id = message.reportId !== BigInt(0) ? message.reportId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: SystemReportDedupEntryAminoMsg): SystemReportDedupEntry {
+    return SystemReportDedupEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: SystemReportDedupEntryProtoMsg): SystemReportDedupEntry {
+    return SystemReportDedupEntry.decode(message.value);
+  },
+  toProto(message: SystemReportDedupEntry): Uint8Array {
+    return SystemReportDedupEntry.encode(message).finish();
+  },
+  toProtoMsg(message: SystemReportDedupEntry): SystemReportDedupEntryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.service.v1.SystemReportDedupEntry",
+      value: SystemReportDedupEntry.encode(message).finish()
     };
   }
 };

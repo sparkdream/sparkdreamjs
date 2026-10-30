@@ -200,7 +200,7 @@ export class LCDQueryClient {
   };
   /* ListGuildInvite Queries a list of GuildInvite items. */
   getGuildInvite = async (params: QueryGetGuildInviteRequest): Promise<QueryGetGuildInviteResponse> => {
-    const endpoint = `sparkdream/season/v1/guild_invite/${params.guildInvitee}`;
+    const endpoint = `sparkdream/season/v1/guild_invite/${params.guildId}/${params.guildInvitee}`;
     return await this.req.get<QueryGetGuildInviteResponse>(endpoint);
   };
   /* ListGuildInvite defines the ListGuildInvite RPC. */

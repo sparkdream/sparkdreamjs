@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgCreateCollection, MsgCreateCollectionResponse, MsgUpdateCollection, MsgUpdateCollectionResponse, MsgDeleteCollection, MsgDeleteCollectionResponse, MsgAddItem, MsgAddItemResponse, MsgAddItems, MsgAddItemsResponse, MsgUpdateItem, MsgUpdateItemResponse, MsgRemoveItem, MsgRemoveItemResponse, MsgRemoveItems, MsgRemoveItemsResponse, MsgReorderItem, MsgReorderItemResponse, MsgAddCollaborator, MsgAddCollaboratorResponse, MsgRemoveCollaborator, MsgRemoveCollaboratorResponse, MsgUpdateCollaboratorRole, MsgUpdateCollaboratorRoleResponse, MsgRateCollection, MsgRateCollectionResponse, MsgChallengeReview, MsgChallengeReviewResponse, MsgRequestSponsorship, MsgRequestSponsorshipResponse, MsgCancelSponsorshipRequest, MsgCancelSponsorshipRequestResponse, MsgSponsorCollection, MsgSponsorCollectionResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgUpvoteContent, MsgUpvoteContentResponse, MsgDownvoteContent, MsgDownvoteContentResponse, MsgFlagContent, MsgFlagContentResponse, MsgHideContent, MsgHideContentResponse, MsgAppealHide, MsgAppealHideResponse, MsgEndorseCollection, MsgEndorseCollectionResponse, MsgSetSeekingEndorsement, MsgSetSeekingEndorsementResponse, MsgPinCollection, MsgPinCollectionResponse, MsgUnpinCollection, MsgUnpinCollectionResponse, MsgMakeCollectionPermanent, MsgMakeCollectionPermanentResponse, MsgUnhideContent, MsgUnhideContentResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgCreateCollection, MsgCreateCollectionResponse, MsgUpdateCollection, MsgUpdateCollectionResponse, MsgDeleteCollection, MsgDeleteCollectionResponse, MsgAddItem, MsgAddItemResponse, MsgAddItems, MsgAddItemsResponse, MsgUpdateItem, MsgUpdateItemResponse, MsgRemoveItem, MsgRemoveItemResponse, MsgRemoveItems, MsgRemoveItemsResponse, MsgReorderItem, MsgReorderItemResponse, MsgAddCollaborator, MsgAddCollaboratorResponse, MsgRemoveCollaborator, MsgRemoveCollaboratorResponse, MsgUpdateCollaboratorRole, MsgUpdateCollaboratorRoleResponse, MsgRateCollection, MsgRateCollectionResponse, MsgChallengeReview, MsgChallengeReviewResponse, MsgRequestSponsorship, MsgRequestSponsorshipResponse, MsgCancelSponsorshipRequest, MsgCancelSponsorshipRequestResponse, MsgSponsorCollection, MsgSponsorCollectionResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgUpvoteContent, MsgUpvoteContentResponse, MsgDownvoteContent, MsgDownvoteContentResponse, MsgFlagContent, MsgFlagContentResponse, MsgHideContent, MsgHideContentResponse, MsgAppealHide, MsgAppealHideResponse, MsgEndorseCollection, MsgEndorseCollectionResponse, MsgSetSeekingEndorsement, MsgSetSeekingEndorsementResponse, MsgPinCollection, MsgPinCollectionResponse, MsgUnpinCollection, MsgUnpinCollectionResponse, MsgMakeCollectionPermanent, MsgMakeCollectionPermanentResponse, MsgUnhideContent, MsgUnhideContentResponse, MsgResolveCurationChallenge, MsgResolveCurationChallengeResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   updateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
@@ -62,6 +62,13 @@ export interface Msg {
    * appeal_deadline (anti hide/unhide cycling).
    */
   unhideContent(request: MsgUnhideContent): Promise<MsgUnhideContentResponse>;
+  /**
+   * ResolveCurationChallenge applies a verdict to a pending curation
+   * challenge (upheld = challenger wins). Signed only by the gov authority,
+   * the Commons Council policy or the Commons Operations Committee policy
+   * (an executed proposal), never by an individual committee member.
+   */
+  resolveCurationChallenge(request: MsgResolveCurationChallenge): Promise<MsgResolveCurationChallengeResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -255,6 +262,15 @@ export class MsgClientImpl implements Msg {
     const data = MsgUnhideContent.encode(request).finish();
     const promise = this.rpc.request("sparkdream.collect.v1.Msg", "UnhideContent", data);
     return promise.then(data => MsgUnhideContentResponse.decode(new BinaryReader(data)));
+  };
+  /* ResolveCurationChallenge applies a verdict to a pending curation
+   challenge (upheld = challenger wins). Signed only by the gov authority,
+   the Commons Council policy or the Commons Operations Committee policy
+   (an executed proposal), never by an individual committee member. */
+  resolveCurationChallenge = async (request: MsgResolveCurationChallenge): Promise<MsgResolveCurationChallengeResponse> => {
+    const data = MsgResolveCurationChallenge.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.collect.v1.Msg", "ResolveCurationChallenge", data);
+    return promise.then(data => MsgResolveCurationChallengeResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

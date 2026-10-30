@@ -536,7 +536,9 @@ export interface MsgSubmitInterimWorkResponseAminoMsg {
   value: MsgSubmitInterimWorkResponseAmino;
 }
 /**
- * MsgApproveInterim defines the MsgApproveInterim message.
+ * MsgApproveInterim approves (pays) or rejects an interim. creator must be
+ * the Commons Operations Committee policy address (an executed committee
+ * proposal), the Commons Council policy or x/gov, never a single member.
  * @name MsgApproveInterim
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgApproveInterim
@@ -552,7 +554,9 @@ export interface MsgApproveInterimProtoMsg {
   value: Uint8Array;
 }
 /**
- * MsgApproveInterim defines the MsgApproveInterim message.
+ * MsgApproveInterim approves (pays) or rejects an interim. creator must be
+ * the Commons Operations Committee policy address (an executed committee
+ * proposal), the Commons Council policy or x/gov, never a single member.
  * @name MsgApproveInterimAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgApproveInterim
@@ -642,7 +646,9 @@ export interface MsgAbandonInterimResponseAminoMsg {
   value: MsgAbandonInterimResponseAmino;
 }
 /**
- * MsgCompleteInterim defines the MsgCompleteInterim message.
+ * MsgCompleteInterim settles an ADJUDICATION interim with an explicit
+ * decision. creator must be the Commons Operations Committee policy address
+ * (an executed committee proposal), the Commons Council policy or x/gov.
  * @name MsgCompleteInterim
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgCompleteInterim
@@ -663,7 +669,9 @@ export interface MsgCompleteInterimProtoMsg {
   value: Uint8Array;
 }
 /**
- * MsgCompleteInterim defines the MsgCompleteInterim message.
+ * MsgCompleteInterim settles an ADJUDICATION interim with an explicit
+ * decision. creator must be the Commons Operations Committee policy address
+ * (an executed committee proposal), the Commons Council policy or x/gov.
  * @name MsgCompleteInterimAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgCompleteInterim
@@ -876,6 +884,66 @@ export interface MsgCancelProjectResponseAmino {}
 export interface MsgCancelProjectResponseAminoMsg {
   type: "/sparkdream.rep.v1.MsgCancelProjectResponse";
   value: MsgCancelProjectResponseAmino;
+}
+/**
+ * MsgCompleteProject records an ACTIVE project as COMPLETED: pays the staker
+ * completion bonus, settles and releases every project stake, and moves the
+ * project to its terminal status. Signed by the project's council or
+ * Operations Committee policy address (an executed proposal) or x/gov; never
+ * by an individual committee member. Refused while any initiative of the
+ * project is non-terminal or any challenge on it is active.
+ * @name MsgCompleteProject
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCompleteProject
+ */
+export interface MsgCompleteProject {
+  creator: string;
+  projectId: bigint;
+}
+export interface MsgCompleteProjectProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgCompleteProject";
+  value: Uint8Array;
+}
+/**
+ * MsgCompleteProject records an ACTIVE project as COMPLETED: pays the staker
+ * completion bonus, settles and releases every project stake, and moves the
+ * project to its terminal status. Signed by the project's council or
+ * Operations Committee policy address (an executed proposal) or x/gov; never
+ * by an individual committee member. Refused while any initiative of the
+ * project is non-terminal or any challenge on it is active.
+ * @name MsgCompleteProjectAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCompleteProject
+ */
+export interface MsgCompleteProjectAmino {
+  creator?: string;
+  project_id?: string;
+}
+export interface MsgCompleteProjectAminoMsg {
+  type: "sparkdream/x/rep/MsgCompleteProject";
+  value: MsgCompleteProjectAmino;
+}
+/**
+ * MsgCompleteProjectResponse defines the MsgCompleteProjectResponse message.
+ * @name MsgCompleteProjectResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCompleteProjectResponse
+ */
+export interface MsgCompleteProjectResponse {}
+export interface MsgCompleteProjectResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgCompleteProjectResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgCompleteProjectResponse defines the MsgCompleteProjectResponse message.
+ * @name MsgCompleteProjectResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCompleteProjectResponse
+ */
+export interface MsgCompleteProjectResponseAmino {}
+export interface MsgCompleteProjectResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgCompleteProjectResponse";
+  value: MsgCompleteProjectResponseAmino;
 }
 /**
  * MsgCreateInitiative defines the MsgCreateInitiative message.
@@ -1834,6 +1902,76 @@ export interface MsgSubmitExpertTestimonyResponseAminoMsg {
   value: MsgSubmitExpertTestimonyResponseAmino;
 }
 /**
+ * MsgInviteExpertWitness lets a juror seated on a pending initiative jury
+ * review call an expert witness. The expert must be an active ESTABLISHED+
+ * member with reputation in one of the initiative's tags and no stake in the
+ * dispute (not the challenger, assignee, initiative creator or a juror). The
+ * invitation opens an EXPERT_TESTIMONY interim that pays the expert when they
+ * testify and expires with the review. At most MaxExpertWitnessesPerReview
+ * experts per review.
+ * @name MsgInviteExpertWitness
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgInviteExpertWitness
+ */
+export interface MsgInviteExpertWitness {
+  juror: string;
+  juryReviewId: bigint;
+  expert: string;
+}
+export interface MsgInviteExpertWitnessProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgInviteExpertWitness";
+  value: Uint8Array;
+}
+/**
+ * MsgInviteExpertWitness lets a juror seated on a pending initiative jury
+ * review call an expert witness. The expert must be an active ESTABLISHED+
+ * member with reputation in one of the initiative's tags and no stake in the
+ * dispute (not the challenger, assignee, initiative creator or a juror). The
+ * invitation opens an EXPERT_TESTIMONY interim that pays the expert when they
+ * testify and expires with the review. At most MaxExpertWitnessesPerReview
+ * experts per review.
+ * @name MsgInviteExpertWitnessAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgInviteExpertWitness
+ */
+export interface MsgInviteExpertWitnessAmino {
+  juror?: string;
+  jury_review_id?: string;
+  expert?: string;
+}
+export interface MsgInviteExpertWitnessAminoMsg {
+  type: "sparkdream/x/rep/MsgInviteExpertWitness";
+  value: MsgInviteExpertWitnessAmino;
+}
+/**
+ * MsgInviteExpertWitnessResponse returns the EXPERT_TESTIMONY interim opened
+ * for the expert.
+ * @name MsgInviteExpertWitnessResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgInviteExpertWitnessResponse
+ */
+export interface MsgInviteExpertWitnessResponse {
+  interimId: bigint;
+}
+export interface MsgInviteExpertWitnessResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgInviteExpertWitnessResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgInviteExpertWitnessResponse returns the EXPERT_TESTIMONY interim opened
+ * for the expert.
+ * @name MsgInviteExpertWitnessResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgInviteExpertWitnessResponse
+ */
+export interface MsgInviteExpertWitnessResponseAmino {
+  interim_id?: string;
+}
+export interface MsgInviteExpertWitnessResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgInviteExpertWitnessResponse";
+  value: MsgInviteExpertWitnessResponseAmino;
+}
+/**
  * MsgChallengeContent creates a challenge against bonded content.
  * @name MsgChallengeContent
  * @package sparkdream.rep.v1
@@ -2710,7 +2848,10 @@ export interface MsgCosignMemberReportResponseAminoMsg {
   value: MsgCosignMemberReportResponseAmino;
 }
 /**
- * MsgResolveMemberReport defines the MsgResolveMemberReport message.
+ * MsgResolveMemberReport resolves a member report (dismiss, warning,
+ * demotion or zeroing). creator must be the Commons Operations Committee
+ * policy address (an executed committee proposal), the Commons Council policy
+ * or x/gov, never a single committee member.
  * @name MsgResolveMemberReport
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgResolveMemberReport
@@ -2726,7 +2867,10 @@ export interface MsgResolveMemberReportProtoMsg {
   value: Uint8Array;
 }
 /**
- * MsgResolveMemberReport defines the MsgResolveMemberReport message.
+ * MsgResolveMemberReport resolves a member report (dismiss, warning,
+ * demotion or zeroing). creator must be the Commons Operations Committee
+ * policy address (an executed committee proposal), the Commons Council policy
+ * or x/gov, never a single committee member.
  * @name MsgResolveMemberReportAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgResolveMemberReport
@@ -2868,10 +3012,11 @@ export interface MsgAppealGovActionResponseAminoMsg {
   value: MsgAppealGovActionResponseAmino;
 }
 /**
- * MsgResolveGovActionAppeal resolves a pending appeal via council authority.
- * Only the Operations Committee of the commons council may resolve appeals.
- * The verdict must be UPHELD or OVERTURNED; TIMEOUT is EndBlocker-only and
- * UNSPECIFIED is rejected.
+ * MsgResolveGovActionAppeal resolves a pending appeal. resolver must be the
+ * Commons Operations Committee policy address (an executed committee
+ * proposal), the Commons Council policy or x/gov, never a single committee
+ * member. The verdict must be UPHELD or OVERTURNED; TIMEOUT is EndBlocker-only
+ * and UNSPECIFIED is rejected.
  * @name MsgResolveGovActionAppeal
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgResolveGovActionAppeal
@@ -2887,10 +3032,11 @@ export interface MsgResolveGovActionAppealProtoMsg {
   value: Uint8Array;
 }
 /**
- * MsgResolveGovActionAppeal resolves a pending appeal via council authority.
- * Only the Operations Committee of the commons council may resolve appeals.
- * The verdict must be UPHELD or OVERTURNED; TIMEOUT is EndBlocker-only and
- * UNSPECIFIED is rejected.
+ * MsgResolveGovActionAppeal resolves a pending appeal. resolver must be the
+ * Commons Operations Committee policy address (an executed committee
+ * proposal), the Commons Council policy or x/gov, never a single committee
+ * member. The verdict must be UPHELD or OVERTURNED; TIMEOUT is EndBlocker-only
+ * and UNSPECIFIED is rejected.
  * @name MsgResolveGovActionAppealAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgResolveGovActionAppeal
@@ -3645,7 +3791,9 @@ export interface MsgAcceptMigrationResponseAminoMsg {
  * MsgCancelMigration cancels a pending migration. The old or new address may
  * cancel a KEY migration; the Commons HR committee policy may cancel KEY and
  * COUNCIL migrations; governance may cancel any path and is the only
- * authority over a RECOVERY migration.
+ * authority over a RECOVERY migration. Cancelling an OBJECTED migration
+ * refunds the objector: governance cancelling a migration whose objection was
+ * escalated to it upholds the objection.
  * @name MsgCancelMigration
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgCancelMigration
@@ -3662,7 +3810,9 @@ export interface MsgCancelMigrationProtoMsg {
  * MsgCancelMigration cancels a pending migration. The old or new address may
  * cancel a KEY migration; the Commons HR committee policy may cancel KEY and
  * COUNCIL migrations; governance may cancel any path and is the only
- * authority over a RECOVERY migration.
+ * authority over a RECOVERY migration. Cancelling an OBJECTED migration
+ * refunds the objector: governance cancelling a migration whose objection was
+ * escalated to it upholds the objection.
  * @name MsgCancelMigrationAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgCancelMigration
@@ -3895,6 +4045,10 @@ export interface MsgCommitRecoveryResponseAminoMsg {
  * the target, and new_address confirms control afterwards with
  * MsgAcceptMigration. The matched commitment is consumed, pending commitment
  * changes are voided and any pending KEY or COUNCIL migration is cancelled.
+ * Once the preimage and the aged seal check out, the commitment and the seal
+ * are consumed even when the migration cannot be opened (the preimage is
+ * public from that block on): the tx then succeeds with migration_id 0 and
+ * failure_reason set, so nobody can re-seal the leaked preimage.
  * @name MsgRevealRecovery
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgRevealRecovery
@@ -3917,6 +4071,10 @@ export interface MsgRevealRecoveryProtoMsg {
  * the target, and new_address confirms control afterwards with
  * MsgAcceptMigration. The matched commitment is consumed, pending commitment
  * changes are voided and any pending KEY or COUNCIL migration is cancelled.
+ * Once the preimage and the aged seal check out, the commitment and the seal
+ * are consumed even when the migration cannot be opened (the preimage is
+ * public from that block on): the tx then succeeds with migration_id 0 and
+ * failure_reason set, so nobody can re-seal the leaked preimage.
  * @name MsgRevealRecoveryAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgRevealRecovery
@@ -3938,7 +4096,16 @@ export interface MsgRevealRecoveryAminoMsg {
  * @see proto type: sparkdream.rep.v1.MsgRevealRecoveryResponse
  */
 export interface MsgRevealRecoveryResponse {
+  /**
+   * migration_id is the opened RECOVERY migration; 0 when it could not be
+   * opened (see failure_reason).
+   */
   migrationId: bigint;
+  /**
+   * failure_reason explains why the migration was not opened although the
+   * reveal itself was valid and consumed the commitment.
+   */
+  failureReason: string;
 }
 export interface MsgRevealRecoveryResponseProtoMsg {
   typeUrl: "/sparkdream.rep.v1.MsgRevealRecoveryResponse";
@@ -3951,7 +4118,16 @@ export interface MsgRevealRecoveryResponseProtoMsg {
  * @see proto type: sparkdream.rep.v1.MsgRevealRecoveryResponse
  */
 export interface MsgRevealRecoveryResponseAmino {
+  /**
+   * migration_id is the opened RECOVERY migration; 0 when it could not be
+   * opened (see failure_reason).
+   */
   migration_id?: string;
+  /**
+   * failure_reason explains why the migration was not opened although the
+   * reveal itself was valid and consumed the commitment.
+   */
+  failure_reason?: string;
 }
 export interface MsgRevealRecoveryResponseAminoMsg {
   type: "/sparkdream.rep.v1.MsgRevealRecoveryResponse";
@@ -3960,9 +4136,10 @@ export interface MsgRevealRecoveryResponseAminoMsg {
 /**
  * MsgObjectMigration lets the old address contest a COUNCIL migration
  * during its delay. It does not cancel the migration: the objector posts
- * migration_objection_bond and an x/rep jury decides. The bond is paid to
- * the new address if the migration is upheld and refunded otherwise, never
- * burned.
+ * migration_objection_bond and an x/rep jury decides. An inconclusive jury
+ * (including one that could not be seated) escalates the objection to x/gov
+ * with the bond still locked. The bond is paid to the new address if the
+ * migration is upheld and refunded otherwise, never burned.
  * @name MsgObjectMigration
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgObjectMigration
@@ -3979,9 +4156,10 @@ export interface MsgObjectMigrationProtoMsg {
 /**
  * MsgObjectMigration lets the old address contest a COUNCIL migration
  * during its delay. It does not cancel the migration: the objector posts
- * migration_objection_bond and an x/rep jury decides. The bond is paid to
- * the new address if the migration is upheld and refunded otherwise, never
- * burned.
+ * migration_objection_bond and an x/rep jury decides. An inconclusive jury
+ * (including one that could not be seated) escalates the objection to x/gov
+ * with the bond still locked. The bond is paid to the new address if the
+ * migration is upheld and refunded otherwise, never burned.
  * @name MsgObjectMigrationAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgObjectMigration
@@ -4021,7 +4199,10 @@ export interface MsgObjectMigrationResponseAminoMsg {
  * MsgSweepTombstone moves a tombstone's spendable SPARK to its canonical
  * address, which signs. Unbonding completes to the old address outside the
  * bank send restriction; on the recovery and council paths the old key may
- * not MsgSend it, so this is how the member collects it.
+ * not MsgSend it, so this is how the member collects it. On those paths
+ * finalization starts unbonding every delegation of the old address; the
+ * sweep also starts any it left behind, and collects the SPARK once the
+ * unbonding matures.
  * @name MsgSweepTombstone
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgSweepTombstone
@@ -4038,7 +4219,10 @@ export interface MsgSweepTombstoneProtoMsg {
  * MsgSweepTombstone moves a tombstone's spendable SPARK to its canonical
  * address, which signs. Unbonding completes to the old address outside the
  * bank send restriction; on the recovery and council paths the old key may
- * not MsgSend it, so this is how the member collects it.
+ * not MsgSend it, so this is how the member collects it. On those paths
+ * finalization starts unbonding every delegation of the old address; the
+ * sweep also starts any it left behind, and collects the SPARK once the
+ * unbonding matures.
  * @name MsgSweepTombstoneAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgSweepTombstone
@@ -4078,7 +4262,10 @@ export interface MsgSweepTombstoneResponseAminoMsg {
  * off-chain evidence (a lost key with no recovery commitment). The authority
  * is the Commons HR (governance) committee policy or x/gov. new_address must
  * still accept; the old address may object to a jury during
- * council_migration_delay. An open member report does not block it.
+ * council_migration_delay. An open member report does not block it. Signed
+ * by x/gov for the member and new address of a migration whose objection was
+ * escalated to governance, it rejects the objection (the migration
+ * finalizes, the bond goes to new_address) instead of opening a new one.
  * @name MsgForceMigration
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgForceMigration
@@ -4102,7 +4289,10 @@ export interface MsgForceMigrationProtoMsg {
  * off-chain evidence (a lost key with no recovery commitment). The authority
  * is the Commons HR (governance) committee policy or x/gov. new_address must
  * still accept; the old address may object to a jury during
- * council_migration_delay. An open member report does not block it.
+ * council_migration_delay. An open member report does not block it. Signed
+ * by x/gov for the member and new address of a migration whose objection was
+ * escalated to governance, it rejects the objection (the migration
+ * finalizes, the bond goes to new_address) instead of opening a new one.
  * @name MsgForceMigrationAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgForceMigration
@@ -5542,7 +5732,9 @@ function createBaseMsgApproveInterim(): MsgApproveInterim {
   };
 }
 /**
- * MsgApproveInterim defines the MsgApproveInterim message.
+ * MsgApproveInterim approves (pays) or rejects an interim. creator must be
+ * the Commons Operations Committee policy address (an executed committee
+ * proposal), the Commons Council policy or x/gov, never a single member.
  * @name MsgApproveInterim
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgApproveInterim
@@ -5866,7 +6058,9 @@ function createBaseMsgCompleteInterim(): MsgCompleteInterim {
   };
 }
 /**
- * MsgCompleteInterim defines the MsgCompleteInterim message.
+ * MsgCompleteInterim settles an ADJUDICATION interim with an explicit
+ * decision. creator must be the Commons Operations Committee policy address
+ * (an executed committee proposal), the Commons Council policy or x/gov.
  * @name MsgCompleteInterim
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgCompleteInterim
@@ -6592,6 +6786,155 @@ export const MsgCancelProjectResponse = {
     return {
       typeUrl: "/sparkdream.rep.v1.MsgCancelProjectResponse",
       value: MsgCancelProjectResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCompleteProject(): MsgCompleteProject {
+  return {
+    creator: "",
+    projectId: BigInt(0)
+  };
+}
+/**
+ * MsgCompleteProject records an ACTIVE project as COMPLETED: pays the staker
+ * completion bonus, settles and releases every project stake, and moves the
+ * project to its terminal status. Signed by the project's council or
+ * Operations Committee policy address (an executed proposal) or x/gov; never
+ * by an individual committee member. Refused while any initiative of the
+ * project is non-terminal or any challenge on it is active.
+ * @name MsgCompleteProject
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCompleteProject
+ */
+export const MsgCompleteProject = {
+  typeUrl: "/sparkdream.rep.v1.MsgCompleteProject",
+  aminoType: "sparkdream/x/rep/MsgCompleteProject",
+  encode(message: MsgCompleteProject, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.projectId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.projectId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCompleteProject {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCompleteProject();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.projectId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCompleteProject>): MsgCompleteProject {
+    const message = createBaseMsgCompleteProject();
+    message.creator = object.creator ?? "";
+    message.projectId = object.projectId !== undefined && object.projectId !== null ? BigInt(object.projectId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgCompleteProjectAmino): MsgCompleteProject {
+    const message = createBaseMsgCompleteProject();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.project_id !== undefined && object.project_id !== null) {
+      message.projectId = BigInt(object.project_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgCompleteProject): MsgCompleteProjectAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.project_id = message.projectId !== BigInt(0) ? message.projectId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgCompleteProjectAminoMsg): MsgCompleteProject {
+    return MsgCompleteProject.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCompleteProject): MsgCompleteProjectAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgCompleteProject",
+      value: MsgCompleteProject.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgCompleteProjectProtoMsg): MsgCompleteProject {
+    return MsgCompleteProject.decode(message.value);
+  },
+  toProto(message: MsgCompleteProject): Uint8Array {
+    return MsgCompleteProject.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCompleteProject): MsgCompleteProjectProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgCompleteProject",
+      value: MsgCompleteProject.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCompleteProjectResponse(): MsgCompleteProjectResponse {
+  return {};
+}
+/**
+ * MsgCompleteProjectResponse defines the MsgCompleteProjectResponse message.
+ * @name MsgCompleteProjectResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgCompleteProjectResponse
+ */
+export const MsgCompleteProjectResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgCompleteProjectResponse",
+  encode(_: MsgCompleteProjectResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCompleteProjectResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCompleteProjectResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgCompleteProjectResponse>): MsgCompleteProjectResponse {
+    const message = createBaseMsgCompleteProjectResponse();
+    return message;
+  },
+  fromAmino(_: MsgCompleteProjectResponseAmino): MsgCompleteProjectResponse {
+    const message = createBaseMsgCompleteProjectResponse();
+    return message;
+  },
+  toAmino(_: MsgCompleteProjectResponse): MsgCompleteProjectResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgCompleteProjectResponseAminoMsg): MsgCompleteProjectResponse {
+    return MsgCompleteProjectResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgCompleteProjectResponseProtoMsg): MsgCompleteProjectResponse {
+    return MsgCompleteProjectResponse.decode(message.value);
+  },
+  toProto(message: MsgCompleteProjectResponse): Uint8Array {
+    return MsgCompleteProjectResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCompleteProjectResponse): MsgCompleteProjectResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgCompleteProjectResponse",
+      value: MsgCompleteProjectResponse.encode(message).finish()
     };
   }
 };
@@ -9380,6 +9723,182 @@ export const MsgSubmitExpertTestimonyResponse = {
     };
   }
 };
+function createBaseMsgInviteExpertWitness(): MsgInviteExpertWitness {
+  return {
+    juror: "",
+    juryReviewId: BigInt(0),
+    expert: ""
+  };
+}
+/**
+ * MsgInviteExpertWitness lets a juror seated on a pending initiative jury
+ * review call an expert witness. The expert must be an active ESTABLISHED+
+ * member with reputation in one of the initiative's tags and no stake in the
+ * dispute (not the challenger, assignee, initiative creator or a juror). The
+ * invitation opens an EXPERT_TESTIMONY interim that pays the expert when they
+ * testify and expires with the review. At most MaxExpertWitnessesPerReview
+ * experts per review.
+ * @name MsgInviteExpertWitness
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgInviteExpertWitness
+ */
+export const MsgInviteExpertWitness = {
+  typeUrl: "/sparkdream.rep.v1.MsgInviteExpertWitness",
+  aminoType: "sparkdream/x/rep/MsgInviteExpertWitness",
+  encode(message: MsgInviteExpertWitness, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.juror !== "") {
+      writer.uint32(10).string(message.juror);
+    }
+    if (message.juryReviewId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.juryReviewId);
+    }
+    if (message.expert !== "") {
+      writer.uint32(26).string(message.expert);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgInviteExpertWitness {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgInviteExpertWitness();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.juror = reader.string();
+          break;
+        case 2:
+          message.juryReviewId = reader.uint64();
+          break;
+        case 3:
+          message.expert = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgInviteExpertWitness>): MsgInviteExpertWitness {
+    const message = createBaseMsgInviteExpertWitness();
+    message.juror = object.juror ?? "";
+    message.juryReviewId = object.juryReviewId !== undefined && object.juryReviewId !== null ? BigInt(object.juryReviewId.toString()) : BigInt(0);
+    message.expert = object.expert ?? "";
+    return message;
+  },
+  fromAmino(object: MsgInviteExpertWitnessAmino): MsgInviteExpertWitness {
+    const message = createBaseMsgInviteExpertWitness();
+    if (object.juror !== undefined && object.juror !== null) {
+      message.juror = object.juror;
+    }
+    if (object.jury_review_id !== undefined && object.jury_review_id !== null) {
+      message.juryReviewId = BigInt(object.jury_review_id);
+    }
+    if (object.expert !== undefined && object.expert !== null) {
+      message.expert = object.expert;
+    }
+    return message;
+  },
+  toAmino(message: MsgInviteExpertWitness): MsgInviteExpertWitnessAmino {
+    const obj: any = {};
+    obj.juror = message.juror === "" ? undefined : message.juror;
+    obj.jury_review_id = message.juryReviewId !== BigInt(0) ? message.juryReviewId?.toString() : undefined;
+    obj.expert = message.expert === "" ? undefined : message.expert;
+    return obj;
+  },
+  fromAminoMsg(object: MsgInviteExpertWitnessAminoMsg): MsgInviteExpertWitness {
+    return MsgInviteExpertWitness.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgInviteExpertWitness): MsgInviteExpertWitnessAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgInviteExpertWitness",
+      value: MsgInviteExpertWitness.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgInviteExpertWitnessProtoMsg): MsgInviteExpertWitness {
+    return MsgInviteExpertWitness.decode(message.value);
+  },
+  toProto(message: MsgInviteExpertWitness): Uint8Array {
+    return MsgInviteExpertWitness.encode(message).finish();
+  },
+  toProtoMsg(message: MsgInviteExpertWitness): MsgInviteExpertWitnessProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgInviteExpertWitness",
+      value: MsgInviteExpertWitness.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgInviteExpertWitnessResponse(): MsgInviteExpertWitnessResponse {
+  return {
+    interimId: BigInt(0)
+  };
+}
+/**
+ * MsgInviteExpertWitnessResponse returns the EXPERT_TESTIMONY interim opened
+ * for the expert.
+ * @name MsgInviteExpertWitnessResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgInviteExpertWitnessResponse
+ */
+export const MsgInviteExpertWitnessResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgInviteExpertWitnessResponse",
+  encode(message: MsgInviteExpertWitnessResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.interimId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.interimId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgInviteExpertWitnessResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgInviteExpertWitnessResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.interimId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgInviteExpertWitnessResponse>): MsgInviteExpertWitnessResponse {
+    const message = createBaseMsgInviteExpertWitnessResponse();
+    message.interimId = object.interimId !== undefined && object.interimId !== null ? BigInt(object.interimId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgInviteExpertWitnessResponseAmino): MsgInviteExpertWitnessResponse {
+    const message = createBaseMsgInviteExpertWitnessResponse();
+    if (object.interim_id !== undefined && object.interim_id !== null) {
+      message.interimId = BigInt(object.interim_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgInviteExpertWitnessResponse): MsgInviteExpertWitnessResponseAmino {
+    const obj: any = {};
+    obj.interim_id = message.interimId !== BigInt(0) ? message.interimId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgInviteExpertWitnessResponseAminoMsg): MsgInviteExpertWitnessResponse {
+    return MsgInviteExpertWitnessResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgInviteExpertWitnessResponseProtoMsg): MsgInviteExpertWitnessResponse {
+    return MsgInviteExpertWitnessResponse.decode(message.value);
+  },
+  toProto(message: MsgInviteExpertWitnessResponse): Uint8Array {
+    return MsgInviteExpertWitnessResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgInviteExpertWitnessResponse): MsgInviteExpertWitnessResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgInviteExpertWitnessResponse",
+      value: MsgInviteExpertWitnessResponse.encode(message).finish()
+    };
+  }
+};
 function createBaseMsgChallengeContent(): MsgChallengeContent {
   return {
     challenger: "",
@@ -11996,7 +12515,10 @@ function createBaseMsgResolveMemberReport(): MsgResolveMemberReport {
   };
 }
 /**
- * MsgResolveMemberReport defines the MsgResolveMemberReport message.
+ * MsgResolveMemberReport resolves a member report (dismiss, warning,
+ * demotion or zeroing). creator must be the Commons Operations Committee
+ * policy address (an executed committee proposal), the Commons Council policy
+ * or x/gov, never a single committee member.
  * @name MsgResolveMemberReport
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgResolveMemberReport
@@ -12476,10 +12998,11 @@ function createBaseMsgResolveGovActionAppeal(): MsgResolveGovActionAppeal {
   };
 }
 /**
- * MsgResolveGovActionAppeal resolves a pending appeal via council authority.
- * Only the Operations Committee of the commons council may resolve appeals.
- * The verdict must be UPHELD or OVERTURNED; TIMEOUT is EndBlocker-only and
- * UNSPECIFIED is rejected.
+ * MsgResolveGovActionAppeal resolves a pending appeal. resolver must be the
+ * Commons Operations Committee policy address (an executed committee
+ * proposal), the Commons Council policy or x/gov, never a single committee
+ * member. The verdict must be UPHELD or OVERTURNED; TIMEOUT is EndBlocker-only
+ * and UNSPECIFIED is rejected.
  * @name MsgResolveGovActionAppeal
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgResolveGovActionAppeal
@@ -14464,7 +14987,9 @@ function createBaseMsgCancelMigration(): MsgCancelMigration {
  * MsgCancelMigration cancels a pending migration. The old or new address may
  * cancel a KEY migration; the Commons HR committee policy may cancel KEY and
  * COUNCIL migrations; governance may cancel any path and is the only
- * authority over a RECOVERY migration.
+ * authority over a RECOVERY migration. Cancelling an OBJECTED migration
+ * refunds the objector: governance cancelling a migration whose objection was
+ * escalated to it upholds the objection.
  * @name MsgCancelMigration
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgCancelMigration
@@ -15070,6 +15595,10 @@ function createBaseMsgRevealRecovery(): MsgRevealRecovery {
  * the target, and new_address confirms control afterwards with
  * MsgAcceptMigration. The matched commitment is consumed, pending commitment
  * changes are voided and any pending KEY or COUNCIL migration is cancelled.
+ * Once the preimage and the aged seal check out, the commitment and the seal
+ * are consumed even when the migration cannot be opened (the preimage is
+ * public from that block on): the tx then succeeds with migration_id 0 and
+ * failure_reason set, so nobody can re-seal the leaked preimage.
  * @name MsgRevealRecovery
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgRevealRecovery
@@ -15174,7 +15703,8 @@ export const MsgRevealRecovery = {
 };
 function createBaseMsgRevealRecoveryResponse(): MsgRevealRecoveryResponse {
   return {
-    migrationId: BigInt(0)
+    migrationId: BigInt(0),
+    failureReason: ""
   };
 }
 /**
@@ -15189,6 +15719,9 @@ export const MsgRevealRecoveryResponse = {
     if (message.migrationId !== BigInt(0)) {
       writer.uint32(8).uint64(message.migrationId);
     }
+    if (message.failureReason !== "") {
+      writer.uint32(18).string(message.failureReason);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgRevealRecoveryResponse {
@@ -15201,6 +15734,9 @@ export const MsgRevealRecoveryResponse = {
         case 1:
           message.migrationId = reader.uint64();
           break;
+        case 2:
+          message.failureReason = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -15211,6 +15747,7 @@ export const MsgRevealRecoveryResponse = {
   fromPartial(object: DeepPartial<MsgRevealRecoveryResponse>): MsgRevealRecoveryResponse {
     const message = createBaseMsgRevealRecoveryResponse();
     message.migrationId = object.migrationId !== undefined && object.migrationId !== null ? BigInt(object.migrationId.toString()) : BigInt(0);
+    message.failureReason = object.failureReason ?? "";
     return message;
   },
   fromAmino(object: MsgRevealRecoveryResponseAmino): MsgRevealRecoveryResponse {
@@ -15218,11 +15755,15 @@ export const MsgRevealRecoveryResponse = {
     if (object.migration_id !== undefined && object.migration_id !== null) {
       message.migrationId = BigInt(object.migration_id);
     }
+    if (object.failure_reason !== undefined && object.failure_reason !== null) {
+      message.failureReason = object.failure_reason;
+    }
     return message;
   },
   toAmino(message: MsgRevealRecoveryResponse): MsgRevealRecoveryResponseAmino {
     const obj: any = {};
     obj.migration_id = message.migrationId !== BigInt(0) ? message.migrationId?.toString() : undefined;
+    obj.failure_reason = message.failureReason === "" ? undefined : message.failureReason;
     return obj;
   },
   fromAminoMsg(object: MsgRevealRecoveryResponseAminoMsg): MsgRevealRecoveryResponse {
@@ -15251,9 +15792,10 @@ function createBaseMsgObjectMigration(): MsgObjectMigration {
 /**
  * MsgObjectMigration lets the old address contest a COUNCIL migration
  * during its delay. It does not cancel the migration: the objector posts
- * migration_objection_bond and an x/rep jury decides. The bond is paid to
- * the new address if the migration is upheld and refunded otherwise, never
- * burned.
+ * migration_objection_bond and an x/rep jury decides. An inconclusive jury
+ * (including one that could not be seated) escalates the objection to x/gov
+ * with the bond still locked. The bond is paid to the new address if the
+ * migration is upheld and refunded otherwise, never burned.
  * @name MsgObjectMigration
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgObjectMigration
@@ -15411,7 +15953,10 @@ function createBaseMsgSweepTombstone(): MsgSweepTombstone {
  * MsgSweepTombstone moves a tombstone's spendable SPARK to its canonical
  * address, which signs. Unbonding completes to the old address outside the
  * bank send restriction; on the recovery and council paths the old key may
- * not MsgSend it, so this is how the member collects it.
+ * not MsgSend it, so this is how the member collects it. On those paths
+ * finalization starts unbonding every delegation of the old address; the
+ * sweep also starts any it left behind, and collects the SPARK once the
+ * unbonding matures.
  * @name MsgSweepTombstone
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgSweepTombstone
@@ -15561,7 +16106,10 @@ function createBaseMsgForceMigration(): MsgForceMigration {
  * off-chain evidence (a lost key with no recovery commitment). The authority
  * is the Commons HR (governance) committee policy or x/gov. new_address must
  * still accept; the old address may object to a jury during
- * council_migration_delay. An open member report does not block it.
+ * council_migration_delay. An open member report does not block it. Signed
+ * by x/gov for the member and new address of a migration whose objection was
+ * escalated to governance, it rejects the objection (the migration
+ * finalizes, the bond goes to new_address) instead of opening a new one.
  * @name MsgForceMigration
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgForceMigration

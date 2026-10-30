@@ -957,6 +957,15 @@ export interface Params {
    * keys. x/commons refuses voting periods longer than it.
    */
   zkKeyActivationDelay: bigint;
+  /**
+   * tag_budget_awarder_epoch_cap_bps caps what one group member may award
+   * from one tag budget per epoch, in basis points of the pool as it stood
+   * before that member's awards this epoch (default 2500 = 25%; 0 = the
+   * default; at most 10000). Applies on top of the 25% single-award cap and
+   * the self-award ban, so one member acting alone cannot drain the pool
+   * through many posts by other authors.
+   */
+  tagBudgetAwarderEpochCapBps: bigint;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Params";
@@ -1827,6 +1836,15 @@ export interface ParamsAmino {
    * keys. x/commons refuses voting periods longer than it.
    */
   zk_key_activation_delay?: string;
+  /**
+   * tag_budget_awarder_epoch_cap_bps caps what one group member may award
+   * from one tag budget per epoch, in basis points of the pool as it stood
+   * before that member's awards this epoch (default 2500 = 25%; 0 = the
+   * default; at most 10000). Applies on top of the 25% single-award cap and
+   * the self-award ban, so one member acting alone cannot drain the pool
+   * through many posts by other authors.
+   */
+  tag_budget_awarder_epoch_cap_bps?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/rep/Params";
@@ -3015,7 +3033,8 @@ function createBaseParams(): Params {
     recoveryCommitTtl: BigInt(0),
     recoveryCommitDeposit: "",
     migrationObjectionBond: "",
-    zkKeyActivationDelay: BigInt(0)
+    zkKeyActivationDelay: BigInt(0),
+    tagBudgetAwarderEpochCapBps: BigInt(0)
   };
 }
 /**
@@ -3520,6 +3539,9 @@ export const Params = {
     if (message.zkKeyActivationDelay !== BigInt(0)) {
       writer.uint32(1312).int64(message.zkKeyActivationDelay);
     }
+    if (message.tagBudgetAwarderEpochCapBps !== BigInt(0)) {
+      writer.uint32(1320).uint64(message.tagBudgetAwarderEpochCapBps);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -4021,6 +4043,9 @@ export const Params = {
         case 164:
           message.zkKeyActivationDelay = reader.int64();
           break;
+        case 165:
+          message.tagBudgetAwarderEpochCapBps = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4194,6 +4219,7 @@ export const Params = {
     message.recoveryCommitDeposit = object.recoveryCommitDeposit ?? "";
     message.migrationObjectionBond = object.migrationObjectionBond ?? "";
     message.zkKeyActivationDelay = object.zkKeyActivationDelay !== undefined && object.zkKeyActivationDelay !== null ? BigInt(object.zkKeyActivationDelay.toString()) : BigInt(0);
+    message.tagBudgetAwarderEpochCapBps = object.tagBudgetAwarderEpochCapBps !== undefined && object.tagBudgetAwarderEpochCapBps !== null ? BigInt(object.tagBudgetAwarderEpochCapBps.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -4690,6 +4716,9 @@ export const Params = {
     if (object.zk_key_activation_delay !== undefined && object.zk_key_activation_delay !== null) {
       message.zkKeyActivationDelay = BigInt(object.zk_key_activation_delay);
     }
+    if (object.tag_budget_awarder_epoch_cap_bps !== undefined && object.tag_budget_awarder_epoch_cap_bps !== null) {
+      message.tagBudgetAwarderEpochCapBps = BigInt(object.tag_budget_awarder_epoch_cap_bps);
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -4858,6 +4887,7 @@ export const Params = {
     obj.recovery_commit_deposit = message.recoveryCommitDeposit === "" ? undefined : message.recoveryCommitDeposit;
     obj.migration_objection_bond = message.migrationObjectionBond === "" ? undefined : message.migrationObjectionBond;
     obj.zk_key_activation_delay = message.zkKeyActivationDelay !== BigInt(0) ? message.zkKeyActivationDelay?.toString() : undefined;
+    obj.tag_budget_awarder_epoch_cap_bps = message.tagBudgetAwarderEpochCapBps !== BigInt(0) ? message.tagBudgetAwarderEpochCapBps?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {

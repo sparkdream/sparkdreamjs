@@ -43,6 +43,13 @@ export interface InitiativeReview {
    * not settle the same verdict twice.
    */
   settled: boolean;
+  /**
+   * Review fee minted to this reviewer for this verdict. Set when the fee is
+   * paid -- when a rejected round sends the work back, or at the initiative's
+   * terminal settlement for the final round -- so each verdict is paid at most
+   * once, and the close paths can charge the project for every round's fees.
+   */
+  feePaid: string;
 }
 export interface InitiativeReviewProtoMsg {
   typeUrl: "/sparkdream.rep.v1.InitiativeReview";
@@ -89,6 +96,13 @@ export interface InitiativeReviewAmino {
    * not settle the same verdict twice.
    */
   settled?: boolean;
+  /**
+   * Review fee minted to this reviewer for this verdict. Set when the fee is
+   * paid -- when a rejected round sends the work back, or at the initiative's
+   * terminal settlement for the final round -- so each verdict is paid at most
+   * once, and the close paths can charge the project for every round's fees.
+   */
+  fee_paid?: string;
 }
 export interface InitiativeReviewAminoMsg {
   type: "/sparkdream.rep.v1.InitiativeReview";
@@ -104,7 +118,8 @@ function createBaseInitiativeReview(): InitiativeReview {
     comments: "",
     createdAt: BigInt(0),
     bondReserved: "",
-    settled: false
+    settled: false,
+    feePaid: ""
   };
 }
 /**
@@ -151,6 +166,9 @@ export const InitiativeReview = {
     if (message.settled === true) {
       writer.uint32(72).bool(message.settled);
     }
+    if (message.feePaid !== "") {
+      writer.uint32(82).string(message.feePaid);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): InitiativeReview {
@@ -187,6 +205,9 @@ export const InitiativeReview = {
         case 9:
           message.settled = reader.bool();
           break;
+        case 10:
+          message.feePaid = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -205,6 +226,7 @@ export const InitiativeReview = {
     message.createdAt = object.createdAt !== undefined && object.createdAt !== null ? BigInt(object.createdAt.toString()) : BigInt(0);
     message.bondReserved = object.bondReserved ?? "";
     message.settled = object.settled ?? false;
+    message.feePaid = object.feePaid ?? "";
     return message;
   },
   fromAmino(object: InitiativeReviewAmino): InitiativeReview {
@@ -234,6 +256,9 @@ export const InitiativeReview = {
     if (object.settled !== undefined && object.settled !== null) {
       message.settled = object.settled;
     }
+    if (object.fee_paid !== undefined && object.fee_paid !== null) {
+      message.feePaid = object.fee_paid;
+    }
     return message;
   },
   toAmino(message: InitiativeReview): InitiativeReviewAmino {
@@ -251,6 +276,7 @@ export const InitiativeReview = {
     obj.created_at = message.createdAt !== BigInt(0) ? message.createdAt?.toString() : undefined;
     obj.bond_reserved = message.bondReserved === "" ? undefined : message.bondReserved;
     obj.settled = message.settled === false ? undefined : message.settled;
+    obj.fee_paid = message.feePaid === "" ? undefined : message.feePaid;
     return obj;
   },
   fromAminoMsg(object: InitiativeReviewAminoMsg): InitiativeReview {

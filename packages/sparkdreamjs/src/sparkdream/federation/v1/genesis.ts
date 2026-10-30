@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { Params, ParamsAmino } from "./params";
-import { Peer, PeerAmino, PeerPolicy, PeerPolicyAmino, BridgeBinding, BridgeBindingAmino, FederatedContent, FederatedContentAmino, IdentityLink, IdentityLinkAmino, ReputationAttestation, ReputationAttestationAmino, OutboundAttestation, OutboundAttestationAmino, VerificationRecord, VerificationRecordAmino, EscalatedChallenge, EscalatedChallengeAmino, ArbiterHashSubmission, ArbiterHashSubmissionAmino } from "./types";
+import { Peer, PeerAmino, PeerPolicy, PeerPolicyAmino, BridgeBinding, BridgeBindingAmino, FederatedContent, FederatedContentAmino, IdentityLink, IdentityLinkAmino, ReputationAttestation, ReputationAttestationAmino, OutboundAttestation, OutboundAttestationAmino, VerificationRecord, VerificationRecordAmino, EscalatedChallenge, EscalatedChallengeAmino, PendingIdentityChallenge, PendingIdentityChallengeAmino, PeerRemovalState, PeerRemovalStateAmino, ArbiterHashSubmission, ArbiterHashSubmissionAmino } from "./types";
 import { VerifierActivity, VerifierActivityAmino } from "./verifier_activity";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
@@ -58,6 +58,23 @@ export interface GenesisState {
   arbiterSubmissions: ArbiterSubmissionEntry[];
   arbiterHashCounts: ArbiterHashCount[];
   nextArbiterAnonSubmissionId: bigint;
+  /**
+   * Identity challenges received from peers and awaiting the local
+   * owner's MsgConfirmIdentityLink. Their expiry and per-peer indexes are
+   * rebuilt at import.
+   */
+  pendingIdentityChallenges: PendingIdentityChallenge[];
+  /**
+   * Peers in the middle of Phase 9 removal cleanup, with their resume
+   * cursors. Dropping these leaves a REMOVED peer's data uncleaned forever.
+   */
+  peerRemovalQueue: PeerRemovalEntry[];
+  /**
+   * (operator, peer) pairs whose bridge-attested identity links are still
+   * being downgraded after the operator was slashed out of x/service. The
+   * per-attester link index is rebuilt at import from the links.
+   */
+  attesterRevocationQueue: AttesterRevocation[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.federation.v1.GenesisState";
@@ -117,10 +134,89 @@ export interface GenesisStateAmino {
   arbiter_submissions?: ArbiterSubmissionEntryAmino[];
   arbiter_hash_counts?: ArbiterHashCountAmino[];
   next_arbiter_anon_submission_id?: string;
+  /**
+   * Identity challenges received from peers and awaiting the local
+   * owner's MsgConfirmIdentityLink. Their expiry and per-peer indexes are
+   * rebuilt at import.
+   */
+  pending_identity_challenges?: PendingIdentityChallengeAmino[];
+  /**
+   * Peers in the middle of Phase 9 removal cleanup, with their resume
+   * cursors. Dropping these leaves a REMOVED peer's data uncleaned forever.
+   */
+  peer_removal_queue?: PeerRemovalEntryAmino[];
+  /**
+   * (operator, peer) pairs whose bridge-attested identity links are still
+   * being downgraded after the operator was slashed out of x/service. The
+   * per-attester link index is rebuilt at import from the links.
+   */
+  attester_revocation_queue?: AttesterRevocationAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.federation.v1.GenesisState";
   value: GenesisStateAmino;
+}
+/**
+ * AttesterRevocation is one AttesterRevocations queue entry: a dissolved
+ * bridge operator and a peer on which the identity links it attested are
+ * being returned to UNVERIFIED.
+ * @name AttesterRevocation
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.AttesterRevocation
+ */
+export interface AttesterRevocation {
+  operator: string;
+  peerId: string;
+}
+export interface AttesterRevocationProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.AttesterRevocation";
+  value: Uint8Array;
+}
+/**
+ * AttesterRevocation is one AttesterRevocations queue entry: a dissolved
+ * bridge operator and a peer on which the identity links it attested are
+ * being returned to UNVERIFIED.
+ * @name AttesterRevocationAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.AttesterRevocation
+ */
+export interface AttesterRevocationAmino {
+  operator?: string;
+  peer_id?: string;
+}
+export interface AttesterRevocationAminoMsg {
+  type: "/sparkdream.federation.v1.AttesterRevocation";
+  value: AttesterRevocationAmino;
+}
+/**
+ * PeerRemovalEntry is one PeerRemovalQueue map entry: the peer being
+ * removed and its cleanup progress.
+ * @name PeerRemovalEntry
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.PeerRemovalEntry
+ */
+export interface PeerRemovalEntry {
+  peerId: string;
+  state: PeerRemovalState;
+}
+export interface PeerRemovalEntryProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.PeerRemovalEntry";
+  value: Uint8Array;
+}
+/**
+ * PeerRemovalEntry is one PeerRemovalQueue map entry: the peer being
+ * removed and its cleanup progress.
+ * @name PeerRemovalEntryAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.PeerRemovalEntry
+ */
+export interface PeerRemovalEntryAmino {
+  peer_id?: string;
+  state?: PeerRemovalStateAmino;
+}
+export interface PeerRemovalEntryAminoMsg {
+  type: "/sparkdream.federation.v1.PeerRemovalEntry";
+  value: PeerRemovalEntryAmino;
 }
 /**
  * ContentDeadline is one (deadline, content_id) entry of a federation
@@ -288,7 +384,10 @@ function createBaseGenesisState(): GenesisState {
     escalatedChallengeDeadlineQueue: [],
     arbiterSubmissions: [],
     arbiterHashCounts: [],
-    nextArbiterAnonSubmissionId: BigInt(0)
+    nextArbiterAnonSubmissionId: BigInt(0),
+    pendingIdentityChallenges: [],
+    peerRemovalQueue: [],
+    attesterRevocationQueue: []
   };
 }
 /**
@@ -369,6 +468,15 @@ export const GenesisState = {
     if (message.nextArbiterAnonSubmissionId !== BigInt(0)) {
       writer.uint32(184).uint64(message.nextArbiterAnonSubmissionId);
     }
+    for (const v of message.pendingIdentityChallenges) {
+      PendingIdentityChallenge.encode(v!, writer.uint32(194).fork()).ldelim();
+    }
+    for (const v of message.peerRemovalQueue) {
+      PeerRemovalEntry.encode(v!, writer.uint32(202).fork()).ldelim();
+    }
+    for (const v of message.attesterRevocationQueue) {
+      AttesterRevocation.encode(v!, writer.uint32(210).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -447,6 +555,15 @@ export const GenesisState = {
         case 23:
           message.nextArbiterAnonSubmissionId = reader.uint64();
           break;
+        case 24:
+          message.pendingIdentityChallenges.push(PendingIdentityChallenge.decode(reader, reader.uint32()));
+          break;
+        case 25:
+          message.peerRemovalQueue.push(PeerRemovalEntry.decode(reader, reader.uint32()));
+          break;
+        case 26:
+          message.attesterRevocationQueue.push(AttesterRevocation.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -479,6 +596,9 @@ export const GenesisState = {
     message.arbiterSubmissions = object.arbiterSubmissions?.map(e => ArbiterSubmissionEntry.fromPartial(e)) || [];
     message.arbiterHashCounts = object.arbiterHashCounts?.map(e => ArbiterHashCount.fromPartial(e)) || [];
     message.nextArbiterAnonSubmissionId = object.nextArbiterAnonSubmissionId !== undefined && object.nextArbiterAnonSubmissionId !== null ? BigInt(object.nextArbiterAnonSubmissionId.toString()) : BigInt(0);
+    message.pendingIdentityChallenges = object.pendingIdentityChallenges?.map(e => PendingIdentityChallenge.fromPartial(e)) || [];
+    message.peerRemovalQueue = object.peerRemovalQueue?.map(e => PeerRemovalEntry.fromPartial(e)) || [];
+    message.attesterRevocationQueue = object.attesterRevocationQueue?.map(e => AttesterRevocation.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -516,6 +636,9 @@ export const GenesisState = {
     if (object.next_arbiter_anon_submission_id !== undefined && object.next_arbiter_anon_submission_id !== null) {
       message.nextArbiterAnonSubmissionId = BigInt(object.next_arbiter_anon_submission_id);
     }
+    message.pendingIdentityChallenges = object.pending_identity_challenges?.map(e => PendingIdentityChallenge.fromAmino(e)) || [];
+    message.peerRemovalQueue = object.peer_removal_queue?.map(e => PeerRemovalEntry.fromAmino(e)) || [];
+    message.attesterRevocationQueue = object.attester_revocation_queue?.map(e => AttesterRevocation.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -615,6 +738,21 @@ export const GenesisState = {
       obj.arbiter_hash_counts = message.arbiterHashCounts;
     }
     obj.next_arbiter_anon_submission_id = message.nextArbiterAnonSubmissionId !== BigInt(0) ? message.nextArbiterAnonSubmissionId?.toString() : undefined;
+    if (message.pendingIdentityChallenges) {
+      obj.pending_identity_challenges = message.pendingIdentityChallenges.map(e => e ? PendingIdentityChallenge.toAmino(e) : undefined);
+    } else {
+      obj.pending_identity_challenges = message.pendingIdentityChallenges;
+    }
+    if (message.peerRemovalQueue) {
+      obj.peer_removal_queue = message.peerRemovalQueue.map(e => e ? PeerRemovalEntry.toAmino(e) : undefined);
+    } else {
+      obj.peer_removal_queue = message.peerRemovalQueue;
+    }
+    if (message.attesterRevocationQueue) {
+      obj.attester_revocation_queue = message.attesterRevocationQueue.map(e => e ? AttesterRevocation.toAmino(e) : undefined);
+    } else {
+      obj.attester_revocation_queue = message.attesterRevocationQueue;
+    }
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {
@@ -630,6 +768,171 @@ export const GenesisState = {
     return {
       typeUrl: "/sparkdream.federation.v1.GenesisState",
       value: GenesisState.encode(message).finish()
+    };
+  }
+};
+function createBaseAttesterRevocation(): AttesterRevocation {
+  return {
+    operator: "",
+    peerId: ""
+  };
+}
+/**
+ * AttesterRevocation is one AttesterRevocations queue entry: a dissolved
+ * bridge operator and a peer on which the identity links it attested are
+ * being returned to UNVERIFIED.
+ * @name AttesterRevocation
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.AttesterRevocation
+ */
+export const AttesterRevocation = {
+  typeUrl: "/sparkdream.federation.v1.AttesterRevocation",
+  encode(message: AttesterRevocation, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.operator !== "") {
+      writer.uint32(10).string(message.operator);
+    }
+    if (message.peerId !== "") {
+      writer.uint32(18).string(message.peerId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): AttesterRevocation {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAttesterRevocation();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.operator = reader.string();
+          break;
+        case 2:
+          message.peerId = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<AttesterRevocation>): AttesterRevocation {
+    const message = createBaseAttesterRevocation();
+    message.operator = object.operator ?? "";
+    message.peerId = object.peerId ?? "";
+    return message;
+  },
+  fromAmino(object: AttesterRevocationAmino): AttesterRevocation {
+    const message = createBaseAttesterRevocation();
+    if (object.operator !== undefined && object.operator !== null) {
+      message.operator = object.operator;
+    }
+    if (object.peer_id !== undefined && object.peer_id !== null) {
+      message.peerId = object.peer_id;
+    }
+    return message;
+  },
+  toAmino(message: AttesterRevocation): AttesterRevocationAmino {
+    const obj: any = {};
+    obj.operator = message.operator === "" ? undefined : message.operator;
+    obj.peer_id = message.peerId === "" ? undefined : message.peerId;
+    return obj;
+  },
+  fromAminoMsg(object: AttesterRevocationAminoMsg): AttesterRevocation {
+    return AttesterRevocation.fromAmino(object.value);
+  },
+  fromProtoMsg(message: AttesterRevocationProtoMsg): AttesterRevocation {
+    return AttesterRevocation.decode(message.value);
+  },
+  toProto(message: AttesterRevocation): Uint8Array {
+    return AttesterRevocation.encode(message).finish();
+  },
+  toProtoMsg(message: AttesterRevocation): AttesterRevocationProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.AttesterRevocation",
+      value: AttesterRevocation.encode(message).finish()
+    };
+  }
+};
+function createBasePeerRemovalEntry(): PeerRemovalEntry {
+  return {
+    peerId: "",
+    state: PeerRemovalState.fromPartial({})
+  };
+}
+/**
+ * PeerRemovalEntry is one PeerRemovalQueue map entry: the peer being
+ * removed and its cleanup progress.
+ * @name PeerRemovalEntry
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.PeerRemovalEntry
+ */
+export const PeerRemovalEntry = {
+  typeUrl: "/sparkdream.federation.v1.PeerRemovalEntry",
+  encode(message: PeerRemovalEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.peerId !== "") {
+      writer.uint32(10).string(message.peerId);
+    }
+    if (message.state !== undefined) {
+      PeerRemovalState.encode(message.state, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): PeerRemovalEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePeerRemovalEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.peerId = reader.string();
+          break;
+        case 2:
+          message.state = PeerRemovalState.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<PeerRemovalEntry>): PeerRemovalEntry {
+    const message = createBasePeerRemovalEntry();
+    message.peerId = object.peerId ?? "";
+    message.state = object.state !== undefined && object.state !== null ? PeerRemovalState.fromPartial(object.state) : undefined;
+    return message;
+  },
+  fromAmino(object: PeerRemovalEntryAmino): PeerRemovalEntry {
+    const message = createBasePeerRemovalEntry();
+    if (object.peer_id !== undefined && object.peer_id !== null) {
+      message.peerId = object.peer_id;
+    }
+    if (object.state !== undefined && object.state !== null) {
+      message.state = PeerRemovalState.fromAmino(object.state);
+    }
+    return message;
+  },
+  toAmino(message: PeerRemovalEntry): PeerRemovalEntryAmino {
+    const obj: any = {};
+    obj.peer_id = message.peerId === "" ? undefined : message.peerId;
+    obj.state = message.state ? PeerRemovalState.toAmino(message.state) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: PeerRemovalEntryAminoMsg): PeerRemovalEntry {
+    return PeerRemovalEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: PeerRemovalEntryProtoMsg): PeerRemovalEntry {
+    return PeerRemovalEntry.decode(message.value);
+  },
+  toProto(message: PeerRemovalEntry): Uint8Array {
+    return PeerRemovalEntry.encode(message).finish();
+  },
+  toProtoMsg(message: PeerRemovalEntry): PeerRemovalEntryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.PeerRemovalEntry",
+      value: PeerRemovalEntry.encode(message).finish()
     };
   }
 };

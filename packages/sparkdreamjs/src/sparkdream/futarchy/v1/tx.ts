@@ -209,6 +209,11 @@ export interface MsgTrade {
   marketId: bigint;
   isYes: boolean;
   amountIn: string;
+  /**
+   * Optional slippage bound: the trade fails if it would mint fewer shares.
+   * Empty or zero means no bound.
+   */
+  minSharesOut: string;
 }
 export interface MsgTradeProtoMsg {
   typeUrl: "/sparkdream.futarchy.v1.MsgTrade";
@@ -225,6 +230,11 @@ export interface MsgTradeAmino {
   market_id?: string;
   is_yes?: boolean;
   amount_in?: string;
+  /**
+   * Optional slippage bound: the trade fails if it would mint fewer shares.
+   * Empty or zero means no bound.
+   */
+  min_shares_out?: string;
 }
 export interface MsgTradeAminoMsg {
   type: "sparkdream/x/futarchy/MsgTrade";
@@ -907,7 +917,8 @@ function createBaseMsgTrade(): MsgTrade {
     creator: "",
     marketId: BigInt(0),
     isYes: false,
-    amountIn: ""
+    amountIn: "",
+    minSharesOut: ""
   };
 }
 /**
@@ -932,6 +943,9 @@ export const MsgTrade = {
     if (message.amountIn !== "") {
       writer.uint32(34).string(message.amountIn);
     }
+    if (message.minSharesOut !== "") {
+      writer.uint32(42).string(message.minSharesOut);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgTrade {
@@ -953,6 +967,9 @@ export const MsgTrade = {
         case 4:
           message.amountIn = reader.string();
           break;
+        case 5:
+          message.minSharesOut = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -966,6 +983,7 @@ export const MsgTrade = {
     message.marketId = object.marketId !== undefined && object.marketId !== null ? BigInt(object.marketId.toString()) : BigInt(0);
     message.isYes = object.isYes ?? false;
     message.amountIn = object.amountIn ?? "";
+    message.minSharesOut = object.minSharesOut ?? "";
     return message;
   },
   fromAmino(object: MsgTradeAmino): MsgTrade {
@@ -982,6 +1000,9 @@ export const MsgTrade = {
     if (object.amount_in !== undefined && object.amount_in !== null) {
       message.amountIn = object.amount_in;
     }
+    if (object.min_shares_out !== undefined && object.min_shares_out !== null) {
+      message.minSharesOut = object.min_shares_out;
+    }
     return message;
   },
   toAmino(message: MsgTrade): MsgTradeAmino {
@@ -990,6 +1011,7 @@ export const MsgTrade = {
     obj.market_id = message.marketId !== BigInt(0) ? message.marketId?.toString() : undefined;
     obj.is_yes = message.isYes === false ? undefined : message.isYes;
     obj.amount_in = message.amountIn === "" ? undefined : message.amountIn;
+    obj.min_shares_out = message.minSharesOut === "" ? undefined : message.minSharesOut;
     return obj;
   },
   fromAminoMsg(object: MsgTradeAminoMsg): MsgTrade {

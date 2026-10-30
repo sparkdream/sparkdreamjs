@@ -411,6 +411,20 @@ export interface Collection {
    * media_rules_version is the labelling rules version that produced media_flags.
    */
   mediaRulesVersion: number;
+  /**
+   * endorsement_pending_until is the block height at which an unendorsed
+   * PENDING collection is pruned: the K1 of its EndorsementPending index key,
+   * fixed at creation. Every removal path rebuilds the index key from this
+   * stored value, never from the (mutable) endorsement_expiry_blocks param.
+   * Zero when the collection never entered the endorsement stage.
+   */
+  endorsementPendingUntil: bigint;
+  /**
+   * endorsement_fee_escrowed is the endorsement creation fee actually escrowed
+   * at creation (uspark). Refunds, endorser payouts and burns use this amount,
+   * never the current endorsement_creation_fee param. Zero once settled.
+   */
+  endorsementFeeEscrowed: string;
 }
 export interface CollectionProtoMsg {
   typeUrl: "/sparkdream.collect.v1.Collection";
@@ -489,6 +503,20 @@ export interface CollectionAmino {
    * media_rules_version is the labelling rules version that produced media_flags.
    */
   media_rules_version?: number;
+  /**
+   * endorsement_pending_until is the block height at which an unendorsed
+   * PENDING collection is pruned: the K1 of its EndorsementPending index key,
+   * fixed at creation. Every removal path rebuilds the index key from this
+   * stored value, never from the (mutable) endorsement_expiry_blocks param.
+   * Zero when the collection never entered the endorsement stage.
+   */
+  endorsement_pending_until?: string;
+  /**
+   * endorsement_fee_escrowed is the endorsement creation fee actually escrowed
+   * at creation (uspark). Refunds, endorser payouts and burns use this amount,
+   * never the current endorsement_creation_fee param. Zero once settled.
+   */
+  endorsement_fee_escrowed?: string;
 }
 export interface CollectionAminoMsg {
   type: "/sparkdream.collect.v1.Collection";
@@ -820,6 +848,12 @@ export interface CurationReview {
    * ReleaseBond on reject). Zero / empty when the review is not challenged.
    */
   committedSlash: string;
+  /**
+   * challenge_deposit is the DREAM amount actually locked from the challenger
+   * at MsgChallengeReview time. Every unlock / burn of the deposit uses this
+   * amount, never the current challenge_deposit param. Zero once settled.
+   */
+  challengeDeposit: string;
 }
 export interface CurationReviewProtoMsg {
   typeUrl: "/sparkdream.collect.v1.CurationReview";
@@ -849,6 +883,12 @@ export interface CurationReviewAmino {
    * ReleaseBond on reject). Zero / empty when the review is not challenged.
    */
   committed_slash?: string;
+  /**
+   * challenge_deposit is the DREAM amount actually locked from the challenger
+   * at MsgChallengeReview time. Every unlock / burn of the deposit uses this
+   * amount, never the current challenge_deposit param. Zero once settled.
+   */
+  challenge_deposit?: string;
 }
 export interface CurationReviewAminoMsg {
   type: "/sparkdream.collect.v1.CurationReview";
@@ -1206,6 +1246,12 @@ export interface CollectionFlag {
   firstFlagAt: bigint;
   lastFlagAt: bigint;
   inReviewQueue: boolean;
+  /**
+   * expires_at is the block height of this flag's FlagExpiry index entry
+   * (last_flag_at + flag_expiration_blocks at the time of the last flag).
+   * Cleanup paths rebuild the index key from it, never from the current param.
+   */
+  expiresAt: bigint;
 }
 export interface CollectionFlagProtoMsg {
   typeUrl: "/sparkdream.collect.v1.CollectionFlag";
@@ -1225,6 +1271,12 @@ export interface CollectionFlagAmino {
   first_flag_at?: string;
   last_flag_at?: string;
   in_review_queue?: boolean;
+  /**
+   * expires_at is the block height of this flag's FlagExpiry index entry
+   * (last_flag_at + flag_expiration_blocks at the time of the last flag).
+   * Cleanup paths rebuild the index key from it, never from the current param.
+   */
+  expires_at?: string;
 }
 export interface CollectionFlagAminoMsg {
   type: "/sparkdream.collect.v1.CollectionFlag";
@@ -1417,7 +1469,9 @@ function createBaseCollection(): Collection {
     anonOwnerTag: new Uint8Array(),
     anonOwnerSequence: BigInt(0),
     mediaFlags: 0,
-    mediaRulesVersion: 0
+    mediaRulesVersion: 0,
+    endorsementPendingUntil: BigInt(0),
+    endorsementFeeEscrowed: ""
   };
 }
 /**
@@ -1537,6 +1591,12 @@ export const Collection = {
     if (message.mediaRulesVersion !== 0) {
       writer.uint32(288).uint32(message.mediaRulesVersion);
     }
+    if (message.endorsementPendingUntil !== BigInt(0)) {
+      writer.uint32(296).int64(message.endorsementPendingUntil);
+    }
+    if (message.endorsementFeeEscrowed !== "") {
+      writer.uint32(306).string(message.endorsementFeeEscrowed);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Collection {
@@ -1654,6 +1714,12 @@ export const Collection = {
         case 36:
           message.mediaRulesVersion = reader.uint32();
           break;
+        case 37:
+          message.endorsementPendingUntil = reader.int64();
+          break;
+        case 38:
+          message.endorsementFeeEscrowed = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1699,6 +1765,8 @@ export const Collection = {
     message.anonOwnerSequence = object.anonOwnerSequence !== undefined && object.anonOwnerSequence !== null ? BigInt(object.anonOwnerSequence.toString()) : BigInt(0);
     message.mediaFlags = object.mediaFlags ?? 0;
     message.mediaRulesVersion = object.mediaRulesVersion ?? 0;
+    message.endorsementPendingUntil = object.endorsementPendingUntil !== undefined && object.endorsementPendingUntil !== null ? BigInt(object.endorsementPendingUntil.toString()) : BigInt(0);
+    message.endorsementFeeEscrowed = object.endorsementFeeEscrowed ?? "";
     return message;
   },
   fromAmino(object: CollectionAmino): Collection {
@@ -1809,6 +1877,12 @@ export const Collection = {
     if (object.media_rules_version !== undefined && object.media_rules_version !== null) {
       message.mediaRulesVersion = object.media_rules_version;
     }
+    if (object.endorsement_pending_until !== undefined && object.endorsement_pending_until !== null) {
+      message.endorsementPendingUntil = BigInt(object.endorsement_pending_until);
+    }
+    if (object.endorsement_fee_escrowed !== undefined && object.endorsement_fee_escrowed !== null) {
+      message.endorsementFeeEscrowed = object.endorsement_fee_escrowed;
+    }
     return message;
   },
   toAmino(message: Collection): CollectionAmino {
@@ -1853,6 +1927,8 @@ export const Collection = {
     obj.anon_owner_sequence = message.anonOwnerSequence !== BigInt(0) ? message.anonOwnerSequence?.toString() : undefined;
     obj.media_flags = message.mediaFlags === 0 ? undefined : message.mediaFlags;
     obj.media_rules_version = message.mediaRulesVersion === 0 ? undefined : message.mediaRulesVersion;
+    obj.endorsement_pending_until = message.endorsementPendingUntil !== BigInt(0) ? message.endorsementPendingUntil?.toString() : undefined;
+    obj.endorsement_fee_escrowed = message.endorsementFeeEscrowed === "" ? undefined : message.endorsementFeeEscrowed;
     return obj;
   },
   fromAminoMsg(object: CollectionAminoMsg): Collection {
@@ -2790,7 +2866,8 @@ function createBaseCurationReview(): CurationReview {
     challenged: false,
     overturned: false,
     challenger: "",
-    committedSlash: ""
+    committedSlash: "",
+    challengeDeposit: ""
   };
 }
 /**
@@ -2835,6 +2912,9 @@ export const CurationReview = {
     if (message.committedSlash !== "") {
       writer.uint32(90).string(message.committedSlash);
     }
+    if (message.challengeDeposit !== "") {
+      writer.uint32(98).string(message.challengeDeposit);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): CurationReview {
@@ -2877,6 +2957,9 @@ export const CurationReview = {
         case 11:
           message.committedSlash = reader.string();
           break;
+        case 12:
+          message.challengeDeposit = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2897,6 +2980,7 @@ export const CurationReview = {
     message.overturned = object.overturned ?? false;
     message.challenger = object.challenger ?? "";
     message.committedSlash = object.committedSlash ?? "";
+    message.challengeDeposit = object.challengeDeposit ?? "";
     return message;
   },
   fromAmino(object: CurationReviewAmino): CurationReview {
@@ -2932,6 +3016,9 @@ export const CurationReview = {
     if (object.committed_slash !== undefined && object.committed_slash !== null) {
       message.committedSlash = object.committed_slash;
     }
+    if (object.challenge_deposit !== undefined && object.challenge_deposit !== null) {
+      message.challengeDeposit = object.challenge_deposit;
+    }
     return message;
   },
   toAmino(message: CurationReview): CurationReviewAmino {
@@ -2951,6 +3038,7 @@ export const CurationReview = {
     obj.overturned = message.overturned === false ? undefined : message.overturned;
     obj.challenger = message.challenger === "" ? undefined : message.challenger;
     obj.committed_slash = message.committedSlash === "" ? undefined : message.committedSlash;
+    obj.challenge_deposit = message.challengeDeposit === "" ? undefined : message.challengeDeposit;
     return obj;
   },
   fromAminoMsg(object: CurationReviewAminoMsg): CurationReview {
@@ -4154,7 +4242,8 @@ function createBaseCollectionFlag(): CollectionFlag {
     totalWeight: "",
     firstFlagAt: BigInt(0),
     lastFlagAt: BigInt(0),
-    inReviewQueue: false
+    inReviewQueue: false,
+    expiresAt: BigInt(0)
   };
 }
 /**
@@ -4187,6 +4276,9 @@ export const CollectionFlag = {
     if (message.inReviewQueue === true) {
       writer.uint32(56).bool(message.inReviewQueue);
     }
+    if (message.expiresAt !== BigInt(0)) {
+      writer.uint32(64).int64(message.expiresAt);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): CollectionFlag {
@@ -4217,6 +4309,9 @@ export const CollectionFlag = {
         case 7:
           message.inReviewQueue = reader.bool();
           break;
+        case 8:
+          message.expiresAt = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4233,6 +4328,7 @@ export const CollectionFlag = {
     message.firstFlagAt = object.firstFlagAt !== undefined && object.firstFlagAt !== null ? BigInt(object.firstFlagAt.toString()) : BigInt(0);
     message.lastFlagAt = object.lastFlagAt !== undefined && object.lastFlagAt !== null ? BigInt(object.lastFlagAt.toString()) : BigInt(0);
     message.inReviewQueue = object.inReviewQueue ?? false;
+    message.expiresAt = object.expiresAt !== undefined && object.expiresAt !== null ? BigInt(object.expiresAt.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: CollectionFlagAmino): CollectionFlag {
@@ -4256,6 +4352,9 @@ export const CollectionFlag = {
     if (object.in_review_queue !== undefined && object.in_review_queue !== null) {
       message.inReviewQueue = object.in_review_queue;
     }
+    if (object.expires_at !== undefined && object.expires_at !== null) {
+      message.expiresAt = BigInt(object.expires_at);
+    }
     return message;
   },
   toAmino(message: CollectionFlag): CollectionFlagAmino {
@@ -4271,6 +4370,7 @@ export const CollectionFlag = {
     obj.first_flag_at = message.firstFlagAt !== BigInt(0) ? message.firstFlagAt?.toString() : undefined;
     obj.last_flag_at = message.lastFlagAt !== BigInt(0) ? message.lastFlagAt?.toString() : undefined;
     obj.in_review_queue = message.inReviewQueue === false ? undefined : message.inReviewQueue;
+    obj.expires_at = message.expiresAt !== BigInt(0) ? message.expiresAt?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: CollectionFlagAminoMsg): CollectionFlag {

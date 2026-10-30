@@ -23,6 +23,7 @@ import { DisplayNameModeration, DisplayNameModerationAmino } from "./display_nam
 import { DisplayNameReportStake, DisplayNameReportStakeAmino } from "./display_name_report_stake";
 import { DisplayNameAppealStake, DisplayNameAppealStakeAmino } from "./display_name_appeal_stake";
 import { Nomination, NominationAmino, NominationStake, NominationStakeAmino, RetroRewardRecord, RetroRewardRecordAmino } from "./nomination";
+import { SeasonStatsCounters, SeasonStatsCountersAmino } from "./season_stats_counters";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -66,6 +67,20 @@ export interface GenesisState {
   nominationCount: bigint;
   nominationStakeList: NominationStake[];
   retroRewardRecordList: RetroRewardRecord[];
+  /**
+   * MsgAbortSeasonTransition count per season (SEA-25), so the
+   * MaxTransitionAbortsPerSeason cap survives export/import.
+   */
+  transitionAbortList: TransitionAbortCount[];
+  /**
+   * Season number whose x/rep seasonal pool initialisation failed at
+   * finalisation and is retried by the BeginBlocker (0 = none, SEA-22).
+   */
+  pendingSeasonalPoolInit: bigint;
+  /**
+   * Running per-season aggregates read by the SeasonStats query (SEA-35).
+   */
+  seasonStatsCountersList: SeasonStatsCounters[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.season.v1.GenesisState";
@@ -112,10 +127,52 @@ export interface GenesisStateAmino {
   nomination_count?: string;
   nomination_stake_list?: NominationStakeAmino[];
   retro_reward_record_list?: RetroRewardRecordAmino[];
+  /**
+   * MsgAbortSeasonTransition count per season (SEA-25), so the
+   * MaxTransitionAbortsPerSeason cap survives export/import.
+   */
+  transition_abort_list?: TransitionAbortCountAmino[];
+  /**
+   * Season number whose x/rep seasonal pool initialisation failed at
+   * finalisation and is retried by the BeginBlocker (0 = none, SEA-22).
+   */
+  pending_seasonal_pool_init?: string;
+  /**
+   * Running per-season aggregates read by the SeasonStats query (SEA-35).
+   */
+  season_stats_counters_list?: SeasonStatsCountersAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.season.v1.GenesisState";
   value: GenesisStateAmino;
+}
+/**
+ * TransitionAbortCount is one entry of the per-season abort counter.
+ * @name TransitionAbortCount
+ * @package sparkdream.season.v1
+ * @see proto type: sparkdream.season.v1.TransitionAbortCount
+ */
+export interface TransitionAbortCount {
+  season: bigint;
+  aborts: bigint;
+}
+export interface TransitionAbortCountProtoMsg {
+  typeUrl: "/sparkdream.season.v1.TransitionAbortCount";
+  value: Uint8Array;
+}
+/**
+ * TransitionAbortCount is one entry of the per-season abort counter.
+ * @name TransitionAbortCountAmino
+ * @package sparkdream.season.v1
+ * @see proto type: sparkdream.season.v1.TransitionAbortCount
+ */
+export interface TransitionAbortCountAmino {
+  season?: string;
+  aborts?: string;
+}
+export interface TransitionAbortCountAminoMsg {
+  type: "/sparkdream.season.v1.TransitionAbortCount";
+  value: TransitionAbortCountAmino;
 }
 function createBaseGenesisState(): GenesisState {
   return {
@@ -146,7 +203,10 @@ function createBaseGenesisState(): GenesisState {
     nominationList: [],
     nominationCount: BigInt(0),
     nominationStakeList: [],
-    retroRewardRecordList: []
+    retroRewardRecordList: [],
+    transitionAbortList: [],
+    pendingSeasonalPoolInit: BigInt(0),
+    seasonStatsCountersList: []
   };
 }
 /**
@@ -242,6 +302,15 @@ export const GenesisState = {
     for (const v of message.retroRewardRecordList) {
       RetroRewardRecord.encode(v!, writer.uint32(226).fork()).ldelim();
     }
+    for (const v of message.transitionAbortList) {
+      TransitionAbortCount.encode(v!, writer.uint32(234).fork()).ldelim();
+    }
+    if (message.pendingSeasonalPoolInit !== BigInt(0)) {
+      writer.uint32(240).uint64(message.pendingSeasonalPoolInit);
+    }
+    for (const v of message.seasonStatsCountersList) {
+      SeasonStatsCounters.encode(v!, writer.uint32(250).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -335,6 +404,15 @@ export const GenesisState = {
         case 28:
           message.retroRewardRecordList.push(RetroRewardRecord.decode(reader, reader.uint32()));
           break;
+        case 29:
+          message.transitionAbortList.push(TransitionAbortCount.decode(reader, reader.uint32()));
+          break;
+        case 30:
+          message.pendingSeasonalPoolInit = reader.uint64();
+          break;
+        case 31:
+          message.seasonStatsCountersList.push(SeasonStatsCounters.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -372,6 +450,9 @@ export const GenesisState = {
     message.nominationCount = object.nominationCount !== undefined && object.nominationCount !== null ? BigInt(object.nominationCount.toString()) : BigInt(0);
     message.nominationStakeList = object.nominationStakeList?.map(e => NominationStake.fromPartial(e)) || [];
     message.retroRewardRecordList = object.retroRewardRecordList?.map(e => RetroRewardRecord.fromPartial(e)) || [];
+    message.transitionAbortList = object.transitionAbortList?.map(e => TransitionAbortCount.fromPartial(e)) || [];
+    message.pendingSeasonalPoolInit = object.pendingSeasonalPoolInit !== undefined && object.pendingSeasonalPoolInit !== null ? BigInt(object.pendingSeasonalPoolInit.toString()) : BigInt(0);
+    message.seasonStatsCountersList = object.seasonStatsCountersList?.map(e => SeasonStatsCounters.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -418,6 +499,11 @@ export const GenesisState = {
     }
     message.nominationStakeList = object.nomination_stake_list?.map(e => NominationStake.fromAmino(e)) || [];
     message.retroRewardRecordList = object.retro_reward_record_list?.map(e => RetroRewardRecord.fromAmino(e)) || [];
+    message.transitionAbortList = object.transition_abort_list?.map(e => TransitionAbortCount.fromAmino(e)) || [];
+    if (object.pending_seasonal_pool_init !== undefined && object.pending_seasonal_pool_init !== null) {
+      message.pendingSeasonalPoolInit = BigInt(object.pending_seasonal_pool_init);
+    }
+    message.seasonStatsCountersList = object.season_stats_counters_list?.map(e => SeasonStatsCounters.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -534,6 +620,17 @@ export const GenesisState = {
     } else {
       obj.retro_reward_record_list = message.retroRewardRecordList;
     }
+    if (message.transitionAbortList) {
+      obj.transition_abort_list = message.transitionAbortList.map(e => e ? TransitionAbortCount.toAmino(e) : undefined);
+    } else {
+      obj.transition_abort_list = message.transitionAbortList;
+    }
+    obj.pending_seasonal_pool_init = message.pendingSeasonalPoolInit !== BigInt(0) ? message.pendingSeasonalPoolInit?.toString() : undefined;
+    if (message.seasonStatsCountersList) {
+      obj.season_stats_counters_list = message.seasonStatsCountersList.map(e => e ? SeasonStatsCounters.toAmino(e) : undefined);
+    } else {
+      obj.season_stats_counters_list = message.seasonStatsCountersList;
+    }
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {
@@ -549,6 +646,87 @@ export const GenesisState = {
     return {
       typeUrl: "/sparkdream.season.v1.GenesisState",
       value: GenesisState.encode(message).finish()
+    };
+  }
+};
+function createBaseTransitionAbortCount(): TransitionAbortCount {
+  return {
+    season: BigInt(0),
+    aborts: BigInt(0)
+  };
+}
+/**
+ * TransitionAbortCount is one entry of the per-season abort counter.
+ * @name TransitionAbortCount
+ * @package sparkdream.season.v1
+ * @see proto type: sparkdream.season.v1.TransitionAbortCount
+ */
+export const TransitionAbortCount = {
+  typeUrl: "/sparkdream.season.v1.TransitionAbortCount",
+  encode(message: TransitionAbortCount, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.season !== BigInt(0)) {
+      writer.uint32(8).uint64(message.season);
+    }
+    if (message.aborts !== BigInt(0)) {
+      writer.uint32(16).uint64(message.aborts);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): TransitionAbortCount {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTransitionAbortCount();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.season = reader.uint64();
+          break;
+        case 2:
+          message.aborts = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<TransitionAbortCount>): TransitionAbortCount {
+    const message = createBaseTransitionAbortCount();
+    message.season = object.season !== undefined && object.season !== null ? BigInt(object.season.toString()) : BigInt(0);
+    message.aborts = object.aborts !== undefined && object.aborts !== null ? BigInt(object.aborts.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: TransitionAbortCountAmino): TransitionAbortCount {
+    const message = createBaseTransitionAbortCount();
+    if (object.season !== undefined && object.season !== null) {
+      message.season = BigInt(object.season);
+    }
+    if (object.aborts !== undefined && object.aborts !== null) {
+      message.aborts = BigInt(object.aborts);
+    }
+    return message;
+  },
+  toAmino(message: TransitionAbortCount): TransitionAbortCountAmino {
+    const obj: any = {};
+    obj.season = message.season !== BigInt(0) ? message.season?.toString() : undefined;
+    obj.aborts = message.aborts !== BigInt(0) ? message.aborts?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: TransitionAbortCountAminoMsg): TransitionAbortCount {
+    return TransitionAbortCount.fromAmino(object.value);
+  },
+  fromProtoMsg(message: TransitionAbortCountProtoMsg): TransitionAbortCount {
+    return TransitionAbortCount.decode(message.value);
+  },
+  toProto(message: TransitionAbortCount): Uint8Array {
+    return TransitionAbortCount.encode(message).finish();
+  },
+  toProtoMsg(message: TransitionAbortCount): TransitionAbortCountProtoMsg {
+    return {
+      typeUrl: "/sparkdream.season.v1.TransitionAbortCount",
+      value: TransitionAbortCount.encode(message).finish()
     };
   }
 };

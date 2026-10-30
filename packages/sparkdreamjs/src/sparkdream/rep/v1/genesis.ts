@@ -15,7 +15,7 @@ import { TagReport, TagReportAmino } from "./tag_report";
 import { TagBudget, TagBudgetAmino } from "./tag_budget";
 import { TagBudgetAward, TagBudgetAwardAmino } from "./tag_budget_award";
 import { JuryParticipation, JuryParticipationAmino } from "./jury_participation";
-import { MemberReport, MemberReportAmino } from "./member_report";
+import { MemberReport, MemberReportAmino, MemberActionRestoration, MemberActionRestorationAmino } from "./member_report";
 import { MemberWarning, MemberWarningAmino } from "./member_warning";
 import { GovActionAppeal, GovActionAppealAmino } from "./gov_action_appeal";
 import { BondedRole, BondedRoleAmino, BondedRoleConfig, BondedRoleConfigAmino } from "./bonded_role";
@@ -150,6 +150,29 @@ export interface GenesisState {
   memberMigrationCount: bigint;
   recoveryCommitmentList: RecoveryCommitmentEntry[];
   recoveryCommitList: RecoveryCommit[];
+  /**
+   * Restoration records of appealable member actions. The filing-window
+   * expiry index is derived from these at InitGenesis.
+   */
+  memberActionRestorationList: MemberActionRestoration[];
+  /**
+   * Jury reviews deliberately kept out of the verdict index (content-challenge
+   * and appeal reviews, which have their own timeout paths). InitGenesis
+   * indexes every other review, so a hand-written genesis that omits this
+   * list indexes them all.
+   */
+  juryReviewsOutsideVerdictIndex: bigint[];
+  /**
+   * The per-(budget, post) award cooldown heights. An award without an entry
+   * here restarts its cooldown at the import height.
+   */
+  tagBudgetAwardCooldownList: TagBudgetAwardCooldown[];
+  /**
+   * What each awarder has awarded from a budget in an epoch (the per-awarder
+   * epoch cap ledger). Without it an import inside an epoch would reset every
+   * awarder's cap for that epoch.
+   */
+  tagBudgetAwarderEpochList: TagBudgetAwarderEpochSpend[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.rep.v1.GenesisState";
@@ -279,10 +302,99 @@ export interface GenesisStateAmino {
   member_migration_count?: string;
   recovery_commitment_list?: RecoveryCommitmentEntryAmino[];
   recovery_commit_list?: RecoveryCommitAmino[];
+  /**
+   * Restoration records of appealable member actions. The filing-window
+   * expiry index is derived from these at InitGenesis.
+   */
+  member_action_restoration_list?: MemberActionRestorationAmino[];
+  /**
+   * Jury reviews deliberately kept out of the verdict index (content-challenge
+   * and appeal reviews, which have their own timeout paths). InitGenesis
+   * indexes every other review, so a hand-written genesis that omits this
+   * list indexes them all.
+   */
+  jury_reviews_outside_verdict_index?: string[];
+  /**
+   * The per-(budget, post) award cooldown heights. An award without an entry
+   * here restarts its cooldown at the import height.
+   */
+  tag_budget_award_cooldown_list?: TagBudgetAwardCooldownAmino[];
+  /**
+   * What each awarder has awarded from a budget in an epoch (the per-awarder
+   * epoch cap ledger). Without it an import inside an epoch would reset every
+   * awarder's cap for that epoch.
+   */
+  tag_budget_awarder_epoch_list?: TagBudgetAwarderEpochSpendAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.rep.v1.GenesisState";
   value: GenesisStateAmino;
+}
+/**
+ * TagBudgetAwarderEpochSpend is the amount awarder awarded from budget_id in
+ * epoch.
+ * @name TagBudgetAwarderEpochSpend
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.TagBudgetAwarderEpochSpend
+ */
+export interface TagBudgetAwarderEpochSpend {
+  budgetId: bigint;
+  awarder: string;
+  epoch: bigint;
+  amount: string;
+}
+export interface TagBudgetAwarderEpochSpendProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.TagBudgetAwarderEpochSpend";
+  value: Uint8Array;
+}
+/**
+ * TagBudgetAwarderEpochSpend is the amount awarder awarded from budget_id in
+ * epoch.
+ * @name TagBudgetAwarderEpochSpendAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.TagBudgetAwarderEpochSpend
+ */
+export interface TagBudgetAwarderEpochSpendAmino {
+  budget_id?: string;
+  awarder?: string;
+  epoch?: string;
+  amount?: string;
+}
+export interface TagBudgetAwarderEpochSpendAminoMsg {
+  type: "/sparkdream.rep.v1.TagBudgetAwarderEpochSpend";
+  value: TagBudgetAwarderEpochSpendAmino;
+}
+/**
+ * TagBudgetAwardCooldown is the height of the latest award from budget_id to
+ * post_id, the start of that pair's award cooldown.
+ * @name TagBudgetAwardCooldown
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.TagBudgetAwardCooldown
+ */
+export interface TagBudgetAwardCooldown {
+  budgetId: bigint;
+  postId: bigint;
+  height: bigint;
+}
+export interface TagBudgetAwardCooldownProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.TagBudgetAwardCooldown";
+  value: Uint8Array;
+}
+/**
+ * TagBudgetAwardCooldown is the height of the latest award from budget_id to
+ * post_id, the start of that pair's award cooldown.
+ * @name TagBudgetAwardCooldownAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.TagBudgetAwardCooldown
+ */
+export interface TagBudgetAwardCooldownAmino {
+  budget_id?: string;
+  post_id?: string;
+  height?: string;
+}
+export interface TagBudgetAwardCooldownAminoMsg {
+  type: "/sparkdream.rep.v1.TagBudgetAwardCooldown";
+  value: TagBudgetAwardCooldownAmino;
 }
 /**
  * EconomicState carries x/rep's token ledger across a genesis round trip.
@@ -509,7 +621,11 @@ function createBaseGenesisState(): GenesisState {
     memberMigrationList: [],
     memberMigrationCount: BigInt(0),
     recoveryCommitmentList: [],
-    recoveryCommitList: []
+    recoveryCommitList: [],
+    memberActionRestorationList: [],
+    juryReviewsOutsideVerdictIndex: [],
+    tagBudgetAwardCooldownList: [],
+    tagBudgetAwarderEpochList: []
   };
 }
 /**
@@ -672,6 +788,20 @@ export const GenesisState = {
     }
     for (const v of message.recoveryCommitList) {
       RecoveryCommit.encode(v!, writer.uint32(402).fork()).ldelim();
+    }
+    for (const v of message.memberActionRestorationList) {
+      MemberActionRestoration.encode(v!, writer.uint32(410).fork()).ldelim();
+    }
+    writer.uint32(418).fork();
+    for (const v of message.juryReviewsOutsideVerdictIndex) {
+      writer.uint64(v);
+    }
+    writer.ldelim();
+    for (const v of message.tagBudgetAwardCooldownList) {
+      TagBudgetAwardCooldown.encode(v!, writer.uint32(426).fork()).ldelim();
+    }
+    for (const v of message.tagBudgetAwarderEpochList) {
+      TagBudgetAwarderEpochSpend.encode(v!, writer.uint32(434).fork()).ldelim();
     }
     return writer;
   },
@@ -839,6 +969,25 @@ export const GenesisState = {
         case 50:
           message.recoveryCommitList.push(RecoveryCommit.decode(reader, reader.uint32()));
           break;
+        case 51:
+          message.memberActionRestorationList.push(MemberActionRestoration.decode(reader, reader.uint32()));
+          break;
+        case 52:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.juryReviewsOutsideVerdictIndex.push(reader.uint64());
+            }
+          } else {
+            message.juryReviewsOutsideVerdictIndex.push(reader.uint64());
+          }
+          break;
+        case 53:
+          message.tagBudgetAwardCooldownList.push(TagBudgetAwardCooldown.decode(reader, reader.uint32()));
+          break;
+        case 54:
+          message.tagBudgetAwarderEpochList.push(TagBudgetAwarderEpochSpend.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -898,6 +1047,10 @@ export const GenesisState = {
     message.memberMigrationCount = object.memberMigrationCount !== undefined && object.memberMigrationCount !== null ? BigInt(object.memberMigrationCount.toString()) : BigInt(0);
     message.recoveryCommitmentList = object.recoveryCommitmentList?.map(e => RecoveryCommitmentEntry.fromPartial(e)) || [];
     message.recoveryCommitList = object.recoveryCommitList?.map(e => RecoveryCommit.fromPartial(e)) || [];
+    message.memberActionRestorationList = object.memberActionRestorationList?.map(e => MemberActionRestoration.fromPartial(e)) || [];
+    message.juryReviewsOutsideVerdictIndex = object.juryReviewsOutsideVerdictIndex?.map(e => BigInt(e.toString())) || [];
+    message.tagBudgetAwardCooldownList = object.tagBudgetAwardCooldownList?.map(e => TagBudgetAwardCooldown.fromPartial(e)) || [];
+    message.tagBudgetAwarderEpochList = object.tagBudgetAwarderEpochList?.map(e => TagBudgetAwarderEpochSpend.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -982,6 +1135,10 @@ export const GenesisState = {
     }
     message.recoveryCommitmentList = object.recovery_commitment_list?.map(e => RecoveryCommitmentEntry.fromAmino(e)) || [];
     message.recoveryCommitList = object.recovery_commit_list?.map(e => RecoveryCommit.fromAmino(e)) || [];
+    message.memberActionRestorationList = object.member_action_restoration_list?.map(e => MemberActionRestoration.fromAmino(e)) || [];
+    message.juryReviewsOutsideVerdictIndex = object.jury_reviews_outside_verdict_index?.map(e => BigInt(e)) || [];
+    message.tagBudgetAwardCooldownList = object.tag_budget_award_cooldown_list?.map(e => TagBudgetAwardCooldown.fromAmino(e)) || [];
+    message.tagBudgetAwarderEpochList = object.tag_budget_awarder_epoch_list?.map(e => TagBudgetAwarderEpochSpend.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -1176,6 +1333,26 @@ export const GenesisState = {
     } else {
       obj.recovery_commit_list = message.recoveryCommitList;
     }
+    if (message.memberActionRestorationList) {
+      obj.member_action_restoration_list = message.memberActionRestorationList.map(e => e ? MemberActionRestoration.toAmino(e) : undefined);
+    } else {
+      obj.member_action_restoration_list = message.memberActionRestorationList;
+    }
+    if (message.juryReviewsOutsideVerdictIndex) {
+      obj.jury_reviews_outside_verdict_index = message.juryReviewsOutsideVerdictIndex.map(e => e.toString());
+    } else {
+      obj.jury_reviews_outside_verdict_index = message.juryReviewsOutsideVerdictIndex;
+    }
+    if (message.tagBudgetAwardCooldownList) {
+      obj.tag_budget_award_cooldown_list = message.tagBudgetAwardCooldownList.map(e => e ? TagBudgetAwardCooldown.toAmino(e) : undefined);
+    } else {
+      obj.tag_budget_award_cooldown_list = message.tagBudgetAwardCooldownList;
+    }
+    if (message.tagBudgetAwarderEpochList) {
+      obj.tag_budget_awarder_epoch_list = message.tagBudgetAwarderEpochList.map(e => e ? TagBudgetAwarderEpochSpend.toAmino(e) : undefined);
+    } else {
+      obj.tag_budget_awarder_epoch_list = message.tagBudgetAwarderEpochList;
+    }
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {
@@ -1191,6 +1368,206 @@ export const GenesisState = {
     return {
       typeUrl: "/sparkdream.rep.v1.GenesisState",
       value: GenesisState.encode(message).finish()
+    };
+  }
+};
+function createBaseTagBudgetAwarderEpochSpend(): TagBudgetAwarderEpochSpend {
+  return {
+    budgetId: BigInt(0),
+    awarder: "",
+    epoch: BigInt(0),
+    amount: ""
+  };
+}
+/**
+ * TagBudgetAwarderEpochSpend is the amount awarder awarded from budget_id in
+ * epoch.
+ * @name TagBudgetAwarderEpochSpend
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.TagBudgetAwarderEpochSpend
+ */
+export const TagBudgetAwarderEpochSpend = {
+  typeUrl: "/sparkdream.rep.v1.TagBudgetAwarderEpochSpend",
+  encode(message: TagBudgetAwarderEpochSpend, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.budgetId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.budgetId);
+    }
+    if (message.awarder !== "") {
+      writer.uint32(18).string(message.awarder);
+    }
+    if (message.epoch !== BigInt(0)) {
+      writer.uint32(24).int64(message.epoch);
+    }
+    if (message.amount !== "") {
+      writer.uint32(34).string(message.amount);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): TagBudgetAwarderEpochSpend {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTagBudgetAwarderEpochSpend();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.budgetId = reader.uint64();
+          break;
+        case 2:
+          message.awarder = reader.string();
+          break;
+        case 3:
+          message.epoch = reader.int64();
+          break;
+        case 4:
+          message.amount = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<TagBudgetAwarderEpochSpend>): TagBudgetAwarderEpochSpend {
+    const message = createBaseTagBudgetAwarderEpochSpend();
+    message.budgetId = object.budgetId !== undefined && object.budgetId !== null ? BigInt(object.budgetId.toString()) : BigInt(0);
+    message.awarder = object.awarder ?? "";
+    message.epoch = object.epoch !== undefined && object.epoch !== null ? BigInt(object.epoch.toString()) : BigInt(0);
+    message.amount = object.amount ?? "";
+    return message;
+  },
+  fromAmino(object: TagBudgetAwarderEpochSpendAmino): TagBudgetAwarderEpochSpend {
+    const message = createBaseTagBudgetAwarderEpochSpend();
+    if (object.budget_id !== undefined && object.budget_id !== null) {
+      message.budgetId = BigInt(object.budget_id);
+    }
+    if (object.awarder !== undefined && object.awarder !== null) {
+      message.awarder = object.awarder;
+    }
+    if (object.epoch !== undefined && object.epoch !== null) {
+      message.epoch = BigInt(object.epoch);
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = object.amount;
+    }
+    return message;
+  },
+  toAmino(message: TagBudgetAwarderEpochSpend): TagBudgetAwarderEpochSpendAmino {
+    const obj: any = {};
+    obj.budget_id = message.budgetId !== BigInt(0) ? message.budgetId?.toString() : undefined;
+    obj.awarder = message.awarder === "" ? undefined : message.awarder;
+    obj.epoch = message.epoch !== BigInt(0) ? message.epoch?.toString() : undefined;
+    obj.amount = message.amount === "" ? undefined : message.amount;
+    return obj;
+  },
+  fromAminoMsg(object: TagBudgetAwarderEpochSpendAminoMsg): TagBudgetAwarderEpochSpend {
+    return TagBudgetAwarderEpochSpend.fromAmino(object.value);
+  },
+  fromProtoMsg(message: TagBudgetAwarderEpochSpendProtoMsg): TagBudgetAwarderEpochSpend {
+    return TagBudgetAwarderEpochSpend.decode(message.value);
+  },
+  toProto(message: TagBudgetAwarderEpochSpend): Uint8Array {
+    return TagBudgetAwarderEpochSpend.encode(message).finish();
+  },
+  toProtoMsg(message: TagBudgetAwarderEpochSpend): TagBudgetAwarderEpochSpendProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.TagBudgetAwarderEpochSpend",
+      value: TagBudgetAwarderEpochSpend.encode(message).finish()
+    };
+  }
+};
+function createBaseTagBudgetAwardCooldown(): TagBudgetAwardCooldown {
+  return {
+    budgetId: BigInt(0),
+    postId: BigInt(0),
+    height: BigInt(0)
+  };
+}
+/**
+ * TagBudgetAwardCooldown is the height of the latest award from budget_id to
+ * post_id, the start of that pair's award cooldown.
+ * @name TagBudgetAwardCooldown
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.TagBudgetAwardCooldown
+ */
+export const TagBudgetAwardCooldown = {
+  typeUrl: "/sparkdream.rep.v1.TagBudgetAwardCooldown",
+  encode(message: TagBudgetAwardCooldown, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.budgetId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.budgetId);
+    }
+    if (message.postId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.postId);
+    }
+    if (message.height !== BigInt(0)) {
+      writer.uint32(24).int64(message.height);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): TagBudgetAwardCooldown {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTagBudgetAwardCooldown();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.budgetId = reader.uint64();
+          break;
+        case 2:
+          message.postId = reader.uint64();
+          break;
+        case 3:
+          message.height = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<TagBudgetAwardCooldown>): TagBudgetAwardCooldown {
+    const message = createBaseTagBudgetAwardCooldown();
+    message.budgetId = object.budgetId !== undefined && object.budgetId !== null ? BigInt(object.budgetId.toString()) : BigInt(0);
+    message.postId = object.postId !== undefined && object.postId !== null ? BigInt(object.postId.toString()) : BigInt(0);
+    message.height = object.height !== undefined && object.height !== null ? BigInt(object.height.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: TagBudgetAwardCooldownAmino): TagBudgetAwardCooldown {
+    const message = createBaseTagBudgetAwardCooldown();
+    if (object.budget_id !== undefined && object.budget_id !== null) {
+      message.budgetId = BigInt(object.budget_id);
+    }
+    if (object.post_id !== undefined && object.post_id !== null) {
+      message.postId = BigInt(object.post_id);
+    }
+    if (object.height !== undefined && object.height !== null) {
+      message.height = BigInt(object.height);
+    }
+    return message;
+  },
+  toAmino(message: TagBudgetAwardCooldown): TagBudgetAwardCooldownAmino {
+    const obj: any = {};
+    obj.budget_id = message.budgetId !== BigInt(0) ? message.budgetId?.toString() : undefined;
+    obj.post_id = message.postId !== BigInt(0) ? message.postId?.toString() : undefined;
+    obj.height = message.height !== BigInt(0) ? message.height?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: TagBudgetAwardCooldownAminoMsg): TagBudgetAwardCooldown {
+    return TagBudgetAwardCooldown.fromAmino(object.value);
+  },
+  fromProtoMsg(message: TagBudgetAwardCooldownProtoMsg): TagBudgetAwardCooldown {
+    return TagBudgetAwardCooldown.decode(message.value);
+  },
+  toProto(message: TagBudgetAwardCooldown): Uint8Array {
+    return TagBudgetAwardCooldown.encode(message).finish();
+  },
+  toProtoMsg(message: TagBudgetAwardCooldown): TagBudgetAwardCooldownProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.TagBudgetAwardCooldown",
+      value: TagBudgetAwardCooldown.encode(message).finish()
     };
   }
 };

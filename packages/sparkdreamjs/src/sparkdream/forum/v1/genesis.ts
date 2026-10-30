@@ -13,6 +13,7 @@ import { ThreadMetadata, ThreadMetadataAmino } from "./thread_metadata";
 import { ThreadFollow, ThreadFollowAmino } from "./thread_follow";
 import { ThreadFollowCount, ThreadFollowCountAmino } from "./thread_follow_count";
 import { ArchiveMetadata, ArchiveMetadataAmino } from "./archive_metadata";
+import { PostConvictionStake, PostConvictionStakeAmino, ForumRepEpochCounter, ForumRepEpochCounterAmino } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -54,6 +55,36 @@ export interface GenesisState {
    * through genesis like sentinel_activity_map.
    */
   proposalCountMap: ProposalCountEntry[];
+  /**
+   * post_conviction_stake_list carries every PostConvictionStake (active and
+   * released-but-not-GC'd). The staker's DREAM stays locked in x/rep while a
+   * stake is active, so dropping the record would strand it.
+   */
+  postConvictionStakeList: PostConvictionStake[];
+  /**
+   * post_conviction_stake_count persists PostConvictionStakeSeq (next id).
+   */
+  postConvictionStakeCount: bigint;
+  /**
+   * post_vote_list persists the one-vote-per-(post, voter) dedup set.
+   */
+  postVoteList: PostVoteEntry[];
+  /**
+   * forum_rep_epoch_counter_list persists the per-(author, tag) epoch rep cap
+   * counters so an export/import cannot reset the daily cap mid-epoch.
+   */
+  forumRepEpochCounterList: ForumRepEpochCounterEntry[];
+  /**
+   * pending_stake_slash_list persists the posts whose stood hide is still
+   * being settled against their conviction stakes, a bounded batch per block.
+   */
+  pendingStakeSlashList: PendingStakeSlash[];
+  /**
+   * Members queued for eager promotion of their ephemeral content (admitted
+   * after posting). Hook-driven, so carried verbatim with the enqueue height;
+   * without it an import would leave that content to the lazy TTL-time path.
+   */
+  promotionQueue: PromotionQueueEntry[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.forum.v1.GenesisState";
@@ -98,10 +129,132 @@ export interface GenesisStateAmino {
    * through genesis like sentinel_activity_map.
    */
   proposal_count_map?: ProposalCountEntryAmino[];
+  /**
+   * post_conviction_stake_list carries every PostConvictionStake (active and
+   * released-but-not-GC'd). The staker's DREAM stays locked in x/rep while a
+   * stake is active, so dropping the record would strand it.
+   */
+  post_conviction_stake_list?: PostConvictionStakeAmino[];
+  /**
+   * post_conviction_stake_count persists PostConvictionStakeSeq (next id).
+   */
+  post_conviction_stake_count?: string;
+  /**
+   * post_vote_list persists the one-vote-per-(post, voter) dedup set.
+   */
+  post_vote_list?: PostVoteEntryAmino[];
+  /**
+   * forum_rep_epoch_counter_list persists the per-(author, tag) epoch rep cap
+   * counters so an export/import cannot reset the daily cap mid-epoch.
+   */
+  forum_rep_epoch_counter_list?: ForumRepEpochCounterEntryAmino[];
+  /**
+   * pending_stake_slash_list persists the posts whose stood hide is still
+   * being settled against their conviction stakes, a bounded batch per block.
+   */
+  pending_stake_slash_list?: PendingStakeSlashAmino[];
+  /**
+   * Members queued for eager promotion of their ephemeral content (admitted
+   * after posting). Hook-driven, so carried verbatim with the enqueue height;
+   * without it an import would leave that content to the lazy TTL-time path.
+   */
+  promotion_queue?: PromotionQueueEntryAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.forum.v1.GenesisState";
   value: GenesisStateAmino;
+}
+/**
+ * PendingStakeSlash is a post whose conviction stakes are still to be
+ * slashed, with the author the reputation is clawed back from (kept here
+ * because the post itself may be pruned before the slash finishes).
+ * @name PendingStakeSlash
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.PendingStakeSlash
+ */
+export interface PendingStakeSlash {
+  postId: bigint;
+  author: string;
+}
+export interface PendingStakeSlashProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.PendingStakeSlash";
+  value: Uint8Array;
+}
+/**
+ * PendingStakeSlash is a post whose conviction stakes are still to be
+ * slashed, with the author the reputation is clawed back from (kept here
+ * because the post itself may be pruned before the slash finishes).
+ * @name PendingStakeSlashAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.PendingStakeSlash
+ */
+export interface PendingStakeSlashAmino {
+  post_id?: string;
+  author?: string;
+}
+export interface PendingStakeSlashAminoMsg {
+  type: "/sparkdream.forum.v1.PendingStakeSlash";
+  value: PendingStakeSlashAmino;
+}
+/**
+ * PostVoteEntry is one (post_id, voter) dedup key of the PostVote set.
+ * @name PostVoteEntry
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.PostVoteEntry
+ */
+export interface PostVoteEntry {
+  postId: bigint;
+  voter: string;
+}
+export interface PostVoteEntryProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.PostVoteEntry";
+  value: Uint8Array;
+}
+/**
+ * PostVoteEntry is one (post_id, voter) dedup key of the PostVote set.
+ * @name PostVoteEntryAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.PostVoteEntry
+ */
+export interface PostVoteEntryAmino {
+  post_id?: string;
+  voter?: string;
+}
+export interface PostVoteEntryAminoMsg {
+  type: "/sparkdream.forum.v1.PostVoteEntry";
+  value: PostVoteEntryAmino;
+}
+/**
+ * ForumRepEpochCounterEntry is one (author, tag) -> ForumRepEpochCounter
+ * tuple, flattened for genesis import/export.
+ * @name ForumRepEpochCounterEntry
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.ForumRepEpochCounterEntry
+ */
+export interface ForumRepEpochCounterEntry {
+  author: string;
+  tag: string;
+  counter: ForumRepEpochCounter;
+}
+export interface ForumRepEpochCounterEntryProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.ForumRepEpochCounterEntry";
+  value: Uint8Array;
+}
+/**
+ * ForumRepEpochCounterEntry is one (author, tag) -> ForumRepEpochCounter
+ * tuple, flattened for genesis import/export.
+ * @name ForumRepEpochCounterEntryAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.ForumRepEpochCounterEntry
+ */
+export interface ForumRepEpochCounterEntryAmino {
+  author?: string;
+  tag?: string;
+  counter?: ForumRepEpochCounterAmino;
+}
+export interface ForumRepEpochCounterEntryAminoMsg {
+  type: "/sparkdream.forum.v1.ForumRepEpochCounterEntry";
+  value: ForumRepEpochCounterEntryAmino;
 }
 /**
  * ProposalCountEntry is one (thread_id, sentinel) -> count tuple of the
@@ -135,6 +288,34 @@ export interface ProposalCountEntryAminoMsg {
   type: "/sparkdream.forum.v1.ProposalCountEntry";
   value: ProposalCountEntryAmino;
 }
+/**
+ * PromotionQueueEntry is one queued author and the height it was enqueued.
+ * @name PromotionQueueEntry
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.PromotionQueueEntry
+ */
+export interface PromotionQueueEntry {
+  address: string;
+  enqueuedAt: bigint;
+}
+export interface PromotionQueueEntryProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.PromotionQueueEntry";
+  value: Uint8Array;
+}
+/**
+ * PromotionQueueEntry is one queued author and the height it was enqueued.
+ * @name PromotionQueueEntryAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.PromotionQueueEntry
+ */
+export interface PromotionQueueEntryAmino {
+  address?: string;
+  enqueued_at?: string;
+}
+export interface PromotionQueueEntryAminoMsg {
+  type: "/sparkdream.forum.v1.PromotionQueueEntry";
+  value: PromotionQueueEntryAmino;
+}
 function createBaseGenesisState(): GenesisState {
   return {
     params: Params.fromPartial({}),
@@ -153,7 +334,13 @@ function createBaseGenesisState(): GenesisState {
     threadFollowCountMap: [],
     archiveMetadataMap: [],
     postCount: BigInt(0),
-    proposalCountMap: []
+    proposalCountMap: [],
+    postConvictionStakeList: [],
+    postConvictionStakeCount: BigInt(0),
+    postVoteList: [],
+    forumRepEpochCounterList: [],
+    pendingStakeSlashList: [],
+    promotionQueue: []
   };
 }
 /**
@@ -216,6 +403,24 @@ export const GenesisState = {
     for (const v of message.proposalCountMap) {
       ProposalCountEntry.encode(v!, writer.uint32(138).fork()).ldelim();
     }
+    for (const v of message.postConvictionStakeList) {
+      PostConvictionStake.encode(v!, writer.uint32(146).fork()).ldelim();
+    }
+    if (message.postConvictionStakeCount !== BigInt(0)) {
+      writer.uint32(152).uint64(message.postConvictionStakeCount);
+    }
+    for (const v of message.postVoteList) {
+      PostVoteEntry.encode(v!, writer.uint32(162).fork()).ldelim();
+    }
+    for (const v of message.forumRepEpochCounterList) {
+      ForumRepEpochCounterEntry.encode(v!, writer.uint32(170).fork()).ldelim();
+    }
+    for (const v of message.pendingStakeSlashList) {
+      PendingStakeSlash.encode(v!, writer.uint32(178).fork()).ldelim();
+    }
+    for (const v of message.promotionQueue) {
+      PromotionQueueEntry.encode(v!, writer.uint32(186).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -276,6 +481,24 @@ export const GenesisState = {
         case 17:
           message.proposalCountMap.push(ProposalCountEntry.decode(reader, reader.uint32()));
           break;
+        case 18:
+          message.postConvictionStakeList.push(PostConvictionStake.decode(reader, reader.uint32()));
+          break;
+        case 19:
+          message.postConvictionStakeCount = reader.uint64();
+          break;
+        case 20:
+          message.postVoteList.push(PostVoteEntry.decode(reader, reader.uint32()));
+          break;
+        case 21:
+          message.forumRepEpochCounterList.push(ForumRepEpochCounterEntry.decode(reader, reader.uint32()));
+          break;
+        case 22:
+          message.pendingStakeSlashList.push(PendingStakeSlash.decode(reader, reader.uint32()));
+          break;
+        case 23:
+          message.promotionQueue.push(PromotionQueueEntry.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -302,6 +525,12 @@ export const GenesisState = {
     message.archiveMetadataMap = object.archiveMetadataMap?.map(e => ArchiveMetadata.fromPartial(e)) || [];
     message.postCount = object.postCount !== undefined && object.postCount !== null ? BigInt(object.postCount.toString()) : BigInt(0);
     message.proposalCountMap = object.proposalCountMap?.map(e => ProposalCountEntry.fromPartial(e)) || [];
+    message.postConvictionStakeList = object.postConvictionStakeList?.map(e => PostConvictionStake.fromPartial(e)) || [];
+    message.postConvictionStakeCount = object.postConvictionStakeCount !== undefined && object.postConvictionStakeCount !== null ? BigInt(object.postConvictionStakeCount.toString()) : BigInt(0);
+    message.postVoteList = object.postVoteList?.map(e => PostVoteEntry.fromPartial(e)) || [];
+    message.forumRepEpochCounterList = object.forumRepEpochCounterList?.map(e => ForumRepEpochCounterEntry.fromPartial(e)) || [];
+    message.pendingStakeSlashList = object.pendingStakeSlashList?.map(e => PendingStakeSlash.fromPartial(e)) || [];
+    message.promotionQueue = object.promotionQueue?.map(e => PromotionQueueEntry.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -329,6 +558,14 @@ export const GenesisState = {
       message.postCount = BigInt(object.post_count);
     }
     message.proposalCountMap = object.proposal_count_map?.map(e => ProposalCountEntry.fromAmino(e)) || [];
+    message.postConvictionStakeList = object.post_conviction_stake_list?.map(e => PostConvictionStake.fromAmino(e)) || [];
+    if (object.post_conviction_stake_count !== undefined && object.post_conviction_stake_count !== null) {
+      message.postConvictionStakeCount = BigInt(object.post_conviction_stake_count);
+    }
+    message.postVoteList = object.post_vote_list?.map(e => PostVoteEntry.fromAmino(e)) || [];
+    message.forumRepEpochCounterList = object.forum_rep_epoch_counter_list?.map(e => ForumRepEpochCounterEntry.fromAmino(e)) || [];
+    message.pendingStakeSlashList = object.pending_stake_slash_list?.map(e => PendingStakeSlash.fromAmino(e)) || [];
+    message.promotionQueue = object.promotion_queue?.map(e => PromotionQueueEntry.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -406,6 +643,32 @@ export const GenesisState = {
     } else {
       obj.proposal_count_map = message.proposalCountMap;
     }
+    if (message.postConvictionStakeList) {
+      obj.post_conviction_stake_list = message.postConvictionStakeList.map(e => e ? PostConvictionStake.toAmino(e) : undefined);
+    } else {
+      obj.post_conviction_stake_list = message.postConvictionStakeList;
+    }
+    obj.post_conviction_stake_count = message.postConvictionStakeCount !== BigInt(0) ? message.postConvictionStakeCount?.toString() : undefined;
+    if (message.postVoteList) {
+      obj.post_vote_list = message.postVoteList.map(e => e ? PostVoteEntry.toAmino(e) : undefined);
+    } else {
+      obj.post_vote_list = message.postVoteList;
+    }
+    if (message.forumRepEpochCounterList) {
+      obj.forum_rep_epoch_counter_list = message.forumRepEpochCounterList.map(e => e ? ForumRepEpochCounterEntry.toAmino(e) : undefined);
+    } else {
+      obj.forum_rep_epoch_counter_list = message.forumRepEpochCounterList;
+    }
+    if (message.pendingStakeSlashList) {
+      obj.pending_stake_slash_list = message.pendingStakeSlashList.map(e => e ? PendingStakeSlash.toAmino(e) : undefined);
+    } else {
+      obj.pending_stake_slash_list = message.pendingStakeSlashList;
+    }
+    if (message.promotionQueue) {
+      obj.promotion_queue = message.promotionQueue.map(e => e ? PromotionQueueEntry.toAmino(e) : undefined);
+    } else {
+      obj.promotion_queue = message.promotionQueue;
+    }
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {
@@ -421,6 +684,264 @@ export const GenesisState = {
     return {
       typeUrl: "/sparkdream.forum.v1.GenesisState",
       value: GenesisState.encode(message).finish()
+    };
+  }
+};
+function createBasePendingStakeSlash(): PendingStakeSlash {
+  return {
+    postId: BigInt(0),
+    author: ""
+  };
+}
+/**
+ * PendingStakeSlash is a post whose conviction stakes are still to be
+ * slashed, with the author the reputation is clawed back from (kept here
+ * because the post itself may be pruned before the slash finishes).
+ * @name PendingStakeSlash
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.PendingStakeSlash
+ */
+export const PendingStakeSlash = {
+  typeUrl: "/sparkdream.forum.v1.PendingStakeSlash",
+  encode(message: PendingStakeSlash, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.postId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.postId);
+    }
+    if (message.author !== "") {
+      writer.uint32(18).string(message.author);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): PendingStakeSlash {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePendingStakeSlash();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.postId = reader.uint64();
+          break;
+        case 2:
+          message.author = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<PendingStakeSlash>): PendingStakeSlash {
+    const message = createBasePendingStakeSlash();
+    message.postId = object.postId !== undefined && object.postId !== null ? BigInt(object.postId.toString()) : BigInt(0);
+    message.author = object.author ?? "";
+    return message;
+  },
+  fromAmino(object: PendingStakeSlashAmino): PendingStakeSlash {
+    const message = createBasePendingStakeSlash();
+    if (object.post_id !== undefined && object.post_id !== null) {
+      message.postId = BigInt(object.post_id);
+    }
+    if (object.author !== undefined && object.author !== null) {
+      message.author = object.author;
+    }
+    return message;
+  },
+  toAmino(message: PendingStakeSlash): PendingStakeSlashAmino {
+    const obj: any = {};
+    obj.post_id = message.postId !== BigInt(0) ? message.postId?.toString() : undefined;
+    obj.author = message.author === "" ? undefined : message.author;
+    return obj;
+  },
+  fromAminoMsg(object: PendingStakeSlashAminoMsg): PendingStakeSlash {
+    return PendingStakeSlash.fromAmino(object.value);
+  },
+  fromProtoMsg(message: PendingStakeSlashProtoMsg): PendingStakeSlash {
+    return PendingStakeSlash.decode(message.value);
+  },
+  toProto(message: PendingStakeSlash): Uint8Array {
+    return PendingStakeSlash.encode(message).finish();
+  },
+  toProtoMsg(message: PendingStakeSlash): PendingStakeSlashProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.PendingStakeSlash",
+      value: PendingStakeSlash.encode(message).finish()
+    };
+  }
+};
+function createBasePostVoteEntry(): PostVoteEntry {
+  return {
+    postId: BigInt(0),
+    voter: ""
+  };
+}
+/**
+ * PostVoteEntry is one (post_id, voter) dedup key of the PostVote set.
+ * @name PostVoteEntry
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.PostVoteEntry
+ */
+export const PostVoteEntry = {
+  typeUrl: "/sparkdream.forum.v1.PostVoteEntry",
+  encode(message: PostVoteEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.postId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.postId);
+    }
+    if (message.voter !== "") {
+      writer.uint32(18).string(message.voter);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): PostVoteEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePostVoteEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.postId = reader.uint64();
+          break;
+        case 2:
+          message.voter = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<PostVoteEntry>): PostVoteEntry {
+    const message = createBasePostVoteEntry();
+    message.postId = object.postId !== undefined && object.postId !== null ? BigInt(object.postId.toString()) : BigInt(0);
+    message.voter = object.voter ?? "";
+    return message;
+  },
+  fromAmino(object: PostVoteEntryAmino): PostVoteEntry {
+    const message = createBasePostVoteEntry();
+    if (object.post_id !== undefined && object.post_id !== null) {
+      message.postId = BigInt(object.post_id);
+    }
+    if (object.voter !== undefined && object.voter !== null) {
+      message.voter = object.voter;
+    }
+    return message;
+  },
+  toAmino(message: PostVoteEntry): PostVoteEntryAmino {
+    const obj: any = {};
+    obj.post_id = message.postId !== BigInt(0) ? message.postId?.toString() : undefined;
+    obj.voter = message.voter === "" ? undefined : message.voter;
+    return obj;
+  },
+  fromAminoMsg(object: PostVoteEntryAminoMsg): PostVoteEntry {
+    return PostVoteEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: PostVoteEntryProtoMsg): PostVoteEntry {
+    return PostVoteEntry.decode(message.value);
+  },
+  toProto(message: PostVoteEntry): Uint8Array {
+    return PostVoteEntry.encode(message).finish();
+  },
+  toProtoMsg(message: PostVoteEntry): PostVoteEntryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.PostVoteEntry",
+      value: PostVoteEntry.encode(message).finish()
+    };
+  }
+};
+function createBaseForumRepEpochCounterEntry(): ForumRepEpochCounterEntry {
+  return {
+    author: "",
+    tag: "",
+    counter: ForumRepEpochCounter.fromPartial({})
+  };
+}
+/**
+ * ForumRepEpochCounterEntry is one (author, tag) -> ForumRepEpochCounter
+ * tuple, flattened for genesis import/export.
+ * @name ForumRepEpochCounterEntry
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.ForumRepEpochCounterEntry
+ */
+export const ForumRepEpochCounterEntry = {
+  typeUrl: "/sparkdream.forum.v1.ForumRepEpochCounterEntry",
+  encode(message: ForumRepEpochCounterEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.author !== "") {
+      writer.uint32(10).string(message.author);
+    }
+    if (message.tag !== "") {
+      writer.uint32(18).string(message.tag);
+    }
+    if (message.counter !== undefined) {
+      ForumRepEpochCounter.encode(message.counter, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): ForumRepEpochCounterEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseForumRepEpochCounterEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.author = reader.string();
+          break;
+        case 2:
+          message.tag = reader.string();
+          break;
+        case 3:
+          message.counter = ForumRepEpochCounter.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<ForumRepEpochCounterEntry>): ForumRepEpochCounterEntry {
+    const message = createBaseForumRepEpochCounterEntry();
+    message.author = object.author ?? "";
+    message.tag = object.tag ?? "";
+    message.counter = object.counter !== undefined && object.counter !== null ? ForumRepEpochCounter.fromPartial(object.counter) : undefined;
+    return message;
+  },
+  fromAmino(object: ForumRepEpochCounterEntryAmino): ForumRepEpochCounterEntry {
+    const message = createBaseForumRepEpochCounterEntry();
+    if (object.author !== undefined && object.author !== null) {
+      message.author = object.author;
+    }
+    if (object.tag !== undefined && object.tag !== null) {
+      message.tag = object.tag;
+    }
+    if (object.counter !== undefined && object.counter !== null) {
+      message.counter = ForumRepEpochCounter.fromAmino(object.counter);
+    }
+    return message;
+  },
+  toAmino(message: ForumRepEpochCounterEntry): ForumRepEpochCounterEntryAmino {
+    const obj: any = {};
+    obj.author = message.author === "" ? undefined : message.author;
+    obj.tag = message.tag === "" ? undefined : message.tag;
+    obj.counter = message.counter ? ForumRepEpochCounter.toAmino(message.counter) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: ForumRepEpochCounterEntryAminoMsg): ForumRepEpochCounterEntry {
+    return ForumRepEpochCounterEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: ForumRepEpochCounterEntryProtoMsg): ForumRepEpochCounterEntry {
+    return ForumRepEpochCounterEntry.decode(message.value);
+  },
+  toProto(message: ForumRepEpochCounterEntry): Uint8Array {
+    return ForumRepEpochCounterEntry.encode(message).finish();
+  },
+  toProtoMsg(message: ForumRepEpochCounterEntry): ForumRepEpochCounterEntryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.ForumRepEpochCounterEntry",
+      value: ForumRepEpochCounterEntry.encode(message).finish()
     };
   }
 };
@@ -515,6 +1036,87 @@ export const ProposalCountEntry = {
     return {
       typeUrl: "/sparkdream.forum.v1.ProposalCountEntry",
       value: ProposalCountEntry.encode(message).finish()
+    };
+  }
+};
+function createBasePromotionQueueEntry(): PromotionQueueEntry {
+  return {
+    address: "",
+    enqueuedAt: BigInt(0)
+  };
+}
+/**
+ * PromotionQueueEntry is one queued author and the height it was enqueued.
+ * @name PromotionQueueEntry
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.PromotionQueueEntry
+ */
+export const PromotionQueueEntry = {
+  typeUrl: "/sparkdream.forum.v1.PromotionQueueEntry",
+  encode(message: PromotionQueueEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.address !== "") {
+      writer.uint32(10).string(message.address);
+    }
+    if (message.enqueuedAt !== BigInt(0)) {
+      writer.uint32(16).int64(message.enqueuedAt);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): PromotionQueueEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePromotionQueueEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.address = reader.string();
+          break;
+        case 2:
+          message.enqueuedAt = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<PromotionQueueEntry>): PromotionQueueEntry {
+    const message = createBasePromotionQueueEntry();
+    message.address = object.address ?? "";
+    message.enqueuedAt = object.enqueuedAt !== undefined && object.enqueuedAt !== null ? BigInt(object.enqueuedAt.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: PromotionQueueEntryAmino): PromotionQueueEntry {
+    const message = createBasePromotionQueueEntry();
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    }
+    if (object.enqueued_at !== undefined && object.enqueued_at !== null) {
+      message.enqueuedAt = BigInt(object.enqueued_at);
+    }
+    return message;
+  },
+  toAmino(message: PromotionQueueEntry): PromotionQueueEntryAmino {
+    const obj: any = {};
+    obj.address = message.address === "" ? undefined : message.address;
+    obj.enqueued_at = message.enqueuedAt !== BigInt(0) ? message.enqueuedAt?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: PromotionQueueEntryAminoMsg): PromotionQueueEntry {
+    return PromotionQueueEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: PromotionQueueEntryProtoMsg): PromotionQueueEntry {
+    return PromotionQueueEntry.decode(message.value);
+  },
+  toProto(message: PromotionQueueEntry): Uint8Array {
+    return PromotionQueueEntry.encode(message).finish();
+  },
+  toProtoMsg(message: PromotionQueueEntry): PromotionQueueEntryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.PromotionQueueEntry",
+      value: PromotionQueueEntry.encode(message).finish()
     };
   }
 };

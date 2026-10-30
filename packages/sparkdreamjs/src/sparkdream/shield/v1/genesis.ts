@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { Params, ParamsAmino } from "./params";
-import { ShieldedOpRegistration, ShieldedOpRegistrationAmino, UsedNullifier, UsedNullifierAmino, DayFunding, DayFundingAmino, VerificationKey, VerificationKeyAmino, TLEKeySet, TLEKeySetAmino, PendingShieldedOp, PendingShieldedOpAmino, ShieldEpochState, ShieldEpochStateAmino, ShieldEpochDecryptionKey, ShieldEpochDecryptionKeyAmino, IdentityRateLimitEntry, IdentityRateLimitEntryAmino, ShieldDecryptionShare, ShieldDecryptionShareAmino, TLEMissCounterEntry, TLEMissCounterEntryAmino, DKGState, DKGStateAmino, DKGContributionEntry, DKGContributionEntryAmino, DecryptionDemandEntry, DecryptionDemandEntryAmino, DKGComplaint, DKGComplaintAmino } from "./types";
+import { ShieldedOpRegistration, ShieldedOpRegistrationAmino, UsedNullifier, UsedNullifierAmino, DayFunding, DayFundingAmino, VerificationKey, VerificationKeyAmino, TLEKeySet, TLEKeySetAmino, PendingShieldedOp, PendingShieldedOpAmino, ShieldEpochState, ShieldEpochStateAmino, ShieldEpochDecryptionKey, ShieldEpochDecryptionKeyAmino, IdentityRateLimitEntry, IdentityRateLimitEntryAmino, ShieldDecryptionShare, ShieldDecryptionShareAmino, TLEMissCounterEntry, TLEMissCounterEntryAmino, DKGState, DKGStateAmino, DKGContributionEntry, DKGContributionEntryAmino, DecryptionDemandEntry, DecryptionDemandEntryAmino, DKGComplaint, DKGComplaintAmino, TLEParticipationEntry, TLEParticipationEntryAmino, EpochFeeLedger, EpochFeeLedgerAmino } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -86,6 +86,24 @@ export interface GenesisState {
    * DKG complaints for the current round
    */
   dkgComplaints: DKGComplaint[];
+  /**
+   * TLE liveness ring buffer (validator, slot) -> participated.
+   */
+  tleParticipation: TLEParticipationEntry[];
+  /**
+   * Demanded epochs judged under the current key set (slot = count % window).
+   */
+  tleJudgedEpochs: bigint;
+  /**
+   * Fees paid in the current shield epoch (params.max_fees_per_epoch).
+   */
+  epochFeeLedger: EpochFeeLedger;
+  /**
+   * Nullifier domains no live op uses any more, each with the registration
+   * of the last op that used it: its scoping rule stays binding (pruning,
+   * re-registration compatibility) while the domain still holds nullifiers.
+   */
+  retiredDomains: ShieldedOpRegistration[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.shield.v1.GenesisState";
@@ -174,6 +192,24 @@ export interface GenesisStateAmino {
    * DKG complaints for the current round
    */
   dkg_complaints?: DKGComplaintAmino[];
+  /**
+   * TLE liveness ring buffer (validator, slot) -> participated.
+   */
+  tle_participation?: TLEParticipationEntryAmino[];
+  /**
+   * Demanded epochs judged under the current key set (slot = count % window).
+   */
+  tle_judged_epochs?: string;
+  /**
+   * Fees paid in the current shield epoch (params.max_fees_per_epoch).
+   */
+  epoch_fee_ledger?: EpochFeeLedgerAmino;
+  /**
+   * Nullifier domains no live op uses any more, each with the registration
+   * of the last op that used it: its scoping rule stays binding (pruning,
+   * re-registration compatibility) while the domain still holds nullifiers.
+   */
+  retired_domains?: ShieldedOpRegistrationAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.shield.v1.GenesisState";
@@ -199,7 +235,11 @@ function createBaseGenesisState(): GenesisState {
     dkgContributions: [],
     dkgRegistrations: [],
     decryptionDemands: [],
-    dkgComplaints: []
+    dkgComplaints: [],
+    tleParticipation: [],
+    tleJudgedEpochs: BigInt(0),
+    epochFeeLedger: EpochFeeLedger.fromPartial({}),
+    retiredDomains: []
   };
 }
 /**
@@ -268,6 +308,18 @@ export const GenesisState = {
     for (const v of message.dkgComplaints) {
       DKGComplaint.encode(v!, writer.uint32(154).fork()).ldelim();
     }
+    for (const v of message.tleParticipation) {
+      TLEParticipationEntry.encode(v!, writer.uint32(162).fork()).ldelim();
+    }
+    if (message.tleJudgedEpochs !== BigInt(0)) {
+      writer.uint32(168).uint64(message.tleJudgedEpochs);
+    }
+    if (message.epochFeeLedger !== undefined) {
+      EpochFeeLedger.encode(message.epochFeeLedger, writer.uint32(178).fork()).ldelim();
+    }
+    for (const v of message.retiredDomains) {
+      ShieldedOpRegistration.encode(v!, writer.uint32(186).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -334,6 +386,18 @@ export const GenesisState = {
         case 19:
           message.dkgComplaints.push(DKGComplaint.decode(reader, reader.uint32()));
           break;
+        case 20:
+          message.tleParticipation.push(TLEParticipationEntry.decode(reader, reader.uint32()));
+          break;
+        case 21:
+          message.tleJudgedEpochs = reader.uint64();
+          break;
+        case 22:
+          message.epochFeeLedger = EpochFeeLedger.decode(reader, reader.uint32());
+          break;
+        case 23:
+          message.retiredDomains.push(ShieldedOpRegistration.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -362,6 +426,10 @@ export const GenesisState = {
     message.dkgRegistrations = object.dkgRegistrations?.map(e => DKGContributionEntry.fromPartial(e)) || [];
     message.decryptionDemands = object.decryptionDemands?.map(e => DecryptionDemandEntry.fromPartial(e)) || [];
     message.dkgComplaints = object.dkgComplaints?.map(e => DKGComplaint.fromPartial(e)) || [];
+    message.tleParticipation = object.tleParticipation?.map(e => TLEParticipationEntry.fromPartial(e)) || [];
+    message.tleJudgedEpochs = object.tleJudgedEpochs !== undefined && object.tleJudgedEpochs !== null ? BigInt(object.tleJudgedEpochs.toString()) : BigInt(0);
+    message.epochFeeLedger = object.epochFeeLedger !== undefined && object.epochFeeLedger !== null ? EpochFeeLedger.fromPartial(object.epochFeeLedger) : undefined;
+    message.retiredDomains = object.retiredDomains?.map(e => ShieldedOpRegistration.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -395,6 +463,14 @@ export const GenesisState = {
     message.dkgRegistrations = object.dkg_registrations?.map(e => DKGContributionEntry.fromAmino(e)) || [];
     message.decryptionDemands = object.decryption_demands?.map(e => DecryptionDemandEntry.fromAmino(e)) || [];
     message.dkgComplaints = object.dkg_complaints?.map(e => DKGComplaint.fromAmino(e)) || [];
+    message.tleParticipation = object.tle_participation?.map(e => TLEParticipationEntry.fromAmino(e)) || [];
+    if (object.tle_judged_epochs !== undefined && object.tle_judged_epochs !== null) {
+      message.tleJudgedEpochs = BigInt(object.tle_judged_epochs);
+    }
+    if (object.epoch_fee_ledger !== undefined && object.epoch_fee_ledger !== null) {
+      message.epochFeeLedger = EpochFeeLedger.fromAmino(object.epoch_fee_ledger);
+    }
+    message.retiredDomains = object.retired_domains?.map(e => ShieldedOpRegistration.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -473,6 +549,18 @@ export const GenesisState = {
       obj.dkg_complaints = message.dkgComplaints.map(e => e ? DKGComplaint.toAmino(e) : undefined);
     } else {
       obj.dkg_complaints = message.dkgComplaints;
+    }
+    if (message.tleParticipation) {
+      obj.tle_participation = message.tleParticipation.map(e => e ? TLEParticipationEntry.toAmino(e) : undefined);
+    } else {
+      obj.tle_participation = message.tleParticipation;
+    }
+    obj.tle_judged_epochs = message.tleJudgedEpochs !== BigInt(0) ? message.tleJudgedEpochs?.toString() : undefined;
+    obj.epoch_fee_ledger = message.epochFeeLedger ? EpochFeeLedger.toAmino(message.epochFeeLedger) : undefined;
+    if (message.retiredDomains) {
+      obj.retired_domains = message.retiredDomains.map(e => e ? ShieldedOpRegistration.toAmino(e) : undefined);
+    } else {
+      obj.retired_domains = message.retiredDomains;
     }
     return obj;
   },

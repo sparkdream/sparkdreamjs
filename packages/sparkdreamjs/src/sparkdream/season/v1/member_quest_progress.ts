@@ -28,6 +28,10 @@ export interface MemberQuestProgress {
    * Progress on each objective (parallel array with quest objectives)
    */
   objectiveProgress: bigint[];
+  /**
+   * Quest.objectives_version the progress was recorded against (SEA-32).
+   */
+  objectivesVersion: bigint;
 }
 export interface MemberQuestProgressProtoMsg {
   typeUrl: "/sparkdream.season.v1.MemberQuestProgress";
@@ -60,6 +64,10 @@ export interface MemberQuestProgressAmino {
    * Progress on each objective (parallel array with quest objectives)
    */
   objective_progress?: string[];
+  /**
+   * Quest.objectives_version the progress was recorded against (SEA-32).
+   */
+  objectives_version?: string;
 }
 export interface MemberQuestProgressAminoMsg {
   type: "/sparkdream.season.v1.MemberQuestProgress";
@@ -71,7 +79,8 @@ function createBaseMemberQuestProgress(): MemberQuestProgress {
     completed: false,
     completedBlock: BigInt(0),
     lastAttemptBlock: BigInt(0),
-    objectiveProgress: []
+    objectiveProgress: [],
+    objectivesVersion: BigInt(0)
   };
 }
 /**
@@ -100,6 +109,9 @@ export const MemberQuestProgress = {
       writer.uint64(v);
     }
     writer.ldelim();
+    if (message.objectivesVersion !== BigInt(0)) {
+      writer.uint32(48).uint64(message.objectivesVersion);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MemberQuestProgress {
@@ -131,6 +143,9 @@ export const MemberQuestProgress = {
             message.objectiveProgress.push(reader.uint64());
           }
           break;
+        case 6:
+          message.objectivesVersion = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -145,6 +160,7 @@ export const MemberQuestProgress = {
     message.completedBlock = object.completedBlock !== undefined && object.completedBlock !== null ? BigInt(object.completedBlock.toString()) : BigInt(0);
     message.lastAttemptBlock = object.lastAttemptBlock !== undefined && object.lastAttemptBlock !== null ? BigInt(object.lastAttemptBlock.toString()) : BigInt(0);
     message.objectiveProgress = object.objectiveProgress?.map(e => BigInt(e.toString())) || [];
+    message.objectivesVersion = object.objectivesVersion !== undefined && object.objectivesVersion !== null ? BigInt(object.objectivesVersion.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: MemberQuestProgressAmino): MemberQuestProgress {
@@ -162,6 +178,9 @@ export const MemberQuestProgress = {
       message.lastAttemptBlock = BigInt(object.last_attempt_block);
     }
     message.objectiveProgress = object.objective_progress?.map(e => BigInt(e)) || [];
+    if (object.objectives_version !== undefined && object.objectives_version !== null) {
+      message.objectivesVersion = BigInt(object.objectives_version);
+    }
     return message;
   },
   toAmino(message: MemberQuestProgress): MemberQuestProgressAmino {
@@ -175,6 +194,7 @@ export const MemberQuestProgress = {
     } else {
       obj.objective_progress = message.objectiveProgress;
     }
+    obj.objectives_version = message.objectivesVersion !== BigInt(0) ? message.objectivesVersion?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: MemberQuestProgressAminoMsg): MemberQuestProgress {

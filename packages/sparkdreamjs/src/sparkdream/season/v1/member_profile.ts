@@ -84,6 +84,12 @@ export interface MemberProfile {
    * Archived seasonal titles from past seasons
    */
   archivedTitles: string[];
+  /**
+   * Season of the member's last completed jury duty (0 = never). A
+   * rep/jury retro-PGF nomination needs it to equal the current season
+   * (SEA-30).
+   */
+  lastJuryDutySeason: bigint;
 }
 export interface MemberProfileProtoMsg {
   typeUrl: "/sparkdream.season.v1.MemberProfile";
@@ -172,6 +178,12 @@ export interface MemberProfileAmino {
    * Archived seasonal titles from past seasons
    */
   archived_titles?: string[];
+  /**
+   * Season of the member's last completed jury duty (0 = never). A
+   * rep/jury retro-PGF nomination needs it to equal the current season
+   * (SEA-30).
+   */
+  last_jury_duty_season?: string;
 }
 export interface MemberProfileAminoMsg {
   type: "/sparkdream.season.v1.MemberProfile";
@@ -197,7 +209,8 @@ function createBaseMemberProfile(): MemberProfile {
     lastActiveEpoch: BigInt(0),
     unlockedTitles: [],
     achievements: [],
-    archivedTitles: []
+    archivedTitles: [],
+    lastJuryDutySeason: BigInt(0)
   };
 }
 /**
@@ -266,6 +279,9 @@ export const MemberProfile = {
     for (const v of message.archivedTitles) {
       writer.uint32(154).string(v!);
     }
+    if (message.lastJuryDutySeason !== BigInt(0)) {
+      writer.uint32(160).uint64(message.lastJuryDutySeason);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MemberProfile {
@@ -332,6 +348,9 @@ export const MemberProfile = {
         case 19:
           message.archivedTitles.push(reader.string());
           break;
+        case 20:
+          message.lastJuryDutySeason = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -360,6 +379,7 @@ export const MemberProfile = {
     message.unlockedTitles = object.unlockedTitles?.map(e => e) || [];
     message.achievements = object.achievements?.map(e => e) || [];
     message.archivedTitles = object.archivedTitles?.map(e => e) || [];
+    message.lastJuryDutySeason = object.lastJuryDutySeason !== undefined && object.lastJuryDutySeason !== null ? BigInt(object.lastJuryDutySeason.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: MemberProfileAmino): MemberProfile {
@@ -415,6 +435,9 @@ export const MemberProfile = {
     message.unlockedTitles = object.unlocked_titles?.map(e => e) || [];
     message.achievements = object.achievements?.map(e => e) || [];
     message.archivedTitles = object.archived_titles?.map(e => e) || [];
+    if (object.last_jury_duty_season !== undefined && object.last_jury_duty_season !== null) {
+      message.lastJuryDutySeason = BigInt(object.last_jury_duty_season);
+    }
     return message;
   },
   toAmino(message: MemberProfile): MemberProfileAmino {
@@ -450,6 +473,7 @@ export const MemberProfile = {
     } else {
       obj.archived_titles = message.archivedTitles;
     }
+    obj.last_jury_duty_season = message.lastJuryDutySeason !== BigInt(0) ? message.lastJuryDutySeason?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: MemberProfileAminoMsg): MemberProfile {

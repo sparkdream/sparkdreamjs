@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetPolicyPermissionsRequest, QueryGetPolicyPermissionsResponse, QueryAllPolicyPermissionsRequest, QueryAllPolicyPermissionsResponse, QueryGetDecisionPolicyRequest, QueryGetDecisionPolicyResponse, QueryAllDecisionPoliciesRequest, QueryAllDecisionPoliciesResponse, QueryGetGroupRequest, QueryGetGroupResponse, QueryAllGroupRequest, QueryAllGroupResponse, QueryGetCouncilMembersRequest, QueryGetCouncilMembersResponse, QueryGetProposalRequest, QueryGetProposalResponse, QueryListProposalsRequest, QueryListProposalsResponse, QueryGetProposalVotesRequest, QueryGetProposalVotesResponse, QueryGetCategoryRequest, QueryGetCategoryResponse, QueryAllCategoryRequest, QueryAllCategoryResponse, QueryGetRecurringSpendRequest, QueryGetRecurringSpendResponse, QueryListRecurringSpendsRequest, QueryListRecurringSpendsResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetPolicyPermissionsRequest, QueryGetPolicyPermissionsResponse, QueryAllPolicyPermissionsRequest, QueryAllPolicyPermissionsResponse, QueryGetDecisionPolicyRequest, QueryGetDecisionPolicyResponse, QueryAllDecisionPoliciesRequest, QueryAllDecisionPoliciesResponse, QueryGetGroupRequest, QueryGetGroupResponse, QueryAllGroupRequest, QueryAllGroupResponse, QueryGetCouncilMembersRequest, QueryGetCouncilMembersResponse, QueryGetProposalRequest, QueryGetProposalResponse, QueryListProposalsRequest, QueryListProposalsResponse, QueryGetProposalVotesRequest, QueryGetProposalVotesResponse, QueryGetCategoryRequest, QueryGetCategoryResponse, QueryAllCategoryRequest, QueryAllCategoryResponse, QueryGetRecurringSpendRequest, QueryGetRecurringSpendResponse, QueryListRecurringSpendsRequest, QueryListRecurringSpendsResponse, QueryGetPollRequest, QueryGetPollResponse, QueryListPollsRequest, QueryListPollsResponse, QueryGetPollVotesRequest, QueryGetPollVotesResponse, QueryGetProposalVoterTreeRequest, QueryGetProposalVoterTreeResponse, QueryGetPollVoterTreeRequest, QueryGetPollVoterTreeResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -45,6 +45,25 @@ export interface Query {
    * filtered by authority (council policy address) or recipient.
    */
   listRecurringSpends(request: QueryListRecurringSpendsRequest): Promise<QueryListRecurringSpendsResponse>;
+  /** GetPoll returns a poll. */
+  getPoll(request: QueryGetPollRequest): Promise<QueryGetPollResponse>;
+  /**
+   * ListPolls lists stored polls in ID order (pagination.reverse for newest
+   * first), optionally for one group and one status.
+   */
+  listPolls(request: QueryListPollsRequest): Promise<QueryListPollsResponse>;
+  /** GetPollVotes lists the open votes on a poll. */
+  getPollVotes(request: QueryGetPollVotesRequest): Promise<QueryGetPollVotesResponse>;
+  /**
+   * GetProposalVoterTree returns a secret-ballot proposal's voter snapshot
+   * (while voting is open), for building a shield proof.
+   */
+  getProposalVoterTree(request: QueryGetProposalVoterTreeRequest): Promise<QueryGetProposalVoterTreeResponse>;
+  /**
+   * GetPollVoterTree returns a secret-ballot poll's voter snapshot (while
+   * voting is open).
+   */
+  getPollVoterTree(request: QueryGetPollVoterTreeRequest): Promise<QueryGetPollVoterTreeResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -153,6 +172,39 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.commons.v1.Query", "ListRecurringSpends", data);
     return promise.then(data => QueryListRecurringSpendsResponse.decode(new BinaryReader(data)));
   };
+  /* GetPoll returns a poll. */
+  getPoll = async (request: QueryGetPollRequest): Promise<QueryGetPollResponse> => {
+    const data = QueryGetPollRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Query", "GetPoll", data);
+    return promise.then(data => QueryGetPollResponse.decode(new BinaryReader(data)));
+  };
+  /* ListPolls lists stored polls in ID order (pagination.reverse for newest
+   first), optionally for one group and one status. */
+  listPolls = async (request: QueryListPollsRequest): Promise<QueryListPollsResponse> => {
+    const data = QueryListPollsRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Query", "ListPolls", data);
+    return promise.then(data => QueryListPollsResponse.decode(new BinaryReader(data)));
+  };
+  /* GetPollVotes lists the open votes on a poll. */
+  getPollVotes = async (request: QueryGetPollVotesRequest): Promise<QueryGetPollVotesResponse> => {
+    const data = QueryGetPollVotesRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Query", "GetPollVotes", data);
+    return promise.then(data => QueryGetPollVotesResponse.decode(new BinaryReader(data)));
+  };
+  /* GetProposalVoterTree returns a secret-ballot proposal's voter snapshot
+   (while voting is open), for building a shield proof. */
+  getProposalVoterTree = async (request: QueryGetProposalVoterTreeRequest): Promise<QueryGetProposalVoterTreeResponse> => {
+    const data = QueryGetProposalVoterTreeRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Query", "GetProposalVoterTree", data);
+    return promise.then(data => QueryGetProposalVoterTreeResponse.decode(new BinaryReader(data)));
+  };
+  /* GetPollVoterTree returns a secret-ballot poll's voter snapshot (while
+   voting is open). */
+  getPollVoterTree = async (request: QueryGetPollVoterTreeRequest): Promise<QueryGetPollVoterTreeResponse> => {
+    const data = QueryGetPollVoterTreeRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Query", "GetPollVoterTree", data);
+    return promise.then(data => QueryGetPollVoterTreeResponse.decode(new BinaryReader(data)));
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);
@@ -202,6 +254,21 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     listRecurringSpends(request: QueryListRecurringSpendsRequest): Promise<QueryListRecurringSpendsResponse> {
       return queryService.listRecurringSpends(request);
+    },
+    getPoll(request: QueryGetPollRequest): Promise<QueryGetPollResponse> {
+      return queryService.getPoll(request);
+    },
+    listPolls(request: QueryListPollsRequest): Promise<QueryListPollsResponse> {
+      return queryService.listPolls(request);
+    },
+    getPollVotes(request: QueryGetPollVotesRequest): Promise<QueryGetPollVotesResponse> {
+      return queryService.getPollVotes(request);
+    },
+    getProposalVoterTree(request: QueryGetProposalVoterTreeRequest): Promise<QueryGetProposalVoterTreeResponse> {
+      return queryService.getProposalVoterTree(request);
+    },
+    getPollVoterTree(request: QueryGetPollVoterTreeRequest): Promise<QueryGetPollVoterTreeResponse> {
+      return queryService.getPollVoterTree(request);
     }
   };
 };

@@ -12,6 +12,11 @@ export interface GuildInvite {
   inviter: string;
   createdEpoch: bigint;
   expiresEpoch: bigint;
+  /**
+   * Guild the invite is for. Together with guild_invitee it forms the store
+   * key "<guild_id>:<guild_invitee>" (SEA-25).
+   */
+  guildId: bigint;
 }
 export interface GuildInviteProtoMsg {
   typeUrl: "/sparkdream.season.v1.GuildInvite";
@@ -28,6 +33,11 @@ export interface GuildInviteAmino {
   inviter?: string;
   created_epoch?: string;
   expires_epoch?: string;
+  /**
+   * Guild the invite is for. Together with guild_invitee it forms the store
+   * key "<guild_id>:<guild_invitee>" (SEA-25).
+   */
+  guild_id?: string;
 }
 export interface GuildInviteAminoMsg {
   type: "/sparkdream.season.v1.GuildInvite";
@@ -38,7 +48,8 @@ function createBaseGuildInvite(): GuildInvite {
     guildInvitee: "",
     inviter: "",
     createdEpoch: BigInt(0),
-    expiresEpoch: BigInt(0)
+    expiresEpoch: BigInt(0),
+    guildId: BigInt(0)
   };
 }
 /**
@@ -62,6 +73,9 @@ export const GuildInvite = {
     if (message.expiresEpoch !== BigInt(0)) {
       writer.uint32(32).int64(message.expiresEpoch);
     }
+    if (message.guildId !== BigInt(0)) {
+      writer.uint32(40).uint64(message.guildId);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GuildInvite {
@@ -83,6 +97,9 @@ export const GuildInvite = {
         case 4:
           message.expiresEpoch = reader.int64();
           break;
+        case 5:
+          message.guildId = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -96,6 +113,7 @@ export const GuildInvite = {
     message.inviter = object.inviter ?? "";
     message.createdEpoch = object.createdEpoch !== undefined && object.createdEpoch !== null ? BigInt(object.createdEpoch.toString()) : BigInt(0);
     message.expiresEpoch = object.expiresEpoch !== undefined && object.expiresEpoch !== null ? BigInt(object.expiresEpoch.toString()) : BigInt(0);
+    message.guildId = object.guildId !== undefined && object.guildId !== null ? BigInt(object.guildId.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: GuildInviteAmino): GuildInvite {
@@ -112,6 +130,9 @@ export const GuildInvite = {
     if (object.expires_epoch !== undefined && object.expires_epoch !== null) {
       message.expiresEpoch = BigInt(object.expires_epoch);
     }
+    if (object.guild_id !== undefined && object.guild_id !== null) {
+      message.guildId = BigInt(object.guild_id);
+    }
     return message;
   },
   toAmino(message: GuildInvite): GuildInviteAmino {
@@ -120,6 +141,7 @@ export const GuildInvite = {
     obj.inviter = message.inviter === "" ? undefined : message.inviter;
     obj.created_epoch = message.createdEpoch !== BigInt(0) ? message.createdEpoch?.toString() : undefined;
     obj.expires_epoch = message.expiresEpoch !== BigInt(0) ? message.expiresEpoch?.toString() : undefined;
+    obj.guild_id = message.guildId !== BigInt(0) ? message.guildId?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: GuildInviteAminoMsg): GuildInvite {

@@ -13,6 +13,12 @@ export interface GuildMembership {
   joinedEpoch: bigint;
   leftEpoch: bigint;
   guildsJoinedThisSeason: bigint;
+  /**
+   * Season number guilds_joined_this_season counts for. A different season
+   * reads as zero, so the per-season cap resets without a transition walk
+   * (SEA-27).
+   */
+  guildsJoinedSeason: bigint;
 }
 export interface GuildMembershipProtoMsg {
   typeUrl: "/sparkdream.season.v1.GuildMembership";
@@ -30,6 +36,12 @@ export interface GuildMembershipAmino {
   joined_epoch?: string;
   left_epoch?: string;
   guilds_joined_this_season?: string;
+  /**
+   * Season number guilds_joined_this_season counts for. A different season
+   * reads as zero, so the per-season cap resets without a transition walk
+   * (SEA-27).
+   */
+  guilds_joined_season?: string;
 }
 export interface GuildMembershipAminoMsg {
   type: "/sparkdream.season.v1.GuildMembership";
@@ -41,7 +53,8 @@ function createBaseGuildMembership(): GuildMembership {
     guildId: BigInt(0),
     joinedEpoch: BigInt(0),
     leftEpoch: BigInt(0),
-    guildsJoinedThisSeason: BigInt(0)
+    guildsJoinedThisSeason: BigInt(0),
+    guildsJoinedSeason: BigInt(0)
   };
 }
 /**
@@ -68,6 +81,9 @@ export const GuildMembership = {
     if (message.guildsJoinedThisSeason !== BigInt(0)) {
       writer.uint32(40).uint64(message.guildsJoinedThisSeason);
     }
+    if (message.guildsJoinedSeason !== BigInt(0)) {
+      writer.uint32(48).uint64(message.guildsJoinedSeason);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GuildMembership {
@@ -92,6 +108,9 @@ export const GuildMembership = {
         case 5:
           message.guildsJoinedThisSeason = reader.uint64();
           break;
+        case 6:
+          message.guildsJoinedSeason = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -106,6 +125,7 @@ export const GuildMembership = {
     message.joinedEpoch = object.joinedEpoch !== undefined && object.joinedEpoch !== null ? BigInt(object.joinedEpoch.toString()) : BigInt(0);
     message.leftEpoch = object.leftEpoch !== undefined && object.leftEpoch !== null ? BigInt(object.leftEpoch.toString()) : BigInt(0);
     message.guildsJoinedThisSeason = object.guildsJoinedThisSeason !== undefined && object.guildsJoinedThisSeason !== null ? BigInt(object.guildsJoinedThisSeason.toString()) : BigInt(0);
+    message.guildsJoinedSeason = object.guildsJoinedSeason !== undefined && object.guildsJoinedSeason !== null ? BigInt(object.guildsJoinedSeason.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: GuildMembershipAmino): GuildMembership {
@@ -125,6 +145,9 @@ export const GuildMembership = {
     if (object.guilds_joined_this_season !== undefined && object.guilds_joined_this_season !== null) {
       message.guildsJoinedThisSeason = BigInt(object.guilds_joined_this_season);
     }
+    if (object.guilds_joined_season !== undefined && object.guilds_joined_season !== null) {
+      message.guildsJoinedSeason = BigInt(object.guilds_joined_season);
+    }
     return message;
   },
   toAmino(message: GuildMembership): GuildMembershipAmino {
@@ -134,6 +157,7 @@ export const GuildMembership = {
     obj.joined_epoch = message.joinedEpoch !== BigInt(0) ? message.joinedEpoch?.toString() : undefined;
     obj.left_epoch = message.leftEpoch !== BigInt(0) ? message.leftEpoch?.toString() : undefined;
     obj.guilds_joined_this_season = message.guildsJoinedThisSeason !== BigInt(0) ? message.guildsJoinedThisSeason?.toString() : undefined;
+    obj.guilds_joined_season = message.guildsJoinedSeason !== BigInt(0) ? message.guildsJoinedSeason?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: GuildMembershipAminoMsg): GuildMembership {

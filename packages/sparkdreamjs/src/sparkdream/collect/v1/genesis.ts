@@ -29,6 +29,27 @@ export interface GenesisState {
   hideRecords: HideRecord[];
   hideRecordCount: bigint;
   endorsements: Endorsement[];
+  /**
+   * reaction_dedups persists the per-(voter, target) reaction marker
+   * (1 = upvote, 2 = downvote) so a voter cannot react again after import.
+   */
+  reactionDedups: ReactionCounterEntry[];
+  /**
+   * reaction_limits persists the per-(address, day, category) daily counters.
+   */
+  reactionLimits: ReactionCounterEntry[];
+  /**
+   * Not-adjudicated timeout schedule of the pending curation challenges.
+   * A pending challenge without an entry gets the latest possible deadline
+   * (review creation + challenge window + resolution timeout).
+   */
+  curationChallengeDeadlines: CurationChallengeDeadline[];
+  /**
+   * Members queued for eager promotion of their ephemeral content (admitted
+   * after posting). Hook-driven, so carried verbatim with the enqueue height;
+   * without it an import would leave that content to the lazy TTL-time path.
+   */
+  promotionQueue: PromotionQueueEntry[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.collect.v1.GenesisState";
@@ -59,10 +80,119 @@ export interface GenesisStateAmino {
   hide_records?: HideRecordAmino[];
   hide_record_count?: string;
   endorsements?: EndorsementAmino[];
+  /**
+   * reaction_dedups persists the per-(voter, target) reaction marker
+   * (1 = upvote, 2 = downvote) so a voter cannot react again after import.
+   */
+  reaction_dedups?: ReactionCounterEntryAmino[];
+  /**
+   * reaction_limits persists the per-(address, day, category) daily counters.
+   */
+  reaction_limits?: ReactionCounterEntryAmino[];
+  /**
+   * Not-adjudicated timeout schedule of the pending curation challenges.
+   * A pending challenge without an entry gets the latest possible deadline
+   * (review creation + challenge window + resolution timeout).
+   */
+  curation_challenge_deadlines?: CurationChallengeDeadlineAmino[];
+  /**
+   * Members queued for eager promotion of their ephemeral content (admitted
+   * after posting). Hook-driven, so carried verbatim with the enqueue height;
+   * without it an import would leave that content to the lazy TTL-time path.
+   */
+  promotion_queue?: PromotionQueueEntryAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.collect.v1.GenesisState";
   value: GenesisStateAmino;
+}
+/**
+ * CurationChallengeDeadline is the block height at which the pending
+ * challenge on review_id resolves as not adjudicated.
+ * @name CurationChallengeDeadline
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.CurationChallengeDeadline
+ */
+export interface CurationChallengeDeadline {
+  deadline: bigint;
+  reviewId: bigint;
+}
+export interface CurationChallengeDeadlineProtoMsg {
+  typeUrl: "/sparkdream.collect.v1.CurationChallengeDeadline";
+  value: Uint8Array;
+}
+/**
+ * CurationChallengeDeadline is the block height at which the pending
+ * challenge on review_id resolves as not adjudicated.
+ * @name CurationChallengeDeadlineAmino
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.CurationChallengeDeadline
+ */
+export interface CurationChallengeDeadlineAmino {
+  deadline?: string;
+  review_id?: string;
+}
+export interface CurationChallengeDeadlineAminoMsg {
+  type: "/sparkdream.collect.v1.CurationChallengeDeadline";
+  value: CurationChallengeDeadlineAmino;
+}
+/**
+ * ReactionCounterEntry is one string-keyed uint32 counter (ReactionDedup or
+ * ReactionLimit), flattened for genesis import/export.
+ * @name ReactionCounterEntry
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.ReactionCounterEntry
+ */
+export interface ReactionCounterEntry {
+  key: string;
+  value: number;
+}
+export interface ReactionCounterEntryProtoMsg {
+  typeUrl: "/sparkdream.collect.v1.ReactionCounterEntry";
+  value: Uint8Array;
+}
+/**
+ * ReactionCounterEntry is one string-keyed uint32 counter (ReactionDedup or
+ * ReactionLimit), flattened for genesis import/export.
+ * @name ReactionCounterEntryAmino
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.ReactionCounterEntry
+ */
+export interface ReactionCounterEntryAmino {
+  key?: string;
+  value?: number;
+}
+export interface ReactionCounterEntryAminoMsg {
+  type: "/sparkdream.collect.v1.ReactionCounterEntry";
+  value: ReactionCounterEntryAmino;
+}
+/**
+ * PromotionQueueEntry is one queued author and the height it was enqueued.
+ * @name PromotionQueueEntry
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.PromotionQueueEntry
+ */
+export interface PromotionQueueEntry {
+  address: string;
+  enqueuedAt: bigint;
+}
+export interface PromotionQueueEntryProtoMsg {
+  typeUrl: "/sparkdream.collect.v1.PromotionQueueEntry";
+  value: Uint8Array;
+}
+/**
+ * PromotionQueueEntry is one queued author and the height it was enqueued.
+ * @name PromotionQueueEntryAmino
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.PromotionQueueEntry
+ */
+export interface PromotionQueueEntryAmino {
+  address?: string;
+  enqueued_at?: string;
+}
+export interface PromotionQueueEntryAminoMsg {
+  type: "/sparkdream.collect.v1.PromotionQueueEntry";
+  value: PromotionQueueEntryAmino;
 }
 function createBaseGenesisState(): GenesisState {
   return {
@@ -80,7 +210,11 @@ function createBaseGenesisState(): GenesisState {
     flags: [],
     hideRecords: [],
     hideRecordCount: BigInt(0),
-    endorsements: []
+    endorsements: [],
+    reactionDedups: [],
+    reactionLimits: [],
+    curationChallengeDeadlines: [],
+    promotionQueue: []
   };
 }
 /**
@@ -111,7 +245,7 @@ export const GenesisState = {
       Collaborator.encode(v!, writer.uint32(50).fork()).ldelim();
     }
     for (const v of message.curatorActivities) {
-      CuratorActivity.encode(v!, writer.uint32(130).fork()).ldelim();
+      CuratorActivity.encode(v!, writer.uint32(58).fork()).ldelim();
     }
     for (const v of message.curationReviews) {
       CurationReview.encode(v!, writer.uint32(66).fork()).ldelim();
@@ -136,6 +270,18 @@ export const GenesisState = {
     }
     for (const v of message.endorsements) {
       Endorsement.encode(v!, writer.uint32(122).fork()).ldelim();
+    }
+    for (const v of message.reactionDedups) {
+      ReactionCounterEntry.encode(v!, writer.uint32(130).fork()).ldelim();
+    }
+    for (const v of message.reactionLimits) {
+      ReactionCounterEntry.encode(v!, writer.uint32(138).fork()).ldelim();
+    }
+    for (const v of message.curationChallengeDeadlines) {
+      CurationChallengeDeadline.encode(v!, writer.uint32(146).fork()).ldelim();
+    }
+    for (const v of message.promotionQueue) {
+      PromotionQueueEntry.encode(v!, writer.uint32(154).fork()).ldelim();
     }
     return writer;
   },
@@ -164,7 +310,7 @@ export const GenesisState = {
         case 6:
           message.collaborators.push(Collaborator.decode(reader, reader.uint32()));
           break;
-        case 16:
+        case 7:
           message.curatorActivities.push(CuratorActivity.decode(reader, reader.uint32()));
           break;
         case 8:
@@ -191,6 +337,18 @@ export const GenesisState = {
         case 15:
           message.endorsements.push(Endorsement.decode(reader, reader.uint32()));
           break;
+        case 16:
+          message.reactionDedups.push(ReactionCounterEntry.decode(reader, reader.uint32()));
+          break;
+        case 17:
+          message.reactionLimits.push(ReactionCounterEntry.decode(reader, reader.uint32()));
+          break;
+        case 18:
+          message.curationChallengeDeadlines.push(CurationChallengeDeadline.decode(reader, reader.uint32()));
+          break;
+        case 19:
+          message.promotionQueue.push(PromotionQueueEntry.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -215,6 +373,10 @@ export const GenesisState = {
     message.hideRecords = object.hideRecords?.map(e => HideRecord.fromPartial(e)) || [];
     message.hideRecordCount = object.hideRecordCount !== undefined && object.hideRecordCount !== null ? BigInt(object.hideRecordCount.toString()) : BigInt(0);
     message.endorsements = object.endorsements?.map(e => Endorsement.fromPartial(e)) || [];
+    message.reactionDedups = object.reactionDedups?.map(e => ReactionCounterEntry.fromPartial(e)) || [];
+    message.reactionLimits = object.reactionLimits?.map(e => ReactionCounterEntry.fromPartial(e)) || [];
+    message.curationChallengeDeadlines = object.curationChallengeDeadlines?.map(e => CurationChallengeDeadline.fromPartial(e)) || [];
+    message.promotionQueue = object.promotionQueue?.map(e => PromotionQueueEntry.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -244,6 +406,10 @@ export const GenesisState = {
       message.hideRecordCount = BigInt(object.hide_record_count);
     }
     message.endorsements = object.endorsements?.map(e => Endorsement.fromAmino(e)) || [];
+    message.reactionDedups = object.reaction_dedups?.map(e => ReactionCounterEntry.fromAmino(e)) || [];
+    message.reactionLimits = object.reaction_limits?.map(e => ReactionCounterEntry.fromAmino(e)) || [];
+    message.curationChallengeDeadlines = object.curation_challenge_deadlines?.map(e => CurationChallengeDeadline.fromAmino(e)) || [];
+    message.promotionQueue = object.promotion_queue?.map(e => PromotionQueueEntry.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -303,6 +469,26 @@ export const GenesisState = {
     } else {
       obj.endorsements = message.endorsements;
     }
+    if (message.reactionDedups) {
+      obj.reaction_dedups = message.reactionDedups.map(e => e ? ReactionCounterEntry.toAmino(e) : undefined);
+    } else {
+      obj.reaction_dedups = message.reactionDedups;
+    }
+    if (message.reactionLimits) {
+      obj.reaction_limits = message.reactionLimits.map(e => e ? ReactionCounterEntry.toAmino(e) : undefined);
+    } else {
+      obj.reaction_limits = message.reactionLimits;
+    }
+    if (message.curationChallengeDeadlines) {
+      obj.curation_challenge_deadlines = message.curationChallengeDeadlines.map(e => e ? CurationChallengeDeadline.toAmino(e) : undefined);
+    } else {
+      obj.curation_challenge_deadlines = message.curationChallengeDeadlines;
+    }
+    if (message.promotionQueue) {
+      obj.promotion_queue = message.promotionQueue.map(e => e ? PromotionQueueEntry.toAmino(e) : undefined);
+    } else {
+      obj.promotion_queue = message.promotionQueue;
+    }
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {
@@ -318,6 +504,251 @@ export const GenesisState = {
     return {
       typeUrl: "/sparkdream.collect.v1.GenesisState",
       value: GenesisState.encode(message).finish()
+    };
+  }
+};
+function createBaseCurationChallengeDeadline(): CurationChallengeDeadline {
+  return {
+    deadline: BigInt(0),
+    reviewId: BigInt(0)
+  };
+}
+/**
+ * CurationChallengeDeadline is the block height at which the pending
+ * challenge on review_id resolves as not adjudicated.
+ * @name CurationChallengeDeadline
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.CurationChallengeDeadline
+ */
+export const CurationChallengeDeadline = {
+  typeUrl: "/sparkdream.collect.v1.CurationChallengeDeadline",
+  encode(message: CurationChallengeDeadline, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.deadline !== BigInt(0)) {
+      writer.uint32(8).int64(message.deadline);
+    }
+    if (message.reviewId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.reviewId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): CurationChallengeDeadline {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCurationChallengeDeadline();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.deadline = reader.int64();
+          break;
+        case 2:
+          message.reviewId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<CurationChallengeDeadline>): CurationChallengeDeadline {
+    const message = createBaseCurationChallengeDeadline();
+    message.deadline = object.deadline !== undefined && object.deadline !== null ? BigInt(object.deadline.toString()) : BigInt(0);
+    message.reviewId = object.reviewId !== undefined && object.reviewId !== null ? BigInt(object.reviewId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: CurationChallengeDeadlineAmino): CurationChallengeDeadline {
+    const message = createBaseCurationChallengeDeadline();
+    if (object.deadline !== undefined && object.deadline !== null) {
+      message.deadline = BigInt(object.deadline);
+    }
+    if (object.review_id !== undefined && object.review_id !== null) {
+      message.reviewId = BigInt(object.review_id);
+    }
+    return message;
+  },
+  toAmino(message: CurationChallengeDeadline): CurationChallengeDeadlineAmino {
+    const obj: any = {};
+    obj.deadline = message.deadline !== BigInt(0) ? message.deadline?.toString() : undefined;
+    obj.review_id = message.reviewId !== BigInt(0) ? message.reviewId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: CurationChallengeDeadlineAminoMsg): CurationChallengeDeadline {
+    return CurationChallengeDeadline.fromAmino(object.value);
+  },
+  fromProtoMsg(message: CurationChallengeDeadlineProtoMsg): CurationChallengeDeadline {
+    return CurationChallengeDeadline.decode(message.value);
+  },
+  toProto(message: CurationChallengeDeadline): Uint8Array {
+    return CurationChallengeDeadline.encode(message).finish();
+  },
+  toProtoMsg(message: CurationChallengeDeadline): CurationChallengeDeadlineProtoMsg {
+    return {
+      typeUrl: "/sparkdream.collect.v1.CurationChallengeDeadline",
+      value: CurationChallengeDeadline.encode(message).finish()
+    };
+  }
+};
+function createBaseReactionCounterEntry(): ReactionCounterEntry {
+  return {
+    key: "",
+    value: 0
+  };
+}
+/**
+ * ReactionCounterEntry is one string-keyed uint32 counter (ReactionDedup or
+ * ReactionLimit), flattened for genesis import/export.
+ * @name ReactionCounterEntry
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.ReactionCounterEntry
+ */
+export const ReactionCounterEntry = {
+  typeUrl: "/sparkdream.collect.v1.ReactionCounterEntry",
+  encode(message: ReactionCounterEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.value !== 0) {
+      writer.uint32(16).uint32(message.value);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): ReactionCounterEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseReactionCounterEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.key = reader.string();
+          break;
+        case 2:
+          message.value = reader.uint32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<ReactionCounterEntry>): ReactionCounterEntry {
+    const message = createBaseReactionCounterEntry();
+    message.key = object.key ?? "";
+    message.value = object.value ?? 0;
+    return message;
+  },
+  fromAmino(object: ReactionCounterEntryAmino): ReactionCounterEntry {
+    const message = createBaseReactionCounterEntry();
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    }
+    if (object.value !== undefined && object.value !== null) {
+      message.value = object.value;
+    }
+    return message;
+  },
+  toAmino(message: ReactionCounterEntry): ReactionCounterEntryAmino {
+    const obj: any = {};
+    obj.key = message.key === "" ? undefined : message.key;
+    obj.value = message.value === 0 ? undefined : message.value;
+    return obj;
+  },
+  fromAminoMsg(object: ReactionCounterEntryAminoMsg): ReactionCounterEntry {
+    return ReactionCounterEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: ReactionCounterEntryProtoMsg): ReactionCounterEntry {
+    return ReactionCounterEntry.decode(message.value);
+  },
+  toProto(message: ReactionCounterEntry): Uint8Array {
+    return ReactionCounterEntry.encode(message).finish();
+  },
+  toProtoMsg(message: ReactionCounterEntry): ReactionCounterEntryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.collect.v1.ReactionCounterEntry",
+      value: ReactionCounterEntry.encode(message).finish()
+    };
+  }
+};
+function createBasePromotionQueueEntry(): PromotionQueueEntry {
+  return {
+    address: "",
+    enqueuedAt: BigInt(0)
+  };
+}
+/**
+ * PromotionQueueEntry is one queued author and the height it was enqueued.
+ * @name PromotionQueueEntry
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.PromotionQueueEntry
+ */
+export const PromotionQueueEntry = {
+  typeUrl: "/sparkdream.collect.v1.PromotionQueueEntry",
+  encode(message: PromotionQueueEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.address !== "") {
+      writer.uint32(10).string(message.address);
+    }
+    if (message.enqueuedAt !== BigInt(0)) {
+      writer.uint32(16).int64(message.enqueuedAt);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): PromotionQueueEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePromotionQueueEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.address = reader.string();
+          break;
+        case 2:
+          message.enqueuedAt = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<PromotionQueueEntry>): PromotionQueueEntry {
+    const message = createBasePromotionQueueEntry();
+    message.address = object.address ?? "";
+    message.enqueuedAt = object.enqueuedAt !== undefined && object.enqueuedAt !== null ? BigInt(object.enqueuedAt.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: PromotionQueueEntryAmino): PromotionQueueEntry {
+    const message = createBasePromotionQueueEntry();
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
+    }
+    if (object.enqueued_at !== undefined && object.enqueued_at !== null) {
+      message.enqueuedAt = BigInt(object.enqueued_at);
+    }
+    return message;
+  },
+  toAmino(message: PromotionQueueEntry): PromotionQueueEntryAmino {
+    const obj: any = {};
+    obj.address = message.address === "" ? undefined : message.address;
+    obj.enqueued_at = message.enqueuedAt !== BigInt(0) ? message.enqueuedAt?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: PromotionQueueEntryAminoMsg): PromotionQueueEntry {
+    return PromotionQueueEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: PromotionQueueEntryProtoMsg): PromotionQueueEntry {
+    return PromotionQueueEntry.decode(message.value);
+  },
+  toProto(message: PromotionQueueEntry): Uint8Array {
+    return PromotionQueueEntry.encode(message).finish();
+  },
+  toProtoMsg(message: PromotionQueueEntry): PromotionQueueEntryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.collect.v1.PromotionQueueEntry",
+      value: PromotionQueueEntry.encode(message).finish()
     };
   }
 };

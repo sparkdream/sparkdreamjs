@@ -1234,6 +1234,7 @@ export interface QueryAllGuildMembershipResponseAminoMsg {
  */
 export interface QueryGetGuildInviteRequest {
   guildInvitee: string;
+  guildId: bigint;
 }
 export interface QueryGetGuildInviteRequestProtoMsg {
   typeUrl: "/sparkdream.season.v1.QueryGetGuildInviteRequest";
@@ -1247,6 +1248,7 @@ export interface QueryGetGuildInviteRequestProtoMsg {
  */
 export interface QueryGetGuildInviteRequestAmino {
   guild_invitee?: string;
+  guild_id?: string;
 }
 export interface QueryGetGuildInviteRequestAminoMsg {
   type: "/sparkdream.season.v1.QueryGetGuildInviteRequest";
@@ -3439,9 +3441,10 @@ export interface QueryAvailableQuestsRequestAminoMsg {
  * @see proto type: sparkdream.season.v1.QueryAvailableQuestsResponse
  */
 export interface QueryAvailableQuestsResponse {
-  id: string;
-  name: string;
-  xpReward: bigint;
+  /**
+   * Quests the member can start now (the same checks as MsgStartQuest).
+   */
+  quests: Quest[];
   pagination?: PageResponse;
 }
 export interface QueryAvailableQuestsResponseProtoMsg {
@@ -3455,9 +3458,10 @@ export interface QueryAvailableQuestsResponseProtoMsg {
  * @see proto type: sparkdream.season.v1.QueryAvailableQuestsResponse
  */
 export interface QueryAvailableQuestsResponseAmino {
-  id?: string;
-  name?: string;
-  xp_reward?: string;
+  /**
+   * Quests the member can start now (the same checks as MsgStartQuest).
+   */
+  quests?: QuestAmino[];
   pagination?: PageResponseAmino;
 }
 export interface QueryAvailableQuestsResponseAminoMsg {
@@ -6975,7 +6979,8 @@ export const QueryAllGuildMembershipResponse = {
 };
 function createBaseQueryGetGuildInviteRequest(): QueryGetGuildInviteRequest {
   return {
-    guildInvitee: ""
+    guildInvitee: "",
+    guildId: BigInt(0)
   };
 }
 /**
@@ -6990,6 +6995,9 @@ export const QueryGetGuildInviteRequest = {
     if (message.guildInvitee !== "") {
       writer.uint32(10).string(message.guildInvitee);
     }
+    if (message.guildId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.guildId);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryGetGuildInviteRequest {
@@ -7002,6 +7010,9 @@ export const QueryGetGuildInviteRequest = {
         case 1:
           message.guildInvitee = reader.string();
           break;
+        case 2:
+          message.guildId = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -7012,6 +7023,7 @@ export const QueryGetGuildInviteRequest = {
   fromPartial(object: DeepPartial<QueryGetGuildInviteRequest>): QueryGetGuildInviteRequest {
     const message = createBaseQueryGetGuildInviteRequest();
     message.guildInvitee = object.guildInvitee ?? "";
+    message.guildId = object.guildId !== undefined && object.guildId !== null ? BigInt(object.guildId.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: QueryGetGuildInviteRequestAmino): QueryGetGuildInviteRequest {
@@ -7019,11 +7031,15 @@ export const QueryGetGuildInviteRequest = {
     if (object.guild_invitee !== undefined && object.guild_invitee !== null) {
       message.guildInvitee = object.guild_invitee;
     }
+    if (object.guild_id !== undefined && object.guild_id !== null) {
+      message.guildId = BigInt(object.guild_id);
+    }
     return message;
   },
   toAmino(message: QueryGetGuildInviteRequest): QueryGetGuildInviteRequestAmino {
     const obj: any = {};
     obj.guild_invitee = message.guildInvitee === "" ? undefined : message.guildInvitee;
+    obj.guild_id = message.guildId !== BigInt(0) ? message.guildId?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: QueryGetGuildInviteRequestAminoMsg): QueryGetGuildInviteRequest {
@@ -13371,9 +13387,7 @@ export const QueryAvailableQuestsRequest = {
 };
 function createBaseQueryAvailableQuestsResponse(): QueryAvailableQuestsResponse {
   return {
-    id: "",
-    name: "",
-    xpReward: BigInt(0),
+    quests: [],
     pagination: undefined
   };
 }
@@ -13386,17 +13400,11 @@ function createBaseQueryAvailableQuestsResponse(): QueryAvailableQuestsResponse 
 export const QueryAvailableQuestsResponse = {
   typeUrl: "/sparkdream.season.v1.QueryAvailableQuestsResponse",
   encode(message: QueryAvailableQuestsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.id !== "") {
-      writer.uint32(10).string(message.id);
-    }
-    if (message.name !== "") {
-      writer.uint32(18).string(message.name);
-    }
-    if (message.xpReward !== BigInt(0)) {
-      writer.uint32(24).uint64(message.xpReward);
+    for (const v of message.quests) {
+      Quest.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.pagination !== undefined) {
-      PageResponse.encode(message.pagination, writer.uint32(34).fork()).ldelim();
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -13408,15 +13416,9 @@ export const QueryAvailableQuestsResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.id = reader.string();
+          message.quests.push(Quest.decode(reader, reader.uint32()));
           break;
         case 2:
-          message.name = reader.string();
-          break;
-        case 3:
-          message.xpReward = reader.uint64();
-          break;
-        case 4:
           message.pagination = PageResponse.decode(reader, reader.uint32());
           break;
         default:
@@ -13428,23 +13430,13 @@ export const QueryAvailableQuestsResponse = {
   },
   fromPartial(object: DeepPartial<QueryAvailableQuestsResponse>): QueryAvailableQuestsResponse {
     const message = createBaseQueryAvailableQuestsResponse();
-    message.id = object.id ?? "";
-    message.name = object.name ?? "";
-    message.xpReward = object.xpReward !== undefined && object.xpReward !== null ? BigInt(object.xpReward.toString()) : BigInt(0);
+    message.quests = object.quests?.map(e => Quest.fromPartial(e)) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
     return message;
   },
   fromAmino(object: QueryAvailableQuestsResponseAmino): QueryAvailableQuestsResponse {
     const message = createBaseQueryAvailableQuestsResponse();
-    if (object.id !== undefined && object.id !== null) {
-      message.id = object.id;
-    }
-    if (object.name !== undefined && object.name !== null) {
-      message.name = object.name;
-    }
-    if (object.xp_reward !== undefined && object.xp_reward !== null) {
-      message.xpReward = BigInt(object.xp_reward);
-    }
+    message.quests = object.quests?.map(e => Quest.fromAmino(e)) || [];
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageResponse.fromAmino(object.pagination);
     }
@@ -13452,9 +13444,11 @@ export const QueryAvailableQuestsResponse = {
   },
   toAmino(message: QueryAvailableQuestsResponse): QueryAvailableQuestsResponseAmino {
     const obj: any = {};
-    obj.id = message.id === "" ? undefined : message.id;
-    obj.name = message.name === "" ? undefined : message.name;
-    obj.xp_reward = message.xpReward !== BigInt(0) ? message.xpReward?.toString() : undefined;
+    if (message.quests) {
+      obj.quests = message.quests.map(e => e ? Quest.toAmino(e) : undefined);
+    } else {
+      obj.quests = message.quests;
+    }
     obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
     return obj;
   },

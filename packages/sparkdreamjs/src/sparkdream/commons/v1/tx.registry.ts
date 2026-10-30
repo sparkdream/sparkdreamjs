@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { TelescopeGeneratedType } from "../../../types";
 import { Registry } from "@cosmjs/proto-signing";
-import { MsgUpdateParams, MsgSpendFromCommons, MsgEmergencyCancelGovProposal, MsgCreatePolicyPermissions, MsgUpdatePolicyPermissions, MsgDeletePolicyPermissions, MsgRegisterGroup, MsgRenewGroup, MsgUpdateGroupMembers, MsgUpdateGroupConfig, MsgForceUpgrade, MsgDeleteGroup, MsgVetoGroupProposals, MsgSubmitProposal, MsgVoteProposal, MsgExecuteProposal, MsgSubmitAnonymousProposal, MsgAnonymousVoteProposal, MsgCreateCategory, MsgDeleteCategory, MsgScheduleRecurringSpend, MsgCancelRecurringSpend, MsgClaimRecurringSpend, MsgDeclineRecurringSpend } from "./tx";
-export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.commons.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.commons.v1.MsgSpendFromCommons", MsgSpendFromCommons], ["/sparkdream.commons.v1.MsgEmergencyCancelGovProposal", MsgEmergencyCancelGovProposal], ["/sparkdream.commons.v1.MsgCreatePolicyPermissions", MsgCreatePolicyPermissions], ["/sparkdream.commons.v1.MsgUpdatePolicyPermissions", MsgUpdatePolicyPermissions], ["/sparkdream.commons.v1.MsgDeletePolicyPermissions", MsgDeletePolicyPermissions], ["/sparkdream.commons.v1.MsgRegisterGroup", MsgRegisterGroup], ["/sparkdream.commons.v1.MsgRenewGroup", MsgRenewGroup], ["/sparkdream.commons.v1.MsgUpdateGroupMembers", MsgUpdateGroupMembers], ["/sparkdream.commons.v1.MsgUpdateGroupConfig", MsgUpdateGroupConfig], ["/sparkdream.commons.v1.MsgForceUpgrade", MsgForceUpgrade], ["/sparkdream.commons.v1.MsgDeleteGroup", MsgDeleteGroup], ["/sparkdream.commons.v1.MsgVetoGroupProposals", MsgVetoGroupProposals], ["/sparkdream.commons.v1.MsgSubmitProposal", MsgSubmitProposal], ["/sparkdream.commons.v1.MsgVoteProposal", MsgVoteProposal], ["/sparkdream.commons.v1.MsgExecuteProposal", MsgExecuteProposal], ["/sparkdream.commons.v1.MsgSubmitAnonymousProposal", MsgSubmitAnonymousProposal], ["/sparkdream.commons.v1.MsgAnonymousVoteProposal", MsgAnonymousVoteProposal], ["/sparkdream.commons.v1.MsgCreateCategory", MsgCreateCategory], ["/sparkdream.commons.v1.MsgDeleteCategory", MsgDeleteCategory], ["/sparkdream.commons.v1.MsgScheduleRecurringSpend", MsgScheduleRecurringSpend], ["/sparkdream.commons.v1.MsgCancelRecurringSpend", MsgCancelRecurringSpend], ["/sparkdream.commons.v1.MsgClaimRecurringSpend", MsgClaimRecurringSpend], ["/sparkdream.commons.v1.MsgDeclineRecurringSpend", MsgDeclineRecurringSpend]];
+import { MsgUpdateParams, MsgSpendFromCommons, MsgEmergencyCancelGovProposal, MsgCreatePolicyPermissions, MsgUpdatePolicyPermissions, MsgDeletePolicyPermissions, MsgRegisterGroup, MsgRenewGroup, MsgUpdateGroupMembers, MsgUpdateGroupConfig, MsgForceUpgrade, MsgDeleteGroup, MsgVetoGroupProposals, MsgSubmitProposal, MsgVoteProposal, MsgExecuteProposal, MsgSubmitAnonymousProposal, MsgAnonymousVoteProposal, MsgCreateCategory, MsgDeleteCategory, MsgScheduleRecurringSpend, MsgCancelRecurringSpend, MsgClaimRecurringSpend, MsgDeclineRecurringSpend, MsgOpenPoll, MsgVotePoll, MsgAnonymousVotePoll, MsgCancelPoll } from "./tx";
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.commons.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.commons.v1.MsgSpendFromCommons", MsgSpendFromCommons], ["/sparkdream.commons.v1.MsgEmergencyCancelGovProposal", MsgEmergencyCancelGovProposal], ["/sparkdream.commons.v1.MsgCreatePolicyPermissions", MsgCreatePolicyPermissions], ["/sparkdream.commons.v1.MsgUpdatePolicyPermissions", MsgUpdatePolicyPermissions], ["/sparkdream.commons.v1.MsgDeletePolicyPermissions", MsgDeletePolicyPermissions], ["/sparkdream.commons.v1.MsgRegisterGroup", MsgRegisterGroup], ["/sparkdream.commons.v1.MsgRenewGroup", MsgRenewGroup], ["/sparkdream.commons.v1.MsgUpdateGroupMembers", MsgUpdateGroupMembers], ["/sparkdream.commons.v1.MsgUpdateGroupConfig", MsgUpdateGroupConfig], ["/sparkdream.commons.v1.MsgForceUpgrade", MsgForceUpgrade], ["/sparkdream.commons.v1.MsgDeleteGroup", MsgDeleteGroup], ["/sparkdream.commons.v1.MsgVetoGroupProposals", MsgVetoGroupProposals], ["/sparkdream.commons.v1.MsgSubmitProposal", MsgSubmitProposal], ["/sparkdream.commons.v1.MsgVoteProposal", MsgVoteProposal], ["/sparkdream.commons.v1.MsgExecuteProposal", MsgExecuteProposal], ["/sparkdream.commons.v1.MsgSubmitAnonymousProposal", MsgSubmitAnonymousProposal], ["/sparkdream.commons.v1.MsgAnonymousVoteProposal", MsgAnonymousVoteProposal], ["/sparkdream.commons.v1.MsgCreateCategory", MsgCreateCategory], ["/sparkdream.commons.v1.MsgDeleteCategory", MsgDeleteCategory], ["/sparkdream.commons.v1.MsgScheduleRecurringSpend", MsgScheduleRecurringSpend], ["/sparkdream.commons.v1.MsgCancelRecurringSpend", MsgCancelRecurringSpend], ["/sparkdream.commons.v1.MsgClaimRecurringSpend", MsgClaimRecurringSpend], ["/sparkdream.commons.v1.MsgDeclineRecurringSpend", MsgDeclineRecurringSpend], ["/sparkdream.commons.v1.MsgOpenPoll", MsgOpenPoll], ["/sparkdream.commons.v1.MsgVotePoll", MsgVotePoll], ["/sparkdream.commons.v1.MsgAnonymousVotePoll", MsgAnonymousVotePoll], ["/sparkdream.commons.v1.MsgCancelPoll", MsgCancelPoll]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -153,6 +153,30 @@ export const MessageComposer = {
         typeUrl: "/sparkdream.commons.v1.MsgDeclineRecurringSpend",
         value: MsgDeclineRecurringSpend.encode(value).finish()
       };
+    },
+    openPoll(value: MsgOpenPoll) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgOpenPoll",
+        value: MsgOpenPoll.encode(value).finish()
+      };
+    },
+    votePoll(value: MsgVotePoll) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgVotePoll",
+        value: MsgVotePoll.encode(value).finish()
+      };
+    },
+    anonymousVotePoll(value: MsgAnonymousVotePoll) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgAnonymousVotePoll",
+        value: MsgAnonymousVotePoll.encode(value).finish()
+      };
+    },
+    cancelPoll(value: MsgCancelPoll) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgCancelPoll",
+        value: MsgCancelPoll.encode(value).finish()
+      };
     }
   },
   withTypeUrl: {
@@ -297,6 +321,30 @@ export const MessageComposer = {
     declineRecurringSpend(value: MsgDeclineRecurringSpend) {
       return {
         typeUrl: "/sparkdream.commons.v1.MsgDeclineRecurringSpend",
+        value
+      };
+    },
+    openPoll(value: MsgOpenPoll) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgOpenPoll",
+        value
+      };
+    },
+    votePoll(value: MsgVotePoll) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgVotePoll",
+        value
+      };
+    },
+    anonymousVotePoll(value: MsgAnonymousVotePoll) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgAnonymousVotePoll",
+        value
+      };
+    },
+    cancelPoll(value: MsgCancelPoll) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgCancelPoll",
         value
       };
     }
@@ -444,6 +492,30 @@ export const MessageComposer = {
       return {
         typeUrl: "/sparkdream.commons.v1.MsgDeclineRecurringSpend",
         value: MsgDeclineRecurringSpend.fromPartial(value)
+      };
+    },
+    openPoll(value: MsgOpenPoll) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgOpenPoll",
+        value: MsgOpenPoll.fromPartial(value)
+      };
+    },
+    votePoll(value: MsgVotePoll) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgVotePoll",
+        value: MsgVotePoll.fromPartial(value)
+      };
+    },
+    anonymousVotePoll(value: MsgAnonymousVotePoll) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgAnonymousVotePoll",
+        value: MsgAnonymousVotePoll.fromPartial(value)
+      };
+    },
+    cancelPoll(value: MsgCancelPoll) {
+      return {
+        typeUrl: "/sparkdream.commons.v1.MsgCancelPoll",
+        value: MsgCancelPoll.fromPartial(value)
       };
     }
   }

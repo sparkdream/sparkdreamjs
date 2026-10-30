@@ -1656,6 +1656,64 @@ export interface MsgUnhideContentResponseAminoMsg {
   type: "/sparkdream.collect.v1.MsgUnhideContentResponse";
   value: MsgUnhideContentResponseAmino;
 }
+/**
+ * MsgResolveCurationChallenge delivers the verdict on a curation challenge.
+ * upheld = true overturns the review and slashes the curator's committed
+ * bond; upheld = false lets the review stand and burns the challenge deposit.
+ * @name MsgResolveCurationChallenge
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgResolveCurationChallenge
+ */
+export interface MsgResolveCurationChallenge {
+  creator: string;
+  reviewId: bigint;
+  upheld: boolean;
+  reason: string;
+}
+export interface MsgResolveCurationChallengeProtoMsg {
+  typeUrl: "/sparkdream.collect.v1.MsgResolveCurationChallenge";
+  value: Uint8Array;
+}
+/**
+ * MsgResolveCurationChallenge delivers the verdict on a curation challenge.
+ * upheld = true overturns the review and slashes the curator's committed
+ * bond; upheld = false lets the review stand and burns the challenge deposit.
+ * @name MsgResolveCurationChallengeAmino
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgResolveCurationChallenge
+ */
+export interface MsgResolveCurationChallengeAmino {
+  creator?: string;
+  review_id?: string;
+  upheld?: boolean;
+  reason?: string;
+}
+export interface MsgResolveCurationChallengeAminoMsg {
+  type: "sparkdream/x/collect/MsgResolveCurationChallenge";
+  value: MsgResolveCurationChallengeAmino;
+}
+/**
+ * MsgResolveCurationChallengeResponse defines the MsgResolveCurationChallengeResponse message.
+ * @name MsgResolveCurationChallengeResponse
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgResolveCurationChallengeResponse
+ */
+export interface MsgResolveCurationChallengeResponse {}
+export interface MsgResolveCurationChallengeResponseProtoMsg {
+  typeUrl: "/sparkdream.collect.v1.MsgResolveCurationChallengeResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgResolveCurationChallengeResponse defines the MsgResolveCurationChallengeResponse message.
+ * @name MsgResolveCurationChallengeResponseAmino
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgResolveCurationChallengeResponse
+ */
+export interface MsgResolveCurationChallengeResponseAmino {}
+export interface MsgResolveCurationChallengeResponseAminoMsg {
+  type: "/sparkdream.collect.v1.MsgResolveCurationChallengeResponse";
+  value: MsgResolveCurationChallengeResponseAmino;
+}
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
     authority: "",
@@ -6770,6 +6828,176 @@ export const MsgUnhideContentResponse = {
     return {
       typeUrl: "/sparkdream.collect.v1.MsgUnhideContentResponse",
       value: MsgUnhideContentResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgResolveCurationChallenge(): MsgResolveCurationChallenge {
+  return {
+    creator: "",
+    reviewId: BigInt(0),
+    upheld: false,
+    reason: ""
+  };
+}
+/**
+ * MsgResolveCurationChallenge delivers the verdict on a curation challenge.
+ * upheld = true overturns the review and slashes the curator's committed
+ * bond; upheld = false lets the review stand and burns the challenge deposit.
+ * @name MsgResolveCurationChallenge
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgResolveCurationChallenge
+ */
+export const MsgResolveCurationChallenge = {
+  typeUrl: "/sparkdream.collect.v1.MsgResolveCurationChallenge",
+  aminoType: "sparkdream/x/collect/MsgResolveCurationChallenge",
+  encode(message: MsgResolveCurationChallenge, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.reviewId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.reviewId);
+    }
+    if (message.upheld === true) {
+      writer.uint32(24).bool(message.upheld);
+    }
+    if (message.reason !== "") {
+      writer.uint32(34).string(message.reason);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgResolveCurationChallenge {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgResolveCurationChallenge();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.reviewId = reader.uint64();
+          break;
+        case 3:
+          message.upheld = reader.bool();
+          break;
+        case 4:
+          message.reason = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgResolveCurationChallenge>): MsgResolveCurationChallenge {
+    const message = createBaseMsgResolveCurationChallenge();
+    message.creator = object.creator ?? "";
+    message.reviewId = object.reviewId !== undefined && object.reviewId !== null ? BigInt(object.reviewId.toString()) : BigInt(0);
+    message.upheld = object.upheld ?? false;
+    message.reason = object.reason ?? "";
+    return message;
+  },
+  fromAmino(object: MsgResolveCurationChallengeAmino): MsgResolveCurationChallenge {
+    const message = createBaseMsgResolveCurationChallenge();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.review_id !== undefined && object.review_id !== null) {
+      message.reviewId = BigInt(object.review_id);
+    }
+    if (object.upheld !== undefined && object.upheld !== null) {
+      message.upheld = object.upheld;
+    }
+    if (object.reason !== undefined && object.reason !== null) {
+      message.reason = object.reason;
+    }
+    return message;
+  },
+  toAmino(message: MsgResolveCurationChallenge): MsgResolveCurationChallengeAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.review_id = message.reviewId !== BigInt(0) ? message.reviewId?.toString() : undefined;
+    obj.upheld = message.upheld === false ? undefined : message.upheld;
+    obj.reason = message.reason === "" ? undefined : message.reason;
+    return obj;
+  },
+  fromAminoMsg(object: MsgResolveCurationChallengeAminoMsg): MsgResolveCurationChallenge {
+    return MsgResolveCurationChallenge.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgResolveCurationChallenge): MsgResolveCurationChallengeAminoMsg {
+    return {
+      type: "sparkdream/x/collect/MsgResolveCurationChallenge",
+      value: MsgResolveCurationChallenge.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgResolveCurationChallengeProtoMsg): MsgResolveCurationChallenge {
+    return MsgResolveCurationChallenge.decode(message.value);
+  },
+  toProto(message: MsgResolveCurationChallenge): Uint8Array {
+    return MsgResolveCurationChallenge.encode(message).finish();
+  },
+  toProtoMsg(message: MsgResolveCurationChallenge): MsgResolveCurationChallengeProtoMsg {
+    return {
+      typeUrl: "/sparkdream.collect.v1.MsgResolveCurationChallenge",
+      value: MsgResolveCurationChallenge.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgResolveCurationChallengeResponse(): MsgResolveCurationChallengeResponse {
+  return {};
+}
+/**
+ * MsgResolveCurationChallengeResponse defines the MsgResolveCurationChallengeResponse message.
+ * @name MsgResolveCurationChallengeResponse
+ * @package sparkdream.collect.v1
+ * @see proto type: sparkdream.collect.v1.MsgResolveCurationChallengeResponse
+ */
+export const MsgResolveCurationChallengeResponse = {
+  typeUrl: "/sparkdream.collect.v1.MsgResolveCurationChallengeResponse",
+  encode(_: MsgResolveCurationChallengeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgResolveCurationChallengeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgResolveCurationChallengeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgResolveCurationChallengeResponse>): MsgResolveCurationChallengeResponse {
+    const message = createBaseMsgResolveCurationChallengeResponse();
+    return message;
+  },
+  fromAmino(_: MsgResolveCurationChallengeResponseAmino): MsgResolveCurationChallengeResponse {
+    const message = createBaseMsgResolveCurationChallengeResponse();
+    return message;
+  },
+  toAmino(_: MsgResolveCurationChallengeResponse): MsgResolveCurationChallengeResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgResolveCurationChallengeResponseAminoMsg): MsgResolveCurationChallengeResponse {
+    return MsgResolveCurationChallengeResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgResolveCurationChallengeResponseProtoMsg): MsgResolveCurationChallengeResponse {
+    return MsgResolveCurationChallengeResponse.decode(message.value);
+  },
+  toProto(message: MsgResolveCurationChallengeResponse): Uint8Array {
+    return MsgResolveCurationChallengeResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgResolveCurationChallengeResponse): MsgResolveCurationChallengeResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.collect.v1.MsgResolveCurationChallengeResponse",
+      value: MsgResolveCurationChallengeResponse.encode(message).finish()
     };
   }
 };

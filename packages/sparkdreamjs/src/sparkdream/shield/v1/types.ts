@@ -9,6 +9,14 @@ import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers"
 export enum ProofDomain {
   PROOF_DOMAIN_UNSPECIFIED = 0,
   PROOF_DOMAIN_TRUST_TREE = 1,
+  /**
+   * PROOF_DOMAIN_GROUP_TREE - PROOF_DOMAIN_GROUP_TREE: the proof is against a voter snapshot the
+   * target module names for the inner message (x/commons secret ballots:
+   * the proposal's or poll's voter tree). Same circuit; the leaves are
+   * MiMC(zk_public_key, 0). Immediate mode only: a batch submission is
+   * checked before its inner message is decrypted, so its root cannot be.
+   */
+  PROOF_DOMAIN_GROUP_TREE = 2,
   UNRECOGNIZED = -1,
 }
 export const ProofDomainAmino = ProofDomain;
@@ -20,6 +28,9 @@ export function proofDomainFromJSON(object: any): ProofDomain {
     case 1:
     case "PROOF_DOMAIN_TRUST_TREE":
       return ProofDomain.PROOF_DOMAIN_TRUST_TREE;
+    case 2:
+    case "PROOF_DOMAIN_GROUP_TREE":
+      return ProofDomain.PROOF_DOMAIN_GROUP_TREE;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -32,6 +43,8 @@ export function proofDomainToJSON(object: ProofDomain): string {
       return "PROOF_DOMAIN_UNSPECIFIED";
     case ProofDomain.PROOF_DOMAIN_TRUST_TREE:
       return "PROOF_DOMAIN_TRUST_TREE";
+    case ProofDomain.PROOF_DOMAIN_GROUP_TREE:
+      return "PROOF_DOMAIN_GROUP_TREE";
     case ProofDomain.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -1345,6 +1358,13 @@ export interface ValidatorDKGExtension {
    * The vote extension data from this validator
    */
   extension: DKGVoteExtension;
+  /**
+   * The validator's CometBFT vote-extension signature (its consensus key over
+   * the CanonicalVoteExtension of the marshaled extension at the previous
+   * height and the last commit's round). ProcessProposal and the PreBlocker
+   * verify it, so a proposer can only inject what the named validator signed.
+   */
+  extensionSignature: Uint8Array;
 }
 export interface ValidatorDKGExtensionProtoMsg {
   typeUrl: "/sparkdream.shield.v1.ValidatorDKGExtension";
@@ -1365,6 +1385,13 @@ export interface ValidatorDKGExtensionAmino {
    * The vote extension data from this validator
    */
   extension?: DKGVoteExtensionAmino;
+  /**
+   * The validator's CometBFT vote-extension signature (its consensus key over
+   * the CanonicalVoteExtension of the marshaled extension at the previous
+   * height and the last commit's round). ProcessProposal and the PreBlocker
+   * verify it, so a proposer can only inject what the named validator signed.
+   */
+  extension_signature?: string;
 }
 export interface ValidatorDKGExtensionAminoMsg {
   type: "/sparkdream.shield.v1.ValidatorDKGExtension";
@@ -1469,6 +1496,68 @@ export interface TLEMissCounterEntryAmino {
 export interface TLEMissCounterEntryAminoMsg {
   type: "/sparkdream.shield.v1.TLEMissCounterEntry";
   value: TLEMissCounterEntryAmino;
+}
+/**
+ * TLEParticipationEntry is a genesis helper for exporting the TLE liveness
+ * ring buffer: whether a validator released its share in a judged epoch slot.
+ * @name TLEParticipationEntry
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.TLEParticipationEntry
+ */
+export interface TLEParticipationEntry {
+  validatorAddress: string;
+  slot: bigint;
+  participated: boolean;
+}
+export interface TLEParticipationEntryProtoMsg {
+  typeUrl: "/sparkdream.shield.v1.TLEParticipationEntry";
+  value: Uint8Array;
+}
+/**
+ * TLEParticipationEntry is a genesis helper for exporting the TLE liveness
+ * ring buffer: whether a validator released its share in a judged epoch slot.
+ * @name TLEParticipationEntryAmino
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.TLEParticipationEntry
+ */
+export interface TLEParticipationEntryAmino {
+  validator_address?: string;
+  slot?: string;
+  participated?: boolean;
+}
+export interface TLEParticipationEntryAminoMsg {
+  type: "/sparkdream.shield.v1.TLEParticipationEntry";
+  value: TLEParticipationEntryAmino;
+}
+/**
+ * EpochFeeLedger is the fees the shield module paid in one shield epoch,
+ * checked against params.max_fees_per_epoch.
+ * @name EpochFeeLedger
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.EpochFeeLedger
+ */
+export interface EpochFeeLedger {
+  epoch: bigint;
+  paid: string;
+}
+export interface EpochFeeLedgerProtoMsg {
+  typeUrl: "/sparkdream.shield.v1.EpochFeeLedger";
+  value: Uint8Array;
+}
+/**
+ * EpochFeeLedger is the fees the shield module paid in one shield epoch,
+ * checked against params.max_fees_per_epoch.
+ * @name EpochFeeLedgerAmino
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.EpochFeeLedger
+ */
+export interface EpochFeeLedgerAmino {
+  epoch?: string;
+  paid?: string;
+}
+export interface EpochFeeLedgerAminoMsg {
+  type: "/sparkdream.shield.v1.EpochFeeLedger";
+  value: EpochFeeLedgerAmino;
 }
 /**
  * DecryptionDemandEntry records that the EndBlocker asked validators for
@@ -3683,7 +3772,8 @@ export const InjectedDecryptionShare = {
 function createBaseValidatorDKGExtension(): ValidatorDKGExtension {
   return {
     validatorAddress: new Uint8Array(),
-    extension: DKGVoteExtension.fromPartial({})
+    extension: DKGVoteExtension.fromPartial({}),
+    extensionSignature: new Uint8Array()
   };
 }
 /**
@@ -3701,6 +3791,9 @@ export const ValidatorDKGExtension = {
     if (message.extension !== undefined) {
       DKGVoteExtension.encode(message.extension, writer.uint32(18).fork()).ldelim();
     }
+    if (message.extensionSignature.length !== 0) {
+      writer.uint32(26).bytes(message.extensionSignature);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): ValidatorDKGExtension {
@@ -3716,6 +3809,9 @@ export const ValidatorDKGExtension = {
         case 2:
           message.extension = DKGVoteExtension.decode(reader, reader.uint32());
           break;
+        case 3:
+          message.extensionSignature = reader.bytes();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3727,6 +3823,7 @@ export const ValidatorDKGExtension = {
     const message = createBaseValidatorDKGExtension();
     message.validatorAddress = object.validatorAddress ?? new Uint8Array();
     message.extension = object.extension !== undefined && object.extension !== null ? DKGVoteExtension.fromPartial(object.extension) : undefined;
+    message.extensionSignature = object.extensionSignature ?? new Uint8Array();
     return message;
   },
   fromAmino(object: ValidatorDKGExtensionAmino): ValidatorDKGExtension {
@@ -3737,12 +3834,16 @@ export const ValidatorDKGExtension = {
     if (object.extension !== undefined && object.extension !== null) {
       message.extension = DKGVoteExtension.fromAmino(object.extension);
     }
+    if (object.extension_signature !== undefined && object.extension_signature !== null) {
+      message.extensionSignature = bytesFromBase64(object.extension_signature);
+    }
     return message;
   },
   toAmino(message: ValidatorDKGExtension): ValidatorDKGExtensionAmino {
     const obj: any = {};
     obj.validator_address = message.validatorAddress ? base64FromBytes(message.validatorAddress) : undefined;
     obj.extension = message.extension ? DKGVoteExtension.toAmino(message.extension) : undefined;
+    obj.extension_signature = message.extensionSignature ? base64FromBytes(message.extensionSignature) : undefined;
     return obj;
   },
   fromAminoMsg(object: ValidatorDKGExtensionAminoMsg): ValidatorDKGExtension {
@@ -4025,6 +4126,182 @@ export const TLEMissCounterEntry = {
     return {
       typeUrl: "/sparkdream.shield.v1.TLEMissCounterEntry",
       value: TLEMissCounterEntry.encode(message).finish()
+    };
+  }
+};
+function createBaseTLEParticipationEntry(): TLEParticipationEntry {
+  return {
+    validatorAddress: "",
+    slot: BigInt(0),
+    participated: false
+  };
+}
+/**
+ * TLEParticipationEntry is a genesis helper for exporting the TLE liveness
+ * ring buffer: whether a validator released its share in a judged epoch slot.
+ * @name TLEParticipationEntry
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.TLEParticipationEntry
+ */
+export const TLEParticipationEntry = {
+  typeUrl: "/sparkdream.shield.v1.TLEParticipationEntry",
+  encode(message: TLEParticipationEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.validatorAddress !== "") {
+      writer.uint32(10).string(message.validatorAddress);
+    }
+    if (message.slot !== BigInt(0)) {
+      writer.uint32(16).uint64(message.slot);
+    }
+    if (message.participated === true) {
+      writer.uint32(24).bool(message.participated);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): TLEParticipationEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTLEParticipationEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.validatorAddress = reader.string();
+          break;
+        case 2:
+          message.slot = reader.uint64();
+          break;
+        case 3:
+          message.participated = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<TLEParticipationEntry>): TLEParticipationEntry {
+    const message = createBaseTLEParticipationEntry();
+    message.validatorAddress = object.validatorAddress ?? "";
+    message.slot = object.slot !== undefined && object.slot !== null ? BigInt(object.slot.toString()) : BigInt(0);
+    message.participated = object.participated ?? false;
+    return message;
+  },
+  fromAmino(object: TLEParticipationEntryAmino): TLEParticipationEntry {
+    const message = createBaseTLEParticipationEntry();
+    if (object.validator_address !== undefined && object.validator_address !== null) {
+      message.validatorAddress = object.validator_address;
+    }
+    if (object.slot !== undefined && object.slot !== null) {
+      message.slot = BigInt(object.slot);
+    }
+    if (object.participated !== undefined && object.participated !== null) {
+      message.participated = object.participated;
+    }
+    return message;
+  },
+  toAmino(message: TLEParticipationEntry): TLEParticipationEntryAmino {
+    const obj: any = {};
+    obj.validator_address = message.validatorAddress === "" ? undefined : message.validatorAddress;
+    obj.slot = message.slot !== BigInt(0) ? message.slot?.toString() : undefined;
+    obj.participated = message.participated === false ? undefined : message.participated;
+    return obj;
+  },
+  fromAminoMsg(object: TLEParticipationEntryAminoMsg): TLEParticipationEntry {
+    return TLEParticipationEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: TLEParticipationEntryProtoMsg): TLEParticipationEntry {
+    return TLEParticipationEntry.decode(message.value);
+  },
+  toProto(message: TLEParticipationEntry): Uint8Array {
+    return TLEParticipationEntry.encode(message).finish();
+  },
+  toProtoMsg(message: TLEParticipationEntry): TLEParticipationEntryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.shield.v1.TLEParticipationEntry",
+      value: TLEParticipationEntry.encode(message).finish()
+    };
+  }
+};
+function createBaseEpochFeeLedger(): EpochFeeLedger {
+  return {
+    epoch: BigInt(0),
+    paid: ""
+  };
+}
+/**
+ * EpochFeeLedger is the fees the shield module paid in one shield epoch,
+ * checked against params.max_fees_per_epoch.
+ * @name EpochFeeLedger
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.EpochFeeLedger
+ */
+export const EpochFeeLedger = {
+  typeUrl: "/sparkdream.shield.v1.EpochFeeLedger",
+  encode(message: EpochFeeLedger, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.epoch !== BigInt(0)) {
+      writer.uint32(8).uint64(message.epoch);
+    }
+    if (message.paid !== "") {
+      writer.uint32(18).string(message.paid);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): EpochFeeLedger {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseEpochFeeLedger();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.epoch = reader.uint64();
+          break;
+        case 2:
+          message.paid = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<EpochFeeLedger>): EpochFeeLedger {
+    const message = createBaseEpochFeeLedger();
+    message.epoch = object.epoch !== undefined && object.epoch !== null ? BigInt(object.epoch.toString()) : BigInt(0);
+    message.paid = object.paid ?? "";
+    return message;
+  },
+  fromAmino(object: EpochFeeLedgerAmino): EpochFeeLedger {
+    const message = createBaseEpochFeeLedger();
+    if (object.epoch !== undefined && object.epoch !== null) {
+      message.epoch = BigInt(object.epoch);
+    }
+    if (object.paid !== undefined && object.paid !== null) {
+      message.paid = object.paid;
+    }
+    return message;
+  },
+  toAmino(message: EpochFeeLedger): EpochFeeLedgerAmino {
+    const obj: any = {};
+    obj.epoch = message.epoch !== BigInt(0) ? message.epoch?.toString() : undefined;
+    obj.paid = message.paid === "" ? undefined : message.paid;
+    return obj;
+  },
+  fromAminoMsg(object: EpochFeeLedgerAminoMsg): EpochFeeLedger {
+    return EpochFeeLedger.fromAmino(object.value);
+  },
+  fromProtoMsg(message: EpochFeeLedgerProtoMsg): EpochFeeLedger {
+    return EpochFeeLedger.decode(message.value);
+  },
+  toProto(message: EpochFeeLedger): Uint8Array {
+    return EpochFeeLedger.encode(message).finish();
+  },
+  toProtoMsg(message: EpochFeeLedger): EpochFeeLedgerProtoMsg {
+    return {
+      typeUrl: "/sparkdream.shield.v1.EpochFeeLedger",
+      value: EpochFeeLedger.encode(message).finish()
     };
   }
 };

@@ -1815,10 +1815,15 @@ export interface QueryPinnedPostsRequestAminoMsg {
  * @see proto type: sparkdream.forum.v1.QueryPinnedPostsResponse
  */
 export interface QueryPinnedPostsResponse {
+  /**
+   * post_id / priority / pinned_by describe the first pinned post of the page
+   * (kept for older clients); posts carries the whole page.
+   */
   postId: bigint;
   priority: bigint;
   pinnedBy: string;
   pagination?: PageResponse;
+  posts: Post[];
 }
 export interface QueryPinnedPostsResponseProtoMsg {
   typeUrl: "/sparkdream.forum.v1.QueryPinnedPostsResponse";
@@ -1831,10 +1836,15 @@ export interface QueryPinnedPostsResponseProtoMsg {
  * @see proto type: sparkdream.forum.v1.QueryPinnedPostsResponse
  */
 export interface QueryPinnedPostsResponseAmino {
+  /**
+   * post_id / priority / pinned_by describe the first pinned post of the page
+   * (kept for older clients); posts carries the whole page.
+   */
   post_id?: string;
   priority?: string;
   pinned_by?: string;
   pagination?: PageResponseAmino;
+  posts?: PostAmino[];
 }
 export interface QueryPinnedPostsResponseAminoMsg {
   type: "/sparkdream.forum.v1.QueryPinnedPostsResponse";
@@ -1873,10 +1883,15 @@ export interface QueryLockedThreadsRequestAminoMsg {
  * @see proto type: sparkdream.forum.v1.QueryLockedThreadsResponse
  */
 export interface QueryLockedThreadsResponse {
+  /**
+   * root_id / locked_by / locked_at describe the first locked thread of the
+   * page (kept for older clients); posts carries the whole page.
+   */
   rootId: bigint;
   lockedBy: string;
   lockedAt: bigint;
   pagination?: PageResponse;
+  posts: Post[];
 }
 export interface QueryLockedThreadsResponseProtoMsg {
   typeUrl: "/sparkdream.forum.v1.QueryLockedThreadsResponse";
@@ -1889,10 +1904,15 @@ export interface QueryLockedThreadsResponseProtoMsg {
  * @see proto type: sparkdream.forum.v1.QueryLockedThreadsResponse
  */
 export interface QueryLockedThreadsResponseAmino {
+  /**
+   * root_id / locked_by / locked_at describe the first locked thread of the
+   * page (kept for older clients); posts carries the whole page.
+   */
   root_id?: string;
   locked_by?: string;
   locked_at?: string;
   pagination?: PageResponseAmino;
+  posts?: PostAmino[];
 }
 export interface QueryLockedThreadsResponseAminoMsg {
   type: "/sparkdream.forum.v1.QueryLockedThreadsResponse";
@@ -1993,10 +2013,15 @@ export interface QueryTopPostsRequestAminoMsg {
  * @see proto type: sparkdream.forum.v1.QueryTopPostsResponse
  */
 export interface QueryTopPostsResponse {
+  /**
+   * post_id / upvote_count / downvote_count describe the top post of the page
+   * (kept for older clients); posts carries the whole page, highest first.
+   */
   postId: bigint;
   upvoteCount: bigint;
   downvoteCount: bigint;
   pagination?: PageResponse;
+  posts: Post[];
 }
 export interface QueryTopPostsResponseProtoMsg {
   typeUrl: "/sparkdream.forum.v1.QueryTopPostsResponse";
@@ -2009,10 +2034,15 @@ export interface QueryTopPostsResponseProtoMsg {
  * @see proto type: sparkdream.forum.v1.QueryTopPostsResponse
  */
 export interface QueryTopPostsResponseAmino {
+  /**
+   * post_id / upvote_count / downvote_count describe the top post of the page
+   * (kept for older clients); posts carries the whole page, highest first.
+   */
   post_id?: string;
   upvote_count?: string;
   downvote_count?: string;
   pagination?: PageResponseAmino;
+  posts?: PostAmino[];
 }
 export interface QueryTopPostsResponseAminoMsg {
   type: "/sparkdream.forum.v1.QueryTopPostsResponse";
@@ -2281,10 +2311,15 @@ export interface QueryActiveBountiesRequestAminoMsg {
  * @see proto type: sparkdream.forum.v1.QueryActiveBountiesResponse
  */
 export interface QueryActiveBountiesResponse {
+  /**
+   * bounty_id / thread_id / amount describe the first bounty of the page
+   * (kept for older clients); bounties carries the whole page.
+   */
   bountyId: bigint;
   threadId: bigint;
   amount: string;
   pagination?: PageResponse;
+  bounties: Bounty[];
 }
 export interface QueryActiveBountiesResponseProtoMsg {
   typeUrl: "/sparkdream.forum.v1.QueryActiveBountiesResponse";
@@ -2297,10 +2332,15 @@ export interface QueryActiveBountiesResponseProtoMsg {
  * @see proto type: sparkdream.forum.v1.QueryActiveBountiesResponse
  */
 export interface QueryActiveBountiesResponseAmino {
+  /**
+   * bounty_id / thread_id / amount describe the first bounty of the page
+   * (kept for older clients); bounties carries the whole page.
+   */
   bounty_id?: string;
   thread_id?: string;
   amount?: string;
   pagination?: PageResponseAmino;
+  bounties?: BountyAmino[];
 }
 export interface QueryActiveBountiesResponseAminoMsg {
   type: "/sparkdream.forum.v1.QueryActiveBountiesResponse";
@@ -2341,10 +2381,15 @@ export interface QueryUserBountiesRequestAminoMsg {
  * @see proto type: sparkdream.forum.v1.QueryUserBountiesResponse
  */
 export interface QueryUserBountiesResponse {
+  /**
+   * bounty_id / thread_id / status describe the first bounty of the page
+   * (kept for older clients); bounties carries the whole page.
+   */
   bountyId: bigint;
   threadId: bigint;
   status: bigint;
   pagination?: PageResponse;
+  bounties: Bounty[];
 }
 export interface QueryUserBountiesResponseProtoMsg {
   typeUrl: "/sparkdream.forum.v1.QueryUserBountiesResponse";
@@ -2357,10 +2402,15 @@ export interface QueryUserBountiesResponseProtoMsg {
  * @see proto type: sparkdream.forum.v1.QueryUserBountiesResponse
  */
 export interface QueryUserBountiesResponseAmino {
+  /**
+   * bounty_id / thread_id / status describe the first bounty of the page
+   * (kept for older clients); bounties carries the whole page.
+   */
   bounty_id?: string;
   thread_id?: string;
   status?: string;
   pagination?: PageResponseAmino;
+  bounties?: BountyAmino[];
 }
 export interface QueryUserBountiesResponseAminoMsg {
   type: "/sparkdream.forum.v1.QueryUserBountiesResponse";
@@ -2401,10 +2451,15 @@ export interface QueryBountyExpiringSoonRequestAminoMsg {
  * @see proto type: sparkdream.forum.v1.QueryBountyExpiringSoonResponse
  */
 export interface QueryBountyExpiringSoonResponse {
+  /**
+   * bounty_id / thread_id / expires_at describe the first bounty of the page
+   * (kept for older clients); bounties carries the whole page.
+   */
   bountyId: bigint;
   threadId: bigint;
   expiresAt: bigint;
   pagination?: PageResponse;
+  bounties: Bounty[];
 }
 export interface QueryBountyExpiringSoonResponseProtoMsg {
   typeUrl: "/sparkdream.forum.v1.QueryBountyExpiringSoonResponse";
@@ -2417,10 +2472,15 @@ export interface QueryBountyExpiringSoonResponseProtoMsg {
  * @see proto type: sparkdream.forum.v1.QueryBountyExpiringSoonResponse
  */
 export interface QueryBountyExpiringSoonResponseAmino {
+  /**
+   * bounty_id / thread_id / expires_at describe the first bounty of the page
+   * (kept for older clients); bounties carries the whole page.
+   */
   bounty_id?: string;
   thread_id?: string;
   expires_at?: string;
   pagination?: PageResponseAmino;
+  bounties?: BountyAmino[];
 }
 export interface QueryBountyExpiringSoonResponseAminoMsg {
   type: "/sparkdream.forum.v1.QueryBountyExpiringSoonResponse";
@@ -2515,9 +2575,14 @@ export interface QueryFlagReviewQueueRequestAminoMsg {
  * @see proto type: sparkdream.forum.v1.QueryFlagReviewQueueResponse
  */
 export interface QueryFlagReviewQueueResponse {
+  /**
+   * post_id / total_weight describe the first queued post of the page (kept
+   * for older clients); flags carries the whole page.
+   */
   postId: bigint;
   totalWeight: string;
   pagination?: PageResponse;
+  flags: PostFlag[];
 }
 export interface QueryFlagReviewQueueResponseProtoMsg {
   typeUrl: "/sparkdream.forum.v1.QueryFlagReviewQueueResponse";
@@ -2530,9 +2595,14 @@ export interface QueryFlagReviewQueueResponseProtoMsg {
  * @see proto type: sparkdream.forum.v1.QueryFlagReviewQueueResponse
  */
 export interface QueryFlagReviewQueueResponseAmino {
+  /**
+   * post_id / total_weight describe the first queued post of the page (kept
+   * for older clients); flags carries the whole page.
+   */
   post_id?: string;
   total_weight?: string;
   pagination?: PageResponseAmino;
+  flags?: PostFlagAmino[];
 }
 export interface QueryFlagReviewQueueResponseAminoMsg {
   type: "/sparkdream.forum.v1.QueryFlagReviewQueueResponse";
@@ -7696,7 +7766,8 @@ function createBaseQueryPinnedPostsResponse(): QueryPinnedPostsResponse {
     postId: BigInt(0),
     priority: BigInt(0),
     pinnedBy: "",
-    pagination: undefined
+    pagination: undefined,
+    posts: []
   };
 }
 /**
@@ -7720,6 +7791,9 @@ export const QueryPinnedPostsResponse = {
     if (message.pagination !== undefined) {
       PageResponse.encode(message.pagination, writer.uint32(34).fork()).ldelim();
     }
+    for (const v of message.posts) {
+      Post.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryPinnedPostsResponse {
@@ -7741,6 +7815,9 @@ export const QueryPinnedPostsResponse = {
         case 4:
           message.pagination = PageResponse.decode(reader, reader.uint32());
           break;
+        case 5:
+          message.posts.push(Post.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -7754,6 +7831,7 @@ export const QueryPinnedPostsResponse = {
     message.priority = object.priority !== undefined && object.priority !== null ? BigInt(object.priority.toString()) : BigInt(0);
     message.pinnedBy = object.pinnedBy ?? "";
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    message.posts = object.posts?.map(e => Post.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: QueryPinnedPostsResponseAmino): QueryPinnedPostsResponse {
@@ -7770,6 +7848,7 @@ export const QueryPinnedPostsResponse = {
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageResponse.fromAmino(object.pagination);
     }
+    message.posts = object.posts?.map(e => Post.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: QueryPinnedPostsResponse): QueryPinnedPostsResponseAmino {
@@ -7778,6 +7857,11 @@ export const QueryPinnedPostsResponse = {
     obj.priority = message.priority !== BigInt(0) ? message.priority?.toString() : undefined;
     obj.pinned_by = message.pinnedBy === "" ? undefined : message.pinnedBy;
     obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    if (message.posts) {
+      obj.posts = message.posts.map(e => e ? Post.toAmino(e) : undefined);
+    } else {
+      obj.posts = message.posts;
+    }
     return obj;
   },
   fromAminoMsg(object: QueryPinnedPostsResponseAminoMsg): QueryPinnedPostsResponse {
@@ -7870,7 +7954,8 @@ function createBaseQueryLockedThreadsResponse(): QueryLockedThreadsResponse {
     rootId: BigInt(0),
     lockedBy: "",
     lockedAt: BigInt(0),
-    pagination: undefined
+    pagination: undefined,
+    posts: []
   };
 }
 /**
@@ -7894,6 +7979,9 @@ export const QueryLockedThreadsResponse = {
     if (message.pagination !== undefined) {
       PageResponse.encode(message.pagination, writer.uint32(34).fork()).ldelim();
     }
+    for (const v of message.posts) {
+      Post.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryLockedThreadsResponse {
@@ -7915,6 +8003,9 @@ export const QueryLockedThreadsResponse = {
         case 4:
           message.pagination = PageResponse.decode(reader, reader.uint32());
           break;
+        case 5:
+          message.posts.push(Post.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -7928,6 +8019,7 @@ export const QueryLockedThreadsResponse = {
     message.lockedBy = object.lockedBy ?? "";
     message.lockedAt = object.lockedAt !== undefined && object.lockedAt !== null ? BigInt(object.lockedAt.toString()) : BigInt(0);
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    message.posts = object.posts?.map(e => Post.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: QueryLockedThreadsResponseAmino): QueryLockedThreadsResponse {
@@ -7944,6 +8036,7 @@ export const QueryLockedThreadsResponse = {
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageResponse.fromAmino(object.pagination);
     }
+    message.posts = object.posts?.map(e => Post.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: QueryLockedThreadsResponse): QueryLockedThreadsResponseAmino {
@@ -7952,6 +8045,11 @@ export const QueryLockedThreadsResponse = {
     obj.locked_by = message.lockedBy === "" ? undefined : message.lockedBy;
     obj.locked_at = message.lockedAt !== BigInt(0) ? message.lockedAt?.toString() : undefined;
     obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    if (message.posts) {
+      obj.posts = message.posts.map(e => e ? Post.toAmino(e) : undefined);
+    } else {
+      obj.posts = message.posts;
+    }
     return obj;
   },
   fromAminoMsg(object: QueryLockedThreadsResponseAminoMsg): QueryLockedThreadsResponse {
@@ -8242,7 +8340,8 @@ function createBaseQueryTopPostsResponse(): QueryTopPostsResponse {
     postId: BigInt(0),
     upvoteCount: BigInt(0),
     downvoteCount: BigInt(0),
-    pagination: undefined
+    pagination: undefined,
+    posts: []
   };
 }
 /**
@@ -8266,6 +8365,9 @@ export const QueryTopPostsResponse = {
     if (message.pagination !== undefined) {
       PageResponse.encode(message.pagination, writer.uint32(34).fork()).ldelim();
     }
+    for (const v of message.posts) {
+      Post.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryTopPostsResponse {
@@ -8287,6 +8389,9 @@ export const QueryTopPostsResponse = {
         case 4:
           message.pagination = PageResponse.decode(reader, reader.uint32());
           break;
+        case 5:
+          message.posts.push(Post.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -8300,6 +8405,7 @@ export const QueryTopPostsResponse = {
     message.upvoteCount = object.upvoteCount !== undefined && object.upvoteCount !== null ? BigInt(object.upvoteCount.toString()) : BigInt(0);
     message.downvoteCount = object.downvoteCount !== undefined && object.downvoteCount !== null ? BigInt(object.downvoteCount.toString()) : BigInt(0);
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    message.posts = object.posts?.map(e => Post.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: QueryTopPostsResponseAmino): QueryTopPostsResponse {
@@ -8316,6 +8422,7 @@ export const QueryTopPostsResponse = {
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageResponse.fromAmino(object.pagination);
     }
+    message.posts = object.posts?.map(e => Post.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: QueryTopPostsResponse): QueryTopPostsResponseAmino {
@@ -8324,6 +8431,11 @@ export const QueryTopPostsResponse = {
     obj.upvote_count = message.upvoteCount !== BigInt(0) ? message.upvoteCount?.toString() : undefined;
     obj.downvote_count = message.downvoteCount !== BigInt(0) ? message.downvoteCount?.toString() : undefined;
     obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    if (message.posts) {
+      obj.posts = message.posts.map(e => e ? Post.toAmino(e) : undefined);
+    } else {
+      obj.posts = message.posts;
+    }
     return obj;
   },
   fromAminoMsg(object: QueryTopPostsResponseAminoMsg): QueryTopPostsResponse {
@@ -9100,7 +9212,8 @@ function createBaseQueryActiveBountiesResponse(): QueryActiveBountiesResponse {
     bountyId: BigInt(0),
     threadId: BigInt(0),
     amount: "",
-    pagination: undefined
+    pagination: undefined,
+    bounties: []
   };
 }
 /**
@@ -9124,6 +9237,9 @@ export const QueryActiveBountiesResponse = {
     if (message.pagination !== undefined) {
       PageResponse.encode(message.pagination, writer.uint32(34).fork()).ldelim();
     }
+    for (const v of message.bounties) {
+      Bounty.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryActiveBountiesResponse {
@@ -9145,6 +9261,9 @@ export const QueryActiveBountiesResponse = {
         case 4:
           message.pagination = PageResponse.decode(reader, reader.uint32());
           break;
+        case 5:
+          message.bounties.push(Bounty.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -9158,6 +9277,7 @@ export const QueryActiveBountiesResponse = {
     message.threadId = object.threadId !== undefined && object.threadId !== null ? BigInt(object.threadId.toString()) : BigInt(0);
     message.amount = object.amount ?? "";
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    message.bounties = object.bounties?.map(e => Bounty.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: QueryActiveBountiesResponseAmino): QueryActiveBountiesResponse {
@@ -9174,6 +9294,7 @@ export const QueryActiveBountiesResponse = {
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageResponse.fromAmino(object.pagination);
     }
+    message.bounties = object.bounties?.map(e => Bounty.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: QueryActiveBountiesResponse): QueryActiveBountiesResponseAmino {
@@ -9182,6 +9303,11 @@ export const QueryActiveBountiesResponse = {
     obj.thread_id = message.threadId !== BigInt(0) ? message.threadId?.toString() : undefined;
     obj.amount = message.amount === "" ? undefined : message.amount;
     obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    if (message.bounties) {
+      obj.bounties = message.bounties.map(e => e ? Bounty.toAmino(e) : undefined);
+    } else {
+      obj.bounties = message.bounties;
+    }
     return obj;
   },
   fromAminoMsg(object: QueryActiveBountiesResponseAminoMsg): QueryActiveBountiesResponse {
@@ -9286,7 +9412,8 @@ function createBaseQueryUserBountiesResponse(): QueryUserBountiesResponse {
     bountyId: BigInt(0),
     threadId: BigInt(0),
     status: BigInt(0),
-    pagination: undefined
+    pagination: undefined,
+    bounties: []
   };
 }
 /**
@@ -9310,6 +9437,9 @@ export const QueryUserBountiesResponse = {
     if (message.pagination !== undefined) {
       PageResponse.encode(message.pagination, writer.uint32(34).fork()).ldelim();
     }
+    for (const v of message.bounties) {
+      Bounty.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryUserBountiesResponse {
@@ -9331,6 +9461,9 @@ export const QueryUserBountiesResponse = {
         case 4:
           message.pagination = PageResponse.decode(reader, reader.uint32());
           break;
+        case 5:
+          message.bounties.push(Bounty.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -9344,6 +9477,7 @@ export const QueryUserBountiesResponse = {
     message.threadId = object.threadId !== undefined && object.threadId !== null ? BigInt(object.threadId.toString()) : BigInt(0);
     message.status = object.status !== undefined && object.status !== null ? BigInt(object.status.toString()) : BigInt(0);
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    message.bounties = object.bounties?.map(e => Bounty.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: QueryUserBountiesResponseAmino): QueryUserBountiesResponse {
@@ -9360,6 +9494,7 @@ export const QueryUserBountiesResponse = {
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageResponse.fromAmino(object.pagination);
     }
+    message.bounties = object.bounties?.map(e => Bounty.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: QueryUserBountiesResponse): QueryUserBountiesResponseAmino {
@@ -9368,6 +9503,11 @@ export const QueryUserBountiesResponse = {
     obj.thread_id = message.threadId !== BigInt(0) ? message.threadId?.toString() : undefined;
     obj.status = message.status !== BigInt(0) ? message.status?.toString() : undefined;
     obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    if (message.bounties) {
+      obj.bounties = message.bounties.map(e => e ? Bounty.toAmino(e) : undefined);
+    } else {
+      obj.bounties = message.bounties;
+    }
     return obj;
   },
   fromAminoMsg(object: QueryUserBountiesResponseAminoMsg): QueryUserBountiesResponse {
@@ -9472,7 +9612,8 @@ function createBaseQueryBountyExpiringSoonResponse(): QueryBountyExpiringSoonRes
     bountyId: BigInt(0),
     threadId: BigInt(0),
     expiresAt: BigInt(0),
-    pagination: undefined
+    pagination: undefined,
+    bounties: []
   };
 }
 /**
@@ -9496,6 +9637,9 @@ export const QueryBountyExpiringSoonResponse = {
     if (message.pagination !== undefined) {
       PageResponse.encode(message.pagination, writer.uint32(34).fork()).ldelim();
     }
+    for (const v of message.bounties) {
+      Bounty.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryBountyExpiringSoonResponse {
@@ -9517,6 +9661,9 @@ export const QueryBountyExpiringSoonResponse = {
         case 4:
           message.pagination = PageResponse.decode(reader, reader.uint32());
           break;
+        case 5:
+          message.bounties.push(Bounty.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -9530,6 +9677,7 @@ export const QueryBountyExpiringSoonResponse = {
     message.threadId = object.threadId !== undefined && object.threadId !== null ? BigInt(object.threadId.toString()) : BigInt(0);
     message.expiresAt = object.expiresAt !== undefined && object.expiresAt !== null ? BigInt(object.expiresAt.toString()) : BigInt(0);
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    message.bounties = object.bounties?.map(e => Bounty.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: QueryBountyExpiringSoonResponseAmino): QueryBountyExpiringSoonResponse {
@@ -9546,6 +9694,7 @@ export const QueryBountyExpiringSoonResponse = {
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageResponse.fromAmino(object.pagination);
     }
+    message.bounties = object.bounties?.map(e => Bounty.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: QueryBountyExpiringSoonResponse): QueryBountyExpiringSoonResponseAmino {
@@ -9554,6 +9703,11 @@ export const QueryBountyExpiringSoonResponse = {
     obj.thread_id = message.threadId !== BigInt(0) ? message.threadId?.toString() : undefined;
     obj.expires_at = message.expiresAt !== BigInt(0) ? message.expiresAt?.toString() : undefined;
     obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    if (message.bounties) {
+      obj.bounties = message.bounties.map(e => e ? Bounty.toAmino(e) : undefined);
+    } else {
+      obj.bounties = message.bounties;
+    }
     return obj;
   },
   fromAminoMsg(object: QueryBountyExpiringSoonResponseAminoMsg): QueryBountyExpiringSoonResponse {
@@ -9807,7 +9961,8 @@ function createBaseQueryFlagReviewQueueResponse(): QueryFlagReviewQueueResponse 
   return {
     postId: BigInt(0),
     totalWeight: "",
-    pagination: undefined
+    pagination: undefined,
+    flags: []
   };
 }
 /**
@@ -9828,6 +9983,9 @@ export const QueryFlagReviewQueueResponse = {
     if (message.pagination !== undefined) {
       PageResponse.encode(message.pagination, writer.uint32(26).fork()).ldelim();
     }
+    for (const v of message.flags) {
+      PostFlag.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryFlagReviewQueueResponse {
@@ -9846,6 +10004,9 @@ export const QueryFlagReviewQueueResponse = {
         case 3:
           message.pagination = PageResponse.decode(reader, reader.uint32());
           break;
+        case 4:
+          message.flags.push(PostFlag.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -9858,6 +10019,7 @@ export const QueryFlagReviewQueueResponse = {
     message.postId = object.postId !== undefined && object.postId !== null ? BigInt(object.postId.toString()) : BigInt(0);
     message.totalWeight = object.totalWeight ?? "";
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    message.flags = object.flags?.map(e => PostFlag.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: QueryFlagReviewQueueResponseAmino): QueryFlagReviewQueueResponse {
@@ -9871,6 +10033,7 @@ export const QueryFlagReviewQueueResponse = {
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageResponse.fromAmino(object.pagination);
     }
+    message.flags = object.flags?.map(e => PostFlag.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: QueryFlagReviewQueueResponse): QueryFlagReviewQueueResponseAmino {
@@ -9878,6 +10041,11 @@ export const QueryFlagReviewQueueResponse = {
     obj.post_id = message.postId !== BigInt(0) ? message.postId?.toString() : undefined;
     obj.total_weight = message.totalWeight === "" ? undefined : message.totalWeight;
     obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    if (message.flags) {
+      obj.flags = message.flags.map(e => e ? PostFlag.toAmino(e) : undefined);
+    } else {
+      obj.flags = message.flags;
+    }
     return obj;
   },
   fromAminoMsg(object: QueryFlagReviewQueueResponseAminoMsg): QueryFlagReviewQueueResponse {

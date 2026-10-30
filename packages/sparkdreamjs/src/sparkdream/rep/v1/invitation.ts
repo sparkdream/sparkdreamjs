@@ -57,6 +57,12 @@ export interface Invitation {
   inviteeAddress: string;
   stakedDream: string;
   vouchedTags: string[];
+  /**
+   * accountability_end / referral_end: unix-time estimates for display,
+   * derived from the epochs below at a nominal 6 s per block. The chain
+   * decides on created_epoch and accountability_end_epoch, which follow the
+   * block-based epoch clock exactly.
+   */
   accountabilityEnd: bigint;
   referralRate: string;
   referralEnd: bigint;
@@ -64,6 +70,16 @@ export interface Invitation {
   status: InvitationStatus;
   createdAt: bigint;
   acceptedAt: bigint;
+  /**
+   * created_epoch: rep epoch the invitation was created in. The acceptance
+   * window (invitation_acceptance_epochs) is counted from it.
+   */
+  createdEpoch: bigint;
+  /**
+   * accountability_end_epoch: last rep epoch of the inviter accountability
+   * and referral window (created_epoch + invitation_accountability_epochs).
+   */
+  accountabilityEndEpoch: bigint;
 }
 export interface InvitationProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Invitation";
@@ -81,6 +97,12 @@ export interface InvitationAmino {
   invitee_address?: string;
   staked_dream?: string;
   vouched_tags?: string[];
+  /**
+   * accountability_end / referral_end: unix-time estimates for display,
+   * derived from the epochs below at a nominal 6 s per block. The chain
+   * decides on created_epoch and accountability_end_epoch, which follow the
+   * block-based epoch clock exactly.
+   */
   accountability_end?: string;
   referral_rate?: string;
   referral_end?: string;
@@ -88,6 +110,16 @@ export interface InvitationAmino {
   status?: InvitationStatus;
   created_at?: string;
   accepted_at?: string;
+  /**
+   * created_epoch: rep epoch the invitation was created in. The acceptance
+   * window (invitation_acceptance_epochs) is counted from it.
+   */
+  created_epoch?: string;
+  /**
+   * accountability_end_epoch: last rep epoch of the inviter accountability
+   * and referral window (created_epoch + invitation_accountability_epochs).
+   */
+  accountability_end_epoch?: string;
 }
 export interface InvitationAminoMsg {
   type: "/sparkdream.rep.v1.Invitation";
@@ -106,7 +138,9 @@ function createBaseInvitation(): Invitation {
     referralEarned: "",
     status: 0,
     createdAt: BigInt(0),
-    acceptedAt: BigInt(0)
+    acceptedAt: BigInt(0),
+    createdEpoch: BigInt(0),
+    accountabilityEndEpoch: BigInt(0)
   };
 }
 /**
@@ -154,6 +188,12 @@ export const Invitation = {
     if (message.acceptedAt !== BigInt(0)) {
       writer.uint32(96).int64(message.acceptedAt);
     }
+    if (message.createdEpoch !== BigInt(0)) {
+      writer.uint32(104).int64(message.createdEpoch);
+    }
+    if (message.accountabilityEndEpoch !== BigInt(0)) {
+      writer.uint32(112).int64(message.accountabilityEndEpoch);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Invitation {
@@ -199,6 +239,12 @@ export const Invitation = {
         case 12:
           message.acceptedAt = reader.int64();
           break;
+        case 13:
+          message.createdEpoch = reader.int64();
+          break;
+        case 14:
+          message.accountabilityEndEpoch = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -220,6 +266,8 @@ export const Invitation = {
     message.status = object.status ?? 0;
     message.createdAt = object.createdAt !== undefined && object.createdAt !== null ? BigInt(object.createdAt.toString()) : BigInt(0);
     message.acceptedAt = object.acceptedAt !== undefined && object.acceptedAt !== null ? BigInt(object.acceptedAt.toString()) : BigInt(0);
+    message.createdEpoch = object.createdEpoch !== undefined && object.createdEpoch !== null ? BigInt(object.createdEpoch.toString()) : BigInt(0);
+    message.accountabilityEndEpoch = object.accountabilityEndEpoch !== undefined && object.accountabilityEndEpoch !== null ? BigInt(object.accountabilityEndEpoch.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: InvitationAmino): Invitation {
@@ -258,6 +306,12 @@ export const Invitation = {
     if (object.accepted_at !== undefined && object.accepted_at !== null) {
       message.acceptedAt = BigInt(object.accepted_at);
     }
+    if (object.created_epoch !== undefined && object.created_epoch !== null) {
+      message.createdEpoch = BigInt(object.created_epoch);
+    }
+    if (object.accountability_end_epoch !== undefined && object.accountability_end_epoch !== null) {
+      message.accountabilityEndEpoch = BigInt(object.accountability_end_epoch);
+    }
     return message;
   },
   toAmino(message: Invitation): InvitationAmino {
@@ -278,6 +332,8 @@ export const Invitation = {
     obj.status = message.status === 0 ? undefined : message.status;
     obj.created_at = message.createdAt !== BigInt(0) ? message.createdAt?.toString() : undefined;
     obj.accepted_at = message.acceptedAt !== BigInt(0) ? message.acceptedAt?.toString() : undefined;
+    obj.created_epoch = message.createdEpoch !== BigInt(0) ? message.createdEpoch?.toString() : undefined;
+    obj.accountability_end_epoch = message.accountabilityEndEpoch !== BigInt(0) ? message.accountabilityEndEpoch?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: InvitationAminoMsg): Invitation {

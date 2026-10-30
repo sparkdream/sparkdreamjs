@@ -2,13 +2,14 @@
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
- * RefileCooldown bars a controller from re-filing the same allegation
- * against the same (operator, service_type) within
- * `report_refile_cooldown_blocks` after a PENDING report was
- * AUTO_DISMISSED (controller stall). See x-service-spec.md §3.4.5.
+ * RefileCooldown bars the reporter of a member report that was
+ * AUTO_DISMISSED (controller stall) from re-filing against the same
+ * (operator, service_type) within `report_refile_cooldown_blocks`. See
+ * x-service-spec.md §3.4.5. Other members can still report the operator,
+ * and auto-dismissed system reports record no cooldown at all.
  * 
- * Keyed by (controller, operator_address, service_type, dismissed_at)
- * in the RefileCooldowns store; lazy expiry — entries are checked at
+ * Keyed by (reporter, operator_address, service_type, dismissed_at) in
+ * the RefileCooldowns store; lazy expiry — entries are checked at
  * MsgReportOperator time and pruned when expired.
  * @name RefileCooldown
  * @package sparkdream.service.v1
@@ -16,8 +17,8 @@ import { DeepPartial } from "../../../helpers";
  */
 export interface RefileCooldown {
   /**
-   * controller is the bech32 address of the controller against whom the
-   * cooldown applies.
+   * controller is the operator's controller at dismissal time (the party
+   * that let the report lapse). Informational.
    */
   controller: string;
   /**
@@ -34,19 +35,25 @@ export interface RefileCooldown {
    * `dismissed_at + report_refile_cooldown_blocks`.
    */
   dismissedAt: bigint;
+  /**
+   * reporter is the bech32 address of the member whose report lapsed and
+   * who is barred from re-filing until the cooldown expires.
+   */
+  reporter: string;
 }
 export interface RefileCooldownProtoMsg {
   typeUrl: "/sparkdream.service.v1.RefileCooldown";
   value: Uint8Array;
 }
 /**
- * RefileCooldown bars a controller from re-filing the same allegation
- * against the same (operator, service_type) within
- * `report_refile_cooldown_blocks` after a PENDING report was
- * AUTO_DISMISSED (controller stall). See x-service-spec.md §3.4.5.
+ * RefileCooldown bars the reporter of a member report that was
+ * AUTO_DISMISSED (controller stall) from re-filing against the same
+ * (operator, service_type) within `report_refile_cooldown_blocks`. See
+ * x-service-spec.md §3.4.5. Other members can still report the operator,
+ * and auto-dismissed system reports record no cooldown at all.
  * 
- * Keyed by (controller, operator_address, service_type, dismissed_at)
- * in the RefileCooldowns store; lazy expiry — entries are checked at
+ * Keyed by (reporter, operator_address, service_type, dismissed_at) in
+ * the RefileCooldowns store; lazy expiry — entries are checked at
  * MsgReportOperator time and pruned when expired.
  * @name RefileCooldownAmino
  * @package sparkdream.service.v1
@@ -54,8 +61,8 @@ export interface RefileCooldownProtoMsg {
  */
 export interface RefileCooldownAmino {
   /**
-   * controller is the bech32 address of the controller against whom the
-   * cooldown applies.
+   * controller is the operator's controller at dismissal time (the party
+   * that let the report lapse). Informational.
    */
   controller?: string;
   /**
@@ -72,6 +79,11 @@ export interface RefileCooldownAmino {
    * `dismissed_at + report_refile_cooldown_blocks`.
    */
   dismissed_at?: string;
+  /**
+   * reporter is the bech32 address of the member whose report lapsed and
+   * who is barred from re-filing until the cooldown expires.
+   */
+  reporter?: string;
 }
 export interface RefileCooldownAminoMsg {
   type: "sparkdream/x/service/RefileCooldown";
@@ -82,17 +94,19 @@ function createBaseRefileCooldown(): RefileCooldown {
     controller: "",
     operatorAddress: "",
     serviceType: "",
-    dismissedAt: BigInt(0)
+    dismissedAt: BigInt(0),
+    reporter: ""
   };
 }
 /**
- * RefileCooldown bars a controller from re-filing the same allegation
- * against the same (operator, service_type) within
- * `report_refile_cooldown_blocks` after a PENDING report was
- * AUTO_DISMISSED (controller stall). See x-service-spec.md §3.4.5.
+ * RefileCooldown bars the reporter of a member report that was
+ * AUTO_DISMISSED (controller stall) from re-filing against the same
+ * (operator, service_type) within `report_refile_cooldown_blocks`. See
+ * x-service-spec.md §3.4.5. Other members can still report the operator,
+ * and auto-dismissed system reports record no cooldown at all.
  * 
- * Keyed by (controller, operator_address, service_type, dismissed_at)
- * in the RefileCooldowns store; lazy expiry — entries are checked at
+ * Keyed by (reporter, operator_address, service_type, dismissed_at) in
+ * the RefileCooldowns store; lazy expiry — entries are checked at
  * MsgReportOperator time and pruned when expired.
  * @name RefileCooldown
  * @package sparkdream.service.v1
@@ -113,6 +127,9 @@ export const RefileCooldown = {
     }
     if (message.dismissedAt !== BigInt(0)) {
       writer.uint32(32).int64(message.dismissedAt);
+    }
+    if (message.reporter !== "") {
+      writer.uint32(42).string(message.reporter);
     }
     return writer;
   },
@@ -135,6 +152,9 @@ export const RefileCooldown = {
         case 4:
           message.dismissedAt = reader.int64();
           break;
+        case 5:
+          message.reporter = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -148,6 +168,7 @@ export const RefileCooldown = {
     message.operatorAddress = object.operatorAddress ?? "";
     message.serviceType = object.serviceType ?? "";
     message.dismissedAt = object.dismissedAt !== undefined && object.dismissedAt !== null ? BigInt(object.dismissedAt.toString()) : BigInt(0);
+    message.reporter = object.reporter ?? "";
     return message;
   },
   fromAmino(object: RefileCooldownAmino): RefileCooldown {
@@ -164,6 +185,9 @@ export const RefileCooldown = {
     if (object.dismissed_at !== undefined && object.dismissed_at !== null) {
       message.dismissedAt = BigInt(object.dismissed_at);
     }
+    if (object.reporter !== undefined && object.reporter !== null) {
+      message.reporter = object.reporter;
+    }
     return message;
   },
   toAmino(message: RefileCooldown): RefileCooldownAmino {
@@ -172,6 +196,7 @@ export const RefileCooldown = {
     obj.operator_address = message.operatorAddress === "" ? undefined : message.operatorAddress;
     obj.service_type = message.serviceType === "" ? undefined : message.serviceType;
     obj.dismissed_at = message.dismissedAt !== BigInt(0) ? message.dismissedAt?.toString() : undefined;
+    obj.reporter = message.reporter === "" ? undefined : message.reporter;
     return obj;
   },
   fromAminoMsg(object: RefileCooldownAminoMsg): RefileCooldown {

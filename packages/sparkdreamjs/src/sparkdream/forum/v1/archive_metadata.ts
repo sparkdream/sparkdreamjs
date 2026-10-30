@@ -13,6 +13,12 @@ export interface ArchiveMetadata {
   firstArchivedAt: bigint;
   lastArchivedAt: bigint;
   hrOverrideRequired: boolean;
+  /**
+   * last_unarchived_at is the block time of the most recent MsgUnarchiveThread.
+   * MsgFreezeThread refuses to re-archive until last_unarchived_at +
+   * archive_cooldown has passed. 0 when the thread was never unarchived.
+   */
+  lastUnarchivedAt: bigint;
 }
 export interface ArchiveMetadataProtoMsg {
   typeUrl: "/sparkdream.forum.v1.ArchiveMetadata";
@@ -30,6 +36,12 @@ export interface ArchiveMetadataAmino {
   first_archived_at?: string;
   last_archived_at?: string;
   hr_override_required?: boolean;
+  /**
+   * last_unarchived_at is the block time of the most recent MsgUnarchiveThread.
+   * MsgFreezeThread refuses to re-archive until last_unarchived_at +
+   * archive_cooldown has passed. 0 when the thread was never unarchived.
+   */
+  last_unarchived_at?: string;
 }
 export interface ArchiveMetadataAminoMsg {
   type: "/sparkdream.forum.v1.ArchiveMetadata";
@@ -41,7 +53,8 @@ function createBaseArchiveMetadata(): ArchiveMetadata {
     archiveCount: BigInt(0),
     firstArchivedAt: BigInt(0),
     lastArchivedAt: BigInt(0),
-    hrOverrideRequired: false
+    hrOverrideRequired: false,
+    lastUnarchivedAt: BigInt(0)
   };
 }
 /**
@@ -68,6 +81,9 @@ export const ArchiveMetadata = {
     if (message.hrOverrideRequired === true) {
       writer.uint32(40).bool(message.hrOverrideRequired);
     }
+    if (message.lastUnarchivedAt !== BigInt(0)) {
+      writer.uint32(48).int64(message.lastUnarchivedAt);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): ArchiveMetadata {
@@ -92,6 +108,9 @@ export const ArchiveMetadata = {
         case 5:
           message.hrOverrideRequired = reader.bool();
           break;
+        case 6:
+          message.lastUnarchivedAt = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -106,6 +125,7 @@ export const ArchiveMetadata = {
     message.firstArchivedAt = object.firstArchivedAt !== undefined && object.firstArchivedAt !== null ? BigInt(object.firstArchivedAt.toString()) : BigInt(0);
     message.lastArchivedAt = object.lastArchivedAt !== undefined && object.lastArchivedAt !== null ? BigInt(object.lastArchivedAt.toString()) : BigInt(0);
     message.hrOverrideRequired = object.hrOverrideRequired ?? false;
+    message.lastUnarchivedAt = object.lastUnarchivedAt !== undefined && object.lastUnarchivedAt !== null ? BigInt(object.lastUnarchivedAt.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ArchiveMetadataAmino): ArchiveMetadata {
@@ -125,6 +145,9 @@ export const ArchiveMetadata = {
     if (object.hr_override_required !== undefined && object.hr_override_required !== null) {
       message.hrOverrideRequired = object.hr_override_required;
     }
+    if (object.last_unarchived_at !== undefined && object.last_unarchived_at !== null) {
+      message.lastUnarchivedAt = BigInt(object.last_unarchived_at);
+    }
     return message;
   },
   toAmino(message: ArchiveMetadata): ArchiveMetadataAmino {
@@ -134,6 +157,7 @@ export const ArchiveMetadata = {
     obj.first_archived_at = message.firstArchivedAt !== BigInt(0) ? message.firstArchivedAt?.toString() : undefined;
     obj.last_archived_at = message.lastArchivedAt !== BigInt(0) ? message.lastArchivedAt?.toString() : undefined;
     obj.hr_override_required = message.hrOverrideRequired === false ? undefined : message.hrOverrideRequired;
+    obj.last_unarchived_at = message.lastUnarchivedAt !== BigInt(0) ? message.lastUnarchivedAt?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ArchiveMetadataAminoMsg): ArchiveMetadata {

@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { TelescopeGeneratedType } from "../../../types";
 import { Registry } from "@cosmjs/proto-signing";
-import { MsgUpdateParams, MsgCreateVault, MsgPropose, MsgApprove, MsgRevokeApproval, MsgExecute, MsgCancelProposal, MsgUpdateVault } from "./tx";
-export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.vault.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.vault.v1.MsgCreateVault", MsgCreateVault], ["/sparkdream.vault.v1.MsgPropose", MsgPropose], ["/sparkdream.vault.v1.MsgApprove", MsgApprove], ["/sparkdream.vault.v1.MsgRevokeApproval", MsgRevokeApproval], ["/sparkdream.vault.v1.MsgExecute", MsgExecute], ["/sparkdream.vault.v1.MsgCancelProposal", MsgCancelProposal], ["/sparkdream.vault.v1.MsgUpdateVault", MsgUpdateVault]];
+import { MsgUpdateParams, MsgCreateVault, MsgPropose, MsgApprove, MsgRevokeApproval, MsgExecute, MsgCancelProposal, MsgUpdateVault, MsgAcceptVaultSigner, MsgLeaveVault } from "./tx";
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.vault.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.vault.v1.MsgCreateVault", MsgCreateVault], ["/sparkdream.vault.v1.MsgPropose", MsgPropose], ["/sparkdream.vault.v1.MsgApprove", MsgApprove], ["/sparkdream.vault.v1.MsgRevokeApproval", MsgRevokeApproval], ["/sparkdream.vault.v1.MsgExecute", MsgExecute], ["/sparkdream.vault.v1.MsgCancelProposal", MsgCancelProposal], ["/sparkdream.vault.v1.MsgUpdateVault", MsgUpdateVault], ["/sparkdream.vault.v1.MsgAcceptVaultSigner", MsgAcceptVaultSigner], ["/sparkdream.vault.v1.MsgLeaveVault", MsgLeaveVault]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -57,6 +57,18 @@ export const MessageComposer = {
         typeUrl: "/sparkdream.vault.v1.MsgUpdateVault",
         value: MsgUpdateVault.encode(value).finish()
       };
+    },
+    acceptVaultSigner(value: MsgAcceptVaultSigner) {
+      return {
+        typeUrl: "/sparkdream.vault.v1.MsgAcceptVaultSigner",
+        value: MsgAcceptVaultSigner.encode(value).finish()
+      };
+    },
+    leaveVault(value: MsgLeaveVault) {
+      return {
+        typeUrl: "/sparkdream.vault.v1.MsgLeaveVault",
+        value: MsgLeaveVault.encode(value).finish()
+      };
     }
   },
   withTypeUrl: {
@@ -105,6 +117,18 @@ export const MessageComposer = {
     updateVault(value: MsgUpdateVault) {
       return {
         typeUrl: "/sparkdream.vault.v1.MsgUpdateVault",
+        value
+      };
+    },
+    acceptVaultSigner(value: MsgAcceptVaultSigner) {
+      return {
+        typeUrl: "/sparkdream.vault.v1.MsgAcceptVaultSigner",
+        value
+      };
+    },
+    leaveVault(value: MsgLeaveVault) {
+      return {
+        typeUrl: "/sparkdream.vault.v1.MsgLeaveVault",
         value
       };
     }
@@ -156,6 +180,18 @@ export const MessageComposer = {
       return {
         typeUrl: "/sparkdream.vault.v1.MsgUpdateVault",
         value: MsgUpdateVault.fromPartial(value)
+      };
+    },
+    acceptVaultSigner(value: MsgAcceptVaultSigner) {
+      return {
+        typeUrl: "/sparkdream.vault.v1.MsgAcceptVaultSigner",
+        value: MsgAcceptVaultSigner.fromPartial(value)
+      };
+    },
+    leaveVault(value: MsgLeaveVault) {
+      return {
+        typeUrl: "/sparkdream.vault.v1.MsgLeaveVault",
+        value: MsgLeaveVault.fromPartial(value)
       };
     }
   }

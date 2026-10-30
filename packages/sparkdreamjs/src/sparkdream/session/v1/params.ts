@@ -42,6 +42,14 @@ export interface Params {
    */
   maxExecCount: bigint;
   /**
+   * Maximum duration of a narrow session: one that names at most
+   * NarrowSessionMaxMsgTypes (2) message types and does not set
+   * allow_self_revoke. Unattended daemons (bridge, verifier, content
+   * scanner) sign through such keys; renewing one needs the granter's main
+   * key, which stays off the daemon's host. Must be >= max_expiration.
+   */
+  narrowSessionMaxExpiration: Duration;
+  /**
    * --- RecurringPull (P3) ---
    * Minimum period_seconds on a RECURRING_PULL grant. Default 86_400 (1 day);
    * prevents abusive sub-second polling.
@@ -216,6 +224,14 @@ export interface ParamsAmino {
    */
   max_exec_count?: string;
   /**
+   * Maximum duration of a narrow session: one that names at most
+   * NarrowSessionMaxMsgTypes (2) message types and does not set
+   * allow_self_revoke. Unattended daemons (bridge, verifier, content
+   * scanner) sign through such keys; renewing one needs the granter's main
+   * key, which stays off the daemon's host. Must be >= max_expiration.
+   */
+  narrow_session_max_expiration?: DurationAmino;
+  /**
    * --- RecurringPull (P3) ---
    * Minimum period_seconds on a RECURRING_PULL grant. Default 86_400 (1 day);
    * prevents abusive sub-second polling.
@@ -369,6 +385,7 @@ export interface SessionOperationalParams {
   maxExpiration: Duration;
   maxSpendLimitAmount: string;
   maxExecCount: bigint;
+  narrowSessionMaxExpiration: Duration;
   /**
    * --- RecurringPull + cross-type (P3) ---
    */
@@ -428,6 +445,7 @@ export interface SessionOperationalParamsAmino {
   max_expiration?: DurationAmino;
   max_spend_limit_amount?: string;
   max_exec_count?: string;
+  narrow_session_max_expiration?: DurationAmino;
   /**
    * --- RecurringPull + cross-type (P3) ---
    */
@@ -477,6 +495,7 @@ function createBaseParams(): Params {
     maxExpiration: Duration.fromPartial({}),
     maxSpendLimitAmount: "",
     maxExecCount: BigInt(0),
+    narrowSessionMaxExpiration: Duration.fromPartial({}),
     minRecurringPeriodSeconds: BigInt(0),
     maxRecurringDurationSeconds: BigInt(0),
     maxRecurringPullsPerGranter: 0,
@@ -531,6 +550,9 @@ export const Params = {
     }
     if (message.maxExecCount !== BigInt(0)) {
       writer.uint32(56).uint64(message.maxExecCount);
+    }
+    if (message.narrowSessionMaxExpiration !== undefined) {
+      Duration.encode(message.narrowSessionMaxExpiration, writer.uint32(66).fork()).ldelim();
     }
     if (message.minRecurringPeriodSeconds !== BigInt(0)) {
       writer.uint32(80).int64(message.minRecurringPeriodSeconds);
@@ -628,6 +650,9 @@ export const Params = {
         case 7:
           message.maxExecCount = reader.uint64();
           break;
+        case 8:
+          message.narrowSessionMaxExpiration = Duration.decode(reader, reader.uint32());
+          break;
         case 10:
           message.minRecurringPeriodSeconds = reader.int64();
           break;
@@ -710,6 +735,7 @@ export const Params = {
     message.maxExpiration = object.maxExpiration !== undefined && object.maxExpiration !== null ? Duration.fromPartial(object.maxExpiration) : undefined;
     message.maxSpendLimitAmount = object.maxSpendLimitAmount ?? "";
     message.maxExecCount = object.maxExecCount !== undefined && object.maxExecCount !== null ? BigInt(object.maxExecCount.toString()) : BigInt(0);
+    message.narrowSessionMaxExpiration = object.narrowSessionMaxExpiration !== undefined && object.narrowSessionMaxExpiration !== null ? Duration.fromPartial(object.narrowSessionMaxExpiration) : undefined;
     message.minRecurringPeriodSeconds = object.minRecurringPeriodSeconds !== undefined && object.minRecurringPeriodSeconds !== null ? BigInt(object.minRecurringPeriodSeconds.toString()) : BigInt(0);
     message.maxRecurringDurationSeconds = object.maxRecurringDurationSeconds !== undefined && object.maxRecurringDurationSeconds !== null ? BigInt(object.maxRecurringDurationSeconds.toString()) : BigInt(0);
     message.maxRecurringPullsPerGranter = object.maxRecurringPullsPerGranter ?? 0;
@@ -752,6 +778,9 @@ export const Params = {
     }
     if (object.max_exec_count !== undefined && object.max_exec_count !== null) {
       message.maxExecCount = BigInt(object.max_exec_count);
+    }
+    if (object.narrow_session_max_expiration !== undefined && object.narrow_session_max_expiration !== null) {
+      message.narrowSessionMaxExpiration = Duration.fromAmino(object.narrow_session_max_expiration);
     }
     if (object.min_recurring_period_seconds !== undefined && object.min_recurring_period_seconds !== null) {
       message.minRecurringPeriodSeconds = BigInt(object.min_recurring_period_seconds);
@@ -834,6 +863,7 @@ export const Params = {
     obj.max_expiration = message.maxExpiration ? Duration.toAmino(message.maxExpiration) : undefined;
     obj.max_spend_limit_amount = message.maxSpendLimitAmount === "" ? undefined : message.maxSpendLimitAmount;
     obj.max_exec_count = message.maxExecCount !== BigInt(0) ? message.maxExecCount?.toString() : undefined;
+    obj.narrow_session_max_expiration = message.narrowSessionMaxExpiration ? Duration.toAmino(message.narrowSessionMaxExpiration) : undefined;
     obj.min_recurring_period_seconds = message.minRecurringPeriodSeconds !== BigInt(0) ? message.minRecurringPeriodSeconds?.toString() : undefined;
     obj.max_recurring_duration_seconds = message.maxRecurringDurationSeconds !== BigInt(0) ? message.maxRecurringDurationSeconds?.toString() : undefined;
     obj.max_recurring_pulls_per_granter = message.maxRecurringPullsPerGranter === 0 ? undefined : message.maxRecurringPullsPerGranter;
@@ -896,6 +926,7 @@ function createBaseSessionOperationalParams(): SessionOperationalParams {
     maxExpiration: Duration.fromPartial({}),
     maxSpendLimitAmount: "",
     maxExecCount: BigInt(0),
+    narrowSessionMaxExpiration: Duration.fromPartial({}),
     minRecurringPeriodSeconds: BigInt(0),
     maxRecurringDurationSeconds: BigInt(0),
     maxRecurringPullsPerGranter: 0,
@@ -948,6 +979,9 @@ export const SessionOperationalParams = {
     }
     if (message.maxExecCount !== BigInt(0)) {
       writer.uint32(48).uint64(message.maxExecCount);
+    }
+    if (message.narrowSessionMaxExpiration !== undefined) {
+      Duration.encode(message.narrowSessionMaxExpiration, writer.uint32(58).fork()).ldelim();
     }
     if (message.minRecurringPeriodSeconds !== BigInt(0)) {
       writer.uint32(80).int64(message.minRecurringPeriodSeconds);
@@ -1039,6 +1073,9 @@ export const SessionOperationalParams = {
         case 6:
           message.maxExecCount = reader.uint64();
           break;
+        case 7:
+          message.narrowSessionMaxExpiration = Duration.decode(reader, reader.uint32());
+          break;
         case 10:
           message.minRecurringPeriodSeconds = reader.int64();
           break;
@@ -1117,6 +1154,7 @@ export const SessionOperationalParams = {
     message.maxExpiration = object.maxExpiration !== undefined && object.maxExpiration !== null ? Duration.fromPartial(object.maxExpiration) : undefined;
     message.maxSpendLimitAmount = object.maxSpendLimitAmount ?? "";
     message.maxExecCount = object.maxExecCount !== undefined && object.maxExecCount !== null ? BigInt(object.maxExecCount.toString()) : BigInt(0);
+    message.narrowSessionMaxExpiration = object.narrowSessionMaxExpiration !== undefined && object.narrowSessionMaxExpiration !== null ? Duration.fromPartial(object.narrowSessionMaxExpiration) : undefined;
     message.minRecurringPeriodSeconds = object.minRecurringPeriodSeconds !== undefined && object.minRecurringPeriodSeconds !== null ? BigInt(object.minRecurringPeriodSeconds.toString()) : BigInt(0);
     message.maxRecurringDurationSeconds = object.maxRecurringDurationSeconds !== undefined && object.maxRecurringDurationSeconds !== null ? BigInt(object.maxRecurringDurationSeconds.toString()) : BigInt(0);
     message.maxRecurringPullsPerGranter = object.maxRecurringPullsPerGranter ?? 0;
@@ -1157,6 +1195,9 @@ export const SessionOperationalParams = {
     }
     if (object.max_exec_count !== undefined && object.max_exec_count !== null) {
       message.maxExecCount = BigInt(object.max_exec_count);
+    }
+    if (object.narrow_session_max_expiration !== undefined && object.narrow_session_max_expiration !== null) {
+      message.narrowSessionMaxExpiration = Duration.fromAmino(object.narrow_session_max_expiration);
     }
     if (object.min_recurring_period_seconds !== undefined && object.min_recurring_period_seconds !== null) {
       message.minRecurringPeriodSeconds = BigInt(object.min_recurring_period_seconds);
@@ -1233,6 +1274,7 @@ export const SessionOperationalParams = {
     obj.max_expiration = message.maxExpiration ? Duration.toAmino(message.maxExpiration) : undefined;
     obj.max_spend_limit_amount = message.maxSpendLimitAmount === "" ? undefined : message.maxSpendLimitAmount;
     obj.max_exec_count = message.maxExecCount !== BigInt(0) ? message.maxExecCount?.toString() : undefined;
+    obj.narrow_session_max_expiration = message.narrowSessionMaxExpiration ? Duration.toAmino(message.narrowSessionMaxExpiration) : undefined;
     obj.min_recurring_period_seconds = message.minRecurringPeriodSeconds !== BigInt(0) ? message.minRecurringPeriodSeconds?.toString() : undefined;
     obj.max_recurring_duration_seconds = message.maxRecurringDurationSeconds !== BigInt(0) ? message.maxRecurringDurationSeconds?.toString() : undefined;
     obj.max_recurring_pulls_per_granter = message.maxRecurringPullsPerGranter === 0 ? undefined : message.maxRecurringPullsPerGranter;

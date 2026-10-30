@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { Params, ParamsAmino } from "./params";
 import { Coin, CoinAmino } from "../../../cosmos/base/v1beta1/coin";
+import { BallotMode, VoteOption } from "./group";
 import { Any, AnyAmino } from "../../../google/protobuf/any";
-import { VoteOption } from "./group";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 import { Decimal } from "@interchainjs/math";
@@ -353,6 +353,11 @@ export interface MsgRegisterGroup {
   policyType: string;
   allowedMessages: string[];
   electoralPolicyAddress: string;
+  /**
+   * ballot_mode decides how the group's proposals are voted (UNSPECIFIED
+   * means OPEN).
+   */
+  ballotMode: BallotMode;
 }
 export interface MsgRegisterGroupProtoMsg {
   typeUrl: "/sparkdream.commons.v1.MsgRegisterGroup";
@@ -385,6 +390,11 @@ export interface MsgRegisterGroupAmino {
   policy_type?: string;
   allowed_messages?: string[];
   electoral_policy_address?: string;
+  /**
+   * ballot_mode decides how the group's proposals are voted (UNSPECIFIED
+   * means OPEN).
+   */
+  ballot_mode?: BallotMode;
 }
 export interface MsgRegisterGroupAminoMsg {
   type: "sparkdream/x/commons/MsgRegisterGroup";
@@ -486,6 +496,16 @@ export interface MsgUpdateGroupConfig {
   votingPeriod: bigint;
   minExecutionPeriod: bigint;
   electoralPolicyAddress: string;
+  /**
+   * funding_weight replaces the group's x/split share when non-zero. x/gov
+   * only; 0 leaves it unchanged.
+   */
+  fundingWeight: bigint;
+  /**
+   * ballot_mode replaces the group's ballot mode; UNSPECIFIED leaves it
+   * unchanged.
+   */
+  ballotMode: BallotMode;
 }
 export interface MsgUpdateGroupConfigProtoMsg {
   typeUrl: "/sparkdream.commons.v1.MsgUpdateGroupConfig";
@@ -511,6 +531,16 @@ export interface MsgUpdateGroupConfigAmino {
   voting_period?: string;
   min_execution_period?: string;
   electoral_policy_address?: string;
+  /**
+   * funding_weight replaces the group's x/split share when non-zero. x/gov
+   * only; 0 leaves it unchanged.
+   */
+  funding_weight?: string;
+  /**
+   * ballot_mode replaces the group's ballot mode; UNSPECIFIED leaves it
+   * unchanged.
+   */
+  ballot_mode?: BallotMode;
 }
 export interface MsgUpdateGroupConfigAminoMsg {
   type: "sparkdream/x/commons/MsgUpdateGroupConfig";
@@ -825,6 +855,12 @@ export interface MsgSubmitProposal {
    * metadata is optional metadata about the proposal
    */
   metadata: string;
+  /**
+   * secret_ballot asks for a secret ballot. Honoured only when the group's
+   * ballot_mode is PROPOSER_CHOICE; a SECRET group always votes secretly and
+   * an OPEN group refuses it.
+   */
+  secretBallot: boolean;
 }
 export interface MsgSubmitProposalProtoMsg {
   typeUrl: "/sparkdream.commons.v1.MsgSubmitProposal";
@@ -853,6 +889,12 @@ export interface MsgSubmitProposalAmino {
    * metadata is optional metadata about the proposal
    */
   metadata?: string;
+  /**
+   * secret_ballot asks for a secret ballot. Honoured only when the group's
+   * ballot_mode is PROPOSER_CHOICE; a SECRET group always votes secretly and
+   * an OPEN group refuses it.
+   */
+  secret_ballot?: boolean;
 }
 export interface MsgSubmitProposalAminoMsg {
   type: "sparkdream/x/commons/MsgSubmitProposal";
@@ -1050,6 +1092,10 @@ export interface MsgSubmitAnonymousProposal {
    * metadata is optional metadata about the proposal
    */
   metadata: string;
+  /**
+   * secret_ballot: as MsgSubmitProposal.secret_ballot.
+   */
+  secretBallot: boolean;
 }
 export interface MsgSubmitAnonymousProposalProtoMsg {
   typeUrl: "/sparkdream.commons.v1.MsgSubmitAnonymousProposal";
@@ -1081,6 +1127,10 @@ export interface MsgSubmitAnonymousProposalAmino {
    * metadata is optional metadata about the proposal
    */
   metadata?: string;
+  /**
+   * secret_ballot: as MsgSubmitProposal.secret_ballot.
+   */
+  secret_ballot?: boolean;
 }
 export interface MsgSubmitAnonymousProposalAminoMsg {
   type: "sparkdream/x/commons/MsgSubmitAnonymousProposal";
@@ -1629,6 +1679,270 @@ export interface MsgDeclineRecurringSpendResponseAmino {}
 export interface MsgDeclineRecurringSpendResponseAminoMsg {
   type: "/sparkdream.commons.v1.MsgDeclineRecurringSpendResponse";
   value: MsgDeclineRecurringSpendResponseAmino;
+}
+/**
+ * MsgOpenPoll opens a non-binding, single-choice poll for a group's members.
+ * @name MsgOpenPoll
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgOpenPoll
+ */
+export interface MsgOpenPoll {
+  /**
+   * creator must be a member of the group.
+   */
+  creator: string;
+  /**
+   * council_name is the group whose members vote.
+   */
+  councilName: string;
+  question: string;
+  /**
+   * options are the 2 to 10 choices, each distinct and non-empty.
+   */
+  options: string[];
+  /**
+   * duration_seconds is how long voting stays open.
+   */
+  durationSeconds: bigint;
+  /**
+   * secret_ballot votes through x/shield against a snapshot of the group's
+   * members (equal weights, enough registered ZK keys).
+   */
+  secretBallot: boolean;
+}
+export interface MsgOpenPollProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgOpenPoll";
+  value: Uint8Array;
+}
+/**
+ * MsgOpenPoll opens a non-binding, single-choice poll for a group's members.
+ * @name MsgOpenPollAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgOpenPoll
+ */
+export interface MsgOpenPollAmino {
+  /**
+   * creator must be a member of the group.
+   */
+  creator?: string;
+  /**
+   * council_name is the group whose members vote.
+   */
+  council_name?: string;
+  question?: string;
+  /**
+   * options are the 2 to 10 choices, each distinct and non-empty.
+   */
+  options?: string[];
+  /**
+   * duration_seconds is how long voting stays open.
+   */
+  duration_seconds?: string;
+  /**
+   * secret_ballot votes through x/shield against a snapshot of the group's
+   * members (equal weights, enough registered ZK keys).
+   */
+  secret_ballot?: boolean;
+}
+export interface MsgOpenPollAminoMsg {
+  type: "sparkdream/x/commons/MsgOpenPoll";
+  value: MsgOpenPollAmino;
+}
+/**
+ * MsgOpenPollResponse defines the MsgOpenPollResponse message.
+ * @name MsgOpenPollResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgOpenPollResponse
+ */
+export interface MsgOpenPollResponse {
+  pollId: bigint;
+}
+export interface MsgOpenPollResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgOpenPollResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgOpenPollResponse defines the MsgOpenPollResponse message.
+ * @name MsgOpenPollResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgOpenPollResponse
+ */
+export interface MsgOpenPollResponseAmino {
+  poll_id?: string;
+}
+export interface MsgOpenPollResponseAminoMsg {
+  type: "/sparkdream.commons.v1.MsgOpenPollResponse";
+  value: MsgOpenPollResponseAmino;
+}
+/**
+ * MsgVotePoll casts a member's open vote. One vote per member, final.
+ * @name MsgVotePoll
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgVotePoll
+ */
+export interface MsgVotePoll {
+  voter: string;
+  pollId: bigint;
+  /**
+   * option is the index into the poll's options.
+   */
+  option: bigint;
+}
+export interface MsgVotePollProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgVotePoll";
+  value: Uint8Array;
+}
+/**
+ * MsgVotePoll casts a member's open vote. One vote per member, final.
+ * @name MsgVotePollAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgVotePoll
+ */
+export interface MsgVotePollAmino {
+  voter?: string;
+  poll_id?: string;
+  /**
+   * option is the index into the poll's options.
+   */
+  option?: string;
+}
+export interface MsgVotePollAminoMsg {
+  type: "sparkdream/x/commons/MsgVotePoll";
+  value: MsgVotePollAmino;
+}
+/**
+ * MsgVotePollResponse defines the MsgVotePollResponse message.
+ * @name MsgVotePollResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgVotePollResponse
+ */
+export interface MsgVotePollResponse {}
+export interface MsgVotePollResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgVotePollResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgVotePollResponse defines the MsgVotePollResponse message.
+ * @name MsgVotePollResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgVotePollResponse
+ */
+export interface MsgVotePollResponseAmino {}
+export interface MsgVotePollResponseAminoMsg {
+  type: "/sparkdream.commons.v1.MsgVotePollResponse";
+  value: MsgVotePollResponseAmino;
+}
+/**
+ * MsgAnonymousVotePoll casts a secret-ballot poll vote. Submitted inside
+ * x/shield's MsgShieldedExec, whose proof shows membership of the poll's
+ * voter snapshot; the nullifier (scope poll_id) allows one vote per member.
+ * @name MsgAnonymousVotePoll
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgAnonymousVotePoll
+ */
+export interface MsgAnonymousVotePoll {
+  /**
+   * voter must be the shield module account address
+   */
+  voter: string;
+  pollId: bigint;
+  option: bigint;
+}
+export interface MsgAnonymousVotePollProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgAnonymousVotePoll";
+  value: Uint8Array;
+}
+/**
+ * MsgAnonymousVotePoll casts a secret-ballot poll vote. Submitted inside
+ * x/shield's MsgShieldedExec, whose proof shows membership of the poll's
+ * voter snapshot; the nullifier (scope poll_id) allows one vote per member.
+ * @name MsgAnonymousVotePollAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgAnonymousVotePoll
+ */
+export interface MsgAnonymousVotePollAmino {
+  /**
+   * voter must be the shield module account address
+   */
+  voter?: string;
+  poll_id?: string;
+  option?: string;
+}
+export interface MsgAnonymousVotePollAminoMsg {
+  type: "sparkdream/x/commons/MsgAnonymousVotePoll";
+  value: MsgAnonymousVotePollAmino;
+}
+/**
+ * MsgAnonymousVotePollResponse defines the MsgAnonymousVotePollResponse message.
+ * @name MsgAnonymousVotePollResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgAnonymousVotePollResponse
+ */
+export interface MsgAnonymousVotePollResponse {}
+export interface MsgAnonymousVotePollResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgAnonymousVotePollResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgAnonymousVotePollResponse defines the MsgAnonymousVotePollResponse message.
+ * @name MsgAnonymousVotePollResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgAnonymousVotePollResponse
+ */
+export interface MsgAnonymousVotePollResponseAmino {}
+export interface MsgAnonymousVotePollResponseAminoMsg {
+  type: "/sparkdream.commons.v1.MsgAnonymousVotePollResponse";
+  value: MsgAnonymousVotePollResponseAmino;
+}
+/**
+ * MsgCancelPoll lets the creator withdraw a poll nobody has voted on.
+ * @name MsgCancelPoll
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgCancelPoll
+ */
+export interface MsgCancelPoll {
+  creator: string;
+  pollId: bigint;
+}
+export interface MsgCancelPollProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgCancelPoll";
+  value: Uint8Array;
+}
+/**
+ * MsgCancelPoll lets the creator withdraw a poll nobody has voted on.
+ * @name MsgCancelPollAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgCancelPoll
+ */
+export interface MsgCancelPollAmino {
+  creator?: string;
+  poll_id?: string;
+}
+export interface MsgCancelPollAminoMsg {
+  type: "sparkdream/x/commons/MsgCancelPoll";
+  value: MsgCancelPollAmino;
+}
+/**
+ * MsgCancelPollResponse defines the MsgCancelPollResponse message.
+ * @name MsgCancelPollResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgCancelPollResponse
+ */
+export interface MsgCancelPollResponse {}
+export interface MsgCancelPollResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgCancelPollResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgCancelPollResponse defines the MsgCancelPollResponse message.
+ * @name MsgCancelPollResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgCancelPollResponse
+ */
+export interface MsgCancelPollResponseAmino {}
+export interface MsgCancelPollResponseAminoMsg {
+  type: "/sparkdream.commons.v1.MsgCancelPollResponse";
+  value: MsgCancelPollResponseAmino;
 }
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
@@ -2558,7 +2872,8 @@ function createBaseMsgRegisterGroup(): MsgRegisterGroup {
     voteThreshold: "",
     policyType: "",
     allowedMessages: [],
-    electoralPolicyAddress: ""
+    electoralPolicyAddress: "",
+    ballotMode: 0
   };
 }
 /**
@@ -2631,6 +2946,9 @@ export const MsgRegisterGroup = {
     if (message.electoralPolicyAddress !== "") {
       writer.uint32(162).string(message.electoralPolicyAddress);
     }
+    if (message.ballotMode !== 0) {
+      writer.uint32(168).int32(message.ballotMode);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgRegisterGroup {
@@ -2700,6 +3018,9 @@ export const MsgRegisterGroup = {
         case 20:
           message.electoralPolicyAddress = reader.string();
           break;
+        case 21:
+          message.ballotMode = reader.int32() as any;
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2729,6 +3050,7 @@ export const MsgRegisterGroup = {
     message.policyType = object.policyType ?? "";
     message.allowedMessages = object.allowedMessages?.map(e => e) || [];
     message.electoralPolicyAddress = object.electoralPolicyAddress ?? "";
+    message.ballotMode = object.ballotMode ?? 0;
     return message;
   },
   fromAmino(object: MsgRegisterGroupAmino): MsgRegisterGroup {
@@ -2787,6 +3109,9 @@ export const MsgRegisterGroup = {
     if (object.electoral_policy_address !== undefined && object.electoral_policy_address !== null) {
       message.electoralPolicyAddress = object.electoral_policy_address;
     }
+    if (object.ballot_mode !== undefined && object.ballot_mode !== null) {
+      message.ballotMode = object.ballot_mode;
+    }
     return message;
   },
   toAmino(message: MsgRegisterGroup): MsgRegisterGroupAmino {
@@ -2823,6 +3148,7 @@ export const MsgRegisterGroup = {
       obj.allowed_messages = message.allowedMessages;
     }
     obj.electoral_policy_address = message.electoralPolicyAddress === "" ? undefined : message.electoralPolicyAddress;
+    obj.ballot_mode = message.ballotMode === 0 ? undefined : message.ballotMode;
     return obj;
   },
   fromAminoMsg(object: MsgRegisterGroupAminoMsg): MsgRegisterGroup {
@@ -3089,7 +3415,9 @@ function createBaseMsgUpdateGroupConfig(): MsgUpdateGroupConfig {
     policyType: "",
     votingPeriod: BigInt(0),
     minExecutionPeriod: BigInt(0),
-    electoralPolicyAddress: ""
+    electoralPolicyAddress: "",
+    fundingWeight: BigInt(0),
+    ballotMode: 0
   };
 }
 /**
@@ -3141,6 +3469,12 @@ export const MsgUpdateGroupConfig = {
     if (message.electoralPolicyAddress !== "") {
       writer.uint32(106).string(message.electoralPolicyAddress);
     }
+    if (message.fundingWeight !== BigInt(0)) {
+      writer.uint32(112).uint64(message.fundingWeight);
+    }
+    if (message.ballotMode !== 0) {
+      writer.uint32(120).int32(message.ballotMode);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgUpdateGroupConfig {
@@ -3189,6 +3523,12 @@ export const MsgUpdateGroupConfig = {
         case 13:
           message.electoralPolicyAddress = reader.string();
           break;
+        case 14:
+          message.fundingWeight = reader.uint64();
+          break;
+        case 15:
+          message.ballotMode = reader.int32() as any;
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3211,6 +3551,8 @@ export const MsgUpdateGroupConfig = {
     message.votingPeriod = object.votingPeriod !== undefined && object.votingPeriod !== null ? BigInt(object.votingPeriod.toString()) : BigInt(0);
     message.minExecutionPeriod = object.minExecutionPeriod !== undefined && object.minExecutionPeriod !== null ? BigInt(object.minExecutionPeriod.toString()) : BigInt(0);
     message.electoralPolicyAddress = object.electoralPolicyAddress ?? "";
+    message.fundingWeight = object.fundingWeight !== undefined && object.fundingWeight !== null ? BigInt(object.fundingWeight.toString()) : BigInt(0);
+    message.ballotMode = object.ballotMode ?? 0;
     return message;
   },
   fromAmino(object: MsgUpdateGroupConfigAmino): MsgUpdateGroupConfig {
@@ -3254,6 +3596,12 @@ export const MsgUpdateGroupConfig = {
     if (object.electoral_policy_address !== undefined && object.electoral_policy_address !== null) {
       message.electoralPolicyAddress = object.electoral_policy_address;
     }
+    if (object.funding_weight !== undefined && object.funding_weight !== null) {
+      message.fundingWeight = BigInt(object.funding_weight);
+    }
+    if (object.ballot_mode !== undefined && object.ballot_mode !== null) {
+      message.ballotMode = object.ballot_mode;
+    }
     return message;
   },
   toAmino(message: MsgUpdateGroupConfig): MsgUpdateGroupConfigAmino {
@@ -3271,6 +3619,8 @@ export const MsgUpdateGroupConfig = {
     obj.voting_period = message.votingPeriod !== BigInt(0) ? message.votingPeriod?.toString() : undefined;
     obj.min_execution_period = message.minExecutionPeriod !== BigInt(0) ? message.minExecutionPeriod?.toString() : undefined;
     obj.electoral_policy_address = message.electoralPolicyAddress === "" ? undefined : message.electoralPolicyAddress;
+    obj.funding_weight = message.fundingWeight !== BigInt(0) ? message.fundingWeight?.toString() : undefined;
+    obj.ballot_mode = message.ballotMode === 0 ? undefined : message.ballotMode;
     return obj;
   },
   fromAminoMsg(object: MsgUpdateGroupConfigAminoMsg): MsgUpdateGroupConfig {
@@ -4137,7 +4487,8 @@ function createBaseMsgSubmitProposal(): MsgSubmitProposal {
     proposer: "",
     policyAddress: "",
     messages: [],
-    metadata: ""
+    metadata: "",
+    secretBallot: false
   };
 }
 /**
@@ -4162,6 +4513,9 @@ export const MsgSubmitProposal = {
     if (message.metadata !== "") {
       writer.uint32(34).string(message.metadata);
     }
+    if (message.secretBallot === true) {
+      writer.uint32(40).bool(message.secretBallot);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgSubmitProposal {
@@ -4183,6 +4537,9 @@ export const MsgSubmitProposal = {
         case 4:
           message.metadata = reader.string();
           break;
+        case 5:
+          message.secretBallot = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4196,6 +4553,7 @@ export const MsgSubmitProposal = {
     message.policyAddress = object.policyAddress ?? "";
     message.messages = object.messages?.map(e => Any.fromPartial(e)) || [];
     message.metadata = object.metadata ?? "";
+    message.secretBallot = object.secretBallot ?? false;
     return message;
   },
   fromAmino(object: MsgSubmitProposalAmino): MsgSubmitProposal {
@@ -4210,6 +4568,9 @@ export const MsgSubmitProposal = {
     if (object.metadata !== undefined && object.metadata !== null) {
       message.metadata = object.metadata;
     }
+    if (object.secret_ballot !== undefined && object.secret_ballot !== null) {
+      message.secretBallot = object.secret_ballot;
+    }
     return message;
   },
   toAmino(message: MsgSubmitProposal): MsgSubmitProposalAmino {
@@ -4222,6 +4583,7 @@ export const MsgSubmitProposal = {
       obj.messages = message.messages;
     }
     obj.metadata = message.metadata === "" ? undefined : message.metadata;
+    obj.secret_ballot = message.secretBallot === false ? undefined : message.secretBallot;
     return obj;
   },
   fromAminoMsg(object: MsgSubmitProposalAminoMsg): MsgSubmitProposal {
@@ -4632,7 +4994,8 @@ function createBaseMsgSubmitAnonymousProposal(): MsgSubmitAnonymousProposal {
     proposer: "",
     policyAddress: "",
     messages: [],
-    metadata: ""
+    metadata: "",
+    secretBallot: false
   };
 }
 /**
@@ -4660,6 +5023,9 @@ export const MsgSubmitAnonymousProposal = {
     if (message.metadata !== "") {
       writer.uint32(34).string(message.metadata);
     }
+    if (message.secretBallot === true) {
+      writer.uint32(40).bool(message.secretBallot);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgSubmitAnonymousProposal {
@@ -4681,6 +5047,9 @@ export const MsgSubmitAnonymousProposal = {
         case 4:
           message.metadata = reader.string();
           break;
+        case 5:
+          message.secretBallot = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4694,6 +5063,7 @@ export const MsgSubmitAnonymousProposal = {
     message.policyAddress = object.policyAddress ?? "";
     message.messages = object.messages?.map(e => Any.fromPartial(e)) || [];
     message.metadata = object.metadata ?? "";
+    message.secretBallot = object.secretBallot ?? false;
     return message;
   },
   fromAmino(object: MsgSubmitAnonymousProposalAmino): MsgSubmitAnonymousProposal {
@@ -4708,6 +5078,9 @@ export const MsgSubmitAnonymousProposal = {
     if (object.metadata !== undefined && object.metadata !== null) {
       message.metadata = object.metadata;
     }
+    if (object.secret_ballot !== undefined && object.secret_ballot !== null) {
+      message.secretBallot = object.secret_ballot;
+    }
     return message;
   },
   toAmino(message: MsgSubmitAnonymousProposal): MsgSubmitAnonymousProposalAmino {
@@ -4720,6 +5093,7 @@ export const MsgSubmitAnonymousProposal = {
       obj.messages = message.messages;
     }
     obj.metadata = message.metadata === "" ? undefined : message.metadata;
+    obj.secret_ballot = message.secretBallot === false ? undefined : message.secretBallot;
     return obj;
   },
   fromAminoMsg(object: MsgSubmitAnonymousProposalAminoMsg): MsgSubmitAnonymousProposal {
@@ -6037,6 +6411,671 @@ export const MsgDeclineRecurringSpendResponse = {
     return {
       typeUrl: "/sparkdream.commons.v1.MsgDeclineRecurringSpendResponse",
       value: MsgDeclineRecurringSpendResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgOpenPoll(): MsgOpenPoll {
+  return {
+    creator: "",
+    councilName: "",
+    question: "",
+    options: [],
+    durationSeconds: BigInt(0),
+    secretBallot: false
+  };
+}
+/**
+ * MsgOpenPoll opens a non-binding, single-choice poll for a group's members.
+ * @name MsgOpenPoll
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgOpenPoll
+ */
+export const MsgOpenPoll = {
+  typeUrl: "/sparkdream.commons.v1.MsgOpenPoll",
+  aminoType: "sparkdream/x/commons/MsgOpenPoll",
+  encode(message: MsgOpenPoll, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.councilName !== "") {
+      writer.uint32(18).string(message.councilName);
+    }
+    if (message.question !== "") {
+      writer.uint32(26).string(message.question);
+    }
+    for (const v of message.options) {
+      writer.uint32(34).string(v!);
+    }
+    if (message.durationSeconds !== BigInt(0)) {
+      writer.uint32(40).int64(message.durationSeconds);
+    }
+    if (message.secretBallot === true) {
+      writer.uint32(48).bool(message.secretBallot);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgOpenPoll {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgOpenPoll();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.councilName = reader.string();
+          break;
+        case 3:
+          message.question = reader.string();
+          break;
+        case 4:
+          message.options.push(reader.string());
+          break;
+        case 5:
+          message.durationSeconds = reader.int64();
+          break;
+        case 6:
+          message.secretBallot = reader.bool();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgOpenPoll>): MsgOpenPoll {
+    const message = createBaseMsgOpenPoll();
+    message.creator = object.creator ?? "";
+    message.councilName = object.councilName ?? "";
+    message.question = object.question ?? "";
+    message.options = object.options?.map(e => e) || [];
+    message.durationSeconds = object.durationSeconds !== undefined && object.durationSeconds !== null ? BigInt(object.durationSeconds.toString()) : BigInt(0);
+    message.secretBallot = object.secretBallot ?? false;
+    return message;
+  },
+  fromAmino(object: MsgOpenPollAmino): MsgOpenPoll {
+    const message = createBaseMsgOpenPoll();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.council_name !== undefined && object.council_name !== null) {
+      message.councilName = object.council_name;
+    }
+    if (object.question !== undefined && object.question !== null) {
+      message.question = object.question;
+    }
+    message.options = object.options?.map(e => e) || [];
+    if (object.duration_seconds !== undefined && object.duration_seconds !== null) {
+      message.durationSeconds = BigInt(object.duration_seconds);
+    }
+    if (object.secret_ballot !== undefined && object.secret_ballot !== null) {
+      message.secretBallot = object.secret_ballot;
+    }
+    return message;
+  },
+  toAmino(message: MsgOpenPoll): MsgOpenPollAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.council_name = message.councilName === "" ? undefined : message.councilName;
+    obj.question = message.question === "" ? undefined : message.question;
+    if (message.options) {
+      obj.options = message.options.map(e => e);
+    } else {
+      obj.options = message.options;
+    }
+    obj.duration_seconds = message.durationSeconds !== BigInt(0) ? message.durationSeconds?.toString() : undefined;
+    obj.secret_ballot = message.secretBallot === false ? undefined : message.secretBallot;
+    return obj;
+  },
+  fromAminoMsg(object: MsgOpenPollAminoMsg): MsgOpenPoll {
+    return MsgOpenPoll.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgOpenPoll): MsgOpenPollAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgOpenPoll",
+      value: MsgOpenPoll.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgOpenPollProtoMsg): MsgOpenPoll {
+    return MsgOpenPoll.decode(message.value);
+  },
+  toProto(message: MsgOpenPoll): Uint8Array {
+    return MsgOpenPoll.encode(message).finish();
+  },
+  toProtoMsg(message: MsgOpenPoll): MsgOpenPollProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgOpenPoll",
+      value: MsgOpenPoll.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgOpenPollResponse(): MsgOpenPollResponse {
+  return {
+    pollId: BigInt(0)
+  };
+}
+/**
+ * MsgOpenPollResponse defines the MsgOpenPollResponse message.
+ * @name MsgOpenPollResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgOpenPollResponse
+ */
+export const MsgOpenPollResponse = {
+  typeUrl: "/sparkdream.commons.v1.MsgOpenPollResponse",
+  encode(message: MsgOpenPollResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pollId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.pollId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgOpenPollResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgOpenPollResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pollId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgOpenPollResponse>): MsgOpenPollResponse {
+    const message = createBaseMsgOpenPollResponse();
+    message.pollId = object.pollId !== undefined && object.pollId !== null ? BigInt(object.pollId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgOpenPollResponseAmino): MsgOpenPollResponse {
+    const message = createBaseMsgOpenPollResponse();
+    if (object.poll_id !== undefined && object.poll_id !== null) {
+      message.pollId = BigInt(object.poll_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgOpenPollResponse): MsgOpenPollResponseAmino {
+    const obj: any = {};
+    obj.poll_id = message.pollId !== BigInt(0) ? message.pollId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgOpenPollResponseAminoMsg): MsgOpenPollResponse {
+    return MsgOpenPollResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgOpenPollResponseProtoMsg): MsgOpenPollResponse {
+    return MsgOpenPollResponse.decode(message.value);
+  },
+  toProto(message: MsgOpenPollResponse): Uint8Array {
+    return MsgOpenPollResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgOpenPollResponse): MsgOpenPollResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgOpenPollResponse",
+      value: MsgOpenPollResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgVotePoll(): MsgVotePoll {
+  return {
+    voter: "",
+    pollId: BigInt(0),
+    option: BigInt(0)
+  };
+}
+/**
+ * MsgVotePoll casts a member's open vote. One vote per member, final.
+ * @name MsgVotePoll
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgVotePoll
+ */
+export const MsgVotePoll = {
+  typeUrl: "/sparkdream.commons.v1.MsgVotePoll",
+  aminoType: "sparkdream/x/commons/MsgVotePoll",
+  encode(message: MsgVotePoll, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.voter !== "") {
+      writer.uint32(10).string(message.voter);
+    }
+    if (message.pollId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.pollId);
+    }
+    if (message.option !== BigInt(0)) {
+      writer.uint32(24).uint64(message.option);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgVotePoll {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgVotePoll();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.voter = reader.string();
+          break;
+        case 2:
+          message.pollId = reader.uint64();
+          break;
+        case 3:
+          message.option = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgVotePoll>): MsgVotePoll {
+    const message = createBaseMsgVotePoll();
+    message.voter = object.voter ?? "";
+    message.pollId = object.pollId !== undefined && object.pollId !== null ? BigInt(object.pollId.toString()) : BigInt(0);
+    message.option = object.option !== undefined && object.option !== null ? BigInt(object.option.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgVotePollAmino): MsgVotePoll {
+    const message = createBaseMsgVotePoll();
+    if (object.voter !== undefined && object.voter !== null) {
+      message.voter = object.voter;
+    }
+    if (object.poll_id !== undefined && object.poll_id !== null) {
+      message.pollId = BigInt(object.poll_id);
+    }
+    if (object.option !== undefined && object.option !== null) {
+      message.option = BigInt(object.option);
+    }
+    return message;
+  },
+  toAmino(message: MsgVotePoll): MsgVotePollAmino {
+    const obj: any = {};
+    obj.voter = message.voter === "" ? undefined : message.voter;
+    obj.poll_id = message.pollId !== BigInt(0) ? message.pollId?.toString() : undefined;
+    obj.option = message.option !== BigInt(0) ? message.option?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgVotePollAminoMsg): MsgVotePoll {
+    return MsgVotePoll.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgVotePoll): MsgVotePollAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgVotePoll",
+      value: MsgVotePoll.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgVotePollProtoMsg): MsgVotePoll {
+    return MsgVotePoll.decode(message.value);
+  },
+  toProto(message: MsgVotePoll): Uint8Array {
+    return MsgVotePoll.encode(message).finish();
+  },
+  toProtoMsg(message: MsgVotePoll): MsgVotePollProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgVotePoll",
+      value: MsgVotePoll.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgVotePollResponse(): MsgVotePollResponse {
+  return {};
+}
+/**
+ * MsgVotePollResponse defines the MsgVotePollResponse message.
+ * @name MsgVotePollResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgVotePollResponse
+ */
+export const MsgVotePollResponse = {
+  typeUrl: "/sparkdream.commons.v1.MsgVotePollResponse",
+  encode(_: MsgVotePollResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgVotePollResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgVotePollResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgVotePollResponse>): MsgVotePollResponse {
+    const message = createBaseMsgVotePollResponse();
+    return message;
+  },
+  fromAmino(_: MsgVotePollResponseAmino): MsgVotePollResponse {
+    const message = createBaseMsgVotePollResponse();
+    return message;
+  },
+  toAmino(_: MsgVotePollResponse): MsgVotePollResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgVotePollResponseAminoMsg): MsgVotePollResponse {
+    return MsgVotePollResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgVotePollResponseProtoMsg): MsgVotePollResponse {
+    return MsgVotePollResponse.decode(message.value);
+  },
+  toProto(message: MsgVotePollResponse): Uint8Array {
+    return MsgVotePollResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgVotePollResponse): MsgVotePollResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgVotePollResponse",
+      value: MsgVotePollResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAnonymousVotePoll(): MsgAnonymousVotePoll {
+  return {
+    voter: "",
+    pollId: BigInt(0),
+    option: BigInt(0)
+  };
+}
+/**
+ * MsgAnonymousVotePoll casts a secret-ballot poll vote. Submitted inside
+ * x/shield's MsgShieldedExec, whose proof shows membership of the poll's
+ * voter snapshot; the nullifier (scope poll_id) allows one vote per member.
+ * @name MsgAnonymousVotePoll
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgAnonymousVotePoll
+ */
+export const MsgAnonymousVotePoll = {
+  typeUrl: "/sparkdream.commons.v1.MsgAnonymousVotePoll",
+  aminoType: "sparkdream/x/commons/MsgAnonymousVotePoll",
+  encode(message: MsgAnonymousVotePoll, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.voter !== "") {
+      writer.uint32(10).string(message.voter);
+    }
+    if (message.pollId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.pollId);
+    }
+    if (message.option !== BigInt(0)) {
+      writer.uint32(24).uint64(message.option);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAnonymousVotePoll {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAnonymousVotePoll();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.voter = reader.string();
+          break;
+        case 2:
+          message.pollId = reader.uint64();
+          break;
+        case 3:
+          message.option = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgAnonymousVotePoll>): MsgAnonymousVotePoll {
+    const message = createBaseMsgAnonymousVotePoll();
+    message.voter = object.voter ?? "";
+    message.pollId = object.pollId !== undefined && object.pollId !== null ? BigInt(object.pollId.toString()) : BigInt(0);
+    message.option = object.option !== undefined && object.option !== null ? BigInt(object.option.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgAnonymousVotePollAmino): MsgAnonymousVotePoll {
+    const message = createBaseMsgAnonymousVotePoll();
+    if (object.voter !== undefined && object.voter !== null) {
+      message.voter = object.voter;
+    }
+    if (object.poll_id !== undefined && object.poll_id !== null) {
+      message.pollId = BigInt(object.poll_id);
+    }
+    if (object.option !== undefined && object.option !== null) {
+      message.option = BigInt(object.option);
+    }
+    return message;
+  },
+  toAmino(message: MsgAnonymousVotePoll): MsgAnonymousVotePollAmino {
+    const obj: any = {};
+    obj.voter = message.voter === "" ? undefined : message.voter;
+    obj.poll_id = message.pollId !== BigInt(0) ? message.pollId?.toString() : undefined;
+    obj.option = message.option !== BigInt(0) ? message.option?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgAnonymousVotePollAminoMsg): MsgAnonymousVotePoll {
+    return MsgAnonymousVotePoll.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAnonymousVotePoll): MsgAnonymousVotePollAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgAnonymousVotePoll",
+      value: MsgAnonymousVotePoll.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgAnonymousVotePollProtoMsg): MsgAnonymousVotePoll {
+    return MsgAnonymousVotePoll.decode(message.value);
+  },
+  toProto(message: MsgAnonymousVotePoll): Uint8Array {
+    return MsgAnonymousVotePoll.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAnonymousVotePoll): MsgAnonymousVotePollProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgAnonymousVotePoll",
+      value: MsgAnonymousVotePoll.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAnonymousVotePollResponse(): MsgAnonymousVotePollResponse {
+  return {};
+}
+/**
+ * MsgAnonymousVotePollResponse defines the MsgAnonymousVotePollResponse message.
+ * @name MsgAnonymousVotePollResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgAnonymousVotePollResponse
+ */
+export const MsgAnonymousVotePollResponse = {
+  typeUrl: "/sparkdream.commons.v1.MsgAnonymousVotePollResponse",
+  encode(_: MsgAnonymousVotePollResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAnonymousVotePollResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAnonymousVotePollResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgAnonymousVotePollResponse>): MsgAnonymousVotePollResponse {
+    const message = createBaseMsgAnonymousVotePollResponse();
+    return message;
+  },
+  fromAmino(_: MsgAnonymousVotePollResponseAmino): MsgAnonymousVotePollResponse {
+    const message = createBaseMsgAnonymousVotePollResponse();
+    return message;
+  },
+  toAmino(_: MsgAnonymousVotePollResponse): MsgAnonymousVotePollResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgAnonymousVotePollResponseAminoMsg): MsgAnonymousVotePollResponse {
+    return MsgAnonymousVotePollResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgAnonymousVotePollResponseProtoMsg): MsgAnonymousVotePollResponse {
+    return MsgAnonymousVotePollResponse.decode(message.value);
+  },
+  toProto(message: MsgAnonymousVotePollResponse): Uint8Array {
+    return MsgAnonymousVotePollResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAnonymousVotePollResponse): MsgAnonymousVotePollResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgAnonymousVotePollResponse",
+      value: MsgAnonymousVotePollResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCancelPoll(): MsgCancelPoll {
+  return {
+    creator: "",
+    pollId: BigInt(0)
+  };
+}
+/**
+ * MsgCancelPoll lets the creator withdraw a poll nobody has voted on.
+ * @name MsgCancelPoll
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgCancelPoll
+ */
+export const MsgCancelPoll = {
+  typeUrl: "/sparkdream.commons.v1.MsgCancelPoll",
+  aminoType: "sparkdream/x/commons/MsgCancelPoll",
+  encode(message: MsgCancelPoll, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.pollId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.pollId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCancelPoll {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCancelPoll();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.pollId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgCancelPoll>): MsgCancelPoll {
+    const message = createBaseMsgCancelPoll();
+    message.creator = object.creator ?? "";
+    message.pollId = object.pollId !== undefined && object.pollId !== null ? BigInt(object.pollId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgCancelPollAmino): MsgCancelPoll {
+    const message = createBaseMsgCancelPoll();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.poll_id !== undefined && object.poll_id !== null) {
+      message.pollId = BigInt(object.poll_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgCancelPoll): MsgCancelPollAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.poll_id = message.pollId !== BigInt(0) ? message.pollId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgCancelPollAminoMsg): MsgCancelPoll {
+    return MsgCancelPoll.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgCancelPoll): MsgCancelPollAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgCancelPoll",
+      value: MsgCancelPoll.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgCancelPollProtoMsg): MsgCancelPoll {
+    return MsgCancelPoll.decode(message.value);
+  },
+  toProto(message: MsgCancelPoll): Uint8Array {
+    return MsgCancelPoll.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCancelPoll): MsgCancelPollProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgCancelPoll",
+      value: MsgCancelPoll.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgCancelPollResponse(): MsgCancelPollResponse {
+  return {};
+}
+/**
+ * MsgCancelPollResponse defines the MsgCancelPollResponse message.
+ * @name MsgCancelPollResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgCancelPollResponse
+ */
+export const MsgCancelPollResponse = {
+  typeUrl: "/sparkdream.commons.v1.MsgCancelPollResponse",
+  encode(_: MsgCancelPollResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgCancelPollResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgCancelPollResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgCancelPollResponse>): MsgCancelPollResponse {
+    const message = createBaseMsgCancelPollResponse();
+    return message;
+  },
+  fromAmino(_: MsgCancelPollResponseAmino): MsgCancelPollResponse {
+    const message = createBaseMsgCancelPollResponse();
+    return message;
+  },
+  toAmino(_: MsgCancelPollResponse): MsgCancelPollResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgCancelPollResponseAminoMsg): MsgCancelPollResponse {
+    return MsgCancelPollResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgCancelPollResponseProtoMsg): MsgCancelPollResponse {
+    return MsgCancelPollResponse.decode(message.value);
+  },
+  toProto(message: MsgCancelPollResponse): Uint8Array {
+    return MsgCancelPollResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgCancelPollResponse): MsgCancelPollResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgCancelPollResponse",
+      value: MsgCancelPollResponse.encode(message).finish()
     };
   }
 };

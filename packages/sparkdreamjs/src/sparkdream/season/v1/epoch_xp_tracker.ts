@@ -13,6 +13,11 @@ export interface EpochXpTracker {
   forumXpEarned: bigint;
   questXpEarned: bigint;
   otherXpEarned: bigint;
+  /**
+   * Vote grants accepted this epoch (SEA-33); the max_vote_xp_per_epoch cap
+   * counts these, not vote_xp_earned / xp_vote_cast.
+   */
+  votesCounted: bigint;
 }
 export interface EpochXpTrackerProtoMsg {
   typeUrl: "/sparkdream.season.v1.EpochXpTracker";
@@ -30,6 +35,11 @@ export interface EpochXpTrackerAmino {
   forum_xp_earned?: string;
   quest_xp_earned?: string;
   other_xp_earned?: string;
+  /**
+   * Vote grants accepted this epoch (SEA-33); the max_vote_xp_per_epoch cap
+   * counts these, not vote_xp_earned / xp_vote_cast.
+   */
+  votes_counted?: string;
 }
 export interface EpochXpTrackerAminoMsg {
   type: "/sparkdream.season.v1.EpochXpTracker";
@@ -41,7 +51,8 @@ function createBaseEpochXpTracker(): EpochXpTracker {
     voteXpEarned: BigInt(0),
     forumXpEarned: BigInt(0),
     questXpEarned: BigInt(0),
-    otherXpEarned: BigInt(0)
+    otherXpEarned: BigInt(0),
+    votesCounted: BigInt(0)
   };
 }
 /**
@@ -68,6 +79,9 @@ export const EpochXpTracker = {
     if (message.otherXpEarned !== BigInt(0)) {
       writer.uint32(40).uint64(message.otherXpEarned);
     }
+    if (message.votesCounted !== BigInt(0)) {
+      writer.uint32(48).uint64(message.votesCounted);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): EpochXpTracker {
@@ -92,6 +106,9 @@ export const EpochXpTracker = {
         case 5:
           message.otherXpEarned = reader.uint64();
           break;
+        case 6:
+          message.votesCounted = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -106,6 +123,7 @@ export const EpochXpTracker = {
     message.forumXpEarned = object.forumXpEarned !== undefined && object.forumXpEarned !== null ? BigInt(object.forumXpEarned.toString()) : BigInt(0);
     message.questXpEarned = object.questXpEarned !== undefined && object.questXpEarned !== null ? BigInt(object.questXpEarned.toString()) : BigInt(0);
     message.otherXpEarned = object.otherXpEarned !== undefined && object.otherXpEarned !== null ? BigInt(object.otherXpEarned.toString()) : BigInt(0);
+    message.votesCounted = object.votesCounted !== undefined && object.votesCounted !== null ? BigInt(object.votesCounted.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: EpochXpTrackerAmino): EpochXpTracker {
@@ -125,6 +143,9 @@ export const EpochXpTracker = {
     if (object.other_xp_earned !== undefined && object.other_xp_earned !== null) {
       message.otherXpEarned = BigInt(object.other_xp_earned);
     }
+    if (object.votes_counted !== undefined && object.votes_counted !== null) {
+      message.votesCounted = BigInt(object.votes_counted);
+    }
     return message;
   },
   toAmino(message: EpochXpTracker): EpochXpTrackerAmino {
@@ -134,6 +155,7 @@ export const EpochXpTracker = {
     obj.forum_xp_earned = message.forumXpEarned !== BigInt(0) ? message.forumXpEarned?.toString() : undefined;
     obj.quest_xp_earned = message.questXpEarned !== BigInt(0) ? message.questXpEarned?.toString() : undefined;
     obj.other_xp_earned = message.otherXpEarned !== BigInt(0) ? message.otherXpEarned?.toString() : undefined;
+    obj.votes_counted = message.votesCounted !== BigInt(0) ? message.votesCounted?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: EpochXpTrackerAminoMsg): EpochXpTracker {

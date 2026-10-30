@@ -871,6 +871,100 @@ export interface MsgConfirmIdentityLinkResponseAminoMsg {
   value: MsgConfirmIdentityLinkResponseAmino;
 }
 /**
+ * MsgAttestIdentityLink verifies an UNVERIFIED identity link to a bridge peer
+ * (ActivityPub, AT Protocol, NOSTR, Lens). The signer is a bridge operator
+ * with an active, non-suspended BridgeBinding for the peer. It attests that
+ * remote_identity published the link's proof string (see
+ * IdentityLinkProofString) at evidence_uri. The attestation is bonded: a
+ * false one is reported against the operator's x/service SPARK bond.
+ * @name MsgAttestIdentityLink
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgAttestIdentityLink
+ */
+export interface MsgAttestIdentityLink {
+  operator: string;
+  peerId: string;
+  /**
+   * local_address is the member whose claim is attested.
+   */
+  localAddress: string;
+  /**
+   * remote_identity must equal the claim's remote_identity.
+   */
+  remoteIdentity: string;
+  /**
+   * challenge is the hex encoding of the claim's challenge, as published in
+   * the proof string. It binds the attestation to this claim: a claim that
+   * was unlinked and made again has a new challenge.
+   */
+  challenge: string;
+  /**
+   * evidence_uri locates the remote post or record carrying the proof string.
+   */
+  evidenceUri: string;
+}
+export interface MsgAttestIdentityLinkProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.MsgAttestIdentityLink";
+  value: Uint8Array;
+}
+/**
+ * MsgAttestIdentityLink verifies an UNVERIFIED identity link to a bridge peer
+ * (ActivityPub, AT Protocol, NOSTR, Lens). The signer is a bridge operator
+ * with an active, non-suspended BridgeBinding for the peer. It attests that
+ * remote_identity published the link's proof string (see
+ * IdentityLinkProofString) at evidence_uri. The attestation is bonded: a
+ * false one is reported against the operator's x/service SPARK bond.
+ * @name MsgAttestIdentityLinkAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgAttestIdentityLink
+ */
+export interface MsgAttestIdentityLinkAmino {
+  operator?: string;
+  peer_id?: string;
+  /**
+   * local_address is the member whose claim is attested.
+   */
+  local_address?: string;
+  /**
+   * remote_identity must equal the claim's remote_identity.
+   */
+  remote_identity?: string;
+  /**
+   * challenge is the hex encoding of the claim's challenge, as published in
+   * the proof string. It binds the attestation to this claim: a claim that
+   * was unlinked and made again has a new challenge.
+   */
+  challenge?: string;
+  /**
+   * evidence_uri locates the remote post or record carrying the proof string.
+   */
+  evidence_uri?: string;
+}
+export interface MsgAttestIdentityLinkAminoMsg {
+  type: "sparkdream/x/federation/MsgAttestIdentityLink";
+  value: MsgAttestIdentityLinkAmino;
+}
+/**
+ * @name MsgAttestIdentityLinkResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgAttestIdentityLinkResponse
+ */
+export interface MsgAttestIdentityLinkResponse {}
+export interface MsgAttestIdentityLinkResponseProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.MsgAttestIdentityLinkResponse";
+  value: Uint8Array;
+}
+/**
+ * @name MsgAttestIdentityLinkResponseAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgAttestIdentityLinkResponse
+ */
+export interface MsgAttestIdentityLinkResponseAmino {}
+export interface MsgAttestIdentityLinkResponseAminoMsg {
+  type: "/sparkdream.federation.v1.MsgAttestIdentityLinkResponse";
+  value: MsgAttestIdentityLinkResponseAmino;
+}
+/**
  * @name MsgRequestReputationAttestation
  * @package sparkdream.federation.v1
  * @see proto type: sparkdream.federation.v1.MsgRequestReputationAttestation
@@ -3999,6 +4093,202 @@ export const MsgConfirmIdentityLinkResponse = {
     return {
       typeUrl: "/sparkdream.federation.v1.MsgConfirmIdentityLinkResponse",
       value: MsgConfirmIdentityLinkResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAttestIdentityLink(): MsgAttestIdentityLink {
+  return {
+    operator: "",
+    peerId: "",
+    localAddress: "",
+    remoteIdentity: "",
+    challenge: "",
+    evidenceUri: ""
+  };
+}
+/**
+ * MsgAttestIdentityLink verifies an UNVERIFIED identity link to a bridge peer
+ * (ActivityPub, AT Protocol, NOSTR, Lens). The signer is a bridge operator
+ * with an active, non-suspended BridgeBinding for the peer. It attests that
+ * remote_identity published the link's proof string (see
+ * IdentityLinkProofString) at evidence_uri. The attestation is bonded: a
+ * false one is reported against the operator's x/service SPARK bond.
+ * @name MsgAttestIdentityLink
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgAttestIdentityLink
+ */
+export const MsgAttestIdentityLink = {
+  typeUrl: "/sparkdream.federation.v1.MsgAttestIdentityLink",
+  aminoType: "sparkdream/x/federation/MsgAttestIdentityLink",
+  encode(message: MsgAttestIdentityLink, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.operator !== "") {
+      writer.uint32(10).string(message.operator);
+    }
+    if (message.peerId !== "") {
+      writer.uint32(18).string(message.peerId);
+    }
+    if (message.localAddress !== "") {
+      writer.uint32(26).string(message.localAddress);
+    }
+    if (message.remoteIdentity !== "") {
+      writer.uint32(34).string(message.remoteIdentity);
+    }
+    if (message.challenge !== "") {
+      writer.uint32(42).string(message.challenge);
+    }
+    if (message.evidenceUri !== "") {
+      writer.uint32(50).string(message.evidenceUri);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAttestIdentityLink {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAttestIdentityLink();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.operator = reader.string();
+          break;
+        case 2:
+          message.peerId = reader.string();
+          break;
+        case 3:
+          message.localAddress = reader.string();
+          break;
+        case 4:
+          message.remoteIdentity = reader.string();
+          break;
+        case 5:
+          message.challenge = reader.string();
+          break;
+        case 6:
+          message.evidenceUri = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgAttestIdentityLink>): MsgAttestIdentityLink {
+    const message = createBaseMsgAttestIdentityLink();
+    message.operator = object.operator ?? "";
+    message.peerId = object.peerId ?? "";
+    message.localAddress = object.localAddress ?? "";
+    message.remoteIdentity = object.remoteIdentity ?? "";
+    message.challenge = object.challenge ?? "";
+    message.evidenceUri = object.evidenceUri ?? "";
+    return message;
+  },
+  fromAmino(object: MsgAttestIdentityLinkAmino): MsgAttestIdentityLink {
+    const message = createBaseMsgAttestIdentityLink();
+    if (object.operator !== undefined && object.operator !== null) {
+      message.operator = object.operator;
+    }
+    if (object.peer_id !== undefined && object.peer_id !== null) {
+      message.peerId = object.peer_id;
+    }
+    if (object.local_address !== undefined && object.local_address !== null) {
+      message.localAddress = object.local_address;
+    }
+    if (object.remote_identity !== undefined && object.remote_identity !== null) {
+      message.remoteIdentity = object.remote_identity;
+    }
+    if (object.challenge !== undefined && object.challenge !== null) {
+      message.challenge = object.challenge;
+    }
+    if (object.evidence_uri !== undefined && object.evidence_uri !== null) {
+      message.evidenceUri = object.evidence_uri;
+    }
+    return message;
+  },
+  toAmino(message: MsgAttestIdentityLink): MsgAttestIdentityLinkAmino {
+    const obj: any = {};
+    obj.operator = message.operator === "" ? undefined : message.operator;
+    obj.peer_id = message.peerId === "" ? undefined : message.peerId;
+    obj.local_address = message.localAddress === "" ? undefined : message.localAddress;
+    obj.remote_identity = message.remoteIdentity === "" ? undefined : message.remoteIdentity;
+    obj.challenge = message.challenge === "" ? undefined : message.challenge;
+    obj.evidence_uri = message.evidenceUri === "" ? undefined : message.evidenceUri;
+    return obj;
+  },
+  fromAminoMsg(object: MsgAttestIdentityLinkAminoMsg): MsgAttestIdentityLink {
+    return MsgAttestIdentityLink.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAttestIdentityLink): MsgAttestIdentityLinkAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgAttestIdentityLink",
+      value: MsgAttestIdentityLink.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgAttestIdentityLinkProtoMsg): MsgAttestIdentityLink {
+    return MsgAttestIdentityLink.decode(message.value);
+  },
+  toProto(message: MsgAttestIdentityLink): Uint8Array {
+    return MsgAttestIdentityLink.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAttestIdentityLink): MsgAttestIdentityLinkProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.MsgAttestIdentityLink",
+      value: MsgAttestIdentityLink.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAttestIdentityLinkResponse(): MsgAttestIdentityLinkResponse {
+  return {};
+}
+/**
+ * @name MsgAttestIdentityLinkResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgAttestIdentityLinkResponse
+ */
+export const MsgAttestIdentityLinkResponse = {
+  typeUrl: "/sparkdream.federation.v1.MsgAttestIdentityLinkResponse",
+  encode(_: MsgAttestIdentityLinkResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAttestIdentityLinkResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAttestIdentityLinkResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgAttestIdentityLinkResponse>): MsgAttestIdentityLinkResponse {
+    const message = createBaseMsgAttestIdentityLinkResponse();
+    return message;
+  },
+  fromAmino(_: MsgAttestIdentityLinkResponseAmino): MsgAttestIdentityLinkResponse {
+    const message = createBaseMsgAttestIdentityLinkResponse();
+    return message;
+  },
+  toAmino(_: MsgAttestIdentityLinkResponse): MsgAttestIdentityLinkResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgAttestIdentityLinkResponseAminoMsg): MsgAttestIdentityLinkResponse {
+    return MsgAttestIdentityLinkResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgAttestIdentityLinkResponseProtoMsg): MsgAttestIdentityLinkResponse {
+    return MsgAttestIdentityLinkResponse.decode(message.value);
+  },
+  toProto(message: MsgAttestIdentityLinkResponse): Uint8Array {
+    return MsgAttestIdentityLinkResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAttestIdentityLinkResponse): MsgAttestIdentityLinkResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.MsgAttestIdentityLinkResponse",
+      value: MsgAttestIdentityLinkResponse.encode(message).finish()
     };
   }
 };

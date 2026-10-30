@@ -1,10 +1,13 @@
 //@ts-nocheck
 import { PageRequest, PageRequestAmino, PageResponse, PageResponseAmino } from "../../../cosmos/base/query/v1beta1/pagination";
+import { PollStatus, Poll, PollAmino } from "./poll";
 import { Params, ParamsAmino } from "./params";
 import { PolicyPermissions, PolicyPermissionsAmino } from "./policy_permissions";
 import { DecisionPolicy, DecisionPolicyAmino, Group, GroupAmino, Member, MemberAmino, Proposal, ProposalAmino, Vote, VoteAmino, TallyResult, TallyResultAmino, AnonVoteTally, AnonVoteTallyAmino } from "./group";
 import { Category, CategoryAmino } from "./category";
 import { RecurringSpend, RecurringSpendAmino } from "./recurring_spend";
+import { PollVote, PollVoteAmino } from "./poll_vote";
+import { VoterTree, VoterTreeAmino } from "./voter_tree";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -878,6 +881,288 @@ export interface QueryListRecurringSpendsResponseAmino {
 export interface QueryListRecurringSpendsResponseAminoMsg {
   type: "/sparkdream.commons.v1.QueryListRecurringSpendsResponse";
   value: QueryListRecurringSpendsResponseAmino;
+}
+/**
+ * QueryGetPollRequest defines the QueryGetPollRequest message.
+ * @name QueryGetPollRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetPollRequest
+ */
+export interface QueryGetPollRequest {
+  pollId: bigint;
+}
+export interface QueryGetPollRequestProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryGetPollRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryGetPollRequest defines the QueryGetPollRequest message.
+ * @name QueryGetPollRequestAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetPollRequest
+ */
+export interface QueryGetPollRequestAmino {
+  poll_id?: string;
+}
+export interface QueryGetPollRequestAminoMsg {
+  type: "/sparkdream.commons.v1.QueryGetPollRequest";
+  value: QueryGetPollRequestAmino;
+}
+/**
+ * QueryGetPollResponse defines the QueryGetPollResponse message.
+ * @name QueryGetPollResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetPollResponse
+ */
+export interface QueryGetPollResponse {
+  poll: Poll;
+}
+export interface QueryGetPollResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryGetPollResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryGetPollResponse defines the QueryGetPollResponse message.
+ * @name QueryGetPollResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetPollResponse
+ */
+export interface QueryGetPollResponseAmino {
+  poll?: PollAmino;
+}
+export interface QueryGetPollResponseAminoMsg {
+  type: "/sparkdream.commons.v1.QueryGetPollResponse";
+  value: QueryGetPollResponseAmino;
+}
+/**
+ * QueryListPollsRequest defines the QueryListPollsRequest message.
+ * @name QueryListPollsRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryListPollsRequest
+ */
+export interface QueryListPollsRequest {
+  /**
+   * council_name filters by group (optional).
+   */
+  councilName: string;
+  /**
+   * status filters by status (UNSPECIFIED = any).
+   */
+  status: PollStatus;
+  pagination?: PageRequest;
+}
+export interface QueryListPollsRequestProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryListPollsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryListPollsRequest defines the QueryListPollsRequest message.
+ * @name QueryListPollsRequestAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryListPollsRequest
+ */
+export interface QueryListPollsRequestAmino {
+  /**
+   * council_name filters by group (optional).
+   */
+  council_name?: string;
+  /**
+   * status filters by status (UNSPECIFIED = any).
+   */
+  status?: PollStatus;
+  pagination?: PageRequestAmino;
+}
+export interface QueryListPollsRequestAminoMsg {
+  type: "/sparkdream.commons.v1.QueryListPollsRequest";
+  value: QueryListPollsRequestAmino;
+}
+/**
+ * QueryListPollsResponse defines the QueryListPollsResponse message.
+ * @name QueryListPollsResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryListPollsResponse
+ */
+export interface QueryListPollsResponse {
+  polls: Poll[];
+  pagination?: PageResponse;
+}
+export interface QueryListPollsResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryListPollsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryListPollsResponse defines the QueryListPollsResponse message.
+ * @name QueryListPollsResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryListPollsResponse
+ */
+export interface QueryListPollsResponseAmino {
+  polls?: PollAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryListPollsResponseAminoMsg {
+  type: "/sparkdream.commons.v1.QueryListPollsResponse";
+  value: QueryListPollsResponseAmino;
+}
+/**
+ * QueryGetPollVotesRequest defines the QueryGetPollVotesRequest message.
+ * @name QueryGetPollVotesRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetPollVotesRequest
+ */
+export interface QueryGetPollVotesRequest {
+  pollId: bigint;
+  pagination?: PageRequest;
+}
+export interface QueryGetPollVotesRequestProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryGetPollVotesRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryGetPollVotesRequest defines the QueryGetPollVotesRequest message.
+ * @name QueryGetPollVotesRequestAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetPollVotesRequest
+ */
+export interface QueryGetPollVotesRequestAmino {
+  poll_id?: string;
+  pagination?: PageRequestAmino;
+}
+export interface QueryGetPollVotesRequestAminoMsg {
+  type: "/sparkdream.commons.v1.QueryGetPollVotesRequest";
+  value: QueryGetPollVotesRequestAmino;
+}
+/**
+ * QueryGetPollVotesResponse defines the QueryGetPollVotesResponse message.
+ * @name QueryGetPollVotesResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetPollVotesResponse
+ */
+export interface QueryGetPollVotesResponse {
+  votes: PollVote[];
+  pagination?: PageResponse;
+}
+export interface QueryGetPollVotesResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryGetPollVotesResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryGetPollVotesResponse defines the QueryGetPollVotesResponse message.
+ * @name QueryGetPollVotesResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetPollVotesResponse
+ */
+export interface QueryGetPollVotesResponseAmino {
+  votes?: PollVoteAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryGetPollVotesResponseAminoMsg {
+  type: "/sparkdream.commons.v1.QueryGetPollVotesResponse";
+  value: QueryGetPollVotesResponseAmino;
+}
+/**
+ * QueryGetProposalVoterTreeRequest defines the QueryGetProposalVoterTreeRequest message.
+ * @name QueryGetProposalVoterTreeRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetProposalVoterTreeRequest
+ */
+export interface QueryGetProposalVoterTreeRequest {
+  proposalId: bigint;
+}
+export interface QueryGetProposalVoterTreeRequestProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryGetProposalVoterTreeRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryGetProposalVoterTreeRequest defines the QueryGetProposalVoterTreeRequest message.
+ * @name QueryGetProposalVoterTreeRequestAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetProposalVoterTreeRequest
+ */
+export interface QueryGetProposalVoterTreeRequestAmino {
+  proposal_id?: string;
+}
+export interface QueryGetProposalVoterTreeRequestAminoMsg {
+  type: "/sparkdream.commons.v1.QueryGetProposalVoterTreeRequest";
+  value: QueryGetProposalVoterTreeRequestAmino;
+}
+/**
+ * QueryGetProposalVoterTreeResponse defines the QueryGetProposalVoterTreeResponse message.
+ * @name QueryGetProposalVoterTreeResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetProposalVoterTreeResponse
+ */
+export interface QueryGetProposalVoterTreeResponse {
+  tree: VoterTree;
+}
+export interface QueryGetProposalVoterTreeResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryGetProposalVoterTreeResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryGetProposalVoterTreeResponse defines the QueryGetProposalVoterTreeResponse message.
+ * @name QueryGetProposalVoterTreeResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetProposalVoterTreeResponse
+ */
+export interface QueryGetProposalVoterTreeResponseAmino {
+  tree?: VoterTreeAmino;
+}
+export interface QueryGetProposalVoterTreeResponseAminoMsg {
+  type: "/sparkdream.commons.v1.QueryGetProposalVoterTreeResponse";
+  value: QueryGetProposalVoterTreeResponseAmino;
+}
+/**
+ * QueryGetPollVoterTreeRequest defines the QueryGetPollVoterTreeRequest message.
+ * @name QueryGetPollVoterTreeRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetPollVoterTreeRequest
+ */
+export interface QueryGetPollVoterTreeRequest {
+  pollId: bigint;
+}
+export interface QueryGetPollVoterTreeRequestProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryGetPollVoterTreeRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryGetPollVoterTreeRequest defines the QueryGetPollVoterTreeRequest message.
+ * @name QueryGetPollVoterTreeRequestAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetPollVoterTreeRequest
+ */
+export interface QueryGetPollVoterTreeRequestAmino {
+  poll_id?: string;
+}
+export interface QueryGetPollVoterTreeRequestAminoMsg {
+  type: "/sparkdream.commons.v1.QueryGetPollVoterTreeRequest";
+  value: QueryGetPollVoterTreeRequestAmino;
+}
+/**
+ * QueryGetPollVoterTreeResponse defines the QueryGetPollVoterTreeResponse message.
+ * @name QueryGetPollVoterTreeResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetPollVoterTreeResponse
+ */
+export interface QueryGetPollVoterTreeResponse {
+  tree: VoterTree;
+}
+export interface QueryGetPollVoterTreeResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryGetPollVoterTreeResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryGetPollVoterTreeResponse defines the QueryGetPollVoterTreeResponse message.
+ * @name QueryGetPollVoterTreeResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetPollVoterTreeResponse
+ */
+export interface QueryGetPollVoterTreeResponseAmino {
+  tree?: VoterTreeAmino;
+}
+export interface QueryGetPollVoterTreeResponseAminoMsg {
+  type: "/sparkdream.commons.v1.QueryGetPollVoterTreeResponse";
+  value: QueryGetPollVoterTreeResponseAmino;
 }
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
@@ -3207,6 +3492,760 @@ export const QueryListRecurringSpendsResponse = {
     return {
       typeUrl: "/sparkdream.commons.v1.QueryListRecurringSpendsResponse",
       value: QueryListRecurringSpendsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetPollRequest(): QueryGetPollRequest {
+  return {
+    pollId: BigInt(0)
+  };
+}
+/**
+ * QueryGetPollRequest defines the QueryGetPollRequest message.
+ * @name QueryGetPollRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetPollRequest
+ */
+export const QueryGetPollRequest = {
+  typeUrl: "/sparkdream.commons.v1.QueryGetPollRequest",
+  encode(message: QueryGetPollRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pollId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.pollId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetPollRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetPollRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pollId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetPollRequest>): QueryGetPollRequest {
+    const message = createBaseQueryGetPollRequest();
+    message.pollId = object.pollId !== undefined && object.pollId !== null ? BigInt(object.pollId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryGetPollRequestAmino): QueryGetPollRequest {
+    const message = createBaseQueryGetPollRequest();
+    if (object.poll_id !== undefined && object.poll_id !== null) {
+      message.pollId = BigInt(object.poll_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetPollRequest): QueryGetPollRequestAmino {
+    const obj: any = {};
+    obj.poll_id = message.pollId !== BigInt(0) ? message.pollId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetPollRequestAminoMsg): QueryGetPollRequest {
+    return QueryGetPollRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetPollRequestProtoMsg): QueryGetPollRequest {
+    return QueryGetPollRequest.decode(message.value);
+  },
+  toProto(message: QueryGetPollRequest): Uint8Array {
+    return QueryGetPollRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetPollRequest): QueryGetPollRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryGetPollRequest",
+      value: QueryGetPollRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetPollResponse(): QueryGetPollResponse {
+  return {
+    poll: Poll.fromPartial({})
+  };
+}
+/**
+ * QueryGetPollResponse defines the QueryGetPollResponse message.
+ * @name QueryGetPollResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetPollResponse
+ */
+export const QueryGetPollResponse = {
+  typeUrl: "/sparkdream.commons.v1.QueryGetPollResponse",
+  encode(message: QueryGetPollResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.poll !== undefined) {
+      Poll.encode(message.poll, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetPollResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetPollResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.poll = Poll.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetPollResponse>): QueryGetPollResponse {
+    const message = createBaseQueryGetPollResponse();
+    message.poll = object.poll !== undefined && object.poll !== null ? Poll.fromPartial(object.poll) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetPollResponseAmino): QueryGetPollResponse {
+    const message = createBaseQueryGetPollResponse();
+    if (object.poll !== undefined && object.poll !== null) {
+      message.poll = Poll.fromAmino(object.poll);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetPollResponse): QueryGetPollResponseAmino {
+    const obj: any = {};
+    obj.poll = message.poll ? Poll.toAmino(message.poll) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetPollResponseAminoMsg): QueryGetPollResponse {
+    return QueryGetPollResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetPollResponseProtoMsg): QueryGetPollResponse {
+    return QueryGetPollResponse.decode(message.value);
+  },
+  toProto(message: QueryGetPollResponse): Uint8Array {
+    return QueryGetPollResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetPollResponse): QueryGetPollResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryGetPollResponse",
+      value: QueryGetPollResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryListPollsRequest(): QueryListPollsRequest {
+  return {
+    councilName: "",
+    status: 0,
+    pagination: undefined
+  };
+}
+/**
+ * QueryListPollsRequest defines the QueryListPollsRequest message.
+ * @name QueryListPollsRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryListPollsRequest
+ */
+export const QueryListPollsRequest = {
+  typeUrl: "/sparkdream.commons.v1.QueryListPollsRequest",
+  encode(message: QueryListPollsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.councilName !== "") {
+      writer.uint32(10).string(message.councilName);
+    }
+    if (message.status !== 0) {
+      writer.uint32(16).int32(message.status);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryListPollsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryListPollsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.councilName = reader.string();
+          break;
+        case 2:
+          message.status = reader.int32() as any;
+          break;
+        case 3:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryListPollsRequest>): QueryListPollsRequest {
+    const message = createBaseQueryListPollsRequest();
+    message.councilName = object.councilName ?? "";
+    message.status = object.status ?? 0;
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryListPollsRequestAmino): QueryListPollsRequest {
+    const message = createBaseQueryListPollsRequest();
+    if (object.council_name !== undefined && object.council_name !== null) {
+      message.councilName = object.council_name;
+    }
+    if (object.status !== undefined && object.status !== null) {
+      message.status = object.status;
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryListPollsRequest): QueryListPollsRequestAmino {
+    const obj: any = {};
+    obj.council_name = message.councilName === "" ? undefined : message.councilName;
+    obj.status = message.status === 0 ? undefined : message.status;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryListPollsRequestAminoMsg): QueryListPollsRequest {
+    return QueryListPollsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryListPollsRequestProtoMsg): QueryListPollsRequest {
+    return QueryListPollsRequest.decode(message.value);
+  },
+  toProto(message: QueryListPollsRequest): Uint8Array {
+    return QueryListPollsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryListPollsRequest): QueryListPollsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryListPollsRequest",
+      value: QueryListPollsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryListPollsResponse(): QueryListPollsResponse {
+  return {
+    polls: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryListPollsResponse defines the QueryListPollsResponse message.
+ * @name QueryListPollsResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryListPollsResponse
+ */
+export const QueryListPollsResponse = {
+  typeUrl: "/sparkdream.commons.v1.QueryListPollsResponse",
+  encode(message: QueryListPollsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.polls) {
+      Poll.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryListPollsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryListPollsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.polls.push(Poll.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryListPollsResponse>): QueryListPollsResponse {
+    const message = createBaseQueryListPollsResponse();
+    message.polls = object.polls?.map(e => Poll.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryListPollsResponseAmino): QueryListPollsResponse {
+    const message = createBaseQueryListPollsResponse();
+    message.polls = object.polls?.map(e => Poll.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryListPollsResponse): QueryListPollsResponseAmino {
+    const obj: any = {};
+    if (message.polls) {
+      obj.polls = message.polls.map(e => e ? Poll.toAmino(e) : undefined);
+    } else {
+      obj.polls = message.polls;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryListPollsResponseAminoMsg): QueryListPollsResponse {
+    return QueryListPollsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryListPollsResponseProtoMsg): QueryListPollsResponse {
+    return QueryListPollsResponse.decode(message.value);
+  },
+  toProto(message: QueryListPollsResponse): Uint8Array {
+    return QueryListPollsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryListPollsResponse): QueryListPollsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryListPollsResponse",
+      value: QueryListPollsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetPollVotesRequest(): QueryGetPollVotesRequest {
+  return {
+    pollId: BigInt(0),
+    pagination: undefined
+  };
+}
+/**
+ * QueryGetPollVotesRequest defines the QueryGetPollVotesRequest message.
+ * @name QueryGetPollVotesRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetPollVotesRequest
+ */
+export const QueryGetPollVotesRequest = {
+  typeUrl: "/sparkdream.commons.v1.QueryGetPollVotesRequest",
+  encode(message: QueryGetPollVotesRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pollId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.pollId);
+    }
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetPollVotesRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetPollVotesRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pollId = reader.uint64();
+          break;
+        case 2:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetPollVotesRequest>): QueryGetPollVotesRequest {
+    const message = createBaseQueryGetPollVotesRequest();
+    message.pollId = object.pollId !== undefined && object.pollId !== null ? BigInt(object.pollId.toString()) : BigInt(0);
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetPollVotesRequestAmino): QueryGetPollVotesRequest {
+    const message = createBaseQueryGetPollVotesRequest();
+    if (object.poll_id !== undefined && object.poll_id !== null) {
+      message.pollId = BigInt(object.poll_id);
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetPollVotesRequest): QueryGetPollVotesRequestAmino {
+    const obj: any = {};
+    obj.poll_id = message.pollId !== BigInt(0) ? message.pollId?.toString() : undefined;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetPollVotesRequestAminoMsg): QueryGetPollVotesRequest {
+    return QueryGetPollVotesRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetPollVotesRequestProtoMsg): QueryGetPollVotesRequest {
+    return QueryGetPollVotesRequest.decode(message.value);
+  },
+  toProto(message: QueryGetPollVotesRequest): Uint8Array {
+    return QueryGetPollVotesRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetPollVotesRequest): QueryGetPollVotesRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryGetPollVotesRequest",
+      value: QueryGetPollVotesRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetPollVotesResponse(): QueryGetPollVotesResponse {
+  return {
+    votes: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryGetPollVotesResponse defines the QueryGetPollVotesResponse message.
+ * @name QueryGetPollVotesResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetPollVotesResponse
+ */
+export const QueryGetPollVotesResponse = {
+  typeUrl: "/sparkdream.commons.v1.QueryGetPollVotesResponse",
+  encode(message: QueryGetPollVotesResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.votes) {
+      PollVote.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetPollVotesResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetPollVotesResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.votes.push(PollVote.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetPollVotesResponse>): QueryGetPollVotesResponse {
+    const message = createBaseQueryGetPollVotesResponse();
+    message.votes = object.votes?.map(e => PollVote.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetPollVotesResponseAmino): QueryGetPollVotesResponse {
+    const message = createBaseQueryGetPollVotesResponse();
+    message.votes = object.votes?.map(e => PollVote.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetPollVotesResponse): QueryGetPollVotesResponseAmino {
+    const obj: any = {};
+    if (message.votes) {
+      obj.votes = message.votes.map(e => e ? PollVote.toAmino(e) : undefined);
+    } else {
+      obj.votes = message.votes;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetPollVotesResponseAminoMsg): QueryGetPollVotesResponse {
+    return QueryGetPollVotesResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetPollVotesResponseProtoMsg): QueryGetPollVotesResponse {
+    return QueryGetPollVotesResponse.decode(message.value);
+  },
+  toProto(message: QueryGetPollVotesResponse): Uint8Array {
+    return QueryGetPollVotesResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetPollVotesResponse): QueryGetPollVotesResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryGetPollVotesResponse",
+      value: QueryGetPollVotesResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetProposalVoterTreeRequest(): QueryGetProposalVoterTreeRequest {
+  return {
+    proposalId: BigInt(0)
+  };
+}
+/**
+ * QueryGetProposalVoterTreeRequest defines the QueryGetProposalVoterTreeRequest message.
+ * @name QueryGetProposalVoterTreeRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetProposalVoterTreeRequest
+ */
+export const QueryGetProposalVoterTreeRequest = {
+  typeUrl: "/sparkdream.commons.v1.QueryGetProposalVoterTreeRequest",
+  encode(message: QueryGetProposalVoterTreeRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.proposalId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.proposalId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetProposalVoterTreeRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetProposalVoterTreeRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.proposalId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetProposalVoterTreeRequest>): QueryGetProposalVoterTreeRequest {
+    const message = createBaseQueryGetProposalVoterTreeRequest();
+    message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryGetProposalVoterTreeRequestAmino): QueryGetProposalVoterTreeRequest {
+    const message = createBaseQueryGetProposalVoterTreeRequest();
+    if (object.proposal_id !== undefined && object.proposal_id !== null) {
+      message.proposalId = BigInt(object.proposal_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetProposalVoterTreeRequest): QueryGetProposalVoterTreeRequestAmino {
+    const obj: any = {};
+    obj.proposal_id = message.proposalId !== BigInt(0) ? message.proposalId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetProposalVoterTreeRequestAminoMsg): QueryGetProposalVoterTreeRequest {
+    return QueryGetProposalVoterTreeRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetProposalVoterTreeRequestProtoMsg): QueryGetProposalVoterTreeRequest {
+    return QueryGetProposalVoterTreeRequest.decode(message.value);
+  },
+  toProto(message: QueryGetProposalVoterTreeRequest): Uint8Array {
+    return QueryGetProposalVoterTreeRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetProposalVoterTreeRequest): QueryGetProposalVoterTreeRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryGetProposalVoterTreeRequest",
+      value: QueryGetProposalVoterTreeRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetProposalVoterTreeResponse(): QueryGetProposalVoterTreeResponse {
+  return {
+    tree: VoterTree.fromPartial({})
+  };
+}
+/**
+ * QueryGetProposalVoterTreeResponse defines the QueryGetProposalVoterTreeResponse message.
+ * @name QueryGetProposalVoterTreeResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetProposalVoterTreeResponse
+ */
+export const QueryGetProposalVoterTreeResponse = {
+  typeUrl: "/sparkdream.commons.v1.QueryGetProposalVoterTreeResponse",
+  encode(message: QueryGetProposalVoterTreeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.tree !== undefined) {
+      VoterTree.encode(message.tree, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetProposalVoterTreeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetProposalVoterTreeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tree = VoterTree.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetProposalVoterTreeResponse>): QueryGetProposalVoterTreeResponse {
+    const message = createBaseQueryGetProposalVoterTreeResponse();
+    message.tree = object.tree !== undefined && object.tree !== null ? VoterTree.fromPartial(object.tree) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetProposalVoterTreeResponseAmino): QueryGetProposalVoterTreeResponse {
+    const message = createBaseQueryGetProposalVoterTreeResponse();
+    if (object.tree !== undefined && object.tree !== null) {
+      message.tree = VoterTree.fromAmino(object.tree);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetProposalVoterTreeResponse): QueryGetProposalVoterTreeResponseAmino {
+    const obj: any = {};
+    obj.tree = message.tree ? VoterTree.toAmino(message.tree) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetProposalVoterTreeResponseAminoMsg): QueryGetProposalVoterTreeResponse {
+    return QueryGetProposalVoterTreeResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetProposalVoterTreeResponseProtoMsg): QueryGetProposalVoterTreeResponse {
+    return QueryGetProposalVoterTreeResponse.decode(message.value);
+  },
+  toProto(message: QueryGetProposalVoterTreeResponse): Uint8Array {
+    return QueryGetProposalVoterTreeResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetProposalVoterTreeResponse): QueryGetProposalVoterTreeResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryGetProposalVoterTreeResponse",
+      value: QueryGetProposalVoterTreeResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetPollVoterTreeRequest(): QueryGetPollVoterTreeRequest {
+  return {
+    pollId: BigInt(0)
+  };
+}
+/**
+ * QueryGetPollVoterTreeRequest defines the QueryGetPollVoterTreeRequest message.
+ * @name QueryGetPollVoterTreeRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetPollVoterTreeRequest
+ */
+export const QueryGetPollVoterTreeRequest = {
+  typeUrl: "/sparkdream.commons.v1.QueryGetPollVoterTreeRequest",
+  encode(message: QueryGetPollVoterTreeRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pollId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.pollId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetPollVoterTreeRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetPollVoterTreeRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pollId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetPollVoterTreeRequest>): QueryGetPollVoterTreeRequest {
+    const message = createBaseQueryGetPollVoterTreeRequest();
+    message.pollId = object.pollId !== undefined && object.pollId !== null ? BigInt(object.pollId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryGetPollVoterTreeRequestAmino): QueryGetPollVoterTreeRequest {
+    const message = createBaseQueryGetPollVoterTreeRequest();
+    if (object.poll_id !== undefined && object.poll_id !== null) {
+      message.pollId = BigInt(object.poll_id);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetPollVoterTreeRequest): QueryGetPollVoterTreeRequestAmino {
+    const obj: any = {};
+    obj.poll_id = message.pollId !== BigInt(0) ? message.pollId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetPollVoterTreeRequestAminoMsg): QueryGetPollVoterTreeRequest {
+    return QueryGetPollVoterTreeRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetPollVoterTreeRequestProtoMsg): QueryGetPollVoterTreeRequest {
+    return QueryGetPollVoterTreeRequest.decode(message.value);
+  },
+  toProto(message: QueryGetPollVoterTreeRequest): Uint8Array {
+    return QueryGetPollVoterTreeRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetPollVoterTreeRequest): QueryGetPollVoterTreeRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryGetPollVoterTreeRequest",
+      value: QueryGetPollVoterTreeRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryGetPollVoterTreeResponse(): QueryGetPollVoterTreeResponse {
+  return {
+    tree: VoterTree.fromPartial({})
+  };
+}
+/**
+ * QueryGetPollVoterTreeResponse defines the QueryGetPollVoterTreeResponse message.
+ * @name QueryGetPollVoterTreeResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryGetPollVoterTreeResponse
+ */
+export const QueryGetPollVoterTreeResponse = {
+  typeUrl: "/sparkdream.commons.v1.QueryGetPollVoterTreeResponse",
+  encode(message: QueryGetPollVoterTreeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.tree !== undefined) {
+      VoterTree.encode(message.tree, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryGetPollVoterTreeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetPollVoterTreeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tree = VoterTree.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryGetPollVoterTreeResponse>): QueryGetPollVoterTreeResponse {
+    const message = createBaseQueryGetPollVoterTreeResponse();
+    message.tree = object.tree !== undefined && object.tree !== null ? VoterTree.fromPartial(object.tree) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryGetPollVoterTreeResponseAmino): QueryGetPollVoterTreeResponse {
+    const message = createBaseQueryGetPollVoterTreeResponse();
+    if (object.tree !== undefined && object.tree !== null) {
+      message.tree = VoterTree.fromAmino(object.tree);
+    }
+    return message;
+  },
+  toAmino(message: QueryGetPollVoterTreeResponse): QueryGetPollVoterTreeResponseAmino {
+    const obj: any = {};
+    obj.tree = message.tree ? VoterTree.toAmino(message.tree) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryGetPollVoterTreeResponseAminoMsg): QueryGetPollVoterTreeResponse {
+    return QueryGetPollVoterTreeResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryGetPollVoterTreeResponseProtoMsg): QueryGetPollVoterTreeResponse {
+    return QueryGetPollVoterTreeResponse.decode(message.value);
+  },
+  toProto(message: QueryGetPollVoterTreeResponse): Uint8Array {
+    return QueryGetPollVoterTreeResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryGetPollVoterTreeResponse): QueryGetPollVoterTreeResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryGetPollVoterTreeResponse",
+      value: QueryGetPollVoterTreeResponse.encode(message).finish()
     };
   }
 };

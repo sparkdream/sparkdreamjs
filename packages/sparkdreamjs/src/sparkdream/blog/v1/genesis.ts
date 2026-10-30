@@ -39,6 +39,13 @@ export interface GenesisState {
    * reaction_counts is the list of all aggregate reaction counts.
    */
   reactionCounts: GenesisReactionCounts[];
+  /**
+   * Authors queued for eager promotion of their ephemeral content (admitted
+   * as members after posting). The queue is driven by an x/rep hook, so it
+   * cannot be rebuilt from the posts; without it an import would drop every
+   * pending promotion.
+   */
+  promotionQueue: PromotionQueueEntry[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.blog.v1.GenesisState";
@@ -79,10 +86,45 @@ export interface GenesisStateAmino {
    * reaction_counts is the list of all aggregate reaction counts.
    */
   reaction_counts?: GenesisReactionCountsAmino[];
+  /**
+   * Authors queued for eager promotion of their ephemeral content (admitted
+   * as members after posting). The queue is driven by an x/rep hook, so it
+   * cannot be rebuilt from the posts; without it an import would drop every
+   * pending promotion.
+   */
+  promotion_queue?: PromotionQueueEntryAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.blog.v1.GenesisState";
   value: GenesisStateAmino;
+}
+/**
+ * PromotionQueueEntry is one queued author and the height it was enqueued.
+ * @name PromotionQueueEntry
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.PromotionQueueEntry
+ */
+export interface PromotionQueueEntry {
+  creator: string;
+  enqueuedAt: bigint;
+}
+export interface PromotionQueueEntryProtoMsg {
+  typeUrl: "/sparkdream.blog.v1.PromotionQueueEntry";
+  value: Uint8Array;
+}
+/**
+ * PromotionQueueEntry is one queued author and the height it was enqueued.
+ * @name PromotionQueueEntryAmino
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.PromotionQueueEntry
+ */
+export interface PromotionQueueEntryAmino {
+  creator?: string;
+  enqueued_at?: string;
+}
+export interface PromotionQueueEntryAminoMsg {
+  type: "/sparkdream.blog.v1.PromotionQueueEntry";
+  value: PromotionQueueEntryAmino;
 }
 function createBaseGenesisState(): GenesisState {
   return {
@@ -92,7 +134,8 @@ function createBaseGenesisState(): GenesisState {
     replies: [],
     replyCount: BigInt(0),
     reactions: [],
-    reactionCounts: []
+    reactionCounts: [],
+    promotionQueue: []
   };
 }
 /**
@@ -125,6 +168,9 @@ export const GenesisState = {
     for (const v of message.reactionCounts) {
       GenesisReactionCounts.encode(v!, writer.uint32(58).fork()).ldelim();
     }
+    for (const v of message.promotionQueue) {
+      PromotionQueueEntry.encode(v!, writer.uint32(66).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -155,6 +201,9 @@ export const GenesisState = {
         case 7:
           message.reactionCounts.push(GenesisReactionCounts.decode(reader, reader.uint32()));
           break;
+        case 8:
+          message.promotionQueue.push(PromotionQueueEntry.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -171,6 +220,7 @@ export const GenesisState = {
     message.replyCount = object.replyCount !== undefined && object.replyCount !== null ? BigInt(object.replyCount.toString()) : BigInt(0);
     message.reactions = object.reactions?.map(e => Reaction.fromPartial(e)) || [];
     message.reactionCounts = object.reactionCounts?.map(e => GenesisReactionCounts.fromPartial(e)) || [];
+    message.promotionQueue = object.promotionQueue?.map(e => PromotionQueueEntry.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -188,6 +238,7 @@ export const GenesisState = {
     }
     message.reactions = object.reactions?.map(e => Reaction.fromAmino(e)) || [];
     message.reactionCounts = object.reaction_counts?.map(e => GenesisReactionCounts.fromAmino(e)) || [];
+    message.promotionQueue = object.promotion_queue?.map(e => PromotionQueueEntry.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -215,6 +266,11 @@ export const GenesisState = {
     } else {
       obj.reaction_counts = message.reactionCounts;
     }
+    if (message.promotionQueue) {
+      obj.promotion_queue = message.promotionQueue.map(e => e ? PromotionQueueEntry.toAmino(e) : undefined);
+    } else {
+      obj.promotion_queue = message.promotionQueue;
+    }
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {
@@ -230,6 +286,87 @@ export const GenesisState = {
     return {
       typeUrl: "/sparkdream.blog.v1.GenesisState",
       value: GenesisState.encode(message).finish()
+    };
+  }
+};
+function createBasePromotionQueueEntry(): PromotionQueueEntry {
+  return {
+    creator: "",
+    enqueuedAt: BigInt(0)
+  };
+}
+/**
+ * PromotionQueueEntry is one queued author and the height it was enqueued.
+ * @name PromotionQueueEntry
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.PromotionQueueEntry
+ */
+export const PromotionQueueEntry = {
+  typeUrl: "/sparkdream.blog.v1.PromotionQueueEntry",
+  encode(message: PromotionQueueEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.enqueuedAt !== BigInt(0)) {
+      writer.uint32(16).int64(message.enqueuedAt);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): PromotionQueueEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePromotionQueueEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.enqueuedAt = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<PromotionQueueEntry>): PromotionQueueEntry {
+    const message = createBasePromotionQueueEntry();
+    message.creator = object.creator ?? "";
+    message.enqueuedAt = object.enqueuedAt !== undefined && object.enqueuedAt !== null ? BigInt(object.enqueuedAt.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: PromotionQueueEntryAmino): PromotionQueueEntry {
+    const message = createBasePromotionQueueEntry();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.enqueued_at !== undefined && object.enqueued_at !== null) {
+      message.enqueuedAt = BigInt(object.enqueued_at);
+    }
+    return message;
+  },
+  toAmino(message: PromotionQueueEntry): PromotionQueueEntryAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.enqueued_at = message.enqueuedAt !== BigInt(0) ? message.enqueuedAt?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: PromotionQueueEntryAminoMsg): PromotionQueueEntry {
+    return PromotionQueueEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: PromotionQueueEntryProtoMsg): PromotionQueueEntry {
+    return PromotionQueueEntry.decode(message.value);
+  },
+  toProto(message: PromotionQueueEntry): Uint8Array {
+    return PromotionQueueEntry.encode(message).finish();
+  },
+  toProtoMsg(message: PromotionQueueEntry): PromotionQueueEntryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.blog.v1.PromotionQueueEntry",
+      value: PromotionQueueEntry.encode(message).finish()
     };
   }
 };

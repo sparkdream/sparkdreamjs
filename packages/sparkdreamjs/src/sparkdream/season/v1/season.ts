@@ -45,6 +45,12 @@ export interface Season {
    * Original end block before any extensions
    */
   originalEndBlock: bigint;
+  /**
+   * Block time (unix seconds) when the season started; 0 for a season
+   * started at genesis. Retro-PGF nominations of time-stamped content (blog
+   * and forum posts) must be created at or after it.
+   */
+  startTime: bigint;
 }
 export interface SeasonProtoMsg {
   typeUrl: "/sparkdream.season.v1.Season";
@@ -93,6 +99,12 @@ export interface SeasonAmino {
    * Original end block before any extensions
    */
   original_end_block?: string;
+  /**
+   * Block time (unix seconds) when the season started; 0 for a season
+   * started at genesis. Retro-PGF nominations of time-stamped content (blog
+   * and forum posts) must be created at or after it.
+   */
+  start_time?: string;
 }
 export interface SeasonAminoMsg {
   type: "/sparkdream.season.v1.Season";
@@ -108,7 +120,8 @@ function createBaseSeason(): Season {
     status: 0,
     extensionsCount: BigInt(0),
     totalExtensionEpochs: BigInt(0),
-    originalEndBlock: BigInt(0)
+    originalEndBlock: BigInt(0),
+    startTime: BigInt(0)
   };
 }
 /**
@@ -147,6 +160,9 @@ export const Season = {
     if (message.originalEndBlock !== BigInt(0)) {
       writer.uint32(72).int64(message.originalEndBlock);
     }
+    if (message.startTime !== BigInt(0)) {
+      writer.uint32(80).int64(message.startTime);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Season {
@@ -183,6 +199,9 @@ export const Season = {
         case 9:
           message.originalEndBlock = reader.int64();
           break;
+        case 10:
+          message.startTime = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -201,6 +220,7 @@ export const Season = {
     message.extensionsCount = object.extensionsCount !== undefined && object.extensionsCount !== null ? BigInt(object.extensionsCount.toString()) : BigInt(0);
     message.totalExtensionEpochs = object.totalExtensionEpochs !== undefined && object.totalExtensionEpochs !== null ? BigInt(object.totalExtensionEpochs.toString()) : BigInt(0);
     message.originalEndBlock = object.originalEndBlock !== undefined && object.originalEndBlock !== null ? BigInt(object.originalEndBlock.toString()) : BigInt(0);
+    message.startTime = object.startTime !== undefined && object.startTime !== null ? BigInt(object.startTime.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: SeasonAmino): Season {
@@ -232,6 +252,9 @@ export const Season = {
     if (object.original_end_block !== undefined && object.original_end_block !== null) {
       message.originalEndBlock = BigInt(object.original_end_block);
     }
+    if (object.start_time !== undefined && object.start_time !== null) {
+      message.startTime = BigInt(object.start_time);
+    }
     return message;
   },
   toAmino(message: Season): SeasonAmino {
@@ -245,6 +268,7 @@ export const Season = {
     obj.extensions_count = message.extensionsCount !== BigInt(0) ? message.extensionsCount?.toString() : undefined;
     obj.total_extension_epochs = message.totalExtensionEpochs !== BigInt(0) ? message.totalExtensionEpochs?.toString() : undefined;
     obj.original_end_block = message.originalEndBlock !== BigInt(0) ? message.originalEndBlock?.toString() : undefined;
+    obj.start_time = message.startTime !== BigInt(0) ? message.startTime?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: SeasonAminoMsg): Season {

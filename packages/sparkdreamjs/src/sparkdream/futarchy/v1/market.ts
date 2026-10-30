@@ -46,6 +46,22 @@ export interface Market {
    * spark. Empty for ACTIVE or RESOLVED_YES/NO markets.
    */
   settlementPriceYes: string;
+  /**
+   * Time-weighted price accumulator (FUT-01). Sum over blocks of the LMSR
+   * YES price in effect during that block: each trade first adds
+   * p_yes * (height - twap_last_height) and only then moves the pools. The
+   * market resolves on twap_accumulator / (end_block - start_height), not on
+   * the final pool state, so a trade in the last blocks cannot decide it.
+   */
+  twapAccumulator: string;
+  /**
+   * Height up to which twap_accumulator has been accumulated.
+   */
+  twapLastHeight: bigint;
+  /**
+   * Height at which the market was created (start of the TWAP window).
+   */
+  startHeight: bigint;
 }
 export interface MarketProtoMsg {
   typeUrl: "/sparkdream.futarchy.v1.Market";
@@ -95,6 +111,22 @@ export interface MarketAmino {
    * spark. Empty for ACTIVE or RESOLVED_YES/NO markets.
    */
   settlement_price_yes?: string;
+  /**
+   * Time-weighted price accumulator (FUT-01). Sum over blocks of the LMSR
+   * YES price in effect during that block: each trade first adds
+   * p_yes * (height - twap_last_height) and only then moves the pools. The
+   * market resolves on twap_accumulator / (end_block - start_height), not on
+   * the final pool state, so a trade in the last blocks cannot decide it.
+   */
+  twap_accumulator?: string;
+  /**
+   * Height up to which twap_accumulator has been accumulated.
+   */
+  twap_last_height?: string;
+  /**
+   * Height at which the market was created (start of the TWAP window).
+   */
+  start_height?: string;
 }
 export interface MarketAminoMsg {
   type: "/sparkdream.futarchy.v1.Market";
@@ -117,7 +149,10 @@ function createBaseMarket(): Market {
     poolNo: "",
     initialLiquidity: "",
     liquidityWithdrawn: "",
-    settlementPriceYes: ""
+    settlementPriceYes: "",
+    twapAccumulator: "",
+    twapLastHeight: BigInt(0),
+    startHeight: BigInt(0)
   };
 }
 /**
@@ -177,6 +212,15 @@ export const Market = {
     if (message.settlementPriceYes !== "") {
       writer.uint32(130).string(Decimal.fromUserInput(message.settlementPriceYes, 18).atomics);
     }
+    if (message.twapAccumulator !== "") {
+      writer.uint32(138).string(Decimal.fromUserInput(message.twapAccumulator, 18).atomics);
+    }
+    if (message.twapLastHeight !== BigInt(0)) {
+      writer.uint32(144).int64(message.twapLastHeight);
+    }
+    if (message.startHeight !== BigInt(0)) {
+      writer.uint32(152).int64(message.startHeight);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Market {
@@ -234,6 +278,15 @@ export const Market = {
         case 16:
           message.settlementPriceYes = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
+        case 17:
+          message.twapAccumulator = Decimal.fromAtomics(reader.string(), 18).toString();
+          break;
+        case 18:
+          message.twapLastHeight = reader.int64();
+          break;
+        case 19:
+          message.startHeight = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -259,6 +312,9 @@ export const Market = {
     message.initialLiquidity = object.initialLiquidity ?? "";
     message.liquidityWithdrawn = object.liquidityWithdrawn ?? "";
     message.settlementPriceYes = object.settlementPriceYes ?? "";
+    message.twapAccumulator = object.twapAccumulator ?? "";
+    message.twapLastHeight = object.twapLastHeight !== undefined && object.twapLastHeight !== null ? BigInt(object.twapLastHeight.toString()) : BigInt(0);
+    message.startHeight = object.startHeight !== undefined && object.startHeight !== null ? BigInt(object.startHeight.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: MarketAmino): Market {
@@ -311,6 +367,15 @@ export const Market = {
     if (object.settlement_price_yes !== undefined && object.settlement_price_yes !== null) {
       message.settlementPriceYes = object.settlement_price_yes;
     }
+    if (object.twap_accumulator !== undefined && object.twap_accumulator !== null) {
+      message.twapAccumulator = object.twap_accumulator;
+    }
+    if (object.twap_last_height !== undefined && object.twap_last_height !== null) {
+      message.twapLastHeight = BigInt(object.twap_last_height);
+    }
+    if (object.start_height !== undefined && object.start_height !== null) {
+      message.startHeight = BigInt(object.start_height);
+    }
     return message;
   },
   toAmino(message: Market): MarketAmino {
@@ -331,6 +396,9 @@ export const Market = {
     obj.initial_liquidity = message.initialLiquidity === "" ? undefined : message.initialLiquidity;
     obj.liquidity_withdrawn = message.liquidityWithdrawn === "" ? undefined : message.liquidityWithdrawn;
     obj.settlement_price_yes = message.settlementPriceYes === "" ? undefined : message.settlementPriceYes;
+    obj.twap_accumulator = message.twapAccumulator === "" ? undefined : message.twapAccumulator;
+    obj.twap_last_height = message.twapLastHeight !== BigInt(0) ? message.twapLastHeight?.toString() : undefined;
+    obj.start_height = message.startHeight !== BigInt(0) ? message.startHeight?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: MarketAminoMsg): Market {

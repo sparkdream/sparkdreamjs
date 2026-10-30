@@ -27,6 +27,22 @@ export interface Nomination {
   conviction: string;
   rewardAmount: string;
   rewarded: boolean;
+  /**
+   * Failed payout attempts of a positive reward (SEA-21). A nomination with
+   * a positive reward_amount that is neither rewarded nor abandoned is
+   * queued for retry.
+   */
+  payoutAttempts: number;
+  /**
+   * Set once the payout retries are exhausted; never paid after that.
+   */
+  payoutAbandoned: boolean;
+  /**
+   * Content author resolved at Nominate (SEA-30). StakeNomination refuses
+   * stakes by this member, so the ban holds even when the content is later
+   * hidden and can no longer be resolved.
+   */
+  author: string;
 }
 export interface NominationProtoMsg {
   typeUrl: "/sparkdream.season.v1.Nomination";
@@ -57,6 +73,22 @@ export interface NominationAmino {
   conviction?: string;
   reward_amount?: string;
   rewarded?: boolean;
+  /**
+   * Failed payout attempts of a positive reward (SEA-21). A nomination with
+   * a positive reward_amount that is neither rewarded nor abandoned is
+   * queued for retry.
+   */
+  payout_attempts?: number;
+  /**
+   * Set once the payout retries are exhausted; never paid after that.
+   */
+  payout_abandoned?: boolean;
+  /**
+   * Content author resolved at Nominate (SEA-30). StakeNomination refuses
+   * stakes by this member, so the ban holds even when the content is later
+   * hidden and can no longer be resolved.
+   */
+  author?: string;
 }
 export interface NominationAminoMsg {
   type: "/sparkdream.season.v1.Nomination";
@@ -149,7 +181,10 @@ function createBaseNomination(): Nomination {
     totalStaked: "",
     conviction: "",
     rewardAmount: "",
-    rewarded: false
+    rewarded: false,
+    payoutAttempts: 0,
+    payoutAbandoned: false,
+    author: ""
   };
 }
 /**
@@ -193,6 +228,15 @@ export const Nomination = {
     if (message.rewarded === true) {
       writer.uint32(80).bool(message.rewarded);
     }
+    if (message.payoutAttempts !== 0) {
+      writer.uint32(88).uint32(message.payoutAttempts);
+    }
+    if (message.payoutAbandoned === true) {
+      writer.uint32(96).bool(message.payoutAbandoned);
+    }
+    if (message.author !== "") {
+      writer.uint32(106).string(message.author);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Nomination {
@@ -232,6 +276,15 @@ export const Nomination = {
         case 10:
           message.rewarded = reader.bool();
           break;
+        case 11:
+          message.payoutAttempts = reader.uint32();
+          break;
+        case 12:
+          message.payoutAbandoned = reader.bool();
+          break;
+        case 13:
+          message.author = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -251,6 +304,9 @@ export const Nomination = {
     message.conviction = object.conviction ?? "";
     message.rewardAmount = object.rewardAmount ?? "";
     message.rewarded = object.rewarded ?? false;
+    message.payoutAttempts = object.payoutAttempts ?? 0;
+    message.payoutAbandoned = object.payoutAbandoned ?? false;
+    message.author = object.author ?? "";
     return message;
   },
   fromAmino(object: NominationAmino): Nomination {
@@ -285,6 +341,15 @@ export const Nomination = {
     if (object.rewarded !== undefined && object.rewarded !== null) {
       message.rewarded = object.rewarded;
     }
+    if (object.payout_attempts !== undefined && object.payout_attempts !== null) {
+      message.payoutAttempts = object.payout_attempts;
+    }
+    if (object.payout_abandoned !== undefined && object.payout_abandoned !== null) {
+      message.payoutAbandoned = object.payout_abandoned;
+    }
+    if (object.author !== undefined && object.author !== null) {
+      message.author = object.author;
+    }
     return message;
   },
   toAmino(message: Nomination): NominationAmino {
@@ -299,6 +364,9 @@ export const Nomination = {
     obj.conviction = message.conviction === "" ? undefined : message.conviction;
     obj.reward_amount = message.rewardAmount === "" ? undefined : message.rewardAmount;
     obj.rewarded = message.rewarded === false ? undefined : message.rewarded;
+    obj.payout_attempts = message.payoutAttempts === 0 ? undefined : message.payoutAttempts;
+    obj.payout_abandoned = message.payoutAbandoned === false ? undefined : message.payoutAbandoned;
+    obj.author = message.author === "" ? undefined : message.author;
     return obj;
   },
   fromAminoMsg(object: NominationAminoMsg): Nomination {

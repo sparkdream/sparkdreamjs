@@ -4,7 +4,8 @@ import { DeepPartial } from "../../../helpers";
 /**
  * VaultSigner is one weighted signer of a vault. The address is personal (never
  * a vault, module account, group policy or reserved address); a native multisig
- * address is allowed.
+ * address is allowed. An entry listed by someone else stays unaccepted until
+ * the address accepts it (MsgAcceptVaultSigner).
  * @name VaultSigner
  * @package sparkdream.vault.v1
  * @see proto type: sparkdream.vault.v1.VaultSigner
@@ -12,6 +13,14 @@ import { DeepPartial } from "../../../helpers";
 export interface VaultSigner {
   address: string;
   weight: bigint;
+  /**
+   * Set by the chain, ignored on MsgCreateVault / MsgUpdateVault input. True
+   * once the listed address consented: the creator's own entry at create, an
+   * entry carried over from the previous accepted config by MsgUpdateVault, or
+   * MsgAcceptVaultSigner. Only accepted entries carry weight in the tally, may
+   * propose, approve or execute, and count toward MaxVaultsPerSigner.
+   */
+  accepted: boolean;
 }
 export interface VaultSignerProtoMsg {
   typeUrl: "/sparkdream.vault.v1.VaultSigner";
@@ -20,7 +29,8 @@ export interface VaultSignerProtoMsg {
 /**
  * VaultSigner is one weighted signer of a vault. The address is personal (never
  * a vault, module account, group policy or reserved address); a native multisig
- * address is allowed.
+ * address is allowed. An entry listed by someone else stays unaccepted until
+ * the address accepts it (MsgAcceptVaultSigner).
  * @name VaultSignerAmino
  * @package sparkdream.vault.v1
  * @see proto type: sparkdream.vault.v1.VaultSigner
@@ -28,6 +38,14 @@ export interface VaultSignerProtoMsg {
 export interface VaultSignerAmino {
   address?: string;
   weight?: string;
+  /**
+   * Set by the chain, ignored on MsgCreateVault / MsgUpdateVault input. True
+   * once the listed address consented: the creator's own entry at create, an
+   * entry carried over from the previous accepted config by MsgUpdateVault, or
+   * MsgAcceptVaultSigner. Only accepted entries carry weight in the tally, may
+   * propose, approve or execute, and count toward MaxVaultsPerSigner.
+   */
+  accepted?: boolean;
 }
 export interface VaultSignerAminoMsg {
   type: "/sparkdream.vault.v1.VaultSigner";
@@ -36,13 +54,15 @@ export interface VaultSignerAminoMsg {
 function createBaseVaultSigner(): VaultSigner {
   return {
     address: "",
-    weight: BigInt(0)
+    weight: BigInt(0),
+    accepted: false
   };
 }
 /**
  * VaultSigner is one weighted signer of a vault. The address is personal (never
  * a vault, module account, group policy or reserved address); a native multisig
- * address is allowed.
+ * address is allowed. An entry listed by someone else stays unaccepted until
+ * the address accepts it (MsgAcceptVaultSigner).
  * @name VaultSigner
  * @package sparkdream.vault.v1
  * @see proto type: sparkdream.vault.v1.VaultSigner
@@ -55,6 +75,9 @@ export const VaultSigner = {
     }
     if (message.weight !== BigInt(0)) {
       writer.uint32(16).uint64(message.weight);
+    }
+    if (message.accepted === true) {
+      writer.uint32(24).bool(message.accepted);
     }
     return writer;
   },
@@ -71,6 +94,9 @@ export const VaultSigner = {
         case 2:
           message.weight = reader.uint64();
           break;
+        case 3:
+          message.accepted = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -82,6 +108,7 @@ export const VaultSigner = {
     const message = createBaseVaultSigner();
     message.address = object.address ?? "";
     message.weight = object.weight !== undefined && object.weight !== null ? BigInt(object.weight.toString()) : BigInt(0);
+    message.accepted = object.accepted ?? false;
     return message;
   },
   fromAmino(object: VaultSignerAmino): VaultSigner {
@@ -92,12 +119,16 @@ export const VaultSigner = {
     if (object.weight !== undefined && object.weight !== null) {
       message.weight = BigInt(object.weight);
     }
+    if (object.accepted !== undefined && object.accepted !== null) {
+      message.accepted = object.accepted;
+    }
     return message;
   },
   toAmino(message: VaultSigner): VaultSignerAmino {
     const obj: any = {};
     obj.address = message.address === "" ? undefined : message.address;
     obj.weight = message.weight !== BigInt(0) ? message.weight?.toString() : undefined;
+    obj.accepted = message.accepted === false ? undefined : message.accepted;
     return obj;
   },
   fromAminoMsg(object: VaultSignerAminoMsg): VaultSigner {

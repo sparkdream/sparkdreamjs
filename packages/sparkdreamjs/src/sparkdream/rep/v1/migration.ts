@@ -79,7 +79,8 @@ export enum MigrationStatus {
   MIGRATION_STATUS_ACCEPTED = 2,
   /**
    * MIGRATION_STATUS_OBJECTED - OBJECTED: (COUNCIL path) the old address objected during the delay and
-   * a jury review decides. The queue entry is removed until the verdict.
+   * a jury review decides. The queue entry is removed until the verdict. An
+   * inconclusive jury escalates the objection to x/gov (escalated_until).
    */
   MIGRATION_STATUS_OBJECTED = 3,
   /** MIGRATION_STATUS_FINALIZED - FINALIZED: the identity moved; the old address is a tombstone. */
@@ -206,6 +207,22 @@ export interface MemberMigration {
    * finalized_at is the block time of finalization (0 until then).
    */
   finalizedAt: bigint;
+  /**
+   * accept_by is the block time by which the new address must accept
+   * (requested_at + migration_accept_window at request time). Stored so the
+   * accept-expiry queue key never drifts when the param changes.
+   */
+  acceptBy: bigint;
+  /**
+   * escalated_until is set (COUNCIL path) when the objection jury reached no
+   * verdict (INCONCLUSIVE, including a jury that could not be seated). The
+   * objection is escalated to x/gov: the migration stays OBJECTED and the
+   * bond stays locked until governance cancels the migration (objection
+   * upheld, bond refunded) or re-forces it (objection rejected, bond paid to
+   * to_address). If governance has not decided by this block time the
+   * objection is rejected. 0 when not escalated.
+   */
+  escalatedUntil: bigint;
 }
 export interface MemberMigrationProtoMsg {
   typeUrl: "/sparkdream.rep.v1.MemberMigration";
@@ -263,6 +280,22 @@ export interface MemberMigrationAmino {
    * finalized_at is the block time of finalization (0 until then).
    */
   finalized_at?: string;
+  /**
+   * accept_by is the block time by which the new address must accept
+   * (requested_at + migration_accept_window at request time). Stored so the
+   * accept-expiry queue key never drifts when the param changes.
+   */
+  accept_by?: string;
+  /**
+   * escalated_until is set (COUNCIL path) when the objection jury reached no
+   * verdict (INCONCLUSIVE, including a jury that could not be seated). The
+   * objection is escalated to x/gov: the migration stays OBJECTED and the
+   * bond stays locked until governance cancels the migration (objection
+   * upheld, bond refunded) or re-forces it (objection rejected, bond paid to
+   * to_address). If governance has not decided by this block time the
+   * objection is rejected. 0 when not escalated.
+   */
+  escalated_until?: string;
 }
 export interface MemberMigrationAminoMsg {
   type: "/sparkdream.rep.v1.MemberMigration";
@@ -551,7 +584,9 @@ function createBaseMemberMigration(): MemberMigration {
     objector: "",
     objectionBond: "",
     failureReason: "",
-    finalizedAt: BigInt(0)
+    finalizedAt: BigInt(0),
+    acceptBy: BigInt(0),
+    escalatedUntil: BigInt(0)
   };
 }
 /**
@@ -605,6 +640,12 @@ export const MemberMigration = {
     if (message.finalizedAt !== BigInt(0)) {
       writer.uint32(112).int64(message.finalizedAt);
     }
+    if (message.acceptBy !== BigInt(0)) {
+      writer.uint32(120).int64(message.acceptBy);
+    }
+    if (message.escalatedUntil !== BigInt(0)) {
+      writer.uint32(128).int64(message.escalatedUntil);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MemberMigration {
@@ -656,6 +697,12 @@ export const MemberMigration = {
         case 14:
           message.finalizedAt = reader.int64();
           break;
+        case 15:
+          message.acceptBy = reader.int64();
+          break;
+        case 16:
+          message.escalatedUntil = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -679,6 +726,8 @@ export const MemberMigration = {
     message.objectionBond = object.objectionBond ?? "";
     message.failureReason = object.failureReason ?? "";
     message.finalizedAt = object.finalizedAt !== undefined && object.finalizedAt !== null ? BigInt(object.finalizedAt.toString()) : BigInt(0);
+    message.acceptBy = object.acceptBy !== undefined && object.acceptBy !== null ? BigInt(object.acceptBy.toString()) : BigInt(0);
+    message.escalatedUntil = object.escalatedUntil !== undefined && object.escalatedUntil !== null ? BigInt(object.escalatedUntil.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: MemberMigrationAmino): MemberMigration {
@@ -725,6 +774,12 @@ export const MemberMigration = {
     if (object.finalized_at !== undefined && object.finalized_at !== null) {
       message.finalizedAt = BigInt(object.finalized_at);
     }
+    if (object.accept_by !== undefined && object.accept_by !== null) {
+      message.acceptBy = BigInt(object.accept_by);
+    }
+    if (object.escalated_until !== undefined && object.escalated_until !== null) {
+      message.escalatedUntil = BigInt(object.escalated_until);
+    }
     return message;
   },
   toAmino(message: MemberMigration): MemberMigrationAmino {
@@ -743,6 +798,8 @@ export const MemberMigration = {
     obj.objection_bond = message.objectionBond === "" ? undefined : message.objectionBond;
     obj.failure_reason = message.failureReason === "" ? undefined : message.failureReason;
     obj.finalized_at = message.finalizedAt !== BigInt(0) ? message.finalizedAt?.toString() : undefined;
+    obj.accept_by = message.acceptBy !== BigInt(0) ? message.acceptBy?.toString() : undefined;
+    obj.escalated_until = message.escalatedUntil !== BigInt(0) ? message.escalatedUntil?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: MemberMigrationAminoMsg): MemberMigration {

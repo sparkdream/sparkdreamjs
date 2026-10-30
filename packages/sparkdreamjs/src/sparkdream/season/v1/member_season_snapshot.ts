@@ -64,6 +64,13 @@ export interface MemberSeasonSnapshot {
    * Achievements earned during this season
    */
   achievementsEarned: string[];
+  /**
+   * Seasonal title definitions (threshold requirements) this member met
+   * when the SNAPSHOT phase evaluated them, before RESET_XP. The TITLES
+   * phase grants `s<N>_<title_id>` from this list. TOP_XP titles are
+   * ranked across members and live in SeasonTitleEligibility instead.
+   */
+  eligibleTitleIds: string[];
 }
 export interface MemberSeasonSnapshotProtoMsg {
   typeUrl: "/sparkdream.season.v1.MemberSeasonSnapshot";
@@ -106,6 +113,13 @@ export interface MemberSeasonSnapshotAmino {
    * Achievements earned during this season
    */
   achievements_earned?: string[];
+  /**
+   * Seasonal title definitions (threshold requirements) this member met
+   * when the SNAPSHOT phase evaluated them, before RESET_XP. The TITLES
+   * phase grants `s<N>_<title_id>` from this list. TOP_XP titles are
+   * ranked across members and live in SeasonTitleEligibility instead.
+   */
+  eligible_title_ids?: string[];
 }
 export interface MemberSeasonSnapshotAminoMsg {
   type: "/sparkdream.season.v1.MemberSeasonSnapshot";
@@ -192,7 +206,8 @@ function createBaseMemberSeasonSnapshot(): MemberSeasonSnapshot {
     initiativesCompleted: BigInt(0),
     xpEarned: BigInt(0),
     seasonLevel: BigInt(0),
-    achievementsEarned: []
+    achievementsEarned: [],
+    eligibleTitleIds: []
   };
 }
 /**
@@ -228,6 +243,9 @@ export const MemberSeasonSnapshot = {
     for (const v of message.achievementsEarned) {
       writer.uint32(58).string(v!);
     }
+    for (const v of message.eligibleTitleIds) {
+      writer.uint32(66).string(v!);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MemberSeasonSnapshot {
@@ -261,6 +279,9 @@ export const MemberSeasonSnapshot = {
         case 7:
           message.achievementsEarned.push(reader.string());
           break;
+        case 8:
+          message.eligibleTitleIds.push(reader.string());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -284,6 +305,7 @@ export const MemberSeasonSnapshot = {
     message.xpEarned = object.xpEarned !== undefined && object.xpEarned !== null ? BigInt(object.xpEarned.toString()) : BigInt(0);
     message.seasonLevel = object.seasonLevel !== undefined && object.seasonLevel !== null ? BigInt(object.seasonLevel.toString()) : BigInt(0);
     message.achievementsEarned = object.achievementsEarned?.map(e => e) || [];
+    message.eligibleTitleIds = object.eligibleTitleIds?.map(e => e) || [];
     return message;
   },
   fromAmino(object: MemberSeasonSnapshotAmino): MemberSeasonSnapshot {
@@ -312,6 +334,7 @@ export const MemberSeasonSnapshot = {
       message.seasonLevel = BigInt(object.season_level);
     }
     message.achievementsEarned = object.achievements_earned?.map(e => e) || [];
+    message.eligibleTitleIds = object.eligible_title_ids?.map(e => e) || [];
     return message;
   },
   toAmino(message: MemberSeasonSnapshot): MemberSeasonSnapshotAmino {
@@ -331,6 +354,11 @@ export const MemberSeasonSnapshot = {
       obj.achievements_earned = message.achievementsEarned.map(e => e);
     } else {
       obj.achievements_earned = message.achievementsEarned;
+    }
+    if (message.eligibleTitleIds) {
+      obj.eligible_title_ids = message.eligibleTitleIds.map(e => e);
+    } else {
+      obj.eligible_title_ids = message.eligibleTitleIds;
     }
     return obj;
   },

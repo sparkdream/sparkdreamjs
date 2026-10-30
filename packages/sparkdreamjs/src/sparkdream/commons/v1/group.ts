@@ -1,7 +1,61 @@
 //@ts-nocheck
 import { Any, AnyAmino } from "../../../google/protobuf/any";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
+/** BallotMode is a group's proposal voting mode. */
+export enum BallotMode {
+  /**
+   * BALLOT_MODE_UNSPECIFIED - UNSPECIFIED is OPEN on a group; on MsgUpdateGroupConfig it leaves the
+   * mode unchanged.
+   */
+  BALLOT_MODE_UNSPECIFIED = 0,
+  /** BALLOT_MODE_OPEN - OPEN: members vote with MsgVoteProposal. */
+  BALLOT_MODE_OPEN = 1,
+  /**
+   * BALLOT_MODE_SECRET - SECRET: every proposal is a secret ballot (MsgAnonymousVoteProposal via
+   * x/shield). Needs equal member weights and enough registered ZK keys.
+   */
+  BALLOT_MODE_SECRET = 2,
+  /** BALLOT_MODE_PROPOSER_CHOICE - PROPOSER_CHOICE: the proposer picks per proposal (secret_ballot). */
+  BALLOT_MODE_PROPOSER_CHOICE = 3,
+  UNRECOGNIZED = -1,
+}
+export const BallotModeAmino = BallotMode;
+export function ballotModeFromJSON(object: any): BallotMode {
+  switch (object) {
+    case 0:
+    case "BALLOT_MODE_UNSPECIFIED":
+      return BallotMode.BALLOT_MODE_UNSPECIFIED;
+    case 1:
+    case "BALLOT_MODE_OPEN":
+      return BallotMode.BALLOT_MODE_OPEN;
+    case 2:
+    case "BALLOT_MODE_SECRET":
+      return BallotMode.BALLOT_MODE_SECRET;
+    case 3:
+    case "BALLOT_MODE_PROPOSER_CHOICE":
+      return BallotMode.BALLOT_MODE_PROPOSER_CHOICE;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return BallotMode.UNRECOGNIZED;
+  }
+}
+export function ballotModeToJSON(object: BallotMode): string {
+  switch (object) {
+    case BallotMode.BALLOT_MODE_UNSPECIFIED:
+      return "BALLOT_MODE_UNSPECIFIED";
+    case BallotMode.BALLOT_MODE_OPEN:
+      return "BALLOT_MODE_OPEN";
+    case BallotMode.BALLOT_MODE_SECRET:
+      return "BALLOT_MODE_SECRET";
+    case BallotMode.BALLOT_MODE_PROPOSER_CHOICE:
+      return "BALLOT_MODE_PROPOSER_CHOICE";
+    case BallotMode.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
 /** ProposalStatus defines the possible states of a council proposal. */
 export enum ProposalStatus {
   /** PROPOSAL_STATUS_UNSPECIFIED - PROPOSAL_STATUS_UNSPECIFIED is the default value. */
@@ -156,6 +210,17 @@ export interface Group {
   lastParentUpdate: bigint;
   futarchyEnabled: boolean;
   vetoPolicyAddress: string;
+  /**
+   * last_config_update is when the parent last changed this group's config
+   * with MsgUpdateGroupConfig (unix seconds; 0 = never). update_cooldown
+   * throttles the parent from it.
+   */
+  lastConfigUpdate: bigint;
+  /**
+   * ballot_mode decides how the group's proposals are voted. UNSPECIFIED
+   * means OPEN.
+   */
+  ballotMode: BallotMode;
 }
 export interface GroupProtoMsg {
   typeUrl: "/sparkdream.commons.v1.Group";
@@ -184,6 +249,17 @@ export interface GroupAmino {
   last_parent_update?: string;
   futarchy_enabled?: boolean;
   veto_policy_address?: string;
+  /**
+   * last_config_update is when the parent last changed this group's config
+   * with MsgUpdateGroupConfig (unix seconds; 0 = never). update_cooldown
+   * throttles the parent from it.
+   */
+  last_config_update?: string;
+  /**
+   * ballot_mode decides how the group's proposals are voted. UNSPECIFIED
+   * means OPEN.
+   */
+  ballot_mode?: BallotMode;
 }
 export interface GroupAminoMsg {
   type: "/sparkdream.commons.v1.Group";
@@ -361,6 +437,22 @@ export interface Proposal {
    * failed_reason stores the reason if execution failed
    */
   failedReason: string;
+  /**
+   * secret_ballot proposals are voted only with MsgAnonymousVoteProposal,
+   * against the voter snapshot taken at submission.
+   */
+  secretBallot: boolean;
+  /**
+   * voter_root is the Merkle root of the voter snapshot (secret ballots).
+   */
+  voterRoot: Uint8Array;
+  /**
+   * ballot_member_count and ballot_member_weight are the group's member
+   * count and (equal) member weight at submission; a secret ballot's
+   * threshold is computed against them.
+   */
+  ballotMemberCount: bigint;
+  ballotMemberWeight: string;
 }
 export interface ProposalProtoMsg {
   typeUrl: "/sparkdream.commons.v1.Proposal";
@@ -418,6 +510,22 @@ export interface ProposalAmino {
    * failed_reason stores the reason if execution failed
    */
   failed_reason?: string;
+  /**
+   * secret_ballot proposals are voted only with MsgAnonymousVoteProposal,
+   * against the voter snapshot taken at submission.
+   */
+  secret_ballot?: boolean;
+  /**
+   * voter_root is the Merkle root of the voter snapshot (secret ballots).
+   */
+  voter_root?: string;
+  /**
+   * ballot_member_count and ballot_member_weight are the group's member
+   * count and (equal) member weight at submission; a secret ballot's
+   * threshold is computed against them.
+   */
+  ballot_member_count?: string;
+  ballot_member_weight?: string;
 }
 export interface ProposalAminoMsg {
   type: "/sparkdream.commons.v1.Proposal";
@@ -508,7 +616,9 @@ function createBaseGroup(): Group {
     activationTime: BigInt(0),
     lastParentUpdate: BigInt(0),
     futarchyEnabled: false,
-    vetoPolicyAddress: ""
+    vetoPolicyAddress: "",
+    lastConfigUpdate: BigInt(0),
+    ballotMode: 0
   };
 }
 /**
@@ -568,6 +678,12 @@ export const Group = {
     if (message.vetoPolicyAddress !== "") {
       writer.uint32(130).string(message.vetoPolicyAddress);
     }
+    if (message.lastConfigUpdate !== BigInt(0)) {
+      writer.uint32(136).int64(message.lastConfigUpdate);
+    }
+    if (message.ballotMode !== 0) {
+      writer.uint32(144).int32(message.ballotMode);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Group {
@@ -625,6 +741,12 @@ export const Group = {
         case 16:
           message.vetoPolicyAddress = reader.string();
           break;
+        case 17:
+          message.lastConfigUpdate = reader.int64();
+          break;
+        case 18:
+          message.ballotMode = reader.int32() as any;
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -650,6 +772,8 @@ export const Group = {
     message.lastParentUpdate = object.lastParentUpdate !== undefined && object.lastParentUpdate !== null ? BigInt(object.lastParentUpdate.toString()) : BigInt(0);
     message.futarchyEnabled = object.futarchyEnabled ?? false;
     message.vetoPolicyAddress = object.vetoPolicyAddress ?? "";
+    message.lastConfigUpdate = object.lastConfigUpdate !== undefined && object.lastConfigUpdate !== null ? BigInt(object.lastConfigUpdate.toString()) : BigInt(0);
+    message.ballotMode = object.ballotMode ?? 0;
     return message;
   },
   fromAmino(object: GroupAmino): Group {
@@ -702,6 +826,12 @@ export const Group = {
     if (object.veto_policy_address !== undefined && object.veto_policy_address !== null) {
       message.vetoPolicyAddress = object.veto_policy_address;
     }
+    if (object.last_config_update !== undefined && object.last_config_update !== null) {
+      message.lastConfigUpdate = BigInt(object.last_config_update);
+    }
+    if (object.ballot_mode !== undefined && object.ballot_mode !== null) {
+      message.ballotMode = object.ballot_mode;
+    }
     return message;
   },
   toAmino(message: Group): GroupAmino {
@@ -722,6 +852,8 @@ export const Group = {
     obj.last_parent_update = message.lastParentUpdate !== BigInt(0) ? message.lastParentUpdate?.toString() : undefined;
     obj.futarchy_enabled = message.futarchyEnabled === false ? undefined : message.futarchyEnabled;
     obj.veto_policy_address = message.vetoPolicyAddress === "" ? undefined : message.vetoPolicyAddress;
+    obj.last_config_update = message.lastConfigUpdate !== BigInt(0) ? message.lastConfigUpdate?.toString() : undefined;
+    obj.ballot_mode = message.ballotMode === 0 ? undefined : message.ballotMode;
     return obj;
   },
   fromAminoMsg(object: GroupAminoMsg): Group {
@@ -1068,7 +1200,11 @@ function createBaseProposal(): Proposal {
     policyVersion: BigInt(0),
     metadata: "",
     executionTime: BigInt(0),
-    failedReason: ""
+    failedReason: "",
+    secretBallot: false,
+    voterRoot: new Uint8Array(),
+    ballotMemberCount: BigInt(0),
+    ballotMemberWeight: ""
   };
 }
 /**
@@ -1116,6 +1252,18 @@ export const Proposal = {
     if (message.failedReason !== "") {
       writer.uint32(98).string(message.failedReason);
     }
+    if (message.secretBallot === true) {
+      writer.uint32(104).bool(message.secretBallot);
+    }
+    if (message.voterRoot.length !== 0) {
+      writer.uint32(114).bytes(message.voterRoot);
+    }
+    if (message.ballotMemberCount !== BigInt(0)) {
+      writer.uint32(120).uint64(message.ballotMemberCount);
+    }
+    if (message.ballotMemberWeight !== "") {
+      writer.uint32(130).string(message.ballotMemberWeight);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Proposal {
@@ -1161,6 +1309,18 @@ export const Proposal = {
         case 12:
           message.failedReason = reader.string();
           break;
+        case 13:
+          message.secretBallot = reader.bool();
+          break;
+        case 14:
+          message.voterRoot = reader.bytes();
+          break;
+        case 15:
+          message.ballotMemberCount = reader.uint64();
+          break;
+        case 16:
+          message.ballotMemberWeight = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1182,6 +1342,10 @@ export const Proposal = {
     message.metadata = object.metadata ?? "";
     message.executionTime = object.executionTime !== undefined && object.executionTime !== null ? BigInt(object.executionTime.toString()) : BigInt(0);
     message.failedReason = object.failedReason ?? "";
+    message.secretBallot = object.secretBallot ?? false;
+    message.voterRoot = object.voterRoot ?? new Uint8Array();
+    message.ballotMemberCount = object.ballotMemberCount !== undefined && object.ballotMemberCount !== null ? BigInt(object.ballotMemberCount.toString()) : BigInt(0);
+    message.ballotMemberWeight = object.ballotMemberWeight ?? "";
     return message;
   },
   fromAmino(object: ProposalAmino): Proposal {
@@ -1220,6 +1384,18 @@ export const Proposal = {
     if (object.failed_reason !== undefined && object.failed_reason !== null) {
       message.failedReason = object.failed_reason;
     }
+    if (object.secret_ballot !== undefined && object.secret_ballot !== null) {
+      message.secretBallot = object.secret_ballot;
+    }
+    if (object.voter_root !== undefined && object.voter_root !== null) {
+      message.voterRoot = bytesFromBase64(object.voter_root);
+    }
+    if (object.ballot_member_count !== undefined && object.ballot_member_count !== null) {
+      message.ballotMemberCount = BigInt(object.ballot_member_count);
+    }
+    if (object.ballot_member_weight !== undefined && object.ballot_member_weight !== null) {
+      message.ballotMemberWeight = object.ballot_member_weight;
+    }
     return message;
   },
   toAmino(message: Proposal): ProposalAmino {
@@ -1240,6 +1416,10 @@ export const Proposal = {
     obj.metadata = message.metadata === "" ? undefined : message.metadata;
     obj.execution_time = message.executionTime !== BigInt(0) ? message.executionTime?.toString() : undefined;
     obj.failed_reason = message.failedReason === "" ? undefined : message.failedReason;
+    obj.secret_ballot = message.secretBallot === false ? undefined : message.secretBallot;
+    obj.voter_root = message.voterRoot ? base64FromBytes(message.voterRoot) : undefined;
+    obj.ballot_member_count = message.ballotMemberCount !== BigInt(0) ? message.ballotMemberCount?.toString() : undefined;
+    obj.ballot_member_weight = message.ballotMemberWeight === "" ? undefined : message.ballotMemberWeight;
     return obj;
   },
   fromAminoMsg(object: ProposalAminoMsg): Proposal {

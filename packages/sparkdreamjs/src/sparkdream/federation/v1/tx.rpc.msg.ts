@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgRegisterPeer, MsgRegisterPeerResponse, MsgRemovePeer, MsgRemovePeerResponse, MsgSuspendPeer, MsgSuspendPeerResponse, MsgResumePeer, MsgResumePeerResponse, MsgUpdatePeerPolicy, MsgUpdatePeerPolicyResponse, MsgRegisterBridge, MsgRegisterBridgeResponse, MsgUpdateBridge, MsgUpdateBridgeResponse, MsgSubmitFederatedContent, MsgSubmitFederatedContentResponse, MsgFederateContent, MsgFederateContentResponse, MsgAttestOutbound, MsgAttestOutboundResponse, MsgModerateContent, MsgModerateContentResponse, MsgLinkIdentity, MsgLinkIdentityResponse, MsgUnlinkIdentity, MsgUnlinkIdentityResponse, MsgConfirmIdentityLink, MsgConfirmIdentityLinkResponse, MsgRequestReputationAttestation, MsgRequestReputationAttestationResponse, MsgVerifyContent, MsgVerifyContentResponse, MsgChallengeVerification, MsgChallengeVerificationResponse, MsgSubmitArbiterHash, MsgSubmitArbiterHashResponse, MsgEscalateChallenge, MsgEscalateChallengeResponse, MsgResolveEscalatedChallenge, MsgResolveEscalatedChallengeResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgUpdatePeerController, MsgUpdatePeerControllerResponse, MsgResyncBridgeCount, MsgResyncBridgeCountResponse, MsgPruneOrphanBindings, MsgPruneOrphanBindingsResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgRegisterPeer, MsgRegisterPeerResponse, MsgRemovePeer, MsgRemovePeerResponse, MsgSuspendPeer, MsgSuspendPeerResponse, MsgResumePeer, MsgResumePeerResponse, MsgUpdatePeerPolicy, MsgUpdatePeerPolicyResponse, MsgRegisterBridge, MsgRegisterBridgeResponse, MsgUpdateBridge, MsgUpdateBridgeResponse, MsgSubmitFederatedContent, MsgSubmitFederatedContentResponse, MsgFederateContent, MsgFederateContentResponse, MsgAttestOutbound, MsgAttestOutboundResponse, MsgModerateContent, MsgModerateContentResponse, MsgLinkIdentity, MsgLinkIdentityResponse, MsgUnlinkIdentity, MsgUnlinkIdentityResponse, MsgConfirmIdentityLink, MsgConfirmIdentityLinkResponse, MsgAttestIdentityLink, MsgAttestIdentityLinkResponse, MsgRequestReputationAttestation, MsgRequestReputationAttestationResponse, MsgVerifyContent, MsgVerifyContentResponse, MsgChallengeVerification, MsgChallengeVerificationResponse, MsgSubmitArbiterHash, MsgSubmitArbiterHashResponse, MsgEscalateChallenge, MsgEscalateChallengeResponse, MsgResolveEscalatedChallenge, MsgResolveEscalatedChallengeResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgUpdatePeerController, MsgUpdatePeerControllerResponse, MsgResyncBridgeCount, MsgResyncBridgeCountResponse, MsgPruneOrphanBindings, MsgPruneOrphanBindingsResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   updateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
@@ -28,6 +28,11 @@ export interface Msg {
   linkIdentity(request: MsgLinkIdentity): Promise<MsgLinkIdentityResponse>;
   unlinkIdentity(request: MsgUnlinkIdentity): Promise<MsgUnlinkIdentityResponse>;
   confirmIdentityLink(request: MsgConfirmIdentityLink): Promise<MsgConfirmIdentityLinkResponse>;
+  /**
+   * AttestIdentityLink is a bridge operator's bonded attestation that a
+   * member controls a remote identity on the operator's bridge peer.
+   */
+  attestIdentityLink(request: MsgAttestIdentityLink): Promise<MsgAttestIdentityLinkResponse>;
   requestReputationAttestation(request: MsgRequestReputationAttestation): Promise<MsgRequestReputationAttestationResponse>;
   /**
    * NOTE: Phase 4 of the bonded-role generalization removed BondVerifier /
@@ -144,6 +149,13 @@ export class MsgClientImpl implements Msg {
     const data = MsgConfirmIdentityLink.encode(request).finish();
     const promise = this.rpc.request("sparkdream.federation.v1.Msg", "ConfirmIdentityLink", data);
     return promise.then(data => MsgConfirmIdentityLinkResponse.decode(new BinaryReader(data)));
+  };
+  /* AttestIdentityLink is a bridge operator's bonded attestation that a
+   member controls a remote identity on the operator's bridge peer. */
+  attestIdentityLink = async (request: MsgAttestIdentityLink): Promise<MsgAttestIdentityLinkResponse> => {
+    const data = MsgAttestIdentityLink.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.federation.v1.Msg", "AttestIdentityLink", data);
+    return promise.then(data => MsgAttestIdentityLinkResponse.decode(new BinaryReader(data)));
   };
   /* RequestReputationAttestation */
   requestReputationAttestation = async (request: MsgRequestReputationAttestation): Promise<MsgRequestReputationAttestationResponse> => {

@@ -78,7 +78,8 @@ export interface Params {
   dkgWindowBlocks: bigint;
   /**
    * Validator set drift percentage (0-100) that triggers automatic re-keying.
-   * e.g. 33 means re-key if >33% of DKG participants are no longer in the bonded set.
+   * e.g. 33 means re-key once 33% or more of the DKG participants (truncated
+   * to a whole percent) are no longer in the bonded set.
    */
   maxValidatorSetDrift: number;
   /**
@@ -95,6 +96,17 @@ export interface Params {
    * satisfied with the ceremony. A re-key always turns batch mode off.
    */
   enableBatchAfterDkg: boolean;
+  /**
+   * Chain-wide budget (in the bond denom) of fees the shield module pays in
+   * one shield epoch, summed over every exec. An exec whose fee would exceed
+   * what is left is rejected before anything is paid; the budget resets at
+   * the next shield epoch. Size it so that budget x epochs per day stays
+   * below max_funding_per_day (at 6 s blocks and a 50-block epoch there are
+   * 288 epochs a day): then no set of identities, however many in-quota
+   * execs they run, can drain the reserve faster than it is funded. Must be
+   * at least max_fee_per_exec.
+   */
+  maxFeesPerEpoch: string;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.shield.v1.Params";
@@ -177,7 +189,8 @@ export interface ParamsAmino {
   dkg_window_blocks?: string;
   /**
    * Validator set drift percentage (0-100) that triggers automatic re-keying.
-   * e.g. 33 means re-key if >33% of DKG participants are no longer in the bonded set.
+   * e.g. 33 means re-key once 33% or more of the DKG participants (truncated
+   * to a whole percent) are no longer in the bonded set.
    */
   max_validator_set_drift?: number;
   /**
@@ -194,6 +207,17 @@ export interface ParamsAmino {
    * satisfied with the ceremony. A re-key always turns batch mode off.
    */
   enable_batch_after_dkg?: boolean;
+  /**
+   * Chain-wide budget (in the bond denom) of fees the shield module pays in
+   * one shield epoch, summed over every exec. An exec whose fee would exceed
+   * what is left is rejected before anything is paid; the budget resets at
+   * the next shield epoch. Size it so that budget x epochs per day stays
+   * below max_funding_per_day (at 6 s blocks and a 50-block epoch there are
+   * 288 epochs a day): then no set of identities, however many in-quota
+   * execs they run, can drain the reserve faster than it is funded. Must be
+   * at least max_fee_per_exec.
+   */
+  max_fees_per_epoch?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/shield/Params";
@@ -220,7 +244,8 @@ function createBaseParams(): Params {
     dkgWindowBlocks: BigInt(0),
     maxValidatorSetDrift: 0,
     maxFeePerExec: "",
-    enableBatchAfterDkg: false
+    enableBatchAfterDkg: false,
+    maxFeesPerEpoch: ""
   };
 }
 /**
@@ -293,6 +318,9 @@ export const Params = {
     if (message.enableBatchAfterDkg === true) {
       writer.uint32(160).bool(message.enableBatchAfterDkg);
     }
+    if (message.maxFeesPerEpoch !== "") {
+      writer.uint32(170).string(message.maxFeesPerEpoch);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -362,6 +390,9 @@ export const Params = {
         case 20:
           message.enableBatchAfterDkg = reader.bool();
           break;
+        case 21:
+          message.maxFeesPerEpoch = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -391,6 +422,7 @@ export const Params = {
     message.maxValidatorSetDrift = object.maxValidatorSetDrift ?? 0;
     message.maxFeePerExec = object.maxFeePerExec ?? "";
     message.enableBatchAfterDkg = object.enableBatchAfterDkg ?? false;
+    message.maxFeesPerEpoch = object.maxFeesPerEpoch ?? "";
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -455,6 +487,9 @@ export const Params = {
     if (object.enable_batch_after_dkg !== undefined && object.enable_batch_after_dkg !== null) {
       message.enableBatchAfterDkg = object.enable_batch_after_dkg;
     }
+    if (object.max_fees_per_epoch !== undefined && object.max_fees_per_epoch !== null) {
+      message.maxFeesPerEpoch = object.max_fees_per_epoch;
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -479,6 +514,7 @@ export const Params = {
     obj.max_validator_set_drift = message.maxValidatorSetDrift === 0 ? undefined : message.maxValidatorSetDrift;
     obj.max_fee_per_exec = message.maxFeePerExec === "" ? undefined : message.maxFeePerExec;
     obj.enable_batch_after_dkg = message.enableBatchAfterDkg === false ? undefined : message.enableBatchAfterDkg;
+    obj.max_fees_per_epoch = message.maxFeesPerEpoch === "" ? undefined : message.maxFeesPerEpoch;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {

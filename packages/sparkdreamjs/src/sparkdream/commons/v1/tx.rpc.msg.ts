@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgSpendFromCommons, MsgSpendFromCommonsResponse, MsgEmergencyCancelGovProposal, MsgEmergencyCancelGovProposalResponse, MsgCreatePolicyPermissions, MsgCreatePolicyPermissionsResponse, MsgUpdatePolicyPermissions, MsgUpdatePolicyPermissionsResponse, MsgDeletePolicyPermissions, MsgDeletePolicyPermissionsResponse, MsgRegisterGroup, MsgRegisterGroupResponse, MsgRenewGroup, MsgRenewGroupResponse, MsgUpdateGroupMembers, MsgUpdateGroupMembersResponse, MsgUpdateGroupConfig, MsgUpdateGroupConfigResponse, MsgForceUpgrade, MsgForceUpgradeResponse, MsgDeleteGroup, MsgDeleteGroupResponse, MsgVetoGroupProposals, MsgVetoGroupProposalsResponse, MsgSubmitProposal, MsgSubmitProposalResponse, MsgVoteProposal, MsgVoteProposalResponse, MsgExecuteProposal, MsgExecuteProposalResponse, MsgSubmitAnonymousProposal, MsgSubmitAnonymousProposalResponse, MsgAnonymousVoteProposal, MsgAnonymousVoteProposalResponse, MsgCreateCategory, MsgCreateCategoryResponse, MsgDeleteCategory, MsgDeleteCategoryResponse, MsgScheduleRecurringSpend, MsgScheduleRecurringSpendResponse, MsgCancelRecurringSpend, MsgCancelRecurringSpendResponse, MsgClaimRecurringSpend, MsgClaimRecurringSpendResponse, MsgDeclineRecurringSpend, MsgDeclineRecurringSpendResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgSpendFromCommons, MsgSpendFromCommonsResponse, MsgEmergencyCancelGovProposal, MsgEmergencyCancelGovProposalResponse, MsgCreatePolicyPermissions, MsgCreatePolicyPermissionsResponse, MsgUpdatePolicyPermissions, MsgUpdatePolicyPermissionsResponse, MsgDeletePolicyPermissions, MsgDeletePolicyPermissionsResponse, MsgRegisterGroup, MsgRegisterGroupResponse, MsgRenewGroup, MsgRenewGroupResponse, MsgUpdateGroupMembers, MsgUpdateGroupMembersResponse, MsgUpdateGroupConfig, MsgUpdateGroupConfigResponse, MsgForceUpgrade, MsgForceUpgradeResponse, MsgDeleteGroup, MsgDeleteGroupResponse, MsgVetoGroupProposals, MsgVetoGroupProposalsResponse, MsgSubmitProposal, MsgSubmitProposalResponse, MsgVoteProposal, MsgVoteProposalResponse, MsgExecuteProposal, MsgExecuteProposalResponse, MsgSubmitAnonymousProposal, MsgSubmitAnonymousProposalResponse, MsgAnonymousVoteProposal, MsgAnonymousVoteProposalResponse, MsgCreateCategory, MsgCreateCategoryResponse, MsgDeleteCategory, MsgDeleteCategoryResponse, MsgScheduleRecurringSpend, MsgScheduleRecurringSpendResponse, MsgCancelRecurringSpend, MsgCancelRecurringSpendResponse, MsgClaimRecurringSpend, MsgClaimRecurringSpendResponse, MsgDeclineRecurringSpend, MsgDeclineRecurringSpendResponse, MsgOpenPoll, MsgOpenPollResponse, MsgVotePoll, MsgVotePollResponse, MsgAnonymousVotePoll, MsgAnonymousVotePollResponse, MsgCancelPoll, MsgCancelPollResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
@@ -79,6 +79,14 @@ export interface Msg {
    * signer must be the recipient.
    */
   declineRecurringSpend(request: MsgDeclineRecurringSpend): Promise<MsgDeclineRecurringSpendResponse>;
+  /** OpenPoll opens a non-binding poll for a group's members. */
+  openPoll(request: MsgOpenPoll): Promise<MsgOpenPollResponse>;
+  /** VotePoll casts a member's open vote on a poll. */
+  votePoll(request: MsgVotePoll): Promise<MsgVotePollResponse>;
+  /** AnonymousVotePoll casts a secret-ballot poll vote via x/shield. */
+  anonymousVotePoll(request: MsgAnonymousVotePoll): Promise<MsgAnonymousVotePollResponse>;
+  /** CancelPoll withdraws a poll before anyone has voted on it. */
+  cancelPoll(request: MsgCancelPoll): Promise<MsgCancelPollResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -240,6 +248,30 @@ export class MsgClientImpl implements Msg {
     const data = MsgDeclineRecurringSpend.encode(request).finish();
     const promise = this.rpc.request("sparkdream.commons.v1.Msg", "DeclineRecurringSpend", data);
     return promise.then(data => MsgDeclineRecurringSpendResponse.decode(new BinaryReader(data)));
+  };
+  /* OpenPoll opens a non-binding poll for a group's members. */
+  openPoll = async (request: MsgOpenPoll): Promise<MsgOpenPollResponse> => {
+    const data = MsgOpenPoll.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Msg", "OpenPoll", data);
+    return promise.then(data => MsgOpenPollResponse.decode(new BinaryReader(data)));
+  };
+  /* VotePoll casts a member's open vote on a poll. */
+  votePoll = async (request: MsgVotePoll): Promise<MsgVotePollResponse> => {
+    const data = MsgVotePoll.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Msg", "VotePoll", data);
+    return promise.then(data => MsgVotePollResponse.decode(new BinaryReader(data)));
+  };
+  /* AnonymousVotePoll casts a secret-ballot poll vote via x/shield. */
+  anonymousVotePoll = async (request: MsgAnonymousVotePoll): Promise<MsgAnonymousVotePollResponse> => {
+    const data = MsgAnonymousVotePoll.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Msg", "AnonymousVotePoll", data);
+    return promise.then(data => MsgAnonymousVotePollResponse.decode(new BinaryReader(data)));
+  };
+  /* CancelPoll withdraws a poll before anyone has voted on it. */
+  cancelPoll = async (request: MsgCancelPoll): Promise<MsgCancelPollResponse> => {
+    const data = MsgCancelPoll.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Msg", "CancelPoll", data);
+    return promise.then(data => MsgCancelPollResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

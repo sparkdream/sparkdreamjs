@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgCreateVault, MsgCreateVaultResponse, MsgPropose, MsgProposeResponse, MsgApprove, MsgApproveResponse, MsgRevokeApproval, MsgRevokeApprovalResponse, MsgExecute, MsgExecuteResponse, MsgCancelProposal, MsgCancelProposalResponse, MsgUpdateVault, MsgUpdateVaultResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgCreateVault, MsgCreateVaultResponse, MsgPropose, MsgProposeResponse, MsgApprove, MsgApproveResponse, MsgRevokeApproval, MsgRevokeApprovalResponse, MsgExecute, MsgExecuteResponse, MsgCancelProposal, MsgCancelProposalResponse, MsgUpdateVault, MsgUpdateVaultResponse, MsgAcceptVaultSigner, MsgAcceptVaultSignerResponse, MsgLeaveVault, MsgLeaveVaultResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
@@ -23,6 +23,10 @@ export interface Msg {
   cancelProposal(request: MsgCancelProposal): Promise<MsgCancelProposalResponse>;
   /** UpdateVault defines the UpdateVault RPC. */
   updateVault(request: MsgUpdateVault): Promise<MsgUpdateVaultResponse>;
+  /** AcceptVaultSigner accepts the signer's own listing in a vault. */
+  acceptVaultSigner(request: MsgAcceptVaultSigner): Promise<MsgAcceptVaultSignerResponse>;
+  /** LeaveVault removes the signer's own entry from a vault. */
+  leaveVault(request: MsgLeaveVault): Promise<MsgLeaveVaultResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -77,6 +81,18 @@ export class MsgClientImpl implements Msg {
     const data = MsgUpdateVault.encode(request).finish();
     const promise = this.rpc.request("sparkdream.vault.v1.Msg", "UpdateVault", data);
     return promise.then(data => MsgUpdateVaultResponse.decode(new BinaryReader(data)));
+  };
+  /* AcceptVaultSigner accepts the signer's own listing in a vault. */
+  acceptVaultSigner = async (request: MsgAcceptVaultSigner): Promise<MsgAcceptVaultSignerResponse> => {
+    const data = MsgAcceptVaultSigner.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.vault.v1.Msg", "AcceptVaultSigner", data);
+    return promise.then(data => MsgAcceptVaultSignerResponse.decode(new BinaryReader(data)));
+  };
+  /* LeaveVault removes the signer's own entry from a vault. */
+  leaveVault = async (request: MsgLeaveVault): Promise<MsgLeaveVaultResponse> => {
+    const data = MsgLeaveVault.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.vault.v1.Msg", "LeaveVault", data);
+    return promise.then(data => MsgLeaveVaultResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

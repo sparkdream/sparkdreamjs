@@ -34,6 +34,13 @@ export interface Dispute {
    * Jury verdict: did owner's contest win?
    */
   contestSucceeded: boolean;
+  /**
+   * Set when the BeginBlocker leaves an uncontested dispute to council
+   * review (the owner is still active, or auto-resolution failed). The
+   * dispute stays active but out of the auto-resolution queue, and a genesis
+   * import keeps it out.
+   */
+  awaitingReview: boolean;
 }
 export interface DisputeProtoMsg {
   typeUrl: "/sparkdream.name.v1.Dispute";
@@ -72,6 +79,13 @@ export interface DisputeAmino {
    * Jury verdict: did owner's contest win?
    */
   contest_succeeded?: boolean;
+  /**
+   * Set when the BeginBlocker leaves an uncontested dispute to council
+   * review (the owner is still active, or auto-resolution failed). The
+   * dispute stays active but out of the auto-resolution queue, and a genesis
+   * import keeps it out.
+   */
+  awaiting_review?: boolean;
 }
 export interface DisputeAminoMsg {
   type: "/sparkdream.name.v1.Dispute";
@@ -170,7 +184,8 @@ function createBaseDispute(): Dispute {
     active: false,
     contestChallengeId: "",
     contestedAt: BigInt(0),
-    contestSucceeded: false
+    contestSucceeded: false,
+    awaitingReview: false
   };
 }
 /**
@@ -206,6 +221,9 @@ export const Dispute = {
     if (message.contestSucceeded === true) {
       writer.uint32(64).bool(message.contestSucceeded);
     }
+    if (message.awaitingReview === true) {
+      writer.uint32(72).bool(message.awaitingReview);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Dispute {
@@ -239,6 +257,9 @@ export const Dispute = {
         case 8:
           message.contestSucceeded = reader.bool();
           break;
+        case 9:
+          message.awaitingReview = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -256,6 +277,7 @@ export const Dispute = {
     message.contestChallengeId = object.contestChallengeId ?? "";
     message.contestedAt = object.contestedAt !== undefined && object.contestedAt !== null ? BigInt(object.contestedAt.toString()) : BigInt(0);
     message.contestSucceeded = object.contestSucceeded ?? false;
+    message.awaitingReview = object.awaitingReview ?? false;
     return message;
   },
   fromAmino(object: DisputeAmino): Dispute {
@@ -284,6 +306,9 @@ export const Dispute = {
     if (object.contest_succeeded !== undefined && object.contest_succeeded !== null) {
       message.contestSucceeded = object.contest_succeeded;
     }
+    if (object.awaiting_review !== undefined && object.awaiting_review !== null) {
+      message.awaitingReview = object.awaiting_review;
+    }
     return message;
   },
   toAmino(message: Dispute): DisputeAmino {
@@ -296,6 +321,7 @@ export const Dispute = {
     obj.contest_challenge_id = message.contestChallengeId === "" ? undefined : message.contestChallengeId;
     obj.contested_at = message.contestedAt !== BigInt(0) ? message.contestedAt?.toString() : undefined;
     obj.contest_succeeded = message.contestSucceeded === false ? undefined : message.contestSucceeded;
+    obj.awaiting_review = message.awaitingReview === false ? undefined : message.awaitingReview;
     return obj;
   },
   fromAminoMsg(object: DisputeAminoMsg): Dispute {

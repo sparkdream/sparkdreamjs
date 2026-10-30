@@ -120,6 +120,11 @@ export interface QueryVaultByAddressResponseAminoMsg {
 export interface QueryVaultsBySignerRequest {
   address: string;
   pagination?: PageRequest;
+  /**
+   * When true, lists the vaults where the address (or an alias) is listed but
+   * has not accepted yet (pending invitations) instead of the accepted ones.
+   */
+  invited: boolean;
 }
 export interface QueryVaultsBySignerRequestProtoMsg {
   typeUrl: "/sparkdream.vault.v1.QueryVaultsBySignerRequest";
@@ -134,6 +139,11 @@ export interface QueryVaultsBySignerRequestProtoMsg {
 export interface QueryVaultsBySignerRequestAmino {
   address?: string;
   pagination?: PageRequestAmino;
+  /**
+   * When true, lists the vaults where the address (or an alias) is listed but
+   * has not accepted yet (pending invitations) instead of the accepted ones.
+   */
+  invited?: boolean;
 }
 export interface QueryVaultsBySignerRequestAminoMsg {
   type: "/sparkdream.vault.v1.QueryVaultsBySignerRequest";
@@ -141,7 +151,8 @@ export interface QueryVaultsBySignerRequestAminoMsg {
 }
 /**
  * QueryVaultsBySignerResponse lists the vaults the address (or any of its
- * x/rep alias addresses) is a signer of.
+ * x/rep alias addresses) is an accepted signer of, or, with invited, the
+ * vaults where it is listed but has not accepted yet.
  * @name QueryVaultsBySignerResponse
  * @package sparkdream.vault.v1
  * @see proto type: sparkdream.vault.v1.QueryVaultsBySignerResponse
@@ -156,7 +167,8 @@ export interface QueryVaultsBySignerResponseProtoMsg {
 }
 /**
  * QueryVaultsBySignerResponse lists the vaults the address (or any of its
- * x/rep alias addresses) is a signer of.
+ * x/rep alias addresses) is an accepted signer of, or, with invited, the
+ * vaults where it is listed but has not accepted yet.
  * @name QueryVaultsBySignerResponseAmino
  * @package sparkdream.vault.v1
  * @see proto type: sparkdream.vault.v1.QueryVaultsBySignerResponse
@@ -835,7 +847,8 @@ export const QueryVaultByAddressResponse = {
 function createBaseQueryVaultsBySignerRequest(): QueryVaultsBySignerRequest {
   return {
     address: "",
-    pagination: undefined
+    pagination: undefined,
+    invited: false
   };
 }
 /**
@@ -853,6 +866,9 @@ export const QueryVaultsBySignerRequest = {
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(18).fork()).ldelim();
     }
+    if (message.invited === true) {
+      writer.uint32(24).bool(message.invited);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): QueryVaultsBySignerRequest {
@@ -868,6 +884,9 @@ export const QueryVaultsBySignerRequest = {
         case 2:
           message.pagination = PageRequest.decode(reader, reader.uint32());
           break;
+        case 3:
+          message.invited = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -879,6 +898,7 @@ export const QueryVaultsBySignerRequest = {
     const message = createBaseQueryVaultsBySignerRequest();
     message.address = object.address ?? "";
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    message.invited = object.invited ?? false;
     return message;
   },
   fromAmino(object: QueryVaultsBySignerRequestAmino): QueryVaultsBySignerRequest {
@@ -889,12 +909,16 @@ export const QueryVaultsBySignerRequest = {
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromAmino(object.pagination);
     }
+    if (object.invited !== undefined && object.invited !== null) {
+      message.invited = object.invited;
+    }
     return message;
   },
   toAmino(message: QueryVaultsBySignerRequest): QueryVaultsBySignerRequestAmino {
     const obj: any = {};
     obj.address = message.address === "" ? undefined : message.address;
     obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    obj.invited = message.invited === false ? undefined : message.invited;
     return obj;
   },
   fromAminoMsg(object: QueryVaultsBySignerRequestAminoMsg): QueryVaultsBySignerRequest {
@@ -921,7 +945,8 @@ function createBaseQueryVaultsBySignerResponse(): QueryVaultsBySignerResponse {
 }
 /**
  * QueryVaultsBySignerResponse lists the vaults the address (or any of its
- * x/rep alias addresses) is a signer of.
+ * x/rep alias addresses) is an accepted signer of, or, with invited, the
+ * vaults where it is listed but has not accepted yet.
  * @name QueryVaultsBySignerResponse
  * @package sparkdream.vault.v1
  * @see proto type: sparkdream.vault.v1.QueryVaultsBySignerResponse

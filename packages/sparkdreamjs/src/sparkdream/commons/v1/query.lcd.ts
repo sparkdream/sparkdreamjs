@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetPolicyPermissionsRequest, QueryGetPolicyPermissionsResponse, QueryAllPolicyPermissionsRequest, QueryAllPolicyPermissionsResponse, QueryGetDecisionPolicyRequest, QueryGetDecisionPolicyResponse, QueryAllDecisionPoliciesRequest, QueryAllDecisionPoliciesResponse, QueryGetGroupRequest, QueryGetGroupResponse, QueryAllGroupRequest, QueryAllGroupResponse, QueryGetCouncilMembersRequest, QueryGetCouncilMembersResponse, QueryGetProposalRequest, QueryGetProposalResponse, QueryListProposalsRequest, QueryListProposalsResponse, QueryGetProposalVotesRequest, QueryGetProposalVotesResponse, QueryGetCategoryRequest, QueryGetCategoryResponse, QueryAllCategoryRequest, QueryAllCategoryResponse, QueryGetRecurringSpendRequest, QueryGetRecurringSpendResponse, QueryListRecurringSpendsRequest, QueryListRecurringSpendsResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetPolicyPermissionsRequest, QueryGetPolicyPermissionsResponse, QueryAllPolicyPermissionsRequest, QueryAllPolicyPermissionsResponse, QueryGetDecisionPolicyRequest, QueryGetDecisionPolicyResponse, QueryAllDecisionPoliciesRequest, QueryAllDecisionPoliciesResponse, QueryGetGroupRequest, QueryGetGroupResponse, QueryAllGroupRequest, QueryAllGroupResponse, QueryGetCouncilMembersRequest, QueryGetCouncilMembersResponse, QueryGetProposalRequest, QueryGetProposalResponse, QueryListProposalsRequest, QueryListProposalsResponse, QueryGetProposalVotesRequest, QueryGetProposalVotesResponse, QueryGetCategoryRequest, QueryGetCategoryResponse, QueryAllCategoryRequest, QueryAllCategoryResponse, QueryGetRecurringSpendRequest, QueryGetRecurringSpendResponse, QueryListRecurringSpendsRequest, QueryListRecurringSpendsResponse, QueryGetPollRequest, QueryGetPollResponse, QueryListPollsRequest, QueryListPollsResponse, QueryGetPollVotesRequest, QueryGetPollVotesResponse, QueryGetProposalVoterTreeRequest, QueryGetProposalVoterTreeResponse, QueryGetPollVoterTreeRequest, QueryGetPollVoterTreeResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -142,5 +142,51 @@ export class LCDQueryClient {
     }
     const endpoint = `sparkdream/commons/v1/recurring_spends`;
     return await this.req.get<QueryListRecurringSpendsResponse>(endpoint, options);
+  };
+  /* GetPoll returns a poll. */
+  getPoll = async (params: QueryGetPollRequest): Promise<QueryGetPollResponse> => {
+    const endpoint = `sparkdream/commons/v1/poll/${params.pollId}`;
+    return await this.req.get<QueryGetPollResponse>(endpoint);
+  };
+  /* ListPolls lists stored polls in ID order (pagination.reverse for newest
+   first), optionally for one group and one status. */
+  listPolls = async (params: QueryListPollsRequest): Promise<QueryListPollsResponse> => {
+    const options: any = {
+      params: {}
+    };
+    if (typeof params?.councilName !== "undefined") {
+      options.params.council_name = params.councilName;
+    }
+    if (typeof params?.status !== "undefined") {
+      options.params.status = params.status;
+    }
+    if (typeof params?.pagination !== "undefined") {
+      setPaginationParams(options, params.pagination);
+    }
+    const endpoint = `sparkdream/commons/v1/polls`;
+    return await this.req.get<QueryListPollsResponse>(endpoint, options);
+  };
+  /* GetPollVotes lists the open votes on a poll. */
+  getPollVotes = async (params: QueryGetPollVotesRequest): Promise<QueryGetPollVotesResponse> => {
+    const options: any = {
+      params: {}
+    };
+    if (typeof params?.pagination !== "undefined") {
+      setPaginationParams(options, params.pagination);
+    }
+    const endpoint = `sparkdream/commons/v1/poll/${params.pollId}/votes`;
+    return await this.req.get<QueryGetPollVotesResponse>(endpoint, options);
+  };
+  /* GetProposalVoterTree returns a secret-ballot proposal's voter snapshot
+   (while voting is open), for building a shield proof. */
+  getProposalVoterTree = async (params: QueryGetProposalVoterTreeRequest): Promise<QueryGetProposalVoterTreeResponse> => {
+    const endpoint = `sparkdream/commons/v1/proposal/${params.proposalId}/voter_tree`;
+    return await this.req.get<QueryGetProposalVoterTreeResponse>(endpoint);
+  };
+  /* GetPollVoterTree returns a secret-ballot poll's voter snapshot (while
+   voting is open). */
+  getPollVoterTree = async (params: QueryGetPollVoterTreeRequest): Promise<QueryGetPollVoterTreeResponse> => {
+    const endpoint = `sparkdream/commons/v1/poll/${params.pollId}/voter_tree`;
+    return await this.req.get<QueryGetPollVoterTreeResponse>(endpoint);
   };
 }

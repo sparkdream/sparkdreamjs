@@ -201,10 +201,6 @@ export interface Contribution {
    */
   projectId: bigint;
   status: ContributionStatus;
-  /**
-   * Commons Council that approved (used for project transition)
-   */
-  councilId: bigint;
   approvedBy: string;
   approvedAt: bigint;
   createdAt: bigint;
@@ -251,10 +247,6 @@ export interface ContributionAmino {
    */
   project_id?: string;
   status?: ContributionStatus;
-  /**
-   * Commons Council that approved (used for project transition)
-   */
-  council_id?: string;
   approved_by?: string;
   approved_at?: string;
   created_at?: string;
@@ -499,7 +491,6 @@ function createBaseContribution(): Contribution {
     transitionedToProject: false,
     projectId: BigInt(0),
     status: 0,
-    councilId: BigInt(0),
     approvedBy: "",
     approvedAt: BigInt(0),
     createdAt: BigInt(0),
@@ -558,23 +549,20 @@ export const Contribution = {
     if (message.status !== 0) {
       writer.uint32(112).int32(message.status);
     }
-    if (message.councilId !== BigInt(0)) {
-      writer.uint32(120).uint64(message.councilId);
-    }
     if (message.approvedBy !== "") {
-      writer.uint32(130).string(message.approvedBy);
+      writer.uint32(122).string(message.approvedBy);
     }
     if (message.approvedAt !== BigInt(0)) {
-      writer.uint32(136).int64(message.approvedAt);
+      writer.uint32(128).int64(message.approvedAt);
     }
     if (message.createdAt !== BigInt(0)) {
-      writer.uint32(144).int64(message.createdAt);
+      writer.uint32(136).int64(message.createdAt);
     }
     if (message.holdbackAmount !== "") {
-      writer.uint32(154).string(message.holdbackAmount);
+      writer.uint32(146).string(message.holdbackAmount);
     }
     if (message.proposalEligibleAt !== BigInt(0)) {
-      writer.uint32(160).int64(message.proposalEligibleAt);
+      writer.uint32(152).int64(message.proposalEligibleAt);
     }
     return writer;
   },
@@ -628,21 +616,18 @@ export const Contribution = {
           message.status = reader.int32() as any;
           break;
         case 15:
-          message.councilId = reader.uint64();
-          break;
-        case 16:
           message.approvedBy = reader.string();
           break;
-        case 17:
+        case 16:
           message.approvedAt = reader.int64();
           break;
-        case 18:
+        case 17:
           message.createdAt = reader.int64();
           break;
-        case 19:
+        case 18:
           message.holdbackAmount = reader.string();
           break;
-        case 20:
+        case 19:
           message.proposalEligibleAt = reader.int64();
           break;
         default:
@@ -668,7 +653,6 @@ export const Contribution = {
     message.transitionedToProject = object.transitionedToProject ?? false;
     message.projectId = object.projectId !== undefined && object.projectId !== null ? BigInt(object.projectId.toString()) : BigInt(0);
     message.status = object.status ?? 0;
-    message.councilId = object.councilId !== undefined && object.councilId !== null ? BigInt(object.councilId.toString()) : BigInt(0);
     message.approvedBy = object.approvedBy ?? "";
     message.approvedAt = object.approvedAt !== undefined && object.approvedAt !== null ? BigInt(object.approvedAt.toString()) : BigInt(0);
     message.createdAt = object.createdAt !== undefined && object.createdAt !== null ? BigInt(object.createdAt.toString()) : BigInt(0);
@@ -718,9 +702,6 @@ export const Contribution = {
     if (object.status !== undefined && object.status !== null) {
       message.status = object.status;
     }
-    if (object.council_id !== undefined && object.council_id !== null) {
-      message.councilId = BigInt(object.council_id);
-    }
     if (object.approved_by !== undefined && object.approved_by !== null) {
       message.approvedBy = object.approved_by;
     }
@@ -758,7 +739,6 @@ export const Contribution = {
     obj.transitioned_to_project = message.transitionedToProject === false ? undefined : message.transitionedToProject;
     obj.project_id = message.projectId !== BigInt(0) ? message.projectId?.toString() : undefined;
     obj.status = message.status === 0 ? undefined : message.status;
-    obj.council_id = message.councilId !== BigInt(0) ? message.councilId?.toString() : undefined;
     obj.approved_by = message.approvedBy === "" ? undefined : message.approvedBy;
     obj.approved_at = message.approvedAt !== BigInt(0) ? message.approvedAt?.toString() : undefined;
     obj.created_at = message.createdAt !== BigInt(0) ? message.createdAt?.toString() : undefined;

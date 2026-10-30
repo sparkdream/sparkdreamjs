@@ -16,6 +16,20 @@ export interface DisplayNameModeration {
   appealChallengeId: string;
   appealedAt: bigint;
   appealSucceeded: boolean;
+  /**
+   * Names upheld as rejected for this member (most recent last, capped).
+   * The member can never set one of them again, and the list survives later
+   * reports and the closure of this record (SEA-23).
+   */
+  blockedNames: string[];
+  /**
+   * Failed automatic resolutions of this unappealed moderation (SEA-09).
+   * A failure re-queues the record at auto_resolve_retry_at with backoff;
+   * after the last attempt it leaves the queue (retry_at 0) and waits for
+   * MsgResolveUnappealedModeration.
+   */
+  autoResolveAttempts: number;
+  autoResolveRetryAt: bigint;
 }
 export interface DisplayNameModerationProtoMsg {
   typeUrl: "/sparkdream.season.v1.DisplayNameModeration";
@@ -36,6 +50,20 @@ export interface DisplayNameModerationAmino {
   appeal_challenge_id?: string;
   appealed_at?: string;
   appeal_succeeded?: boolean;
+  /**
+   * Names upheld as rejected for this member (most recent last, capped).
+   * The member can never set one of them again, and the list survives later
+   * reports and the closure of this record (SEA-23).
+   */
+  blocked_names?: string[];
+  /**
+   * Failed automatic resolutions of this unappealed moderation (SEA-09).
+   * A failure re-queues the record at auto_resolve_retry_at with backoff;
+   * after the last attempt it leaves the queue (retry_at 0) and waits for
+   * MsgResolveUnappealedModeration.
+   */
+  auto_resolve_attempts?: number;
+  auto_resolve_retry_at?: string;
 }
 export interface DisplayNameModerationAminoMsg {
   type: "/sparkdream.season.v1.DisplayNameModeration";
@@ -50,7 +78,10 @@ function createBaseDisplayNameModeration(): DisplayNameModeration {
     active: false,
     appealChallengeId: "",
     appealedAt: BigInt(0),
-    appealSucceeded: false
+    appealSucceeded: false,
+    blockedNames: [],
+    autoResolveAttempts: 0,
+    autoResolveRetryAt: BigInt(0)
   };
 }
 /**
@@ -86,6 +117,15 @@ export const DisplayNameModeration = {
     if (message.appealSucceeded === true) {
       writer.uint32(64).bool(message.appealSucceeded);
     }
+    for (const v of message.blockedNames) {
+      writer.uint32(74).string(v!);
+    }
+    if (message.autoResolveAttempts !== 0) {
+      writer.uint32(80).uint32(message.autoResolveAttempts);
+    }
+    if (message.autoResolveRetryAt !== BigInt(0)) {
+      writer.uint32(88).int64(message.autoResolveRetryAt);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): DisplayNameModeration {
@@ -119,6 +159,15 @@ export const DisplayNameModeration = {
         case 8:
           message.appealSucceeded = reader.bool();
           break;
+        case 9:
+          message.blockedNames.push(reader.string());
+          break;
+        case 10:
+          message.autoResolveAttempts = reader.uint32();
+          break;
+        case 11:
+          message.autoResolveRetryAt = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -136,6 +185,9 @@ export const DisplayNameModeration = {
     message.appealChallengeId = object.appealChallengeId ?? "";
     message.appealedAt = object.appealedAt !== undefined && object.appealedAt !== null ? BigInt(object.appealedAt.toString()) : BigInt(0);
     message.appealSucceeded = object.appealSucceeded ?? false;
+    message.blockedNames = object.blockedNames?.map(e => e) || [];
+    message.autoResolveAttempts = object.autoResolveAttempts ?? 0;
+    message.autoResolveRetryAt = object.autoResolveRetryAt !== undefined && object.autoResolveRetryAt !== null ? BigInt(object.autoResolveRetryAt.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: DisplayNameModerationAmino): DisplayNameModeration {
@@ -164,6 +216,13 @@ export const DisplayNameModeration = {
     if (object.appeal_succeeded !== undefined && object.appeal_succeeded !== null) {
       message.appealSucceeded = object.appeal_succeeded;
     }
+    message.blockedNames = object.blocked_names?.map(e => e) || [];
+    if (object.auto_resolve_attempts !== undefined && object.auto_resolve_attempts !== null) {
+      message.autoResolveAttempts = object.auto_resolve_attempts;
+    }
+    if (object.auto_resolve_retry_at !== undefined && object.auto_resolve_retry_at !== null) {
+      message.autoResolveRetryAt = BigInt(object.auto_resolve_retry_at);
+    }
     return message;
   },
   toAmino(message: DisplayNameModeration): DisplayNameModerationAmino {
@@ -176,6 +235,13 @@ export const DisplayNameModeration = {
     obj.appeal_challenge_id = message.appealChallengeId === "" ? undefined : message.appealChallengeId;
     obj.appealed_at = message.appealedAt !== BigInt(0) ? message.appealedAt?.toString() : undefined;
     obj.appeal_succeeded = message.appealSucceeded === false ? undefined : message.appealSucceeded;
+    if (message.blockedNames) {
+      obj.blocked_names = message.blockedNames.map(e => e);
+    } else {
+      obj.blocked_names = message.blockedNames;
+    }
+    obj.auto_resolve_attempts = message.autoResolveAttempts === 0 ? undefined : message.autoResolveAttempts;
+    obj.auto_resolve_retry_at = message.autoResolveRetryAt !== BigInt(0) ? message.autoResolveRetryAt?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: DisplayNameModerationAminoMsg): DisplayNameModeration {

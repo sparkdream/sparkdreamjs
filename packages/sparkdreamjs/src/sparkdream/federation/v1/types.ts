@@ -351,6 +351,53 @@ export function verificationOutcomeToJSON(object: VerificationOutcome): string {
       return "UNRECOGNIZED";
   }
 }
+/** SettlementKind names an EndBlocker settlement that failed and is retried. */
+export enum SettlementKind {
+  SETTLEMENT_KIND_UNSPECIFIED = 0,
+  /** SETTLEMENT_KIND_NO_QUORUM - The arbiter resolution window closed without a quorum. */
+  SETTLEMENT_KIND_NO_QUORUM = 1,
+  /** SETTLEMENT_KIND_AUTO_VERDICT - The escalation window of a stashed arbiter verdict closed. */
+  SETTLEMENT_KIND_AUTO_VERDICT = 2,
+  /** SETTLEMENT_KIND_JURY_TIMEOUT - The jury deadline of an escalated challenge passed (TIMEOUT). */
+  SETTLEMENT_KIND_JURY_TIMEOUT = 3,
+  UNRECOGNIZED = -1,
+}
+export const SettlementKindAmino = SettlementKind;
+export function settlementKindFromJSON(object: any): SettlementKind {
+  switch (object) {
+    case 0:
+    case "SETTLEMENT_KIND_UNSPECIFIED":
+      return SettlementKind.SETTLEMENT_KIND_UNSPECIFIED;
+    case 1:
+    case "SETTLEMENT_KIND_NO_QUORUM":
+      return SettlementKind.SETTLEMENT_KIND_NO_QUORUM;
+    case 2:
+    case "SETTLEMENT_KIND_AUTO_VERDICT":
+      return SettlementKind.SETTLEMENT_KIND_AUTO_VERDICT;
+    case 3:
+    case "SETTLEMENT_KIND_JURY_TIMEOUT":
+      return SettlementKind.SETTLEMENT_KIND_JURY_TIMEOUT;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return SettlementKind.UNRECOGNIZED;
+  }
+}
+export function settlementKindToJSON(object: SettlementKind): string {
+  switch (object) {
+    case SettlementKind.SETTLEMENT_KIND_UNSPECIFIED:
+      return "SETTLEMENT_KIND_UNSPECIFIED";
+    case SettlementKind.SETTLEMENT_KIND_NO_QUORUM:
+      return "SETTLEMENT_KIND_NO_QUORUM";
+    case SettlementKind.SETTLEMENT_KIND_AUTO_VERDICT:
+      return "SETTLEMENT_KIND_AUTO_VERDICT";
+    case SettlementKind.SETTLEMENT_KIND_JURY_TIMEOUT:
+      return "SETTLEMENT_KIND_JURY_TIMEOUT";
+    case SettlementKind.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
 /**
  * PendingVerifierVerdict captures an arbiter-quorum auto-verdict that
  * hasn't yet been applied (escalation window still open). Drives the
@@ -865,6 +912,58 @@ export interface VerificationRecord {
    * by SlashBond on the upheld path.
    */
   commitmentReleased: boolean;
+  /**
+   * arbiter_escalation_deadline is the unix time until which the
+   * challenger or verifier may escalate the stashed arbiter-quorum
+   * auto-verdict (quorum time + arbiter_escalation_window). Zero until a
+   * quorum lands; MsgEscalateChallenge refuses once it has passed.
+   */
+  arbiterEscalationDeadline: bigint;
+  /**
+   * arbiter_resolution_deadline is the unix time until which arbiters may
+   * submit hashes for the current dispute round (round start +
+   * arbiter_resolution_window). MsgSubmitArbiterHash refuses after it, and
+   * the Phase 7 EndBlocker acts only on the resolution-queue entry keyed
+   * on exactly this deadline, so an entry left over from an earlier round
+   * of the same content never settles the current one.
+   */
+  arbiterResolutionDeadline: bigint;
+  /**
+   * challenge_report_id is the x/service report id returned when
+   * federation filed a system report against the submitting bridge
+   * operator for this content. Zero when no report was filed.
+   */
+  challengeReportId: bigint;
+  /**
+   * pending_challenge_report holds the evidence URI of an operator report
+   * that is owed but could not be filed yet (x/service refused it, e.g.
+   * under its per-caller system-report rate limit). The EndBlocker retries
+   * it with the same dedupe key until it is filed; empty when nothing is
+   * owed.
+   */
+  pendingChallengeReport: string;
+  /**
+   * quorum_falsified_content records, when the arbiter quorum lands, that
+   * the quorum hash differs from the operator's content hash. The stashed
+   * verdict only says whether the verifier was right; for DISPUTED content
+   * whose quorum hash matches neither the verifier nor the operator, this is
+   * what tells the auto-verdict that the content is REJECTED rather than
+   * VERIFIED.
+   */
+  quorumFalsifiedContent: boolean;
+  /**
+   * EndBlocker settlement retry (FED-29). A settlement the EndBlocker runs
+   * (no-quorum expiry, automatic verdict, jury TIMEOUT) executes in a cache
+   * context; when a bank or x/rep side effect fails, nothing of it commits
+   * (the escrow stays on this record) and the settlement is retried at
+   * settlement_retry_at with backoff. settlement_retry_kind says which
+   * settlement is owed; settlement_attempts counts failed attempts. After
+   * the last attempt settlement_retry_at is cleared and the record keeps its
+   * escrow until peer removal or a committee verdict settles it.
+   */
+  settlementRetryKind: SettlementKind;
+  settlementAttempts: number;
+  settlementRetryAt: bigint;
 }
 export interface VerificationRecordProtoMsg {
   typeUrl: "/sparkdream.federation.v1.VerificationRecord";
@@ -918,6 +1017,58 @@ export interface VerificationRecordAmino {
    * by SlashBond on the upheld path.
    */
   commitment_released?: boolean;
+  /**
+   * arbiter_escalation_deadline is the unix time until which the
+   * challenger or verifier may escalate the stashed arbiter-quorum
+   * auto-verdict (quorum time + arbiter_escalation_window). Zero until a
+   * quorum lands; MsgEscalateChallenge refuses once it has passed.
+   */
+  arbiter_escalation_deadline?: string;
+  /**
+   * arbiter_resolution_deadline is the unix time until which arbiters may
+   * submit hashes for the current dispute round (round start +
+   * arbiter_resolution_window). MsgSubmitArbiterHash refuses after it, and
+   * the Phase 7 EndBlocker acts only on the resolution-queue entry keyed
+   * on exactly this deadline, so an entry left over from an earlier round
+   * of the same content never settles the current one.
+   */
+  arbiter_resolution_deadline?: string;
+  /**
+   * challenge_report_id is the x/service report id returned when
+   * federation filed a system report against the submitting bridge
+   * operator for this content. Zero when no report was filed.
+   */
+  challenge_report_id?: string;
+  /**
+   * pending_challenge_report holds the evidence URI of an operator report
+   * that is owed but could not be filed yet (x/service refused it, e.g.
+   * under its per-caller system-report rate limit). The EndBlocker retries
+   * it with the same dedupe key until it is filed; empty when nothing is
+   * owed.
+   */
+  pending_challenge_report?: string;
+  /**
+   * quorum_falsified_content records, when the arbiter quorum lands, that
+   * the quorum hash differs from the operator's content hash. The stashed
+   * verdict only says whether the verifier was right; for DISPUTED content
+   * whose quorum hash matches neither the verifier nor the operator, this is
+   * what tells the auto-verdict that the content is REJECTED rather than
+   * VERIFIED.
+   */
+  quorum_falsified_content?: boolean;
+  /**
+   * EndBlocker settlement retry (FED-29). A settlement the EndBlocker runs
+   * (no-quorum expiry, automatic verdict, jury TIMEOUT) executes in a cache
+   * context; when a bank or x/rep side effect fails, nothing of it commits
+   * (the escrow stays on this record) and the settlement is retried at
+   * settlement_retry_at with backoff. settlement_retry_kind says which
+   * settlement is owed; settlement_attempts counts failed attempts. After
+   * the last attempt settlement_retry_at is cleared and the record keeps its
+   * escrow until peer removal or a committee verdict settles it.
+   */
+  settlement_retry_kind?: SettlementKind;
+  settlement_attempts?: number;
+  settlement_retry_at?: string;
 }
 export interface VerificationRecordAminoMsg {
   type: "/sparkdream.federation.v1.VerificationRecord";
@@ -1203,6 +1354,30 @@ export interface IdentityLink {
    * confirmation packet returns from the remote peer (FEDERATION-S2-1).
    */
   challenge: Uint8Array;
+  /**
+   * verification_attempts counts Phase 1 challenge deliveries sent for this
+   * link. A timed-out delivery is re-sent automatically until it reaches
+   * three attempts.
+   */
+  verificationAttempts: number;
+  /**
+   * unverified_expires_at is the UnverifiedLinkExp queue key the link was
+   * written with (linked_at + unverified_link_ttl at link time). The
+   * expiry sweep only prunes the link when the queue entry it walks
+   * carries this exact time, so a stale entry left by an earlier link of
+   * the same (local_address, peer_id) can never prune a re-created one.
+   */
+  unverifiedExpiresAt: bigint;
+  /**
+   * attested_by is the bridge operator whose MsgAttestIdentityLink verified
+   * this link (empty for links verified over IBC). A false attestation is
+   * reported against this operator's x/service bond.
+   */
+  attestedBy: string;
+  /**
+   * attestation_evidence is the evidence_uri the operator attested with.
+   */
+  attestationEvidence: string;
 }
 export interface IdentityLinkProtoMsg {
   typeUrl: "/sparkdream.federation.v1.IdentityLink";
@@ -1226,6 +1401,30 @@ export interface IdentityLinkAmino {
    * confirmation packet returns from the remote peer (FEDERATION-S2-1).
    */
   challenge?: string;
+  /**
+   * verification_attempts counts Phase 1 challenge deliveries sent for this
+   * link. A timed-out delivery is re-sent automatically until it reaches
+   * three attempts.
+   */
+  verification_attempts?: number;
+  /**
+   * unverified_expires_at is the UnverifiedLinkExp queue key the link was
+   * written with (linked_at + unverified_link_ttl at link time). The
+   * expiry sweep only prunes the link when the queue entry it walks
+   * carries this exact time, so a stale entry left by an earlier link of
+   * the same (local_address, peer_id) can never prune a re-created one.
+   */
+  unverified_expires_at?: string;
+  /**
+   * attested_by is the bridge operator whose MsgAttestIdentityLink verified
+   * this link (empty for links verified over IBC). A false attestation is
+   * reported against this operator's x/service bond.
+   */
+  attested_by?: string;
+  /**
+   * attestation_evidence is the evidence_uri the operator attested with.
+   */
+  attestation_evidence?: string;
 }
 export interface IdentityLinkAminoMsg {
   type: "/sparkdream.federation.v1.IdentityLink";
@@ -2205,7 +2404,15 @@ function createBaseVerificationRecord(): VerificationRecord {
     challenger: "",
     escrowedChallengeFee: "",
     pendingVerifierVerdict: 0,
-    commitmentReleased: false
+    commitmentReleased: false,
+    arbiterEscalationDeadline: BigInt(0),
+    arbiterResolutionDeadline: BigInt(0),
+    challengeReportId: BigInt(0),
+    pendingChallengeReport: "",
+    quorumFalsifiedContent: false,
+    settlementRetryKind: 0,
+    settlementAttempts: 0,
+    settlementRetryAt: BigInt(0)
   };
 }
 /**
@@ -2259,6 +2466,30 @@ export const VerificationRecord = {
     if (message.commitmentReleased === true) {
       writer.uint32(112).bool(message.commitmentReleased);
     }
+    if (message.arbiterEscalationDeadline !== BigInt(0)) {
+      writer.uint32(120).int64(message.arbiterEscalationDeadline);
+    }
+    if (message.arbiterResolutionDeadline !== BigInt(0)) {
+      writer.uint32(128).int64(message.arbiterResolutionDeadline);
+    }
+    if (message.challengeReportId !== BigInt(0)) {
+      writer.uint32(136).uint64(message.challengeReportId);
+    }
+    if (message.pendingChallengeReport !== "") {
+      writer.uint32(146).string(message.pendingChallengeReport);
+    }
+    if (message.quorumFalsifiedContent === true) {
+      writer.uint32(152).bool(message.quorumFalsifiedContent);
+    }
+    if (message.settlementRetryKind !== 0) {
+      writer.uint32(160).int32(message.settlementRetryKind);
+    }
+    if (message.settlementAttempts !== 0) {
+      writer.uint32(168).uint32(message.settlementAttempts);
+    }
+    if (message.settlementRetryAt !== BigInt(0)) {
+      writer.uint32(176).int64(message.settlementRetryAt);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): VerificationRecord {
@@ -2310,6 +2541,30 @@ export const VerificationRecord = {
         case 14:
           message.commitmentReleased = reader.bool();
           break;
+        case 15:
+          message.arbiterEscalationDeadline = reader.int64();
+          break;
+        case 16:
+          message.arbiterResolutionDeadline = reader.int64();
+          break;
+        case 17:
+          message.challengeReportId = reader.uint64();
+          break;
+        case 18:
+          message.pendingChallengeReport = reader.string();
+          break;
+        case 19:
+          message.quorumFalsifiedContent = reader.bool();
+          break;
+        case 20:
+          message.settlementRetryKind = reader.int32() as any;
+          break;
+        case 21:
+          message.settlementAttempts = reader.uint32();
+          break;
+        case 22:
+          message.settlementRetryAt = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2333,6 +2588,14 @@ export const VerificationRecord = {
     message.escrowedChallengeFee = object.escrowedChallengeFee ?? "";
     message.pendingVerifierVerdict = object.pendingVerifierVerdict ?? 0;
     message.commitmentReleased = object.commitmentReleased ?? false;
+    message.arbiterEscalationDeadline = object.arbiterEscalationDeadline !== undefined && object.arbiterEscalationDeadline !== null ? BigInt(object.arbiterEscalationDeadline.toString()) : BigInt(0);
+    message.arbiterResolutionDeadline = object.arbiterResolutionDeadline !== undefined && object.arbiterResolutionDeadline !== null ? BigInt(object.arbiterResolutionDeadline.toString()) : BigInt(0);
+    message.challengeReportId = object.challengeReportId !== undefined && object.challengeReportId !== null ? BigInt(object.challengeReportId.toString()) : BigInt(0);
+    message.pendingChallengeReport = object.pendingChallengeReport ?? "";
+    message.quorumFalsifiedContent = object.quorumFalsifiedContent ?? false;
+    message.settlementRetryKind = object.settlementRetryKind ?? 0;
+    message.settlementAttempts = object.settlementAttempts ?? 0;
+    message.settlementRetryAt = object.settlementRetryAt !== undefined && object.settlementRetryAt !== null ? BigInt(object.settlementRetryAt.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: VerificationRecordAmino): VerificationRecord {
@@ -2379,6 +2642,30 @@ export const VerificationRecord = {
     if (object.commitment_released !== undefined && object.commitment_released !== null) {
       message.commitmentReleased = object.commitment_released;
     }
+    if (object.arbiter_escalation_deadline !== undefined && object.arbiter_escalation_deadline !== null) {
+      message.arbiterEscalationDeadline = BigInt(object.arbiter_escalation_deadline);
+    }
+    if (object.arbiter_resolution_deadline !== undefined && object.arbiter_resolution_deadline !== null) {
+      message.arbiterResolutionDeadline = BigInt(object.arbiter_resolution_deadline);
+    }
+    if (object.challenge_report_id !== undefined && object.challenge_report_id !== null) {
+      message.challengeReportId = BigInt(object.challenge_report_id);
+    }
+    if (object.pending_challenge_report !== undefined && object.pending_challenge_report !== null) {
+      message.pendingChallengeReport = object.pending_challenge_report;
+    }
+    if (object.quorum_falsified_content !== undefined && object.quorum_falsified_content !== null) {
+      message.quorumFalsifiedContent = object.quorum_falsified_content;
+    }
+    if (object.settlement_retry_kind !== undefined && object.settlement_retry_kind !== null) {
+      message.settlementRetryKind = object.settlement_retry_kind;
+    }
+    if (object.settlement_attempts !== undefined && object.settlement_attempts !== null) {
+      message.settlementAttempts = object.settlement_attempts;
+    }
+    if (object.settlement_retry_at !== undefined && object.settlement_retry_at !== null) {
+      message.settlementRetryAt = BigInt(object.settlement_retry_at);
+    }
     return message;
   },
   toAmino(message: VerificationRecord): VerificationRecordAmino {
@@ -2397,6 +2684,14 @@ export const VerificationRecord = {
     obj.escrowed_challenge_fee = message.escrowedChallengeFee === "" ? undefined : message.escrowedChallengeFee;
     obj.pending_verifier_verdict = message.pendingVerifierVerdict === 0 ? undefined : message.pendingVerifierVerdict;
     obj.commitment_released = message.commitmentReleased === false ? undefined : message.commitmentReleased;
+    obj.arbiter_escalation_deadline = message.arbiterEscalationDeadline !== BigInt(0) ? message.arbiterEscalationDeadline?.toString() : undefined;
+    obj.arbiter_resolution_deadline = message.arbiterResolutionDeadline !== BigInt(0) ? message.arbiterResolutionDeadline?.toString() : undefined;
+    obj.challenge_report_id = message.challengeReportId !== BigInt(0) ? message.challengeReportId?.toString() : undefined;
+    obj.pending_challenge_report = message.pendingChallengeReport === "" ? undefined : message.pendingChallengeReport;
+    obj.quorum_falsified_content = message.quorumFalsifiedContent === false ? undefined : message.quorumFalsifiedContent;
+    obj.settlement_retry_kind = message.settlementRetryKind === 0 ? undefined : message.settlementRetryKind;
+    obj.settlement_attempts = message.settlementAttempts === 0 ? undefined : message.settlementAttempts;
+    obj.settlement_retry_at = message.settlementRetryAt !== BigInt(0) ? message.settlementRetryAt?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: VerificationRecordAminoMsg): VerificationRecord {
@@ -3044,7 +3339,11 @@ function createBaseIdentityLink(): IdentityLink {
     status: 0,
     linkedAt: BigInt(0),
     verifiedAt: BigInt(0),
-    challenge: new Uint8Array()
+    challenge: new Uint8Array(),
+    verificationAttempts: 0,
+    unverifiedExpiresAt: BigInt(0),
+    attestedBy: "",
+    attestationEvidence: ""
   };
 }
 /**
@@ -3077,6 +3376,18 @@ export const IdentityLink = {
     if (message.challenge.length !== 0) {
       writer.uint32(58).bytes(message.challenge);
     }
+    if (message.verificationAttempts !== 0) {
+      writer.uint32(64).uint32(message.verificationAttempts);
+    }
+    if (message.unverifiedExpiresAt !== BigInt(0)) {
+      writer.uint32(72).int64(message.unverifiedExpiresAt);
+    }
+    if (message.attestedBy !== "") {
+      writer.uint32(82).string(message.attestedBy);
+    }
+    if (message.attestationEvidence !== "") {
+      writer.uint32(90).string(message.attestationEvidence);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): IdentityLink {
@@ -3107,6 +3418,18 @@ export const IdentityLink = {
         case 7:
           message.challenge = reader.bytes();
           break;
+        case 8:
+          message.verificationAttempts = reader.uint32();
+          break;
+        case 9:
+          message.unverifiedExpiresAt = reader.int64();
+          break;
+        case 10:
+          message.attestedBy = reader.string();
+          break;
+        case 11:
+          message.attestationEvidence = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -3123,6 +3446,10 @@ export const IdentityLink = {
     message.linkedAt = object.linkedAt !== undefined && object.linkedAt !== null ? BigInt(object.linkedAt.toString()) : BigInt(0);
     message.verifiedAt = object.verifiedAt !== undefined && object.verifiedAt !== null ? BigInt(object.verifiedAt.toString()) : BigInt(0);
     message.challenge = object.challenge ?? new Uint8Array();
+    message.verificationAttempts = object.verificationAttempts ?? 0;
+    message.unverifiedExpiresAt = object.unverifiedExpiresAt !== undefined && object.unverifiedExpiresAt !== null ? BigInt(object.unverifiedExpiresAt.toString()) : BigInt(0);
+    message.attestedBy = object.attestedBy ?? "";
+    message.attestationEvidence = object.attestationEvidence ?? "";
     return message;
   },
   fromAmino(object: IdentityLinkAmino): IdentityLink {
@@ -3148,6 +3475,18 @@ export const IdentityLink = {
     if (object.challenge !== undefined && object.challenge !== null) {
       message.challenge = bytesFromBase64(object.challenge);
     }
+    if (object.verification_attempts !== undefined && object.verification_attempts !== null) {
+      message.verificationAttempts = object.verification_attempts;
+    }
+    if (object.unverified_expires_at !== undefined && object.unverified_expires_at !== null) {
+      message.unverifiedExpiresAt = BigInt(object.unverified_expires_at);
+    }
+    if (object.attested_by !== undefined && object.attested_by !== null) {
+      message.attestedBy = object.attested_by;
+    }
+    if (object.attestation_evidence !== undefined && object.attestation_evidence !== null) {
+      message.attestationEvidence = object.attestation_evidence;
+    }
     return message;
   },
   toAmino(message: IdentityLink): IdentityLinkAmino {
@@ -3159,6 +3498,10 @@ export const IdentityLink = {
     obj.linked_at = message.linkedAt !== BigInt(0) ? message.linkedAt?.toString() : undefined;
     obj.verified_at = message.verifiedAt !== BigInt(0) ? message.verifiedAt?.toString() : undefined;
     obj.challenge = message.challenge ? base64FromBytes(message.challenge) : undefined;
+    obj.verification_attempts = message.verificationAttempts === 0 ? undefined : message.verificationAttempts;
+    obj.unverified_expires_at = message.unverifiedExpiresAt !== BigInt(0) ? message.unverifiedExpiresAt?.toString() : undefined;
+    obj.attested_by = message.attestedBy === "" ? undefined : message.attestedBy;
+    obj.attestation_evidence = message.attestationEvidence === "" ? undefined : message.attestationEvidence;
     return obj;
   },
   fromAminoMsg(object: IdentityLinkAminoMsg): IdentityLink {

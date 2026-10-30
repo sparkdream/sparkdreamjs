@@ -491,6 +491,132 @@ export interface MsgUpdateVaultResponseAminoMsg {
   type: "/sparkdream.vault.v1.MsgUpdateVaultResponse";
   value: MsgUpdateVaultResponseAmino;
 }
+/**
+ * MsgAcceptVaultSigner accepts the signer's own entry in a vault. An entry
+ * listed by someone else (at create, or added by MsgUpdateVault) starts
+ * unaccepted: it has no weight in the tally, cannot propose, approve or
+ * execute, and does not count toward MaxVaultsPerSigner. Signed by the listed
+ * address or, after a member migration, by the member's current address
+ * (alias contract). Refused when it would exceed MaxVaultsPerSigner or when
+ * another accepted entry of the vault already resolves to the same member.
+ * @name MsgAcceptVaultSigner
+ * @package sparkdream.vault.v1
+ * @see proto type: sparkdream.vault.v1.MsgAcceptVaultSigner
+ */
+export interface MsgAcceptVaultSigner {
+  signer: string;
+  vaultId: bigint;
+}
+export interface MsgAcceptVaultSignerProtoMsg {
+  typeUrl: "/sparkdream.vault.v1.MsgAcceptVaultSigner";
+  value: Uint8Array;
+}
+/**
+ * MsgAcceptVaultSigner accepts the signer's own entry in a vault. An entry
+ * listed by someone else (at create, or added by MsgUpdateVault) starts
+ * unaccepted: it has no weight in the tally, cannot propose, approve or
+ * execute, and does not count toward MaxVaultsPerSigner. Signed by the listed
+ * address or, after a member migration, by the member's current address
+ * (alias contract). Refused when it would exceed MaxVaultsPerSigner or when
+ * another accepted entry of the vault already resolves to the same member.
+ * @name MsgAcceptVaultSignerAmino
+ * @package sparkdream.vault.v1
+ * @see proto type: sparkdream.vault.v1.MsgAcceptVaultSigner
+ */
+export interface MsgAcceptVaultSignerAmino {
+  signer?: string;
+  vault_id?: string;
+}
+export interface MsgAcceptVaultSignerAminoMsg {
+  type: "sparkdream/x/vault/MsgAcceptVaultSigner";
+  value: MsgAcceptVaultSignerAmino;
+}
+/**
+ * MsgAcceptVaultSignerResponse defines the MsgAcceptVaultSignerResponse message.
+ * @name MsgAcceptVaultSignerResponse
+ * @package sparkdream.vault.v1
+ * @see proto type: sparkdream.vault.v1.MsgAcceptVaultSignerResponse
+ */
+export interface MsgAcceptVaultSignerResponse {}
+export interface MsgAcceptVaultSignerResponseProtoMsg {
+  typeUrl: "/sparkdream.vault.v1.MsgAcceptVaultSignerResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgAcceptVaultSignerResponse defines the MsgAcceptVaultSignerResponse message.
+ * @name MsgAcceptVaultSignerResponseAmino
+ * @package sparkdream.vault.v1
+ * @see proto type: sparkdream.vault.v1.MsgAcceptVaultSignerResponse
+ */
+export interface MsgAcceptVaultSignerResponseAmino {}
+export interface MsgAcceptVaultSignerResponseAminoMsg {
+  type: "/sparkdream.vault.v1.MsgAcceptVaultSignerResponse";
+  value: MsgAcceptVaultSignerResponseAmino;
+}
+/**
+ * MsgLeaveVault removes the signer's own entry from a vault (an unaccepted
+ * entry is declined this way). Refused when the remaining weight could no
+ * longer reach the threshold, or when the leaver is accepted and the vault's
+ * accepted weight would drop below the threshold (a vault never bricks
+ * itself); the remedy is a MsgUpdateVault by the remaining signers first.
+ * Leaving an accepted entry bumps config_version and invalidates the vault's
+ * pending proposals; declining an unaccepted entry does not (it never had
+ * weight).
+ * @name MsgLeaveVault
+ * @package sparkdream.vault.v1
+ * @see proto type: sparkdream.vault.v1.MsgLeaveVault
+ */
+export interface MsgLeaveVault {
+  signer: string;
+  vaultId: bigint;
+}
+export interface MsgLeaveVaultProtoMsg {
+  typeUrl: "/sparkdream.vault.v1.MsgLeaveVault";
+  value: Uint8Array;
+}
+/**
+ * MsgLeaveVault removes the signer's own entry from a vault (an unaccepted
+ * entry is declined this way). Refused when the remaining weight could no
+ * longer reach the threshold, or when the leaver is accepted and the vault's
+ * accepted weight would drop below the threshold (a vault never bricks
+ * itself); the remedy is a MsgUpdateVault by the remaining signers first.
+ * Leaving an accepted entry bumps config_version and invalidates the vault's
+ * pending proposals; declining an unaccepted entry does not (it never had
+ * weight).
+ * @name MsgLeaveVaultAmino
+ * @package sparkdream.vault.v1
+ * @see proto type: sparkdream.vault.v1.MsgLeaveVault
+ */
+export interface MsgLeaveVaultAmino {
+  signer?: string;
+  vault_id?: string;
+}
+export interface MsgLeaveVaultAminoMsg {
+  type: "sparkdream/x/vault/MsgLeaveVault";
+  value: MsgLeaveVaultAmino;
+}
+/**
+ * MsgLeaveVaultResponse defines the MsgLeaveVaultResponse message.
+ * @name MsgLeaveVaultResponse
+ * @package sparkdream.vault.v1
+ * @see proto type: sparkdream.vault.v1.MsgLeaveVaultResponse
+ */
+export interface MsgLeaveVaultResponse {}
+export interface MsgLeaveVaultResponseProtoMsg {
+  typeUrl: "/sparkdream.vault.v1.MsgLeaveVaultResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgLeaveVaultResponse defines the MsgLeaveVaultResponse message.
+ * @name MsgLeaveVaultResponseAmino
+ * @package sparkdream.vault.v1
+ * @see proto type: sparkdream.vault.v1.MsgLeaveVaultResponse
+ */
+export interface MsgLeaveVaultResponseAmino {}
+export interface MsgLeaveVaultResponseAminoMsg {
+  type: "/sparkdream.vault.v1.MsgLeaveVaultResponse";
+  value: MsgLeaveVaultResponseAmino;
+}
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
     authority: "",
@@ -1858,6 +1984,307 @@ export const MsgUpdateVaultResponse = {
     return {
       typeUrl: "/sparkdream.vault.v1.MsgUpdateVaultResponse",
       value: MsgUpdateVaultResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAcceptVaultSigner(): MsgAcceptVaultSigner {
+  return {
+    signer: "",
+    vaultId: BigInt(0)
+  };
+}
+/**
+ * MsgAcceptVaultSigner accepts the signer's own entry in a vault. An entry
+ * listed by someone else (at create, or added by MsgUpdateVault) starts
+ * unaccepted: it has no weight in the tally, cannot propose, approve or
+ * execute, and does not count toward MaxVaultsPerSigner. Signed by the listed
+ * address or, after a member migration, by the member's current address
+ * (alias contract). Refused when it would exceed MaxVaultsPerSigner or when
+ * another accepted entry of the vault already resolves to the same member.
+ * @name MsgAcceptVaultSigner
+ * @package sparkdream.vault.v1
+ * @see proto type: sparkdream.vault.v1.MsgAcceptVaultSigner
+ */
+export const MsgAcceptVaultSigner = {
+  typeUrl: "/sparkdream.vault.v1.MsgAcceptVaultSigner",
+  aminoType: "sparkdream/x/vault/MsgAcceptVaultSigner",
+  encode(message: MsgAcceptVaultSigner, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.signer !== "") {
+      writer.uint32(10).string(message.signer);
+    }
+    if (message.vaultId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.vaultId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAcceptVaultSigner {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAcceptVaultSigner();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.signer = reader.string();
+          break;
+        case 2:
+          message.vaultId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgAcceptVaultSigner>): MsgAcceptVaultSigner {
+    const message = createBaseMsgAcceptVaultSigner();
+    message.signer = object.signer ?? "";
+    message.vaultId = object.vaultId !== undefined && object.vaultId !== null ? BigInt(object.vaultId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgAcceptVaultSignerAmino): MsgAcceptVaultSigner {
+    const message = createBaseMsgAcceptVaultSigner();
+    if (object.signer !== undefined && object.signer !== null) {
+      message.signer = object.signer;
+    }
+    if (object.vault_id !== undefined && object.vault_id !== null) {
+      message.vaultId = BigInt(object.vault_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgAcceptVaultSigner): MsgAcceptVaultSignerAmino {
+    const obj: any = {};
+    obj.signer = message.signer === "" ? undefined : message.signer;
+    obj.vault_id = message.vaultId !== BigInt(0) ? message.vaultId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgAcceptVaultSignerAminoMsg): MsgAcceptVaultSigner {
+    return MsgAcceptVaultSigner.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAcceptVaultSigner): MsgAcceptVaultSignerAminoMsg {
+    return {
+      type: "sparkdream/x/vault/MsgAcceptVaultSigner",
+      value: MsgAcceptVaultSigner.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgAcceptVaultSignerProtoMsg): MsgAcceptVaultSigner {
+    return MsgAcceptVaultSigner.decode(message.value);
+  },
+  toProto(message: MsgAcceptVaultSigner): Uint8Array {
+    return MsgAcceptVaultSigner.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAcceptVaultSigner): MsgAcceptVaultSignerProtoMsg {
+    return {
+      typeUrl: "/sparkdream.vault.v1.MsgAcceptVaultSigner",
+      value: MsgAcceptVaultSigner.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAcceptVaultSignerResponse(): MsgAcceptVaultSignerResponse {
+  return {};
+}
+/**
+ * MsgAcceptVaultSignerResponse defines the MsgAcceptVaultSignerResponse message.
+ * @name MsgAcceptVaultSignerResponse
+ * @package sparkdream.vault.v1
+ * @see proto type: sparkdream.vault.v1.MsgAcceptVaultSignerResponse
+ */
+export const MsgAcceptVaultSignerResponse = {
+  typeUrl: "/sparkdream.vault.v1.MsgAcceptVaultSignerResponse",
+  encode(_: MsgAcceptVaultSignerResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAcceptVaultSignerResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAcceptVaultSignerResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgAcceptVaultSignerResponse>): MsgAcceptVaultSignerResponse {
+    const message = createBaseMsgAcceptVaultSignerResponse();
+    return message;
+  },
+  fromAmino(_: MsgAcceptVaultSignerResponseAmino): MsgAcceptVaultSignerResponse {
+    const message = createBaseMsgAcceptVaultSignerResponse();
+    return message;
+  },
+  toAmino(_: MsgAcceptVaultSignerResponse): MsgAcceptVaultSignerResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgAcceptVaultSignerResponseAminoMsg): MsgAcceptVaultSignerResponse {
+    return MsgAcceptVaultSignerResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgAcceptVaultSignerResponseProtoMsg): MsgAcceptVaultSignerResponse {
+    return MsgAcceptVaultSignerResponse.decode(message.value);
+  },
+  toProto(message: MsgAcceptVaultSignerResponse): Uint8Array {
+    return MsgAcceptVaultSignerResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAcceptVaultSignerResponse): MsgAcceptVaultSignerResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.vault.v1.MsgAcceptVaultSignerResponse",
+      value: MsgAcceptVaultSignerResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgLeaveVault(): MsgLeaveVault {
+  return {
+    signer: "",
+    vaultId: BigInt(0)
+  };
+}
+/**
+ * MsgLeaveVault removes the signer's own entry from a vault (an unaccepted
+ * entry is declined this way). Refused when the remaining weight could no
+ * longer reach the threshold, or when the leaver is accepted and the vault's
+ * accepted weight would drop below the threshold (a vault never bricks
+ * itself); the remedy is a MsgUpdateVault by the remaining signers first.
+ * Leaving an accepted entry bumps config_version and invalidates the vault's
+ * pending proposals; declining an unaccepted entry does not (it never had
+ * weight).
+ * @name MsgLeaveVault
+ * @package sparkdream.vault.v1
+ * @see proto type: sparkdream.vault.v1.MsgLeaveVault
+ */
+export const MsgLeaveVault = {
+  typeUrl: "/sparkdream.vault.v1.MsgLeaveVault",
+  aminoType: "sparkdream/x/vault/MsgLeaveVault",
+  encode(message: MsgLeaveVault, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.signer !== "") {
+      writer.uint32(10).string(message.signer);
+    }
+    if (message.vaultId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.vaultId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgLeaveVault {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgLeaveVault();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.signer = reader.string();
+          break;
+        case 2:
+          message.vaultId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgLeaveVault>): MsgLeaveVault {
+    const message = createBaseMsgLeaveVault();
+    message.signer = object.signer ?? "";
+    message.vaultId = object.vaultId !== undefined && object.vaultId !== null ? BigInt(object.vaultId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgLeaveVaultAmino): MsgLeaveVault {
+    const message = createBaseMsgLeaveVault();
+    if (object.signer !== undefined && object.signer !== null) {
+      message.signer = object.signer;
+    }
+    if (object.vault_id !== undefined && object.vault_id !== null) {
+      message.vaultId = BigInt(object.vault_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgLeaveVault): MsgLeaveVaultAmino {
+    const obj: any = {};
+    obj.signer = message.signer === "" ? undefined : message.signer;
+    obj.vault_id = message.vaultId !== BigInt(0) ? message.vaultId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgLeaveVaultAminoMsg): MsgLeaveVault {
+    return MsgLeaveVault.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgLeaveVault): MsgLeaveVaultAminoMsg {
+    return {
+      type: "sparkdream/x/vault/MsgLeaveVault",
+      value: MsgLeaveVault.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgLeaveVaultProtoMsg): MsgLeaveVault {
+    return MsgLeaveVault.decode(message.value);
+  },
+  toProto(message: MsgLeaveVault): Uint8Array {
+    return MsgLeaveVault.encode(message).finish();
+  },
+  toProtoMsg(message: MsgLeaveVault): MsgLeaveVaultProtoMsg {
+    return {
+      typeUrl: "/sparkdream.vault.v1.MsgLeaveVault",
+      value: MsgLeaveVault.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgLeaveVaultResponse(): MsgLeaveVaultResponse {
+  return {};
+}
+/**
+ * MsgLeaveVaultResponse defines the MsgLeaveVaultResponse message.
+ * @name MsgLeaveVaultResponse
+ * @package sparkdream.vault.v1
+ * @see proto type: sparkdream.vault.v1.MsgLeaveVaultResponse
+ */
+export const MsgLeaveVaultResponse = {
+  typeUrl: "/sparkdream.vault.v1.MsgLeaveVaultResponse",
+  encode(_: MsgLeaveVaultResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgLeaveVaultResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgLeaveVaultResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgLeaveVaultResponse>): MsgLeaveVaultResponse {
+    const message = createBaseMsgLeaveVaultResponse();
+    return message;
+  },
+  fromAmino(_: MsgLeaveVaultResponseAmino): MsgLeaveVaultResponse {
+    const message = createBaseMsgLeaveVaultResponse();
+    return message;
+  },
+  toAmino(_: MsgLeaveVaultResponse): MsgLeaveVaultResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgLeaveVaultResponseAminoMsg): MsgLeaveVaultResponse {
+    return MsgLeaveVaultResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgLeaveVaultResponseProtoMsg): MsgLeaveVaultResponse {
+    return MsgLeaveVaultResponse.decode(message.value);
+  },
+  toProto(message: MsgLeaveVaultResponse): Uint8Array {
+    return MsgLeaveVaultResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgLeaveVaultResponse): MsgLeaveVaultResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.vault.v1.MsgLeaveVaultResponse",
+      value: MsgLeaveVaultResponse.encode(message).finish()
     };
   }
 };

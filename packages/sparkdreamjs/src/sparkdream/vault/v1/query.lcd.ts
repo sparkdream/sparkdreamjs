@@ -29,6 +29,9 @@ export class LCDQueryClient {
     if (typeof params?.pagination !== "undefined") {
       setPaginationParams(options, params.pagination);
     }
+    if (typeof params?.invited !== "undefined") {
+      options.params.invited = params.invited;
+    }
     const endpoint = `sparkdream/vault/v1/vaults_by_signer/${params.address}`;
     return await this.req.get<QueryVaultsBySignerResponse>(endpoint, options);
   };

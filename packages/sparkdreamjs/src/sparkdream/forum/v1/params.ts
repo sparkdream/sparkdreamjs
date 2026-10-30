@@ -52,18 +52,6 @@ export interface Params {
    */
   downvoteDepositAmount: string;
   /**
-   * appeal_fee_amount charged for appeals, in bond-denom micro-units.
-   */
-  appealFeeAmount: string;
-  /**
-   * lock_appeal_fee_amount charged for thread lock appeals, in bond-denom micro-units.
-   */
-  lockAppealFeeAmount: string;
-  /**
-   * move_appeal_fee_amount charged for thread move appeals, in bond-denom micro-units.
-   */
-  moveAppealFeeAmount: string;
-  /**
    * edit_fee_amount charged for edits past grace period, in bond-denom micro-units.
    */
   editFeeAmount: string;
@@ -390,18 +378,6 @@ export interface ParamsAmino {
    */
   downvote_deposit_amount?: string;
   /**
-   * appeal_fee_amount charged for appeals, in bond-denom micro-units.
-   */
-  appeal_fee_amount?: string;
-  /**
-   * lock_appeal_fee_amount charged for thread lock appeals, in bond-denom micro-units.
-   */
-  lock_appeal_fee_amount?: string;
-  /**
-   * move_appeal_fee_amount charged for thread move appeals, in bond-denom micro-units.
-   */
-  move_appeal_fee_amount?: string;
-  /**
    * edit_fee_amount charged for edits past grace period, in bond-denom micro-units.
    */
   edit_fee_amount?: string;
@@ -701,9 +677,6 @@ export interface ForumOperationalParams {
   reactionSpamTaxAmount: string;
   flagSpamTaxAmount: string;
   downvoteDepositAmount: string;
-  appealFeeAmount: string;
-  lockAppealFeeAmount: string;
-  moveAppealFeeAmount: string;
   editFeeAmount: string;
   costPerByteAmount: string;
   costPerByteExempt: boolean;
@@ -874,9 +847,6 @@ export interface ForumOperationalParamsAmino {
   reaction_spam_tax_amount?: string;
   flag_spam_tax_amount?: string;
   downvote_deposit_amount?: string;
-  appeal_fee_amount?: string;
-  lock_appeal_fee_amount?: string;
-  move_appeal_fee_amount?: string;
   edit_fee_amount?: string;
   cost_per_byte_amount?: string;
   cost_per_byte_exempt?: boolean;
@@ -1036,9 +1006,6 @@ function createBaseParams(): Params {
     reactionSpamTaxAmount: "",
     flagSpamTaxAmount: "",
     downvoteDepositAmount: "",
-    appealFeeAmount: "",
-    lockAppealFeeAmount: "",
-    moveAppealFeeAmount: "",
     editFeeAmount: "",
     bountyCancellationFeePercent: BigInt(0),
     maxContentSize: BigInt(0),
@@ -1132,161 +1099,152 @@ export const Params = {
     if (message.downvoteDepositAmount !== "") {
       writer.uint32(82).string(message.downvoteDepositAmount);
     }
-    if (message.appealFeeAmount !== "") {
-      writer.uint32(90).string(message.appealFeeAmount);
-    }
-    if (message.lockAppealFeeAmount !== "") {
-      writer.uint32(98).string(message.lockAppealFeeAmount);
-    }
-    if (message.moveAppealFeeAmount !== "") {
-      writer.uint32(106).string(message.moveAppealFeeAmount);
-    }
     if (message.editFeeAmount !== "") {
-      writer.uint32(114).string(message.editFeeAmount);
+      writer.uint32(90).string(message.editFeeAmount);
     }
     if (message.bountyCancellationFeePercent !== BigInt(0)) {
-      writer.uint32(120).uint64(message.bountyCancellationFeePercent);
+      writer.uint32(96).uint64(message.bountyCancellationFeePercent);
     }
     if (message.maxContentSize !== BigInt(0)) {
-      writer.uint32(128).uint64(message.maxContentSize);
+      writer.uint32(104).uint64(message.maxContentSize);
     }
     if (message.dailyPostLimit !== BigInt(0)) {
-      writer.uint32(136).uint64(message.dailyPostLimit);
+      writer.uint32(112).uint64(message.dailyPostLimit);
     }
     if (message.maxReplyDepth !== 0) {
-      writer.uint32(144).uint32(message.maxReplyDepth);
+      writer.uint32(120).uint32(message.maxReplyDepth);
     }
     if (message.editGracePeriod !== BigInt(0)) {
-      writer.uint32(152).int64(message.editGracePeriod);
+      writer.uint32(128).int64(message.editGracePeriod);
     }
     if (message.editMaxWindow !== BigInt(0)) {
-      writer.uint32(160).int64(message.editMaxWindow);
+      writer.uint32(136).int64(message.editMaxWindow);
     }
     if (message.maxFollowsPerDay !== BigInt(0)) {
-      writer.uint32(168).uint64(message.maxFollowsPerDay);
+      writer.uint32(144).uint64(message.maxFollowsPerDay);
     }
     if (message.archiveThreshold !== BigInt(0)) {
-      writer.uint32(176).int64(message.archiveThreshold);
+      writer.uint32(152).int64(message.archiveThreshold);
     }
     if (message.unarchiveCooldown !== BigInt(0)) {
-      writer.uint32(184).int64(message.unarchiveCooldown);
+      writer.uint32(160).int64(message.unarchiveCooldown);
     }
     if (message.archiveCooldown !== BigInt(0)) {
-      writer.uint32(192).int64(message.archiveCooldown);
+      writer.uint32(168).int64(message.archiveCooldown);
     }
     if (message.hideAppealCooldown !== BigInt(0)) {
-      writer.uint32(200).int64(message.hideAppealCooldown);
+      writer.uint32(176).int64(message.hideAppealCooldown);
     }
     if (message.lockAppealCooldown !== BigInt(0)) {
-      writer.uint32(208).int64(message.lockAppealCooldown);
+      writer.uint32(184).int64(message.lockAppealCooldown);
     }
     if (message.moveAppealCooldown !== BigInt(0)) {
-      writer.uint32(216).int64(message.moveAppealCooldown);
+      writer.uint32(192).int64(message.moveAppealCooldown);
     }
     if (message.costPerByteAmount !== "") {
-      writer.uint32(226).string(message.costPerByteAmount);
+      writer.uint32(202).string(message.costPerByteAmount);
     }
     if (message.costPerByteExempt === true) {
-      writer.uint32(232).bool(message.costPerByteExempt);
+      writer.uint32(208).bool(message.costPerByteExempt);
     }
     if (message.ephemeralTtl !== BigInt(0)) {
-      writer.uint32(240).int64(message.ephemeralTtl);
+      writer.uint32(216).int64(message.ephemeralTtl);
     }
     if (message.convictionRenewalThreshold !== "") {
-      writer.uint32(298).string(Decimal.fromUserInput(message.convictionRenewalThreshold, 18).atomics);
+      writer.uint32(226).string(Decimal.fromUserInput(message.convictionRenewalThreshold, 18).atomics);
     }
     if (message.convictionRenewalPeriod !== BigInt(0)) {
-      writer.uint32(304).int64(message.convictionRenewalPeriod);
+      writer.uint32(232).int64(message.convictionRenewalPeriod);
     }
     if (message.minSentinelBond !== "") {
-      writer.uint32(322).string(message.minSentinelBond);
+      writer.uint32(242).string(message.minSentinelBond);
     }
     if (message.minSentinelRepTier !== BigInt(0)) {
-      writer.uint32(328).uint64(message.minSentinelRepTier);
+      writer.uint32(248).uint64(message.minSentinelRepTier);
     }
     if (message.minSentinelTrustLevel !== "") {
-      writer.uint32(338).string(message.minSentinelTrustLevel);
+      writer.uint32(258).string(message.minSentinelTrustLevel);
     }
     if (message.minSentinelAgeBlocks !== BigInt(0)) {
-      writer.uint32(344).int64(message.minSentinelAgeBlocks);
+      writer.uint32(264).int64(message.minSentinelAgeBlocks);
     }
     if (message.sentinelDemotionCooldown !== BigInt(0)) {
-      writer.uint32(352).int64(message.sentinelDemotionCooldown);
+      writer.uint32(272).int64(message.sentinelDemotionCooldown);
     }
     if (message.sentinelDemotionThreshold !== "") {
-      writer.uint32(362).string(message.sentinelDemotionThreshold);
+      writer.uint32(282).string(message.sentinelDemotionThreshold);
     }
     if (message.sentinelUnhideWindow !== BigInt(0)) {
-      writer.uint32(368).int64(message.sentinelUnhideWindow);
+      writer.uint32(288).int64(message.sentinelUnhideWindow);
     }
     if (message.sentinelUnbondCooldown !== BigInt(0)) {
-      writer.uint32(376).int64(message.sentinelUnbondCooldown);
+      writer.uint32(296).int64(message.sentinelUnbondCooldown);
     }
     if (message.makePermanentMinTrustLevel !== 0) {
-      writer.uint32(384).uint32(message.makePermanentMinTrustLevel);
+      writer.uint32(304).uint32(message.makePermanentMinTrustLevel);
     }
     if (message.maxPromotionsPerBlock !== 0) {
-      writer.uint32(392).uint32(message.maxPromotionsPerBlock);
+      writer.uint32(312).uint32(message.maxPromotionsPerBlock);
     }
     if (message.authorRepSlash !== "") {
-      writer.uint32(402).string(Decimal.fromUserInput(message.authorRepSlash, 18).atomics);
+      writer.uint32(322).string(Decimal.fromUserInput(message.authorRepSlash, 18).atomics);
     }
     if (message.maxMakePermanentPerDay !== BigInt(0)) {
-      writer.uint32(408).uint64(message.maxMakePermanentPerDay);
+      writer.uint32(328).uint64(message.maxMakePermanentPerDay);
     }
     if (message.maxHidesPerEpoch !== BigInt(0)) {
-      writer.uint32(416).uint64(message.maxHidesPerEpoch);
+      writer.uint32(336).uint64(message.maxHidesPerEpoch);
     }
     if (message.maxSentinelLocksPerEpoch !== BigInt(0)) {
-      writer.uint32(424).uint64(message.maxSentinelLocksPerEpoch);
+      writer.uint32(344).uint64(message.maxSentinelLocksPerEpoch);
     }
     if (message.maxSentinelMovesPerEpoch !== BigInt(0)) {
-      writer.uint32(432).uint64(message.maxSentinelMovesPerEpoch);
+      writer.uint32(352).uint64(message.maxSentinelMovesPerEpoch);
     }
     if (message.sentinelSlashAmount !== "") {
-      writer.uint32(442).string(message.sentinelSlashAmount);
+      writer.uint32(362).string(message.sentinelSlashAmount);
     }
     if (message.lockBondMultiplier !== BigInt(0)) {
-      writer.uint32(448).uint64(message.lockBondMultiplier);
+      writer.uint32(368).uint64(message.lockBondMultiplier);
     }
     if (message.lockBackingAmount !== "") {
-      writer.uint32(458).string(message.lockBackingAmount);
+      writer.uint32(378).string(message.lockBackingAmount);
     }
     if (message.lockMinRepTier !== BigInt(0)) {
-      writer.uint32(464).uint64(message.lockMinRepTier);
+      writer.uint32(384).uint64(message.lockMinRepTier);
     }
     if (message.minPostConvictionStake !== "") {
-      writer.uint32(482).string(message.minPostConvictionStake);
+      writer.uint32(394).string(message.minPostConvictionStake);
     }
     if (message.postConvictionLockSeconds !== BigInt(0)) {
-      writer.uint32(488).int64(message.postConvictionLockSeconds);
+      writer.uint32(400).int64(message.postConvictionLockSeconds);
     }
     if (message.postConvictionStreamRatePerBlock !== "") {
-      writer.uint32(498).string(Decimal.fromUserInput(message.postConvictionStreamRatePerBlock, 18).atomics);
+      writer.uint32(410).string(Decimal.fromUserInput(message.postConvictionStreamRatePerBlock, 18).atomics);
     }
     if (message.maxForumRepPerTagPerEpoch !== "") {
-      writer.uint32(506).string(Decimal.fromUserInput(message.maxForumRepPerTagPerEpoch, 18).atomics);
+      writer.uint32(418).string(Decimal.fromUserInput(message.maxForumRepPerTagPerEpoch, 18).atomics);
     }
     if (message.postConvictionStakerSlashBps !== BigInt(0)) {
-      writer.uint32(512).uint64(message.postConvictionStakerSlashBps);
+      writer.uint32(424).uint64(message.postConvictionStakerSlashBps);
     }
     if (message.curationDreamReward !== "") {
-      writer.uint32(522).string(message.curationDreamReward);
+      writer.uint32(434).string(message.curationDreamReward);
     }
     if (message.acceptProposalTimeout !== BigInt(0)) {
-      writer.uint32(528).int64(message.acceptProposalTimeout);
+      writer.uint32(440).int64(message.acceptProposalTimeout);
     }
     if (message.maxAcceptProposalsPerSentinelPerThread !== 0) {
-      writer.uint32(536).uint32(message.maxAcceptProposalsPerSentinelPerThread);
+      writer.uint32(448).uint32(message.maxAcceptProposalsPerSentinelPerThread);
     }
     if (message.mediaMinTrustLevel !== 0) {
-      writer.uint32(544).uint32(message.mediaMinTrustLevel);
+      writer.uint32(456).uint32(message.mediaMinTrustLevel);
     }
     if (message.mediaAuthorBondMin !== "") {
-      writer.uint32(554).string(message.mediaAuthorBondMin);
+      writer.uint32(466).string(message.mediaAuthorBondMin);
     }
     if (message.mediaScanFee !== "") {
-      writer.uint32(562).string(message.mediaScanFee);
+      writer.uint32(474).string(message.mediaScanFee);
     }
     return writer;
   },
@@ -1328,159 +1286,150 @@ export const Params = {
           message.downvoteDepositAmount = reader.string();
           break;
         case 11:
-          message.appealFeeAmount = reader.string();
-          break;
-        case 12:
-          message.lockAppealFeeAmount = reader.string();
-          break;
-        case 13:
-          message.moveAppealFeeAmount = reader.string();
-          break;
-        case 14:
           message.editFeeAmount = reader.string();
           break;
-        case 15:
+        case 12:
           message.bountyCancellationFeePercent = reader.uint64();
           break;
-        case 16:
+        case 13:
           message.maxContentSize = reader.uint64();
           break;
-        case 17:
+        case 14:
           message.dailyPostLimit = reader.uint64();
           break;
-        case 18:
+        case 15:
           message.maxReplyDepth = reader.uint32();
           break;
-        case 19:
+        case 16:
           message.editGracePeriod = reader.int64();
           break;
-        case 20:
+        case 17:
           message.editMaxWindow = reader.int64();
           break;
-        case 21:
+        case 18:
           message.maxFollowsPerDay = reader.uint64();
           break;
-        case 22:
+        case 19:
           message.archiveThreshold = reader.int64();
           break;
-        case 23:
+        case 20:
           message.unarchiveCooldown = reader.int64();
           break;
-        case 24:
+        case 21:
           message.archiveCooldown = reader.int64();
           break;
-        case 25:
+        case 22:
           message.hideAppealCooldown = reader.int64();
           break;
-        case 26:
+        case 23:
           message.lockAppealCooldown = reader.int64();
           break;
-        case 27:
+        case 24:
           message.moveAppealCooldown = reader.int64();
           break;
-        case 28:
+        case 25:
           message.costPerByteAmount = reader.string();
           break;
-        case 29:
+        case 26:
           message.costPerByteExempt = reader.bool();
           break;
-        case 30:
+        case 27:
           message.ephemeralTtl = reader.int64();
           break;
-        case 37:
+        case 28:
           message.convictionRenewalThreshold = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 38:
+        case 29:
           message.convictionRenewalPeriod = reader.int64();
           break;
-        case 40:
+        case 30:
           message.minSentinelBond = reader.string();
           break;
-        case 41:
+        case 31:
           message.minSentinelRepTier = reader.uint64();
           break;
-        case 42:
+        case 32:
           message.minSentinelTrustLevel = reader.string();
           break;
-        case 43:
+        case 33:
           message.minSentinelAgeBlocks = reader.int64();
           break;
-        case 44:
+        case 34:
           message.sentinelDemotionCooldown = reader.int64();
           break;
-        case 45:
+        case 35:
           message.sentinelDemotionThreshold = reader.string();
           break;
-        case 46:
+        case 36:
           message.sentinelUnhideWindow = reader.int64();
           break;
-        case 47:
+        case 37:
           message.sentinelUnbondCooldown = reader.int64();
           break;
-        case 48:
+        case 38:
           message.makePermanentMinTrustLevel = reader.uint32();
           break;
-        case 49:
+        case 39:
           message.maxPromotionsPerBlock = reader.uint32();
           break;
-        case 50:
+        case 40:
           message.authorRepSlash = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 51:
+        case 41:
           message.maxMakePermanentPerDay = reader.uint64();
           break;
-        case 52:
+        case 42:
           message.maxHidesPerEpoch = reader.uint64();
           break;
-        case 53:
+        case 43:
           message.maxSentinelLocksPerEpoch = reader.uint64();
           break;
-        case 54:
+        case 44:
           message.maxSentinelMovesPerEpoch = reader.uint64();
           break;
-        case 55:
+        case 45:
           message.sentinelSlashAmount = reader.string();
           break;
-        case 56:
+        case 46:
           message.lockBondMultiplier = reader.uint64();
           break;
-        case 57:
+        case 47:
           message.lockBackingAmount = reader.string();
           break;
-        case 58:
+        case 48:
           message.lockMinRepTier = reader.uint64();
           break;
-        case 60:
+        case 49:
           message.minPostConvictionStake = reader.string();
           break;
-        case 61:
+        case 50:
           message.postConvictionLockSeconds = reader.int64();
           break;
-        case 62:
+        case 51:
           message.postConvictionStreamRatePerBlock = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 63:
+        case 52:
           message.maxForumRepPerTagPerEpoch = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 64:
+        case 53:
           message.postConvictionStakerSlashBps = reader.uint64();
           break;
-        case 65:
+        case 54:
           message.curationDreamReward = reader.string();
           break;
-        case 66:
+        case 55:
           message.acceptProposalTimeout = reader.int64();
           break;
-        case 67:
+        case 56:
           message.maxAcceptProposalsPerSentinelPerThread = reader.uint32();
           break;
-        case 68:
+        case 57:
           message.mediaMinTrustLevel = reader.uint32();
           break;
-        case 69:
+        case 58:
           message.mediaAuthorBondMin = reader.string();
           break;
-        case 70:
+        case 59:
           message.mediaScanFee = reader.string();
           break;
         default:
@@ -1502,9 +1451,6 @@ export const Params = {
     message.reactionSpamTaxAmount = object.reactionSpamTaxAmount ?? "";
     message.flagSpamTaxAmount = object.flagSpamTaxAmount ?? "";
     message.downvoteDepositAmount = object.downvoteDepositAmount ?? "";
-    message.appealFeeAmount = object.appealFeeAmount ?? "";
-    message.lockAppealFeeAmount = object.lockAppealFeeAmount ?? "";
-    message.moveAppealFeeAmount = object.moveAppealFeeAmount ?? "";
     message.editFeeAmount = object.editFeeAmount ?? "";
     message.bountyCancellationFeePercent = object.bountyCancellationFeePercent !== undefined && object.bountyCancellationFeePercent !== null ? BigInt(object.bountyCancellationFeePercent.toString()) : BigInt(0);
     message.maxContentSize = object.maxContentSize !== undefined && object.maxContentSize !== null ? BigInt(object.maxContentSize.toString()) : BigInt(0);
@@ -1587,15 +1533,6 @@ export const Params = {
     }
     if (object.downvote_deposit_amount !== undefined && object.downvote_deposit_amount !== null) {
       message.downvoteDepositAmount = object.downvote_deposit_amount;
-    }
-    if (object.appeal_fee_amount !== undefined && object.appeal_fee_amount !== null) {
-      message.appealFeeAmount = object.appeal_fee_amount;
-    }
-    if (object.lock_appeal_fee_amount !== undefined && object.lock_appeal_fee_amount !== null) {
-      message.lockAppealFeeAmount = object.lock_appeal_fee_amount;
-    }
-    if (object.move_appeal_fee_amount !== undefined && object.move_appeal_fee_amount !== null) {
-      message.moveAppealFeeAmount = object.move_appeal_fee_amount;
     }
     if (object.edit_fee_amount !== undefined && object.edit_fee_amount !== null) {
       message.editFeeAmount = object.edit_fee_amount;
@@ -1758,9 +1695,6 @@ export const Params = {
     obj.reaction_spam_tax_amount = message.reactionSpamTaxAmount === "" ? undefined : message.reactionSpamTaxAmount;
     obj.flag_spam_tax_amount = message.flagSpamTaxAmount === "" ? undefined : message.flagSpamTaxAmount;
     obj.downvote_deposit_amount = message.downvoteDepositAmount === "" ? undefined : message.downvoteDepositAmount;
-    obj.appeal_fee_amount = message.appealFeeAmount === "" ? undefined : message.appealFeeAmount;
-    obj.lock_appeal_fee_amount = message.lockAppealFeeAmount === "" ? undefined : message.lockAppealFeeAmount;
-    obj.move_appeal_fee_amount = message.moveAppealFeeAmount === "" ? undefined : message.moveAppealFeeAmount;
     obj.edit_fee_amount = message.editFeeAmount === "" ? undefined : message.editFeeAmount;
     obj.bounty_cancellation_fee_percent = message.bountyCancellationFeePercent !== BigInt(0) ? message.bountyCancellationFeePercent?.toString() : undefined;
     obj.max_content_size = message.maxContentSize !== BigInt(0) ? message.maxContentSize?.toString() : undefined;
@@ -1843,9 +1777,6 @@ function createBaseForumOperationalParams(): ForumOperationalParams {
     reactionSpamTaxAmount: "",
     flagSpamTaxAmount: "",
     downvoteDepositAmount: "",
-    appealFeeAmount: "",
-    lockAppealFeeAmount: "",
-    moveAppealFeeAmount: "",
     editFeeAmount: "",
     costPerByteAmount: "",
     costPerByteExempt: false,
@@ -1925,143 +1856,134 @@ export const ForumOperationalParams = {
     if (message.downvoteDepositAmount !== "") {
       writer.uint32(58).string(message.downvoteDepositAmount);
     }
-    if (message.appealFeeAmount !== "") {
-      writer.uint32(66).string(message.appealFeeAmount);
-    }
-    if (message.lockAppealFeeAmount !== "") {
-      writer.uint32(74).string(message.lockAppealFeeAmount);
-    }
-    if (message.moveAppealFeeAmount !== "") {
-      writer.uint32(82).string(message.moveAppealFeeAmount);
-    }
     if (message.editFeeAmount !== "") {
-      writer.uint32(90).string(message.editFeeAmount);
+      writer.uint32(66).string(message.editFeeAmount);
     }
     if (message.costPerByteAmount !== "") {
-      writer.uint32(98).string(message.costPerByteAmount);
+      writer.uint32(74).string(message.costPerByteAmount);
     }
     if (message.costPerByteExempt === true) {
-      writer.uint32(104).bool(message.costPerByteExempt);
+      writer.uint32(80).bool(message.costPerByteExempt);
     }
     if (message.maxContentSize !== BigInt(0)) {
-      writer.uint32(112).uint64(message.maxContentSize);
+      writer.uint32(88).uint64(message.maxContentSize);
     }
     if (message.dailyPostLimit !== BigInt(0)) {
-      writer.uint32(120).uint64(message.dailyPostLimit);
+      writer.uint32(96).uint64(message.dailyPostLimit);
     }
     if (message.maxReplyDepth !== 0) {
-      writer.uint32(128).uint32(message.maxReplyDepth);
+      writer.uint32(104).uint32(message.maxReplyDepth);
     }
     if (message.maxFollowsPerDay !== BigInt(0)) {
-      writer.uint32(136).uint64(message.maxFollowsPerDay);
+      writer.uint32(112).uint64(message.maxFollowsPerDay);
     }
     if (message.bountyCancellationFeePercent !== BigInt(0)) {
-      writer.uint32(144).uint64(message.bountyCancellationFeePercent);
+      writer.uint32(120).uint64(message.bountyCancellationFeePercent);
     }
     if (message.editGracePeriod !== BigInt(0)) {
-      writer.uint32(152).int64(message.editGracePeriod);
+      writer.uint32(128).int64(message.editGracePeriod);
     }
     if (message.editMaxWindow !== BigInt(0)) {
-      writer.uint32(160).int64(message.editMaxWindow);
+      writer.uint32(136).int64(message.editMaxWindow);
     }
     if (message.archiveThreshold !== BigInt(0)) {
-      writer.uint32(168).int64(message.archiveThreshold);
+      writer.uint32(144).int64(message.archiveThreshold);
     }
     if (message.unarchiveCooldown !== BigInt(0)) {
-      writer.uint32(176).int64(message.unarchiveCooldown);
+      writer.uint32(152).int64(message.unarchiveCooldown);
     }
     if (message.archiveCooldown !== BigInt(0)) {
-      writer.uint32(184).int64(message.archiveCooldown);
+      writer.uint32(160).int64(message.archiveCooldown);
     }
     if (message.hideAppealCooldown !== BigInt(0)) {
-      writer.uint32(192).int64(message.hideAppealCooldown);
+      writer.uint32(168).int64(message.hideAppealCooldown);
     }
     if (message.lockAppealCooldown !== BigInt(0)) {
-      writer.uint32(200).int64(message.lockAppealCooldown);
+      writer.uint32(176).int64(message.lockAppealCooldown);
     }
     if (message.moveAppealCooldown !== BigInt(0)) {
-      writer.uint32(208).int64(message.moveAppealCooldown);
+      writer.uint32(184).int64(message.moveAppealCooldown);
     }
     if (message.ephemeralTtl !== BigInt(0)) {
-      writer.uint32(216).int64(message.ephemeralTtl);
+      writer.uint32(192).int64(message.ephemeralTtl);
     }
     if (message.convictionRenewalThreshold !== "") {
-      writer.uint32(250).string(Decimal.fromUserInput(message.convictionRenewalThreshold, 18).atomics);
+      writer.uint32(202).string(Decimal.fromUserInput(message.convictionRenewalThreshold, 18).atomics);
     }
     if (message.convictionRenewalPeriod !== BigInt(0)) {
-      writer.uint32(256).int64(message.convictionRenewalPeriod);
+      writer.uint32(208).int64(message.convictionRenewalPeriod);
     }
     if (message.minSentinelBond !== "") {
-      writer.uint32(322).string(message.minSentinelBond);
+      writer.uint32(218).string(message.minSentinelBond);
     }
     if (message.minSentinelRepTier !== BigInt(0)) {
-      writer.uint32(328).uint64(message.minSentinelRepTier);
+      writer.uint32(224).uint64(message.minSentinelRepTier);
     }
     if (message.minSentinelTrustLevel !== "") {
-      writer.uint32(338).string(message.minSentinelTrustLevel);
+      writer.uint32(234).string(message.minSentinelTrustLevel);
     }
     if (message.minSentinelAgeBlocks !== BigInt(0)) {
-      writer.uint32(344).int64(message.minSentinelAgeBlocks);
+      writer.uint32(240).int64(message.minSentinelAgeBlocks);
     }
     if (message.sentinelDemotionCooldown !== BigInt(0)) {
-      writer.uint32(352).int64(message.sentinelDemotionCooldown);
+      writer.uint32(248).int64(message.sentinelDemotionCooldown);
     }
     if (message.sentinelDemotionThreshold !== "") {
-      writer.uint32(362).string(message.sentinelDemotionThreshold);
+      writer.uint32(258).string(message.sentinelDemotionThreshold);
     }
     if (message.sentinelUnhideWindow !== BigInt(0)) {
-      writer.uint32(368).int64(message.sentinelUnhideWindow);
+      writer.uint32(264).int64(message.sentinelUnhideWindow);
     }
     if (message.sentinelUnbondCooldown !== BigInt(0)) {
-      writer.uint32(376).int64(message.sentinelUnbondCooldown);
+      writer.uint32(272).int64(message.sentinelUnbondCooldown);
     }
     if (message.makePermanentMinTrustLevel !== 0) {
-      writer.uint32(384).uint32(message.makePermanentMinTrustLevel);
+      writer.uint32(280).uint32(message.makePermanentMinTrustLevel);
     }
     if (message.maxPromotionsPerBlock !== 0) {
-      writer.uint32(392).uint32(message.maxPromotionsPerBlock);
+      writer.uint32(288).uint32(message.maxPromotionsPerBlock);
     }
     if (message.authorRepSlash !== "") {
-      writer.uint32(402).string(Decimal.fromUserInput(message.authorRepSlash, 18).atomics);
+      writer.uint32(298).string(Decimal.fromUserInput(message.authorRepSlash, 18).atomics);
     }
     if (message.maxMakePermanentPerDay !== BigInt(0)) {
-      writer.uint32(408).uint64(message.maxMakePermanentPerDay);
+      writer.uint32(304).uint64(message.maxMakePermanentPerDay);
     }
     if (message.maxHidesPerEpoch !== BigInt(0)) {
-      writer.uint32(416).uint64(message.maxHidesPerEpoch);
+      writer.uint32(312).uint64(message.maxHidesPerEpoch);
     }
     if (message.maxSentinelLocksPerEpoch !== BigInt(0)) {
-      writer.uint32(424).uint64(message.maxSentinelLocksPerEpoch);
+      writer.uint32(320).uint64(message.maxSentinelLocksPerEpoch);
     }
     if (message.maxSentinelMovesPerEpoch !== BigInt(0)) {
-      writer.uint32(432).uint64(message.maxSentinelMovesPerEpoch);
+      writer.uint32(328).uint64(message.maxSentinelMovesPerEpoch);
     }
     if (message.sentinelSlashAmount !== "") {
-      writer.uint32(442).string(message.sentinelSlashAmount);
+      writer.uint32(338).string(message.sentinelSlashAmount);
     }
     if (message.minPostConvictionStake !== "") {
-      writer.uint32(482).string(message.minPostConvictionStake);
+      writer.uint32(346).string(message.minPostConvictionStake);
     }
     if (message.postConvictionLockSeconds !== BigInt(0)) {
-      writer.uint32(488).int64(message.postConvictionLockSeconds);
+      writer.uint32(352).int64(message.postConvictionLockSeconds);
     }
     if (message.postConvictionStreamRatePerBlock !== "") {
-      writer.uint32(498).string(Decimal.fromUserInput(message.postConvictionStreamRatePerBlock, 18).atomics);
+      writer.uint32(362).string(Decimal.fromUserInput(message.postConvictionStreamRatePerBlock, 18).atomics);
     }
     if (message.maxForumRepPerTagPerEpoch !== "") {
-      writer.uint32(506).string(Decimal.fromUserInput(message.maxForumRepPerTagPerEpoch, 18).atomics);
+      writer.uint32(370).string(Decimal.fromUserInput(message.maxForumRepPerTagPerEpoch, 18).atomics);
     }
     if (message.postConvictionStakerSlashBps !== BigInt(0)) {
-      writer.uint32(512).uint64(message.postConvictionStakerSlashBps);
+      writer.uint32(376).uint64(message.postConvictionStakerSlashBps);
     }
     if (message.curationDreamReward !== "") {
-      writer.uint32(522).string(message.curationDreamReward);
+      writer.uint32(386).string(message.curationDreamReward);
     }
     if (message.acceptProposalTimeout !== BigInt(0)) {
-      writer.uint32(528).int64(message.acceptProposalTimeout);
+      writer.uint32(392).int64(message.acceptProposalTimeout);
     }
     if (message.maxAcceptProposalsPerSentinelPerThread !== 0) {
-      writer.uint32(536).uint32(message.maxAcceptProposalsPerSentinelPerThread);
+      writer.uint32(400).uint32(message.maxAcceptProposalsPerSentinelPerThread);
     }
     return writer;
   },
@@ -2094,141 +2016,132 @@ export const ForumOperationalParams = {
           message.downvoteDepositAmount = reader.string();
           break;
         case 8:
-          message.appealFeeAmount = reader.string();
-          break;
-        case 9:
-          message.lockAppealFeeAmount = reader.string();
-          break;
-        case 10:
-          message.moveAppealFeeAmount = reader.string();
-          break;
-        case 11:
           message.editFeeAmount = reader.string();
           break;
-        case 12:
+        case 9:
           message.costPerByteAmount = reader.string();
           break;
-        case 13:
+        case 10:
           message.costPerByteExempt = reader.bool();
           break;
-        case 14:
+        case 11:
           message.maxContentSize = reader.uint64();
           break;
-        case 15:
+        case 12:
           message.dailyPostLimit = reader.uint64();
           break;
-        case 16:
+        case 13:
           message.maxReplyDepth = reader.uint32();
           break;
-        case 17:
+        case 14:
           message.maxFollowsPerDay = reader.uint64();
           break;
-        case 18:
+        case 15:
           message.bountyCancellationFeePercent = reader.uint64();
           break;
-        case 19:
+        case 16:
           message.editGracePeriod = reader.int64();
           break;
-        case 20:
+        case 17:
           message.editMaxWindow = reader.int64();
           break;
-        case 21:
+        case 18:
           message.archiveThreshold = reader.int64();
           break;
-        case 22:
+        case 19:
           message.unarchiveCooldown = reader.int64();
           break;
-        case 23:
+        case 20:
           message.archiveCooldown = reader.int64();
           break;
-        case 24:
+        case 21:
           message.hideAppealCooldown = reader.int64();
           break;
-        case 25:
+        case 22:
           message.lockAppealCooldown = reader.int64();
           break;
-        case 26:
+        case 23:
           message.moveAppealCooldown = reader.int64();
           break;
-        case 27:
+        case 24:
           message.ephemeralTtl = reader.int64();
           break;
-        case 31:
+        case 25:
           message.convictionRenewalThreshold = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 32:
+        case 26:
           message.convictionRenewalPeriod = reader.int64();
           break;
-        case 40:
+        case 27:
           message.minSentinelBond = reader.string();
           break;
-        case 41:
+        case 28:
           message.minSentinelRepTier = reader.uint64();
           break;
-        case 42:
+        case 29:
           message.minSentinelTrustLevel = reader.string();
           break;
-        case 43:
+        case 30:
           message.minSentinelAgeBlocks = reader.int64();
           break;
-        case 44:
+        case 31:
           message.sentinelDemotionCooldown = reader.int64();
           break;
-        case 45:
+        case 32:
           message.sentinelDemotionThreshold = reader.string();
           break;
-        case 46:
+        case 33:
           message.sentinelUnhideWindow = reader.int64();
           break;
-        case 47:
+        case 34:
           message.sentinelUnbondCooldown = reader.int64();
           break;
-        case 48:
+        case 35:
           message.makePermanentMinTrustLevel = reader.uint32();
           break;
-        case 49:
+        case 36:
           message.maxPromotionsPerBlock = reader.uint32();
           break;
-        case 50:
+        case 37:
           message.authorRepSlash = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 51:
+        case 38:
           message.maxMakePermanentPerDay = reader.uint64();
           break;
-        case 52:
+        case 39:
           message.maxHidesPerEpoch = reader.uint64();
           break;
-        case 53:
+        case 40:
           message.maxSentinelLocksPerEpoch = reader.uint64();
           break;
-        case 54:
+        case 41:
           message.maxSentinelMovesPerEpoch = reader.uint64();
           break;
-        case 55:
+        case 42:
           message.sentinelSlashAmount = reader.string();
           break;
-        case 60:
+        case 43:
           message.minPostConvictionStake = reader.string();
           break;
-        case 61:
+        case 44:
           message.postConvictionLockSeconds = reader.int64();
           break;
-        case 62:
+        case 45:
           message.postConvictionStreamRatePerBlock = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 63:
+        case 46:
           message.maxForumRepPerTagPerEpoch = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 64:
+        case 47:
           message.postConvictionStakerSlashBps = reader.uint64();
           break;
-        case 65:
+        case 48:
           message.curationDreamReward = reader.string();
           break;
-        case 66:
+        case 49:
           message.acceptProposalTimeout = reader.int64();
           break;
-        case 67:
+        case 50:
           message.maxAcceptProposalsPerSentinelPerThread = reader.uint32();
           break;
         default:
@@ -2247,9 +2160,6 @@ export const ForumOperationalParams = {
     message.reactionSpamTaxAmount = object.reactionSpamTaxAmount ?? "";
     message.flagSpamTaxAmount = object.flagSpamTaxAmount ?? "";
     message.downvoteDepositAmount = object.downvoteDepositAmount ?? "";
-    message.appealFeeAmount = object.appealFeeAmount ?? "";
-    message.lockAppealFeeAmount = object.lockAppealFeeAmount ?? "";
-    message.moveAppealFeeAmount = object.moveAppealFeeAmount ?? "";
     message.editFeeAmount = object.editFeeAmount ?? "";
     message.costPerByteAmount = object.costPerByteAmount ?? "";
     message.costPerByteExempt = object.costPerByteExempt ?? false;
@@ -2317,15 +2227,6 @@ export const ForumOperationalParams = {
     }
     if (object.downvote_deposit_amount !== undefined && object.downvote_deposit_amount !== null) {
       message.downvoteDepositAmount = object.downvote_deposit_amount;
-    }
-    if (object.appeal_fee_amount !== undefined && object.appeal_fee_amount !== null) {
-      message.appealFeeAmount = object.appeal_fee_amount;
-    }
-    if (object.lock_appeal_fee_amount !== undefined && object.lock_appeal_fee_amount !== null) {
-      message.lockAppealFeeAmount = object.lock_appeal_fee_amount;
-    }
-    if (object.move_appeal_fee_amount !== undefined && object.move_appeal_fee_amount !== null) {
-      message.moveAppealFeeAmount = object.move_appeal_fee_amount;
     }
     if (object.edit_fee_amount !== undefined && object.edit_fee_amount !== null) {
       message.editFeeAmount = object.edit_fee_amount;
@@ -2467,9 +2368,6 @@ export const ForumOperationalParams = {
     obj.reaction_spam_tax_amount = message.reactionSpamTaxAmount === "" ? undefined : message.reactionSpamTaxAmount;
     obj.flag_spam_tax_amount = message.flagSpamTaxAmount === "" ? undefined : message.flagSpamTaxAmount;
     obj.downvote_deposit_amount = message.downvoteDepositAmount === "" ? undefined : message.downvoteDepositAmount;
-    obj.appeal_fee_amount = message.appealFeeAmount === "" ? undefined : message.appealFeeAmount;
-    obj.lock_appeal_fee_amount = message.lockAppealFeeAmount === "" ? undefined : message.lockAppealFeeAmount;
-    obj.move_appeal_fee_amount = message.moveAppealFeeAmount === "" ? undefined : message.moveAppealFeeAmount;
     obj.edit_fee_amount = message.editFeeAmount === "" ? undefined : message.editFeeAmount;
     obj.cost_per_byte_amount = message.costPerByteAmount === "" ? undefined : message.costPerByteAmount;
     obj.cost_per_byte_exempt = message.costPerByteExempt === false ? undefined : message.costPerByteExempt;

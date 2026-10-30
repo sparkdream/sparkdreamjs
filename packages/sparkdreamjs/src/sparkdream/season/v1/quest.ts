@@ -117,6 +117,12 @@ export interface Quest {
    * Quest objectives
    */
   objectives: QuestObjective[];
+  /**
+   * Bumped by MsgUpdateQuest whenever the objectives change (SEA-32).
+   * Progress recorded against another version is stale and restarts from
+   * zero, so a reorder or retarget never re-reads old counters.
+   */
+  objectivesVersion: bigint;
 }
 export interface QuestProtoMsg {
   typeUrl: "/sparkdream.season.v1.Quest";
@@ -189,6 +195,12 @@ export interface QuestAmino {
    * Quest objectives
    */
   objectives?: QuestObjectiveAmino[];
+  /**
+   * Bumped by MsgUpdateQuest whenever the objectives change (SEA-32).
+   * Progress recorded against another version is stale and restarts from
+   * zero, so a reorder or retarget never re-reads old counters.
+   */
+  objectives_version?: string;
 }
 export interface QuestAminoMsg {
   type: "/sparkdream.season.v1.Quest";
@@ -303,7 +315,8 @@ function createBaseQuest(): Quest {
     requiredAchievement: "",
     prerequisiteQuest: "",
     questChain: "",
-    objectives: []
+    objectives: [],
+    objectivesVersion: BigInt(0)
   };
 }
 /**
@@ -360,6 +373,9 @@ export const Quest = {
     for (const v of message.objectives) {
       QuestObjective.encode(v!, writer.uint32(122).fork()).ldelim();
     }
+    if (message.objectivesVersion !== BigInt(0)) {
+      writer.uint32(128).uint64(message.objectivesVersion);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Quest {
@@ -414,6 +430,9 @@ export const Quest = {
         case 15:
           message.objectives.push(QuestObjective.decode(reader, reader.uint32()));
           break;
+        case 16:
+          message.objectivesVersion = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -438,6 +457,7 @@ export const Quest = {
     message.prerequisiteQuest = object.prerequisiteQuest ?? "";
     message.questChain = object.questChain ?? "";
     message.objectives = object.objectives?.map(e => QuestObjective.fromPartial(e)) || [];
+    message.objectivesVersion = object.objectivesVersion !== undefined && object.objectivesVersion !== null ? BigInt(object.objectivesVersion.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: QuestAmino): Quest {
@@ -485,6 +505,9 @@ export const Quest = {
       message.questChain = object.quest_chain;
     }
     message.objectives = object.objectives?.map(e => QuestObjective.fromAmino(e)) || [];
+    if (object.objectives_version !== undefined && object.objectives_version !== null) {
+      message.objectivesVersion = BigInt(object.objectives_version);
+    }
     return message;
   },
   toAmino(message: Quest): QuestAmino {
@@ -508,6 +531,7 @@ export const Quest = {
     } else {
       obj.objectives = message.objectives;
     }
+    obj.objectives_version = message.objectivesVersion !== BigInt(0) ? message.objectivesVersion?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: QuestAminoMsg): Quest {

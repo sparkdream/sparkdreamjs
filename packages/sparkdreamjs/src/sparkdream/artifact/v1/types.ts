@@ -2588,6 +2588,13 @@ export interface Auction {
   highBidder: string;
   highBid: string;
   bids: number;
+  /**
+   * The high bid's optional pins (MsgBid expected_metadata_hash /
+   * expected_contents_hash). Settlement re-checks them and refunds the bid
+   * instead of selling when the token no longer matches.
+   */
+  highBidMetadataHash: string;
+  highBidContentsHash: string;
 }
 export interface AuctionProtoMsg {
   typeUrl: "/sparkdream.artifact.v1.Auction";
@@ -2622,6 +2629,13 @@ export interface AuctionAmino {
   high_bidder?: string;
   high_bid?: string;
   bids?: number;
+  /**
+   * The high bid's optional pins (MsgBid expected_metadata_hash /
+   * expected_contents_hash). Settlement re-checks them and refunds the bid
+   * instead of selling when the token no longer matches.
+   */
+  high_bid_metadata_hash?: string;
+  high_bid_contents_hash?: string;
 }
 export interface AuctionAminoMsg {
   type: "/sparkdream.artifact.v1.Auction";
@@ -7669,7 +7683,9 @@ function createBaseAuction(): Auction {
     endsAt: BigInt(0),
     highBidder: "",
     highBid: "",
-    bids: 0
+    bids: 0,
+    highBidMetadataHash: "",
+    highBidContentsHash: ""
   };
 }
 /**
@@ -7716,6 +7732,12 @@ export const Auction = {
     if (message.bids !== 0) {
       writer.uint32(88).uint32(message.bids);
     }
+    if (message.highBidMetadataHash !== "") {
+      writer.uint32(98).string(message.highBidMetadataHash);
+    }
+    if (message.highBidContentsHash !== "") {
+      writer.uint32(106).string(message.highBidContentsHash);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Auction {
@@ -7758,6 +7780,12 @@ export const Auction = {
         case 11:
           message.bids = reader.uint32();
           break;
+        case 12:
+          message.highBidMetadataHash = reader.string();
+          break;
+        case 13:
+          message.highBidContentsHash = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -7778,6 +7806,8 @@ export const Auction = {
     message.highBidder = object.highBidder ?? "";
     message.highBid = object.highBid ?? "";
     message.bids = object.bids ?? 0;
+    message.highBidMetadataHash = object.highBidMetadataHash ?? "";
+    message.highBidContentsHash = object.highBidContentsHash ?? "";
     return message;
   },
   fromAmino(object: AuctionAmino): Auction {
@@ -7815,6 +7845,12 @@ export const Auction = {
     if (object.bids !== undefined && object.bids !== null) {
       message.bids = object.bids;
     }
+    if (object.high_bid_metadata_hash !== undefined && object.high_bid_metadata_hash !== null) {
+      message.highBidMetadataHash = object.high_bid_metadata_hash;
+    }
+    if (object.high_bid_contents_hash !== undefined && object.high_bid_contents_hash !== null) {
+      message.highBidContentsHash = object.high_bid_contents_hash;
+    }
     return message;
   },
   toAmino(message: Auction): AuctionAmino {
@@ -7830,6 +7866,8 @@ export const Auction = {
     obj.high_bidder = message.highBidder === "" ? undefined : message.highBidder;
     obj.high_bid = message.highBid === "" ? undefined : message.highBid;
     obj.bids = message.bids === 0 ? undefined : message.bids;
+    obj.high_bid_metadata_hash = message.highBidMetadataHash === "" ? undefined : message.highBidMetadataHash;
+    obj.high_bid_contents_hash = message.highBidContentsHash === "" ? undefined : message.highBidContentsHash;
     return obj;
   },
   fromAminoMsg(object: AuctionAminoMsg): Auction {
