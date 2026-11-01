@@ -343,6 +343,62 @@ export interface MsgUpdatePeerPolicyResponseAminoMsg {
   value: MsgUpdatePeerPolicyResponseAmino;
 }
 /**
+ * MsgUpdatePeerInfo corrects a peer's descriptive fields. Both fields are
+ * replaced as given, so callers resend the current metadata to keep it.
+ * The peer's id, type and channels are identity and cannot change here.
+ * @name MsgUpdatePeerInfo
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgUpdatePeerInfo
+ */
+export interface MsgUpdatePeerInfo {
+  authority: string;
+  peerId: string;
+  displayName: string;
+  metadata: string;
+}
+export interface MsgUpdatePeerInfoProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.MsgUpdatePeerInfo";
+  value: Uint8Array;
+}
+/**
+ * MsgUpdatePeerInfo corrects a peer's descriptive fields. Both fields are
+ * replaced as given, so callers resend the current metadata to keep it.
+ * The peer's id, type and channels are identity and cannot change here.
+ * @name MsgUpdatePeerInfoAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgUpdatePeerInfo
+ */
+export interface MsgUpdatePeerInfoAmino {
+  authority?: string;
+  peer_id?: string;
+  display_name?: string;
+  metadata?: string;
+}
+export interface MsgUpdatePeerInfoAminoMsg {
+  type: "sparkdream/x/federation/MsgUpdatePeerInfo";
+  value: MsgUpdatePeerInfoAmino;
+}
+/**
+ * @name MsgUpdatePeerInfoResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgUpdatePeerInfoResponse
+ */
+export interface MsgUpdatePeerInfoResponse {}
+export interface MsgUpdatePeerInfoResponseProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.MsgUpdatePeerInfoResponse";
+  value: Uint8Array;
+}
+/**
+ * @name MsgUpdatePeerInfoResponseAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgUpdatePeerInfoResponse
+ */
+export interface MsgUpdatePeerInfoResponseAmino {}
+export interface MsgUpdatePeerInfoResponseAminoMsg {
+  type: "/sparkdream.federation.v1.MsgUpdatePeerInfoResponse";
+  value: MsgUpdatePeerInfoResponseAmino;
+}
+/**
  * MsgRegisterBridge registers a bridge operator for a peer. Operator-
  * signed (federation→service migration): the operator pays their own
  * bond into x/service, so they must sign the tx. Peer existence and
@@ -2461,6 +2517,175 @@ export const MsgUpdatePeerPolicyResponse = {
     return {
       typeUrl: "/sparkdream.federation.v1.MsgUpdatePeerPolicyResponse",
       value: MsgUpdatePeerPolicyResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUpdatePeerInfo(): MsgUpdatePeerInfo {
+  return {
+    authority: "",
+    peerId: "",
+    displayName: "",
+    metadata: ""
+  };
+}
+/**
+ * MsgUpdatePeerInfo corrects a peer's descriptive fields. Both fields are
+ * replaced as given, so callers resend the current metadata to keep it.
+ * The peer's id, type and channels are identity and cannot change here.
+ * @name MsgUpdatePeerInfo
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgUpdatePeerInfo
+ */
+export const MsgUpdatePeerInfo = {
+  typeUrl: "/sparkdream.federation.v1.MsgUpdatePeerInfo",
+  aminoType: "sparkdream/x/federation/MsgUpdatePeerInfo",
+  encode(message: MsgUpdatePeerInfo, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.peerId !== "") {
+      writer.uint32(18).string(message.peerId);
+    }
+    if (message.displayName !== "") {
+      writer.uint32(26).string(message.displayName);
+    }
+    if (message.metadata !== "") {
+      writer.uint32(34).string(message.metadata);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUpdatePeerInfo {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUpdatePeerInfo();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+        case 2:
+          message.peerId = reader.string();
+          break;
+        case 3:
+          message.displayName = reader.string();
+          break;
+        case 4:
+          message.metadata = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgUpdatePeerInfo>): MsgUpdatePeerInfo {
+    const message = createBaseMsgUpdatePeerInfo();
+    message.authority = object.authority ?? "";
+    message.peerId = object.peerId ?? "";
+    message.displayName = object.displayName ?? "";
+    message.metadata = object.metadata ?? "";
+    return message;
+  },
+  fromAmino(object: MsgUpdatePeerInfoAmino): MsgUpdatePeerInfo {
+    const message = createBaseMsgUpdatePeerInfo();
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
+    if (object.peer_id !== undefined && object.peer_id !== null) {
+      message.peerId = object.peer_id;
+    }
+    if (object.display_name !== undefined && object.display_name !== null) {
+      message.displayName = object.display_name;
+    }
+    if (object.metadata !== undefined && object.metadata !== null) {
+      message.metadata = object.metadata;
+    }
+    return message;
+  },
+  toAmino(message: MsgUpdatePeerInfo): MsgUpdatePeerInfoAmino {
+    const obj: any = {};
+    obj.authority = message.authority === "" ? undefined : message.authority;
+    obj.peer_id = message.peerId === "" ? undefined : message.peerId;
+    obj.display_name = message.displayName === "" ? undefined : message.displayName;
+    obj.metadata = message.metadata === "" ? undefined : message.metadata;
+    return obj;
+  },
+  fromAminoMsg(object: MsgUpdatePeerInfoAminoMsg): MsgUpdatePeerInfo {
+    return MsgUpdatePeerInfo.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUpdatePeerInfo): MsgUpdatePeerInfoAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgUpdatePeerInfo",
+      value: MsgUpdatePeerInfo.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgUpdatePeerInfoProtoMsg): MsgUpdatePeerInfo {
+    return MsgUpdatePeerInfo.decode(message.value);
+  },
+  toProto(message: MsgUpdatePeerInfo): Uint8Array {
+    return MsgUpdatePeerInfo.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUpdatePeerInfo): MsgUpdatePeerInfoProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.MsgUpdatePeerInfo",
+      value: MsgUpdatePeerInfo.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUpdatePeerInfoResponse(): MsgUpdatePeerInfoResponse {
+  return {};
+}
+/**
+ * @name MsgUpdatePeerInfoResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgUpdatePeerInfoResponse
+ */
+export const MsgUpdatePeerInfoResponse = {
+  typeUrl: "/sparkdream.federation.v1.MsgUpdatePeerInfoResponse",
+  encode(_: MsgUpdatePeerInfoResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUpdatePeerInfoResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUpdatePeerInfoResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgUpdatePeerInfoResponse>): MsgUpdatePeerInfoResponse {
+    const message = createBaseMsgUpdatePeerInfoResponse();
+    return message;
+  },
+  fromAmino(_: MsgUpdatePeerInfoResponseAmino): MsgUpdatePeerInfoResponse {
+    const message = createBaseMsgUpdatePeerInfoResponse();
+    return message;
+  },
+  toAmino(_: MsgUpdatePeerInfoResponse): MsgUpdatePeerInfoResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgUpdatePeerInfoResponseAminoMsg): MsgUpdatePeerInfoResponse {
+    return MsgUpdatePeerInfoResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgUpdatePeerInfoResponseProtoMsg): MsgUpdatePeerInfoResponse {
+    return MsgUpdatePeerInfoResponse.decode(message.value);
+  },
+  toProto(message: MsgUpdatePeerInfoResponse): Uint8Array {
+    return MsgUpdatePeerInfoResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUpdatePeerInfoResponse): MsgUpdatePeerInfoResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.MsgUpdatePeerInfoResponse",
+      value: MsgUpdatePeerInfoResponse.encode(message).finish()
     };
   }
 };

@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgRegisterPeer, MsgRegisterPeerResponse, MsgRemovePeer, MsgRemovePeerResponse, MsgSuspendPeer, MsgSuspendPeerResponse, MsgResumePeer, MsgResumePeerResponse, MsgUpdatePeerPolicy, MsgUpdatePeerPolicyResponse, MsgRegisterBridge, MsgRegisterBridgeResponse, MsgUpdateBridge, MsgUpdateBridgeResponse, MsgSubmitFederatedContent, MsgSubmitFederatedContentResponse, MsgFederateContent, MsgFederateContentResponse, MsgAttestOutbound, MsgAttestOutboundResponse, MsgModerateContent, MsgModerateContentResponse, MsgLinkIdentity, MsgLinkIdentityResponse, MsgUnlinkIdentity, MsgUnlinkIdentityResponse, MsgConfirmIdentityLink, MsgConfirmIdentityLinkResponse, MsgAttestIdentityLink, MsgAttestIdentityLinkResponse, MsgRequestReputationAttestation, MsgRequestReputationAttestationResponse, MsgVerifyContent, MsgVerifyContentResponse, MsgChallengeVerification, MsgChallengeVerificationResponse, MsgSubmitArbiterHash, MsgSubmitArbiterHashResponse, MsgEscalateChallenge, MsgEscalateChallengeResponse, MsgResolveEscalatedChallenge, MsgResolveEscalatedChallengeResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgUpdatePeerController, MsgUpdatePeerControllerResponse, MsgResyncBridgeCount, MsgResyncBridgeCountResponse, MsgPruneOrphanBindings, MsgPruneOrphanBindingsResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgRegisterPeer, MsgRegisterPeerResponse, MsgRemovePeer, MsgRemovePeerResponse, MsgSuspendPeer, MsgSuspendPeerResponse, MsgResumePeer, MsgResumePeerResponse, MsgUpdatePeerPolicy, MsgUpdatePeerPolicyResponse, MsgUpdatePeerInfo, MsgUpdatePeerInfoResponse, MsgRegisterBridge, MsgRegisterBridgeResponse, MsgUpdateBridge, MsgUpdateBridgeResponse, MsgSubmitFederatedContent, MsgSubmitFederatedContentResponse, MsgFederateContent, MsgFederateContentResponse, MsgAttestOutbound, MsgAttestOutboundResponse, MsgModerateContent, MsgModerateContentResponse, MsgLinkIdentity, MsgLinkIdentityResponse, MsgUnlinkIdentity, MsgUnlinkIdentityResponse, MsgConfirmIdentityLink, MsgConfirmIdentityLinkResponse, MsgAttestIdentityLink, MsgAttestIdentityLinkResponse, MsgRequestReputationAttestation, MsgRequestReputationAttestationResponse, MsgVerifyContent, MsgVerifyContentResponse, MsgChallengeVerification, MsgChallengeVerificationResponse, MsgSubmitArbiterHash, MsgSubmitArbiterHashResponse, MsgEscalateChallenge, MsgEscalateChallengeResponse, MsgResolveEscalatedChallenge, MsgResolveEscalatedChallengeResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgUpdatePeerController, MsgUpdatePeerControllerResponse, MsgResyncBridgeCount, MsgResyncBridgeCountResponse, MsgPruneOrphanBindings, MsgPruneOrphanBindingsResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   updateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
@@ -10,6 +10,7 @@ export interface Msg {
   suspendPeer(request: MsgSuspendPeer): Promise<MsgSuspendPeerResponse>;
   resumePeer(request: MsgResumePeer): Promise<MsgResumePeerResponse>;
   updatePeerPolicy(request: MsgUpdatePeerPolicy): Promise<MsgUpdatePeerPolicyResponse>;
+  updatePeerInfo(request: MsgUpdatePeerInfo): Promise<MsgUpdatePeerInfoResponse>;
   registerBridge(request: MsgRegisterBridge): Promise<MsgRegisterBridgeResponse>;
   updateBridge(request: MsgUpdateBridge): Promise<MsgUpdateBridgeResponse>;
   /**
@@ -89,6 +90,12 @@ export class MsgClientImpl implements Msg {
     const data = MsgUpdatePeerPolicy.encode(request).finish();
     const promise = this.rpc.request("sparkdream.federation.v1.Msg", "UpdatePeerPolicy", data);
     return promise.then(data => MsgUpdatePeerPolicyResponse.decode(new BinaryReader(data)));
+  };
+  /* UpdatePeerInfo */
+  updatePeerInfo = async (request: MsgUpdatePeerInfo): Promise<MsgUpdatePeerInfoResponse> => {
+    const data = MsgUpdatePeerInfo.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.federation.v1.Msg", "UpdatePeerInfo", data);
+    return promise.then(data => MsgUpdatePeerInfoResponse.decode(new BinaryReader(data)));
   };
   /* RegisterBridge */
   registerBridge = async (request: MsgRegisterBridge): Promise<MsgRegisterBridgeResponse> => {
