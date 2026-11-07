@@ -89,6 +89,45 @@ export interface JuryReview {
    * not answer.
    */
   redrawCount: number;
+  /**
+   * Addresses never drawn onto this review: the parties recorded when the
+   * case opened (appellant, action target, hiding sentinel, migration
+   * parties, an external case's accused and accuser) and every juror who
+   * declined or was vacated for silence. SelectJury reads it together with
+   * the parties it derives from the case itself (challenger, initiative
+   * affiliates, content author, expert witnesses), so no redraw can seat a
+   * party or bring back a released juror.
+   */
+  excludedJurors: string[];
+  /**
+   * Seats waiting for the EndBlocker draw. Jurors are never drawn inside the
+   * transaction that opens or refills a review: the transaction's sender is
+   * an interested party who could otherwise retry until the draw suits them.
+   * DrawPendingJuries seats them in the EndBlocker from the x/shield
+   * randomness beacon (PendingJuryDraw.seed_epoch), or from the block hash
+   * when no beacon is available.
+   */
+  pendingSeats: number;
+  /**
+   * The EXPERT_TESTIMONY interim each invitation opened, parallel to
+   * expert_witnesses (expert_interim_ids[i] pays expert_witnesses[i]). The
+   * payout settles exactly this id when the review reaches its verdict, never
+   * whichever matching interim a walk finds first (REP-E-101).
+   */
+  expertInterimIds: bigint[];
+  /**
+   * The seat address of the juror who issued each invitation, parallel to
+   * expert_witnesses. Recorded so that the inviter can never be the one who
+   * endorses it.
+   */
+  expertInviters: string[];
+  /**
+   * The seat address of the juror who endorsed each invitation, parallel to
+   * expert_witnesses; "" while the invitation is still unendorsed. Only an
+   * endorsed expert may testify, and only an endorsed invitation is paid at
+   * the verdict (REP-E-103: an invitation needs two jurors, never one).
+   */
+  expertEndorsers: string[];
 }
 export interface JuryReviewProtoMsg {
   typeUrl: "/sparkdream.rep.v1.JuryReview";
@@ -138,6 +177,45 @@ export interface JuryReviewAmino {
    * not answer.
    */
   redraw_count?: number;
+  /**
+   * Addresses never drawn onto this review: the parties recorded when the
+   * case opened (appellant, action target, hiding sentinel, migration
+   * parties, an external case's accused and accuser) and every juror who
+   * declined or was vacated for silence. SelectJury reads it together with
+   * the parties it derives from the case itself (challenger, initiative
+   * affiliates, content author, expert witnesses), so no redraw can seat a
+   * party or bring back a released juror.
+   */
+  excluded_jurors?: string[];
+  /**
+   * Seats waiting for the EndBlocker draw. Jurors are never drawn inside the
+   * transaction that opens or refills a review: the transaction's sender is
+   * an interested party who could otherwise retry until the draw suits them.
+   * DrawPendingJuries seats them in the EndBlocker from the x/shield
+   * randomness beacon (PendingJuryDraw.seed_epoch), or from the block hash
+   * when no beacon is available.
+   */
+  pending_seats?: number;
+  /**
+   * The EXPERT_TESTIMONY interim each invitation opened, parallel to
+   * expert_witnesses (expert_interim_ids[i] pays expert_witnesses[i]). The
+   * payout settles exactly this id when the review reaches its verdict, never
+   * whichever matching interim a walk finds first (REP-E-101).
+   */
+  expert_interim_ids?: string[];
+  /**
+   * The seat address of the juror who issued each invitation, parallel to
+   * expert_witnesses. Recorded so that the inviter can never be the one who
+   * endorses it.
+   */
+  expert_inviters?: string[];
+  /**
+   * The seat address of the juror who endorsed each invitation, parallel to
+   * expert_witnesses; "" while the invitation is still unendorsed. Only an
+   * endorsed expert may testify, and only an endorsed invitation is paid at
+   * the verdict (REP-E-103: an invitation needs two jurors, never one).
+   */
+  expert_endorsers?: string[];
 }
 export interface JuryReviewAminoMsg {
   type: "/sparkdream.rep.v1.JuryReview";
@@ -237,6 +315,62 @@ export interface CriteriaVoteAminoMsg {
   type: "/sparkdream.rep.v1.CriteriaVote";
   value: CriteriaVoteAmino;
 }
+/**
+ * PendingJuryDraw is one queued jury draw: which x/shield beacon epoch seeds
+ * it and when it was queued (REP-R-102).
+ * @name PendingJuryDraw
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.PendingJuryDraw
+ */
+export interface PendingJuryDraw {
+  juryReviewId: bigint;
+  /**
+   * Shield epoch whose beacon key seeds the draw: the epoch after the one
+   * current when the seats were queued, so nobody (the sender, the block
+   * proposer, any validator short of the TLE threshold) knows the seed when
+   * the review opens. 0 means no beacon was available when the seats were
+   * queued: the draw is seeded from the block hash in the next EndBlocker.
+   */
+  seedEpoch: bigint;
+  /**
+   * Height at which the seats were queued. Once the beacon has stayed
+   * pending for JuryBeaconWaitBlocks past it, the draw falls back to the
+   * block hash (event jury_seed_fallback).
+   */
+  queuedAtHeight: bigint;
+}
+export interface PendingJuryDrawProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.PendingJuryDraw";
+  value: Uint8Array;
+}
+/**
+ * PendingJuryDraw is one queued jury draw: which x/shield beacon epoch seeds
+ * it and when it was queued (REP-R-102).
+ * @name PendingJuryDrawAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.PendingJuryDraw
+ */
+export interface PendingJuryDrawAmino {
+  jury_review_id?: string;
+  /**
+   * Shield epoch whose beacon key seeds the draw: the epoch after the one
+   * current when the seats were queued, so nobody (the sender, the block
+   * proposer, any validator short of the TLE threshold) knows the seed when
+   * the review opens. 0 means no beacon was available when the seats were
+   * queued: the draw is seeded from the block hash in the next EndBlocker.
+   */
+  seed_epoch?: string;
+  /**
+   * Height at which the seats were queued. Once the beacon has stayed
+   * pending for JuryBeaconWaitBlocks past it, the draw falls back to the
+   * block hash (event jury_seed_fallback).
+   */
+  queued_at_height?: string;
+}
+export interface PendingJuryDrawAminoMsg {
+  type: "/sparkdream.rep.v1.PendingJuryDraw";
+  value: PendingJuryDrawAmino;
+}
 function createBaseJuryReview(): JuryReview {
   return {
     id: BigInt(0),
@@ -256,7 +390,12 @@ function createBaseJuryReview(): JuryReview {
     contentChallengeId: BigInt(0),
     acceptanceDeadline: BigInt(0),
     accepted: [],
-    redrawCount: 0
+    redrawCount: 0,
+    excludedJurors: [],
+    pendingSeats: 0,
+    expertInterimIds: [],
+    expertInviters: [],
+    expertEndorsers: []
   };
 }
 /**
@@ -322,6 +461,23 @@ export const JuryReview = {
     if (message.redrawCount !== 0) {
       writer.uint32(144).uint32(message.redrawCount);
     }
+    for (const v of message.excludedJurors) {
+      writer.uint32(154).string(v!);
+    }
+    if (message.pendingSeats !== 0) {
+      writer.uint32(160).uint32(message.pendingSeats);
+    }
+    writer.uint32(170).fork();
+    for (const v of message.expertInterimIds) {
+      writer.uint64(v);
+    }
+    writer.ldelim();
+    for (const v of message.expertInviters) {
+      writer.uint32(178).string(v!);
+    }
+    for (const v of message.expertEndorsers) {
+      writer.uint32(186).string(v!);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): JuryReview {
@@ -385,6 +541,28 @@ export const JuryReview = {
         case 18:
           message.redrawCount = reader.uint32();
           break;
+        case 19:
+          message.excludedJurors.push(reader.string());
+          break;
+        case 20:
+          message.pendingSeats = reader.uint32();
+          break;
+        case 21:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.expertInterimIds.push(reader.uint64());
+            }
+          } else {
+            message.expertInterimIds.push(reader.uint64());
+          }
+          break;
+        case 22:
+          message.expertInviters.push(reader.string());
+          break;
+        case 23:
+          message.expertEndorsers.push(reader.string());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -412,6 +590,11 @@ export const JuryReview = {
     message.acceptanceDeadline = object.acceptanceDeadline !== undefined && object.acceptanceDeadline !== null ? BigInt(object.acceptanceDeadline.toString()) : BigInt(0);
     message.accepted = object.accepted?.map(e => e) || [];
     message.redrawCount = object.redrawCount ?? 0;
+    message.excludedJurors = object.excludedJurors?.map(e => e) || [];
+    message.pendingSeats = object.pendingSeats ?? 0;
+    message.expertInterimIds = object.expertInterimIds?.map(e => BigInt(e.toString())) || [];
+    message.expertInviters = object.expertInviters?.map(e => e) || [];
+    message.expertEndorsers = object.expertEndorsers?.map(e => e) || [];
     return message;
   },
   fromAmino(object: JuryReviewAmino): JuryReview {
@@ -460,6 +643,13 @@ export const JuryReview = {
     if (object.redraw_count !== undefined && object.redraw_count !== null) {
       message.redrawCount = object.redraw_count;
     }
+    message.excludedJurors = object.excluded_jurors?.map(e => e) || [];
+    if (object.pending_seats !== undefined && object.pending_seats !== null) {
+      message.pendingSeats = object.pending_seats;
+    }
+    message.expertInterimIds = object.expert_interim_ids?.map(e => BigInt(e)) || [];
+    message.expertInviters = object.expert_inviters?.map(e => e) || [];
+    message.expertEndorsers = object.expert_endorsers?.map(e => e) || [];
     return message;
   },
   toAmino(message: JuryReview): JuryReviewAmino {
@@ -502,6 +692,27 @@ export const JuryReview = {
       obj.accepted = message.accepted;
     }
     obj.redraw_count = message.redrawCount === 0 ? undefined : message.redrawCount;
+    if (message.excludedJurors) {
+      obj.excluded_jurors = message.excludedJurors.map(e => e);
+    } else {
+      obj.excluded_jurors = message.excludedJurors;
+    }
+    obj.pending_seats = message.pendingSeats === 0 ? undefined : message.pendingSeats;
+    if (message.expertInterimIds) {
+      obj.expert_interim_ids = message.expertInterimIds.map(e => e.toString());
+    } else {
+      obj.expert_interim_ids = message.expertInterimIds;
+    }
+    if (message.expertInviters) {
+      obj.expert_inviters = message.expertInviters.map(e => e);
+    } else {
+      obj.expert_inviters = message.expertInviters;
+    }
+    if (message.expertEndorsers) {
+      obj.expert_endorsers = message.expertEndorsers.map(e => e);
+    } else {
+      obj.expert_endorsers = message.expertEndorsers;
+    }
     return obj;
   },
   fromAminoMsg(object: JuryReviewAminoMsg): JuryReview {
@@ -855,6 +1066,100 @@ export const CriteriaVote = {
     return {
       typeUrl: "/sparkdream.rep.v1.CriteriaVote",
       value: CriteriaVote.encode(message).finish()
+    };
+  }
+};
+function createBasePendingJuryDraw(): PendingJuryDraw {
+  return {
+    juryReviewId: BigInt(0),
+    seedEpoch: BigInt(0),
+    queuedAtHeight: BigInt(0)
+  };
+}
+/**
+ * PendingJuryDraw is one queued jury draw: which x/shield beacon epoch seeds
+ * it and when it was queued (REP-R-102).
+ * @name PendingJuryDraw
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.PendingJuryDraw
+ */
+export const PendingJuryDraw = {
+  typeUrl: "/sparkdream.rep.v1.PendingJuryDraw",
+  encode(message: PendingJuryDraw, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.juryReviewId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.juryReviewId);
+    }
+    if (message.seedEpoch !== BigInt(0)) {
+      writer.uint32(16).uint64(message.seedEpoch);
+    }
+    if (message.queuedAtHeight !== BigInt(0)) {
+      writer.uint32(24).int64(message.queuedAtHeight);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): PendingJuryDraw {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePendingJuryDraw();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.juryReviewId = reader.uint64();
+          break;
+        case 2:
+          message.seedEpoch = reader.uint64();
+          break;
+        case 3:
+          message.queuedAtHeight = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<PendingJuryDraw>): PendingJuryDraw {
+    const message = createBasePendingJuryDraw();
+    message.juryReviewId = object.juryReviewId !== undefined && object.juryReviewId !== null ? BigInt(object.juryReviewId.toString()) : BigInt(0);
+    message.seedEpoch = object.seedEpoch !== undefined && object.seedEpoch !== null ? BigInt(object.seedEpoch.toString()) : BigInt(0);
+    message.queuedAtHeight = object.queuedAtHeight !== undefined && object.queuedAtHeight !== null ? BigInt(object.queuedAtHeight.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: PendingJuryDrawAmino): PendingJuryDraw {
+    const message = createBasePendingJuryDraw();
+    if (object.jury_review_id !== undefined && object.jury_review_id !== null) {
+      message.juryReviewId = BigInt(object.jury_review_id);
+    }
+    if (object.seed_epoch !== undefined && object.seed_epoch !== null) {
+      message.seedEpoch = BigInt(object.seed_epoch);
+    }
+    if (object.queued_at_height !== undefined && object.queued_at_height !== null) {
+      message.queuedAtHeight = BigInt(object.queued_at_height);
+    }
+    return message;
+  },
+  toAmino(message: PendingJuryDraw): PendingJuryDrawAmino {
+    const obj: any = {};
+    obj.jury_review_id = message.juryReviewId !== BigInt(0) ? message.juryReviewId?.toString() : undefined;
+    obj.seed_epoch = message.seedEpoch !== BigInt(0) ? message.seedEpoch?.toString() : undefined;
+    obj.queued_at_height = message.queuedAtHeight !== BigInt(0) ? message.queuedAtHeight?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: PendingJuryDrawAminoMsg): PendingJuryDraw {
+    return PendingJuryDraw.fromAmino(object.value);
+  },
+  fromProtoMsg(message: PendingJuryDrawProtoMsg): PendingJuryDraw {
+    return PendingJuryDraw.decode(message.value);
+  },
+  toProto(message: PendingJuryDraw): Uint8Array {
+    return PendingJuryDraw.encode(message).finish();
+  },
+  toProtoMsg(message: PendingJuryDraw): PendingJuryDrawProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.PendingJuryDraw",
+      value: PendingJuryDraw.encode(message).finish()
     };
   }
 };

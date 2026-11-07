@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryShieldedOpRequest, QueryShieldedOpResponse, QueryShieldedOpsRequest, QueryShieldedOpsResponse, QueryModuleBalanceRequest, QueryModuleBalanceResponse, QueryNullifierUsedRequest, QueryNullifierUsedResponse, QueryDayFundingRequest, QueryDayFundingResponse, QueryShieldEpochRequest, QueryShieldEpochResponse, QueryPendingOpsRequest, QueryPendingOpsResponse, QueryPendingOpCountRequest, QueryPendingOpCountResponse, QueryTLEMasterPublicKeyRequest, QueryTLEMasterPublicKeyResponse, QueryTLEKeySetRequest, QueryTLEKeySetResponse, QueryVerificationKeyRequest, QueryVerificationKeyResponse, QueryTLEMissCountRequest, QueryTLEMissCountResponse, QueryDecryptionSharesRequest, QueryDecryptionSharesResponse, QueryIdentityRateLimitRequest, QueryIdentityRateLimitResponse, QueryDKGStateRequest, QueryDKGStateResponse, QueryDKGContributionsRequest, QueryDKGContributionsResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryShieldedOpRequest, QueryShieldedOpResponse, QueryShieldedOpsRequest, QueryShieldedOpsResponse, QueryModuleBalanceRequest, QueryModuleBalanceResponse, QueryNullifierUsedRequest, QueryNullifierUsedResponse, QueryDayFundingRequest, QueryDayFundingResponse, QueryShieldEpochRequest, QueryShieldEpochResponse, QueryPendingOpsRequest, QueryPendingOpsResponse, QueryPendingOpCountRequest, QueryPendingOpCountResponse, QueryTLEMasterPublicKeyRequest, QueryTLEMasterPublicKeyResponse, QueryTLEKeySetRequest, QueryTLEKeySetResponse, QueryVerificationKeyRequest, QueryVerificationKeyResponse, QueryTLEMissCountRequest, QueryTLEMissCountResponse, QueryDecryptionSharesRequest, QueryDecryptionSharesResponse, QueryIdentityRateLimitRequest, QueryIdentityRateLimitResponse, QueryBeaconRequest, QueryBeaconResponse, QueryDKGStateRequest, QueryDKGStateResponse, QueryDKGContributionsRequest, QueryDKGContributionsResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Params returns module parameters. */
@@ -35,6 +35,12 @@ export interface Query {
   decryptionShares(request: QueryDecryptionSharesRequest): Promise<QueryDecryptionSharesResponse>;
   /** IdentityRateLimit returns the remaining rate limit for a given rate-limit nullifier. */
   identityRateLimit(request: QueryIdentityRateLimitRequest): Promise<QueryIdentityRateLimitResponse>;
+  /**
+   * Beacon returns the randomness beacon value for a shield epoch: the
+   * reconstructed TLE epoch key and whether it is available, still pending
+   * or will never be (see docs/x-shield-spec.md "Randomness beacon").
+   */
+  beacon(request: QueryBeaconRequest): Promise<QueryBeaconResponse>;
   /** DKGState returns the current DKG ceremony state. */
   dKGState(request?: QueryDKGStateRequest): Promise<QueryDKGStateResponse>;
   /** DKGContributions returns all DKG contributions for the current round. */
@@ -137,6 +143,14 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.shield.v1.Query", "IdentityRateLimit", data);
     return promise.then(data => QueryIdentityRateLimitResponse.decode(new BinaryReader(data)));
   };
+  /* Beacon returns the randomness beacon value for a shield epoch: the
+   reconstructed TLE epoch key and whether it is available, still pending
+   or will never be (see docs/x-shield-spec.md "Randomness beacon"). */
+  beacon = async (request: QueryBeaconRequest): Promise<QueryBeaconResponse> => {
+    const data = QueryBeaconRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.shield.v1.Query", "Beacon", data);
+    return promise.then(data => QueryBeaconResponse.decode(new BinaryReader(data)));
+  };
   /* DKGState returns the current DKG ceremony state. */
   dKGState = async (request: QueryDKGStateRequest = {}): Promise<QueryDKGStateResponse> => {
     const data = QueryDKGStateRequest.encode(request).finish();
@@ -198,6 +212,9 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     identityRateLimit(request: QueryIdentityRateLimitRequest): Promise<QueryIdentityRateLimitResponse> {
       return queryService.identityRateLimit(request);
+    },
+    beacon(request: QueryBeaconRequest): Promise<QueryBeaconResponse> {
+      return queryService.beacon(request);
     },
     dKGState(request?: QueryDKGStateRequest): Promise<QueryDKGStateResponse> {
       return queryService.dKGState(request);

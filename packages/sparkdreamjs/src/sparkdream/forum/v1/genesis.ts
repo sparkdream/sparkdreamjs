@@ -85,6 +85,13 @@ export interface GenesisState {
    * without it an import would leave that content to the lazy TTL-time path.
    */
   promotionQueue: PromotionQueueEntry[];
+  /**
+   * Tags x/rep removed from its registry whose references forum is still
+   * stripping from posts, each with the next post id to scan. Not derivable
+   * (the registry no longer knows the tag), so an import without it would
+   * leave the tag on every post not yet scanned.
+   */
+  tagPruneQueue: TagPruneEntry[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.forum.v1.GenesisState";
@@ -159,10 +166,47 @@ export interface GenesisStateAmino {
    * without it an import would leave that content to the lazy TTL-time path.
    */
   promotion_queue?: PromotionQueueEntryAmino[];
+  /**
+   * Tags x/rep removed from its registry whose references forum is still
+   * stripping from posts, each with the next post id to scan. Not derivable
+   * (the registry no longer knows the tag), so an import without it would
+   * leave the tag on every post not yet scanned.
+   */
+  tag_prune_queue?: TagPruneEntryAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.forum.v1.GenesisState";
   value: GenesisStateAmino;
+}
+/**
+ * TagPruneEntry is one in-flight tag prune: the removed tag and the next
+ * post id to scan.
+ * @name TagPruneEntry
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.TagPruneEntry
+ */
+export interface TagPruneEntry {
+  tag: string;
+  nextPostId: bigint;
+}
+export interface TagPruneEntryProtoMsg {
+  typeUrl: "/sparkdream.forum.v1.TagPruneEntry";
+  value: Uint8Array;
+}
+/**
+ * TagPruneEntry is one in-flight tag prune: the removed tag and the next
+ * post id to scan.
+ * @name TagPruneEntryAmino
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.TagPruneEntry
+ */
+export interface TagPruneEntryAmino {
+  tag?: string;
+  next_post_id?: string;
+}
+export interface TagPruneEntryAminoMsg {
+  type: "/sparkdream.forum.v1.TagPruneEntry";
+  value: TagPruneEntryAmino;
 }
 /**
  * PendingStakeSlash is a post whose conviction stakes are still to be
@@ -340,7 +384,8 @@ function createBaseGenesisState(): GenesisState {
     postVoteList: [],
     forumRepEpochCounterList: [],
     pendingStakeSlashList: [],
-    promotionQueue: []
+    promotionQueue: [],
+    tagPruneQueue: []
   };
 }
 /**
@@ -421,6 +466,9 @@ export const GenesisState = {
     for (const v of message.promotionQueue) {
       PromotionQueueEntry.encode(v!, writer.uint32(186).fork()).ldelim();
     }
+    for (const v of message.tagPruneQueue) {
+      TagPruneEntry.encode(v!, writer.uint32(194).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -499,6 +547,9 @@ export const GenesisState = {
         case 23:
           message.promotionQueue.push(PromotionQueueEntry.decode(reader, reader.uint32()));
           break;
+        case 24:
+          message.tagPruneQueue.push(TagPruneEntry.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -531,6 +582,7 @@ export const GenesisState = {
     message.forumRepEpochCounterList = object.forumRepEpochCounterList?.map(e => ForumRepEpochCounterEntry.fromPartial(e)) || [];
     message.pendingStakeSlashList = object.pendingStakeSlashList?.map(e => PendingStakeSlash.fromPartial(e)) || [];
     message.promotionQueue = object.promotionQueue?.map(e => PromotionQueueEntry.fromPartial(e)) || [];
+    message.tagPruneQueue = object.tagPruneQueue?.map(e => TagPruneEntry.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -566,6 +618,7 @@ export const GenesisState = {
     message.forumRepEpochCounterList = object.forum_rep_epoch_counter_list?.map(e => ForumRepEpochCounterEntry.fromAmino(e)) || [];
     message.pendingStakeSlashList = object.pending_stake_slash_list?.map(e => PendingStakeSlash.fromAmino(e)) || [];
     message.promotionQueue = object.promotion_queue?.map(e => PromotionQueueEntry.fromAmino(e)) || [];
+    message.tagPruneQueue = object.tag_prune_queue?.map(e => TagPruneEntry.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -669,6 +722,11 @@ export const GenesisState = {
     } else {
       obj.promotion_queue = message.promotionQueue;
     }
+    if (message.tagPruneQueue) {
+      obj.tag_prune_queue = message.tagPruneQueue.map(e => e ? TagPruneEntry.toAmino(e) : undefined);
+    } else {
+      obj.tag_prune_queue = message.tagPruneQueue;
+    }
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {
@@ -684,6 +742,88 @@ export const GenesisState = {
     return {
       typeUrl: "/sparkdream.forum.v1.GenesisState",
       value: GenesisState.encode(message).finish()
+    };
+  }
+};
+function createBaseTagPruneEntry(): TagPruneEntry {
+  return {
+    tag: "",
+    nextPostId: BigInt(0)
+  };
+}
+/**
+ * TagPruneEntry is one in-flight tag prune: the removed tag and the next
+ * post id to scan.
+ * @name TagPruneEntry
+ * @package sparkdream.forum.v1
+ * @see proto type: sparkdream.forum.v1.TagPruneEntry
+ */
+export const TagPruneEntry = {
+  typeUrl: "/sparkdream.forum.v1.TagPruneEntry",
+  encode(message: TagPruneEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.tag !== "") {
+      writer.uint32(10).string(message.tag);
+    }
+    if (message.nextPostId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.nextPostId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): TagPruneEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTagPruneEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tag = reader.string();
+          break;
+        case 2:
+          message.nextPostId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<TagPruneEntry>): TagPruneEntry {
+    const message = createBaseTagPruneEntry();
+    message.tag = object.tag ?? "";
+    message.nextPostId = object.nextPostId !== undefined && object.nextPostId !== null ? BigInt(object.nextPostId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: TagPruneEntryAmino): TagPruneEntry {
+    const message = createBaseTagPruneEntry();
+    if (object.tag !== undefined && object.tag !== null) {
+      message.tag = object.tag;
+    }
+    if (object.next_post_id !== undefined && object.next_post_id !== null) {
+      message.nextPostId = BigInt(object.next_post_id);
+    }
+    return message;
+  },
+  toAmino(message: TagPruneEntry): TagPruneEntryAmino {
+    const obj: any = {};
+    obj.tag = message.tag === "" ? undefined : message.tag;
+    obj.next_post_id = message.nextPostId !== BigInt(0) ? message.nextPostId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: TagPruneEntryAminoMsg): TagPruneEntry {
+    return TagPruneEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: TagPruneEntryProtoMsg): TagPruneEntry {
+    return TagPruneEntry.decode(message.value);
+  },
+  toProto(message: TagPruneEntry): Uint8Array {
+    return TagPruneEntry.encode(message).finish();
+  },
+  toProtoMsg(message: TagPruneEntry): TagPruneEntryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.forum.v1.TagPruneEntry",
+      value: TagPruneEntry.encode(message).finish()
     };
   }
 };

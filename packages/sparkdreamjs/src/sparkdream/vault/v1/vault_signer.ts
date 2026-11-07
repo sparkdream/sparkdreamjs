@@ -21,6 +21,15 @@ export interface VaultSigner {
    * propose, approve or execute, and count toward MaxVaultsPerSigner.
    */
   accepted: boolean;
+  /**
+   * Set by the chain, ignored on input. Unix seconds after which an
+   * unaccepted entry is removed by the EndBlocker (block time of the listing
+   * + InviteTTL); 0 on an accepted entry, or on an unaccepted entry that is
+   * the vault's only one (it never expires: removing it would leave no
+   * signer). Removing an invitee whose weight the threshold still needed
+   * clamps the threshold to the remaining reachable weight (§3.4).
+   */
+  inviteExpiresAt: bigint;
 }
 export interface VaultSignerProtoMsg {
   typeUrl: "/sparkdream.vault.v1.VaultSigner";
@@ -46,6 +55,15 @@ export interface VaultSignerAmino {
    * propose, approve or execute, and count toward MaxVaultsPerSigner.
    */
   accepted?: boolean;
+  /**
+   * Set by the chain, ignored on input. Unix seconds after which an
+   * unaccepted entry is removed by the EndBlocker (block time of the listing
+   * + InviteTTL); 0 on an accepted entry, or on an unaccepted entry that is
+   * the vault's only one (it never expires: removing it would leave no
+   * signer). Removing an invitee whose weight the threshold still needed
+   * clamps the threshold to the remaining reachable weight (§3.4).
+   */
+  invite_expires_at?: string;
 }
 export interface VaultSignerAminoMsg {
   type: "/sparkdream.vault.v1.VaultSigner";
@@ -55,7 +73,8 @@ function createBaseVaultSigner(): VaultSigner {
   return {
     address: "",
     weight: BigInt(0),
-    accepted: false
+    accepted: false,
+    inviteExpiresAt: BigInt(0)
   };
 }
 /**
@@ -79,6 +98,9 @@ export const VaultSigner = {
     if (message.accepted === true) {
       writer.uint32(24).bool(message.accepted);
     }
+    if (message.inviteExpiresAt !== BigInt(0)) {
+      writer.uint32(32).int64(message.inviteExpiresAt);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): VaultSigner {
@@ -97,6 +119,9 @@ export const VaultSigner = {
         case 3:
           message.accepted = reader.bool();
           break;
+        case 4:
+          message.inviteExpiresAt = reader.int64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -109,6 +134,7 @@ export const VaultSigner = {
     message.address = object.address ?? "";
     message.weight = object.weight !== undefined && object.weight !== null ? BigInt(object.weight.toString()) : BigInt(0);
     message.accepted = object.accepted ?? false;
+    message.inviteExpiresAt = object.inviteExpiresAt !== undefined && object.inviteExpiresAt !== null ? BigInt(object.inviteExpiresAt.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: VaultSignerAmino): VaultSigner {
@@ -122,6 +148,9 @@ export const VaultSigner = {
     if (object.accepted !== undefined && object.accepted !== null) {
       message.accepted = object.accepted;
     }
+    if (object.invite_expires_at !== undefined && object.invite_expires_at !== null) {
+      message.inviteExpiresAt = BigInt(object.invite_expires_at);
+    }
     return message;
   },
   toAmino(message: VaultSigner): VaultSignerAmino {
@@ -129,6 +158,7 @@ export const VaultSigner = {
     obj.address = message.address === "" ? undefined : message.address;
     obj.weight = message.weight !== BigInt(0) ? message.weight?.toString() : undefined;
     obj.accepted = message.accepted === false ? undefined : message.accepted;
+    obj.invite_expires_at = message.inviteExpiresAt !== BigInt(0) ? message.inviteExpiresAt?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: VaultSignerAminoMsg): VaultSigner {

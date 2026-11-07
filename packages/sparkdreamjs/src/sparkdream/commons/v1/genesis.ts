@@ -3,7 +3,7 @@ import { Params, ParamsAmino } from "./params";
 import { PolicyPermissions, PolicyPermissionsAmino } from "./policy_permissions";
 import { Group, GroupAmino, Proposal, ProposalAmino, AnonVoteTally, AnonVoteTallyAmino, Member, MemberAmino, DecisionPolicy, DecisionPolicyAmino, Vote, VoteAmino } from "./group";
 import { Category, CategoryAmino } from "./category";
-import { Poll, PollAmino } from "./poll";
+import { Poll, PollAmino, PollOpenCount, PollOpenCountAmino } from "./poll";
 import { PollVote, PollVoteAmino } from "./poll_vote";
 import { VoterTree, VoterTreeAmino } from "./voter_tree";
 import { BinaryReader, BinaryWriter } from "../../../binary";
@@ -118,6 +118,11 @@ export interface GenesisState {
    * poll_voter_trees are the voter snapshots of open secret-ballot polls.
    */
   pollVoterTrees: PollVoterTreeEntry[];
+  /**
+   * poll_open_counts are the per-creator poll-opening buckets, so a round
+   * trip does not grant a second daily allowance.
+   */
+  pollOpenCounts: PollOpenCount[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.commons.v1.GenesisState";
@@ -233,6 +238,11 @@ export interface GenesisStateAmino {
    * poll_voter_trees are the voter snapshots of open secret-ballot polls.
    */
   poll_voter_trees?: PollVoterTreeEntryAmino[];
+  /**
+   * poll_open_counts are the per-creator poll-opening buckets, so a round
+   * trip does not grant a second daily allowance.
+   */
+  poll_open_counts?: PollOpenCountAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.commons.v1.GenesisState";
@@ -653,7 +663,8 @@ function createBaseGenesisState(): GenesisState {
     pollVotes: [],
     nextPollId: BigInt(0),
     proposalVoterTrees: [],
-    pollVoterTrees: []
+    pollVoterTrees: [],
+    pollOpenCounts: []
   };
 }
 /**
@@ -737,6 +748,9 @@ export const GenesisState = {
     for (const v of message.pollVoterTrees) {
       PollVoterTreeEntry.encode(v!, writer.uint32(194).fork()).ldelim();
     }
+    for (const v of message.pollOpenCounts) {
+      PollOpenCount.encode(v!, writer.uint32(202).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -818,6 +832,9 @@ export const GenesisState = {
         case 24:
           message.pollVoterTrees.push(PollVoterTreeEntry.decode(reader, reader.uint32()));
           break;
+        case 25:
+          message.pollOpenCounts.push(PollOpenCount.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -851,6 +868,7 @@ export const GenesisState = {
     message.nextPollId = object.nextPollId !== undefined && object.nextPollId !== null ? BigInt(object.nextPollId.toString()) : BigInt(0);
     message.proposalVoterTrees = object.proposalVoterTrees?.map(e => ProposalVoterTreeEntry.fromPartial(e)) || [];
     message.pollVoterTrees = object.pollVoterTrees?.map(e => PollVoterTreeEntry.fromPartial(e)) || [];
+    message.pollOpenCounts = object.pollOpenCounts?.map(e => PollOpenCount.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -889,6 +907,7 @@ export const GenesisState = {
     }
     message.proposalVoterTrees = object.proposal_voter_trees?.map(e => ProposalVoterTreeEntry.fromAmino(e)) || [];
     message.pollVoterTrees = object.poll_voter_trees?.map(e => PollVoterTreeEntry.fromAmino(e)) || [];
+    message.pollOpenCounts = object.poll_open_counts?.map(e => PollOpenCount.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -992,6 +1011,11 @@ export const GenesisState = {
       obj.poll_voter_trees = message.pollVoterTrees.map(e => e ? PollVoterTreeEntry.toAmino(e) : undefined);
     } else {
       obj.poll_voter_trees = message.pollVoterTrees;
+    }
+    if (message.pollOpenCounts) {
+      obj.poll_open_counts = message.pollOpenCounts.map(e => e ? PollOpenCount.toAmino(e) : undefined);
+    } else {
+      obj.poll_open_counts = message.pollOpenCounts;
     }
     return obj;
   },

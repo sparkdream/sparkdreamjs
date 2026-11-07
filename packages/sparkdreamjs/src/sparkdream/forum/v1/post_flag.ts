@@ -182,16 +182,16 @@ export const PostFlag = {
       writer.uint32(40).bool(message.inReviewQueue);
     }
     for (const v of message.flaggers) {
-      writer.uint32(82).string(v!);
+      writer.uint32(50).string(v!);
     }
     for (const v of message.flagRecords) {
-      FlagRecord.encode(v!, writer.uint32(90).fork()).ldelim();
+      FlagRecord.encode(v!, writer.uint32(58).fork()).ldelim();
     }
     Object.entries(message.reasonCounts).forEach(([key, value]) => {
       PostFlag_ReasonCountsEntry.encode({
         key: key as any,
         value
-      }, writer.uint32(96).fork()).ldelim();
+      }, writer.uint32(64).fork()).ldelim();
     });
     return writer;
   },
@@ -217,16 +217,16 @@ export const PostFlag = {
         case 5:
           message.inReviewQueue = reader.bool();
           break;
-        case 10:
+        case 6:
           message.flaggers.push(reader.string());
           break;
-        case 11:
+        case 7:
           message.flagRecords.push(FlagRecord.decode(reader, reader.uint32()));
           break;
-        case 12:
-          const entry12 = PostFlag_ReasonCountsEntry.decode(reader, reader.uint32());
-          if (entry12.value !== undefined) {
-            message.reasonCounts[entry12.key] = entry12.value;
+        case 8:
+          const entry8 = PostFlag_ReasonCountsEntry.decode(reader, reader.uint32());
+          if (entry8.value !== undefined) {
+            message.reasonCounts[entry8.key] = entry8.value;
           }
           break;
         default:

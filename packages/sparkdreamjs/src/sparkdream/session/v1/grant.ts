@@ -71,6 +71,11 @@ export function grantTypeToJSON(object: GrantType): string {
  * GrantStatus is the state-machine label for a grant. Terminal states
  * (REVOKED, DECLINED, COMPLETED, FIRED) are absorbing — once entered, the
  * grant is never re-activated; the granter must create a new grant.
+ * PENDING is the pre-consent state of an access-class grant (SESSION_KEY,
+ * SIGN_IN) from a granter the grantee has not allowed yet: it waits for
+ * the grantee's MsgAcceptGrant (or, for a session key, the grantee's first
+ * MsgExecSession) and becomes ACTIVE, or it is revoked, declined or expires
+ * without ever reaching the grantee's indexes.
  */
 export enum GrantStatus {
   GRANT_STATUS_UNSPECIFIED = 0,
@@ -80,6 +85,7 @@ export enum GrantStatus {
   GRANT_STATUS_REVOKED = 4,
   GRANT_STATUS_COMPLETED = 5,
   GRANT_STATUS_FIRED = 6,
+  GRANT_STATUS_PENDING = 7,
   UNRECOGNIZED = -1,
 }
 export const GrantStatusAmino = GrantStatus;
@@ -106,6 +112,9 @@ export function grantStatusFromJSON(object: any): GrantStatus {
     case 6:
     case "GRANT_STATUS_FIRED":
       return GrantStatus.GRANT_STATUS_FIRED;
+    case 7:
+    case "GRANT_STATUS_PENDING":
+      return GrantStatus.GRANT_STATUS_PENDING;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -128,6 +137,8 @@ export function grantStatusToJSON(object: GrantStatus): string {
       return "GRANT_STATUS_COMPLETED";
     case GrantStatus.GRANT_STATUS_FIRED:
       return "GRANT_STATUS_FIRED";
+    case GrantStatus.GRANT_STATUS_PENDING:
+      return "GRANT_STATUS_PENDING";
     case GrantStatus.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -371,6 +382,13 @@ export interface ScheduledOneshotPayload {
    * Captured failure reason if execution failed at fire time (Exec only).
    */
   fireError: string;
+  /**
+   * Unix seconds of the first underfunded pause, kept across grantee
+   * retries that pause again so paused_oneshot_ttl_seconds counts from it
+   * (a grantee cannot keep a paused oneshot alive by retrying). Cleared
+   * by a granter retry. 0 = never paused.
+   */
+  firstPausedAt: bigint;
 }
 export interface ScheduledOneshotPayloadProtoMsg {
   typeUrl: "/sparkdream.session.v1.ScheduledOneshotPayload";
@@ -392,6 +410,13 @@ export interface ScheduledOneshotPayloadAmino {
    * Captured failure reason if execution failed at fire time (Exec only).
    */
   fire_error?: string;
+  /**
+   * Unix seconds of the first underfunded pause, kept across grantee
+   * retries that pause again so paused_oneshot_ttl_seconds counts from it
+   * (a grantee cannot keep a paused oneshot alive by retrying). Cleared
+   * by a granter retry. 0 = never paused.
+   */
+  first_paused_at?: string;
 }
 export interface ScheduledOneshotPayloadAminoMsg {
   type: "/sparkdream.session.v1.ScheduledOneshotPayload";
@@ -562,22 +587,22 @@ export const Grant = {
       Timestamp.encode(toTimestamp(message.expiresAt), writer.uint32(58).fork()).ldelim();
     }
     if (message.note !== "") {
-      writer.uint32(74).string(message.note);
+      writer.uint32(66).string(message.note);
     }
     if (message.sessionKey !== undefined) {
-      SessionKeyPayload.encode(message.sessionKey, writer.uint32(162).fork()).ldelim();
+      SessionKeyPayload.encode(message.sessionKey, writer.uint32(74).fork()).ldelim();
     }
     if (message.recurringPull !== undefined) {
-      RecurringPullPayload.encode(message.recurringPull, writer.uint32(170).fork()).ldelim();
+      RecurringPullPayload.encode(message.recurringPull, writer.uint32(82).fork()).ldelim();
     }
     if (message.spendingAllowance !== undefined) {
-      SpendingAllowancePayload.encode(message.spendingAllowance, writer.uint32(178).fork()).ldelim();
+      SpendingAllowancePayload.encode(message.spendingAllowance, writer.uint32(90).fork()).ldelim();
     }
     if (message.scheduledOneshot !== undefined) {
-      ScheduledOneshotPayload.encode(message.scheduledOneshot, writer.uint32(186).fork()).ldelim();
+      ScheduledOneshotPayload.encode(message.scheduledOneshot, writer.uint32(98).fork()).ldelim();
     }
     if (message.signIn !== undefined) {
-      SignInPayload.encode(message.signIn, writer.uint32(194).fork()).ldelim();
+      SignInPayload.encode(message.signIn, writer.uint32(106).fork()).ldelim();
     }
     return writer;
   },
@@ -609,22 +634,22 @@ export const Grant = {
         case 7:
           message.expiresAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           break;
-        case 9:
+        case 8:
           message.note = reader.string();
           break;
-        case 20:
+        case 9:
           message.sessionKey = SessionKeyPayload.decode(reader, reader.uint32());
           break;
-        case 21:
+        case 10:
           message.recurringPull = RecurringPullPayload.decode(reader, reader.uint32());
           break;
-        case 22:
+        case 11:
           message.spendingAllowance = SpendingAllowancePayload.decode(reader, reader.uint32());
           break;
-        case 23:
+        case 12:
           message.scheduledOneshot = ScheduledOneshotPayload.decode(reader, reader.uint32());
           break;
-        case 24:
+        case 13:
           message.signIn = SignInPayload.decode(reader, reader.uint32());
           break;
         default:
@@ -1143,7 +1168,8 @@ function createBaseScheduledOneshotPayload(): ScheduledOneshotPayload {
     transfer: undefined,
     exec: undefined,
     fireAt: BigInt(0),
-    fireError: ""
+    fireError: "",
+    firstPausedAt: BigInt(0)
   };
 }
 /**
@@ -1164,10 +1190,13 @@ export const ScheduledOneshotPayload = {
       OneshotExec.encode(message.exec, writer.uint32(18).fork()).ldelim();
     }
     if (message.fireAt !== BigInt(0)) {
-      writer.uint32(80).int64(message.fireAt);
+      writer.uint32(24).int64(message.fireAt);
     }
     if (message.fireError !== "") {
-      writer.uint32(90).string(message.fireError);
+      writer.uint32(34).string(message.fireError);
+    }
+    if (message.firstPausedAt !== BigInt(0)) {
+      writer.uint32(40).int64(message.firstPausedAt);
     }
     return writer;
   },
@@ -1184,11 +1213,14 @@ export const ScheduledOneshotPayload = {
         case 2:
           message.exec = OneshotExec.decode(reader, reader.uint32());
           break;
-        case 10:
+        case 3:
           message.fireAt = reader.int64();
           break;
-        case 11:
+        case 4:
           message.fireError = reader.string();
+          break;
+        case 5:
+          message.firstPausedAt = reader.int64();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1203,6 +1235,7 @@ export const ScheduledOneshotPayload = {
     message.exec = object.exec !== undefined && object.exec !== null ? OneshotExec.fromPartial(object.exec) : undefined;
     message.fireAt = object.fireAt !== undefined && object.fireAt !== null ? BigInt(object.fireAt.toString()) : BigInt(0);
     message.fireError = object.fireError ?? "";
+    message.firstPausedAt = object.firstPausedAt !== undefined && object.firstPausedAt !== null ? BigInt(object.firstPausedAt.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ScheduledOneshotPayloadAmino): ScheduledOneshotPayload {
@@ -1219,6 +1252,9 @@ export const ScheduledOneshotPayload = {
     if (object.fire_error !== undefined && object.fire_error !== null) {
       message.fireError = object.fire_error;
     }
+    if (object.first_paused_at !== undefined && object.first_paused_at !== null) {
+      message.firstPausedAt = BigInt(object.first_paused_at);
+    }
     return message;
   },
   toAmino(message: ScheduledOneshotPayload): ScheduledOneshotPayloadAmino {
@@ -1227,6 +1263,7 @@ export const ScheduledOneshotPayload = {
     obj.exec = message.exec ? OneshotExec.toAmino(message.exec) : undefined;
     obj.fire_at = message.fireAt !== BigInt(0) ? message.fireAt?.toString() : undefined;
     obj.fire_error = message.fireError === "" ? undefined : message.fireError;
+    obj.first_paused_at = message.firstPausedAt !== BigInt(0) ? message.firstPausedAt?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ScheduledOneshotPayloadAminoMsg): ScheduledOneshotPayload {

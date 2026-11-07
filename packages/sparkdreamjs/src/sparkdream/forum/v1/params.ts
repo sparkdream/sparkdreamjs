@@ -725,9 +725,10 @@ export interface ForumOperationalParams {
    */
   minSentinelTrustLevel: string;
   /**
-   * min_sentinel_age_blocks is enforced by forum at action time (the sentinel
-   * must have been bonded for this many blocks before taking an action). Zero
-   * = no age gate.
+   * min_sentinel_age_blocks is projected into the sentinel's x/rep
+   * BondedRoleConfig.min_age_blocks and enforced at action time by x/rep's
+   * EligibleForRole (the sentinel must have been bonded for this many blocks
+   * before taking an action). Zero = no age gate.
    */
   minSentinelAgeBlocks: bigint;
   /**
@@ -895,9 +896,10 @@ export interface ForumOperationalParamsAmino {
    */
   min_sentinel_trust_level?: string;
   /**
-   * min_sentinel_age_blocks is enforced by forum at action time (the sentinel
-   * must have been bonded for this many blocks before taking an action). Zero
-   * = no age gate.
+   * min_sentinel_age_blocks is projected into the sentinel's x/rep
+   * BondedRoleConfig.min_age_blocks and enforced at action time by x/rep's
+   * EligibleForRole (the sentinel must have been bonded for this many blocks
+   * before taking an action). Zero = no age gate.
    */
   min_sentinel_age_blocks?: string;
   /**

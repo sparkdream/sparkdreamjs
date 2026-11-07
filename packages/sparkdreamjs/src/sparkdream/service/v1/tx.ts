@@ -633,9 +633,12 @@ export interface MsgContestSlashResponseAminoMsg {
   value: MsgContestSlashResponseAmino;
 }
 /**
- * MsgResolveReportByJury is the only path to apply a tier-2 slash.
- * Signer is the x/rep module account (§5.2 + §6.2); rejected from any
- * other signer with ErrUnauthorizedJuryAuthority.
+ * MsgResolveReportByJury relays a tallied tier-2 jury verdict (§5.2 +
+ * §6.2). jury_authority is a member of the Commons Operations Committee
+ * (any other signer: ErrUnauthorizedCouncilResolver); REDUCE and
+ * dissolve=true need the committee or Commons Council policy address, or
+ * governance. An UPHOLD nobody relays is applied by the EndBlocker at
+ * max_escalated_blocks as ACCEPT at the proposed slash, without dissolve.
  * @name MsgResolveReportByJury
  * @package sparkdream.service.v1
  * @see proto type: sparkdream.service.v1.MsgResolveReportByJury
@@ -652,9 +655,12 @@ export interface MsgResolveReportByJuryProtoMsg {
   value: Uint8Array;
 }
 /**
- * MsgResolveReportByJury is the only path to apply a tier-2 slash.
- * Signer is the x/rep module account (§5.2 + §6.2); rejected from any
- * other signer with ErrUnauthorizedJuryAuthority.
+ * MsgResolveReportByJury relays a tallied tier-2 jury verdict (§5.2 +
+ * §6.2). jury_authority is a member of the Commons Operations Committee
+ * (any other signer: ErrUnauthorizedCouncilResolver); REDUCE and
+ * dissolve=true need the committee or Commons Council policy address, or
+ * governance. An UPHOLD nobody relays is applied by the EndBlocker at
+ * max_escalated_blocks as ACCEPT at the proposed slash, without dissolve.
  * @name MsgResolveReportByJuryAmino
  * @package sparkdream.service.v1
  * @see proto type: sparkdream.service.v1.MsgResolveReportByJury
@@ -2618,9 +2624,12 @@ function createBaseMsgResolveReportByJury(): MsgResolveReportByJury {
   };
 }
 /**
- * MsgResolveReportByJury is the only path to apply a tier-2 slash.
- * Signer is the x/rep module account (§5.2 + §6.2); rejected from any
- * other signer with ErrUnauthorizedJuryAuthority.
+ * MsgResolveReportByJury relays a tallied tier-2 jury verdict (§5.2 +
+ * §6.2). jury_authority is a member of the Commons Operations Committee
+ * (any other signer: ErrUnauthorizedCouncilResolver); REDUCE and
+ * dissolve=true need the committee or Commons Council policy address, or
+ * governance. An UPHOLD nobody relays is applied by the EndBlocker at
+ * max_escalated_blocks as ACCEPT at the proposed slash, without dissolve.
  * @name MsgResolveReportByJury
  * @package sparkdream.service.v1
  * @see proto type: sparkdream.service.v1.MsgResolveReportByJury

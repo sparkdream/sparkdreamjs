@@ -108,6 +108,9 @@ const fixtures: Record<string, { typeUrl: string; value: any }> = {
   retry_scheduled_oneshot: { typeUrl: S + "MsgRetryScheduledOneshot", value: { caller: GRANTER, grantId: BigInt(9) } },
   revoke_grant: { typeUrl: S + "MsgRevokeGrant", value: { granter: GRANTER, grantId: BigInt(10) } },
   decline_grant: { typeUrl: S + "MsgDeclineGrant", value: { grantee: GRANTEE, grantId: BigInt(11) } },
+  // App-shaped: a Number where the codec expects BigInt.
+  accept_grant: { typeUrl: S + "MsgAcceptGrant", value: { grantee: GRANTEE, grantId: 12 } },
+  disallow_granter: { typeUrl: S + "MsgDisallowGranter", value: { grantee: GRANTEE, granter: GRANTER } },
 };
 
 // Mirrors @cosmjs/amino's sortedJsonStringify (what actually gets signed).

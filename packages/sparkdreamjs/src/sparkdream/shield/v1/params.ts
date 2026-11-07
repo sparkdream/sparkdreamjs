@@ -107,6 +107,15 @@ export interface Params {
    * at least max_fee_per_exec.
    */
   maxFeesPerEpoch: string;
+  /**
+   * Whether the randomness beacon is on: once a DKG has completed, the
+   * EndBlocker demands the TLE decryption key of every epoch as it closes,
+   * batch or no batch, so the reconstructed key (d = s.H1(epoch), a
+   * threshold BLS signature over the epoch number) is a public random value
+   * no single validator can predict or bias. Consumers: x/rep jury draws.
+   * A key only opens ciphertexts sealed to its own, already closed, epoch.
+   */
+  beaconEnabled: boolean;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.shield.v1.Params";
@@ -218,6 +227,15 @@ export interface ParamsAmino {
    * at least max_fee_per_exec.
    */
   max_fees_per_epoch?: string;
+  /**
+   * Whether the randomness beacon is on: once a DKG has completed, the
+   * EndBlocker demands the TLE decryption key of every epoch as it closes,
+   * batch or no batch, so the reconstructed key (d = s.H1(epoch), a
+   * threshold BLS signature over the epoch number) is a public random value
+   * no single validator can predict or bias. Consumers: x/rep jury draws.
+   * A key only opens ciphertexts sealed to its own, already closed, epoch.
+   */
+  beacon_enabled?: boolean;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/shield/Params";
@@ -245,7 +263,8 @@ function createBaseParams(): Params {
     maxValidatorSetDrift: 0,
     maxFeePerExec: "",
     enableBatchAfterDkg: false,
-    maxFeesPerEpoch: ""
+    maxFeesPerEpoch: "",
+    beaconEnabled: false
   };
 }
 /**
@@ -321,6 +340,9 @@ export const Params = {
     if (message.maxFeesPerEpoch !== "") {
       writer.uint32(170).string(message.maxFeesPerEpoch);
     }
+    if (message.beaconEnabled === true) {
+      writer.uint32(176).bool(message.beaconEnabled);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Params {
@@ -393,6 +415,9 @@ export const Params = {
         case 21:
           message.maxFeesPerEpoch = reader.string();
           break;
+        case 22:
+          message.beaconEnabled = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -423,6 +448,7 @@ export const Params = {
     message.maxFeePerExec = object.maxFeePerExec ?? "";
     message.enableBatchAfterDkg = object.enableBatchAfterDkg ?? false;
     message.maxFeesPerEpoch = object.maxFeesPerEpoch ?? "";
+    message.beaconEnabled = object.beaconEnabled ?? false;
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -490,6 +516,9 @@ export const Params = {
     if (object.max_fees_per_epoch !== undefined && object.max_fees_per_epoch !== null) {
       message.maxFeesPerEpoch = object.max_fees_per_epoch;
     }
+    if (object.beacon_enabled !== undefined && object.beacon_enabled !== null) {
+      message.beaconEnabled = object.beacon_enabled;
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -515,6 +544,7 @@ export const Params = {
     obj.max_fee_per_exec = message.maxFeePerExec === "" ? undefined : message.maxFeePerExec;
     obj.enable_batch_after_dkg = message.enableBatchAfterDkg === false ? undefined : message.enableBatchAfterDkg;
     obj.max_fees_per_epoch = message.maxFeesPerEpoch === "" ? undefined : message.maxFeesPerEpoch;
+    obj.beacon_enabled = message.beaconEnabled === false ? undefined : message.beaconEnabled;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {

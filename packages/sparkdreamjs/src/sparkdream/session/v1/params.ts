@@ -42,8 +42,9 @@ export interface Params {
    */
   maxExecCount: bigint;
   /**
-   * Maximum duration of a narrow session: one that names at most
-   * NarrowSessionMaxMsgTypes (2) message types and does not set
+   * Maximum duration of a narrow session: one that names 1 to
+   * NarrowSessionMaxMsgTypes (2) message types, all in the compiled
+   * NarrowSessionMsgTypes daemon set, and does not set
    * allow_self_revoke. Unattended daemons (bridge, verifier, content
    * scanner) sign through such keys; renewing one needs the granter's main
    * key, which stays off the daemon's host. Must be >= max_expiration.
@@ -179,6 +180,17 @@ export interface Params {
    * grants. Add only after a security review.
    */
   authorizedGrantCreators: string[];
+  /**
+   * --- Grantee consent (SES-102) ---
+   * SPARK deposit (bond-denom micro-units) a granter escrows on an
+   * access-class grant (SESSION_KEY, SIGN_IN) to a grantee that has not
+   * allowed the granter yet. The grant waits as PENDING; the deposit is
+   * refunded when the grantee accepts, declines or the granter revokes, and
+   * forfeited to the community pool when the grant expires unaccepted
+   * (PendingGrantTTL, compiled). Default 1_000_000 (1 SPARK). Governance
+   * only; 0 disables the deposit but not the consent step.
+   */
+  pendingGrantDeposit: bigint;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.session.v1.Params";
@@ -224,8 +236,9 @@ export interface ParamsAmino {
    */
   max_exec_count?: string;
   /**
-   * Maximum duration of a narrow session: one that names at most
-   * NarrowSessionMaxMsgTypes (2) message types and does not set
+   * Maximum duration of a narrow session: one that names 1 to
+   * NarrowSessionMaxMsgTypes (2) message types, all in the compiled
+   * NarrowSessionMsgTypes daemon set, and does not set
    * allow_self_revoke. Unattended daemons (bridge, verifier, content
    * scanner) sign through such keys; renewing one needs the granter's main
    * key, which stays off the daemon's host. Must be >= max_expiration.
@@ -361,6 +374,17 @@ export interface ParamsAmino {
    * grants. Add only after a security review.
    */
   authorized_grant_creators?: string[];
+  /**
+   * --- Grantee consent (SES-102) ---
+   * SPARK deposit (bond-denom micro-units) a granter escrows on an
+   * access-class grant (SESSION_KEY, SIGN_IN) to a grantee that has not
+   * allowed the granter yet. The grant waits as PENDING; the deposit is
+   * refunded when the grantee accepts, declines or the granter revokes, and
+   * forfeited to the community pool when the grant expires unaccepted
+   * (PendingGrantTTL, compiled). Default 1_000_000 (1 SPARK). Governance
+   * only; 0 disables the deposit but not the consent step.
+   */
+  pending_grant_deposit?: string;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/session/Params";
@@ -517,7 +541,8 @@ function createBaseParams(): Params {
     maxEndblockerDispatchesPerPass: 0,
     allowedDenoms: [],
     maxGrantLifetimeSeconds: BigInt(0),
-    authorizedGrantCreators: []
+    authorizedGrantCreators: [],
+    pendingGrantDeposit: BigInt(0)
   };
 }
 /**
@@ -555,70 +580,73 @@ export const Params = {
       Duration.encode(message.narrowSessionMaxExpiration, writer.uint32(66).fork()).ldelim();
     }
     if (message.minRecurringPeriodSeconds !== BigInt(0)) {
-      writer.uint32(80).int64(message.minRecurringPeriodSeconds);
+      writer.uint32(72).int64(message.minRecurringPeriodSeconds);
     }
     if (message.maxRecurringDurationSeconds !== BigInt(0)) {
-      writer.uint32(88).int64(message.maxRecurringDurationSeconds);
+      writer.uint32(80).int64(message.maxRecurringDurationSeconds);
     }
     if (message.maxRecurringPullsPerGranter !== 0) {
-      writer.uint32(96).uint32(message.maxRecurringPullsPerGranter);
+      writer.uint32(88).uint32(message.maxRecurringPullsPerGranter);
     }
     if (message.minAllowancePeriodSeconds !== BigInt(0)) {
-      writer.uint32(160).int64(message.minAllowancePeriodSeconds);
+      writer.uint32(96).int64(message.minAllowancePeriodSeconds);
     }
     if (message.maxAllowancesPerGranter !== 0) {
-      writer.uint32(168).uint32(message.maxAllowancesPerGranter);
+      writer.uint32(104).uint32(message.maxAllowancesPerGranter);
     }
     if (message.maxAllowanceRecipientList !== 0) {
-      writer.uint32(176).uint32(message.maxAllowanceRecipientList);
+      writer.uint32(112).uint32(message.maxAllowanceRecipientList);
     }
     if (message.minPullAmount !== "") {
-      writer.uint32(186).string(message.minPullAmount);
+      writer.uint32(122).string(message.minPullAmount);
     }
     if (message.minScheduleDelaySeconds !== BigInt(0)) {
-      writer.uint32(240).int64(message.minScheduleDelaySeconds);
+      writer.uint32(128).int64(message.minScheduleDelaySeconds);
     }
     if (message.maxScheduleHorizonSeconds !== BigInt(0)) {
-      writer.uint32(248).int64(message.maxScheduleHorizonSeconds);
+      writer.uint32(136).int64(message.maxScheduleHorizonSeconds);
     }
     if (message.fireToExpiryBufferSeconds !== BigInt(0)) {
-      writer.uint32(256).int64(message.fireToExpiryBufferSeconds);
+      writer.uint32(144).int64(message.fireToExpiryBufferSeconds);
     }
     if (message.maxPendingOneshotsPerGranter !== 0) {
-      writer.uint32(264).uint32(message.maxPendingOneshotsPerGranter);
+      writer.uint32(152).uint32(message.maxPendingOneshotsPerGranter);
     }
     if (message.maxPausedOneshotsPerGranter !== 0) {
-      writer.uint32(272).uint32(message.maxPausedOneshotsPerGranter);
+      writer.uint32(160).uint32(message.maxPausedOneshotsPerGranter);
     }
     if (message.pausedOneshotTtlSeconds !== BigInt(0)) {
-      writer.uint32(280).int64(message.pausedOneshotTtlSeconds);
+      writer.uint32(168).int64(message.pausedOneshotTtlSeconds);
     }
     if (message.minOneshotExecGas !== BigInt(0)) {
-      writer.uint32(288).uint64(message.minOneshotExecGas);
+      writer.uint32(176).uint64(message.minOneshotExecGas);
     }
     if (message.maxOneshotExecGas !== BigInt(0)) {
-      writer.uint32(296).uint64(message.maxOneshotExecGas);
+      writer.uint32(184).uint64(message.maxOneshotExecGas);
     }
     if (message.oneshotGasPrice !== "") {
-      writer.uint32(306).string(message.oneshotGasPrice);
+      writer.uint32(194).string(message.oneshotGasPrice);
     }
     if (message.oneshotCreationFee !== BigInt(0)) {
-      writer.uint32(312).uint64(message.oneshotCreationFee);
+      writer.uint32(200).uint64(message.oneshotCreationFee);
     }
     if (message.minOneshotDeposit !== BigInt(0)) {
-      writer.uint32(320).uint64(message.minOneshotDeposit);
+      writer.uint32(208).uint64(message.minOneshotDeposit);
     }
     if (message.maxEndblockerDispatchesPerPass !== 0) {
-      writer.uint32(328).uint32(message.maxEndblockerDispatchesPerPass);
+      writer.uint32(216).uint32(message.maxEndblockerDispatchesPerPass);
     }
     for (const v of message.allowedDenoms) {
-      writer.uint32(402).string(v!);
+      writer.uint32(226).string(v!);
     }
     if (message.maxGrantLifetimeSeconds !== BigInt(0)) {
-      writer.uint32(408).int64(message.maxGrantLifetimeSeconds);
+      writer.uint32(232).int64(message.maxGrantLifetimeSeconds);
     }
     for (const v of message.authorizedGrantCreators) {
-      writer.uint32(482).string(v!);
+      writer.uint32(242).string(v!);
+    }
+    if (message.pendingGrantDeposit !== BigInt(0)) {
+      writer.uint32(248).uint64(message.pendingGrantDeposit);
     }
     return writer;
   },
@@ -653,71 +681,74 @@ export const Params = {
         case 8:
           message.narrowSessionMaxExpiration = Duration.decode(reader, reader.uint32());
           break;
-        case 10:
+        case 9:
           message.minRecurringPeriodSeconds = reader.int64();
           break;
-        case 11:
+        case 10:
           message.maxRecurringDurationSeconds = reader.int64();
           break;
-        case 12:
+        case 11:
           message.maxRecurringPullsPerGranter = reader.uint32();
           break;
-        case 20:
+        case 12:
           message.minAllowancePeriodSeconds = reader.int64();
           break;
-        case 21:
+        case 13:
           message.maxAllowancesPerGranter = reader.uint32();
           break;
-        case 22:
+        case 14:
           message.maxAllowanceRecipientList = reader.uint32();
           break;
-        case 23:
+        case 15:
           message.minPullAmount = reader.string();
           break;
-        case 30:
+        case 16:
           message.minScheduleDelaySeconds = reader.int64();
           break;
-        case 31:
+        case 17:
           message.maxScheduleHorizonSeconds = reader.int64();
           break;
-        case 32:
+        case 18:
           message.fireToExpiryBufferSeconds = reader.int64();
           break;
-        case 33:
+        case 19:
           message.maxPendingOneshotsPerGranter = reader.uint32();
           break;
-        case 34:
+        case 20:
           message.maxPausedOneshotsPerGranter = reader.uint32();
           break;
-        case 35:
+        case 21:
           message.pausedOneshotTtlSeconds = reader.int64();
           break;
-        case 36:
+        case 22:
           message.minOneshotExecGas = reader.uint64();
           break;
-        case 37:
+        case 23:
           message.maxOneshotExecGas = reader.uint64();
           break;
-        case 38:
+        case 24:
           message.oneshotGasPrice = reader.string();
           break;
-        case 39:
+        case 25:
           message.oneshotCreationFee = reader.uint64();
           break;
-        case 40:
+        case 26:
           message.minOneshotDeposit = reader.uint64();
           break;
-        case 41:
+        case 27:
           message.maxEndblockerDispatchesPerPass = reader.uint32();
           break;
-        case 50:
+        case 28:
           message.allowedDenoms.push(reader.string());
           break;
-        case 51:
+        case 29:
           message.maxGrantLifetimeSeconds = reader.int64();
           break;
-        case 60:
+        case 30:
           message.authorizedGrantCreators.push(reader.string());
+          break;
+        case 31:
+          message.pendingGrantDeposit = reader.uint64();
           break;
         default:
           reader.skipType(tag & 7);
@@ -758,6 +789,7 @@ export const Params = {
     message.allowedDenoms = object.allowedDenoms?.map(e => e) || [];
     message.maxGrantLifetimeSeconds = object.maxGrantLifetimeSeconds !== undefined && object.maxGrantLifetimeSeconds !== null ? BigInt(object.maxGrantLifetimeSeconds.toString()) : BigInt(0);
     message.authorizedGrantCreators = object.authorizedGrantCreators?.map(e => e) || [];
+    message.pendingGrantDeposit = object.pendingGrantDeposit !== undefined && object.pendingGrantDeposit !== null ? BigInt(object.pendingGrantDeposit.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -844,6 +876,9 @@ export const Params = {
       message.maxGrantLifetimeSeconds = BigInt(object.max_grant_lifetime_seconds);
     }
     message.authorizedGrantCreators = object.authorized_grant_creators?.map(e => e) || [];
+    if (object.pending_grant_deposit !== undefined && object.pending_grant_deposit !== null) {
+      message.pendingGrantDeposit = BigInt(object.pending_grant_deposit);
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -894,6 +929,7 @@ export const Params = {
     } else {
       obj.authorized_grant_creators = message.authorizedGrantCreators;
     }
+    obj.pending_grant_deposit = message.pendingGrantDeposit !== BigInt(0) ? message.pendingGrantDeposit?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {
@@ -984,67 +1020,67 @@ export const SessionOperationalParams = {
       Duration.encode(message.narrowSessionMaxExpiration, writer.uint32(58).fork()).ldelim();
     }
     if (message.minRecurringPeriodSeconds !== BigInt(0)) {
-      writer.uint32(80).int64(message.minRecurringPeriodSeconds);
+      writer.uint32(64).int64(message.minRecurringPeriodSeconds);
     }
     if (message.maxRecurringDurationSeconds !== BigInt(0)) {
-      writer.uint32(88).int64(message.maxRecurringDurationSeconds);
+      writer.uint32(72).int64(message.maxRecurringDurationSeconds);
     }
     if (message.maxRecurringPullsPerGranter !== 0) {
-      writer.uint32(96).uint32(message.maxRecurringPullsPerGranter);
+      writer.uint32(80).uint32(message.maxRecurringPullsPerGranter);
     }
     if (message.minAllowancePeriodSeconds !== BigInt(0)) {
-      writer.uint32(160).int64(message.minAllowancePeriodSeconds);
+      writer.uint32(88).int64(message.minAllowancePeriodSeconds);
     }
     if (message.maxAllowancesPerGranter !== 0) {
-      writer.uint32(168).uint32(message.maxAllowancesPerGranter);
+      writer.uint32(96).uint32(message.maxAllowancesPerGranter);
     }
     if (message.maxAllowanceRecipientList !== 0) {
-      writer.uint32(176).uint32(message.maxAllowanceRecipientList);
+      writer.uint32(104).uint32(message.maxAllowanceRecipientList);
     }
     if (message.minPullAmount !== "") {
-      writer.uint32(186).string(message.minPullAmount);
+      writer.uint32(114).string(message.minPullAmount);
     }
     if (message.minScheduleDelaySeconds !== BigInt(0)) {
-      writer.uint32(240).int64(message.minScheduleDelaySeconds);
+      writer.uint32(120).int64(message.minScheduleDelaySeconds);
     }
     if (message.maxScheduleHorizonSeconds !== BigInt(0)) {
-      writer.uint32(248).int64(message.maxScheduleHorizonSeconds);
+      writer.uint32(128).int64(message.maxScheduleHorizonSeconds);
     }
     if (message.fireToExpiryBufferSeconds !== BigInt(0)) {
-      writer.uint32(256).int64(message.fireToExpiryBufferSeconds);
+      writer.uint32(136).int64(message.fireToExpiryBufferSeconds);
     }
     if (message.maxPendingOneshotsPerGranter !== 0) {
-      writer.uint32(264).uint32(message.maxPendingOneshotsPerGranter);
+      writer.uint32(144).uint32(message.maxPendingOneshotsPerGranter);
     }
     if (message.maxPausedOneshotsPerGranter !== 0) {
-      writer.uint32(272).uint32(message.maxPausedOneshotsPerGranter);
+      writer.uint32(152).uint32(message.maxPausedOneshotsPerGranter);
     }
     if (message.pausedOneshotTtlSeconds !== BigInt(0)) {
-      writer.uint32(280).int64(message.pausedOneshotTtlSeconds);
+      writer.uint32(160).int64(message.pausedOneshotTtlSeconds);
     }
     if (message.minOneshotExecGas !== BigInt(0)) {
-      writer.uint32(288).uint64(message.minOneshotExecGas);
+      writer.uint32(168).uint64(message.minOneshotExecGas);
     }
     if (message.maxOneshotExecGas !== BigInt(0)) {
-      writer.uint32(296).uint64(message.maxOneshotExecGas);
+      writer.uint32(176).uint64(message.maxOneshotExecGas);
     }
     if (message.oneshotGasPrice !== "") {
-      writer.uint32(306).string(message.oneshotGasPrice);
+      writer.uint32(186).string(message.oneshotGasPrice);
     }
     if (message.oneshotCreationFee !== BigInt(0)) {
-      writer.uint32(312).uint64(message.oneshotCreationFee);
+      writer.uint32(192).uint64(message.oneshotCreationFee);
     }
     if (message.minOneshotDeposit !== BigInt(0)) {
-      writer.uint32(320).uint64(message.minOneshotDeposit);
+      writer.uint32(200).uint64(message.minOneshotDeposit);
     }
     if (message.maxEndblockerDispatchesPerPass !== 0) {
-      writer.uint32(328).uint32(message.maxEndblockerDispatchesPerPass);
+      writer.uint32(208).uint32(message.maxEndblockerDispatchesPerPass);
     }
     for (const v of message.allowedDenoms) {
-      writer.uint32(402).string(v!);
+      writer.uint32(218).string(v!);
     }
     if (message.maxGrantLifetimeSeconds !== BigInt(0)) {
-      writer.uint32(408).int64(message.maxGrantLifetimeSeconds);
+      writer.uint32(224).int64(message.maxGrantLifetimeSeconds);
     }
     return writer;
   },
@@ -1076,67 +1112,67 @@ export const SessionOperationalParams = {
         case 7:
           message.narrowSessionMaxExpiration = Duration.decode(reader, reader.uint32());
           break;
-        case 10:
+        case 8:
           message.minRecurringPeriodSeconds = reader.int64();
           break;
-        case 11:
+        case 9:
           message.maxRecurringDurationSeconds = reader.int64();
           break;
-        case 12:
+        case 10:
           message.maxRecurringPullsPerGranter = reader.uint32();
           break;
-        case 20:
+        case 11:
           message.minAllowancePeriodSeconds = reader.int64();
           break;
-        case 21:
+        case 12:
           message.maxAllowancesPerGranter = reader.uint32();
           break;
-        case 22:
+        case 13:
           message.maxAllowanceRecipientList = reader.uint32();
           break;
-        case 23:
+        case 14:
           message.minPullAmount = reader.string();
           break;
-        case 30:
+        case 15:
           message.minScheduleDelaySeconds = reader.int64();
           break;
-        case 31:
+        case 16:
           message.maxScheduleHorizonSeconds = reader.int64();
           break;
-        case 32:
+        case 17:
           message.fireToExpiryBufferSeconds = reader.int64();
           break;
-        case 33:
+        case 18:
           message.maxPendingOneshotsPerGranter = reader.uint32();
           break;
-        case 34:
+        case 19:
           message.maxPausedOneshotsPerGranter = reader.uint32();
           break;
-        case 35:
+        case 20:
           message.pausedOneshotTtlSeconds = reader.int64();
           break;
-        case 36:
+        case 21:
           message.minOneshotExecGas = reader.uint64();
           break;
-        case 37:
+        case 22:
           message.maxOneshotExecGas = reader.uint64();
           break;
-        case 38:
+        case 23:
           message.oneshotGasPrice = reader.string();
           break;
-        case 39:
+        case 24:
           message.oneshotCreationFee = reader.uint64();
           break;
-        case 40:
+        case 25:
           message.minOneshotDeposit = reader.uint64();
           break;
-        case 41:
+        case 26:
           message.maxEndblockerDispatchesPerPass = reader.uint32();
           break;
-        case 50:
+        case 27:
           message.allowedDenoms.push(reader.string());
           break;
-        case 51:
+        case 28:
           message.maxGrantLifetimeSeconds = reader.int64();
           break;
         default:

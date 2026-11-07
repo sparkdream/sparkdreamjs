@@ -50,6 +50,17 @@ export interface GenesisState {
    * the creating module.
    */
   grantCreators: GrantCreator[];
+  /**
+   * Granters each grantee has allowed (SES-102): an access-class grant from
+   * an allowed granter is ACTIVE at creation instead of PENDING.
+   */
+  allowedGranters: AllowedGranter[];
+  /**
+   * SPARK deposits escrowed in the session module account for PENDING
+   * access-class grants. Per-granter pending counts are recomputed from the
+   * grants list on InitGenesis.
+   */
+  pendingGrantDeposits: PendingGrantDeposit[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.session.v1.GenesisState";
@@ -101,10 +112,77 @@ export interface GenesisStateAmino {
    * the creating module.
    */
   grant_creators?: GrantCreatorAmino[];
+  /**
+   * Granters each grantee has allowed (SES-102): an access-class grant from
+   * an allowed granter is ACTIVE at creation instead of PENDING.
+   */
+  allowed_granters?: AllowedGranterAmino[];
+  /**
+   * SPARK deposits escrowed in the session module account for PENDING
+   * access-class grants. Per-granter pending counts are recomputed from the
+   * grants list on InitGenesis.
+   */
+  pending_grant_deposits?: PendingGrantDepositAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.session.v1.GenesisState";
   value: GenesisStateAmino;
+}
+/**
+ * AllowedGranter is one (grantee, granter) consent entry.
+ * @name AllowedGranter
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.AllowedGranter
+ */
+export interface AllowedGranter {
+  grantee: string;
+  granter: string;
+}
+export interface AllowedGranterProtoMsg {
+  typeUrl: "/sparkdream.session.v1.AllowedGranter";
+  value: Uint8Array;
+}
+/**
+ * AllowedGranter is one (grantee, granter) consent entry.
+ * @name AllowedGranterAmino
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.AllowedGranter
+ */
+export interface AllowedGranterAmino {
+  grantee?: string;
+  granter?: string;
+}
+export interface AllowedGranterAminoMsg {
+  type: "/sparkdream.session.v1.AllowedGranter";
+  value: AllowedGranterAmino;
+}
+/**
+ * PendingGrantDeposit is one escrowed pending-grant deposit.
+ * @name PendingGrantDeposit
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.PendingGrantDeposit
+ */
+export interface PendingGrantDeposit {
+  grantId: bigint;
+  amount: Coin;
+}
+export interface PendingGrantDepositProtoMsg {
+  typeUrl: "/sparkdream.session.v1.PendingGrantDeposit";
+  value: Uint8Array;
+}
+/**
+ * PendingGrantDeposit is one escrowed pending-grant deposit.
+ * @name PendingGrantDepositAmino
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.PendingGrantDeposit
+ */
+export interface PendingGrantDepositAmino {
+  grant_id?: string;
+  amount: CoinAmino;
+}
+export interface PendingGrantDepositAminoMsg {
+  type: "/sparkdream.session.v1.PendingGrantDeposit";
+  value: PendingGrantDepositAmino;
 }
 /**
  * OneshotDeposit is one escrowed ScheduledOneshot gas deposit.
@@ -246,7 +324,9 @@ function createBaseGenesisState(): GenesisState {
     activeGrantCounts: [],
     oneshotGasDeposits: [],
     epochSpends: [],
-    grantCreators: []
+    grantCreators: [],
+    allowedGranters: [],
+    pendingGrantDeposits: []
   };
 }
 /**
@@ -284,6 +364,12 @@ export const GenesisState = {
     for (const v of message.grantCreators) {
       GrantCreator.encode(v!, writer.uint32(58).fork()).ldelim();
     }
+    for (const v of message.allowedGranters) {
+      AllowedGranter.encode(v!, writer.uint32(66).fork()).ldelim();
+    }
+    for (const v of message.pendingGrantDeposits) {
+      PendingGrantDeposit.encode(v!, writer.uint32(74).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -314,6 +400,12 @@ export const GenesisState = {
         case 7:
           message.grantCreators.push(GrantCreator.decode(reader, reader.uint32()));
           break;
+        case 8:
+          message.allowedGranters.push(AllowedGranter.decode(reader, reader.uint32()));
+          break;
+        case 9:
+          message.pendingGrantDeposits.push(PendingGrantDeposit.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -330,6 +422,8 @@ export const GenesisState = {
     message.oneshotGasDeposits = object.oneshotGasDeposits?.map(e => OneshotDeposit.fromPartial(e)) || [];
     message.epochSpends = object.epochSpends?.map(e => EpochSpendEntry.fromPartial(e)) || [];
     message.grantCreators = object.grantCreators?.map(e => GrantCreator.fromPartial(e)) || [];
+    message.allowedGranters = object.allowedGranters?.map(e => AllowedGranter.fromPartial(e)) || [];
+    message.pendingGrantDeposits = object.pendingGrantDeposits?.map(e => PendingGrantDeposit.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -345,6 +439,8 @@ export const GenesisState = {
     message.oneshotGasDeposits = object.oneshot_gas_deposits?.map(e => OneshotDeposit.fromAmino(e)) || [];
     message.epochSpends = object.epoch_spends?.map(e => EpochSpendEntry.fromAmino(e)) || [];
     message.grantCreators = object.grant_creators?.map(e => GrantCreator.fromAmino(e)) || [];
+    message.allowedGranters = object.allowed_granters?.map(e => AllowedGranter.fromAmino(e)) || [];
+    message.pendingGrantDeposits = object.pending_grant_deposits?.map(e => PendingGrantDeposit.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -376,6 +472,16 @@ export const GenesisState = {
     } else {
       obj.grant_creators = message.grantCreators;
     }
+    if (message.allowedGranters) {
+      obj.allowed_granters = message.allowedGranters.map(e => e ? AllowedGranter.toAmino(e) : undefined);
+    } else {
+      obj.allowed_granters = message.allowedGranters;
+    }
+    if (message.pendingGrantDeposits) {
+      obj.pending_grant_deposits = message.pendingGrantDeposits.map(e => e ? PendingGrantDeposit.toAmino(e) : undefined);
+    } else {
+      obj.pending_grant_deposits = message.pendingGrantDeposits;
+    }
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {
@@ -391,6 +497,168 @@ export const GenesisState = {
     return {
       typeUrl: "/sparkdream.session.v1.GenesisState",
       value: GenesisState.encode(message).finish()
+    };
+  }
+};
+function createBaseAllowedGranter(): AllowedGranter {
+  return {
+    grantee: "",
+    granter: ""
+  };
+}
+/**
+ * AllowedGranter is one (grantee, granter) consent entry.
+ * @name AllowedGranter
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.AllowedGranter
+ */
+export const AllowedGranter = {
+  typeUrl: "/sparkdream.session.v1.AllowedGranter",
+  encode(message: AllowedGranter, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.grantee !== "") {
+      writer.uint32(10).string(message.grantee);
+    }
+    if (message.granter !== "") {
+      writer.uint32(18).string(message.granter);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): AllowedGranter {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAllowedGranter();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.grantee = reader.string();
+          break;
+        case 2:
+          message.granter = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<AllowedGranter>): AllowedGranter {
+    const message = createBaseAllowedGranter();
+    message.grantee = object.grantee ?? "";
+    message.granter = object.granter ?? "";
+    return message;
+  },
+  fromAmino(object: AllowedGranterAmino): AllowedGranter {
+    const message = createBaseAllowedGranter();
+    if (object.grantee !== undefined && object.grantee !== null) {
+      message.grantee = object.grantee;
+    }
+    if (object.granter !== undefined && object.granter !== null) {
+      message.granter = object.granter;
+    }
+    return message;
+  },
+  toAmino(message: AllowedGranter): AllowedGranterAmino {
+    const obj: any = {};
+    obj.grantee = message.grantee === "" ? undefined : message.grantee;
+    obj.granter = message.granter === "" ? undefined : message.granter;
+    return obj;
+  },
+  fromAminoMsg(object: AllowedGranterAminoMsg): AllowedGranter {
+    return AllowedGranter.fromAmino(object.value);
+  },
+  fromProtoMsg(message: AllowedGranterProtoMsg): AllowedGranter {
+    return AllowedGranter.decode(message.value);
+  },
+  toProto(message: AllowedGranter): Uint8Array {
+    return AllowedGranter.encode(message).finish();
+  },
+  toProtoMsg(message: AllowedGranter): AllowedGranterProtoMsg {
+    return {
+      typeUrl: "/sparkdream.session.v1.AllowedGranter",
+      value: AllowedGranter.encode(message).finish()
+    };
+  }
+};
+function createBasePendingGrantDeposit(): PendingGrantDeposit {
+  return {
+    grantId: BigInt(0),
+    amount: Coin.fromPartial({})
+  };
+}
+/**
+ * PendingGrantDeposit is one escrowed pending-grant deposit.
+ * @name PendingGrantDeposit
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.PendingGrantDeposit
+ */
+export const PendingGrantDeposit = {
+  typeUrl: "/sparkdream.session.v1.PendingGrantDeposit",
+  encode(message: PendingGrantDeposit, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.grantId !== BigInt(0)) {
+      writer.uint32(8).uint64(message.grantId);
+    }
+    if (message.amount !== undefined) {
+      Coin.encode(message.amount, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): PendingGrantDeposit {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePendingGrantDeposit();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.grantId = reader.uint64();
+          break;
+        case 2:
+          message.amount = Coin.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<PendingGrantDeposit>): PendingGrantDeposit {
+    const message = createBasePendingGrantDeposit();
+    message.grantId = object.grantId !== undefined && object.grantId !== null ? BigInt(object.grantId.toString()) : BigInt(0);
+    message.amount = object.amount !== undefined && object.amount !== null ? Coin.fromPartial(object.amount) : undefined;
+    return message;
+  },
+  fromAmino(object: PendingGrantDepositAmino): PendingGrantDeposit {
+    const message = createBasePendingGrantDeposit();
+    if (object.grant_id !== undefined && object.grant_id !== null) {
+      message.grantId = BigInt(object.grant_id);
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = Coin.fromAmino(object.amount);
+    }
+    return message;
+  },
+  toAmino(message: PendingGrantDeposit): PendingGrantDepositAmino {
+    const obj: any = {};
+    obj.grant_id = message.grantId !== BigInt(0) ? message.grantId?.toString() : undefined;
+    obj.amount = message.amount ? Coin.toAmino(message.amount) : Coin.toAmino(Coin.fromPartial({}));
+    return obj;
+  },
+  fromAminoMsg(object: PendingGrantDepositAminoMsg): PendingGrantDeposit {
+    return PendingGrantDeposit.fromAmino(object.value);
+  },
+  fromProtoMsg(message: PendingGrantDepositProtoMsg): PendingGrantDeposit {
+    return PendingGrantDeposit.decode(message.value);
+  },
+  toProto(message: PendingGrantDeposit): Uint8Array {
+    return PendingGrantDeposit.encode(message).finish();
+  },
+  toProtoMsg(message: PendingGrantDeposit): PendingGrantDepositProtoMsg {
+    return {
+      typeUrl: "/sparkdream.session.v1.PendingGrantDeposit",
+      value: PendingGrantDeposit.encode(message).finish()
     };
   }
 };

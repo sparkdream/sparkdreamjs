@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgCreateSession, MsgCreateSessionResponse, MsgRevokeSession, MsgRevokeSessionResponse, MsgExecSession, MsgExecSessionResponse, MsgCreateGrant, MsgCreateGrantResponse, MsgClaimRecurringPull, MsgClaimRecurringPullResponse, MsgPullAllowance, MsgPullAllowanceResponse, MsgRetryScheduledOneshot, MsgRetryScheduledOneshotResponse, MsgRevokeGrant, MsgRevokeGrantResponse, MsgDeclineGrant, MsgDeclineGrantResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgCreateSession, MsgCreateSessionResponse, MsgRevokeSession, MsgRevokeSessionResponse, MsgExecSession, MsgExecSessionResponse, MsgCreateGrant, MsgCreateGrantResponse, MsgClaimRecurringPull, MsgClaimRecurringPullResponse, MsgPullAllowance, MsgPullAllowanceResponse, MsgRetryScheduledOneshot, MsgRetryScheduledOneshotResponse, MsgRevokeGrant, MsgRevokeGrantResponse, MsgDeclineGrant, MsgDeclineGrantResponse, MsgAcceptGrant, MsgAcceptGrantResponse, MsgDisallowGranter, MsgDisallowGranterResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
@@ -74,6 +74,20 @@ export interface Msg {
    * to retry.
    */
   declineGrant(request: MsgDeclineGrant): Promise<MsgDeclineGrantResponse>;
+  /**
+   * AcceptGrant lets the grantee of a PENDING access-class grant (a session
+   * key or sign-in from a granter it has not allowed yet) accept it: the
+   * grant becomes ACTIVE, the granter is added to the grantee's allowed
+   * granters and the granter's deposit is refunded. A session key is also
+   * accepted implicitly by the grantee's first MsgExecSession under it.
+   */
+  acceptGrant(request: MsgAcceptGrant): Promise<MsgAcceptGrantResponse>;
+  /**
+   * DisallowGranter removes a granter from the grantee's allowed granters,
+   * so the granter's next access-class grant waits as PENDING again.
+   * Existing grants are untouched (decline them individually).
+   */
+  disallowGranter(request: MsgDisallowGranter): Promise<MsgDisallowGranterResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -173,6 +187,24 @@ export class MsgClientImpl implements Msg {
     const data = MsgDeclineGrant.encode(request).finish();
     const promise = this.rpc.request("sparkdream.session.v1.Msg", "DeclineGrant", data);
     return promise.then(data => MsgDeclineGrantResponse.decode(new BinaryReader(data)));
+  };
+  /* AcceptGrant lets the grantee of a PENDING access-class grant (a session
+   key or sign-in from a granter it has not allowed yet) accept it: the
+   grant becomes ACTIVE, the granter is added to the grantee's allowed
+   granters and the granter's deposit is refunded. A session key is also
+   accepted implicitly by the grantee's first MsgExecSession under it. */
+  acceptGrant = async (request: MsgAcceptGrant): Promise<MsgAcceptGrantResponse> => {
+    const data = MsgAcceptGrant.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.session.v1.Msg", "AcceptGrant", data);
+    return promise.then(data => MsgAcceptGrantResponse.decode(new BinaryReader(data)));
+  };
+  /* DisallowGranter removes a granter from the grantee's allowed granters,
+   so the granter's next access-class grant waits as PENDING again.
+   Existing grants are untouched (decline them individually). */
+  disallowGranter = async (request: MsgDisallowGranter): Promise<MsgDisallowGranterResponse> => {
+    const data = MsgDisallowGranter.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.session.v1.Msg", "DisallowGranter", data);
+    return promise.then(data => MsgDisallowGranterResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

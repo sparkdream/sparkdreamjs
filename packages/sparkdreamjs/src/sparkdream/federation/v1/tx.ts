@@ -86,6 +86,13 @@ export interface MsgRegisterPeer {
    * this channel and is skipped when it is empty.
    */
   ibcTransferChannelId: string;
+  /**
+   * expected_chain_id is the chain id the peer's federation channel must
+   * lead to; MsgResumePeer refuses activation when the channel's light
+   * client names another chain. Required for PEER_TYPE_SPARK_DREAM peers,
+   * must be empty for every other type. See Peer.expected_chain_id.
+   */
+  expectedChainId: string;
 }
 export interface MsgRegisterPeerProtoMsg {
   typeUrl: "/sparkdream.federation.v1.MsgRegisterPeer";
@@ -127,6 +134,13 @@ export interface MsgRegisterPeerAmino {
    * this channel and is skipped when it is empty.
    */
   ibc_transfer_channel_id?: string;
+  /**
+   * expected_chain_id is the chain id the peer's federation channel must
+   * lead to; MsgResumePeer refuses activation when the channel's light
+   * client names another chain. Required for PEER_TYPE_SPARK_DREAM peers,
+   * must be empty for every other type. See Peer.expected_chain_id.
+   */
+  expected_chain_id?: string;
 }
 export interface MsgRegisterPeerAminoMsg {
   type: "sparkdream/x/federation/MsgRegisterPeer";
@@ -355,6 +369,13 @@ export interface MsgUpdatePeerInfo {
   peerId: string;
   displayName: string;
   metadata: string;
+  /**
+   * expected_chain_id, when non-empty, replaces Peer.expected_chain_id.
+   * Only on a PEER_TYPE_SPARK_DREAM peer that is not ACTIVE: changing the
+   * pin on an active peer would re-trust a channel without a vote. Empty
+   * keeps the current value.
+   */
+  expectedChainId: string;
 }
 export interface MsgUpdatePeerInfoProtoMsg {
   typeUrl: "/sparkdream.federation.v1.MsgUpdatePeerInfo";
@@ -373,6 +394,13 @@ export interface MsgUpdatePeerInfoAmino {
   peer_id?: string;
   display_name?: string;
   metadata?: string;
+  /**
+   * expected_chain_id, when non-empty, replaces Peer.expected_chain_id.
+   * Only on a PEER_TYPE_SPARK_DREAM peer that is not ACTIVE: changing the
+   * pin on an active peer would re-trust a channel without a vote. Empty
+   * keeps the current value.
+   */
+  expected_chain_id?: string;
 }
 export interface MsgUpdatePeerInfoAminoMsg {
   type: "sparkdream/x/federation/MsgUpdatePeerInfo";
@@ -1548,6 +1576,62 @@ export interface MsgPruneOrphanBindingsResponseAminoMsg {
   type: "/sparkdream.federation.v1.MsgPruneOrphanBindingsResponse";
   value: MsgPruneOrphanBindingsResponseAmino;
 }
+/**
+ * MsgRevokeIdentityLink removes the identity link of local_address to
+ * peer_id. Signed by governance or the Commons Council / Operations
+ * Committee policy address (an executed proposal), never one member.
+ * @name MsgRevokeIdentityLink
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgRevokeIdentityLink
+ */
+export interface MsgRevokeIdentityLink {
+  authority: string;
+  localAddress: string;
+  peerId: string;
+  reason: string;
+}
+export interface MsgRevokeIdentityLinkProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.MsgRevokeIdentityLink";
+  value: Uint8Array;
+}
+/**
+ * MsgRevokeIdentityLink removes the identity link of local_address to
+ * peer_id. Signed by governance or the Commons Council / Operations
+ * Committee policy address (an executed proposal), never one member.
+ * @name MsgRevokeIdentityLinkAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgRevokeIdentityLink
+ */
+export interface MsgRevokeIdentityLinkAmino {
+  authority?: string;
+  local_address?: string;
+  peer_id?: string;
+  reason?: string;
+}
+export interface MsgRevokeIdentityLinkAminoMsg {
+  type: "sparkdream/x/federation/MsgRevokeIdentityLink";
+  value: MsgRevokeIdentityLinkAmino;
+}
+/**
+ * @name MsgRevokeIdentityLinkResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgRevokeIdentityLinkResponse
+ */
+export interface MsgRevokeIdentityLinkResponse {}
+export interface MsgRevokeIdentityLinkResponseProtoMsg {
+  typeUrl: "/sparkdream.federation.v1.MsgRevokeIdentityLinkResponse";
+  value: Uint8Array;
+}
+/**
+ * @name MsgRevokeIdentityLinkResponseAmino
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgRevokeIdentityLinkResponse
+ */
+export interface MsgRevokeIdentityLinkResponseAmino {}
+export interface MsgRevokeIdentityLinkResponseAminoMsg {
+  type: "/sparkdream.federation.v1.MsgRevokeIdentityLinkResponse";
+  value: MsgRevokeIdentityLinkResponseAmino;
+}
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
     authority: "",
@@ -1700,7 +1784,8 @@ function createBaseMsgRegisterPeer(): MsgRegisterPeer {
     metadata: "",
     controllerGroup: "",
     peerIdentity: undefined,
-    ibcTransferChannelId: ""
+    ibcTransferChannelId: "",
+    expectedChainId: ""
   };
 }
 /**
@@ -1739,6 +1824,9 @@ export const MsgRegisterPeer = {
     if (message.ibcTransferChannelId !== "") {
       writer.uint32(74).string(message.ibcTransferChannelId);
     }
+    if (message.expectedChainId !== "") {
+      writer.uint32(82).string(message.expectedChainId);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgRegisterPeer {
@@ -1775,6 +1863,9 @@ export const MsgRegisterPeer = {
         case 9:
           message.ibcTransferChannelId = reader.string();
           break;
+        case 10:
+          message.expectedChainId = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1793,6 +1884,7 @@ export const MsgRegisterPeer = {
     message.controllerGroup = object.controllerGroup ?? "";
     message.peerIdentity = object.peerIdentity !== undefined && object.peerIdentity !== null ? ChainIdentity.fromPartial(object.peerIdentity) : undefined;
     message.ibcTransferChannelId = object.ibcTransferChannelId ?? "";
+    message.expectedChainId = object.expectedChainId ?? "";
     return message;
   },
   fromAmino(object: MsgRegisterPeerAmino): MsgRegisterPeer {
@@ -1824,6 +1916,9 @@ export const MsgRegisterPeer = {
     if (object.ibc_transfer_channel_id !== undefined && object.ibc_transfer_channel_id !== null) {
       message.ibcTransferChannelId = object.ibc_transfer_channel_id;
     }
+    if (object.expected_chain_id !== undefined && object.expected_chain_id !== null) {
+      message.expectedChainId = object.expected_chain_id;
+    }
     return message;
   },
   toAmino(message: MsgRegisterPeer): MsgRegisterPeerAmino {
@@ -1837,6 +1932,7 @@ export const MsgRegisterPeer = {
     obj.controller_group = message.controllerGroup === "" ? undefined : message.controllerGroup;
     obj.peer_identity = message.peerIdentity ? ChainIdentity.toAmino(message.peerIdentity) : undefined;
     obj.ibc_transfer_channel_id = message.ibcTransferChannelId === "" ? undefined : message.ibcTransferChannelId;
+    obj.expected_chain_id = message.expectedChainId === "" ? undefined : message.expectedChainId;
     return obj;
   },
   fromAminoMsg(object: MsgRegisterPeerAminoMsg): MsgRegisterPeer {
@@ -2525,7 +2621,8 @@ function createBaseMsgUpdatePeerInfo(): MsgUpdatePeerInfo {
     authority: "",
     peerId: "",
     displayName: "",
-    metadata: ""
+    metadata: "",
+    expectedChainId: ""
   };
 }
 /**
@@ -2552,6 +2649,9 @@ export const MsgUpdatePeerInfo = {
     if (message.metadata !== "") {
       writer.uint32(34).string(message.metadata);
     }
+    if (message.expectedChainId !== "") {
+      writer.uint32(42).string(message.expectedChainId);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgUpdatePeerInfo {
@@ -2573,6 +2673,9 @@ export const MsgUpdatePeerInfo = {
         case 4:
           message.metadata = reader.string();
           break;
+        case 5:
+          message.expectedChainId = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2586,6 +2689,7 @@ export const MsgUpdatePeerInfo = {
     message.peerId = object.peerId ?? "";
     message.displayName = object.displayName ?? "";
     message.metadata = object.metadata ?? "";
+    message.expectedChainId = object.expectedChainId ?? "";
     return message;
   },
   fromAmino(object: MsgUpdatePeerInfoAmino): MsgUpdatePeerInfo {
@@ -2602,6 +2706,9 @@ export const MsgUpdatePeerInfo = {
     if (object.metadata !== undefined && object.metadata !== null) {
       message.metadata = object.metadata;
     }
+    if (object.expected_chain_id !== undefined && object.expected_chain_id !== null) {
+      message.expectedChainId = object.expected_chain_id;
+    }
     return message;
   },
   toAmino(message: MsgUpdatePeerInfo): MsgUpdatePeerInfoAmino {
@@ -2610,6 +2717,7 @@ export const MsgUpdatePeerInfo = {
     obj.peer_id = message.peerId === "" ? undefined : message.peerId;
     obj.display_name = message.displayName === "" ? undefined : message.displayName;
     obj.metadata = message.metadata === "" ? undefined : message.metadata;
+    obj.expected_chain_id = message.expectedChainId === "" ? undefined : message.expectedChainId;
     return obj;
   },
   fromAminoMsg(object: MsgUpdatePeerInfoAminoMsg): MsgUpdatePeerInfo {
@@ -6078,6 +6186,175 @@ export const MsgPruneOrphanBindingsResponse = {
     return {
       typeUrl: "/sparkdream.federation.v1.MsgPruneOrphanBindingsResponse",
       value: MsgPruneOrphanBindingsResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRevokeIdentityLink(): MsgRevokeIdentityLink {
+  return {
+    authority: "",
+    localAddress: "",
+    peerId: "",
+    reason: ""
+  };
+}
+/**
+ * MsgRevokeIdentityLink removes the identity link of local_address to
+ * peer_id. Signed by governance or the Commons Council / Operations
+ * Committee policy address (an executed proposal), never one member.
+ * @name MsgRevokeIdentityLink
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgRevokeIdentityLink
+ */
+export const MsgRevokeIdentityLink = {
+  typeUrl: "/sparkdream.federation.v1.MsgRevokeIdentityLink",
+  aminoType: "sparkdream/x/federation/MsgRevokeIdentityLink",
+  encode(message: MsgRevokeIdentityLink, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.localAddress !== "") {
+      writer.uint32(18).string(message.localAddress);
+    }
+    if (message.peerId !== "") {
+      writer.uint32(26).string(message.peerId);
+    }
+    if (message.reason !== "") {
+      writer.uint32(34).string(message.reason);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRevokeIdentityLink {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRevokeIdentityLink();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+        case 2:
+          message.localAddress = reader.string();
+          break;
+        case 3:
+          message.peerId = reader.string();
+          break;
+        case 4:
+          message.reason = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgRevokeIdentityLink>): MsgRevokeIdentityLink {
+    const message = createBaseMsgRevokeIdentityLink();
+    message.authority = object.authority ?? "";
+    message.localAddress = object.localAddress ?? "";
+    message.peerId = object.peerId ?? "";
+    message.reason = object.reason ?? "";
+    return message;
+  },
+  fromAmino(object: MsgRevokeIdentityLinkAmino): MsgRevokeIdentityLink {
+    const message = createBaseMsgRevokeIdentityLink();
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
+    if (object.local_address !== undefined && object.local_address !== null) {
+      message.localAddress = object.local_address;
+    }
+    if (object.peer_id !== undefined && object.peer_id !== null) {
+      message.peerId = object.peer_id;
+    }
+    if (object.reason !== undefined && object.reason !== null) {
+      message.reason = object.reason;
+    }
+    return message;
+  },
+  toAmino(message: MsgRevokeIdentityLink): MsgRevokeIdentityLinkAmino {
+    const obj: any = {};
+    obj.authority = message.authority === "" ? undefined : message.authority;
+    obj.local_address = message.localAddress === "" ? undefined : message.localAddress;
+    obj.peer_id = message.peerId === "" ? undefined : message.peerId;
+    obj.reason = message.reason === "" ? undefined : message.reason;
+    return obj;
+  },
+  fromAminoMsg(object: MsgRevokeIdentityLinkAminoMsg): MsgRevokeIdentityLink {
+    return MsgRevokeIdentityLink.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRevokeIdentityLink): MsgRevokeIdentityLinkAminoMsg {
+    return {
+      type: "sparkdream/x/federation/MsgRevokeIdentityLink",
+      value: MsgRevokeIdentityLink.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgRevokeIdentityLinkProtoMsg): MsgRevokeIdentityLink {
+    return MsgRevokeIdentityLink.decode(message.value);
+  },
+  toProto(message: MsgRevokeIdentityLink): Uint8Array {
+    return MsgRevokeIdentityLink.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRevokeIdentityLink): MsgRevokeIdentityLinkProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.MsgRevokeIdentityLink",
+      value: MsgRevokeIdentityLink.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRevokeIdentityLinkResponse(): MsgRevokeIdentityLinkResponse {
+  return {};
+}
+/**
+ * @name MsgRevokeIdentityLinkResponse
+ * @package sparkdream.federation.v1
+ * @see proto type: sparkdream.federation.v1.MsgRevokeIdentityLinkResponse
+ */
+export const MsgRevokeIdentityLinkResponse = {
+  typeUrl: "/sparkdream.federation.v1.MsgRevokeIdentityLinkResponse",
+  encode(_: MsgRevokeIdentityLinkResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRevokeIdentityLinkResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRevokeIdentityLinkResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgRevokeIdentityLinkResponse>): MsgRevokeIdentityLinkResponse {
+    const message = createBaseMsgRevokeIdentityLinkResponse();
+    return message;
+  },
+  fromAmino(_: MsgRevokeIdentityLinkResponseAmino): MsgRevokeIdentityLinkResponse {
+    const message = createBaseMsgRevokeIdentityLinkResponse();
+    return message;
+  },
+  toAmino(_: MsgRevokeIdentityLinkResponse): MsgRevokeIdentityLinkResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgRevokeIdentityLinkResponseAminoMsg): MsgRevokeIdentityLinkResponse {
+    return MsgRevokeIdentityLinkResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgRevokeIdentityLinkResponseProtoMsg): MsgRevokeIdentityLinkResponse {
+    return MsgRevokeIdentityLinkResponse.decode(message.value);
+  },
+  toProto(message: MsgRevokeIdentityLinkResponse): Uint8Array {
+    return MsgRevokeIdentityLinkResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRevokeIdentityLinkResponse): MsgRevokeIdentityLinkResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.federation.v1.MsgRevokeIdentityLinkResponse",
+      value: MsgRevokeIdentityLinkResponse.encode(message).finish()
     };
   }
 };

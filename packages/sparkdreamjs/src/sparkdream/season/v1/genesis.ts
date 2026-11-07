@@ -81,6 +81,12 @@ export interface GenesisState {
    * Running per-season aggregates read by the SeasonStats query (SEA-35).
    */
   seasonStatsCountersList: SeasonStatsCounters[];
+  /**
+   * Completed seasons, the full Season record of each (status COMPLETED,
+   * final end_block and extension counters), keyed by season number. At
+   * most snapshot_retention_seasons records are kept.
+   */
+  seasonHistoryList: Season[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.season.v1.GenesisState";
@@ -141,6 +147,12 @@ export interface GenesisStateAmino {
    * Running per-season aggregates read by the SeasonStats query (SEA-35).
    */
   season_stats_counters_list?: SeasonStatsCountersAmino[];
+  /**
+   * Completed seasons, the full Season record of each (status COMPLETED,
+   * final end_block and extension counters), keyed by season number. At
+   * most snapshot_retention_seasons records are kept.
+   */
+  season_history_list?: SeasonAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.season.v1.GenesisState";
@@ -206,7 +218,8 @@ function createBaseGenesisState(): GenesisState {
     retroRewardRecordList: [],
     transitionAbortList: [],
     pendingSeasonalPoolInit: BigInt(0),
-    seasonStatsCountersList: []
+    seasonStatsCountersList: [],
+    seasonHistoryList: []
   };
 }
 /**
@@ -311,6 +324,9 @@ export const GenesisState = {
     for (const v of message.seasonStatsCountersList) {
       SeasonStatsCounters.encode(v!, writer.uint32(250).fork()).ldelim();
     }
+    for (const v of message.seasonHistoryList) {
+      Season.encode(v!, writer.uint32(258).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -413,6 +429,9 @@ export const GenesisState = {
         case 31:
           message.seasonStatsCountersList.push(SeasonStatsCounters.decode(reader, reader.uint32()));
           break;
+        case 32:
+          message.seasonHistoryList.push(Season.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -453,6 +472,7 @@ export const GenesisState = {
     message.transitionAbortList = object.transitionAbortList?.map(e => TransitionAbortCount.fromPartial(e)) || [];
     message.pendingSeasonalPoolInit = object.pendingSeasonalPoolInit !== undefined && object.pendingSeasonalPoolInit !== null ? BigInt(object.pendingSeasonalPoolInit.toString()) : BigInt(0);
     message.seasonStatsCountersList = object.seasonStatsCountersList?.map(e => SeasonStatsCounters.fromPartial(e)) || [];
+    message.seasonHistoryList = object.seasonHistoryList?.map(e => Season.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -504,6 +524,7 @@ export const GenesisState = {
       message.pendingSeasonalPoolInit = BigInt(object.pending_seasonal_pool_init);
     }
     message.seasonStatsCountersList = object.season_stats_counters_list?.map(e => SeasonStatsCounters.fromAmino(e)) || [];
+    message.seasonHistoryList = object.season_history_list?.map(e => Season.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -630,6 +651,11 @@ export const GenesisState = {
       obj.season_stats_counters_list = message.seasonStatsCountersList.map(e => e ? SeasonStatsCounters.toAmino(e) : undefined);
     } else {
       obj.season_stats_counters_list = message.seasonStatsCountersList;
+    }
+    if (message.seasonHistoryList) {
+      obj.season_history_list = message.seasonHistoryList.map(e => e ? Season.toAmino(e) : undefined);
+    } else {
+      obj.season_history_list = message.seasonHistoryList;
     }
     return obj;
   },

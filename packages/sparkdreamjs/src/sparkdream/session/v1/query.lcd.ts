@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponse, QuerySessionRequest, QuerySessionResponse, QuerySessionsByGranterRequest, QuerySessionsByGranterResponse, QuerySessionsByGranteeRequest, QuerySessionsByGranteeResponse, QueryGrantRequest, QueryGrantResponse, QueryGrantsByGranterRequest, QueryGrantsByGranterResponse, QueryGrantsByGranteeRequest, QueryGrantsByGranteeResponse, QueryAllowedMsgTypesRequest, QueryAllowedMsgTypesResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QuerySessionRequest, QuerySessionResponse, QuerySessionsByGranterRequest, QuerySessionsByGranterResponse, QuerySessionsByGranteeRequest, QuerySessionsByGranteeResponse, QueryGrantRequest, QueryGrantResponse, QueryGrantsByGranterRequest, QueryGrantsByGranterResponse, QueryGrantsByGranteeRequest, QueryGrantsByGranteeResponse, QueryAllowedMsgTypesRequest, QueryAllowedMsgTypesResponse, QueryAllowedGrantersRequest, QueryAllowedGrantersResponse, QueryPendingGrantsForGranteeRequest, QueryPendingGrantsForGranteeResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -85,5 +85,33 @@ export class LCDQueryClient {
   allowedMsgTypes = async (_params: QueryAllowedMsgTypesRequest = {}): Promise<QueryAllowedMsgTypesResponse> => {
     const endpoint = `sparkdream/session/v1/allowed_msg_types`;
     return await this.req.get<QueryAllowedMsgTypesResponse>(endpoint);
+  };
+  /* AllowedGranters lists the granters a grantee has allowed: their
+   access-class grants (session keys, sign-ins) are ACTIVE at creation
+   instead of waiting as PENDING for the grantee's acceptance. */
+  allowedGranters = async (params: QueryAllowedGrantersRequest): Promise<QueryAllowedGrantersResponse> => {
+    const options: any = {
+      params: {}
+    };
+    if (typeof params?.pagination !== "undefined") {
+      setPaginationParams(options, params.pagination);
+    }
+    const endpoint = `sparkdream/session/v1/allowed_granters/${params.grantee}`;
+    return await this.req.get<QueryAllowedGrantersResponse>(endpoint, options);
+  };
+  /* PendingGrantsForGrantee lists the PENDING access-class grants (session
+   keys, sign-ins) that name a grantee and await its acceptance (spec
+   §31.6). These grants are on no other grantee-keyed index, so this is
+   the grantee's discovery path to the grant id MsgAcceptGrant or
+   MsgDeclineGrant needs. Query-only: no on-chain consumer walks it. */
+  pendingGrantsForGrantee = async (params: QueryPendingGrantsForGranteeRequest): Promise<QueryPendingGrantsForGranteeResponse> => {
+    const options: any = {
+      params: {}
+    };
+    if (typeof params?.pagination !== "undefined") {
+      setPaginationParams(options, params.pagination);
+    }
+    const endpoint = `sparkdream/session/v1/pending_grants_for_grantee/${params.grantee}`;
+    return await this.req.get<QueryPendingGrantsForGranteeResponse>(endpoint, options);
   };
 }

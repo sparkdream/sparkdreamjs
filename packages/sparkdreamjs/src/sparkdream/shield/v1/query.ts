@@ -5,6 +5,57 @@ import { ShieldedOpRegistration, ShieldedOpRegistrationAmino, DayFunding, DayFun
 import { Coin, CoinAmino } from "../../../cosmos/base/v1beta1/coin";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
+/** BeaconStatus is the state of one epoch's beacon value. */
+export enum BeaconStatus {
+  BEACON_STATUS_UNSPECIFIED = 0,
+  /**
+   * BEACON_STATUS_UNAVAILABLE - No key will come: the beacon is off, no DKG has completed, the epoch is
+   * older than max_pending_epochs (its key was pruned or never demanded), or
+   * its demand was judged for liveness without reaching the threshold.
+   */
+  BEACON_STATUS_UNAVAILABLE = 1,
+  /** BEACON_STATUS_PENDING - The epoch is open, or closed and demanded, and no key exists yet. */
+  BEACON_STATUS_PENDING = 2,
+  /** BEACON_STATUS_AVAILABLE - The key is reconstructed and stored. */
+  BEACON_STATUS_AVAILABLE = 3,
+  UNRECOGNIZED = -1,
+}
+export const BeaconStatusAmino = BeaconStatus;
+export function beaconStatusFromJSON(object: any): BeaconStatus {
+  switch (object) {
+    case 0:
+    case "BEACON_STATUS_UNSPECIFIED":
+      return BeaconStatus.BEACON_STATUS_UNSPECIFIED;
+    case 1:
+    case "BEACON_STATUS_UNAVAILABLE":
+      return BeaconStatus.BEACON_STATUS_UNAVAILABLE;
+    case 2:
+    case "BEACON_STATUS_PENDING":
+      return BeaconStatus.BEACON_STATUS_PENDING;
+    case 3:
+    case "BEACON_STATUS_AVAILABLE":
+      return BeaconStatus.BEACON_STATUS_AVAILABLE;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return BeaconStatus.UNRECOGNIZED;
+  }
+}
+export function beaconStatusToJSON(object: BeaconStatus): string {
+  switch (object) {
+    case BeaconStatus.BEACON_STATUS_UNSPECIFIED:
+      return "BEACON_STATUS_UNSPECIFIED";
+    case BeaconStatus.BEACON_STATUS_UNAVAILABLE:
+      return "BEACON_STATUS_UNAVAILABLE";
+    case BeaconStatus.BEACON_STATUS_PENDING:
+      return "BEACON_STATUS_PENDING";
+    case BeaconStatus.BEACON_STATUS_AVAILABLE:
+      return "BEACON_STATUS_AVAILABLE";
+    case BeaconStatus.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
 /**
  * @name QueryParamsRequest
  * @package sparkdream.shield.v1
@@ -678,6 +729,74 @@ export interface QueryDecryptionSharesResponseAmino {
 export interface QueryDecryptionSharesResponseAminoMsg {
   type: "/sparkdream.shield.v1.QueryDecryptionSharesResponse";
   value: QueryDecryptionSharesResponseAmino;
+}
+/**
+ * @name QueryBeaconRequest
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.QueryBeaconRequest
+ */
+export interface QueryBeaconRequest {
+  /**
+   * Epoch to look up; 0 means the latest closed epoch (current_epoch - 1).
+   */
+  epoch: bigint;
+}
+export interface QueryBeaconRequestProtoMsg {
+  typeUrl: "/sparkdream.shield.v1.QueryBeaconRequest";
+  value: Uint8Array;
+}
+/**
+ * @name QueryBeaconRequestAmino
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.QueryBeaconRequest
+ */
+export interface QueryBeaconRequestAmino {
+  /**
+   * Epoch to look up; 0 means the latest closed epoch (current_epoch - 1).
+   */
+  epoch?: string;
+}
+export interface QueryBeaconRequestAminoMsg {
+  type: "/sparkdream.shield.v1.QueryBeaconRequest";
+  value: QueryBeaconRequestAmino;
+}
+/**
+ * @name QueryBeaconResponse
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.QueryBeaconResponse
+ */
+export interface QueryBeaconResponse {
+  epoch: bigint;
+  status: BeaconStatus;
+  /**
+   * Hex of the canonical G1 encoding of the epoch key; empty unless AVAILABLE.
+   */
+  keyHex: string;
+  reconstructedAtHeight: bigint;
+  currentEpoch: bigint;
+}
+export interface QueryBeaconResponseProtoMsg {
+  typeUrl: "/sparkdream.shield.v1.QueryBeaconResponse";
+  value: Uint8Array;
+}
+/**
+ * @name QueryBeaconResponseAmino
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.QueryBeaconResponse
+ */
+export interface QueryBeaconResponseAmino {
+  epoch?: string;
+  status?: BeaconStatus;
+  /**
+   * Hex of the canonical G1 encoding of the epoch key; empty unless AVAILABLE.
+   */
+  key_hex?: string;
+  reconstructed_at_height?: string;
+  current_epoch?: string;
+}
+export interface QueryBeaconResponseAminoMsg {
+  type: "/sparkdream.shield.v1.QueryBeaconResponse";
+  value: QueryBeaconResponseAmino;
 }
 /**
  * @name QueryIdentityRateLimitRequest
@@ -2732,6 +2851,190 @@ export const QueryDecryptionSharesResponse = {
     return {
       typeUrl: "/sparkdream.shield.v1.QueryDecryptionSharesResponse",
       value: QueryDecryptionSharesResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryBeaconRequest(): QueryBeaconRequest {
+  return {
+    epoch: BigInt(0)
+  };
+}
+/**
+ * @name QueryBeaconRequest
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.QueryBeaconRequest
+ */
+export const QueryBeaconRequest = {
+  typeUrl: "/sparkdream.shield.v1.QueryBeaconRequest",
+  encode(message: QueryBeaconRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.epoch !== BigInt(0)) {
+      writer.uint32(8).uint64(message.epoch);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryBeaconRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryBeaconRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.epoch = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryBeaconRequest>): QueryBeaconRequest {
+    const message = createBaseQueryBeaconRequest();
+    message.epoch = object.epoch !== undefined && object.epoch !== null ? BigInt(object.epoch.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryBeaconRequestAmino): QueryBeaconRequest {
+    const message = createBaseQueryBeaconRequest();
+    if (object.epoch !== undefined && object.epoch !== null) {
+      message.epoch = BigInt(object.epoch);
+    }
+    return message;
+  },
+  toAmino(message: QueryBeaconRequest): QueryBeaconRequestAmino {
+    const obj: any = {};
+    obj.epoch = message.epoch !== BigInt(0) ? message.epoch?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryBeaconRequestAminoMsg): QueryBeaconRequest {
+    return QueryBeaconRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryBeaconRequestProtoMsg): QueryBeaconRequest {
+    return QueryBeaconRequest.decode(message.value);
+  },
+  toProto(message: QueryBeaconRequest): Uint8Array {
+    return QueryBeaconRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryBeaconRequest): QueryBeaconRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.shield.v1.QueryBeaconRequest",
+      value: QueryBeaconRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryBeaconResponse(): QueryBeaconResponse {
+  return {
+    epoch: BigInt(0),
+    status: 0,
+    keyHex: "",
+    reconstructedAtHeight: BigInt(0),
+    currentEpoch: BigInt(0)
+  };
+}
+/**
+ * @name QueryBeaconResponse
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.QueryBeaconResponse
+ */
+export const QueryBeaconResponse = {
+  typeUrl: "/sparkdream.shield.v1.QueryBeaconResponse",
+  encode(message: QueryBeaconResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.epoch !== BigInt(0)) {
+      writer.uint32(8).uint64(message.epoch);
+    }
+    if (message.status !== 0) {
+      writer.uint32(16).int32(message.status);
+    }
+    if (message.keyHex !== "") {
+      writer.uint32(26).string(message.keyHex);
+    }
+    if (message.reconstructedAtHeight !== BigInt(0)) {
+      writer.uint32(32).int64(message.reconstructedAtHeight);
+    }
+    if (message.currentEpoch !== BigInt(0)) {
+      writer.uint32(40).uint64(message.currentEpoch);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryBeaconResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryBeaconResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.epoch = reader.uint64();
+          break;
+        case 2:
+          message.status = reader.int32() as any;
+          break;
+        case 3:
+          message.keyHex = reader.string();
+          break;
+        case 4:
+          message.reconstructedAtHeight = reader.int64();
+          break;
+        case 5:
+          message.currentEpoch = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryBeaconResponse>): QueryBeaconResponse {
+    const message = createBaseQueryBeaconResponse();
+    message.epoch = object.epoch !== undefined && object.epoch !== null ? BigInt(object.epoch.toString()) : BigInt(0);
+    message.status = object.status ?? 0;
+    message.keyHex = object.keyHex ?? "";
+    message.reconstructedAtHeight = object.reconstructedAtHeight !== undefined && object.reconstructedAtHeight !== null ? BigInt(object.reconstructedAtHeight.toString()) : BigInt(0);
+    message.currentEpoch = object.currentEpoch !== undefined && object.currentEpoch !== null ? BigInt(object.currentEpoch.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: QueryBeaconResponseAmino): QueryBeaconResponse {
+    const message = createBaseQueryBeaconResponse();
+    if (object.epoch !== undefined && object.epoch !== null) {
+      message.epoch = BigInt(object.epoch);
+    }
+    if (object.status !== undefined && object.status !== null) {
+      message.status = object.status;
+    }
+    if (object.key_hex !== undefined && object.key_hex !== null) {
+      message.keyHex = object.key_hex;
+    }
+    if (object.reconstructed_at_height !== undefined && object.reconstructed_at_height !== null) {
+      message.reconstructedAtHeight = BigInt(object.reconstructed_at_height);
+    }
+    if (object.current_epoch !== undefined && object.current_epoch !== null) {
+      message.currentEpoch = BigInt(object.current_epoch);
+    }
+    return message;
+  },
+  toAmino(message: QueryBeaconResponse): QueryBeaconResponseAmino {
+    const obj: any = {};
+    obj.epoch = message.epoch !== BigInt(0) ? message.epoch?.toString() : undefined;
+    obj.status = message.status === 0 ? undefined : message.status;
+    obj.key_hex = message.keyHex === "" ? undefined : message.keyHex;
+    obj.reconstructed_at_height = message.reconstructedAtHeight !== BigInt(0) ? message.reconstructedAtHeight?.toString() : undefined;
+    obj.current_epoch = message.currentEpoch !== BigInt(0) ? message.currentEpoch?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryBeaconResponseAminoMsg): QueryBeaconResponse {
+    return QueryBeaconResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryBeaconResponseProtoMsg): QueryBeaconResponse {
+    return QueryBeaconResponse.decode(message.value);
+  },
+  toProto(message: QueryBeaconResponse): Uint8Array {
+    return QueryBeaconResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryBeaconResponse): QueryBeaconResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.shield.v1.QueryBeaconResponse",
+      value: QueryBeaconResponse.encode(message).finish()
     };
   }
 };

@@ -11,6 +11,10 @@ export interface TagReport {
   tagName: string;
   totalBond: string;
   firstReportAt: bigint;
+  /**
+   * True while the report is open (set when the first reporter files it; the
+   * record is removed on resolution).
+   */
   underReview: boolean;
   reporters: string[];
 }
@@ -28,6 +32,10 @@ export interface TagReportAmino {
   tag_name?: string;
   total_bond?: string;
   first_report_at?: string;
+  /**
+   * True while the report is open (set when the first reporter files it; the
+   * record is removed on resolution).
+   */
   under_review?: boolean;
   reporters?: string[];
 }

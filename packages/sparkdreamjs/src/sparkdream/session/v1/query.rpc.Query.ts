@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QuerySessionRequest, QuerySessionResponse, QuerySessionsByGranterRequest, QuerySessionsByGranterResponse, QuerySessionsByGranteeRequest, QuerySessionsByGranteeResponse, QueryGrantRequest, QueryGrantResponse, QueryGrantsByGranterRequest, QueryGrantsByGranterResponse, QueryGrantsByGranteeRequest, QueryGrantsByGranteeResponse, QueryAllowedMsgTypesRequest, QueryAllowedMsgTypesResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QuerySessionRequest, QuerySessionResponse, QuerySessionsByGranterRequest, QuerySessionsByGranterResponse, QuerySessionsByGranteeRequest, QuerySessionsByGranteeResponse, QueryGrantRequest, QueryGrantResponse, QueryGrantsByGranterRequest, QueryGrantsByGranterResponse, QueryGrantsByGranteeRequest, QueryGrantsByGranteeResponse, QueryAllowedMsgTypesRequest, QueryAllowedMsgTypesResponse, QueryAllowedGrantersRequest, QueryAllowedGrantersResponse, QueryPendingGrantsForGranteeRequest, QueryPendingGrantsForGranteeResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Params queries the parameters of the module. */
@@ -32,6 +32,20 @@ export interface Query {
   grantsByGrantee(request: QueryGrantsByGranteeRequest): Promise<QueryGrantsByGranteeResponse>;
   /** AllowedMsgTypes queries the ceiling and currently active message types. */
   allowedMsgTypes(request?: QueryAllowedMsgTypesRequest): Promise<QueryAllowedMsgTypesResponse>;
+  /**
+   * AllowedGranters lists the granters a grantee has allowed: their
+   * access-class grants (session keys, sign-ins) are ACTIVE at creation
+   * instead of waiting as PENDING for the grantee's acceptance.
+   */
+  allowedGranters(request: QueryAllowedGrantersRequest): Promise<QueryAllowedGrantersResponse>;
+  /**
+   * PendingGrantsForGrantee lists the PENDING access-class grants (session
+   * keys, sign-ins) that name a grantee and await its acceptance (spec
+   * §31.6). These grants are on no other grantee-keyed index, so this is
+   * the grantee's discovery path to the grant id MsgAcceptGrant or
+   * MsgDeclineGrant needs. Query-only: no on-chain consumer walks it.
+   */
+  pendingGrantsForGrantee(request: QueryPendingGrantsForGranteeRequest): Promise<QueryPendingGrantsForGranteeResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -91,6 +105,24 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.session.v1.Query", "AllowedMsgTypes", data);
     return promise.then(data => QueryAllowedMsgTypesResponse.decode(new BinaryReader(data)));
   };
+  /* AllowedGranters lists the granters a grantee has allowed: their
+   access-class grants (session keys, sign-ins) are ACTIVE at creation
+   instead of waiting as PENDING for the grantee's acceptance. */
+  allowedGranters = async (request: QueryAllowedGrantersRequest): Promise<QueryAllowedGrantersResponse> => {
+    const data = QueryAllowedGrantersRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.session.v1.Query", "AllowedGranters", data);
+    return promise.then(data => QueryAllowedGrantersResponse.decode(new BinaryReader(data)));
+  };
+  /* PendingGrantsForGrantee lists the PENDING access-class grants (session
+   keys, sign-ins) that name a grantee and await its acceptance (spec
+   §31.6). These grants are on no other grantee-keyed index, so this is
+   the grantee's discovery path to the grant id MsgAcceptGrant or
+   MsgDeclineGrant needs. Query-only: no on-chain consumer walks it. */
+  pendingGrantsForGrantee = async (request: QueryPendingGrantsForGranteeRequest): Promise<QueryPendingGrantsForGranteeResponse> => {
+    const data = QueryPendingGrantsForGranteeRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.session.v1.Query", "PendingGrantsForGrantee", data);
+    return promise.then(data => QueryPendingGrantsForGranteeResponse.decode(new BinaryReader(data)));
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);
@@ -119,6 +151,12 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     allowedMsgTypes(request?: QueryAllowedMsgTypesRequest): Promise<QueryAllowedMsgTypesResponse> {
       return queryService.allowedMsgTypes(request);
+    },
+    allowedGranters(request: QueryAllowedGrantersRequest): Promise<QueryAllowedGrantersResponse> {
+      return queryService.allowedGranters(request);
+    },
+    pendingGrantsForGrantee(request: QueryPendingGrantsForGranteeRequest): Promise<QueryPendingGrantsForGranteeResponse> {
+      return queryService.pendingGrantsForGrantee(request);
     }
   };
 };

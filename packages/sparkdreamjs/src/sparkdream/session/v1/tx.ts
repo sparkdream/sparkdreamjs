@@ -752,6 +752,112 @@ export interface MsgDeclineGrantResponseAminoMsg {
   type: "/sparkdream.session.v1.MsgDeclineGrantResponse";
   value: MsgDeclineGrantResponseAmino;
 }
+/**
+ * MsgAcceptGrant accepts a PENDING access-class grant as its grantee.
+ * @name MsgAcceptGrant
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.MsgAcceptGrant
+ */
+export interface MsgAcceptGrant {
+  grantee: string;
+  grantId: bigint;
+}
+export interface MsgAcceptGrantProtoMsg {
+  typeUrl: "/sparkdream.session.v1.MsgAcceptGrant";
+  value: Uint8Array;
+}
+/**
+ * MsgAcceptGrant accepts a PENDING access-class grant as its grantee.
+ * @name MsgAcceptGrantAmino
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.MsgAcceptGrant
+ */
+export interface MsgAcceptGrantAmino {
+  grantee?: string;
+  grant_id?: string;
+}
+export interface MsgAcceptGrantAminoMsg {
+  type: "sparkdream/x/session/MsgAcceptGrant";
+  value: MsgAcceptGrantAmino;
+}
+/**
+ * @name MsgAcceptGrantResponse
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.MsgAcceptGrantResponse
+ */
+export interface MsgAcceptGrantResponse {
+  /**
+   * refund_amount is the pending-grant deposit returned to the granter.
+   */
+  refundAmount: Coin;
+}
+export interface MsgAcceptGrantResponseProtoMsg {
+  typeUrl: "/sparkdream.session.v1.MsgAcceptGrantResponse";
+  value: Uint8Array;
+}
+/**
+ * @name MsgAcceptGrantResponseAmino
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.MsgAcceptGrantResponse
+ */
+export interface MsgAcceptGrantResponseAmino {
+  /**
+   * refund_amount is the pending-grant deposit returned to the granter.
+   */
+  refund_amount?: CoinAmino;
+}
+export interface MsgAcceptGrantResponseAminoMsg {
+  type: "/sparkdream.session.v1.MsgAcceptGrantResponse";
+  value: MsgAcceptGrantResponseAmino;
+}
+/**
+ * MsgDisallowGranter removes granter from the grantee's allowed granters.
+ * @name MsgDisallowGranter
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.MsgDisallowGranter
+ */
+export interface MsgDisallowGranter {
+  grantee: string;
+  granter: string;
+}
+export interface MsgDisallowGranterProtoMsg {
+  typeUrl: "/sparkdream.session.v1.MsgDisallowGranter";
+  value: Uint8Array;
+}
+/**
+ * MsgDisallowGranter removes granter from the grantee's allowed granters.
+ * @name MsgDisallowGranterAmino
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.MsgDisallowGranter
+ */
+export interface MsgDisallowGranterAmino {
+  grantee?: string;
+  granter?: string;
+}
+export interface MsgDisallowGranterAminoMsg {
+  type: "sparkdream/x/session/MsgDisallowGranter";
+  value: MsgDisallowGranterAmino;
+}
+/**
+ * @name MsgDisallowGranterResponse
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.MsgDisallowGranterResponse
+ */
+export interface MsgDisallowGranterResponse {}
+export interface MsgDisallowGranterResponseProtoMsg {
+  typeUrl: "/sparkdream.session.v1.MsgDisallowGranterResponse";
+  value: Uint8Array;
+}
+/**
+ * @name MsgDisallowGranterResponseAmino
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.MsgDisallowGranterResponse
+ */
+export interface MsgDisallowGranterResponseAmino {}
+export interface MsgDisallowGranterResponseAminoMsg {
+  type: "/sparkdream.session.v1.MsgDisallowGranterResponse";
+  value: MsgDisallowGranterResponseAmino;
+}
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
     authority: "",
@@ -1570,19 +1676,19 @@ export const MsgCreateGrant = {
       writer.uint32(34).string(message.note);
     }
     if (message.sessionKey !== undefined) {
-      SessionKeyPayload.encode(message.sessionKey, writer.uint32(82).fork()).ldelim();
+      SessionKeyPayload.encode(message.sessionKey, writer.uint32(42).fork()).ldelim();
     }
     if (message.recurringPull !== undefined) {
-      RecurringPullPayload.encode(message.recurringPull, writer.uint32(90).fork()).ldelim();
+      RecurringPullPayload.encode(message.recurringPull, writer.uint32(50).fork()).ldelim();
     }
     if (message.spendingAllowance !== undefined) {
-      SpendingAllowancePayload.encode(message.spendingAllowance, writer.uint32(98).fork()).ldelim();
+      SpendingAllowancePayload.encode(message.spendingAllowance, writer.uint32(58).fork()).ldelim();
     }
     if (message.scheduledOneshot !== undefined) {
-      ScheduledOneshotPayload.encode(message.scheduledOneshot, writer.uint32(106).fork()).ldelim();
+      ScheduledOneshotPayload.encode(message.scheduledOneshot, writer.uint32(66).fork()).ldelim();
     }
     if (message.signIn !== undefined) {
-      SignInPayload.encode(message.signIn, writer.uint32(114).fork()).ldelim();
+      SignInPayload.encode(message.signIn, writer.uint32(74).fork()).ldelim();
     }
     return writer;
   },
@@ -1605,19 +1711,19 @@ export const MsgCreateGrant = {
         case 4:
           message.note = reader.string();
           break;
-        case 10:
+        case 5:
           message.sessionKey = SessionKeyPayload.decode(reader, reader.uint32());
           break;
-        case 11:
+        case 6:
           message.recurringPull = RecurringPullPayload.decode(reader, reader.uint32());
           break;
-        case 12:
+        case 7:
           message.spendingAllowance = SpendingAllowancePayload.decode(reader, reader.uint32());
           break;
-        case 13:
+        case 8:
           message.scheduledOneshot = ScheduledOneshotPayload.decode(reader, reader.uint32());
           break;
-        case 14:
+        case 9:
           message.signIn = SignInPayload.decode(reader, reader.uint32());
           break;
         default:
@@ -2642,6 +2748,305 @@ export const MsgDeclineGrantResponse = {
     return {
       typeUrl: "/sparkdream.session.v1.MsgDeclineGrantResponse",
       value: MsgDeclineGrantResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAcceptGrant(): MsgAcceptGrant {
+  return {
+    grantee: "",
+    grantId: BigInt(0)
+  };
+}
+/**
+ * MsgAcceptGrant accepts a PENDING access-class grant as its grantee.
+ * @name MsgAcceptGrant
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.MsgAcceptGrant
+ */
+export const MsgAcceptGrant = {
+  typeUrl: "/sparkdream.session.v1.MsgAcceptGrant",
+  aminoType: "sparkdream/x/session/MsgAcceptGrant",
+  encode(message: MsgAcceptGrant, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.grantee !== "") {
+      writer.uint32(10).string(message.grantee);
+    }
+    if (message.grantId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.grantId);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAcceptGrant {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAcceptGrant();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.grantee = reader.string();
+          break;
+        case 2:
+          message.grantId = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgAcceptGrant>): MsgAcceptGrant {
+    const message = createBaseMsgAcceptGrant();
+    message.grantee = object.grantee ?? "";
+    message.grantId = object.grantId !== undefined && object.grantId !== null ? BigInt(object.grantId.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgAcceptGrantAmino): MsgAcceptGrant {
+    const message = createBaseMsgAcceptGrant();
+    if (object.grantee !== undefined && object.grantee !== null) {
+      message.grantee = object.grantee;
+    }
+    if (object.grant_id !== undefined && object.grant_id !== null) {
+      message.grantId = BigInt(object.grant_id);
+    }
+    return message;
+  },
+  toAmino(message: MsgAcceptGrant): MsgAcceptGrantAmino {
+    const obj: any = {};
+    obj.grantee = message.grantee === "" ? undefined : message.grantee;
+    obj.grant_id = message.grantId !== BigInt(0) ? message.grantId?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgAcceptGrantAminoMsg): MsgAcceptGrant {
+    return MsgAcceptGrant.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgAcceptGrant): MsgAcceptGrantAminoMsg {
+    return {
+      type: "sparkdream/x/session/MsgAcceptGrant",
+      value: MsgAcceptGrant.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgAcceptGrantProtoMsg): MsgAcceptGrant {
+    return MsgAcceptGrant.decode(message.value);
+  },
+  toProto(message: MsgAcceptGrant): Uint8Array {
+    return MsgAcceptGrant.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAcceptGrant): MsgAcceptGrantProtoMsg {
+    return {
+      typeUrl: "/sparkdream.session.v1.MsgAcceptGrant",
+      value: MsgAcceptGrant.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgAcceptGrantResponse(): MsgAcceptGrantResponse {
+  return {
+    refundAmount: Coin.fromPartial({})
+  };
+}
+/**
+ * @name MsgAcceptGrantResponse
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.MsgAcceptGrantResponse
+ */
+export const MsgAcceptGrantResponse = {
+  typeUrl: "/sparkdream.session.v1.MsgAcceptGrantResponse",
+  encode(message: MsgAcceptGrantResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.refundAmount !== undefined) {
+      Coin.encode(message.refundAmount, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgAcceptGrantResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgAcceptGrantResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.refundAmount = Coin.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgAcceptGrantResponse>): MsgAcceptGrantResponse {
+    const message = createBaseMsgAcceptGrantResponse();
+    message.refundAmount = object.refundAmount !== undefined && object.refundAmount !== null ? Coin.fromPartial(object.refundAmount) : undefined;
+    return message;
+  },
+  fromAmino(object: MsgAcceptGrantResponseAmino): MsgAcceptGrantResponse {
+    const message = createBaseMsgAcceptGrantResponse();
+    if (object.refund_amount !== undefined && object.refund_amount !== null) {
+      message.refundAmount = Coin.fromAmino(object.refund_amount);
+    }
+    return message;
+  },
+  toAmino(message: MsgAcceptGrantResponse): MsgAcceptGrantResponseAmino {
+    const obj: any = {};
+    obj.refund_amount = message.refundAmount ? Coin.toAmino(message.refundAmount) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgAcceptGrantResponseAminoMsg): MsgAcceptGrantResponse {
+    return MsgAcceptGrantResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgAcceptGrantResponseProtoMsg): MsgAcceptGrantResponse {
+    return MsgAcceptGrantResponse.decode(message.value);
+  },
+  toProto(message: MsgAcceptGrantResponse): Uint8Array {
+    return MsgAcceptGrantResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgAcceptGrantResponse): MsgAcceptGrantResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.session.v1.MsgAcceptGrantResponse",
+      value: MsgAcceptGrantResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgDisallowGranter(): MsgDisallowGranter {
+  return {
+    grantee: "",
+    granter: ""
+  };
+}
+/**
+ * MsgDisallowGranter removes granter from the grantee's allowed granters.
+ * @name MsgDisallowGranter
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.MsgDisallowGranter
+ */
+export const MsgDisallowGranter = {
+  typeUrl: "/sparkdream.session.v1.MsgDisallowGranter",
+  aminoType: "sparkdream/x/session/MsgDisallowGranter",
+  encode(message: MsgDisallowGranter, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.grantee !== "") {
+      writer.uint32(10).string(message.grantee);
+    }
+    if (message.granter !== "") {
+      writer.uint32(18).string(message.granter);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgDisallowGranter {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgDisallowGranter();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.grantee = reader.string();
+          break;
+        case 2:
+          message.granter = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgDisallowGranter>): MsgDisallowGranter {
+    const message = createBaseMsgDisallowGranter();
+    message.grantee = object.grantee ?? "";
+    message.granter = object.granter ?? "";
+    return message;
+  },
+  fromAmino(object: MsgDisallowGranterAmino): MsgDisallowGranter {
+    const message = createBaseMsgDisallowGranter();
+    if (object.grantee !== undefined && object.grantee !== null) {
+      message.grantee = object.grantee;
+    }
+    if (object.granter !== undefined && object.granter !== null) {
+      message.granter = object.granter;
+    }
+    return message;
+  },
+  toAmino(message: MsgDisallowGranter): MsgDisallowGranterAmino {
+    const obj: any = {};
+    obj.grantee = message.grantee === "" ? undefined : message.grantee;
+    obj.granter = message.granter === "" ? undefined : message.granter;
+    return obj;
+  },
+  fromAminoMsg(object: MsgDisallowGranterAminoMsg): MsgDisallowGranter {
+    return MsgDisallowGranter.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgDisallowGranter): MsgDisallowGranterAminoMsg {
+    return {
+      type: "sparkdream/x/session/MsgDisallowGranter",
+      value: MsgDisallowGranter.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgDisallowGranterProtoMsg): MsgDisallowGranter {
+    return MsgDisallowGranter.decode(message.value);
+  },
+  toProto(message: MsgDisallowGranter): Uint8Array {
+    return MsgDisallowGranter.encode(message).finish();
+  },
+  toProtoMsg(message: MsgDisallowGranter): MsgDisallowGranterProtoMsg {
+    return {
+      typeUrl: "/sparkdream.session.v1.MsgDisallowGranter",
+      value: MsgDisallowGranter.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgDisallowGranterResponse(): MsgDisallowGranterResponse {
+  return {};
+}
+/**
+ * @name MsgDisallowGranterResponse
+ * @package sparkdream.session.v1
+ * @see proto type: sparkdream.session.v1.MsgDisallowGranterResponse
+ */
+export const MsgDisallowGranterResponse = {
+  typeUrl: "/sparkdream.session.v1.MsgDisallowGranterResponse",
+  encode(_: MsgDisallowGranterResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgDisallowGranterResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgDisallowGranterResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgDisallowGranterResponse>): MsgDisallowGranterResponse {
+    const message = createBaseMsgDisallowGranterResponse();
+    return message;
+  },
+  fromAmino(_: MsgDisallowGranterResponseAmino): MsgDisallowGranterResponse {
+    const message = createBaseMsgDisallowGranterResponse();
+    return message;
+  },
+  toAmino(_: MsgDisallowGranterResponse): MsgDisallowGranterResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgDisallowGranterResponseAminoMsg): MsgDisallowGranterResponse {
+    return MsgDisallowGranterResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgDisallowGranterResponseProtoMsg): MsgDisallowGranterResponse {
+    return MsgDisallowGranterResponse.decode(message.value);
+  },
+  toProto(message: MsgDisallowGranterResponse): Uint8Array {
+    return MsgDisallowGranterResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgDisallowGranterResponse): MsgDisallowGranterResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.session.v1.MsgDisallowGranterResponse",
+      value: MsgDisallowGranterResponse.encode(message).finish()
     };
   }
 };

@@ -1291,6 +1291,13 @@ export interface Token {
    * Tokens nested under this one, at any depth.
    */
   descendants: number;
+  /**
+   * Set when the deposit was paid through a delegated x/session key: the
+   * granter that paid it, who receives the refund instead of the holder or
+   * burner (a leaked key cannot mint to itself and burn for the granter's
+   * deposits). Empty = the usual recipient.
+   */
+  depositPayer: string;
 }
 export interface TokenProtoMsg {
   typeUrl: "/sparkdream.artifact.v1.Token";
@@ -1366,6 +1373,13 @@ export interface TokenAmino {
    * Tokens nested under this one, at any depth.
    */
   descendants?: number;
+  /**
+   * Set when the deposit was paid through a delegated x/session key: the
+   * granter that paid it, who receives the refund instead of the holder or
+   * burner (a leaked key cannot mint to itself and burn for the granter's
+   * deposits). Empty = the usual recipient.
+   */
+  deposit_payer?: string;
 }
 export interface TokenAminoMsg {
   type: "/sparkdream.artifact.v1.Token";
@@ -1453,6 +1467,10 @@ export interface PendingMint {
   expiresAt: bigint;
   schedule: MetadataStage[];
   unrevealed: boolean;
+  /**
+   * Carried to Token.deposit_payer on acceptance.
+   */
+  depositPayer: string;
 }
 export interface PendingMintProtoMsg {
   typeUrl: "/sparkdream.artifact.v1.PendingMint";
@@ -1476,6 +1494,10 @@ export interface PendingMintAmino {
   expires_at?: string;
   schedule?: MetadataStageAmino[];
   unrevealed?: boolean;
+  /**
+   * Carried to Token.deposit_payer on acceptance.
+   */
+  deposit_payer?: string;
 }
 export interface PendingMintAminoMsg {
   type: "/sparkdream.artifact.v1.PendingMint";
@@ -1851,6 +1873,14 @@ export interface HarbergerState {
    * Tax paid by the current holder so far.
    */
   taxPaid: string;
+  /**
+   * The price the paid-through window (now to PaidThrough) was assessed
+   * at: the arrival price for the grace period, the price at each pull or
+   * up-front charge after. A re-assessment above it within the window
+   * charges the difference up front, so lowering the price never makes
+   * the time already paid for cheaper to hold at a higher one.
+   */
+  paidPrice: string;
 }
 export interface HarbergerStateProtoMsg {
   typeUrl: "/sparkdream.artifact.v1.HarbergerState";
@@ -1888,6 +1918,14 @@ export interface HarbergerStateAmino {
    * Tax paid by the current holder so far.
    */
   tax_paid?: string;
+  /**
+   * The price the paid-through window (now to PaidThrough) was assessed
+   * at: the arrival price for the grace period, the price at each pull or
+   * up-front charge after. A re-assessment above it within the window
+   * charges the difference up front, so lowering the price never makes
+   * the time already paid for cheaper to hold at a higher one.
+   */
+  paid_price?: string;
 }
 export interface HarbergerStateAminoMsg {
   type: "/sparkdream.artifact.v1.HarbergerState";
@@ -2219,6 +2257,13 @@ export interface Balance {
    * Settled retro-funding rewards not yet claimed (bond denom).
    */
   unclaimed: string;
+  /**
+   * Set when the deposit was paid through a delegated x/session key: the
+   * granter that paid it, who receives the refund instead of the holder
+   * who empties the record (a leaked key cannot mint units to itself and
+   * burn them for the granter's deposits). Empty = the usual recipient.
+   */
+  depositPayer: string;
 }
 export interface BalanceProtoMsg {
   typeUrl: "/sparkdream.artifact.v1.Balance";
@@ -2254,6 +2299,13 @@ export interface BalanceAmino {
    * Settled retro-funding rewards not yet claimed (bond denom).
    */
   unclaimed?: string;
+  /**
+   * Set when the deposit was paid through a delegated x/session key: the
+   * granter that paid it, who receives the refund instead of the holder
+   * who empties the record (a leaked key cannot mint units to itself and
+   * burn them for the granter's deposits). Empty = the usual recipient.
+   */
+  deposit_payer?: string;
 }
 export interface BalanceAminoMsg {
   type: "/sparkdream.artifact.v1.Balance";
@@ -2315,6 +2367,10 @@ export interface PendingUnits {
   deposit: string;
   createdAt: bigint;
   expiresAt: bigint;
+  /**
+   * Carried to Balance.deposit_payer when a mint creates the record.
+   */
+  depositPayer: string;
 }
 export interface PendingUnitsProtoMsg {
   typeUrl: "/sparkdream.artifact.v1.PendingUnits";
@@ -2348,6 +2404,10 @@ export interface PendingUnitsAmino {
   deposit?: string;
   created_at?: string;
   expires_at?: string;
+  /**
+   * Carried to Balance.deposit_payer when a mint creates the record.
+   */
+  deposit_payer?: string;
 }
 export interface PendingUnitsAminoMsg {
   type: "/sparkdream.artifact.v1.PendingUnits";
@@ -4236,7 +4296,8 @@ function createBaseToken(): Token {
     nextMediaProposalId: BigInt(0),
     harberger: undefined,
     parent: undefined,
-    descendants: 0
+    descendants: 0,
+    depositPayer: ""
   };
 }
 /**
@@ -4320,6 +4381,9 @@ export const Token = {
     if (message.descendants !== 0) {
       writer.uint32(192).uint32(message.descendants);
     }
+    if (message.depositPayer !== "") {
+      writer.uint32(202).string(message.depositPayer);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Token {
@@ -4401,6 +4465,9 @@ export const Token = {
         case 24:
           message.descendants = reader.uint32();
           break;
+        case 25:
+          message.depositPayer = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4434,6 +4501,7 @@ export const Token = {
     message.harberger = object.harberger !== undefined && object.harberger !== null ? HarbergerState.fromPartial(object.harberger) : undefined;
     message.parent = object.parent !== undefined && object.parent !== null ? TokenRef.fromPartial(object.parent) : undefined;
     message.descendants = object.descendants ?? 0;
+    message.depositPayer = object.depositPayer ?? "";
     return message;
   },
   fromAmino(object: TokenAmino): Token {
@@ -4506,6 +4574,9 @@ export const Token = {
     if (object.descendants !== undefined && object.descendants !== null) {
       message.descendants = object.descendants;
     }
+    if (object.deposit_payer !== undefined && object.deposit_payer !== null) {
+      message.depositPayer = object.deposit_payer;
+    }
     return message;
   },
   toAmino(message: Token): TokenAmino {
@@ -4542,6 +4613,7 @@ export const Token = {
     obj.harberger = message.harberger ? HarbergerState.toAmino(message.harberger) : undefined;
     obj.parent = message.parent ? TokenRef.toAmino(message.parent) : undefined;
     obj.descendants = message.descendants === 0 ? undefined : message.descendants;
+    obj.deposit_payer = message.depositPayer === "" ? undefined : message.depositPayer;
     return obj;
   },
   fromAminoMsg(object: TokenAminoMsg): Token {
@@ -4781,7 +4853,8 @@ function createBasePendingMint(): PendingMint {
     createdAt: BigInt(0),
     expiresAt: BigInt(0),
     schedule: [],
-    unrevealed: false
+    unrevealed: false,
+    depositPayer: ""
   };
 }
 /**
@@ -4824,6 +4897,9 @@ export const PendingMint = {
     if (message.unrevealed === true) {
       writer.uint32(80).bool(message.unrevealed);
     }
+    if (message.depositPayer !== "") {
+      writer.uint32(90).string(message.depositPayer);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): PendingMint {
@@ -4863,6 +4939,9 @@ export const PendingMint = {
         case 10:
           message.unrevealed = reader.bool();
           break;
+        case 11:
+          message.depositPayer = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4882,6 +4961,7 @@ export const PendingMint = {
     message.expiresAt = object.expiresAt !== undefined && object.expiresAt !== null ? BigInt(object.expiresAt.toString()) : BigInt(0);
     message.schedule = object.schedule?.map(e => MetadataStage.fromPartial(e)) || [];
     message.unrevealed = object.unrevealed ?? false;
+    message.depositPayer = object.depositPayer ?? "";
     return message;
   },
   fromAmino(object: PendingMintAmino): PendingMint {
@@ -4914,6 +4994,9 @@ export const PendingMint = {
     if (object.unrevealed !== undefined && object.unrevealed !== null) {
       message.unrevealed = object.unrevealed;
     }
+    if (object.deposit_payer !== undefined && object.deposit_payer !== null) {
+      message.depositPayer = object.deposit_payer;
+    }
     return message;
   },
   toAmino(message: PendingMint): PendingMintAmino {
@@ -4932,6 +5015,7 @@ export const PendingMint = {
       obj.schedule = message.schedule;
     }
     obj.unrevealed = message.unrevealed === false ? undefined : message.unrevealed;
+    obj.deposit_payer = message.depositPayer === "" ? undefined : message.depositPayer;
     return obj;
   },
   fromAminoMsg(object: PendingMintAminoMsg): PendingMint {
@@ -5861,7 +5945,8 @@ function createBaseHarbergerState(): HarbergerState {
     nextDue: BigInt(0),
     graceUntil: BigInt(0),
     foreclosedAt: BigInt(0),
-    taxPaid: ""
+    taxPaid: "",
+    paidPrice: ""
   };
 }
 /**
@@ -5891,6 +5976,9 @@ export const HarbergerState = {
     if (message.taxPaid !== "") {
       writer.uint32(50).string(message.taxPaid);
     }
+    if (message.paidPrice !== "") {
+      writer.uint32(58).string(message.paidPrice);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): HarbergerState {
@@ -5918,6 +6006,9 @@ export const HarbergerState = {
         case 6:
           message.taxPaid = reader.string();
           break;
+        case 7:
+          message.paidPrice = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -5933,6 +6024,7 @@ export const HarbergerState = {
     message.graceUntil = object.graceUntil !== undefined && object.graceUntil !== null ? BigInt(object.graceUntil.toString()) : BigInt(0);
     message.foreclosedAt = object.foreclosedAt !== undefined && object.foreclosedAt !== null ? BigInt(object.foreclosedAt.toString()) : BigInt(0);
     message.taxPaid = object.taxPaid ?? "";
+    message.paidPrice = object.paidPrice ?? "";
     return message;
   },
   fromAmino(object: HarbergerStateAmino): HarbergerState {
@@ -5955,6 +6047,9 @@ export const HarbergerState = {
     if (object.tax_paid !== undefined && object.tax_paid !== null) {
       message.taxPaid = object.tax_paid;
     }
+    if (object.paid_price !== undefined && object.paid_price !== null) {
+      message.paidPrice = object.paid_price;
+    }
     return message;
   },
   toAmino(message: HarbergerState): HarbergerStateAmino {
@@ -5965,6 +6060,7 @@ export const HarbergerState = {
     obj.grace_until = message.graceUntil !== BigInt(0) ? message.graceUntil?.toString() : undefined;
     obj.foreclosed_at = message.foreclosedAt !== BigInt(0) ? message.foreclosedAt?.toString() : undefined;
     obj.tax_paid = message.taxPaid === "" ? undefined : message.taxPaid;
+    obj.paid_price = message.paidPrice === "" ? undefined : message.paidPrice;
     return obj;
   },
   fromAminoMsg(object: HarbergerStateAminoMsg): HarbergerState {
@@ -6708,7 +6804,8 @@ function createBaseBalance(): Balance {
     locked: BigInt(0),
     deposit: "",
     rewardDebt: "",
-    unclaimed: ""
+    unclaimed: "",
+    depositPayer: ""
   };
 }
 /**
@@ -6744,6 +6841,9 @@ export const Balance = {
     if (message.unclaimed !== "") {
       writer.uint32(66).string(message.unclaimed);
     }
+    if (message.depositPayer !== "") {
+      writer.uint32(74).string(message.depositPayer);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Balance {
@@ -6777,6 +6877,9 @@ export const Balance = {
         case 8:
           message.unclaimed = reader.string();
           break;
+        case 9:
+          message.depositPayer = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -6794,6 +6897,7 @@ export const Balance = {
     message.deposit = object.deposit ?? "";
     message.rewardDebt = object.rewardDebt ?? "";
     message.unclaimed = object.unclaimed ?? "";
+    message.depositPayer = object.depositPayer ?? "";
     return message;
   },
   fromAmino(object: BalanceAmino): Balance {
@@ -6822,6 +6926,9 @@ export const Balance = {
     if (object.unclaimed !== undefined && object.unclaimed !== null) {
       message.unclaimed = object.unclaimed;
     }
+    if (object.deposit_payer !== undefined && object.deposit_payer !== null) {
+      message.depositPayer = object.deposit_payer;
+    }
     return message;
   },
   toAmino(message: Balance): BalanceAmino {
@@ -6834,6 +6941,7 @@ export const Balance = {
     obj.deposit = message.deposit === "" ? undefined : message.deposit;
     obj.reward_debt = message.rewardDebt === "" ? undefined : message.rewardDebt;
     obj.unclaimed = message.unclaimed === "" ? undefined : message.unclaimed;
+    obj.deposit_payer = message.depositPayer === "" ? undefined : message.depositPayer;
     return obj;
   },
   fromAminoMsg(object: BalanceAminoMsg): Balance {
@@ -6944,7 +7052,8 @@ function createBasePendingUnits(): PendingUnits {
     amount: BigInt(0),
     deposit: "",
     createdAt: BigInt(0),
-    expiresAt: BigInt(0)
+    expiresAt: BigInt(0),
+    depositPayer: ""
   };
 }
 /**
@@ -6987,6 +7096,9 @@ export const PendingUnits = {
     if (message.expiresAt !== BigInt(0)) {
       writer.uint32(80).int64(message.expiresAt);
     }
+    if (message.depositPayer !== "") {
+      writer.uint32(90).string(message.depositPayer);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): PendingUnits {
@@ -7026,6 +7138,9 @@ export const PendingUnits = {
         case 10:
           message.expiresAt = reader.int64();
           break;
+        case 11:
+          message.depositPayer = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -7045,6 +7160,7 @@ export const PendingUnits = {
     message.deposit = object.deposit ?? "";
     message.createdAt = object.createdAt !== undefined && object.createdAt !== null ? BigInt(object.createdAt.toString()) : BigInt(0);
     message.expiresAt = object.expiresAt !== undefined && object.expiresAt !== null ? BigInt(object.expiresAt.toString()) : BigInt(0);
+    message.depositPayer = object.depositPayer ?? "";
     return message;
   },
   fromAmino(object: PendingUnitsAmino): PendingUnits {
@@ -7079,6 +7195,9 @@ export const PendingUnits = {
     if (object.expires_at !== undefined && object.expires_at !== null) {
       message.expiresAt = BigInt(object.expires_at);
     }
+    if (object.deposit_payer !== undefined && object.deposit_payer !== null) {
+      message.depositPayer = object.deposit_payer;
+    }
     return message;
   },
   toAmino(message: PendingUnits): PendingUnitsAmino {
@@ -7093,6 +7212,7 @@ export const PendingUnits = {
     obj.deposit = message.deposit === "" ? undefined : message.deposit;
     obj.created_at = message.createdAt !== BigInt(0) ? message.createdAt?.toString() : undefined;
     obj.expires_at = message.expiresAt !== BigInt(0) ? message.expiresAt?.toString() : undefined;
+    obj.deposit_payer = message.depositPayer === "" ? undefined : message.depositPayer;
     return obj;
   },
   fromAminoMsg(object: PendingUnitsAminoMsg): PendingUnits {

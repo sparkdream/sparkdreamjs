@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { Params, ParamsAmino } from "./params";
 import { Coin, CoinAmino } from "../../../cosmos/base/v1beta1/coin";
-import { BallotMode, VoteOption } from "./group";
+import { BallotMode, VoteOption, ProposalStatus } from "./group";
 import { Any, AnyAmino } from "../../../google/protobuf/any";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
@@ -1050,7 +1050,14 @@ export interface MsgExecuteProposalAminoMsg {
  * @package sparkdream.commons.v1
  * @see proto type: sparkdream.commons.v1.MsgExecuteProposalResponse
  */
-export interface MsgExecuteProposalResponse {}
+export interface MsgExecuteProposalResponse {
+  /**
+   * status is the proposal's status after the call: EXECUTED, or the
+   * terminal VETOED / FAILED it was closed with when it can never run.
+   * An execution that may succeed on retry is a tx error instead.
+   */
+  status: ProposalStatus;
+}
 export interface MsgExecuteProposalResponseProtoMsg {
   typeUrl: "/sparkdream.commons.v1.MsgExecuteProposalResponse";
   value: Uint8Array;
@@ -1061,7 +1068,14 @@ export interface MsgExecuteProposalResponseProtoMsg {
  * @package sparkdream.commons.v1
  * @see proto type: sparkdream.commons.v1.MsgExecuteProposalResponse
  */
-export interface MsgExecuteProposalResponseAmino {}
+export interface MsgExecuteProposalResponseAmino {
+  /**
+   * status is the proposal's status after the call: EXECUTED, or the
+   * terminal VETOED / FAILED it was closed with when it can never run.
+   * An execution that may succeed on retry is a tx error instead.
+   */
+  status?: ProposalStatus;
+}
 export interface MsgExecuteProposalResponseAminoMsg {
   type: "/sparkdream.commons.v1.MsgExecuteProposalResponse";
   value: MsgExecuteProposalResponseAmino;
@@ -4934,7 +4948,9 @@ export const MsgExecuteProposal = {
   }
 };
 function createBaseMsgExecuteProposalResponse(): MsgExecuteProposalResponse {
-  return {};
+  return {
+    status: 0
+  };
 }
 /**
  * MsgExecuteProposalResponse defines the response for ExecuteProposal.
@@ -4944,7 +4960,10 @@ function createBaseMsgExecuteProposalResponse(): MsgExecuteProposalResponse {
  */
 export const MsgExecuteProposalResponse = {
   typeUrl: "/sparkdream.commons.v1.MsgExecuteProposalResponse",
-  encode(_: MsgExecuteProposalResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+  encode(message: MsgExecuteProposalResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.status !== 0) {
+      writer.uint32(8).int32(message.status);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgExecuteProposalResponse {
@@ -4954,6 +4973,9 @@ export const MsgExecuteProposalResponse = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1:
+          message.status = reader.int32() as any;
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -4961,16 +4983,21 @@ export const MsgExecuteProposalResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgExecuteProposalResponse>): MsgExecuteProposalResponse {
+  fromPartial(object: DeepPartial<MsgExecuteProposalResponse>): MsgExecuteProposalResponse {
     const message = createBaseMsgExecuteProposalResponse();
+    message.status = object.status ?? 0;
     return message;
   },
-  fromAmino(_: MsgExecuteProposalResponseAmino): MsgExecuteProposalResponse {
+  fromAmino(object: MsgExecuteProposalResponseAmino): MsgExecuteProposalResponse {
     const message = createBaseMsgExecuteProposalResponse();
+    if (object.status !== undefined && object.status !== null) {
+      message.status = object.status;
+    }
     return message;
   },
-  toAmino(_: MsgExecuteProposalResponse): MsgExecuteProposalResponseAmino {
+  toAmino(message: MsgExecuteProposalResponse): MsgExecuteProposalResponseAmino {
     const obj: any = {};
+    obj.status = message.status === 0 ? undefined : message.status;
     return obj;
   },
   fromAminoMsg(object: MsgExecuteProposalResponseAminoMsg): MsgExecuteProposalResponse {

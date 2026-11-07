@@ -6,7 +6,7 @@ import { Project, ProjectAmino } from "./project";
 import { Initiative, InitiativeAmino } from "./initiative";
 import { Stake, StakeAmino, MemberStakePool, MemberStakePoolAmino, TagStakePool, TagStakePoolAmino, ProjectStakeInfo, ProjectStakeInfoAmino } from "./stake";
 import { Challenge, ChallengeAmino } from "./challenge";
-import { JuryReview, JuryReviewAmino } from "./jury_review";
+import { JuryReview, JuryReviewAmino, PendingJuryDraw, PendingJuryDrawAmino } from "./jury_review";
 import { Interim, InterimAmino } from "./interim";
 import { ContentChallenge, ContentChallengeAmino } from "./content_challenge";
 import { Tag, TagAmino } from "./tag";
@@ -173,6 +173,13 @@ export interface GenesisState {
    * awarder's cap for that epoch.
    */
   tagBudgetAwarderEpochList: TagBudgetAwarderEpochSpend[];
+  /**
+   * Reviews with seats waiting for the EndBlocker draw, with the x/shield
+   * beacon epoch each draw is seeded from. A review exported with
+   * pending_seats > 0 and no entry here is queued with seed_epoch 0 (block-hash
+   * seed, drawn in the first block).
+   */
+  pendingJuryDrawList: PendingJuryDraw[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.rep.v1.GenesisState";
@@ -325,6 +332,13 @@ export interface GenesisStateAmino {
    * awarder's cap for that epoch.
    */
   tag_budget_awarder_epoch_list?: TagBudgetAwarderEpochSpendAmino[];
+  /**
+   * Reviews with seats waiting for the EndBlocker draw, with the x/shield
+   * beacon epoch each draw is seeded from. A review exported with
+   * pending_seats > 0 and no entry here is queued with seed_epoch 0 (block-hash
+   * seed, drawn in the first block).
+   */
+  pending_jury_draw_list?: PendingJuryDrawAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.rep.v1.GenesisState";
@@ -425,6 +439,19 @@ export interface EconomicState {
   epochMintedEpoch: bigint;
   epochMintedAmount: string;
   decayLastProcessedEpoch: bigint;
+  /**
+   * The decay pass in flight (REP-E-108). A pass spans blocks, so an export
+   * taken mid-pass must carry where it stopped, or the importing chain starts
+   * a fresh pass and decays the already-visited stake records a second time.
+   * decay_pass_epoch is 0 when no pass is running (a pass is never for epoch
+   * 0); the member cursor is the last member visited ("" before the first);
+   * decay_pass_stake_phase marks that the member phase is done and
+   * decay_pass_stake_cursor is the next stake id.
+   */
+  decayPassEpoch: bigint;
+  decayPassMemberCursor: string;
+  decayPassStakePhase: boolean;
+  decayPassStakeCursor: bigint;
 }
 export interface EconomicStateProtoMsg {
   typeUrl: "/sparkdream.rep.v1.EconomicState";
@@ -459,6 +486,19 @@ export interface EconomicStateAmino {
   epoch_minted_epoch?: string;
   epoch_minted_amount?: string;
   decay_last_processed_epoch?: string;
+  /**
+   * The decay pass in flight (REP-E-108). A pass spans blocks, so an export
+   * taken mid-pass must carry where it stopped, or the importing chain starts
+   * a fresh pass and decays the already-visited stake records a second time.
+   * decay_pass_epoch is 0 when no pass is running (a pass is never for epoch
+   * 0); the member cursor is the last member visited ("" before the first);
+   * decay_pass_stake_phase marks that the member phase is done and
+   * decay_pass_stake_cursor is the next stake id.
+   */
+  decay_pass_epoch?: string;
+  decay_pass_member_cursor?: string;
+  decay_pass_stake_phase?: boolean;
+  decay_pass_stake_cursor?: string;
 }
 export interface EconomicStateAminoMsg {
   type: "/sparkdream.rep.v1.EconomicState";
@@ -625,7 +665,8 @@ function createBaseGenesisState(): GenesisState {
     memberActionRestorationList: [],
     juryReviewsOutsideVerdictIndex: [],
     tagBudgetAwardCooldownList: [],
-    tagBudgetAwarderEpochList: []
+    tagBudgetAwarderEpochList: [],
+    pendingJuryDrawList: []
   };
 }
 /**
@@ -802,6 +843,9 @@ export const GenesisState = {
     }
     for (const v of message.tagBudgetAwarderEpochList) {
       TagBudgetAwarderEpochSpend.encode(v!, writer.uint32(434).fork()).ldelim();
+    }
+    for (const v of message.pendingJuryDrawList) {
+      PendingJuryDraw.encode(v!, writer.uint32(442).fork()).ldelim();
     }
     return writer;
   },
@@ -988,6 +1032,9 @@ export const GenesisState = {
         case 54:
           message.tagBudgetAwarderEpochList.push(TagBudgetAwarderEpochSpend.decode(reader, reader.uint32()));
           break;
+        case 55:
+          message.pendingJuryDrawList.push(PendingJuryDraw.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1051,6 +1098,7 @@ export const GenesisState = {
     message.juryReviewsOutsideVerdictIndex = object.juryReviewsOutsideVerdictIndex?.map(e => BigInt(e.toString())) || [];
     message.tagBudgetAwardCooldownList = object.tagBudgetAwardCooldownList?.map(e => TagBudgetAwardCooldown.fromPartial(e)) || [];
     message.tagBudgetAwarderEpochList = object.tagBudgetAwarderEpochList?.map(e => TagBudgetAwarderEpochSpend.fromPartial(e)) || [];
+    message.pendingJuryDrawList = object.pendingJuryDrawList?.map(e => PendingJuryDraw.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -1139,6 +1187,7 @@ export const GenesisState = {
     message.juryReviewsOutsideVerdictIndex = object.jury_reviews_outside_verdict_index?.map(e => BigInt(e)) || [];
     message.tagBudgetAwardCooldownList = object.tag_budget_award_cooldown_list?.map(e => TagBudgetAwardCooldown.fromAmino(e)) || [];
     message.tagBudgetAwarderEpochList = object.tag_budget_awarder_epoch_list?.map(e => TagBudgetAwarderEpochSpend.fromAmino(e)) || [];
+    message.pendingJuryDrawList = object.pending_jury_draw_list?.map(e => PendingJuryDraw.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -1352,6 +1401,11 @@ export const GenesisState = {
       obj.tag_budget_awarder_epoch_list = message.tagBudgetAwarderEpochList.map(e => e ? TagBudgetAwarderEpochSpend.toAmino(e) : undefined);
     } else {
       obj.tag_budget_awarder_epoch_list = message.tagBudgetAwarderEpochList;
+    }
+    if (message.pendingJuryDrawList) {
+      obj.pending_jury_draw_list = message.pendingJuryDrawList.map(e => e ? PendingJuryDraw.toAmino(e) : undefined);
+    } else {
+      obj.pending_jury_draw_list = message.pendingJuryDrawList;
     }
     return obj;
   },
@@ -1587,7 +1641,11 @@ function createBaseEconomicState(): EconomicState {
     seasonalPoolStartEpoch: BigInt(0),
     epochMintedEpoch: BigInt(0),
     epochMintedAmount: "",
-    decayLastProcessedEpoch: BigInt(0)
+    decayLastProcessedEpoch: BigInt(0),
+    decayPassEpoch: BigInt(0),
+    decayPassMemberCursor: "",
+    decayPassStakePhase: false,
+    decayPassStakeCursor: BigInt(0)
   };
 }
 /**
@@ -1646,6 +1704,18 @@ export const EconomicState = {
     if (message.decayLastProcessedEpoch !== BigInt(0)) {
       writer.uint32(120).uint64(message.decayLastProcessedEpoch);
     }
+    if (message.decayPassEpoch !== BigInt(0)) {
+      writer.uint32(128).uint64(message.decayPassEpoch);
+    }
+    if (message.decayPassMemberCursor !== "") {
+      writer.uint32(138).string(message.decayPassMemberCursor);
+    }
+    if (message.decayPassStakePhase === true) {
+      writer.uint32(144).bool(message.decayPassStakePhase);
+    }
+    if (message.decayPassStakeCursor !== BigInt(0)) {
+      writer.uint32(152).uint64(message.decayPassStakeCursor);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): EconomicState {
@@ -1700,6 +1770,18 @@ export const EconomicState = {
         case 15:
           message.decayLastProcessedEpoch = reader.uint64();
           break;
+        case 16:
+          message.decayPassEpoch = reader.uint64();
+          break;
+        case 17:
+          message.decayPassMemberCursor = reader.string();
+          break;
+        case 18:
+          message.decayPassStakePhase = reader.bool();
+          break;
+        case 19:
+          message.decayPassStakeCursor = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1724,6 +1806,10 @@ export const EconomicState = {
     message.epochMintedEpoch = object.epochMintedEpoch !== undefined && object.epochMintedEpoch !== null ? BigInt(object.epochMintedEpoch.toString()) : BigInt(0);
     message.epochMintedAmount = object.epochMintedAmount ?? "";
     message.decayLastProcessedEpoch = object.decayLastProcessedEpoch !== undefined && object.decayLastProcessedEpoch !== null ? BigInt(object.decayLastProcessedEpoch.toString()) : BigInt(0);
+    message.decayPassEpoch = object.decayPassEpoch !== undefined && object.decayPassEpoch !== null ? BigInt(object.decayPassEpoch.toString()) : BigInt(0);
+    message.decayPassMemberCursor = object.decayPassMemberCursor ?? "";
+    message.decayPassStakePhase = object.decayPassStakePhase ?? false;
+    message.decayPassStakeCursor = object.decayPassStakeCursor !== undefined && object.decayPassStakeCursor !== null ? BigInt(object.decayPassStakeCursor.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: EconomicStateAmino): EconomicState {
@@ -1773,6 +1859,18 @@ export const EconomicState = {
     if (object.decay_last_processed_epoch !== undefined && object.decay_last_processed_epoch !== null) {
       message.decayLastProcessedEpoch = BigInt(object.decay_last_processed_epoch);
     }
+    if (object.decay_pass_epoch !== undefined && object.decay_pass_epoch !== null) {
+      message.decayPassEpoch = BigInt(object.decay_pass_epoch);
+    }
+    if (object.decay_pass_member_cursor !== undefined && object.decay_pass_member_cursor !== null) {
+      message.decayPassMemberCursor = object.decay_pass_member_cursor;
+    }
+    if (object.decay_pass_stake_phase !== undefined && object.decay_pass_stake_phase !== null) {
+      message.decayPassStakePhase = object.decay_pass_stake_phase;
+    }
+    if (object.decay_pass_stake_cursor !== undefined && object.decay_pass_stake_cursor !== null) {
+      message.decayPassStakeCursor = BigInt(object.decay_pass_stake_cursor);
+    }
     return message;
   },
   toAmino(message: EconomicState): EconomicStateAmino {
@@ -1792,6 +1890,10 @@ export const EconomicState = {
     obj.epoch_minted_epoch = message.epochMintedEpoch !== BigInt(0) ? message.epochMintedEpoch?.toString() : undefined;
     obj.epoch_minted_amount = message.epochMintedAmount === "" ? undefined : message.epochMintedAmount;
     obj.decay_last_processed_epoch = message.decayLastProcessedEpoch !== BigInt(0) ? message.decayLastProcessedEpoch?.toString() : undefined;
+    obj.decay_pass_epoch = message.decayPassEpoch !== BigInt(0) ? message.decayPassEpoch?.toString() : undefined;
+    obj.decay_pass_member_cursor = message.decayPassMemberCursor === "" ? undefined : message.decayPassMemberCursor;
+    obj.decay_pass_stake_phase = message.decayPassStakePhase === false ? undefined : message.decayPassStakePhase;
+    obj.decay_pass_stake_cursor = message.decayPassStakeCursor !== BigInt(0) ? message.decayPassStakeCursor?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: EconomicStateAminoMsg): EconomicState {

@@ -1560,6 +1560,42 @@ export interface EpochFeeLedgerAminoMsg {
   value: EpochFeeLedgerAmino;
 }
 /**
+ * IdentityEpochFeeEntry is the fees the shield module paid in one shield
+ * epoch for the execs of one identity (keyed by its rate-limit nullifier, the
+ * same key as the identity rate limit). Each identity may use only a share of
+ * params.max_fees_per_epoch, so one member cannot exhaust the epoch's budget.
+ * @name IdentityEpochFeeEntry
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.IdentityEpochFeeEntry
+ */
+export interface IdentityEpochFeeEntry {
+  epoch: bigint;
+  rateLimitNullifierHex: string;
+  paid: string;
+}
+export interface IdentityEpochFeeEntryProtoMsg {
+  typeUrl: "/sparkdream.shield.v1.IdentityEpochFeeEntry";
+  value: Uint8Array;
+}
+/**
+ * IdentityEpochFeeEntry is the fees the shield module paid in one shield
+ * epoch for the execs of one identity (keyed by its rate-limit nullifier, the
+ * same key as the identity rate limit). Each identity may use only a share of
+ * params.max_fees_per_epoch, so one member cannot exhaust the epoch's budget.
+ * @name IdentityEpochFeeEntryAmino
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.IdentityEpochFeeEntry
+ */
+export interface IdentityEpochFeeEntryAmino {
+  epoch?: string;
+  rate_limit_nullifier_hex?: string;
+  paid?: string;
+}
+export interface IdentityEpochFeeEntryAminoMsg {
+  type: "/sparkdream.shield.v1.IdentityEpochFeeEntry";
+  value: IdentityEpochFeeEntryAmino;
+}
+/**
  * DecryptionDemandEntry records that the EndBlocker asked validators for
  * decryption shares of a closed epoch (its batch became ready) at a height.
  * TLE liveness for that epoch is judged one full epoch interval later.
@@ -4302,6 +4338,102 @@ export const EpochFeeLedger = {
     return {
       typeUrl: "/sparkdream.shield.v1.EpochFeeLedger",
       value: EpochFeeLedger.encode(message).finish()
+    };
+  }
+};
+function createBaseIdentityEpochFeeEntry(): IdentityEpochFeeEntry {
+  return {
+    epoch: BigInt(0),
+    rateLimitNullifierHex: "",
+    paid: ""
+  };
+}
+/**
+ * IdentityEpochFeeEntry is the fees the shield module paid in one shield
+ * epoch for the execs of one identity (keyed by its rate-limit nullifier, the
+ * same key as the identity rate limit). Each identity may use only a share of
+ * params.max_fees_per_epoch, so one member cannot exhaust the epoch's budget.
+ * @name IdentityEpochFeeEntry
+ * @package sparkdream.shield.v1
+ * @see proto type: sparkdream.shield.v1.IdentityEpochFeeEntry
+ */
+export const IdentityEpochFeeEntry = {
+  typeUrl: "/sparkdream.shield.v1.IdentityEpochFeeEntry",
+  encode(message: IdentityEpochFeeEntry, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.epoch !== BigInt(0)) {
+      writer.uint32(8).uint64(message.epoch);
+    }
+    if (message.rateLimitNullifierHex !== "") {
+      writer.uint32(18).string(message.rateLimitNullifierHex);
+    }
+    if (message.paid !== "") {
+      writer.uint32(26).string(message.paid);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): IdentityEpochFeeEntry {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseIdentityEpochFeeEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.epoch = reader.uint64();
+          break;
+        case 2:
+          message.rateLimitNullifierHex = reader.string();
+          break;
+        case 3:
+          message.paid = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<IdentityEpochFeeEntry>): IdentityEpochFeeEntry {
+    const message = createBaseIdentityEpochFeeEntry();
+    message.epoch = object.epoch !== undefined && object.epoch !== null ? BigInt(object.epoch.toString()) : BigInt(0);
+    message.rateLimitNullifierHex = object.rateLimitNullifierHex ?? "";
+    message.paid = object.paid ?? "";
+    return message;
+  },
+  fromAmino(object: IdentityEpochFeeEntryAmino): IdentityEpochFeeEntry {
+    const message = createBaseIdentityEpochFeeEntry();
+    if (object.epoch !== undefined && object.epoch !== null) {
+      message.epoch = BigInt(object.epoch);
+    }
+    if (object.rate_limit_nullifier_hex !== undefined && object.rate_limit_nullifier_hex !== null) {
+      message.rateLimitNullifierHex = object.rate_limit_nullifier_hex;
+    }
+    if (object.paid !== undefined && object.paid !== null) {
+      message.paid = object.paid;
+    }
+    return message;
+  },
+  toAmino(message: IdentityEpochFeeEntry): IdentityEpochFeeEntryAmino {
+    const obj: any = {};
+    obj.epoch = message.epoch !== BigInt(0) ? message.epoch?.toString() : undefined;
+    obj.rate_limit_nullifier_hex = message.rateLimitNullifierHex === "" ? undefined : message.rateLimitNullifierHex;
+    obj.paid = message.paid === "" ? undefined : message.paid;
+    return obj;
+  },
+  fromAminoMsg(object: IdentityEpochFeeEntryAminoMsg): IdentityEpochFeeEntry {
+    return IdentityEpochFeeEntry.fromAmino(object.value);
+  },
+  fromProtoMsg(message: IdentityEpochFeeEntryProtoMsg): IdentityEpochFeeEntry {
+    return IdentityEpochFeeEntry.decode(message.value);
+  },
+  toProto(message: IdentityEpochFeeEntry): Uint8Array {
+    return IdentityEpochFeeEntry.encode(message).finish();
+  },
+  toProtoMsg(message: IdentityEpochFeeEntry): IdentityEpochFeeEntryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.shield.v1.IdentityEpochFeeEntry",
+      value: IdentityEpochFeeEntry.encode(message).finish()
     };
   }
 };

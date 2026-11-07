@@ -383,6 +383,10 @@ export interface MsgCreateInterim {
   referenceId: bigint;
   referenceType: string;
   complexity: InterimComplexity;
+  /**
+   * Block height the work is due by; must be after the current height. 0
+   * = the default, interim_deadline_epochs * epoch_blocks from now.
+   */
   deadline: bigint;
 }
 export interface MsgCreateInterimProtoMsg {
@@ -401,6 +405,10 @@ export interface MsgCreateInterimAmino {
   reference_id?: string;
   reference_type?: string;
   complexity?: InterimComplexity;
+  /**
+   * Block height the work is due by; must be after the current height. 0
+   * = the default, interim_deadline_epochs * epoch_blocks from now.
+   */
   deadline?: string;
 }
 export interface MsgCreateInterimAminoMsg {
@@ -1848,7 +1856,10 @@ export interface MsgSubmitJurorVoteResponseAminoMsg {
   value: MsgSubmitJurorVoteResponseAmino;
 }
 /**
- * MsgSubmitExpertTestimony defines the MsgSubmitExpertTestimony message.
+ * MsgSubmitExpertTestimony records an invited expert's testimony, once, while
+ * the review is still PENDING. The opinion is 64..4096 bytes, the reasoning at
+ * most 4096. Testifying pays nothing by itself: the verdict pays the expert's
+ * EXPERT_TESTIMONY interim.
  * @name MsgSubmitExpertTestimony
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgSubmitExpertTestimony
@@ -1864,7 +1875,10 @@ export interface MsgSubmitExpertTestimonyProtoMsg {
   value: Uint8Array;
 }
 /**
- * MsgSubmitExpertTestimony defines the MsgSubmitExpertTestimony message.
+ * MsgSubmitExpertTestimony records an invited expert's testimony, once, while
+ * the review is still PENDING. The opinion is 64..4096 bytes, the reasoning at
+ * most 4096. Testifying pays nothing by itself: the verdict pays the expert's
+ * EXPERT_TESTIMONY interim.
  * @name MsgSubmitExpertTestimonyAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgSubmitExpertTestimony
@@ -1905,10 +1919,11 @@ export interface MsgSubmitExpertTestimonyResponseAminoMsg {
  * MsgInviteExpertWitness lets a juror seated on a pending initiative jury
  * review call an expert witness. The expert must be an active ESTABLISHED+
  * member with reputation in one of the initiative's tags and no stake in the
- * dispute (not the challenger, assignee, initiative creator or a juror). The
- * invitation opens an EXPERT_TESTIMONY interim that pays the expert when they
- * testify and expires with the review. At most MaxExpertWitnessesPerReview
- * experts per review.
+ * dispute (not the challenger, assignee, initiative creator or a juror, nor an
+ * invitation neighbour of any of them). The invitation opens an
+ * EXPERT_TESTIMONY interim, bound to it by id, that the review's verdict pays
+ * if the expert testified and expires otherwise. At most
+ * MaxExpertWitnessesPerReview experts per review.
  * @name MsgInviteExpertWitness
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgInviteExpertWitness
@@ -1926,10 +1941,11 @@ export interface MsgInviteExpertWitnessProtoMsg {
  * MsgInviteExpertWitness lets a juror seated on a pending initiative jury
  * review call an expert witness. The expert must be an active ESTABLISHED+
  * member with reputation in one of the initiative's tags and no stake in the
- * dispute (not the challenger, assignee, initiative creator or a juror). The
- * invitation opens an EXPERT_TESTIMONY interim that pays the expert when they
- * testify and expires with the review. At most MaxExpertWitnessesPerReview
- * experts per review.
+ * dispute (not the challenger, assignee, initiative creator or a juror, nor an
+ * invitation neighbour of any of them). The invitation opens an
+ * EXPERT_TESTIMONY interim, bound to it by id, that the review's verdict pays
+ * if the expert testified and expires otherwise. At most
+ * MaxExpertWitnessesPerReview experts per review.
  * @name MsgInviteExpertWitnessAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgInviteExpertWitness
@@ -2254,7 +2270,12 @@ export interface MsgReportTagResponseAminoMsg {
   value: MsgReportTagResponseAmino;
 }
 /**
- * MsgResolveTagReport defines the MsgResolveTagReport message.
+ * MsgResolveTagReport resolves an open tag report. Authority-only. `action`
+ * is 0 ignore (reporters' bonds forfeited), 1 remove, 2 reserve, 3 restore
+ * (release a reserved tag back to public use; refused for a tag that is not
+ * reserved, works whether or not the tag still has a Tag row). Actions 1-3
+ * refund the reporters' bonds. For action 2, reserve_authority is empty or
+ * a bech32 address; anything else is refused before the report is touched.
  * @name MsgResolveTagReport
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgResolveTagReport
@@ -2271,7 +2292,12 @@ export interface MsgResolveTagReportProtoMsg {
   value: Uint8Array;
 }
 /**
- * MsgResolveTagReport defines the MsgResolveTagReport message.
+ * MsgResolveTagReport resolves an open tag report. Authority-only. `action`
+ * is 0 ignore (reporters' bonds forfeited), 1 remove, 2 reserve, 3 restore
+ * (release a reserved tag back to public use; refused for a tag that is not
+ * reserved, works whether or not the tag still has a Tag row). Actions 1-3
+ * refund the reporters' bonds. For action 2, reserve_authority is empty or
+ * a bech32 address; anything else is refused before the report is touched.
  * @name MsgResolveTagReportAmino
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgResolveTagReport
@@ -4398,6 +4424,70 @@ export interface MsgClearZkPublicKeyResponseAmino {}
 export interface MsgClearZkPublicKeyResponseAminoMsg {
   type: "/sparkdream.rep.v1.MsgClearZkPublicKeyResponse";
   value: MsgClearZkPublicKeyResponseAmino;
+}
+/**
+ * MsgEndorseExpertWitness endorses a pending expert invitation on a jury
+ * review. The signer must be a juror seated on the review who has answered
+ * the summons (accepted jury duty or already voted) and is not the juror who
+ * invited the expert. Until endorsed, the expert cannot testify and the
+ * invitation's EXPERT_TESTIMONY interim is never paid: the review's verdict
+ * (or voiding) expires an unendorsed invitation unpaid. One juror alone can
+ * therefore never direct expert pay (REP-E-103).
+ * @name MsgEndorseExpertWitness
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgEndorseExpertWitness
+ */
+export interface MsgEndorseExpertWitness {
+  juror: string;
+  juryReviewId: bigint;
+  expert: string;
+}
+export interface MsgEndorseExpertWitnessProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgEndorseExpertWitness";
+  value: Uint8Array;
+}
+/**
+ * MsgEndorseExpertWitness endorses a pending expert invitation on a jury
+ * review. The signer must be a juror seated on the review who has answered
+ * the summons (accepted jury duty or already voted) and is not the juror who
+ * invited the expert. Until endorsed, the expert cannot testify and the
+ * invitation's EXPERT_TESTIMONY interim is never paid: the review's verdict
+ * (or voiding) expires an unendorsed invitation unpaid. One juror alone can
+ * therefore never direct expert pay (REP-E-103).
+ * @name MsgEndorseExpertWitnessAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgEndorseExpertWitness
+ */
+export interface MsgEndorseExpertWitnessAmino {
+  juror?: string;
+  jury_review_id?: string;
+  expert?: string;
+}
+export interface MsgEndorseExpertWitnessAminoMsg {
+  type: "sparkdream/x/rep/MsgEndorseExpertWitness";
+  value: MsgEndorseExpertWitnessAmino;
+}
+/**
+ * MsgEndorseExpertWitnessResponse defines the MsgEndorseExpertWitnessResponse message.
+ * @name MsgEndorseExpertWitnessResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgEndorseExpertWitnessResponse
+ */
+export interface MsgEndorseExpertWitnessResponse {}
+export interface MsgEndorseExpertWitnessResponseProtoMsg {
+  typeUrl: "/sparkdream.rep.v1.MsgEndorseExpertWitnessResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgEndorseExpertWitnessResponse defines the MsgEndorseExpertWitnessResponse message.
+ * @name MsgEndorseExpertWitnessResponseAmino
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgEndorseExpertWitnessResponse
+ */
+export interface MsgEndorseExpertWitnessResponseAmino {}
+export interface MsgEndorseExpertWitnessResponseAminoMsg {
+  type: "/sparkdream.rep.v1.MsgEndorseExpertWitnessResponse";
+  value: MsgEndorseExpertWitnessResponseAmino;
 }
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
@@ -9564,7 +9654,10 @@ function createBaseMsgSubmitExpertTestimony(): MsgSubmitExpertTestimony {
   };
 }
 /**
- * MsgSubmitExpertTestimony defines the MsgSubmitExpertTestimony message.
+ * MsgSubmitExpertTestimony records an invited expert's testimony, once, while
+ * the review is still PENDING. The opinion is 64..4096 bytes, the reasoning at
+ * most 4096. Testifying pays nothing by itself: the verdict pays the expert's
+ * EXPERT_TESTIMONY interim.
  * @name MsgSubmitExpertTestimony
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgSubmitExpertTestimony
@@ -9734,10 +9827,11 @@ function createBaseMsgInviteExpertWitness(): MsgInviteExpertWitness {
  * MsgInviteExpertWitness lets a juror seated on a pending initiative jury
  * review call an expert witness. The expert must be an active ESTABLISHED+
  * member with reputation in one of the initiative's tags and no stake in the
- * dispute (not the challenger, assignee, initiative creator or a juror). The
- * invitation opens an EXPERT_TESTIMONY interim that pays the expert when they
- * testify and expires with the review. At most MaxExpertWitnessesPerReview
- * experts per review.
+ * dispute (not the challenger, assignee, initiative creator or a juror, nor an
+ * invitation neighbour of any of them). The invitation opens an
+ * EXPERT_TESTIMONY interim, bound to it by id, that the review's verdict pays
+ * if the expert testified and expires otherwise. At most
+ * MaxExpertWitnessesPerReview experts per review.
  * @name MsgInviteExpertWitness
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgInviteExpertWitness
@@ -10745,7 +10839,12 @@ function createBaseMsgResolveTagReport(): MsgResolveTagReport {
   };
 }
 /**
- * MsgResolveTagReport defines the MsgResolveTagReport message.
+ * MsgResolveTagReport resolves an open tag report. Authority-only. `action`
+ * is 0 ignore (reporters' bonds forfeited), 1 remove, 2 reserve, 3 restore
+ * (release a reserved tag back to public use; refused for a tag that is not
+ * reserved, works whether or not the tag still has a Tag row). Actions 1-3
+ * refund the reporters' bonds. For action 2, reserve_authority is empty or
+ * a bech32 address; anything else is refused before the report is touched.
  * @name MsgResolveTagReport
  * @package sparkdream.rep.v1
  * @see proto type: sparkdream.rep.v1.MsgResolveTagReport
@@ -16417,6 +16516,168 @@ export const MsgClearZkPublicKeyResponse = {
     return {
       typeUrl: "/sparkdream.rep.v1.MsgClearZkPublicKeyResponse",
       value: MsgClearZkPublicKeyResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgEndorseExpertWitness(): MsgEndorseExpertWitness {
+  return {
+    juror: "",
+    juryReviewId: BigInt(0),
+    expert: ""
+  };
+}
+/**
+ * MsgEndorseExpertWitness endorses a pending expert invitation on a jury
+ * review. The signer must be a juror seated on the review who has answered
+ * the summons (accepted jury duty or already voted) and is not the juror who
+ * invited the expert. Until endorsed, the expert cannot testify and the
+ * invitation's EXPERT_TESTIMONY interim is never paid: the review's verdict
+ * (or voiding) expires an unendorsed invitation unpaid. One juror alone can
+ * therefore never direct expert pay (REP-E-103).
+ * @name MsgEndorseExpertWitness
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgEndorseExpertWitness
+ */
+export const MsgEndorseExpertWitness = {
+  typeUrl: "/sparkdream.rep.v1.MsgEndorseExpertWitness",
+  aminoType: "sparkdream/x/rep/MsgEndorseExpertWitness",
+  encode(message: MsgEndorseExpertWitness, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.juror !== "") {
+      writer.uint32(10).string(message.juror);
+    }
+    if (message.juryReviewId !== BigInt(0)) {
+      writer.uint32(16).uint64(message.juryReviewId);
+    }
+    if (message.expert !== "") {
+      writer.uint32(26).string(message.expert);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgEndorseExpertWitness {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgEndorseExpertWitness();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.juror = reader.string();
+          break;
+        case 2:
+          message.juryReviewId = reader.uint64();
+          break;
+        case 3:
+          message.expert = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgEndorseExpertWitness>): MsgEndorseExpertWitness {
+    const message = createBaseMsgEndorseExpertWitness();
+    message.juror = object.juror ?? "";
+    message.juryReviewId = object.juryReviewId !== undefined && object.juryReviewId !== null ? BigInt(object.juryReviewId.toString()) : BigInt(0);
+    message.expert = object.expert ?? "";
+    return message;
+  },
+  fromAmino(object: MsgEndorseExpertWitnessAmino): MsgEndorseExpertWitness {
+    const message = createBaseMsgEndorseExpertWitness();
+    if (object.juror !== undefined && object.juror !== null) {
+      message.juror = object.juror;
+    }
+    if (object.jury_review_id !== undefined && object.jury_review_id !== null) {
+      message.juryReviewId = BigInt(object.jury_review_id);
+    }
+    if (object.expert !== undefined && object.expert !== null) {
+      message.expert = object.expert;
+    }
+    return message;
+  },
+  toAmino(message: MsgEndorseExpertWitness): MsgEndorseExpertWitnessAmino {
+    const obj: any = {};
+    obj.juror = message.juror === "" ? undefined : message.juror;
+    obj.jury_review_id = message.juryReviewId !== BigInt(0) ? message.juryReviewId?.toString() : undefined;
+    obj.expert = message.expert === "" ? undefined : message.expert;
+    return obj;
+  },
+  fromAminoMsg(object: MsgEndorseExpertWitnessAminoMsg): MsgEndorseExpertWitness {
+    return MsgEndorseExpertWitness.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgEndorseExpertWitness): MsgEndorseExpertWitnessAminoMsg {
+    return {
+      type: "sparkdream/x/rep/MsgEndorseExpertWitness",
+      value: MsgEndorseExpertWitness.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgEndorseExpertWitnessProtoMsg): MsgEndorseExpertWitness {
+    return MsgEndorseExpertWitness.decode(message.value);
+  },
+  toProto(message: MsgEndorseExpertWitness): Uint8Array {
+    return MsgEndorseExpertWitness.encode(message).finish();
+  },
+  toProtoMsg(message: MsgEndorseExpertWitness): MsgEndorseExpertWitnessProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgEndorseExpertWitness",
+      value: MsgEndorseExpertWitness.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgEndorseExpertWitnessResponse(): MsgEndorseExpertWitnessResponse {
+  return {};
+}
+/**
+ * MsgEndorseExpertWitnessResponse defines the MsgEndorseExpertWitnessResponse message.
+ * @name MsgEndorseExpertWitnessResponse
+ * @package sparkdream.rep.v1
+ * @see proto type: sparkdream.rep.v1.MsgEndorseExpertWitnessResponse
+ */
+export const MsgEndorseExpertWitnessResponse = {
+  typeUrl: "/sparkdream.rep.v1.MsgEndorseExpertWitnessResponse",
+  encode(_: MsgEndorseExpertWitnessResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgEndorseExpertWitnessResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgEndorseExpertWitnessResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgEndorseExpertWitnessResponse>): MsgEndorseExpertWitnessResponse {
+    const message = createBaseMsgEndorseExpertWitnessResponse();
+    return message;
+  },
+  fromAmino(_: MsgEndorseExpertWitnessResponseAmino): MsgEndorseExpertWitnessResponse {
+    const message = createBaseMsgEndorseExpertWitnessResponse();
+    return message;
+  },
+  toAmino(_: MsgEndorseExpertWitnessResponse): MsgEndorseExpertWitnessResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgEndorseExpertWitnessResponseAminoMsg): MsgEndorseExpertWitnessResponse {
+    return MsgEndorseExpertWitnessResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgEndorseExpertWitnessResponseProtoMsg): MsgEndorseExpertWitnessResponse {
+    return MsgEndorseExpertWitnessResponse.decode(message.value);
+  },
+  toProto(message: MsgEndorseExpertWitnessResponse): Uint8Array {
+    return MsgEndorseExpertWitnessResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgEndorseExpertWitnessResponse): MsgEndorseExpertWitnessResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.rep.v1.MsgEndorseExpertWitnessResponse",
+      value: MsgEndorseExpertWitnessResponse.encode(message).finish()
     };
   }
 };

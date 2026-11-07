@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { TelescopeGeneratedType } from "../../../types";
 import { Registry } from "@cosmjs/proto-signing";
-import { MsgUpdateParams, MsgUpdateOperationalParams, MsgCreateSession, MsgRevokeSession, MsgExecSession, MsgCreateGrant, MsgClaimRecurringPull, MsgPullAllowance, MsgRetryScheduledOneshot, MsgRevokeGrant, MsgDeclineGrant } from "./tx";
-export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.session.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.session.v1.MsgUpdateOperationalParams", MsgUpdateOperationalParams], ["/sparkdream.session.v1.MsgCreateSession", MsgCreateSession], ["/sparkdream.session.v1.MsgRevokeSession", MsgRevokeSession], ["/sparkdream.session.v1.MsgExecSession", MsgExecSession], ["/sparkdream.session.v1.MsgCreateGrant", MsgCreateGrant], ["/sparkdream.session.v1.MsgClaimRecurringPull", MsgClaimRecurringPull], ["/sparkdream.session.v1.MsgPullAllowance", MsgPullAllowance], ["/sparkdream.session.v1.MsgRetryScheduledOneshot", MsgRetryScheduledOneshot], ["/sparkdream.session.v1.MsgRevokeGrant", MsgRevokeGrant], ["/sparkdream.session.v1.MsgDeclineGrant", MsgDeclineGrant]];
+import { MsgUpdateParams, MsgUpdateOperationalParams, MsgCreateSession, MsgRevokeSession, MsgExecSession, MsgCreateGrant, MsgClaimRecurringPull, MsgPullAllowance, MsgRetryScheduledOneshot, MsgRevokeGrant, MsgDeclineGrant, MsgAcceptGrant, MsgDisallowGranter } from "./tx";
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/sparkdream.session.v1.MsgUpdateParams", MsgUpdateParams], ["/sparkdream.session.v1.MsgUpdateOperationalParams", MsgUpdateOperationalParams], ["/sparkdream.session.v1.MsgCreateSession", MsgCreateSession], ["/sparkdream.session.v1.MsgRevokeSession", MsgRevokeSession], ["/sparkdream.session.v1.MsgExecSession", MsgExecSession], ["/sparkdream.session.v1.MsgCreateGrant", MsgCreateGrant], ["/sparkdream.session.v1.MsgClaimRecurringPull", MsgClaimRecurringPull], ["/sparkdream.session.v1.MsgPullAllowance", MsgPullAllowance], ["/sparkdream.session.v1.MsgRetryScheduledOneshot", MsgRetryScheduledOneshot], ["/sparkdream.session.v1.MsgRevokeGrant", MsgRevokeGrant], ["/sparkdream.session.v1.MsgDeclineGrant", MsgDeclineGrant], ["/sparkdream.session.v1.MsgAcceptGrant", MsgAcceptGrant], ["/sparkdream.session.v1.MsgDisallowGranter", MsgDisallowGranter]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -75,6 +75,18 @@ export const MessageComposer = {
         typeUrl: "/sparkdream.session.v1.MsgDeclineGrant",
         value: MsgDeclineGrant.encode(value).finish()
       };
+    },
+    acceptGrant(value: MsgAcceptGrant) {
+      return {
+        typeUrl: "/sparkdream.session.v1.MsgAcceptGrant",
+        value: MsgAcceptGrant.encode(value).finish()
+      };
+    },
+    disallowGranter(value: MsgDisallowGranter) {
+      return {
+        typeUrl: "/sparkdream.session.v1.MsgDisallowGranter",
+        value: MsgDisallowGranter.encode(value).finish()
+      };
     }
   },
   withTypeUrl: {
@@ -141,6 +153,18 @@ export const MessageComposer = {
     declineGrant(value: MsgDeclineGrant) {
       return {
         typeUrl: "/sparkdream.session.v1.MsgDeclineGrant",
+        value
+      };
+    },
+    acceptGrant(value: MsgAcceptGrant) {
+      return {
+        typeUrl: "/sparkdream.session.v1.MsgAcceptGrant",
+        value
+      };
+    },
+    disallowGranter(value: MsgDisallowGranter) {
+      return {
+        typeUrl: "/sparkdream.session.v1.MsgDisallowGranter",
         value
       };
     }
@@ -210,6 +234,18 @@ export const MessageComposer = {
       return {
         typeUrl: "/sparkdream.session.v1.MsgDeclineGrant",
         value: MsgDeclineGrant.fromPartial(value)
+      };
+    },
+    acceptGrant(value: MsgAcceptGrant) {
+      return {
+        typeUrl: "/sparkdream.session.v1.MsgAcceptGrant",
+        value: MsgAcceptGrant.fromPartial(value)
+      };
+    },
+    disallowGranter(value: MsgDisallowGranter) {
+      return {
+        typeUrl: "/sparkdream.session.v1.MsgDisallowGranter",
+        value: MsgDisallowGranter.fromPartial(value)
       };
     }
   }

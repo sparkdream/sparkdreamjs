@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { Params, ParamsAmino } from "./params";
-import { ShieldedOpRegistration, ShieldedOpRegistrationAmino, UsedNullifier, UsedNullifierAmino, DayFunding, DayFundingAmino, VerificationKey, VerificationKeyAmino, TLEKeySet, TLEKeySetAmino, PendingShieldedOp, PendingShieldedOpAmino, ShieldEpochState, ShieldEpochStateAmino, ShieldEpochDecryptionKey, ShieldEpochDecryptionKeyAmino, IdentityRateLimitEntry, IdentityRateLimitEntryAmino, ShieldDecryptionShare, ShieldDecryptionShareAmino, TLEMissCounterEntry, TLEMissCounterEntryAmino, DKGState, DKGStateAmino, DKGContributionEntry, DKGContributionEntryAmino, DecryptionDemandEntry, DecryptionDemandEntryAmino, DKGComplaint, DKGComplaintAmino, TLEParticipationEntry, TLEParticipationEntryAmino, EpochFeeLedger, EpochFeeLedgerAmino } from "./types";
+import { ShieldedOpRegistration, ShieldedOpRegistrationAmino, UsedNullifier, UsedNullifierAmino, DayFunding, DayFundingAmino, VerificationKey, VerificationKeyAmino, TLEKeySet, TLEKeySetAmino, PendingShieldedOp, PendingShieldedOpAmino, ShieldEpochState, ShieldEpochStateAmino, ShieldEpochDecryptionKey, ShieldEpochDecryptionKeyAmino, IdentityRateLimitEntry, IdentityRateLimitEntryAmino, ShieldDecryptionShare, ShieldDecryptionShareAmino, TLEMissCounterEntry, TLEMissCounterEntryAmino, DKGState, DKGStateAmino, DKGContributionEntry, DKGContributionEntryAmino, DecryptionDemandEntry, DecryptionDemandEntryAmino, DKGComplaint, DKGComplaintAmino, TLEParticipationEntry, TLEParticipationEntryAmino, EpochFeeLedger, EpochFeeLedgerAmino, IdentityEpochFeeEntry, IdentityEpochFeeEntryAmino } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial } from "../../../helpers";
 /**
@@ -104,6 +104,11 @@ export interface GenesisState {
    * re-registration compatibility) while the domain still holds nullifiers.
    */
   retiredDomains: ShieldedOpRegistration[];
+  /**
+   * Fees paid per identity (rate-limit nullifier) in the current shield
+   * epoch, each capped at a share of params.max_fees_per_epoch.
+   */
+  identityEpochFees: IdentityEpochFeeEntry[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.shield.v1.GenesisState";
@@ -210,6 +215,11 @@ export interface GenesisStateAmino {
    * re-registration compatibility) while the domain still holds nullifiers.
    */
   retired_domains?: ShieldedOpRegistrationAmino[];
+  /**
+   * Fees paid per identity (rate-limit nullifier) in the current shield
+   * epoch, each capped at a share of params.max_fees_per_epoch.
+   */
+  identity_epoch_fees?: IdentityEpochFeeEntryAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.shield.v1.GenesisState";
@@ -239,7 +249,8 @@ function createBaseGenesisState(): GenesisState {
     tleParticipation: [],
     tleJudgedEpochs: BigInt(0),
     epochFeeLedger: EpochFeeLedger.fromPartial({}),
-    retiredDomains: []
+    retiredDomains: [],
+    identityEpochFees: []
   };
 }
 /**
@@ -320,6 +331,9 @@ export const GenesisState = {
     for (const v of message.retiredDomains) {
       ShieldedOpRegistration.encode(v!, writer.uint32(186).fork()).ldelim();
     }
+    for (const v of message.identityEpochFees) {
+      IdentityEpochFeeEntry.encode(v!, writer.uint32(194).fork()).ldelim();
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -398,6 +412,9 @@ export const GenesisState = {
         case 23:
           message.retiredDomains.push(ShieldedOpRegistration.decode(reader, reader.uint32()));
           break;
+        case 24:
+          message.identityEpochFees.push(IdentityEpochFeeEntry.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -430,6 +447,7 @@ export const GenesisState = {
     message.tleJudgedEpochs = object.tleJudgedEpochs !== undefined && object.tleJudgedEpochs !== null ? BigInt(object.tleJudgedEpochs.toString()) : BigInt(0);
     message.epochFeeLedger = object.epochFeeLedger !== undefined && object.epochFeeLedger !== null ? EpochFeeLedger.fromPartial(object.epochFeeLedger) : undefined;
     message.retiredDomains = object.retiredDomains?.map(e => ShieldedOpRegistration.fromPartial(e)) || [];
+    message.identityEpochFees = object.identityEpochFees?.map(e => IdentityEpochFeeEntry.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -471,6 +489,7 @@ export const GenesisState = {
       message.epochFeeLedger = EpochFeeLedger.fromAmino(object.epoch_fee_ledger);
     }
     message.retiredDomains = object.retired_domains?.map(e => ShieldedOpRegistration.fromAmino(e)) || [];
+    message.identityEpochFees = object.identity_epoch_fees?.map(e => IdentityEpochFeeEntry.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -561,6 +580,11 @@ export const GenesisState = {
       obj.retired_domains = message.retiredDomains.map(e => e ? ShieldedOpRegistration.toAmino(e) : undefined);
     } else {
       obj.retired_domains = message.retiredDomains;
+    }
+    if (message.identityEpochFees) {
+      obj.identity_epoch_fees = message.identityEpochFees.map(e => e ? IdentityEpochFeeEntry.toAmino(e) : undefined);
+    } else {
+      obj.identity_epoch_fees = message.identityEpochFees;
     }
     return obj;
   },

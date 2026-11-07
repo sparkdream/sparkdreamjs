@@ -185,6 +185,22 @@ export interface Project {
    * when the project transitions out of PROPOSED.
    */
   expiryBlockHeight: bigint;
+  /**
+   * Id of the PROJECT_APPROVAL or BUDGET_REVIEW interim opened for the
+   * Commons Operations Committee when a budget-backed project is proposed.
+   * Zero when none was opened (permissionless project, or the committee had
+   * no members). The interim is system-settled: paid when the project is
+   * approved, expired unpaid when the proposal is cancelled or expires.
+   */
+  approvalInterimId: bigint;
+  /**
+   * What the proposal asked for. MsgApproveProjectBudget may approve at most
+   * these amounts: the review interim's type (PROJECT_APPROVAL or
+   * BUDGET_REVIEW) is priced from the request, so an approval above it would
+   * have been reviewed at the wrong rate. Zero on permissionless projects.
+   */
+  requestedBudget: string;
+  requestedSpark: string;
 }
 export interface ProjectProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Project";
@@ -227,6 +243,22 @@ export interface ProjectAmino {
    * when the project transitions out of PROPOSED.
    */
   expiry_block_height?: string;
+  /**
+   * Id of the PROJECT_APPROVAL or BUDGET_REVIEW interim opened for the
+   * Commons Operations Committee when a budget-backed project is proposed.
+   * Zero when none was opened (permissionless project, or the committee had
+   * no members). The interim is system-settled: paid when the project is
+   * approved, expired unpaid when the proposal is cancelled or expires.
+   */
+  approval_interim_id?: string;
+  /**
+   * What the proposal asked for. MsgApproveProjectBudget may approve at most
+   * these amounts: the review interim's type (PROJECT_APPROVAL or
+   * BUDGET_REVIEW) is priced from the request, so an approval above it would
+   * have been reviewed at the wrong rate. Zero on permissionless projects.
+   */
+  requested_budget?: string;
+  requested_spark?: string;
 }
 export interface ProjectAminoMsg {
   type: "/sparkdream.rep.v1.Project";
@@ -288,7 +320,10 @@ function createBaseProject(): Project {
     approvedAt: BigInt(0),
     completedAt: BigInt(0),
     permissionless: false,
-    expiryBlockHeight: BigInt(0)
+    expiryBlockHeight: BigInt(0),
+    approvalInterimId: BigInt(0),
+    requestedBudget: "",
+    requestedSpark: ""
   };
 }
 /**
@@ -357,6 +392,15 @@ export const Project = {
     if (message.expiryBlockHeight !== BigInt(0)) {
       writer.uint32(152).int64(message.expiryBlockHeight);
     }
+    if (message.approvalInterimId !== BigInt(0)) {
+      writer.uint32(160).uint64(message.approvalInterimId);
+    }
+    if (message.requestedBudget !== "") {
+      writer.uint32(170).string(message.requestedBudget);
+    }
+    if (message.requestedSpark !== "") {
+      writer.uint32(178).string(message.requestedSpark);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Project {
@@ -423,6 +467,15 @@ export const Project = {
         case 19:
           message.expiryBlockHeight = reader.int64();
           break;
+        case 20:
+          message.approvalInterimId = reader.uint64();
+          break;
+        case 21:
+          message.requestedBudget = reader.string();
+          break;
+        case 22:
+          message.requestedSpark = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -451,6 +504,9 @@ export const Project = {
     message.completedAt = object.completedAt !== undefined && object.completedAt !== null ? BigInt(object.completedAt.toString()) : BigInt(0);
     message.permissionless = object.permissionless ?? false;
     message.expiryBlockHeight = object.expiryBlockHeight !== undefined && object.expiryBlockHeight !== null ? BigInt(object.expiryBlockHeight.toString()) : BigInt(0);
+    message.approvalInterimId = object.approvalInterimId !== undefined && object.approvalInterimId !== null ? BigInt(object.approvalInterimId.toString()) : BigInt(0);
+    message.requestedBudget = object.requestedBudget ?? "";
+    message.requestedSpark = object.requestedSpark ?? "";
     return message;
   },
   fromAmino(object: ProjectAmino): Project {
@@ -510,6 +566,15 @@ export const Project = {
     if (object.expiry_block_height !== undefined && object.expiry_block_height !== null) {
       message.expiryBlockHeight = BigInt(object.expiry_block_height);
     }
+    if (object.approval_interim_id !== undefined && object.approval_interim_id !== null) {
+      message.approvalInterimId = BigInt(object.approval_interim_id);
+    }
+    if (object.requested_budget !== undefined && object.requested_budget !== null) {
+      message.requestedBudget = object.requested_budget;
+    }
+    if (object.requested_spark !== undefined && object.requested_spark !== null) {
+      message.requestedSpark = object.requested_spark;
+    }
     return message;
   },
   toAmino(message: Project): ProjectAmino {
@@ -537,6 +602,9 @@ export const Project = {
     obj.completed_at = message.completedAt !== BigInt(0) ? message.completedAt?.toString() : undefined;
     obj.permissionless = message.permissionless === false ? undefined : message.permissionless;
     obj.expiry_block_height = message.expiryBlockHeight !== BigInt(0) ? message.expiryBlockHeight?.toString() : undefined;
+    obj.approval_interim_id = message.approvalInterimId !== BigInt(0) ? message.approvalInterimId?.toString() : undefined;
+    obj.requested_budget = message.requestedBudget === "" ? undefined : message.requestedBudget;
+    obj.requested_spark = message.requestedSpark === "" ? undefined : message.requestedSpark;
     return obj;
   },
   fromAminoMsg(object: ProjectAminoMsg): Project {

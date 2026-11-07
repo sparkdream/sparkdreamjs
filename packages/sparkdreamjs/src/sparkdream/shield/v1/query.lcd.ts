@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponse, QueryShieldedOpRequest, QueryShieldedOpResponse, QueryShieldedOpsRequest, QueryShieldedOpsResponse, QueryModuleBalanceRequest, QueryModuleBalanceResponse, QueryNullifierUsedRequest, QueryNullifierUsedResponse, QueryDayFundingRequest, QueryDayFundingResponse, QueryShieldEpochRequest, QueryShieldEpochResponse, QueryPendingOpsRequest, QueryPendingOpsResponse, QueryPendingOpCountRequest, QueryPendingOpCountResponse, QueryTLEMasterPublicKeyRequest, QueryTLEMasterPublicKeyResponse, QueryTLEKeySetRequest, QueryTLEKeySetResponse, QueryVerificationKeyRequest, QueryVerificationKeyResponse, QueryTLEMissCountRequest, QueryTLEMissCountResponse, QueryDecryptionSharesRequest, QueryDecryptionSharesResponse, QueryIdentityRateLimitRequest, QueryIdentityRateLimitResponse, QueryDKGStateRequest, QueryDKGStateResponse, QueryDKGContributionsRequest, QueryDKGContributionsResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryShieldedOpRequest, QueryShieldedOpResponse, QueryShieldedOpsRequest, QueryShieldedOpsResponse, QueryModuleBalanceRequest, QueryModuleBalanceResponse, QueryNullifierUsedRequest, QueryNullifierUsedResponse, QueryDayFundingRequest, QueryDayFundingResponse, QueryShieldEpochRequest, QueryShieldEpochResponse, QueryPendingOpsRequest, QueryPendingOpsResponse, QueryPendingOpCountRequest, QueryPendingOpCountResponse, QueryTLEMasterPublicKeyRequest, QueryTLEMasterPublicKeyResponse, QueryTLEKeySetRequest, QueryTLEKeySetResponse, QueryVerificationKeyRequest, QueryVerificationKeyResponse, QueryTLEMissCountRequest, QueryTLEMissCountResponse, QueryDecryptionSharesRequest, QueryDecryptionSharesResponse, QueryIdentityRateLimitRequest, QueryIdentityRateLimitResponse, QueryBeaconRequest, QueryBeaconResponse, QueryDKGStateRequest, QueryDKGStateResponse, QueryDKGContributionsRequest, QueryDKGContributionsResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -102,6 +102,13 @@ export class LCDQueryClient {
   identityRateLimit = async (params: QueryIdentityRateLimitRequest): Promise<QueryIdentityRateLimitResponse> => {
     const endpoint = `sparkdream/shield/v1/identity_rate_limit/${params.rateLimitNullifierHex}`;
     return await this.req.get<QueryIdentityRateLimitResponse>(endpoint);
+  };
+  /* Beacon returns the randomness beacon value for a shield epoch: the
+   reconstructed TLE epoch key and whether it is available, still pending
+   or will never be (see docs/x-shield-spec.md "Randomness beacon"). */
+  beacon = async (params: QueryBeaconRequest): Promise<QueryBeaconResponse> => {
+    const endpoint = `sparkdream/shield/v1/beacon/${params.epoch}`;
+    return await this.req.get<QueryBeaconResponse>(endpoint);
   };
   /* DKGState returns the current DKG ceremony state. */
   dKGState = async (_params: QueryDKGStateRequest = {}): Promise<QueryDKGStateResponse> => {

@@ -148,6 +148,42 @@ export interface PollAminoMsg {
   type: "/sparkdream.commons.v1.Poll";
   value: PollAmino;
 }
+/**
+ * PollOpenCount is a member's poll-opening bucket for the per-creator rate
+ * limit: the polls the creator opened on utc_day (block time in unix
+ * seconds divided by 86400). One record per creator, reset when the day
+ * changes; cancelling a poll never decrements it.
+ * @name PollOpenCount
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.PollOpenCount
+ */
+export interface PollOpenCount {
+  creator: string;
+  utcDay: bigint;
+  count: bigint;
+}
+export interface PollOpenCountProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.PollOpenCount";
+  value: Uint8Array;
+}
+/**
+ * PollOpenCount is a member's poll-opening bucket for the per-creator rate
+ * limit: the polls the creator opened on utc_day (block time in unix
+ * seconds divided by 86400). One record per creator, reset when the day
+ * changes; cancelling a poll never decrements it.
+ * @name PollOpenCountAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.PollOpenCount
+ */
+export interface PollOpenCountAmino {
+  creator?: string;
+  utc_day?: string;
+  count?: string;
+}
+export interface PollOpenCountAminoMsg {
+  type: "/sparkdream.commons.v1.PollOpenCount";
+  value: PollOpenCountAmino;
+}
 function createBasePoll(): Poll {
   return {
     id: BigInt(0),
@@ -372,6 +408,102 @@ export const Poll = {
     return {
       typeUrl: "/sparkdream.commons.v1.Poll",
       value: Poll.encode(message).finish()
+    };
+  }
+};
+function createBasePollOpenCount(): PollOpenCount {
+  return {
+    creator: "",
+    utcDay: BigInt(0),
+    count: BigInt(0)
+  };
+}
+/**
+ * PollOpenCount is a member's poll-opening bucket for the per-creator rate
+ * limit: the polls the creator opened on utc_day (block time in unix
+ * seconds divided by 86400). One record per creator, reset when the day
+ * changes; cancelling a poll never decrements it.
+ * @name PollOpenCount
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.PollOpenCount
+ */
+export const PollOpenCount = {
+  typeUrl: "/sparkdream.commons.v1.PollOpenCount",
+  encode(message: PollOpenCount, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.utcDay !== BigInt(0)) {
+      writer.uint32(16).int64(message.utcDay);
+    }
+    if (message.count !== BigInt(0)) {
+      writer.uint32(24).uint64(message.count);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): PollOpenCount {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePollOpenCount();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.utcDay = reader.int64();
+          break;
+        case 3:
+          message.count = reader.uint64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<PollOpenCount>): PollOpenCount {
+    const message = createBasePollOpenCount();
+    message.creator = object.creator ?? "";
+    message.utcDay = object.utcDay !== undefined && object.utcDay !== null ? BigInt(object.utcDay.toString()) : BigInt(0);
+    message.count = object.count !== undefined && object.count !== null ? BigInt(object.count.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: PollOpenCountAmino): PollOpenCount {
+    const message = createBasePollOpenCount();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.utc_day !== undefined && object.utc_day !== null) {
+      message.utcDay = BigInt(object.utc_day);
+    }
+    if (object.count !== undefined && object.count !== null) {
+      message.count = BigInt(object.count);
+    }
+    return message;
+  },
+  toAmino(message: PollOpenCount): PollOpenCountAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.utc_day = message.utcDay !== BigInt(0) ? message.utcDay?.toString() : undefined;
+    obj.count = message.count !== BigInt(0) ? message.count?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: PollOpenCountAminoMsg): PollOpenCount {
+    return PollOpenCount.fromAmino(object.value);
+  },
+  fromProtoMsg(message: PollOpenCountProtoMsg): PollOpenCount {
+    return PollOpenCount.decode(message.value);
+  },
+  toProto(message: PollOpenCount): Uint8Array {
+    return PollOpenCount.encode(message).finish();
+  },
+  toProtoMsg(message: PollOpenCount): PollOpenCountProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.PollOpenCount",
+      value: PollOpenCount.encode(message).finish()
     };
   }
 };

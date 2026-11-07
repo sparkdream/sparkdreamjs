@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgRegisterPeer, MsgRegisterPeerResponse, MsgRemovePeer, MsgRemovePeerResponse, MsgSuspendPeer, MsgSuspendPeerResponse, MsgResumePeer, MsgResumePeerResponse, MsgUpdatePeerPolicy, MsgUpdatePeerPolicyResponse, MsgUpdatePeerInfo, MsgUpdatePeerInfoResponse, MsgRegisterBridge, MsgRegisterBridgeResponse, MsgUpdateBridge, MsgUpdateBridgeResponse, MsgSubmitFederatedContent, MsgSubmitFederatedContentResponse, MsgFederateContent, MsgFederateContentResponse, MsgAttestOutbound, MsgAttestOutboundResponse, MsgModerateContent, MsgModerateContentResponse, MsgLinkIdentity, MsgLinkIdentityResponse, MsgUnlinkIdentity, MsgUnlinkIdentityResponse, MsgConfirmIdentityLink, MsgConfirmIdentityLinkResponse, MsgAttestIdentityLink, MsgAttestIdentityLinkResponse, MsgRequestReputationAttestation, MsgRequestReputationAttestationResponse, MsgVerifyContent, MsgVerifyContentResponse, MsgChallengeVerification, MsgChallengeVerificationResponse, MsgSubmitArbiterHash, MsgSubmitArbiterHashResponse, MsgEscalateChallenge, MsgEscalateChallengeResponse, MsgResolveEscalatedChallenge, MsgResolveEscalatedChallengeResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgUpdatePeerController, MsgUpdatePeerControllerResponse, MsgResyncBridgeCount, MsgResyncBridgeCountResponse, MsgPruneOrphanBindings, MsgPruneOrphanBindingsResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgRegisterPeer, MsgRegisterPeerResponse, MsgRemovePeer, MsgRemovePeerResponse, MsgSuspendPeer, MsgSuspendPeerResponse, MsgResumePeer, MsgResumePeerResponse, MsgUpdatePeerPolicy, MsgUpdatePeerPolicyResponse, MsgUpdatePeerInfo, MsgUpdatePeerInfoResponse, MsgRegisterBridge, MsgRegisterBridgeResponse, MsgUpdateBridge, MsgUpdateBridgeResponse, MsgSubmitFederatedContent, MsgSubmitFederatedContentResponse, MsgFederateContent, MsgFederateContentResponse, MsgAttestOutbound, MsgAttestOutboundResponse, MsgModerateContent, MsgModerateContentResponse, MsgLinkIdentity, MsgLinkIdentityResponse, MsgUnlinkIdentity, MsgUnlinkIdentityResponse, MsgConfirmIdentityLink, MsgConfirmIdentityLinkResponse, MsgAttestIdentityLink, MsgAttestIdentityLinkResponse, MsgRequestReputationAttestation, MsgRequestReputationAttestationResponse, MsgVerifyContent, MsgVerifyContentResponse, MsgChallengeVerification, MsgChallengeVerificationResponse, MsgSubmitArbiterHash, MsgSubmitArbiterHashResponse, MsgEscalateChallenge, MsgEscalateChallengeResponse, MsgResolveEscalatedChallenge, MsgResolveEscalatedChallengeResponse, MsgUpdateOperationalParams, MsgUpdateOperationalParamsResponse, MsgUpdatePeerController, MsgUpdatePeerControllerResponse, MsgResyncBridgeCount, MsgResyncBridgeCountResponse, MsgPruneOrphanBindings, MsgPruneOrphanBindingsResponse, MsgRevokeIdentityLink, MsgRevokeIdentityLinkResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   updateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
@@ -49,6 +49,12 @@ export interface Msg {
   updatePeerController(request: MsgUpdatePeerController): Promise<MsgUpdatePeerControllerResponse>;
   resyncBridgeCount(request: MsgResyncBridgeCount): Promise<MsgResyncBridgeCountResponse>;
   pruneOrphanBindings(request: MsgPruneOrphanBindings): Promise<MsgPruneOrphanBindingsResponse>;
+  /**
+   * RevokeIdentityLink removes a member's identity link (verified or not)
+   * by governance or the Commons Council / Operations Committee policy:
+   * the remedy for a false bridge attestation whose operator has retired.
+   */
+  revokeIdentityLink(request: MsgRevokeIdentityLink): Promise<MsgRevokeIdentityLinkResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -225,6 +231,14 @@ export class MsgClientImpl implements Msg {
     const data = MsgPruneOrphanBindings.encode(request).finish();
     const promise = this.rpc.request("sparkdream.federation.v1.Msg", "PruneOrphanBindings", data);
     return promise.then(data => MsgPruneOrphanBindingsResponse.decode(new BinaryReader(data)));
+  };
+  /* RevokeIdentityLink removes a member's identity link (verified or not)
+   by governance or the Commons Council / Operations Committee policy:
+   the remedy for a false bridge attestation whose operator has retired. */
+  revokeIdentityLink = async (request: MsgRevokeIdentityLink): Promise<MsgRevokeIdentityLinkResponse> => {
+    const data = MsgRevokeIdentityLink.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.federation.v1.Msg", "RevokeIdentityLink", data);
+    return promise.then(data => MsgRevokeIdentityLinkResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

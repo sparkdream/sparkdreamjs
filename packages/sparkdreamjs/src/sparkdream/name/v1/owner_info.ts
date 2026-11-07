@@ -17,6 +17,12 @@ export interface OwnerInfo {
    * required to own a primary_name.
    */
   displayName: string;
+  /**
+   * Set by the x/rep zeroing hook: every name this address owns is
+   * released and can be scavenged at once (IsOwnerExpired reports true),
+   * whatever last_active_time says. A zeroed address never clears it.
+   */
+  scavengeable: boolean;
 }
 export interface OwnerInfoProtoMsg {
   typeUrl: "/sparkdream.name.v1.OwnerInfo";
@@ -38,6 +44,12 @@ export interface OwnerInfoAmino {
    * required to own a primary_name.
    */
   display_name?: string;
+  /**
+   * Set by the x/rep zeroing hook: every name this address owns is
+   * released and can be scavenged at once (IsOwnerExpired reports true),
+   * whatever last_active_time says. A zeroed address never clears it.
+   */
+  scavengeable?: boolean;
 }
 export interface OwnerInfoAminoMsg {
   type: "/sparkdream.name.v1.OwnerInfo";
@@ -48,7 +60,8 @@ function createBaseOwnerInfo(): OwnerInfo {
     address: "",
     primaryName: "",
     lastActiveTime: BigInt(0),
-    displayName: ""
+    displayName: "",
+    scavengeable: false
   };
 }
 /**
@@ -72,6 +85,9 @@ export const OwnerInfo = {
     if (message.displayName !== "") {
       writer.uint32(34).string(message.displayName);
     }
+    if (message.scavengeable === true) {
+      writer.uint32(40).bool(message.scavengeable);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): OwnerInfo {
@@ -93,6 +109,9 @@ export const OwnerInfo = {
         case 4:
           message.displayName = reader.string();
           break;
+        case 5:
+          message.scavengeable = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -106,6 +125,7 @@ export const OwnerInfo = {
     message.primaryName = object.primaryName ?? "";
     message.lastActiveTime = object.lastActiveTime !== undefined && object.lastActiveTime !== null ? BigInt(object.lastActiveTime.toString()) : BigInt(0);
     message.displayName = object.displayName ?? "";
+    message.scavengeable = object.scavengeable ?? false;
     return message;
   },
   fromAmino(object: OwnerInfoAmino): OwnerInfo {
@@ -122,6 +142,9 @@ export const OwnerInfo = {
     if (object.display_name !== undefined && object.display_name !== null) {
       message.displayName = object.display_name;
     }
+    if (object.scavengeable !== undefined && object.scavengeable !== null) {
+      message.scavengeable = object.scavengeable;
+    }
     return message;
   },
   toAmino(message: OwnerInfo): OwnerInfoAmino {
@@ -130,6 +153,7 @@ export const OwnerInfo = {
     obj.primary_name = message.primaryName === "" ? undefined : message.primaryName;
     obj.last_active_time = message.lastActiveTime !== BigInt(0) ? message.lastActiveTime?.toString() : undefined;
     obj.display_name = message.displayName === "" ? undefined : message.displayName;
+    obj.scavengeable = message.scavengeable === false ? undefined : message.scavengeable;
     return obj;
   },
   fromAminoMsg(object: OwnerInfoAminoMsg): OwnerInfo {

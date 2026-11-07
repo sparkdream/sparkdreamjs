@@ -532,6 +532,18 @@ export interface Peer {
    * has no transfer channel. Voucher metadata (spec §9.2) is keyed on it.
    */
   ibcTransferChannelId: string;
+  /**
+   * expected_chain_id pins a PEER_TYPE_SPARK_DREAM peer to the chain behind
+   * its federation channel. MsgResumePeer reads the chain id of the
+   * Tendermint light client under ibc_channel_id and refuses activation
+   * unless it equals this value (FED-106): channel ids are sequential, so a
+   * peer registered ahead of its handshake could otherwise be activated on
+   * whatever chain opened the next federation channel. Required (a
+   * CometBFT chain id, at most 50 bytes, no whitespace) for Spark Dream
+   * peers, empty for every other peer type. Correctable with
+   * MsgUpdatePeerInfo only while the peer is not ACTIVE.
+   */
+  expectedChainId: string;
 }
 export interface PeerProtoMsg {
   typeUrl: "/sparkdream.federation.v1.Peer";
@@ -579,6 +591,18 @@ export interface PeerAmino {
    * has no transfer channel. Voucher metadata (spec §9.2) is keyed on it.
    */
   ibc_transfer_channel_id?: string;
+  /**
+   * expected_chain_id pins a PEER_TYPE_SPARK_DREAM peer to the chain behind
+   * its federation channel. MsgResumePeer reads the chain id of the
+   * Tendermint light client under ibc_channel_id and refuses activation
+   * unless it equals this value (FED-106): channel ids are sequential, so a
+   * peer registered ahead of its handshake could otherwise be activated on
+   * whatever chain opened the next federation channel. Required (a
+   * CometBFT chain id, at most 50 bytes, no whitespace) for Spark Dream
+   * peers, empty for every other peer type. Correctable with
+   * MsgUpdatePeerInfo only while the peer is not ACTIVE.
+   */
+  expected_chain_id?: string;
 }
 export interface PeerAminoMsg {
   type: "/sparkdream.federation.v1.Peer";
@@ -1626,7 +1650,8 @@ function createBasePeer(): Peer {
     removedAt: BigInt(0),
     controllerGroup: "",
     peerIdentity: undefined,
-    ibcTransferChannelId: ""
+    ibcTransferChannelId: "",
+    expectedChainId: ""
   };
 }
 /**
@@ -1677,6 +1702,9 @@ export const Peer = {
     if (message.ibcTransferChannelId !== "") {
       writer.uint32(106).string(message.ibcTransferChannelId);
     }
+    if (message.expectedChainId !== "") {
+      writer.uint32(114).string(message.expectedChainId);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): Peer {
@@ -1725,6 +1753,9 @@ export const Peer = {
         case 13:
           message.ibcTransferChannelId = reader.string();
           break;
+        case 14:
+          message.expectedChainId = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1747,6 +1778,7 @@ export const Peer = {
     message.controllerGroup = object.controllerGroup ?? "";
     message.peerIdentity = object.peerIdentity !== undefined && object.peerIdentity !== null ? ChainIdentity.fromPartial(object.peerIdentity) : undefined;
     message.ibcTransferChannelId = object.ibcTransferChannelId ?? "";
+    message.expectedChainId = object.expectedChainId ?? "";
     return message;
   },
   fromAmino(object: PeerAmino): Peer {
@@ -1790,6 +1822,9 @@ export const Peer = {
     if (object.ibc_transfer_channel_id !== undefined && object.ibc_transfer_channel_id !== null) {
       message.ibcTransferChannelId = object.ibc_transfer_channel_id;
     }
+    if (object.expected_chain_id !== undefined && object.expected_chain_id !== null) {
+      message.expectedChainId = object.expected_chain_id;
+    }
     return message;
   },
   toAmino(message: Peer): PeerAmino {
@@ -1807,6 +1842,7 @@ export const Peer = {
     obj.controller_group = message.controllerGroup === "" ? undefined : message.controllerGroup;
     obj.peer_identity = message.peerIdentity ? ChainIdentity.toAmino(message.peerIdentity) : undefined;
     obj.ibc_transfer_channel_id = message.ibcTransferChannelId === "" ? undefined : message.ibcTransferChannelId;
+    obj.expected_chain_id = message.expectedChainId === "" ? undefined : message.expectedChainId;
     return obj;
   },
   fromAminoMsg(object: PeerAminoMsg): Peer {

@@ -126,7 +126,6 @@ export interface Params {
    */
   completerShare: string;
   treasuryShare: string;
-  minReputationMultiplier: string;
   /**
    * Initiative tiers
    */
@@ -172,20 +171,15 @@ export interface Params {
   complexComplexityBudget: string;
   expertComplexityBudget: string;
   soloExpertBonusRate: string;
-  interimDeadlineEpochs: bigint;
   /**
-   * Rate limits
+   * Default lifetime of a member-created interim, in epochs: MsgCreateInterim
+   * with deadline 0 is due interim_deadline_epochs * epoch_blocks from now.
    */
-  maxActiveChallengesPerCommittee: number;
-  maxNewChallengesPerEpoch: number;
-  challengeQueueMaxSize: number;
+  interimDeadlineEpochs: bigint;
   /**
    * Slashing
    */
-  minorSlashPenalty: string;
-  moderateSlashPenalty: string;
   severeSlashPenalty: string;
-  zeroingSlashPenalty: string;
   /**
    * Extended staking
    */
@@ -966,6 +960,22 @@ export interface Params {
    * through many posts by other authors.
    */
   tagBudgetAwarderEpochCapBps: bigint;
+  /**
+   * budget_review_threshold is the requested DREAM budget (micro-DREAM) at or
+   * above which a budget-backed project proposal opens a BUDGET_REVIEW interim
+   * (COMPLEX budget) for the Commons Operations Committee instead of a
+   * PROJECT_APPROVAL one (STANDARD budget). Default 5,000 DREAM. Governance
+   * only: it prices committee work, so a committee must not set it.
+   */
+  budgetReviewThreshold: string;
+  /**
+   * max_proposed_projects_per_creator caps how many budget-backed project
+   * proposals one member (across their aliases) may hold in PROPOSED at
+   * once (default 3). Each proposal opens a paid review interim for the
+   * picked council's Operations Committee, so an uncapped proposer could
+   * fill the committee's pending work for the price of gas. Governance only.
+   */
+  maxProposedProjectsPerCreator: number;
 }
 export interface ParamsProtoMsg {
   typeUrl: "/sparkdream.rep.v1.Params";
@@ -1005,7 +1015,6 @@ export interface ParamsAmino {
    */
   completer_share?: string;
   treasury_share?: string;
-  min_reputation_multiplier?: string;
   /**
    * Initiative tiers
    */
@@ -1051,20 +1060,15 @@ export interface ParamsAmino {
   complex_complexity_budget?: string;
   expert_complexity_budget?: string;
   solo_expert_bonus_rate?: string;
-  interim_deadline_epochs?: string;
   /**
-   * Rate limits
+   * Default lifetime of a member-created interim, in epochs: MsgCreateInterim
+   * with deadline 0 is due interim_deadline_epochs * epoch_blocks from now.
    */
-  max_active_challenges_per_committee?: number;
-  max_new_challenges_per_epoch?: number;
-  challenge_queue_max_size?: number;
+  interim_deadline_epochs?: string;
   /**
    * Slashing
    */
-  minor_slash_penalty?: string;
-  moderate_slash_penalty?: string;
   severe_slash_penalty?: string;
-  zeroing_slash_penalty?: string;
   /**
    * Extended staking
    */
@@ -1845,6 +1849,22 @@ export interface ParamsAmino {
    * through many posts by other authors.
    */
   tag_budget_awarder_epoch_cap_bps?: string;
+  /**
+   * budget_review_threshold is the requested DREAM budget (micro-DREAM) at or
+   * above which a budget-backed project proposal opens a BUDGET_REVIEW interim
+   * (COMPLEX budget) for the Commons Operations Committee instead of a
+   * PROJECT_APPROVAL one (STANDARD budget). Default 5,000 DREAM. Governance
+   * only: it prices committee work, so a committee must not set it.
+   */
+  budget_review_threshold?: string;
+  /**
+   * max_proposed_projects_per_creator caps how many budget-backed project
+   * proposals one member (across their aliases) may hold in PROPOSED at
+   * once (default 3). Each proposal opens a paid review interim for the
+   * picked council's Operations Committee, so an uncapped proposer could
+   * fill the committee's pending work for the price of gas. Governance only.
+   */
+  max_proposed_projects_per_creator?: number;
 }
 export interface ParamsAminoMsg {
   type: "sparkdream/x/rep/Params";
@@ -1882,10 +1902,6 @@ export interface RepOperationalParams {
   maxGiftPerInvitee: string;
   giftOnlyToInvitees: boolean;
   /**
-   * Reputation
-   */
-  minReputationMultiplier: string;
-  /**
    * Review periods
    */
   defaultReviewPeriodEpochs: bigint;
@@ -1913,13 +1929,11 @@ export interface RepOperationalParams {
   complexComplexityBudget: string;
   expertComplexityBudget: string;
   soloExpertBonusRate: string;
-  interimDeadlineEpochs: bigint;
   /**
-   * Rate limits
+   * Default lifetime of a member-created interim, in epochs: MsgCreateInterim
+   * with deadline 0 is due interim_deadline_epochs * epoch_blocks from now.
    */
-  maxActiveChallengesPerCommittee: number;
-  maxNewChallengesPerEpoch: number;
-  challengeQueueMaxSize: number;
+  interimDeadlineEpochs: bigint;
   /**
    * Extended staking
    */
@@ -2232,10 +2246,6 @@ export interface RepOperationalParamsAmino {
   max_gift_per_invitee?: string;
   gift_only_to_invitees?: boolean;
   /**
-   * Reputation
-   */
-  min_reputation_multiplier?: string;
-  /**
    * Review periods
    */
   default_review_period_epochs?: string;
@@ -2263,13 +2273,11 @@ export interface RepOperationalParamsAmino {
   complex_complexity_budget?: string;
   expert_complexity_budget?: string;
   solo_expert_bonus_rate?: string;
-  interim_deadline_epochs?: string;
   /**
-   * Rate limits
+   * Default lifetime of a member-created interim, in epochs: MsgCreateInterim
+   * with deadline 0 is due interim_deadline_epochs * epoch_blocks from now.
    */
-  max_active_challenges_per_committee?: number;
-  max_new_challenges_per_epoch?: number;
-  challenge_queue_max_size?: number;
+  interim_deadline_epochs?: string;
   /**
    * Extended staking
    */
@@ -2880,7 +2888,6 @@ function createBaseParams(): Params {
     giftOnlyToInvitees: false,
     completerShare: "",
     treasuryShare: "",
-    minReputationMultiplier: "",
     apprenticeTier: TierConfig.fromPartial({}),
     standardTier: TierConfig.fromPartial({}),
     expertTier: TierConfig.fromPartial({}),
@@ -2906,13 +2913,7 @@ function createBaseParams(): Params {
     expertComplexityBudget: "",
     soloExpertBonusRate: "",
     interimDeadlineEpochs: BigInt(0),
-    maxActiveChallengesPerCommittee: 0,
-    maxNewChallengesPerEpoch: 0,
-    challengeQueueMaxSize: 0,
-    minorSlashPenalty: "",
-    moderateSlashPenalty: "",
     severeSlashPenalty: "",
-    zeroingSlashPenalty: "",
     projectCompletionBonusRate: "",
     memberStakeRevenueShare: "",
     tagStakeRevenueShare: "",
@@ -3034,7 +3035,9 @@ function createBaseParams(): Params {
     recoveryCommitDeposit: "",
     migrationObjectionBond: "",
     zkKeyActivationDelay: BigInt(0),
-    tagBudgetAwarderEpochCapBps: BigInt(0)
+    tagBudgetAwarderEpochCapBps: BigInt(0),
+    budgetReviewThreshold: "",
+    maxProposedProjectsPerCreator: 0
   };
 }
 /**
@@ -3077,470 +3080,455 @@ export const Params = {
     if (message.treasuryShare !== "") {
       writer.uint32(82).string(Decimal.fromUserInput(message.treasuryShare, 18).atomics);
     }
-    if (message.minReputationMultiplier !== "") {
-      writer.uint32(90).string(Decimal.fromUserInput(message.minReputationMultiplier, 18).atomics);
-    }
     if (message.apprenticeTier !== undefined) {
-      TierConfig.encode(message.apprenticeTier, writer.uint32(98).fork()).ldelim();
+      TierConfig.encode(message.apprenticeTier, writer.uint32(90).fork()).ldelim();
     }
     if (message.standardTier !== undefined) {
-      TierConfig.encode(message.standardTier, writer.uint32(106).fork()).ldelim();
+      TierConfig.encode(message.standardTier, writer.uint32(98).fork()).ldelim();
     }
     if (message.expertTier !== undefined) {
-      TierConfig.encode(message.expertTier, writer.uint32(114).fork()).ldelim();
+      TierConfig.encode(message.expertTier, writer.uint32(106).fork()).ldelim();
     }
     if (message.epicTier !== undefined) {
-      TierConfig.encode(message.epicTier, writer.uint32(122).fork()).ldelim();
+      TierConfig.encode(message.epicTier, writer.uint32(114).fork()).ldelim();
     }
     if (message.convictionHalfLifeEpochs !== BigInt(0)) {
-      writer.uint32(128).int64(message.convictionHalfLifeEpochs);
+      writer.uint32(120).int64(message.convictionHalfLifeEpochs);
     }
     if (message.externalConvictionRatio !== "") {
-      writer.uint32(138).string(Decimal.fromUserInput(message.externalConvictionRatio, 18).atomics);
+      writer.uint32(130).string(Decimal.fromUserInput(message.externalConvictionRatio, 18).atomics);
     }
     if (message.convictionPerDream !== "") {
-      writer.uint32(146).string(Decimal.fromUserInput(message.convictionPerDream, 18).atomics);
+      writer.uint32(138).string(Decimal.fromUserInput(message.convictionPerDream, 18).atomics);
     }
     if (message.defaultReviewPeriodEpochs !== BigInt(0)) {
-      writer.uint32(152).int64(message.defaultReviewPeriodEpochs);
+      writer.uint32(144).int64(message.defaultReviewPeriodEpochs);
     }
     if (message.defaultChallengePeriodEpochs !== BigInt(0)) {
-      writer.uint32(160).int64(message.defaultChallengePeriodEpochs);
+      writer.uint32(152).int64(message.defaultChallengePeriodEpochs);
     }
     if (message.minInvitationStake !== "") {
-      writer.uint32(170).string(message.minInvitationStake);
+      writer.uint32(162).string(message.minInvitationStake);
     }
     if (message.invitationAccountabilityEpochs !== BigInt(0)) {
-      writer.uint32(176).int64(message.invitationAccountabilityEpochs);
+      writer.uint32(168).int64(message.invitationAccountabilityEpochs);
     }
     if (message.referralRewardRate !== "") {
-      writer.uint32(186).string(Decimal.fromUserInput(message.referralRewardRate, 18).atomics);
+      writer.uint32(178).string(Decimal.fromUserInput(message.referralRewardRate, 18).atomics);
     }
     if (message.invitationCostMultiplier !== "") {
-      writer.uint32(194).string(Decimal.fromUserInput(message.invitationCostMultiplier, 18).atomics);
+      writer.uint32(186).string(Decimal.fromUserInput(message.invitationCostMultiplier, 18).atomics);
     }
     if (message.trustLevelConfig !== undefined) {
-      TrustLevelConfig.encode(message.trustLevelConfig, writer.uint32(202).fork()).ldelim();
+      TrustLevelConfig.encode(message.trustLevelConfig, writer.uint32(194).fork()).ldelim();
     }
     if (message.minChallengeStake !== "") {
-      writer.uint32(210).string(message.minChallengeStake);
+      writer.uint32(202).string(message.minChallengeStake);
     }
     if (message.challengerRewardRate !== "") {
-      writer.uint32(218).string(Decimal.fromUserInput(message.challengerRewardRate, 18).atomics);
+      writer.uint32(210).string(Decimal.fromUserInput(message.challengerRewardRate, 18).atomics);
     }
     if (message.jurySize !== 0) {
-      writer.uint32(224).uint32(message.jurySize);
+      writer.uint32(216).uint32(message.jurySize);
     }
     if (message.jurySuperMajority !== "") {
-      writer.uint32(234).string(Decimal.fromUserInput(message.jurySuperMajority, 18).atomics);
+      writer.uint32(226).string(Decimal.fromUserInput(message.jurySuperMajority, 18).atomics);
     }
     if (message.minJurorReputation !== "") {
-      writer.uint32(242).string(Decimal.fromUserInput(message.minJurorReputation, 18).atomics);
+      writer.uint32(234).string(Decimal.fromUserInput(message.minJurorReputation, 18).atomics);
     }
     if (message.simpleComplexityBudget !== "") {
-      writer.uint32(250).string(message.simpleComplexityBudget);
+      writer.uint32(242).string(message.simpleComplexityBudget);
     }
     if (message.standardComplexityBudget !== "") {
-      writer.uint32(258).string(message.standardComplexityBudget);
+      writer.uint32(250).string(message.standardComplexityBudget);
     }
     if (message.complexComplexityBudget !== "") {
-      writer.uint32(266).string(message.complexComplexityBudget);
+      writer.uint32(258).string(message.complexComplexityBudget);
     }
     if (message.expertComplexityBudget !== "") {
-      writer.uint32(274).string(message.expertComplexityBudget);
+      writer.uint32(266).string(message.expertComplexityBudget);
     }
     if (message.soloExpertBonusRate !== "") {
-      writer.uint32(282).string(Decimal.fromUserInput(message.soloExpertBonusRate, 18).atomics);
+      writer.uint32(274).string(Decimal.fromUserInput(message.soloExpertBonusRate, 18).atomics);
     }
     if (message.interimDeadlineEpochs !== BigInt(0)) {
-      writer.uint32(288).int64(message.interimDeadlineEpochs);
-    }
-    if (message.maxActiveChallengesPerCommittee !== 0) {
-      writer.uint32(296).uint32(message.maxActiveChallengesPerCommittee);
-    }
-    if (message.maxNewChallengesPerEpoch !== 0) {
-      writer.uint32(304).uint32(message.maxNewChallengesPerEpoch);
-    }
-    if (message.challengeQueueMaxSize !== 0) {
-      writer.uint32(312).uint32(message.challengeQueueMaxSize);
-    }
-    if (message.minorSlashPenalty !== "") {
-      writer.uint32(322).string(Decimal.fromUserInput(message.minorSlashPenalty, 18).atomics);
-    }
-    if (message.moderateSlashPenalty !== "") {
-      writer.uint32(330).string(Decimal.fromUserInput(message.moderateSlashPenalty, 18).atomics);
+      writer.uint32(280).int64(message.interimDeadlineEpochs);
     }
     if (message.severeSlashPenalty !== "") {
-      writer.uint32(338).string(Decimal.fromUserInput(message.severeSlashPenalty, 18).atomics);
-    }
-    if (message.zeroingSlashPenalty !== "") {
-      writer.uint32(346).string(Decimal.fromUserInput(message.zeroingSlashPenalty, 18).atomics);
+      writer.uint32(290).string(Decimal.fromUserInput(message.severeSlashPenalty, 18).atomics);
     }
     if (message.projectCompletionBonusRate !== "") {
-      writer.uint32(354).string(Decimal.fromUserInput(message.projectCompletionBonusRate, 18).atomics);
+      writer.uint32(298).string(Decimal.fromUserInput(message.projectCompletionBonusRate, 18).atomics);
     }
     if (message.memberStakeRevenueShare !== "") {
-      writer.uint32(362).string(Decimal.fromUserInput(message.memberStakeRevenueShare, 18).atomics);
+      writer.uint32(306).string(Decimal.fromUserInput(message.memberStakeRevenueShare, 18).atomics);
     }
     if (message.tagStakeRevenueShare !== "") {
-      writer.uint32(370).string(Decimal.fromUserInput(message.tagStakeRevenueShare, 18).atomics);
+      writer.uint32(314).string(Decimal.fromUserInput(message.tagStakeRevenueShare, 18).atomics);
     }
     if (message.minStakeDurationSeconds !== BigInt(0)) {
-      writer.uint32(376).int64(message.minStakeDurationSeconds);
+      writer.uint32(320).int64(message.minStakeDurationSeconds);
     }
     if (message.allowSelfMemberStake === true) {
-      writer.uint32(384).bool(message.allowSelfMemberStake);
+      writer.uint32(328).bool(message.allowSelfMemberStake);
     }
     if (message.challengeResponseDeadlineEpochs !== BigInt(0)) {
-      writer.uint32(392).int64(message.challengeResponseDeadlineEpochs);
+      writer.uint32(336).int64(message.challengeResponseDeadlineEpochs);
     }
     if (message.maxTransferReceivedPerEpoch !== "") {
-      writer.uint32(402).string(message.maxTransferReceivedPerEpoch);
+      writer.uint32(346).string(message.maxTransferReceivedPerEpoch);
     }
     if (message.maxTransferReceivedPerSeason !== "") {
-      writer.uint32(410).string(message.maxTransferReceivedPerSeason);
+      writer.uint32(354).string(message.maxTransferReceivedPerSeason);
     }
     if (message.contentConvictionHalfLifeEpochs !== BigInt(0)) {
-      writer.uint32(416).int64(message.contentConvictionHalfLifeEpochs);
+      writer.uint32(360).int64(message.contentConvictionHalfLifeEpochs);
     }
     if (message.maxContentStakePerMember !== "") {
-      writer.uint32(426).string(message.maxContentStakePerMember);
+      writer.uint32(370).string(message.maxContentStakePerMember);
     }
     if (message.maxAuthorBondPerContent !== "") {
-      writer.uint32(434).string(message.maxAuthorBondPerContent);
+      writer.uint32(378).string(message.maxAuthorBondPerContent);
     }
     if (message.authorBondSlashOnModeration === true) {
-      writer.uint32(440).bool(message.authorBondSlashOnModeration);
+      writer.uint32(384).bool(message.authorBondSlashOnModeration);
     }
     if (message.contentChallengeRewardShare !== "") {
-      writer.uint32(450).string(Decimal.fromUserInput(message.contentChallengeRewardShare, 18).atomics);
+      writer.uint32(394).string(Decimal.fromUserInput(message.contentChallengeRewardShare, 18).atomics);
     }
     if (message.convictionPropagationRatio !== "") {
-      writer.uint32(458).string(Decimal.fromUserInput(message.convictionPropagationRatio, 18).atomics);
+      writer.uint32(402).string(Decimal.fromUserInput(message.convictionPropagationRatio, 18).atomics);
     }
     if (message.maxTagsPerInitiative !== 0) {
-      writer.uint32(464).uint32(message.maxTagsPerInitiative);
+      writer.uint32(408).uint32(message.maxTagsPerInitiative);
     }
     if (message.reputationDecayRate !== "") {
-      writer.uint32(474).string(Decimal.fromUserInput(message.reputationDecayRate, 18).atomics);
+      writer.uint32(418).string(Decimal.fromUserInput(message.reputationDecayRate, 18).atomics);
     }
     if (message.maxConvictionSharePerMember !== "") {
-      writer.uint32(482).string(Decimal.fromUserInput(message.maxConvictionSharePerMember, 18).atomics);
+      writer.uint32(426).string(Decimal.fromUserInput(message.maxConvictionSharePerMember, 18).atomics);
     }
     if (message.invitationStakeBurnRate !== "") {
-      writer.uint32(490).string(Decimal.fromUserInput(message.invitationStakeBurnRate, 18).atomics);
+      writer.uint32(434).string(Decimal.fromUserInput(message.invitationStakeBurnRate, 18).atomics);
     }
     if (message.maxReputationGainPerEpoch !== "") {
-      writer.uint32(498).string(Decimal.fromUserInput(message.maxReputationGainPerEpoch, 18).atomics);
+      writer.uint32(442).string(Decimal.fromUserInput(message.maxReputationGainPerEpoch, 18).atomics);
     }
     if (message.maxStakingRewardsPerSeason !== "") {
-      writer.uint32(506).string(message.maxStakingRewardsPerSeason);
+      writer.uint32(450).string(message.maxStakingRewardsPerSeason);
     }
     if (message.stakingRewardYieldPerEpoch !== "") {
-      writer.uint32(1090).string(Decimal.fromUserInput(message.stakingRewardYieldPerEpoch, 18).atomics);
+      writer.uint32(1034).string(Decimal.fromUserInput(message.stakingRewardYieldPerEpoch, 18).atomics);
     }
     if (message.stakingPoolMintShare !== "") {
-      writer.uint32(1098).string(Decimal.fromUserInput(message.stakingPoolMintShare, 18).atomics);
+      writer.uint32(1042).string(Decimal.fromUserInput(message.stakingPoolMintShare, 18).atomics);
     }
     if (message.stakingPoolCapBase !== "") {
-      writer.uint32(1106).string(message.stakingPoolCapBase);
+      writer.uint32(1050).string(message.stakingPoolCapBase);
     }
     if (message.stakingPoolCapRate !== "") {
-      writer.uint32(1114).string(Decimal.fromUserInput(message.stakingPoolCapRate, 18).atomics);
+      writer.uint32(1058).string(Decimal.fromUserInput(message.stakingPoolCapRate, 18).atomics);
     }
     if (message.stakedDecayRate !== "") {
-      writer.uint32(514).string(Decimal.fromUserInput(message.stakedDecayRate, 18).atomics);
+      writer.uint32(458).string(Decimal.fromUserInput(message.stakedDecayRate, 18).atomics);
     }
     if (message.newMemberDecayGraceEpochs !== BigInt(0)) {
-      writer.uint32(520).int64(message.newMemberDecayGraceEpochs);
+      writer.uint32(464).int64(message.newMemberDecayGraceEpochs);
     }
     if (message.maxTreasuryBalance !== "") {
-      writer.uint32(530).string(message.maxTreasuryBalance);
+      writer.uint32(474).string(message.maxTreasuryBalance);
     }
     if (message.treasuryFundsInterims === true) {
-      writer.uint32(536).bool(message.treasuryFundsInterims);
+      writer.uint32(480).bool(message.treasuryFundsInterims);
     }
     if (message.treasuryFundsRetroPgf === true) {
-      writer.uint32(544).bool(message.treasuryFundsRetroPgf);
+      writer.uint32(488).bool(message.treasuryFundsRetroPgf);
     }
     if (message.maxInitiativeStakePerMember !== "") {
-      writer.uint32(554).string(message.maxInitiativeStakePerMember);
+      writer.uint32(498).string(message.maxInitiativeStakePerMember);
     }
     if (message.minStakeAmount !== "") {
-      writer.uint32(1122).string(message.minStakeAmount);
+      writer.uint32(1066).string(message.minStakeAmount);
     }
     if (message.maxInterimRewardsPerSeason !== "") {
-      writer.uint32(1146).string(message.maxInterimRewardsPerSeason);
+      writer.uint32(1090).string(message.maxInterimRewardsPerSeason);
     }
     if (message.maxInitiativeRewardsPerSeason !== "") {
-      writer.uint32(562).string(message.maxInitiativeRewardsPerSeason);
+      writer.uint32(506).string(message.maxInitiativeRewardsPerSeason);
     }
     if (message.largeProjectBudgetThreshold !== "") {
-      writer.uint32(570).string(message.largeProjectBudgetThreshold);
+      writer.uint32(514).string(message.largeProjectBudgetThreshold);
     }
     if (message.projectCreationFee !== "") {
-      writer.uint32(578).string(message.projectCreationFee);
+      writer.uint32(522).string(message.projectCreationFee);
     }
     if (message.initiativeCreationFeeApprentice !== "") {
-      writer.uint32(586).string(message.initiativeCreationFeeApprentice);
+      writer.uint32(530).string(message.initiativeCreationFeeApprentice);
     }
     if (message.initiativeCreationFeeStandard !== "") {
-      writer.uint32(594).string(message.initiativeCreationFeeStandard);
+      writer.uint32(538).string(message.initiativeCreationFeeStandard);
     }
     if (message.permissionlessMinTrustLevel !== 0) {
-      writer.uint32(600).uint32(message.permissionlessMinTrustLevel);
+      writer.uint32(544).uint32(message.permissionlessMinTrustLevel);
     }
     if (message.permissionlessMaxTier !== 0) {
-      writer.uint32(608).uint32(message.permissionlessMaxTier);
+      writer.uint32(552).uint32(message.permissionlessMaxTier);
     }
     if (message.tagCreationFee !== "") {
-      writer.uint32(618).string(message.tagCreationFee);
+      writer.uint32(562).string(message.tagCreationFee);
     }
     if (message.maxSentinelRewardPool !== "") {
-      writer.uint32(626).string(message.maxSentinelRewardPool);
+      writer.uint32(570).string(message.maxSentinelRewardPool);
     }
     if (message.sentinelRewardPoolOverflowBurnRatio !== "") {
-      writer.uint32(634).string(Decimal.fromUserInput(message.sentinelRewardPoolOverflowBurnRatio, 18).atomics);
+      writer.uint32(578).string(Decimal.fromUserInput(message.sentinelRewardPoolOverflowBurnRatio, 18).atomics);
     }
     if (message.sentinelRewardEpochBlocks !== BigInt(0)) {
-      writer.uint32(640).uint64(message.sentinelRewardEpochBlocks);
+      writer.uint32(584).uint64(message.sentinelRewardEpochBlocks);
     }
     if (message.minSentinelAccuracy !== "") {
-      writer.uint32(650).string(Decimal.fromUserInput(message.minSentinelAccuracy, 18).atomics);
+      writer.uint32(594).string(Decimal.fromUserInput(message.minSentinelAccuracy, 18).atomics);
     }
     if (message.minAppealsForAccuracy !== BigInt(0)) {
-      writer.uint32(656).uint64(message.minAppealsForAccuracy);
+      writer.uint32(600).uint64(message.minAppealsForAccuracy);
     }
     if (message.minEpochActivityForReward !== BigInt(0)) {
-      writer.uint32(664).uint64(message.minEpochActivityForReward);
+      writer.uint32(608).uint64(message.minEpochActivityForReward);
     }
     if (message.minAppealRate !== "") {
-      writer.uint32(674).string(Decimal.fromUserInput(message.minAppealRate, 18).atomics);
+      writer.uint32(618).string(Decimal.fromUserInput(message.minAppealRate, 18).atomics);
     }
     if (message.sentinelAccuracyWindowEpochs !== BigInt(0)) {
-      writer.uint32(728).uint64(message.sentinelAccuracyWindowEpochs);
+      writer.uint32(672).uint64(message.sentinelAccuracyWindowEpochs);
     }
     if (message.maxActiveInitiativesPerMember !== 0) {
-      writer.uint32(680).uint32(message.maxActiveInitiativesPerMember);
+      writer.uint32(624).uint32(message.maxActiveInitiativesPerMember);
     }
     if (message.maxActiveInterimsPerMember !== 0) {
-      writer.uint32(688).uint32(message.maxActiveInterimsPerMember);
+      writer.uint32(632).uint32(message.maxActiveInterimsPerMember);
     }
     if (message.maxDreamMintPerEpoch !== "") {
-      writer.uint32(698).string(message.maxDreamMintPerEpoch);
+      writer.uint32(642).string(message.maxDreamMintPerEpoch);
     }
     if (message.maxProjectRequestedBudget !== "") {
-      writer.uint32(706).string(message.maxProjectRequestedBudget);
+      writer.uint32(650).string(message.maxProjectRequestedBudget);
     }
     if (message.maxProjectRequestedSpark !== "") {
-      writer.uint32(714).string(message.maxProjectRequestedSpark);
+      writer.uint32(658).string(message.maxProjectRequestedSpark);
     }
     if (message.proposedProjectExpiryBlocks !== BigInt(0)) {
-      writer.uint32(720).int64(message.proposedProjectExpiryBlocks);
+      writer.uint32(664).int64(message.proposedProjectExpiryBlocks);
     }
     if (message.selfAssignedBondRate !== "") {
-      writer.uint32(738).string(Decimal.fromUserInput(message.selfAssignedBondRate, 18).atomics);
+      writer.uint32(682).string(Decimal.fromUserInput(message.selfAssignedBondRate, 18).atomics);
     }
     if (message.selfAssignedExternalConvictionRatio !== "") {
-      writer.uint32(746).string(Decimal.fromUserInput(message.selfAssignedExternalConvictionRatio, 18).atomics);
+      writer.uint32(690).string(Decimal.fromUserInput(message.selfAssignedExternalConvictionRatio, 18).atomics);
     }
     if (message.selfAssignedChallengeMultiplier !== BigInt(0)) {
-      writer.uint32(752).int64(message.selfAssignedChallengeMultiplier);
+      writer.uint32(696).int64(message.selfAssignedChallengeMultiplier);
     }
     if (message.permissionlessSelfAssignedBondRate !== "") {
-      writer.uint32(762).string(Decimal.fromUserInput(message.permissionlessSelfAssignedBondRate, 18).atomics);
+      writer.uint32(706).string(Decimal.fromUserInput(message.permissionlessSelfAssignedBondRate, 18).atomics);
     }
     if (message.abandonedJurySeatPenalty !== "") {
-      writer.uint32(770).string(Decimal.fromUserInput(message.abandonedJurySeatPenalty, 18).atomics);
+      writer.uint32(714).string(Decimal.fromUserInput(message.abandonedJurySeatPenalty, 18).atomics);
     }
     if (message.jurorRewardRate !== "") {
-      writer.uint32(778).string(Decimal.fromUserInput(message.jurorRewardRate, 18).atomics);
+      writer.uint32(722).string(Decimal.fromUserInput(message.jurorRewardRate, 18).atomics);
     }
     if (message.juryAcceptanceWindowRatio !== "") {
-      writer.uint32(786).string(Decimal.fromUserInput(message.juryAcceptanceWindowRatio, 18).atomics);
+      writer.uint32(730).string(Decimal.fromUserInput(message.juryAcceptanceWindowRatio, 18).atomics);
     }
     if (message.minJurorReward !== "") {
-      writer.uint32(794).string(message.minJurorReward);
+      writer.uint32(738).string(message.minJurorReward);
     }
     if (message.minJurorSelectionWeight !== "") {
-      writer.uint32(802).string(Decimal.fromUserInput(message.minJurorSelectionWeight, 18).atomics);
+      writer.uint32(746).string(Decimal.fromUserInput(message.minJurorSelectionWeight, 18).atomics);
     }
     if (message.minJurySeatingsForWeighting !== BigInt(0)) {
-      writer.uint32(808).uint64(message.minJurySeatingsForWeighting);
+      writer.uint32(752).uint64(message.minJurySeatingsForWeighting);
     }
     if (message.initiativeCompletionBonusRate !== "") {
-      writer.uint32(818).string(Decimal.fromUserInput(message.initiativeCompletionBonusRate, 18).atomics);
+      writer.uint32(762).string(Decimal.fromUserInput(message.initiativeCompletionBonusRate, 18).atomics);
     }
     if (message.maxCompletionBonusStakeMultiple !== "") {
-      writer.uint32(1130).string(Decimal.fromUserInput(message.maxCompletionBonusStakeMultiple, 18).atomics);
+      writer.uint32(1074).string(Decimal.fromUserInput(message.maxCompletionBonusStakeMultiple, 18).atomics);
     }
     if (message.maxTotalContentStakePerMember !== "") {
-      writer.uint32(1138).string(message.maxTotalContentStakePerMember);
+      writer.uint32(1082).string(message.maxTotalContentStakePerMember);
     }
     if (message.maxJuryRedraws !== 0) {
-      writer.uint32(824).uint32(message.maxJuryRedraws);
+      writer.uint32(768).uint32(message.maxJuryRedraws);
     }
     if (message.reviewerBondReserveRate !== "") {
-      writer.uint32(834).string(Decimal.fromUserInput(message.reviewerBondReserveRate, 18).atomics);
+      writer.uint32(778).string(Decimal.fromUserInput(message.reviewerBondReserveRate, 18).atomics);
     }
     if (message.reviewFeeRate !== "") {
-      writer.uint32(842).string(Decimal.fromUserInput(message.reviewFeeRate, 18).atomics);
+      writer.uint32(786).string(Decimal.fromUserInput(message.reviewFeeRate, 18).atomics);
     }
     if (message.maxReviewRounds !== 0) {
-      writer.uint32(848).uint32(message.maxReviewRounds);
+      writer.uint32(792).uint32(message.maxReviewRounds);
     }
     if (message.maxReviewerRewardPool !== "") {
-      writer.uint32(858).string(message.maxReviewerRewardPool);
+      writer.uint32(802).string(message.maxReviewerRewardPool);
     }
     if (message.reviewerRewardPoolOverflowBurnRatio !== "") {
-      writer.uint32(866).string(Decimal.fromUserInput(message.reviewerRewardPoolOverflowBurnRatio, 18).atomics);
+      writer.uint32(810).string(Decimal.fromUserInput(message.reviewerRewardPoolOverflowBurnRatio, 18).atomics);
     }
     if (message.reviewerRewardEpochBlocks !== BigInt(0)) {
-      writer.uint32(872).uint64(message.reviewerRewardEpochBlocks);
+      writer.uint32(816).uint64(message.reviewerRewardEpochBlocks);
     }
     if (message.minReviewerAccuracy !== "") {
-      writer.uint32(882).string(Decimal.fromUserInput(message.minReviewerAccuracy, 18).atomics);
+      writer.uint32(826).string(Decimal.fromUserInput(message.minReviewerAccuracy, 18).atomics);
     }
     if (message.reviewerAccuracyWindowEpochs !== BigInt(0)) {
-      writer.uint32(888).uint64(message.reviewerAccuracyWindowEpochs);
+      writer.uint32(832).uint64(message.reviewerAccuracyWindowEpochs);
     }
     if (message.minReviewerBond !== "") {
-      writer.uint32(1034).string(message.minReviewerBond);
+      writer.uint32(978).string(message.minReviewerBond);
     }
     if (message.reviewerDemotionThreshold !== "") {
-      writer.uint32(1042).string(message.reviewerDemotionThreshold);
+      writer.uint32(986).string(message.reviewerDemotionThreshold);
     }
     if (message.minReviewerTrustLevel !== "") {
-      writer.uint32(1050).string(message.minReviewerTrustLevel);
+      writer.uint32(994).string(message.minReviewerTrustLevel);
     }
     if (message.minReviewerRepTier !== BigInt(0)) {
-      writer.uint32(1056).uint64(message.minReviewerRepTier);
+      writer.uint32(1000).uint64(message.minReviewerRepTier);
     }
     if (message.minReviewerAgeBlocks !== BigInt(0)) {
-      writer.uint32(1064).int64(message.minReviewerAgeBlocks);
+      writer.uint32(1008).int64(message.minReviewerAgeBlocks);
     }
     if (message.reviewerDemotionCooldown !== BigInt(0)) {
-      writer.uint32(1072).int64(message.reviewerDemotionCooldown);
+      writer.uint32(1016).int64(message.reviewerDemotionCooldown);
     }
     if (message.reviewerUnbondCooldown !== BigInt(0)) {
-      writer.uint32(1080).int64(message.reviewerUnbondCooldown);
+      writer.uint32(1024).int64(message.reviewerUnbondCooldown);
     }
     if (message.roleRewardInflationShare !== "") {
-      writer.uint32(898).string(Decimal.fromUserInput(message.roleRewardInflationShare, 18).atomics);
+      writer.uint32(842).string(Decimal.fromUserInput(message.roleRewardInflationShare, 18).atomics);
     }
     if (message.maxCuratorRewardPool !== "") {
-      writer.uint32(906).string(message.maxCuratorRewardPool);
+      writer.uint32(850).string(message.maxCuratorRewardPool);
     }
     if (message.curatorRewardPoolOverflowBurnRatio !== "") {
-      writer.uint32(914).string(Decimal.fromUserInput(message.curatorRewardPoolOverflowBurnRatio, 18).atomics);
+      writer.uint32(858).string(Decimal.fromUserInput(message.curatorRewardPoolOverflowBurnRatio, 18).atomics);
     }
     if (message.curatorRewardEpochBlocks !== BigInt(0)) {
-      writer.uint32(920).uint64(message.curatorRewardEpochBlocks);
+      writer.uint32(864).uint64(message.curatorRewardEpochBlocks);
     }
     if (message.minCuratorAccuracy !== "") {
-      writer.uint32(930).string(Decimal.fromUserInput(message.minCuratorAccuracy, 18).atomics);
+      writer.uint32(874).string(Decimal.fromUserInput(message.minCuratorAccuracy, 18).atomics);
     }
     if (message.curatorAccuracyWindowEpochs !== BigInt(0)) {
-      writer.uint32(936).uint64(message.curatorAccuracyWindowEpochs);
+      writer.uint32(880).uint64(message.curatorAccuracyWindowEpochs);
     }
     if (message.reviewRequiredAboveBudget !== "") {
-      writer.uint32(946).string(message.reviewRequiredAboveBudget);
+      writer.uint32(890).string(message.reviewRequiredAboveBudget);
     }
     if (message.reviewBountyReclaimDelay !== BigInt(0)) {
-      writer.uint32(952).uint64(message.reviewBountyReclaimDelay);
+      writer.uint32(896).uint64(message.reviewBountyReclaimDelay);
     }
     if (message.permissionlessMinReviewBountyRate !== "") {
-      writer.uint32(962).string(Decimal.fromUserInput(message.permissionlessMinReviewBountyRate, 18).atomics);
+      writer.uint32(906).string(Decimal.fromUserInput(message.permissionlessMinReviewBountyRate, 18).atomics);
     }
     if (message.maxVerifierRewardPool !== "") {
-      writer.uint32(970).string(message.maxVerifierRewardPool);
+      writer.uint32(914).string(message.maxVerifierRewardPool);
     }
     if (message.verifierRewardPoolOverflowBurnRatio !== "") {
-      writer.uint32(978).string(Decimal.fromUserInput(message.verifierRewardPoolOverflowBurnRatio, 18).atomics);
+      writer.uint32(922).string(Decimal.fromUserInput(message.verifierRewardPoolOverflowBurnRatio, 18).atomics);
     }
     if (message.verifierRewardEpochBlocks !== BigInt(0)) {
-      writer.uint32(984).uint64(message.verifierRewardEpochBlocks);
+      writer.uint32(928).uint64(message.verifierRewardEpochBlocks);
     }
     if (message.minVerifierAccuracy !== "") {
-      writer.uint32(994).string(Decimal.fromUserInput(message.minVerifierAccuracy, 18).atomics);
+      writer.uint32(938).string(Decimal.fromUserInput(message.minVerifierAccuracy, 18).atomics);
     }
     if (message.verifierAccuracyWindowEpochs !== BigInt(0)) {
-      writer.uint32(1000).uint64(message.verifierAccuracyWindowEpochs);
+      writer.uint32(944).uint64(message.verifierAccuracyWindowEpochs);
     }
     if (message.minEpochVerifications !== 0) {
-      writer.uint32(1008).uint32(message.minEpochVerifications);
+      writer.uint32(952).uint32(message.minEpochVerifications);
     }
     if (message.verifierDreamReward !== "") {
-      writer.uint32(1018).string(message.verifierDreamReward);
+      writer.uint32(962).string(message.verifierDreamReward);
     }
     if (message.maxVerifierDreamMintPerEpoch !== "") {
-      writer.uint32(1026).string(message.maxVerifierDreamMintPerEpoch);
+      writer.uint32(970).string(message.maxVerifierDreamMintPerEpoch);
     }
     if (message.initiativeBountyMaxBudgetRatio !== "") {
-      writer.uint32(1154).string(Decimal.fromUserInput(message.initiativeBountyMaxBudgetRatio, 18).atomics);
+      writer.uint32(1098).string(Decimal.fromUserInput(message.initiativeBountyMaxBudgetRatio, 18).atomics);
     }
     if (message.maxInitiativeBountyPerFunderEpoch !== "") {
-      writer.uint32(1162).string(message.maxInitiativeBountyPerFunderEpoch);
+      writer.uint32(1106).string(message.maxInitiativeBountyPerFunderEpoch);
     }
     if (message.minInitiativeBountyContribution !== "") {
-      writer.uint32(1170).string(message.minInitiativeBountyContribution);
+      writer.uint32(1114).string(message.minInitiativeBountyContribution);
     }
     if (message.maxInitiativeBountyContributions !== 0) {
-      writer.uint32(1176).uint32(message.maxInitiativeBountyContributions);
+      writer.uint32(1120).uint32(message.maxInitiativeBountyContributions);
     }
     if (message.initiativeBountyReclaimDelay !== BigInt(0)) {
-      writer.uint32(1184).uint64(message.initiativeBountyReclaimDelay);
+      writer.uint32(1128).uint64(message.initiativeBountyReclaimDelay);
     }
     if (message.invitationAcceptanceEpochs !== BigInt(0)) {
-      writer.uint32(1192).int64(message.invitationAcceptanceEpochs);
+      writer.uint32(1136).int64(message.invitationAcceptanceEpochs);
     }
     if (message.migrationEnabled === true) {
-      writer.uint32(1200).bool(message.migrationEnabled);
+      writer.uint32(1144).bool(message.migrationEnabled);
     }
     if (message.keyPathEnabled === true) {
-      writer.uint32(1208).bool(message.keyPathEnabled);
+      writer.uint32(1152).bool(message.keyPathEnabled);
     }
     if (message.keyMigrationDelay !== BigInt(0)) {
-      writer.uint32(1216).int64(message.keyMigrationDelay);
+      writer.uint32(1160).int64(message.keyMigrationDelay);
     }
     if (message.recoveryMigrationDelay !== BigInt(0)) {
-      writer.uint32(1224).int64(message.recoveryMigrationDelay);
+      writer.uint32(1168).int64(message.recoveryMigrationDelay);
     }
     if (message.councilMigrationDelay !== BigInt(0)) {
-      writer.uint32(1232).int64(message.councilMigrationDelay);
+      writer.uint32(1176).int64(message.councilMigrationDelay);
     }
     if (message.migrationAcceptWindow !== BigInt(0)) {
-      writer.uint32(1240).int64(message.migrationAcceptWindow);
+      writer.uint32(1184).int64(message.migrationAcceptWindow);
     }
     if (message.migrationCooldown !== BigInt(0)) {
-      writer.uint32(1248).int64(message.migrationCooldown);
+      writer.uint32(1192).int64(message.migrationCooldown);
     }
     if (message.maxKeyMigrationsPerWindow !== 0) {
-      writer.uint32(1256).uint32(message.maxKeyMigrationsPerWindow);
+      writer.uint32(1200).uint32(message.maxKeyMigrationsPerWindow);
     }
     if (message.keyMigrationWindow !== BigInt(0)) {
-      writer.uint32(1264).int64(message.keyMigrationWindow);
+      writer.uint32(1208).int64(message.keyMigrationWindow);
     }
     if (message.recoveryChangeDelay !== BigInt(0)) {
-      writer.uint32(1272).int64(message.recoveryChangeDelay);
+      writer.uint32(1216).int64(message.recoveryChangeDelay);
     }
     if (message.recoveryRevealMinBlocks !== BigInt(0)) {
-      writer.uint32(1280).int64(message.recoveryRevealMinBlocks);
+      writer.uint32(1224).int64(message.recoveryRevealMinBlocks);
     }
     if (message.recoveryCommitTtl !== BigInt(0)) {
-      writer.uint32(1288).int64(message.recoveryCommitTtl);
+      writer.uint32(1232).int64(message.recoveryCommitTtl);
     }
     if (message.recoveryCommitDeposit !== "") {
-      writer.uint32(1298).string(message.recoveryCommitDeposit);
+      writer.uint32(1242).string(message.recoveryCommitDeposit);
     }
     if (message.migrationObjectionBond !== "") {
-      writer.uint32(1306).string(message.migrationObjectionBond);
+      writer.uint32(1250).string(message.migrationObjectionBond);
     }
     if (message.zkKeyActivationDelay !== BigInt(0)) {
-      writer.uint32(1312).int64(message.zkKeyActivationDelay);
+      writer.uint32(1256).int64(message.zkKeyActivationDelay);
     }
     if (message.tagBudgetAwarderEpochCapBps !== BigInt(0)) {
-      writer.uint32(1320).uint64(message.tagBudgetAwarderEpochCapBps);
+      writer.uint32(1264).uint64(message.tagBudgetAwarderEpochCapBps);
+    }
+    if (message.budgetReviewThreshold !== "") {
+      writer.uint32(1274).string(message.budgetReviewThreshold);
+    }
+    if (message.maxProposedProjectsPerCreator !== 0) {
+      writer.uint32(1280).uint32(message.maxProposedProjectsPerCreator);
     }
     return writer;
   },
@@ -3582,469 +3570,454 @@ export const Params = {
           message.treasuryShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
         case 11:
-          message.minReputationMultiplier = Decimal.fromAtomics(reader.string(), 18).toString();
-          break;
-        case 12:
           message.apprenticeTier = TierConfig.decode(reader, reader.uint32());
           break;
-        case 13:
+        case 12:
           message.standardTier = TierConfig.decode(reader, reader.uint32());
           break;
-        case 14:
+        case 13:
           message.expertTier = TierConfig.decode(reader, reader.uint32());
           break;
-        case 15:
+        case 14:
           message.epicTier = TierConfig.decode(reader, reader.uint32());
           break;
-        case 16:
+        case 15:
           message.convictionHalfLifeEpochs = reader.int64();
           break;
-        case 17:
+        case 16:
           message.externalConvictionRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 18:
+        case 17:
           message.convictionPerDream = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 19:
+        case 18:
           message.defaultReviewPeriodEpochs = reader.int64();
           break;
-        case 20:
+        case 19:
           message.defaultChallengePeriodEpochs = reader.int64();
           break;
-        case 21:
+        case 20:
           message.minInvitationStake = reader.string();
           break;
-        case 22:
+        case 21:
           message.invitationAccountabilityEpochs = reader.int64();
           break;
-        case 23:
+        case 22:
           message.referralRewardRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 24:
+        case 23:
           message.invitationCostMultiplier = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 25:
+        case 24:
           message.trustLevelConfig = TrustLevelConfig.decode(reader, reader.uint32());
           break;
-        case 26:
+        case 25:
           message.minChallengeStake = reader.string();
           break;
-        case 27:
+        case 26:
           message.challengerRewardRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 28:
+        case 27:
           message.jurySize = reader.uint32();
           break;
-        case 29:
+        case 28:
           message.jurySuperMajority = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 30:
+        case 29:
           message.minJurorReputation = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 31:
+        case 30:
           message.simpleComplexityBudget = reader.string();
           break;
-        case 32:
+        case 31:
           message.standardComplexityBudget = reader.string();
           break;
-        case 33:
+        case 32:
           message.complexComplexityBudget = reader.string();
           break;
-        case 34:
+        case 33:
           message.expertComplexityBudget = reader.string();
           break;
-        case 35:
+        case 34:
           message.soloExpertBonusRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 36:
+        case 35:
           message.interimDeadlineEpochs = reader.int64();
           break;
-        case 37:
-          message.maxActiveChallengesPerCommittee = reader.uint32();
-          break;
-        case 38:
-          message.maxNewChallengesPerEpoch = reader.uint32();
-          break;
-        case 39:
-          message.challengeQueueMaxSize = reader.uint32();
-          break;
-        case 40:
-          message.minorSlashPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
-          break;
-        case 41:
-          message.moderateSlashPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
-          break;
-        case 42:
+        case 36:
           message.severeSlashPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 43:
-          message.zeroingSlashPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
-          break;
-        case 44:
+        case 37:
           message.projectCompletionBonusRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 45:
+        case 38:
           message.memberStakeRevenueShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 46:
+        case 39:
           message.tagStakeRevenueShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 47:
+        case 40:
           message.minStakeDurationSeconds = reader.int64();
           break;
-        case 48:
+        case 41:
           message.allowSelfMemberStake = reader.bool();
           break;
-        case 49:
+        case 42:
           message.challengeResponseDeadlineEpochs = reader.int64();
           break;
-        case 50:
+        case 43:
           message.maxTransferReceivedPerEpoch = reader.string();
           break;
-        case 51:
+        case 44:
           message.maxTransferReceivedPerSeason = reader.string();
           break;
-        case 52:
+        case 45:
           message.contentConvictionHalfLifeEpochs = reader.int64();
           break;
-        case 53:
+        case 46:
           message.maxContentStakePerMember = reader.string();
           break;
-        case 54:
+        case 47:
           message.maxAuthorBondPerContent = reader.string();
           break;
-        case 55:
+        case 48:
           message.authorBondSlashOnModeration = reader.bool();
           break;
-        case 56:
+        case 49:
           message.contentChallengeRewardShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 57:
+        case 50:
           message.convictionPropagationRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 58:
+        case 51:
           message.maxTagsPerInitiative = reader.uint32();
           break;
-        case 59:
+        case 52:
           message.reputationDecayRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 60:
+        case 53:
           message.maxConvictionSharePerMember = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 61:
+        case 54:
           message.invitationStakeBurnRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 62:
+        case 55:
           message.maxReputationGainPerEpoch = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 63:
+        case 56:
           message.maxStakingRewardsPerSeason = reader.string();
           break;
-        case 136:
+        case 129:
           message.stakingRewardYieldPerEpoch = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 137:
+        case 130:
           message.stakingPoolMintShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 138:
+        case 131:
           message.stakingPoolCapBase = reader.string();
           break;
-        case 139:
+        case 132:
           message.stakingPoolCapRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 64:
+        case 57:
           message.stakedDecayRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 65:
+        case 58:
           message.newMemberDecayGraceEpochs = reader.int64();
           break;
-        case 66:
+        case 59:
           message.maxTreasuryBalance = reader.string();
           break;
-        case 67:
+        case 60:
           message.treasuryFundsInterims = reader.bool();
           break;
-        case 68:
+        case 61:
           message.treasuryFundsRetroPgf = reader.bool();
           break;
-        case 69:
+        case 62:
           message.maxInitiativeStakePerMember = reader.string();
           break;
-        case 140:
+        case 133:
           message.minStakeAmount = reader.string();
           break;
-        case 143:
+        case 136:
           message.maxInterimRewardsPerSeason = reader.string();
           break;
-        case 70:
+        case 63:
           message.maxInitiativeRewardsPerSeason = reader.string();
           break;
-        case 71:
+        case 64:
           message.largeProjectBudgetThreshold = reader.string();
           break;
-        case 72:
+        case 65:
           message.projectCreationFee = reader.string();
           break;
-        case 73:
+        case 66:
           message.initiativeCreationFeeApprentice = reader.string();
           break;
-        case 74:
+        case 67:
           message.initiativeCreationFeeStandard = reader.string();
           break;
-        case 75:
+        case 68:
           message.permissionlessMinTrustLevel = reader.uint32();
           break;
-        case 76:
+        case 69:
           message.permissionlessMaxTier = reader.uint32();
           break;
-        case 77:
+        case 70:
           message.tagCreationFee = reader.string();
           break;
-        case 78:
+        case 71:
           message.maxSentinelRewardPool = reader.string();
           break;
-        case 79:
+        case 72:
           message.sentinelRewardPoolOverflowBurnRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 80:
+        case 73:
           message.sentinelRewardEpochBlocks = reader.uint64();
           break;
-        case 81:
+        case 74:
           message.minSentinelAccuracy = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 82:
+        case 75:
           message.minAppealsForAccuracy = reader.uint64();
           break;
-        case 83:
+        case 76:
           message.minEpochActivityForReward = reader.uint64();
           break;
-        case 84:
+        case 77:
           message.minAppealRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 91:
+        case 84:
           message.sentinelAccuracyWindowEpochs = reader.uint64();
           break;
-        case 85:
+        case 78:
           message.maxActiveInitiativesPerMember = reader.uint32();
           break;
-        case 86:
+        case 79:
           message.maxActiveInterimsPerMember = reader.uint32();
           break;
-        case 87:
+        case 80:
           message.maxDreamMintPerEpoch = reader.string();
           break;
-        case 88:
+        case 81:
           message.maxProjectRequestedBudget = reader.string();
           break;
-        case 89:
+        case 82:
           message.maxProjectRequestedSpark = reader.string();
           break;
-        case 90:
+        case 83:
           message.proposedProjectExpiryBlocks = reader.int64();
           break;
-        case 92:
+        case 85:
           message.selfAssignedBondRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 93:
+        case 86:
           message.selfAssignedExternalConvictionRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 94:
+        case 87:
           message.selfAssignedChallengeMultiplier = reader.int64();
           break;
-        case 95:
+        case 88:
           message.permissionlessSelfAssignedBondRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 96:
+        case 89:
           message.abandonedJurySeatPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 97:
+        case 90:
           message.jurorRewardRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 98:
+        case 91:
           message.juryAcceptanceWindowRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 99:
+        case 92:
           message.minJurorReward = reader.string();
           break;
-        case 100:
+        case 93:
           message.minJurorSelectionWeight = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 101:
+        case 94:
           message.minJurySeatingsForWeighting = reader.uint64();
           break;
-        case 102:
+        case 95:
           message.initiativeCompletionBonusRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 141:
+        case 134:
           message.maxCompletionBonusStakeMultiple = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 142:
+        case 135:
           message.maxTotalContentStakePerMember = reader.string();
           break;
-        case 103:
+        case 96:
           message.maxJuryRedraws = reader.uint32();
           break;
-        case 104:
+        case 97:
           message.reviewerBondReserveRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 105:
+        case 98:
           message.reviewFeeRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 106:
+        case 99:
           message.maxReviewRounds = reader.uint32();
           break;
-        case 107:
+        case 100:
           message.maxReviewerRewardPool = reader.string();
           break;
-        case 108:
+        case 101:
           message.reviewerRewardPoolOverflowBurnRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 109:
+        case 102:
           message.reviewerRewardEpochBlocks = reader.uint64();
           break;
-        case 110:
+        case 103:
           message.minReviewerAccuracy = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 111:
+        case 104:
           message.reviewerAccuracyWindowEpochs = reader.uint64();
           break;
-        case 129:
+        case 122:
           message.minReviewerBond = reader.string();
           break;
-        case 130:
+        case 123:
           message.reviewerDemotionThreshold = reader.string();
           break;
-        case 131:
+        case 124:
           message.minReviewerTrustLevel = reader.string();
           break;
-        case 132:
+        case 125:
           message.minReviewerRepTier = reader.uint64();
           break;
-        case 133:
+        case 126:
           message.minReviewerAgeBlocks = reader.int64();
           break;
-        case 134:
+        case 127:
           message.reviewerDemotionCooldown = reader.int64();
           break;
-        case 135:
+        case 128:
           message.reviewerUnbondCooldown = reader.int64();
           break;
-        case 112:
+        case 105:
           message.roleRewardInflationShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 113:
+        case 106:
           message.maxCuratorRewardPool = reader.string();
           break;
-        case 114:
+        case 107:
           message.curatorRewardPoolOverflowBurnRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 115:
+        case 108:
           message.curatorRewardEpochBlocks = reader.uint64();
           break;
-        case 116:
+        case 109:
           message.minCuratorAccuracy = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 117:
+        case 110:
           message.curatorAccuracyWindowEpochs = reader.uint64();
           break;
-        case 118:
+        case 111:
           message.reviewRequiredAboveBudget = reader.string();
           break;
-        case 119:
+        case 112:
           message.reviewBountyReclaimDelay = reader.uint64();
           break;
-        case 120:
+        case 113:
           message.permissionlessMinReviewBountyRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 121:
+        case 114:
           message.maxVerifierRewardPool = reader.string();
           break;
-        case 122:
+        case 115:
           message.verifierRewardPoolOverflowBurnRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 123:
+        case 116:
           message.verifierRewardEpochBlocks = reader.uint64();
           break;
-        case 124:
+        case 117:
           message.minVerifierAccuracy = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 125:
+        case 118:
           message.verifierAccuracyWindowEpochs = reader.uint64();
           break;
-        case 126:
+        case 119:
           message.minEpochVerifications = reader.uint32();
           break;
-        case 127:
+        case 120:
           message.verifierDreamReward = reader.string();
           break;
-        case 128:
+        case 121:
           message.maxVerifierDreamMintPerEpoch = reader.string();
           break;
-        case 144:
+        case 137:
           message.initiativeBountyMaxBudgetRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 145:
+        case 138:
           message.maxInitiativeBountyPerFunderEpoch = reader.string();
           break;
-        case 146:
+        case 139:
           message.minInitiativeBountyContribution = reader.string();
           break;
-        case 147:
+        case 140:
           message.maxInitiativeBountyContributions = reader.uint32();
           break;
-        case 148:
+        case 141:
           message.initiativeBountyReclaimDelay = reader.uint64();
           break;
-        case 149:
+        case 142:
           message.invitationAcceptanceEpochs = reader.int64();
           break;
-        case 150:
+        case 143:
           message.migrationEnabled = reader.bool();
           break;
-        case 151:
+        case 144:
           message.keyPathEnabled = reader.bool();
           break;
-        case 152:
+        case 145:
           message.keyMigrationDelay = reader.int64();
           break;
-        case 153:
+        case 146:
           message.recoveryMigrationDelay = reader.int64();
           break;
-        case 154:
+        case 147:
           message.councilMigrationDelay = reader.int64();
           break;
-        case 155:
+        case 148:
           message.migrationAcceptWindow = reader.int64();
           break;
-        case 156:
+        case 149:
           message.migrationCooldown = reader.int64();
           break;
-        case 157:
+        case 150:
           message.maxKeyMigrationsPerWindow = reader.uint32();
           break;
-        case 158:
+        case 151:
           message.keyMigrationWindow = reader.int64();
           break;
-        case 159:
+        case 152:
           message.recoveryChangeDelay = reader.int64();
           break;
-        case 160:
+        case 153:
           message.recoveryRevealMinBlocks = reader.int64();
           break;
-        case 161:
+        case 154:
           message.recoveryCommitTtl = reader.int64();
           break;
-        case 162:
+        case 155:
           message.recoveryCommitDeposit = reader.string();
           break;
-        case 163:
+        case 156:
           message.migrationObjectionBond = reader.string();
           break;
-        case 164:
+        case 157:
           message.zkKeyActivationDelay = reader.int64();
           break;
-        case 165:
+        case 158:
           message.tagBudgetAwarderEpochCapBps = reader.uint64();
+          break;
+        case 159:
+          message.budgetReviewThreshold = reader.string();
+          break;
+        case 160:
+          message.maxProposedProjectsPerCreator = reader.uint32();
           break;
         default:
           reader.skipType(tag & 7);
@@ -4065,7 +4038,6 @@ export const Params = {
     message.giftOnlyToInvitees = object.giftOnlyToInvitees ?? false;
     message.completerShare = object.completerShare ?? "";
     message.treasuryShare = object.treasuryShare ?? "";
-    message.minReputationMultiplier = object.minReputationMultiplier ?? "";
     message.apprenticeTier = object.apprenticeTier !== undefined && object.apprenticeTier !== null ? TierConfig.fromPartial(object.apprenticeTier) : undefined;
     message.standardTier = object.standardTier !== undefined && object.standardTier !== null ? TierConfig.fromPartial(object.standardTier) : undefined;
     message.expertTier = object.expertTier !== undefined && object.expertTier !== null ? TierConfig.fromPartial(object.expertTier) : undefined;
@@ -4091,13 +4063,7 @@ export const Params = {
     message.expertComplexityBudget = object.expertComplexityBudget ?? "";
     message.soloExpertBonusRate = object.soloExpertBonusRate ?? "";
     message.interimDeadlineEpochs = object.interimDeadlineEpochs !== undefined && object.interimDeadlineEpochs !== null ? BigInt(object.interimDeadlineEpochs.toString()) : BigInt(0);
-    message.maxActiveChallengesPerCommittee = object.maxActiveChallengesPerCommittee ?? 0;
-    message.maxNewChallengesPerEpoch = object.maxNewChallengesPerEpoch ?? 0;
-    message.challengeQueueMaxSize = object.challengeQueueMaxSize ?? 0;
-    message.minorSlashPenalty = object.minorSlashPenalty ?? "";
-    message.moderateSlashPenalty = object.moderateSlashPenalty ?? "";
     message.severeSlashPenalty = object.severeSlashPenalty ?? "";
-    message.zeroingSlashPenalty = object.zeroingSlashPenalty ?? "";
     message.projectCompletionBonusRate = object.projectCompletionBonusRate ?? "";
     message.memberStakeRevenueShare = object.memberStakeRevenueShare ?? "";
     message.tagStakeRevenueShare = object.tagStakeRevenueShare ?? "";
@@ -4220,6 +4186,8 @@ export const Params = {
     message.migrationObjectionBond = object.migrationObjectionBond ?? "";
     message.zkKeyActivationDelay = object.zkKeyActivationDelay !== undefined && object.zkKeyActivationDelay !== null ? BigInt(object.zkKeyActivationDelay.toString()) : BigInt(0);
     message.tagBudgetAwarderEpochCapBps = object.tagBudgetAwarderEpochCapBps !== undefined && object.tagBudgetAwarderEpochCapBps !== null ? BigInt(object.tagBudgetAwarderEpochCapBps.toString()) : BigInt(0);
+    message.budgetReviewThreshold = object.budgetReviewThreshold ?? "";
+    message.maxProposedProjectsPerCreator = object.maxProposedProjectsPerCreator ?? 0;
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -4253,9 +4221,6 @@ export const Params = {
     }
     if (object.treasury_share !== undefined && object.treasury_share !== null) {
       message.treasuryShare = object.treasury_share;
-    }
-    if (object.min_reputation_multiplier !== undefined && object.min_reputation_multiplier !== null) {
-      message.minReputationMultiplier = object.min_reputation_multiplier;
     }
     if (object.apprentice_tier !== undefined && object.apprentice_tier !== null) {
       message.apprenticeTier = TierConfig.fromAmino(object.apprentice_tier);
@@ -4332,26 +4297,8 @@ export const Params = {
     if (object.interim_deadline_epochs !== undefined && object.interim_deadline_epochs !== null) {
       message.interimDeadlineEpochs = BigInt(object.interim_deadline_epochs);
     }
-    if (object.max_active_challenges_per_committee !== undefined && object.max_active_challenges_per_committee !== null) {
-      message.maxActiveChallengesPerCommittee = object.max_active_challenges_per_committee;
-    }
-    if (object.max_new_challenges_per_epoch !== undefined && object.max_new_challenges_per_epoch !== null) {
-      message.maxNewChallengesPerEpoch = object.max_new_challenges_per_epoch;
-    }
-    if (object.challenge_queue_max_size !== undefined && object.challenge_queue_max_size !== null) {
-      message.challengeQueueMaxSize = object.challenge_queue_max_size;
-    }
-    if (object.minor_slash_penalty !== undefined && object.minor_slash_penalty !== null) {
-      message.minorSlashPenalty = object.minor_slash_penalty;
-    }
-    if (object.moderate_slash_penalty !== undefined && object.moderate_slash_penalty !== null) {
-      message.moderateSlashPenalty = object.moderate_slash_penalty;
-    }
     if (object.severe_slash_penalty !== undefined && object.severe_slash_penalty !== null) {
       message.severeSlashPenalty = object.severe_slash_penalty;
-    }
-    if (object.zeroing_slash_penalty !== undefined && object.zeroing_slash_penalty !== null) {
-      message.zeroingSlashPenalty = object.zeroing_slash_penalty;
     }
     if (object.project_completion_bonus_rate !== undefined && object.project_completion_bonus_rate !== null) {
       message.projectCompletionBonusRate = object.project_completion_bonus_rate;
@@ -4719,6 +4666,12 @@ export const Params = {
     if (object.tag_budget_awarder_epoch_cap_bps !== undefined && object.tag_budget_awarder_epoch_cap_bps !== null) {
       message.tagBudgetAwarderEpochCapBps = BigInt(object.tag_budget_awarder_epoch_cap_bps);
     }
+    if (object.budget_review_threshold !== undefined && object.budget_review_threshold !== null) {
+      message.budgetReviewThreshold = object.budget_review_threshold;
+    }
+    if (object.max_proposed_projects_per_creator !== undefined && object.max_proposed_projects_per_creator !== null) {
+      message.maxProposedProjectsPerCreator = object.max_proposed_projects_per_creator;
+    }
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -4733,7 +4686,6 @@ export const Params = {
     obj.gift_only_to_invitees = message.giftOnlyToInvitees === false ? undefined : message.giftOnlyToInvitees;
     obj.completer_share = message.completerShare === "" ? undefined : message.completerShare;
     obj.treasury_share = message.treasuryShare === "" ? undefined : message.treasuryShare;
-    obj.min_reputation_multiplier = message.minReputationMultiplier === "" ? undefined : message.minReputationMultiplier;
     obj.apprentice_tier = message.apprenticeTier ? TierConfig.toAmino(message.apprenticeTier) : undefined;
     obj.standard_tier = message.standardTier ? TierConfig.toAmino(message.standardTier) : undefined;
     obj.expert_tier = message.expertTier ? TierConfig.toAmino(message.expertTier) : undefined;
@@ -4759,13 +4711,7 @@ export const Params = {
     obj.expert_complexity_budget = message.expertComplexityBudget === "" ? undefined : message.expertComplexityBudget;
     obj.solo_expert_bonus_rate = message.soloExpertBonusRate === "" ? undefined : message.soloExpertBonusRate;
     obj.interim_deadline_epochs = message.interimDeadlineEpochs !== BigInt(0) ? message.interimDeadlineEpochs?.toString() : undefined;
-    obj.max_active_challenges_per_committee = message.maxActiveChallengesPerCommittee === 0 ? undefined : message.maxActiveChallengesPerCommittee;
-    obj.max_new_challenges_per_epoch = message.maxNewChallengesPerEpoch === 0 ? undefined : message.maxNewChallengesPerEpoch;
-    obj.challenge_queue_max_size = message.challengeQueueMaxSize === 0 ? undefined : message.challengeQueueMaxSize;
-    obj.minor_slash_penalty = message.minorSlashPenalty === "" ? undefined : message.minorSlashPenalty;
-    obj.moderate_slash_penalty = message.moderateSlashPenalty === "" ? undefined : message.moderateSlashPenalty;
     obj.severe_slash_penalty = message.severeSlashPenalty === "" ? undefined : message.severeSlashPenalty;
-    obj.zeroing_slash_penalty = message.zeroingSlashPenalty === "" ? undefined : message.zeroingSlashPenalty;
     obj.project_completion_bonus_rate = message.projectCompletionBonusRate === "" ? undefined : message.projectCompletionBonusRate;
     obj.member_stake_revenue_share = message.memberStakeRevenueShare === "" ? undefined : message.memberStakeRevenueShare;
     obj.tag_stake_revenue_share = message.tagStakeRevenueShare === "" ? undefined : message.tagStakeRevenueShare;
@@ -4888,6 +4834,8 @@ export const Params = {
     obj.migration_objection_bond = message.migrationObjectionBond === "" ? undefined : message.migrationObjectionBond;
     obj.zk_key_activation_delay = message.zkKeyActivationDelay !== BigInt(0) ? message.zkKeyActivationDelay?.toString() : undefined;
     obj.tag_budget_awarder_epoch_cap_bps = message.tagBudgetAwarderEpochCapBps !== BigInt(0) ? message.tagBudgetAwarderEpochCapBps?.toString() : undefined;
+    obj.budget_review_threshold = message.budgetReviewThreshold === "" ? undefined : message.budgetReviewThreshold;
+    obj.max_proposed_projects_per_creator = message.maxProposedProjectsPerCreator === 0 ? undefined : message.maxProposedProjectsPerCreator;
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {
@@ -4922,7 +4870,6 @@ function createBaseRepOperationalParams(): RepOperationalParams {
     maxTipsSentPerEpoch: "",
     maxGiftPerInvitee: "",
     giftOnlyToInvitees: false,
-    minReputationMultiplier: "",
     defaultReviewPeriodEpochs: BigInt(0),
     defaultChallengePeriodEpochs: BigInt(0),
     minInvitationStake: "",
@@ -4940,9 +4887,6 @@ function createBaseRepOperationalParams(): RepOperationalParams {
     expertComplexityBudget: "",
     soloExpertBonusRate: "",
     interimDeadlineEpochs: BigInt(0),
-    maxActiveChallengesPerCommittee: 0,
-    maxNewChallengesPerEpoch: 0,
-    challengeQueueMaxSize: 0,
     projectCompletionBonusRate: "",
     memberStakeRevenueShare: "",
     tagStakeRevenueShare: "",
@@ -5080,365 +5024,353 @@ export const RepOperationalParams = {
     if (message.giftOnlyToInvitees === true) {
       writer.uint32(64).bool(message.giftOnlyToInvitees);
     }
-    if (message.minReputationMultiplier !== "") {
-      writer.uint32(74).string(Decimal.fromUserInput(message.minReputationMultiplier, 18).atomics);
-    }
     if (message.defaultReviewPeriodEpochs !== BigInt(0)) {
-      writer.uint32(80).int64(message.defaultReviewPeriodEpochs);
+      writer.uint32(72).int64(message.defaultReviewPeriodEpochs);
     }
     if (message.defaultChallengePeriodEpochs !== BigInt(0)) {
-      writer.uint32(88).int64(message.defaultChallengePeriodEpochs);
+      writer.uint32(80).int64(message.defaultChallengePeriodEpochs);
     }
     if (message.minInvitationStake !== "") {
-      writer.uint32(98).string(message.minInvitationStake);
+      writer.uint32(90).string(message.minInvitationStake);
     }
     if (message.invitationAccountabilityEpochs !== BigInt(0)) {
-      writer.uint32(104).int64(message.invitationAccountabilityEpochs);
+      writer.uint32(96).int64(message.invitationAccountabilityEpochs);
     }
     if (message.referralRewardRate !== "") {
-      writer.uint32(114).string(Decimal.fromUserInput(message.referralRewardRate, 18).atomics);
+      writer.uint32(106).string(Decimal.fromUserInput(message.referralRewardRate, 18).atomics);
     }
     if (message.invitationCostMultiplier !== "") {
-      writer.uint32(122).string(Decimal.fromUserInput(message.invitationCostMultiplier, 18).atomics);
+      writer.uint32(114).string(Decimal.fromUserInput(message.invitationCostMultiplier, 18).atomics);
     }
     if (message.minChallengeStake !== "") {
-      writer.uint32(130).string(message.minChallengeStake);
+      writer.uint32(122).string(message.minChallengeStake);
     }
     if (message.challengerRewardRate !== "") {
-      writer.uint32(138).string(Decimal.fromUserInput(message.challengerRewardRate, 18).atomics);
+      writer.uint32(130).string(Decimal.fromUserInput(message.challengerRewardRate, 18).atomics);
     }
     if (message.jurySize !== 0) {
-      writer.uint32(144).uint32(message.jurySize);
+      writer.uint32(136).uint32(message.jurySize);
     }
     if (message.jurySuperMajority !== "") {
-      writer.uint32(154).string(Decimal.fromUserInput(message.jurySuperMajority, 18).atomics);
+      writer.uint32(146).string(Decimal.fromUserInput(message.jurySuperMajority, 18).atomics);
     }
     if (message.minJurorReputation !== "") {
-      writer.uint32(162).string(Decimal.fromUserInput(message.minJurorReputation, 18).atomics);
+      writer.uint32(154).string(Decimal.fromUserInput(message.minJurorReputation, 18).atomics);
     }
     if (message.simpleComplexityBudget !== "") {
-      writer.uint32(170).string(message.simpleComplexityBudget);
+      writer.uint32(162).string(message.simpleComplexityBudget);
     }
     if (message.standardComplexityBudget !== "") {
-      writer.uint32(178).string(message.standardComplexityBudget);
+      writer.uint32(170).string(message.standardComplexityBudget);
     }
     if (message.complexComplexityBudget !== "") {
-      writer.uint32(186).string(message.complexComplexityBudget);
+      writer.uint32(178).string(message.complexComplexityBudget);
     }
     if (message.expertComplexityBudget !== "") {
-      writer.uint32(194).string(message.expertComplexityBudget);
+      writer.uint32(186).string(message.expertComplexityBudget);
     }
     if (message.soloExpertBonusRate !== "") {
-      writer.uint32(202).string(Decimal.fromUserInput(message.soloExpertBonusRate, 18).atomics);
+      writer.uint32(194).string(Decimal.fromUserInput(message.soloExpertBonusRate, 18).atomics);
     }
     if (message.interimDeadlineEpochs !== BigInt(0)) {
-      writer.uint32(208).int64(message.interimDeadlineEpochs);
-    }
-    if (message.maxActiveChallengesPerCommittee !== 0) {
-      writer.uint32(216).uint32(message.maxActiveChallengesPerCommittee);
-    }
-    if (message.maxNewChallengesPerEpoch !== 0) {
-      writer.uint32(224).uint32(message.maxNewChallengesPerEpoch);
-    }
-    if (message.challengeQueueMaxSize !== 0) {
-      writer.uint32(232).uint32(message.challengeQueueMaxSize);
+      writer.uint32(200).int64(message.interimDeadlineEpochs);
     }
     if (message.projectCompletionBonusRate !== "") {
-      writer.uint32(242).string(Decimal.fromUserInput(message.projectCompletionBonusRate, 18).atomics);
+      writer.uint32(210).string(Decimal.fromUserInput(message.projectCompletionBonusRate, 18).atomics);
     }
     if (message.memberStakeRevenueShare !== "") {
-      writer.uint32(250).string(Decimal.fromUserInput(message.memberStakeRevenueShare, 18).atomics);
+      writer.uint32(218).string(Decimal.fromUserInput(message.memberStakeRevenueShare, 18).atomics);
     }
     if (message.tagStakeRevenueShare !== "") {
-      writer.uint32(258).string(Decimal.fromUserInput(message.tagStakeRevenueShare, 18).atomics);
+      writer.uint32(226).string(Decimal.fromUserInput(message.tagStakeRevenueShare, 18).atomics);
     }
     if (message.minStakeDurationSeconds !== BigInt(0)) {
-      writer.uint32(264).int64(message.minStakeDurationSeconds);
+      writer.uint32(232).int64(message.minStakeDurationSeconds);
     }
     if (message.allowSelfMemberStake === true) {
-      writer.uint32(272).bool(message.allowSelfMemberStake);
+      writer.uint32(240).bool(message.allowSelfMemberStake);
     }
     if (message.challengeResponseDeadlineEpochs !== BigInt(0)) {
-      writer.uint32(280).int64(message.challengeResponseDeadlineEpochs);
+      writer.uint32(248).int64(message.challengeResponseDeadlineEpochs);
     }
     if (message.maxTransferReceivedPerEpoch !== "") {
-      writer.uint32(290).string(message.maxTransferReceivedPerEpoch);
+      writer.uint32(258).string(message.maxTransferReceivedPerEpoch);
     }
     if (message.maxTransferReceivedPerSeason !== "") {
-      writer.uint32(298).string(message.maxTransferReceivedPerSeason);
+      writer.uint32(266).string(message.maxTransferReceivedPerSeason);
     }
     if (message.contentConvictionHalfLifeEpochs !== BigInt(0)) {
-      writer.uint32(304).int64(message.contentConvictionHalfLifeEpochs);
+      writer.uint32(272).int64(message.contentConvictionHalfLifeEpochs);
     }
     if (message.maxContentStakePerMember !== "") {
-      writer.uint32(314).string(message.maxContentStakePerMember);
+      writer.uint32(282).string(message.maxContentStakePerMember);
     }
     if (message.maxAuthorBondPerContent !== "") {
-      writer.uint32(322).string(message.maxAuthorBondPerContent);
+      writer.uint32(290).string(message.maxAuthorBondPerContent);
     }
     if (message.authorBondSlashOnModeration === true) {
-      writer.uint32(328).bool(message.authorBondSlashOnModeration);
+      writer.uint32(296).bool(message.authorBondSlashOnModeration);
     }
     if (message.contentChallengeRewardShare !== "") {
-      writer.uint32(338).string(Decimal.fromUserInput(message.contentChallengeRewardShare, 18).atomics);
+      writer.uint32(306).string(Decimal.fromUserInput(message.contentChallengeRewardShare, 18).atomics);
     }
     if (message.convictionPropagationRatio !== "") {
-      writer.uint32(346).string(Decimal.fromUserInput(message.convictionPropagationRatio, 18).atomics);
+      writer.uint32(314).string(Decimal.fromUserInput(message.convictionPropagationRatio, 18).atomics);
     }
     if (message.maxTagsPerInitiative !== 0) {
-      writer.uint32(352).uint32(message.maxTagsPerInitiative);
+      writer.uint32(320).uint32(message.maxTagsPerInitiative);
     }
     if (message.reputationDecayRate !== "") {
-      writer.uint32(362).string(Decimal.fromUserInput(message.reputationDecayRate, 18).atomics);
+      writer.uint32(330).string(Decimal.fromUserInput(message.reputationDecayRate, 18).atomics);
     }
     if (message.maxConvictionSharePerMember !== "") {
-      writer.uint32(370).string(Decimal.fromUserInput(message.maxConvictionSharePerMember, 18).atomics);
+      writer.uint32(338).string(Decimal.fromUserInput(message.maxConvictionSharePerMember, 18).atomics);
     }
     if (message.invitationStakeBurnRate !== "") {
-      writer.uint32(378).string(Decimal.fromUserInput(message.invitationStakeBurnRate, 18).atomics);
+      writer.uint32(346).string(Decimal.fromUserInput(message.invitationStakeBurnRate, 18).atomics);
     }
     if (message.maxReputationGainPerEpoch !== "") {
-      writer.uint32(386).string(Decimal.fromUserInput(message.maxReputationGainPerEpoch, 18).atomics);
+      writer.uint32(354).string(Decimal.fromUserInput(message.maxReputationGainPerEpoch, 18).atomics);
     }
     if (message.maxStakingRewardsPerSeason !== "") {
-      writer.uint32(394).string(message.maxStakingRewardsPerSeason);
+      writer.uint32(362).string(message.maxStakingRewardsPerSeason);
     }
     if (message.stakedDecayRate !== "") {
-      writer.uint32(402).string(Decimal.fromUserInput(message.stakedDecayRate, 18).atomics);
+      writer.uint32(370).string(Decimal.fromUserInput(message.stakedDecayRate, 18).atomics);
     }
     if (message.newMemberDecayGraceEpochs !== BigInt(0)) {
-      writer.uint32(408).int64(message.newMemberDecayGraceEpochs);
+      writer.uint32(376).int64(message.newMemberDecayGraceEpochs);
     }
     if (message.maxTreasuryBalance !== "") {
-      writer.uint32(418).string(message.maxTreasuryBalance);
+      writer.uint32(386).string(message.maxTreasuryBalance);
     }
     if (message.treasuryFundsInterims === true) {
-      writer.uint32(424).bool(message.treasuryFundsInterims);
+      writer.uint32(392).bool(message.treasuryFundsInterims);
     }
     if (message.treasuryFundsRetroPgf === true) {
-      writer.uint32(432).bool(message.treasuryFundsRetroPgf);
+      writer.uint32(400).bool(message.treasuryFundsRetroPgf);
     }
     if (message.maxInitiativeStakePerMember !== "") {
-      writer.uint32(442).string(message.maxInitiativeStakePerMember);
+      writer.uint32(410).string(message.maxInitiativeStakePerMember);
     }
     if (message.minStakeAmount !== "") {
-      writer.uint32(962).string(message.minStakeAmount);
+      writer.uint32(930).string(message.minStakeAmount);
     }
     if (message.maxInterimRewardsPerSeason !== "") {
-      writer.uint32(986).string(message.maxInterimRewardsPerSeason);
+      writer.uint32(954).string(message.maxInterimRewardsPerSeason);
     }
     if (message.maxInitiativeRewardsPerSeason !== "") {
-      writer.uint32(450).string(message.maxInitiativeRewardsPerSeason);
+      writer.uint32(418).string(message.maxInitiativeRewardsPerSeason);
     }
     if (message.largeProjectBudgetThreshold !== "") {
-      writer.uint32(458).string(message.largeProjectBudgetThreshold);
+      writer.uint32(426).string(message.largeProjectBudgetThreshold);
     }
     if (message.projectCreationFee !== "") {
-      writer.uint32(466).string(message.projectCreationFee);
+      writer.uint32(434).string(message.projectCreationFee);
     }
     if (message.initiativeCreationFeeApprentice !== "") {
-      writer.uint32(474).string(message.initiativeCreationFeeApprentice);
+      writer.uint32(442).string(message.initiativeCreationFeeApprentice);
     }
     if (message.initiativeCreationFeeStandard !== "") {
-      writer.uint32(482).string(message.initiativeCreationFeeStandard);
+      writer.uint32(450).string(message.initiativeCreationFeeStandard);
     }
     if (message.tagCreationFee !== "") {
-      writer.uint32(490).string(message.tagCreationFee);
+      writer.uint32(458).string(message.tagCreationFee);
     }
     if (message.maxSentinelRewardPool !== "") {
-      writer.uint32(498).string(message.maxSentinelRewardPool);
+      writer.uint32(466).string(message.maxSentinelRewardPool);
     }
     if (message.sentinelRewardPoolOverflowBurnRatio !== "") {
-      writer.uint32(506).string(Decimal.fromUserInput(message.sentinelRewardPoolOverflowBurnRatio, 18).atomics);
+      writer.uint32(474).string(Decimal.fromUserInput(message.sentinelRewardPoolOverflowBurnRatio, 18).atomics);
     }
     if (message.sentinelRewardEpochBlocks !== BigInt(0)) {
-      writer.uint32(512).uint64(message.sentinelRewardEpochBlocks);
+      writer.uint32(480).uint64(message.sentinelRewardEpochBlocks);
     }
     if (message.minSentinelAccuracy !== "") {
-      writer.uint32(522).string(Decimal.fromUserInput(message.minSentinelAccuracy, 18).atomics);
+      writer.uint32(490).string(Decimal.fromUserInput(message.minSentinelAccuracy, 18).atomics);
     }
     if (message.minAppealsForAccuracy !== BigInt(0)) {
-      writer.uint32(528).uint64(message.minAppealsForAccuracy);
+      writer.uint32(496).uint64(message.minAppealsForAccuracy);
     }
     if (message.minEpochActivityForReward !== BigInt(0)) {
-      writer.uint32(536).uint64(message.minEpochActivityForReward);
+      writer.uint32(504).uint64(message.minEpochActivityForReward);
     }
     if (message.minAppealRate !== "") {
-      writer.uint32(546).string(Decimal.fromUserInput(message.minAppealRate, 18).atomics);
+      writer.uint32(514).string(Decimal.fromUserInput(message.minAppealRate, 18).atomics);
     }
     if (message.sentinelAccuracyWindowEpochs !== BigInt(0)) {
-      writer.uint32(600).uint64(message.sentinelAccuracyWindowEpochs);
+      writer.uint32(568).uint64(message.sentinelAccuracyWindowEpochs);
     }
     if (message.maxActiveInitiativesPerMember !== 0) {
-      writer.uint32(552).uint32(message.maxActiveInitiativesPerMember);
+      writer.uint32(520).uint32(message.maxActiveInitiativesPerMember);
     }
     if (message.maxActiveInterimsPerMember !== 0) {
-      writer.uint32(560).uint32(message.maxActiveInterimsPerMember);
+      writer.uint32(528).uint32(message.maxActiveInterimsPerMember);
     }
     if (message.maxDreamMintPerEpoch !== "") {
-      writer.uint32(570).string(message.maxDreamMintPerEpoch);
+      writer.uint32(538).string(message.maxDreamMintPerEpoch);
     }
     if (message.maxProjectRequestedBudget !== "") {
-      writer.uint32(578).string(message.maxProjectRequestedBudget);
+      writer.uint32(546).string(message.maxProjectRequestedBudget);
     }
     if (message.maxProjectRequestedSpark !== "") {
-      writer.uint32(586).string(message.maxProjectRequestedSpark);
+      writer.uint32(554).string(message.maxProjectRequestedSpark);
     }
     if (message.proposedProjectExpiryBlocks !== BigInt(0)) {
-      writer.uint32(592).int64(message.proposedProjectExpiryBlocks);
+      writer.uint32(560).int64(message.proposedProjectExpiryBlocks);
     }
     if (message.abandonedJurySeatPenalty !== "") {
-      writer.uint32(610).string(Decimal.fromUserInput(message.abandonedJurySeatPenalty, 18).atomics);
+      writer.uint32(578).string(Decimal.fromUserInput(message.abandonedJurySeatPenalty, 18).atomics);
     }
     if (message.jurorRewardRate !== "") {
-      writer.uint32(618).string(Decimal.fromUserInput(message.jurorRewardRate, 18).atomics);
+      writer.uint32(586).string(Decimal.fromUserInput(message.jurorRewardRate, 18).atomics);
     }
     if (message.minJurorReward !== "") {
-      writer.uint32(626).string(message.minJurorReward);
+      writer.uint32(594).string(message.minJurorReward);
     }
     if (message.minJurorSelectionWeight !== "") {
-      writer.uint32(634).string(Decimal.fromUserInput(message.minJurorSelectionWeight, 18).atomics);
+      writer.uint32(602).string(Decimal.fromUserInput(message.minJurorSelectionWeight, 18).atomics);
     }
     if (message.minJurySeatingsForWeighting !== BigInt(0)) {
-      writer.uint32(640).uint64(message.minJurySeatingsForWeighting);
+      writer.uint32(608).uint64(message.minJurySeatingsForWeighting);
     }
     if (message.initiativeCompletionBonusRate !== "") {
-      writer.uint32(650).string(Decimal.fromUserInput(message.initiativeCompletionBonusRate, 18).atomics);
+      writer.uint32(618).string(Decimal.fromUserInput(message.initiativeCompletionBonusRate, 18).atomics);
     }
     if (message.maxCompletionBonusStakeMultiple !== "") {
-      writer.uint32(970).string(Decimal.fromUserInput(message.maxCompletionBonusStakeMultiple, 18).atomics);
+      writer.uint32(938).string(Decimal.fromUserInput(message.maxCompletionBonusStakeMultiple, 18).atomics);
     }
     if (message.maxTotalContentStakePerMember !== "") {
-      writer.uint32(978).string(message.maxTotalContentStakePerMember);
+      writer.uint32(946).string(message.maxTotalContentStakePerMember);
     }
     if (message.juryAcceptanceWindowRatio !== "") {
-      writer.uint32(658).string(Decimal.fromUserInput(message.juryAcceptanceWindowRatio, 18).atomics);
+      writer.uint32(626).string(Decimal.fromUserInput(message.juryAcceptanceWindowRatio, 18).atomics);
     }
     if (message.maxJuryRedraws !== 0) {
-      writer.uint32(664).uint32(message.maxJuryRedraws);
+      writer.uint32(632).uint32(message.maxJuryRedraws);
     }
     if (message.reviewerBondReserveRate !== "") {
-      writer.uint32(674).string(Decimal.fromUserInput(message.reviewerBondReserveRate, 18).atomics);
+      writer.uint32(642).string(Decimal.fromUserInput(message.reviewerBondReserveRate, 18).atomics);
     }
     if (message.reviewFeeRate !== "") {
-      writer.uint32(682).string(Decimal.fromUserInput(message.reviewFeeRate, 18).atomics);
+      writer.uint32(650).string(Decimal.fromUserInput(message.reviewFeeRate, 18).atomics);
     }
     if (message.maxReviewRounds !== 0) {
-      writer.uint32(688).uint32(message.maxReviewRounds);
+      writer.uint32(656).uint32(message.maxReviewRounds);
     }
     if (message.maxReviewerRewardPool !== "") {
-      writer.uint32(698).string(message.maxReviewerRewardPool);
+      writer.uint32(666).string(message.maxReviewerRewardPool);
     }
     if (message.reviewerRewardPoolOverflowBurnRatio !== "") {
-      writer.uint32(706).string(Decimal.fromUserInput(message.reviewerRewardPoolOverflowBurnRatio, 18).atomics);
+      writer.uint32(674).string(Decimal.fromUserInput(message.reviewerRewardPoolOverflowBurnRatio, 18).atomics);
     }
     if (message.reviewerRewardEpochBlocks !== BigInt(0)) {
-      writer.uint32(712).uint64(message.reviewerRewardEpochBlocks);
+      writer.uint32(680).uint64(message.reviewerRewardEpochBlocks);
     }
     if (message.minReviewerAccuracy !== "") {
-      writer.uint32(722).string(Decimal.fromUserInput(message.minReviewerAccuracy, 18).atomics);
+      writer.uint32(690).string(Decimal.fromUserInput(message.minReviewerAccuracy, 18).atomics);
     }
     if (message.reviewerAccuracyWindowEpochs !== BigInt(0)) {
-      writer.uint32(728).uint64(message.reviewerAccuracyWindowEpochs);
+      writer.uint32(696).uint64(message.reviewerAccuracyWindowEpochs);
     }
     if (message.roleRewardInflationShare !== "") {
-      writer.uint32(738).string(Decimal.fromUserInput(message.roleRewardInflationShare, 18).atomics);
+      writer.uint32(706).string(Decimal.fromUserInput(message.roleRewardInflationShare, 18).atomics);
     }
     if (message.maxCuratorRewardPool !== "") {
-      writer.uint32(746).string(message.maxCuratorRewardPool);
+      writer.uint32(714).string(message.maxCuratorRewardPool);
     }
     if (message.curatorRewardPoolOverflowBurnRatio !== "") {
-      writer.uint32(754).string(Decimal.fromUserInput(message.curatorRewardPoolOverflowBurnRatio, 18).atomics);
+      writer.uint32(722).string(Decimal.fromUserInput(message.curatorRewardPoolOverflowBurnRatio, 18).atomics);
     }
     if (message.curatorRewardEpochBlocks !== BigInt(0)) {
-      writer.uint32(760).uint64(message.curatorRewardEpochBlocks);
+      writer.uint32(728).uint64(message.curatorRewardEpochBlocks);
     }
     if (message.minCuratorAccuracy !== "") {
-      writer.uint32(770).string(Decimal.fromUserInput(message.minCuratorAccuracy, 18).atomics);
+      writer.uint32(738).string(Decimal.fromUserInput(message.minCuratorAccuracy, 18).atomics);
     }
     if (message.curatorAccuracyWindowEpochs !== BigInt(0)) {
-      writer.uint32(776).uint64(message.curatorAccuracyWindowEpochs);
+      writer.uint32(744).uint64(message.curatorAccuracyWindowEpochs);
     }
     if (message.reviewRequiredAboveBudget !== "") {
-      writer.uint32(786).string(message.reviewRequiredAboveBudget);
+      writer.uint32(754).string(message.reviewRequiredAboveBudget);
     }
     if (message.reviewBountyReclaimDelay !== BigInt(0)) {
-      writer.uint32(792).uint64(message.reviewBountyReclaimDelay);
+      writer.uint32(760).uint64(message.reviewBountyReclaimDelay);
     }
     if (message.permissionlessMinReviewBountyRate !== "") {
-      writer.uint32(802).string(Decimal.fromUserInput(message.permissionlessMinReviewBountyRate, 18).atomics);
+      writer.uint32(770).string(Decimal.fromUserInput(message.permissionlessMinReviewBountyRate, 18).atomics);
     }
     if (message.maxVerifierRewardPool !== "") {
-      writer.uint32(810).string(message.maxVerifierRewardPool);
+      writer.uint32(778).string(message.maxVerifierRewardPool);
     }
     if (message.verifierRewardPoolOverflowBurnRatio !== "") {
-      writer.uint32(818).string(Decimal.fromUserInput(message.verifierRewardPoolOverflowBurnRatio, 18).atomics);
+      writer.uint32(786).string(Decimal.fromUserInput(message.verifierRewardPoolOverflowBurnRatio, 18).atomics);
     }
     if (message.verifierRewardEpochBlocks !== BigInt(0)) {
-      writer.uint32(824).uint64(message.verifierRewardEpochBlocks);
+      writer.uint32(792).uint64(message.verifierRewardEpochBlocks);
     }
     if (message.minVerifierAccuracy !== "") {
-      writer.uint32(834).string(Decimal.fromUserInput(message.minVerifierAccuracy, 18).atomics);
+      writer.uint32(802).string(Decimal.fromUserInput(message.minVerifierAccuracy, 18).atomics);
     }
     if (message.verifierAccuracyWindowEpochs !== BigInt(0)) {
-      writer.uint32(840).uint64(message.verifierAccuracyWindowEpochs);
+      writer.uint32(808).uint64(message.verifierAccuracyWindowEpochs);
     }
     if (message.minEpochVerifications !== 0) {
-      writer.uint32(848).uint32(message.minEpochVerifications);
+      writer.uint32(816).uint32(message.minEpochVerifications);
     }
     if (message.verifierDreamReward !== "") {
-      writer.uint32(858).string(message.verifierDreamReward);
+      writer.uint32(826).string(message.verifierDreamReward);
     }
     if (message.maxVerifierDreamMintPerEpoch !== "") {
-      writer.uint32(866).string(message.maxVerifierDreamMintPerEpoch);
+      writer.uint32(834).string(message.maxVerifierDreamMintPerEpoch);
     }
     if (message.minReviewerBond !== "") {
-      writer.uint32(874).string(message.minReviewerBond);
+      writer.uint32(842).string(message.minReviewerBond);
     }
     if (message.reviewerDemotionThreshold !== "") {
-      writer.uint32(882).string(message.reviewerDemotionThreshold);
+      writer.uint32(850).string(message.reviewerDemotionThreshold);
     }
     if (message.minReviewerTrustLevel !== "") {
-      writer.uint32(890).string(message.minReviewerTrustLevel);
+      writer.uint32(858).string(message.minReviewerTrustLevel);
     }
     if (message.minReviewerRepTier !== BigInt(0)) {
-      writer.uint32(896).uint64(message.minReviewerRepTier);
+      writer.uint32(864).uint64(message.minReviewerRepTier);
     }
     if (message.minReviewerAgeBlocks !== BigInt(0)) {
-      writer.uint32(904).int64(message.minReviewerAgeBlocks);
+      writer.uint32(872).int64(message.minReviewerAgeBlocks);
     }
     if (message.reviewerDemotionCooldown !== BigInt(0)) {
-      writer.uint32(912).int64(message.reviewerDemotionCooldown);
+      writer.uint32(880).int64(message.reviewerDemotionCooldown);
     }
     if (message.reviewerUnbondCooldown !== BigInt(0)) {
-      writer.uint32(920).int64(message.reviewerUnbondCooldown);
+      writer.uint32(888).int64(message.reviewerUnbondCooldown);
     }
     if (message.stakingRewardYieldPerEpoch !== "") {
-      writer.uint32(930).string(Decimal.fromUserInput(message.stakingRewardYieldPerEpoch, 18).atomics);
+      writer.uint32(898).string(Decimal.fromUserInput(message.stakingRewardYieldPerEpoch, 18).atomics);
     }
     if (message.stakingPoolMintShare !== "") {
-      writer.uint32(938).string(Decimal.fromUserInput(message.stakingPoolMintShare, 18).atomics);
+      writer.uint32(906).string(Decimal.fromUserInput(message.stakingPoolMintShare, 18).atomics);
     }
     if (message.stakingPoolCapBase !== "") {
-      writer.uint32(946).string(message.stakingPoolCapBase);
+      writer.uint32(914).string(message.stakingPoolCapBase);
     }
     if (message.stakingPoolCapRate !== "") {
-      writer.uint32(954).string(Decimal.fromUserInput(message.stakingPoolCapRate, 18).atomics);
+      writer.uint32(922).string(Decimal.fromUserInput(message.stakingPoolCapRate, 18).atomics);
     }
     if (message.initiativeBountyMaxBudgetRatio !== "") {
-      writer.uint32(994).string(Decimal.fromUserInput(message.initiativeBountyMaxBudgetRatio, 18).atomics);
+      writer.uint32(962).string(Decimal.fromUserInput(message.initiativeBountyMaxBudgetRatio, 18).atomics);
     }
     if (message.maxInitiativeBountyPerFunderEpoch !== "") {
-      writer.uint32(1002).string(message.maxInitiativeBountyPerFunderEpoch);
+      writer.uint32(970).string(message.maxInitiativeBountyPerFunderEpoch);
     }
     if (message.minInitiativeBountyContribution !== "") {
-      writer.uint32(1010).string(message.minInitiativeBountyContribution);
+      writer.uint32(978).string(message.minInitiativeBountyContribution);
     }
     if (message.maxInitiativeBountyContributions !== 0) {
-      writer.uint32(1016).uint32(message.maxInitiativeBountyContributions);
+      writer.uint32(984).uint32(message.maxInitiativeBountyContributions);
     }
     if (message.initiativeBountyReclaimDelay !== BigInt(0)) {
-      writer.uint32(1024).uint64(message.initiativeBountyReclaimDelay);
+      writer.uint32(992).uint64(message.initiativeBountyReclaimDelay);
     }
     return writer;
   },
@@ -5474,363 +5406,351 @@ export const RepOperationalParams = {
           message.giftOnlyToInvitees = reader.bool();
           break;
         case 9:
-          message.minReputationMultiplier = Decimal.fromAtomics(reader.string(), 18).toString();
-          break;
-        case 10:
           message.defaultReviewPeriodEpochs = reader.int64();
           break;
-        case 11:
+        case 10:
           message.defaultChallengePeriodEpochs = reader.int64();
           break;
-        case 12:
+        case 11:
           message.minInvitationStake = reader.string();
           break;
-        case 13:
+        case 12:
           message.invitationAccountabilityEpochs = reader.int64();
           break;
-        case 14:
+        case 13:
           message.referralRewardRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 15:
+        case 14:
           message.invitationCostMultiplier = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 16:
+        case 15:
           message.minChallengeStake = reader.string();
           break;
-        case 17:
+        case 16:
           message.challengerRewardRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 18:
+        case 17:
           message.jurySize = reader.uint32();
           break;
-        case 19:
+        case 18:
           message.jurySuperMajority = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 20:
+        case 19:
           message.minJurorReputation = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 21:
+        case 20:
           message.simpleComplexityBudget = reader.string();
           break;
-        case 22:
+        case 21:
           message.standardComplexityBudget = reader.string();
           break;
-        case 23:
+        case 22:
           message.complexComplexityBudget = reader.string();
           break;
-        case 24:
+        case 23:
           message.expertComplexityBudget = reader.string();
           break;
-        case 25:
+        case 24:
           message.soloExpertBonusRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 26:
+        case 25:
           message.interimDeadlineEpochs = reader.int64();
           break;
-        case 27:
-          message.maxActiveChallengesPerCommittee = reader.uint32();
-          break;
-        case 28:
-          message.maxNewChallengesPerEpoch = reader.uint32();
-          break;
-        case 29:
-          message.challengeQueueMaxSize = reader.uint32();
-          break;
-        case 30:
+        case 26:
           message.projectCompletionBonusRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 31:
+        case 27:
           message.memberStakeRevenueShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 32:
+        case 28:
           message.tagStakeRevenueShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 33:
+        case 29:
           message.minStakeDurationSeconds = reader.int64();
           break;
-        case 34:
+        case 30:
           message.allowSelfMemberStake = reader.bool();
           break;
-        case 35:
+        case 31:
           message.challengeResponseDeadlineEpochs = reader.int64();
           break;
-        case 36:
+        case 32:
           message.maxTransferReceivedPerEpoch = reader.string();
           break;
-        case 37:
+        case 33:
           message.maxTransferReceivedPerSeason = reader.string();
           break;
-        case 38:
+        case 34:
           message.contentConvictionHalfLifeEpochs = reader.int64();
           break;
-        case 39:
+        case 35:
           message.maxContentStakePerMember = reader.string();
           break;
-        case 40:
+        case 36:
           message.maxAuthorBondPerContent = reader.string();
           break;
-        case 41:
+        case 37:
           message.authorBondSlashOnModeration = reader.bool();
           break;
-        case 42:
+        case 38:
           message.contentChallengeRewardShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 43:
+        case 39:
           message.convictionPropagationRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 44:
+        case 40:
           message.maxTagsPerInitiative = reader.uint32();
           break;
-        case 45:
+        case 41:
           message.reputationDecayRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 46:
+        case 42:
           message.maxConvictionSharePerMember = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 47:
+        case 43:
           message.invitationStakeBurnRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 48:
+        case 44:
           message.maxReputationGainPerEpoch = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 49:
+        case 45:
           message.maxStakingRewardsPerSeason = reader.string();
           break;
-        case 50:
+        case 46:
           message.stakedDecayRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 51:
+        case 47:
           message.newMemberDecayGraceEpochs = reader.int64();
           break;
-        case 52:
+        case 48:
           message.maxTreasuryBalance = reader.string();
           break;
-        case 53:
+        case 49:
           message.treasuryFundsInterims = reader.bool();
           break;
-        case 54:
+        case 50:
           message.treasuryFundsRetroPgf = reader.bool();
           break;
-        case 55:
+        case 51:
           message.maxInitiativeStakePerMember = reader.string();
           break;
-        case 120:
+        case 116:
           message.minStakeAmount = reader.string();
           break;
-        case 123:
+        case 119:
           message.maxInterimRewardsPerSeason = reader.string();
           break;
-        case 56:
+        case 52:
           message.maxInitiativeRewardsPerSeason = reader.string();
           break;
-        case 57:
+        case 53:
           message.largeProjectBudgetThreshold = reader.string();
           break;
-        case 58:
+        case 54:
           message.projectCreationFee = reader.string();
           break;
-        case 59:
+        case 55:
           message.initiativeCreationFeeApprentice = reader.string();
           break;
-        case 60:
+        case 56:
           message.initiativeCreationFeeStandard = reader.string();
           break;
-        case 61:
+        case 57:
           message.tagCreationFee = reader.string();
           break;
-        case 62:
+        case 58:
           message.maxSentinelRewardPool = reader.string();
           break;
-        case 63:
+        case 59:
           message.sentinelRewardPoolOverflowBurnRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 64:
+        case 60:
           message.sentinelRewardEpochBlocks = reader.uint64();
           break;
-        case 65:
+        case 61:
           message.minSentinelAccuracy = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 66:
+        case 62:
           message.minAppealsForAccuracy = reader.uint64();
           break;
-        case 67:
+        case 63:
           message.minEpochActivityForReward = reader.uint64();
           break;
-        case 68:
+        case 64:
           message.minAppealRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 75:
+        case 71:
           message.sentinelAccuracyWindowEpochs = reader.uint64();
           break;
-        case 69:
+        case 65:
           message.maxActiveInitiativesPerMember = reader.uint32();
           break;
-        case 70:
+        case 66:
           message.maxActiveInterimsPerMember = reader.uint32();
           break;
-        case 71:
+        case 67:
           message.maxDreamMintPerEpoch = reader.string();
           break;
-        case 72:
+        case 68:
           message.maxProjectRequestedBudget = reader.string();
           break;
-        case 73:
+        case 69:
           message.maxProjectRequestedSpark = reader.string();
           break;
-        case 74:
+        case 70:
           message.proposedProjectExpiryBlocks = reader.int64();
           break;
-        case 76:
+        case 72:
           message.abandonedJurySeatPenalty = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 77:
+        case 73:
           message.jurorRewardRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 78:
+        case 74:
           message.minJurorReward = reader.string();
           break;
-        case 79:
+        case 75:
           message.minJurorSelectionWeight = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 80:
+        case 76:
           message.minJurySeatingsForWeighting = reader.uint64();
           break;
-        case 81:
+        case 77:
           message.initiativeCompletionBonusRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 121:
+        case 117:
           message.maxCompletionBonusStakeMultiple = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 122:
+        case 118:
           message.maxTotalContentStakePerMember = reader.string();
           break;
-        case 82:
+        case 78:
           message.juryAcceptanceWindowRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 83:
+        case 79:
           message.maxJuryRedraws = reader.uint32();
           break;
-        case 84:
+        case 80:
           message.reviewerBondReserveRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 85:
+        case 81:
           message.reviewFeeRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 86:
+        case 82:
           message.maxReviewRounds = reader.uint32();
           break;
-        case 87:
+        case 83:
           message.maxReviewerRewardPool = reader.string();
           break;
-        case 88:
+        case 84:
           message.reviewerRewardPoolOverflowBurnRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 89:
+        case 85:
           message.reviewerRewardEpochBlocks = reader.uint64();
           break;
-        case 90:
+        case 86:
           message.minReviewerAccuracy = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 91:
+        case 87:
           message.reviewerAccuracyWindowEpochs = reader.uint64();
           break;
-        case 92:
+        case 88:
           message.roleRewardInflationShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 93:
+        case 89:
           message.maxCuratorRewardPool = reader.string();
           break;
-        case 94:
+        case 90:
           message.curatorRewardPoolOverflowBurnRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 95:
+        case 91:
           message.curatorRewardEpochBlocks = reader.uint64();
           break;
-        case 96:
+        case 92:
           message.minCuratorAccuracy = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 97:
+        case 93:
           message.curatorAccuracyWindowEpochs = reader.uint64();
           break;
-        case 98:
+        case 94:
           message.reviewRequiredAboveBudget = reader.string();
           break;
-        case 99:
+        case 95:
           message.reviewBountyReclaimDelay = reader.uint64();
           break;
-        case 100:
+        case 96:
           message.permissionlessMinReviewBountyRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 101:
+        case 97:
           message.maxVerifierRewardPool = reader.string();
           break;
-        case 102:
+        case 98:
           message.verifierRewardPoolOverflowBurnRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 103:
+        case 99:
           message.verifierRewardEpochBlocks = reader.uint64();
           break;
-        case 104:
+        case 100:
           message.minVerifierAccuracy = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 105:
+        case 101:
           message.verifierAccuracyWindowEpochs = reader.uint64();
           break;
-        case 106:
+        case 102:
           message.minEpochVerifications = reader.uint32();
           break;
-        case 107:
+        case 103:
           message.verifierDreamReward = reader.string();
           break;
-        case 108:
+        case 104:
           message.maxVerifierDreamMintPerEpoch = reader.string();
           break;
-        case 109:
+        case 105:
           message.minReviewerBond = reader.string();
           break;
-        case 110:
+        case 106:
           message.reviewerDemotionThreshold = reader.string();
           break;
-        case 111:
+        case 107:
           message.minReviewerTrustLevel = reader.string();
           break;
-        case 112:
+        case 108:
           message.minReviewerRepTier = reader.uint64();
           break;
-        case 113:
+        case 109:
           message.minReviewerAgeBlocks = reader.int64();
           break;
-        case 114:
+        case 110:
           message.reviewerDemotionCooldown = reader.int64();
           break;
-        case 115:
+        case 111:
           message.reviewerUnbondCooldown = reader.int64();
           break;
-        case 116:
+        case 112:
           message.stakingRewardYieldPerEpoch = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 117:
+        case 113:
           message.stakingPoolMintShare = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 118:
+        case 114:
           message.stakingPoolCapBase = reader.string();
           break;
-        case 119:
+        case 115:
           message.stakingPoolCapRate = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 124:
+        case 120:
           message.initiativeBountyMaxBudgetRatio = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 125:
+        case 121:
           message.maxInitiativeBountyPerFunderEpoch = reader.string();
           break;
-        case 126:
+        case 122:
           message.minInitiativeBountyContribution = reader.string();
           break;
-        case 127:
+        case 123:
           message.maxInitiativeBountyContributions = reader.uint32();
           break;
-        case 128:
+        case 124:
           message.initiativeBountyReclaimDelay = reader.uint64();
           break;
         default:
@@ -5850,7 +5770,6 @@ export const RepOperationalParams = {
     message.maxTipsSentPerEpoch = object.maxTipsSentPerEpoch ?? "";
     message.maxGiftPerInvitee = object.maxGiftPerInvitee ?? "";
     message.giftOnlyToInvitees = object.giftOnlyToInvitees ?? false;
-    message.minReputationMultiplier = object.minReputationMultiplier ?? "";
     message.defaultReviewPeriodEpochs = object.defaultReviewPeriodEpochs !== undefined && object.defaultReviewPeriodEpochs !== null ? BigInt(object.defaultReviewPeriodEpochs.toString()) : BigInt(0);
     message.defaultChallengePeriodEpochs = object.defaultChallengePeriodEpochs !== undefined && object.defaultChallengePeriodEpochs !== null ? BigInt(object.defaultChallengePeriodEpochs.toString()) : BigInt(0);
     message.minInvitationStake = object.minInvitationStake ?? "";
@@ -5868,9 +5787,6 @@ export const RepOperationalParams = {
     message.expertComplexityBudget = object.expertComplexityBudget ?? "";
     message.soloExpertBonusRate = object.soloExpertBonusRate ?? "";
     message.interimDeadlineEpochs = object.interimDeadlineEpochs !== undefined && object.interimDeadlineEpochs !== null ? BigInt(object.interimDeadlineEpochs.toString()) : BigInt(0);
-    message.maxActiveChallengesPerCommittee = object.maxActiveChallengesPerCommittee ?? 0;
-    message.maxNewChallengesPerEpoch = object.maxNewChallengesPerEpoch ?? 0;
-    message.challengeQueueMaxSize = object.challengeQueueMaxSize ?? 0;
     message.projectCompletionBonusRate = object.projectCompletionBonusRate ?? "";
     message.memberStakeRevenueShare = object.memberStakeRevenueShare ?? "";
     message.tagStakeRevenueShare = object.tagStakeRevenueShare ?? "";
@@ -5998,9 +5914,6 @@ export const RepOperationalParams = {
     if (object.gift_only_to_invitees !== undefined && object.gift_only_to_invitees !== null) {
       message.giftOnlyToInvitees = object.gift_only_to_invitees;
     }
-    if (object.min_reputation_multiplier !== undefined && object.min_reputation_multiplier !== null) {
-      message.minReputationMultiplier = object.min_reputation_multiplier;
-    }
     if (object.default_review_period_epochs !== undefined && object.default_review_period_epochs !== null) {
       message.defaultReviewPeriodEpochs = BigInt(object.default_review_period_epochs);
     }
@@ -6051,15 +5964,6 @@ export const RepOperationalParams = {
     }
     if (object.interim_deadline_epochs !== undefined && object.interim_deadline_epochs !== null) {
       message.interimDeadlineEpochs = BigInt(object.interim_deadline_epochs);
-    }
-    if (object.max_active_challenges_per_committee !== undefined && object.max_active_challenges_per_committee !== null) {
-      message.maxActiveChallengesPerCommittee = object.max_active_challenges_per_committee;
-    }
-    if (object.max_new_challenges_per_epoch !== undefined && object.max_new_challenges_per_epoch !== null) {
-      message.maxNewChallengesPerEpoch = object.max_new_challenges_per_epoch;
-    }
-    if (object.challenge_queue_max_size !== undefined && object.challenge_queue_max_size !== null) {
-      message.challengeQueueMaxSize = object.challenge_queue_max_size;
     }
     if (object.project_completion_bonus_rate !== undefined && object.project_completion_bonus_rate !== null) {
       message.projectCompletionBonusRate = object.project_completion_bonus_rate;
@@ -6370,7 +6274,6 @@ export const RepOperationalParams = {
     obj.max_tips_sent_per_epoch = message.maxTipsSentPerEpoch === "" ? undefined : message.maxTipsSentPerEpoch;
     obj.max_gift_per_invitee = message.maxGiftPerInvitee === "" ? undefined : message.maxGiftPerInvitee;
     obj.gift_only_to_invitees = message.giftOnlyToInvitees === false ? undefined : message.giftOnlyToInvitees;
-    obj.min_reputation_multiplier = message.minReputationMultiplier === "" ? undefined : message.minReputationMultiplier;
     obj.default_review_period_epochs = message.defaultReviewPeriodEpochs !== BigInt(0) ? message.defaultReviewPeriodEpochs?.toString() : undefined;
     obj.default_challenge_period_epochs = message.defaultChallengePeriodEpochs !== BigInt(0) ? message.defaultChallengePeriodEpochs?.toString() : undefined;
     obj.min_invitation_stake = message.minInvitationStake === "" ? undefined : message.minInvitationStake;
@@ -6388,9 +6291,6 @@ export const RepOperationalParams = {
     obj.expert_complexity_budget = message.expertComplexityBudget === "" ? undefined : message.expertComplexityBudget;
     obj.solo_expert_bonus_rate = message.soloExpertBonusRate === "" ? undefined : message.soloExpertBonusRate;
     obj.interim_deadline_epochs = message.interimDeadlineEpochs !== BigInt(0) ? message.interimDeadlineEpochs?.toString() : undefined;
-    obj.max_active_challenges_per_committee = message.maxActiveChallengesPerCommittee === 0 ? undefined : message.maxActiveChallengesPerCommittee;
-    obj.max_new_challenges_per_epoch = message.maxNewChallengesPerEpoch === 0 ? undefined : message.maxNewChallengesPerEpoch;
-    obj.challenge_queue_max_size = message.challengeQueueMaxSize === 0 ? undefined : message.challengeQueueMaxSize;
     obj.project_completion_bonus_rate = message.projectCompletionBonusRate === "" ? undefined : message.projectCompletionBonusRate;
     obj.member_stake_revenue_share = message.memberStakeRevenueShare === "" ? undefined : message.memberStakeRevenueShare;
     obj.tag_stake_revenue_share = message.tagStakeRevenueShare === "" ? undefined : message.tagStakeRevenueShare;

@@ -491,52 +491,52 @@ export const Params = {
       writer.uint32(88).uint32(message.maxReactionsPerDay);
     }
     if (message.ephemeralContentTtl !== BigInt(0)) {
-      writer.uint32(136).int64(message.ephemeralContentTtl);
+      writer.uint32(96).int64(message.ephemeralContentTtl);
     }
     if (message.pinMinTrustLevel !== 0) {
-      writer.uint32(144).uint32(message.pinMinTrustLevel);
+      writer.uint32(104).uint32(message.pinMinTrustLevel);
     }
     if (message.maxPinsPerDay !== 0) {
-      writer.uint32(152).uint32(message.maxPinsPerDay);
+      writer.uint32(112).uint32(message.maxPinsPerDay);
     }
     if (message.minEphemeralContentTtl !== BigInt(0)) {
-      writer.uint32(160).int64(message.minEphemeralContentTtl);
+      writer.uint32(120).int64(message.minEphemeralContentTtl);
     }
     if (message.maxCostPerByteAmount !== "") {
-      writer.uint32(170).string(message.maxCostPerByteAmount);
+      writer.uint32(130).string(message.maxCostPerByteAmount);
     }
     if (message.maxReactionFeeAmount !== "") {
-      writer.uint32(178).string(message.maxReactionFeeAmount);
+      writer.uint32(138).string(message.maxReactionFeeAmount);
     }
     if (message.convictionRenewalThreshold !== "") {
-      writer.uint32(186).string(Decimal.fromUserInput(message.convictionRenewalThreshold, 18).atomics);
+      writer.uint32(146).string(Decimal.fromUserInput(message.convictionRenewalThreshold, 18).atomics);
     }
     if (message.convictionRenewalPeriod !== BigInt(0)) {
-      writer.uint32(192).int64(message.convictionRenewalPeriod);
+      writer.uint32(152).int64(message.convictionRenewalPeriod);
     }
     if (message.maxTagsPerPost !== 0) {
-      writer.uint32(200).uint32(message.maxTagsPerPost);
+      writer.uint32(160).uint32(message.maxTagsPerPost);
     }
     if (message.maxTagLength !== 0) {
-      writer.uint32(208).uint32(message.maxTagLength);
+      writer.uint32(168).uint32(message.maxTagLength);
     }
     if (message.maxPromotionsPerBlock !== 0) {
-      writer.uint32(216).uint32(message.maxPromotionsPerBlock);
+      writer.uint32(176).uint32(message.maxPromotionsPerBlock);
     }
     if (message.makePermanentMinTrustLevel !== 0) {
-      writer.uint32(224).uint32(message.makePermanentMinTrustLevel);
+      writer.uint32(184).uint32(message.makePermanentMinTrustLevel);
     }
     if (message.maxMakePermanentPerDay !== 0) {
-      writer.uint32(232).uint32(message.maxMakePermanentPerDay);
+      writer.uint32(192).uint32(message.maxMakePermanentPerDay);
     }
     if (message.mediaMinTrustLevel !== 0) {
-      writer.uint32(240).uint32(message.mediaMinTrustLevel);
+      writer.uint32(200).uint32(message.mediaMinTrustLevel);
     }
     if (message.mediaAuthorBondMin !== "") {
-      writer.uint32(250).string(message.mediaAuthorBondMin);
+      writer.uint32(210).string(message.mediaAuthorBondMin);
     }
     if (message.mediaScanFee !== "") {
-      writer.uint32(258).string(message.mediaScanFee);
+      writer.uint32(218).string(message.mediaScanFee);
     }
     return writer;
   },
@@ -580,52 +580,52 @@ export const Params = {
         case 11:
           message.maxReactionsPerDay = reader.uint32();
           break;
-        case 17:
+        case 12:
           message.ephemeralContentTtl = reader.int64();
           break;
-        case 18:
+        case 13:
           message.pinMinTrustLevel = reader.uint32();
           break;
-        case 19:
+        case 14:
           message.maxPinsPerDay = reader.uint32();
           break;
-        case 20:
+        case 15:
           message.minEphemeralContentTtl = reader.int64();
           break;
-        case 21:
+        case 16:
           message.maxCostPerByteAmount = reader.string();
           break;
-        case 22:
+        case 17:
           message.maxReactionFeeAmount = reader.string();
           break;
-        case 23:
+        case 18:
           message.convictionRenewalThreshold = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 24:
+        case 19:
           message.convictionRenewalPeriod = reader.int64();
           break;
-        case 25:
+        case 20:
           message.maxTagsPerPost = reader.uint32();
           break;
-        case 26:
+        case 21:
           message.maxTagLength = reader.uint32();
           break;
-        case 27:
+        case 22:
           message.maxPromotionsPerBlock = reader.uint32();
           break;
-        case 28:
+        case 23:
           message.makePermanentMinTrustLevel = reader.uint32();
           break;
-        case 29:
+        case 24:
           message.maxMakePermanentPerDay = reader.uint32();
           break;
-        case 30:
+        case 25:
           message.mediaMinTrustLevel = reader.uint32();
           break;
-        case 31:
+        case 26:
           message.mediaAuthorBondMin = reader.string();
           break;
-        case 32:
+        case 27:
           message.mediaScanFee = reader.string();
           break;
         default:
@@ -854,22 +854,22 @@ export const BlogOperationalParams = {
       writer.uint32(56).uint32(message.maxReactionsPerDay);
     }
     if (message.ephemeralContentTtl !== BigInt(0)) {
-      writer.uint32(96).int64(message.ephemeralContentTtl);
+      writer.uint32(64).int64(message.ephemeralContentTtl);
     }
     if (message.maxPinsPerDay !== 0) {
-      writer.uint32(104).uint32(message.maxPinsPerDay);
+      writer.uint32(72).uint32(message.maxPinsPerDay);
     }
     if (message.convictionRenewalThreshold !== "") {
-      writer.uint32(114).string(Decimal.fromUserInput(message.convictionRenewalThreshold, 18).atomics);
+      writer.uint32(82).string(Decimal.fromUserInput(message.convictionRenewalThreshold, 18).atomics);
     }
     if (message.convictionRenewalPeriod !== BigInt(0)) {
-      writer.uint32(120).int64(message.convictionRenewalPeriod);
+      writer.uint32(88).int64(message.convictionRenewalPeriod);
     }
     if (message.maxPromotionsPerBlock !== 0) {
-      writer.uint32(128).uint32(message.maxPromotionsPerBlock);
+      writer.uint32(96).uint32(message.maxPromotionsPerBlock);
     }
     if (message.maxMakePermanentPerDay !== 0) {
-      writer.uint32(136).uint32(message.maxMakePermanentPerDay);
+      writer.uint32(104).uint32(message.maxMakePermanentPerDay);
     }
     return writer;
   },
@@ -901,22 +901,22 @@ export const BlogOperationalParams = {
         case 7:
           message.maxReactionsPerDay = reader.uint32();
           break;
-        case 12:
+        case 8:
           message.ephemeralContentTtl = reader.int64();
           break;
-        case 13:
+        case 9:
           message.maxPinsPerDay = reader.uint32();
           break;
-        case 14:
+        case 10:
           message.convictionRenewalThreshold = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
-        case 15:
+        case 11:
           message.convictionRenewalPeriod = reader.int64();
           break;
-        case 16:
+        case 12:
           message.maxPromotionsPerBlock = reader.uint32();
           break;
-        case 17:
+        case 13:
           message.maxMakePermanentPerDay = reader.uint32();
           break;
         default:
