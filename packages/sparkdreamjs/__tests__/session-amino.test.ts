@@ -1,6 +1,7 @@
 // Amino sign-byte parity for x/session. The golden file holds what the chain's
 // cosmossdk.io/x/tx/signing/aminojson renders from the proto bytes of each
-// fixture below; regenerate it with the chain-side test described in
+// fixture below, after the re-encoding the chain's tx decoding applies to
+// them; regenerate it with the chain-side test described in
 // session-amino.golden.json's "_source" key whenever session/v1 protos change.
 //
 // Each fixture is passed exactly as an app would hand it to cosmjs (plain
@@ -13,6 +14,7 @@ import { AminoTypes, createDefaultAminoConverters, defaultRegistryTypes } from "
 import { load, registry as sessionRegistry } from "../src/sparkdream/session/v1/tx.registry";
 import { AminoConverter } from "../src/sparkdream/session/v1/tx.amino";
 import { configureNestedAminoConverter } from "../src/nested-amino";
+import { renderAminoJson } from "../src/chain-amino";
 
 const GRANTER = "sprkdrm1granter000000000000000000000000000";
 const GRANTEE = "sprkdrm1grantee000000000000000000000000000";
@@ -146,10 +148,16 @@ describe("x/session amino converters", () => {
 
   for (const [name, msg] of Object.entries(fixtures)) {
     describe(name, () => {
-      it("round-trips through fromAmino to identical proto bytes", () => {
-        const back = aminoTypes.fromAmino(aminoTypes.toAmino(msg));
+      // cosmjs signs toAmino's JSON and sends fromAmino's result as the tx
+      // body, which the chain renders: both must be the same JSON. The bytes
+      // themselves may differ from the app's value, since the JSON carries
+      // the non-nullable fields the chain always writes (a session key's
+      // `spent` and `last_used_at`) even when the app left them out.
+      it("round-trips through fromAmino to a body that renders the same", () => {
+        const amino = aminoTypes.toAmino(msg);
+        const back = aminoTypes.fromAmino(JSON.parse(JSON.stringify(amino)));
         expect(back.typeUrl).toBe(msg.typeUrl);
-        expect(protoHex(back)).toBe(protoHex(msg));
+        expect(sortedJson(renderAminoJson(back.typeUrl, registry.encode(back)))).toBe(sortedJson(amino));
       });
 
       it("matches the chain's aminojson rendering", () => {

@@ -51,6 +51,10 @@ export interface SchemaField {
   nn?: boolean;
   /** [oneof JSON name, amino.oneof_name] */
   o?: [string, string];
+  /** gogoproto.stdtime on a Timestamp field (a Go time.Time) */
+  st?: boolean;
+  /** singular non-nullable customtype scalar (Int, LegacyDec): never empty on the chain, zero is "0" */
+  z?: boolean;
 }
 
 export interface SchemaMessage {
@@ -339,6 +343,38 @@ function render(typeName: string, bytes: Uint8Array, isAny: boolean): Json {
   return name !== undefined ? { type: name, value } : value;
 }
 
+const ZERO_STRING: WireValue[] = [{ wire: 2, bytes: new TextEncoder().encode("0") }];
+const EMPTY_MESSAGE: WireValue[] = [{ wire: 2, bytes: new Uint8Array() }];
+/** Go's zero time.Time, 0001-01-01T00:00:00Z, as Timestamp bytes (seconds = -62135596800). */
+const GO_ZERO_TIME: WireValue[] = [
+  { wire: 2, bytes: new Uint8Array([0x08, 0x80, 0x92, 0xb8, 0xc3, 0x98, 0xfe, 0xff, 0xff, 0xff, 0x01]) },
+];
+
+/**
+ * The wire values of a field as the chain signs them. Decoding a tx, the SDK
+ * unpacks each message into its gogoproto Go type and replaces the message's
+ * bytes with that value's re-encoding; aminojson renders from those bytes,
+ * not from the ones the client sent. A gogoproto.nullable = false field is a
+ * plain value in the Go type and is always written:
+ *   - an embedded message left out comes back present and empty (a Coin
+ *     renders as {"amount":"0"}), a stdtime Timestamp as Go's zero time;
+ *   - an empty Int or LegacyDec customtype comes back as "0".
+ * A client that leaves such a field unset (a session key's `spent` and
+ * `last_used_at`, say) must still sign the JSON that includes it.
+ */
+function chainValues(f: SchemaField, values: WireValue[]): WireValue[] {
+  if (f.r || f.k === "map") return values;
+  if (f.k === "message") {
+    if (f.nn && values.length === 0) return f.st ? GO_ZERO_TIME : EMPTY_MESSAGE;
+    return values;
+  }
+  if (f.z) {
+    const last = values[values.length - 1];
+    if (!last || !last.bytes || last.bytes.length === 0) return ZERO_STRING;
+  }
+  return values;
+}
+
 /** protoreflect Message.Has for a dynamic proto3 message. */
 function fieldHas(f: SchemaField, values: WireValue[]): boolean {
   if (values.length === 0) return false;
@@ -379,7 +415,7 @@ function renderMessage(typeName: string, bytes: Uint8Array): Json {
   const out: Record<string, Json> = {};
 
   for (const f of fields) {
-    const values = wire.get(f.no) ?? [];
+    const values = chainValues(f, wire.get(f.no) ?? []);
     let name = f.n;
     let writeNil = false;
     if (!fieldHas(f, values)) {
@@ -598,11 +634,13 @@ function encodeAny(json: any): { typeUrl: string; value: Uint8Array } {
 
 /**
  * Returns value with every dont_omitempty embedded message present (empty
- * when left out), recursively. aminojson refuses to render an absent one, and
- * Go clients never send one absent (they are gogoproto.nullable = false), but
- * Telescope's fromPartial leaves them undefined.
+ * when left out), recursively. Go clients never send one absent (they are
+ * gogoproto.nullable = false), but Telescope's fromPartial leaves them
+ * undefined.
  * Filled on the plain value, before fromPartial, so the codec builds proper
  * defaults; a Timestamp gets the epoch.
+ * Every other non-nullable message a caller leaves out is not filled here:
+ * the renderer adds it the way the chain does (see chainValues).
  */
 export function fillNonNullable(typeName: string, value: any): any {
   const md = schema.messages[typeName];
@@ -616,8 +654,8 @@ export function fillNonNullable(typeName: string, value: any): any {
       continue;
     }
     if (v === undefined || v === null) {
-      // Only a dont_omitempty message must be present: aminojson refuses to
-      // render it absent. Others render the same either way, so stay untouched.
+      // Only a dont_omitempty message is filled in. Other non-nullable ones
+      // stay as given; the renderer treats them as present.
       if (!f.d) continue;
       out[f.j] = f.t === "google.protobuf.Timestamp" ? new Date(0) : BUILTIN.has(f.t) ? {} : fillNonNullable(f.t, {});
       continue;

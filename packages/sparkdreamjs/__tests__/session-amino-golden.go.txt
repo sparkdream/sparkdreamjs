@@ -6,9 +6,12 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"os"
+	"reflect"
+	"strings"
 	"testing"
 
 	"cosmossdk.io/x/tx/signing/aminojson"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	gogoproto "github.com/cosmos/gogoproto/proto"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/dynamicpb"
@@ -16,6 +19,37 @@ import (
 	_ "github.com/cosmos/cosmos-sdk/x/bank/types"
 	_ "sparkdream/x/session/types"
 )
+
+// chainBytes re-encodes a message the way the chain's tx decoding does before
+// the ante handler builds the sign bytes: unpacked into its gogoproto Go type
+// (inner Anys too) and marshalled again. Non-nullable fields the client left
+// out come back present. Same as gogoCanonical in the chain's cmd/aminogolden.
+type chainBytes struct{}
+
+func (chainBytes) UnpackAny(a *codectypes.Any, _ interface{}) error {
+	if a == nil || a.TypeUrl == "" {
+		return nil
+	}
+	rt := gogoproto.MessageType(strings.TrimPrefix(a.TypeUrl, "/"))
+	if rt == nil {
+		return nil // a type this test binary does not import: left as sent
+	}
+	msg := reflect.New(rt.Elem()).Interface().(gogoproto.Message)
+	if err := gogoproto.Unmarshal(a.Value, msg); err != nil {
+		return err
+	}
+	if um, ok := msg.(codectypes.UnpackInterfacesMessage); ok {
+		if err := um.UnpackInterfaces(chainBytes{}); err != nil {
+			return err
+		}
+	}
+	re, err := codectypes.NewAnyWithValue(msg)
+	if err != nil {
+		return err
+	}
+	*a = *re
+	return nil
+}
 
 func TestRenderAminoGolden(t *testing.T) {
 	raw, err := os.ReadFile(os.Getenv("FIXTURES"))
@@ -42,6 +76,11 @@ func TestRenderAminoGolden(t *testing.T) {
 			t.Fatal(name, err)
 		}
 		bz, _ := hex.DecodeString(f.ProtoHex)
+		packed := &codectypes.Any{TypeUrl: f.TypeURL, Value: bz}
+		if err := (chainBytes{}).UnpackAny(packed, nil); err != nil {
+			t.Fatal(name, err)
+		}
+		bz = packed.Value
 		msg := mt.New().Interface()
 		if err := proto.Unmarshal(bz, msg); err != nil {
 			t.Fatal(name, err)
