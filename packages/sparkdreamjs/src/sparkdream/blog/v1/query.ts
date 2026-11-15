@@ -685,6 +685,60 @@ export interface QueryListPostsByTagResponseAminoMsg {
   value: QueryListPostsByTagResponseAmino;
 }
 /**
+ * QueryListPinnedPostsRequest defines the QueryListPinnedPostsRequest message.
+ * @name QueryListPinnedPostsRequest
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryListPinnedPostsRequest
+ */
+export interface QueryListPinnedPostsRequest {
+  pagination?: PageRequest;
+}
+export interface QueryListPinnedPostsRequestProtoMsg {
+  typeUrl: "/sparkdream.blog.v1.QueryListPinnedPostsRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryListPinnedPostsRequest defines the QueryListPinnedPostsRequest message.
+ * @name QueryListPinnedPostsRequestAmino
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryListPinnedPostsRequest
+ */
+export interface QueryListPinnedPostsRequestAmino {
+  pagination?: PageRequestAmino;
+}
+export interface QueryListPinnedPostsRequestAminoMsg {
+  type: "/sparkdream.blog.v1.QueryListPinnedPostsRequest";
+  value: QueryListPinnedPostsRequestAmino;
+}
+/**
+ * QueryListPinnedPostsResponse defines the QueryListPinnedPostsResponse message.
+ * @name QueryListPinnedPostsResponse
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryListPinnedPostsResponse
+ */
+export interface QueryListPinnedPostsResponse {
+  posts: Post[];
+  pagination?: PageResponse;
+}
+export interface QueryListPinnedPostsResponseProtoMsg {
+  typeUrl: "/sparkdream.blog.v1.QueryListPinnedPostsResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryListPinnedPostsResponse defines the QueryListPinnedPostsResponse message.
+ * @name QueryListPinnedPostsResponseAmino
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryListPinnedPostsResponse
+ */
+export interface QueryListPinnedPostsResponseAmino {
+  posts?: PostAmino[];
+  pagination?: PageResponseAmino;
+}
+export interface QueryListPinnedPostsResponseAminoMsg {
+  type: "/sparkdream.blog.v1.QueryListPinnedPostsResponse";
+  value: QueryListPinnedPostsResponseAmino;
+}
+/**
  * QueryPostBodyRequest defines the QueryPostBodyRequest message.
  * @name QueryPostBodyRequest
  * @package sparkdream.blog.v1
@@ -2736,6 +2790,158 @@ export const QueryListPostsByTagResponse = {
     return {
       typeUrl: "/sparkdream.blog.v1.QueryListPostsByTagResponse",
       value: QueryListPostsByTagResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryListPinnedPostsRequest(): QueryListPinnedPostsRequest {
+  return {
+    pagination: undefined
+  };
+}
+/**
+ * QueryListPinnedPostsRequest defines the QueryListPinnedPostsRequest message.
+ * @name QueryListPinnedPostsRequest
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryListPinnedPostsRequest
+ */
+export const QueryListPinnedPostsRequest = {
+  typeUrl: "/sparkdream.blog.v1.QueryListPinnedPostsRequest",
+  encode(message: QueryListPinnedPostsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryListPinnedPostsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryListPinnedPostsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryListPinnedPostsRequest>): QueryListPinnedPostsRequest {
+    const message = createBaseQueryListPinnedPostsRequest();
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryListPinnedPostsRequestAmino): QueryListPinnedPostsRequest {
+    const message = createBaseQueryListPinnedPostsRequest();
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryListPinnedPostsRequest): QueryListPinnedPostsRequestAmino {
+    const obj: any = {};
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryListPinnedPostsRequestAminoMsg): QueryListPinnedPostsRequest {
+    return QueryListPinnedPostsRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryListPinnedPostsRequestProtoMsg): QueryListPinnedPostsRequest {
+    return QueryListPinnedPostsRequest.decode(message.value);
+  },
+  toProto(message: QueryListPinnedPostsRequest): Uint8Array {
+    return QueryListPinnedPostsRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryListPinnedPostsRequest): QueryListPinnedPostsRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.blog.v1.QueryListPinnedPostsRequest",
+      value: QueryListPinnedPostsRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryListPinnedPostsResponse(): QueryListPinnedPostsResponse {
+  return {
+    posts: [],
+    pagination: undefined
+  };
+}
+/**
+ * QueryListPinnedPostsResponse defines the QueryListPinnedPostsResponse message.
+ * @name QueryListPinnedPostsResponse
+ * @package sparkdream.blog.v1
+ * @see proto type: sparkdream.blog.v1.QueryListPinnedPostsResponse
+ */
+export const QueryListPinnedPostsResponse = {
+  typeUrl: "/sparkdream.blog.v1.QueryListPinnedPostsResponse",
+  encode(message: QueryListPinnedPostsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.posts) {
+      Post.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryListPinnedPostsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryListPinnedPostsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.posts.push(Post.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryListPinnedPostsResponse>): QueryListPinnedPostsResponse {
+    const message = createBaseQueryListPinnedPostsResponse();
+    message.posts = object.posts?.map(e => Post.fromPartial(e)) || [];
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
+    return message;
+  },
+  fromAmino(object: QueryListPinnedPostsResponseAmino): QueryListPinnedPostsResponse {
+    const message = createBaseQueryListPinnedPostsResponse();
+    message.posts = object.posts?.map(e => Post.fromAmino(e)) || [];
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
+    }
+    return message;
+  },
+  toAmino(message: QueryListPinnedPostsResponse): QueryListPinnedPostsResponseAmino {
+    const obj: any = {};
+    if (message.posts) {
+      obj.posts = message.posts.map(e => e ? Post.toAmino(e) : undefined);
+    } else {
+      obj.posts = message.posts;
+    }
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: QueryListPinnedPostsResponseAminoMsg): QueryListPinnedPostsResponse {
+    return QueryListPinnedPostsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryListPinnedPostsResponseProtoMsg): QueryListPinnedPostsResponse {
+    return QueryListPinnedPostsResponse.decode(message.value);
+  },
+  toProto(message: QueryListPinnedPostsResponse): Uint8Array {
+    return QueryListPinnedPostsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryListPinnedPostsResponse): QueryListPinnedPostsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.blog.v1.QueryListPinnedPostsResponse",
+      value: QueryListPinnedPostsResponse.encode(message).finish()
     };
   }
 };

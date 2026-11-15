@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryShowPostRequest, QueryShowPostResponse, QueryListPostRequest, QueryListPostResponse, QueryShowReplyRequest, QueryShowReplyResponse, QueryListRepliesRequest, QueryListRepliesResponse, QueryListPostsByCreatorRequest, QueryListPostsByCreatorResponse, QueryReactionCountsRequest, QueryReactionCountsResponse, QueryUserReactionRequest, QueryUserReactionResponse, QueryListReactionsRequest, QueryListReactionsResponse, QueryListReactionsByCreatorRequest, QueryListReactionsByCreatorResponse, QueryListExpiringContentRequest, QueryListExpiringContentResponse, QueryListPostsByTagRequest, QueryListPostsByTagResponse, QueryPostBodyRequest, QueryPostBodyResponse, QueryReplyBodyRequest, QueryReplyBodyResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryShowPostRequest, QueryShowPostResponse, QueryListPostRequest, QueryListPostResponse, QueryShowReplyRequest, QueryShowReplyResponse, QueryListRepliesRequest, QueryListRepliesResponse, QueryListPostsByCreatorRequest, QueryListPostsByCreatorResponse, QueryReactionCountsRequest, QueryReactionCountsResponse, QueryUserReactionRequest, QueryUserReactionResponse, QueryListReactionsRequest, QueryListReactionsResponse, QueryListReactionsByCreatorRequest, QueryListReactionsByCreatorResponse, QueryListExpiringContentRequest, QueryListExpiringContentResponse, QueryListPostsByTagRequest, QueryListPostsByTagResponse, QueryListPinnedPostsRequest, QueryListPinnedPostsResponse, QueryPostBodyRequest, QueryPostBodyResponse, QueryReplyBodyRequest, QueryReplyBodyResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -29,6 +29,11 @@ export interface Query {
   listExpiringContent(request: QueryListExpiringContentRequest): Promise<QueryListExpiringContentResponse>;
   /** ListPostsByTag returns paginated posts that carry a given tag. */
   listPostsByTag(request: QueryListPostsByTagRequest): Promise<QueryListPostsByTagResponse>;
+  /**
+   * ListPinnedPosts returns paginated pinned posts, most recently pinned
+   * first. Hidden and deleted posts are left out.
+   */
+  listPinnedPosts(request?: QueryListPinnedPostsRequest): Promise<QueryListPinnedPostsResponse>;
   /**
    * PostBody returns the full body of one post. List and show queries return
    * the body as "" whenever media_flags != 0; clients fetch it here once
@@ -117,6 +122,15 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.blog.v1.Query", "ListPostsByTag", data);
     return promise.then(data => QueryListPostsByTagResponse.decode(new BinaryReader(data)));
   };
+  /* ListPinnedPosts returns paginated pinned posts, most recently pinned
+   first. Hidden and deleted posts are left out. */
+  listPinnedPosts = async (request: QueryListPinnedPostsRequest = {
+    pagination: undefined
+  }): Promise<QueryListPinnedPostsResponse> => {
+    const data = QueryListPinnedPostsRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.blog.v1.Query", "ListPinnedPosts", data);
+    return promise.then(data => QueryListPinnedPostsResponse.decode(new BinaryReader(data)));
+  };
   /* PostBody returns the full body of one post. List and show queries return
    the body as "" whenever media_flags != 0; clients fetch it here once
    scanner verdicts say it is clean (docs/content-scanning.md §3.4). */
@@ -171,6 +185,9 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     listPostsByTag(request: QueryListPostsByTagRequest): Promise<QueryListPostsByTagResponse> {
       return queryService.listPostsByTag(request);
+    },
+    listPinnedPosts(request?: QueryListPinnedPostsRequest): Promise<QueryListPinnedPostsResponse> {
+      return queryService.listPinnedPosts(request);
     },
     postBody(request: QueryPostBodyRequest): Promise<QueryPostBodyResponse> {
       return queryService.postBody(request);

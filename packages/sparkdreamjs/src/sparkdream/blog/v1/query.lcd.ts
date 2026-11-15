@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponse, QueryShowPostRequest, QueryShowPostResponse, QueryListPostRequest, QueryListPostResponse, QueryShowReplyRequest, QueryShowReplyResponse, QueryListRepliesRequest, QueryListRepliesResponse, QueryListPostsByCreatorRequest, QueryListPostsByCreatorResponse, QueryReactionCountsRequest, QueryReactionCountsResponse, QueryUserReactionRequest, QueryUserReactionResponse, QueryListReactionsRequest, QueryListReactionsResponse, QueryListReactionsByCreatorRequest, QueryListReactionsByCreatorResponse, QueryListExpiringContentRequest, QueryListExpiringContentResponse, QueryListPostsByTagRequest, QueryListPostsByTagResponse, QueryPostBodyRequest, QueryPostBodyResponse, QueryReplyBodyRequest, QueryReplyBodyResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryShowPostRequest, QueryShowPostResponse, QueryListPostRequest, QueryListPostResponse, QueryShowReplyRequest, QueryShowReplyResponse, QueryListRepliesRequest, QueryListRepliesResponse, QueryListPostsByCreatorRequest, QueryListPostsByCreatorResponse, QueryReactionCountsRequest, QueryReactionCountsResponse, QueryUserReactionRequest, QueryUserReactionResponse, QueryListReactionsRequest, QueryListReactionsResponse, QueryListReactionsByCreatorRequest, QueryListReactionsByCreatorResponse, QueryListExpiringContentRequest, QueryListExpiringContentResponse, QueryListPostsByTagRequest, QueryListPostsByTagResponse, QueryListPinnedPostsRequest, QueryListPinnedPostsResponse, QueryPostBodyRequest, QueryPostBodyResponse, QueryReplyBodyRequest, QueryReplyBodyResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -147,6 +147,20 @@ export class LCDQueryClient {
     }
     const endpoint = `sparkdream/blog/v1/list_posts_by_tag/${params.tag}`;
     return await this.req.get<QueryListPostsByTagResponse>(endpoint, options);
+  };
+  /* ListPinnedPosts returns paginated pinned posts, most recently pinned
+   first. Hidden and deleted posts are left out. */
+  listPinnedPosts = async (params: QueryListPinnedPostsRequest = {
+    pagination: undefined
+  }): Promise<QueryListPinnedPostsResponse> => {
+    const options: any = {
+      params: {}
+    };
+    if (typeof params?.pagination !== "undefined") {
+      setPaginationParams(options, params.pagination);
+    }
+    const endpoint = `sparkdream/blog/v1/list_pinned_posts`;
+    return await this.req.get<QueryListPinnedPostsResponse>(endpoint, options);
   };
   /* PostBody returns the full body of one post. List and show queries return
    the body as "" whenever media_flags != 0; clients fetch it here once
