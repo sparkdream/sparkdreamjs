@@ -111,6 +111,9 @@ export const createRPCMsgClient = async ({
     split: {
       v1: new (await import("./split/v1/tx.rpc.msg")).MsgClientImpl(rpc)
     },
+    storage: {
+      v1: new (await import("./storage/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    },
     vault: {
       v1: new (await import("./vault/v1/tx.rpc.msg")).MsgClientImpl(rpc)
     }

@@ -197,6 +197,11 @@ export const createLCDClient = async ({
           requestClient
         })
       },
+      storage: {
+        v1: new (await import("./storage/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
       vault: {
         v1: new (await import("./vault/v1/query.lcd")).LCDQueryClient({
           requestClient
