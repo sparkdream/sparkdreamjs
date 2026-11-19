@@ -1164,6 +1164,90 @@ export interface QueryGetPollVoterTreeResponseAminoMsg {
   type: "/sparkdream.commons.v1.QueryGetPollVoterTreeResponse";
   value: QueryGetPollVoterTreeResponseAmino;
 }
+/**
+ * QueryTreasuryStakeRequest defines the QueryTreasuryStakeRequest message.
+ * @name QueryTreasuryStakeRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryTreasuryStakeRequest
+ */
+export interface QueryTreasuryStakeRequest {}
+export interface QueryTreasuryStakeRequestProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryTreasuryStakeRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryTreasuryStakeRequest defines the QueryTreasuryStakeRequest message.
+ * @name QueryTreasuryStakeRequestAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryTreasuryStakeRequest
+ */
+export interface QueryTreasuryStakeRequestAmino {}
+export interface QueryTreasuryStakeRequestAminoMsg {
+  type: "/sparkdream.commons.v1.QueryTreasuryStakeRequest";
+  value: QueryTreasuryStakeRequestAmino;
+}
+/**
+ * QueryTreasuryStakeResponse defines the QueryTreasuryStakeResponse message.
+ * @name QueryTreasuryStakeResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryTreasuryStakeResponse
+ */
+export interface QueryTreasuryStakeResponse {
+  /**
+   * treasury_staked is the SPARK all group treasuries have delegated, at
+   * current validator exchange rates (deleted groups still winding down
+   * included).
+   */
+  treasuryStaked: string;
+  /**
+   * total_bonded is the chain's total bonded stake.
+   */
+  totalBonded: string;
+  /**
+   * cap_bps is the treasury stake cap in basis points of total bonded stake.
+   */
+  capBps: bigint;
+  /**
+   * headroom is the largest amount a treasury could delegate now without
+   * crossing the cap.
+   */
+  headroom: string;
+}
+export interface QueryTreasuryStakeResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.QueryTreasuryStakeResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryTreasuryStakeResponse defines the QueryTreasuryStakeResponse message.
+ * @name QueryTreasuryStakeResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryTreasuryStakeResponse
+ */
+export interface QueryTreasuryStakeResponseAmino {
+  /**
+   * treasury_staked is the SPARK all group treasuries have delegated, at
+   * current validator exchange rates (deleted groups still winding down
+   * included).
+   */
+  treasury_staked?: string;
+  /**
+   * total_bonded is the chain's total bonded stake.
+   */
+  total_bonded?: string;
+  /**
+   * cap_bps is the treasury stake cap in basis points of total bonded stake.
+   */
+  cap_bps?: string;
+  /**
+   * headroom is the largest amount a treasury could delegate now without
+   * crossing the cap.
+   */
+  headroom?: string;
+}
+export interface QueryTreasuryStakeResponseAminoMsg {
+  type: "/sparkdream.commons.v1.QueryTreasuryStakeResponse";
+  value: QueryTreasuryStakeResponseAmino;
+}
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
 }
@@ -4246,6 +4330,167 @@ export const QueryGetPollVoterTreeResponse = {
     return {
       typeUrl: "/sparkdream.commons.v1.QueryGetPollVoterTreeResponse",
       value: QueryGetPollVoterTreeResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryTreasuryStakeRequest(): QueryTreasuryStakeRequest {
+  return {};
+}
+/**
+ * QueryTreasuryStakeRequest defines the QueryTreasuryStakeRequest message.
+ * @name QueryTreasuryStakeRequest
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryTreasuryStakeRequest
+ */
+export const QueryTreasuryStakeRequest = {
+  typeUrl: "/sparkdream.commons.v1.QueryTreasuryStakeRequest",
+  encode(_: QueryTreasuryStakeRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryTreasuryStakeRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryTreasuryStakeRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<QueryTreasuryStakeRequest>): QueryTreasuryStakeRequest {
+    const message = createBaseQueryTreasuryStakeRequest();
+    return message;
+  },
+  fromAmino(_: QueryTreasuryStakeRequestAmino): QueryTreasuryStakeRequest {
+    const message = createBaseQueryTreasuryStakeRequest();
+    return message;
+  },
+  toAmino(_: QueryTreasuryStakeRequest): QueryTreasuryStakeRequestAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: QueryTreasuryStakeRequestAminoMsg): QueryTreasuryStakeRequest {
+    return QueryTreasuryStakeRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryTreasuryStakeRequestProtoMsg): QueryTreasuryStakeRequest {
+    return QueryTreasuryStakeRequest.decode(message.value);
+  },
+  toProto(message: QueryTreasuryStakeRequest): Uint8Array {
+    return QueryTreasuryStakeRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryTreasuryStakeRequest): QueryTreasuryStakeRequestProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryTreasuryStakeRequest",
+      value: QueryTreasuryStakeRequest.encode(message).finish()
+    };
+  }
+};
+function createBaseQueryTreasuryStakeResponse(): QueryTreasuryStakeResponse {
+  return {
+    treasuryStaked: "",
+    totalBonded: "",
+    capBps: BigInt(0),
+    headroom: ""
+  };
+}
+/**
+ * QueryTreasuryStakeResponse defines the QueryTreasuryStakeResponse message.
+ * @name QueryTreasuryStakeResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.QueryTreasuryStakeResponse
+ */
+export const QueryTreasuryStakeResponse = {
+  typeUrl: "/sparkdream.commons.v1.QueryTreasuryStakeResponse",
+  encode(message: QueryTreasuryStakeResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.treasuryStaked !== "") {
+      writer.uint32(10).string(message.treasuryStaked);
+    }
+    if (message.totalBonded !== "") {
+      writer.uint32(18).string(message.totalBonded);
+    }
+    if (message.capBps !== BigInt(0)) {
+      writer.uint32(24).uint64(message.capBps);
+    }
+    if (message.headroom !== "") {
+      writer.uint32(34).string(message.headroom);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryTreasuryStakeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryTreasuryStakeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.treasuryStaked = reader.string();
+          break;
+        case 2:
+          message.totalBonded = reader.string();
+          break;
+        case 3:
+          message.capBps = reader.uint64();
+          break;
+        case 4:
+          message.headroom = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<QueryTreasuryStakeResponse>): QueryTreasuryStakeResponse {
+    const message = createBaseQueryTreasuryStakeResponse();
+    message.treasuryStaked = object.treasuryStaked ?? "";
+    message.totalBonded = object.totalBonded ?? "";
+    message.capBps = object.capBps !== undefined && object.capBps !== null ? BigInt(object.capBps.toString()) : BigInt(0);
+    message.headroom = object.headroom ?? "";
+    return message;
+  },
+  fromAmino(object: QueryTreasuryStakeResponseAmino): QueryTreasuryStakeResponse {
+    const message = createBaseQueryTreasuryStakeResponse();
+    if (object.treasury_staked !== undefined && object.treasury_staked !== null) {
+      message.treasuryStaked = object.treasury_staked;
+    }
+    if (object.total_bonded !== undefined && object.total_bonded !== null) {
+      message.totalBonded = object.total_bonded;
+    }
+    if (object.cap_bps !== undefined && object.cap_bps !== null) {
+      message.capBps = BigInt(object.cap_bps);
+    }
+    if (object.headroom !== undefined && object.headroom !== null) {
+      message.headroom = object.headroom;
+    }
+    return message;
+  },
+  toAmino(message: QueryTreasuryStakeResponse): QueryTreasuryStakeResponseAmino {
+    const obj: any = {};
+    obj.treasury_staked = message.treasuryStaked === "" ? undefined : message.treasuryStaked;
+    obj.total_bonded = message.totalBonded === "" ? undefined : message.totalBonded;
+    obj.cap_bps = message.capBps !== BigInt(0) ? message.capBps?.toString() : undefined;
+    obj.headroom = message.headroom === "" ? undefined : message.headroom;
+    return obj;
+  },
+  fromAminoMsg(object: QueryTreasuryStakeResponseAminoMsg): QueryTreasuryStakeResponse {
+    return QueryTreasuryStakeResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryTreasuryStakeResponseProtoMsg): QueryTreasuryStakeResponse {
+    return QueryTreasuryStakeResponse.decode(message.value);
+  },
+  toProto(message: QueryTreasuryStakeResponse): Uint8Array {
+    return QueryTreasuryStakeResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryTreasuryStakeResponse): QueryTreasuryStakeResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.QueryTreasuryStakeResponse",
+      value: QueryTreasuryStakeResponse.encode(message).finish()
     };
   }
 };

@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { setPaginationParams } from "../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetPolicyPermissionsRequest, QueryGetPolicyPermissionsResponse, QueryAllPolicyPermissionsRequest, QueryAllPolicyPermissionsResponse, QueryGetDecisionPolicyRequest, QueryGetDecisionPolicyResponse, QueryAllDecisionPoliciesRequest, QueryAllDecisionPoliciesResponse, QueryGetGroupRequest, QueryGetGroupResponse, QueryAllGroupRequest, QueryAllGroupResponse, QueryGetCouncilMembersRequest, QueryGetCouncilMembersResponse, QueryGetProposalRequest, QueryGetProposalResponse, QueryListProposalsRequest, QueryListProposalsResponse, QueryGetProposalVotesRequest, QueryGetProposalVotesResponse, QueryGetCategoryRequest, QueryGetCategoryResponse, QueryAllCategoryRequest, QueryAllCategoryResponse, QueryGetRecurringSpendRequest, QueryGetRecurringSpendResponse, QueryListRecurringSpendsRequest, QueryListRecurringSpendsResponse, QueryGetPollRequest, QueryGetPollResponse, QueryListPollsRequest, QueryListPollsResponse, QueryGetPollVotesRequest, QueryGetPollVotesResponse, QueryGetProposalVoterTreeRequest, QueryGetProposalVoterTreeResponse, QueryGetPollVoterTreeRequest, QueryGetPollVoterTreeResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetPolicyPermissionsRequest, QueryGetPolicyPermissionsResponse, QueryAllPolicyPermissionsRequest, QueryAllPolicyPermissionsResponse, QueryGetDecisionPolicyRequest, QueryGetDecisionPolicyResponse, QueryAllDecisionPoliciesRequest, QueryAllDecisionPoliciesResponse, QueryGetGroupRequest, QueryGetGroupResponse, QueryAllGroupRequest, QueryAllGroupResponse, QueryGetCouncilMembersRequest, QueryGetCouncilMembersResponse, QueryGetProposalRequest, QueryGetProposalResponse, QueryListProposalsRequest, QueryListProposalsResponse, QueryGetProposalVotesRequest, QueryGetProposalVotesResponse, QueryGetCategoryRequest, QueryGetCategoryResponse, QueryAllCategoryRequest, QueryAllCategoryResponse, QueryGetRecurringSpendRequest, QueryGetRecurringSpendResponse, QueryListRecurringSpendsRequest, QueryListRecurringSpendsResponse, QueryGetPollRequest, QueryGetPollResponse, QueryListPollsRequest, QueryListPollsResponse, QueryGetPollVotesRequest, QueryGetPollVotesResponse, QueryGetProposalVoterTreeRequest, QueryGetProposalVoterTreeResponse, QueryGetPollVoterTreeRequest, QueryGetPollVoterTreeResponse, QueryTreasuryStakeRequest, QueryTreasuryStakeResponse } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -188,5 +188,11 @@ export class LCDQueryClient {
   getPollVoterTree = async (params: QueryGetPollVoterTreeRequest): Promise<QueryGetPollVoterTreeResponse> => {
     const endpoint = `sparkdream/commons/v1/poll/${params.pollId}/voter_tree`;
     return await this.req.get<QueryGetPollVoterTreeResponse>(endpoint);
+  };
+  /* TreasuryStake reports how much SPARK the group treasuries have staked
+   together and how much more the treasury stake cap lets them delegate. */
+  treasuryStake = async (_params: QueryTreasuryStakeRequest = {}): Promise<QueryTreasuryStakeResponse> => {
+    const endpoint = `sparkdream/commons/v1/treasury_stake`;
+    return await this.req.get<QueryTreasuryStakeResponse>(endpoint);
   };
 }

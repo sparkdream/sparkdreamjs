@@ -2,7 +2,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryGetPolicyPermissionsRequest, QueryGetPolicyPermissionsResponse, QueryAllPolicyPermissionsRequest, QueryAllPolicyPermissionsResponse, QueryGetDecisionPolicyRequest, QueryGetDecisionPolicyResponse, QueryAllDecisionPoliciesRequest, QueryAllDecisionPoliciesResponse, QueryGetGroupRequest, QueryGetGroupResponse, QueryAllGroupRequest, QueryAllGroupResponse, QueryGetCouncilMembersRequest, QueryGetCouncilMembersResponse, QueryGetProposalRequest, QueryGetProposalResponse, QueryListProposalsRequest, QueryListProposalsResponse, QueryGetProposalVotesRequest, QueryGetProposalVotesResponse, QueryGetCategoryRequest, QueryGetCategoryResponse, QueryAllCategoryRequest, QueryAllCategoryResponse, QueryGetRecurringSpendRequest, QueryGetRecurringSpendResponse, QueryListRecurringSpendsRequest, QueryListRecurringSpendsResponse, QueryGetPollRequest, QueryGetPollResponse, QueryListPollsRequest, QueryListPollsResponse, QueryGetPollVotesRequest, QueryGetPollVotesResponse, QueryGetProposalVoterTreeRequest, QueryGetProposalVoterTreeResponse, QueryGetPollVoterTreeRequest, QueryGetPollVoterTreeResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryGetPolicyPermissionsRequest, QueryGetPolicyPermissionsResponse, QueryAllPolicyPermissionsRequest, QueryAllPolicyPermissionsResponse, QueryGetDecisionPolicyRequest, QueryGetDecisionPolicyResponse, QueryAllDecisionPoliciesRequest, QueryAllDecisionPoliciesResponse, QueryGetGroupRequest, QueryGetGroupResponse, QueryAllGroupRequest, QueryAllGroupResponse, QueryGetCouncilMembersRequest, QueryGetCouncilMembersResponse, QueryGetProposalRequest, QueryGetProposalResponse, QueryListProposalsRequest, QueryListProposalsResponse, QueryGetProposalVotesRequest, QueryGetProposalVotesResponse, QueryGetCategoryRequest, QueryGetCategoryResponse, QueryAllCategoryRequest, QueryAllCategoryResponse, QueryGetRecurringSpendRequest, QueryGetRecurringSpendResponse, QueryListRecurringSpendsRequest, QueryListRecurringSpendsResponse, QueryGetPollRequest, QueryGetPollResponse, QueryListPollsRequest, QueryListPollsResponse, QueryGetPollVotesRequest, QueryGetPollVotesResponse, QueryGetProposalVoterTreeRequest, QueryGetProposalVoterTreeResponse, QueryGetPollVoterTreeRequest, QueryGetPollVoterTreeResponse, QueryTreasuryStakeRequest, QueryTreasuryStakeResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -64,6 +64,11 @@ export interface Query {
    * voting is open).
    */
   getPollVoterTree(request: QueryGetPollVoterTreeRequest): Promise<QueryGetPollVoterTreeResponse>;
+  /**
+   * TreasuryStake reports how much SPARK the group treasuries have staked
+   * together and how much more the treasury stake cap lets them delegate.
+   */
+  treasuryStake(request?: QueryTreasuryStakeRequest): Promise<QueryTreasuryStakeResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -205,6 +210,13 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("sparkdream.commons.v1.Query", "GetPollVoterTree", data);
     return promise.then(data => QueryGetPollVoterTreeResponse.decode(new BinaryReader(data)));
   };
+  /* TreasuryStake reports how much SPARK the group treasuries have staked
+   together and how much more the treasury stake cap lets them delegate. */
+  treasuryStake = async (request: QueryTreasuryStakeRequest = {}): Promise<QueryTreasuryStakeResponse> => {
+    const data = QueryTreasuryStakeRequest.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Query", "TreasuryStake", data);
+    return promise.then(data => QueryTreasuryStakeResponse.decode(new BinaryReader(data)));
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);
@@ -269,6 +281,9 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     getPollVoterTree(request: QueryGetPollVoterTreeRequest): Promise<QueryGetPollVoterTreeResponse> {
       return queryService.getPollVoterTree(request);
+    },
+    treasuryStake(request?: QueryTreasuryStakeRequest): Promise<QueryTreasuryStakeResponse> {
+      return queryService.treasuryStake(request);
     }
   };
 };

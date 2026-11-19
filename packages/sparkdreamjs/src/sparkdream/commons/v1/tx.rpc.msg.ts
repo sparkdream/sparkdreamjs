@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
-import { MsgUpdateParams, MsgUpdateParamsResponse, MsgSpendFromCommons, MsgSpendFromCommonsResponse, MsgEmergencyCancelGovProposal, MsgEmergencyCancelGovProposalResponse, MsgCreatePolicyPermissions, MsgCreatePolicyPermissionsResponse, MsgUpdatePolicyPermissions, MsgUpdatePolicyPermissionsResponse, MsgDeletePolicyPermissions, MsgDeletePolicyPermissionsResponse, MsgRegisterGroup, MsgRegisterGroupResponse, MsgRenewGroup, MsgRenewGroupResponse, MsgUpdateGroupMembers, MsgUpdateGroupMembersResponse, MsgUpdateGroupConfig, MsgUpdateGroupConfigResponse, MsgForceUpgrade, MsgForceUpgradeResponse, MsgDeleteGroup, MsgDeleteGroupResponse, MsgVetoGroupProposals, MsgVetoGroupProposalsResponse, MsgSubmitProposal, MsgSubmitProposalResponse, MsgVoteProposal, MsgVoteProposalResponse, MsgExecuteProposal, MsgExecuteProposalResponse, MsgSubmitAnonymousProposal, MsgSubmitAnonymousProposalResponse, MsgAnonymousVoteProposal, MsgAnonymousVoteProposalResponse, MsgCreateCategory, MsgCreateCategoryResponse, MsgDeleteCategory, MsgDeleteCategoryResponse, MsgScheduleRecurringSpend, MsgScheduleRecurringSpendResponse, MsgCancelRecurringSpend, MsgCancelRecurringSpendResponse, MsgClaimRecurringSpend, MsgClaimRecurringSpendResponse, MsgDeclineRecurringSpend, MsgDeclineRecurringSpendResponse, MsgOpenPoll, MsgOpenPollResponse, MsgVotePoll, MsgVotePollResponse, MsgAnonymousVotePoll, MsgAnonymousVotePollResponse, MsgCancelPoll, MsgCancelPollResponse } from "./tx";
+import { MsgUpdateParams, MsgUpdateParamsResponse, MsgSpendFromCommons, MsgSpendFromCommonsResponse, MsgEmergencyCancelGovProposal, MsgEmergencyCancelGovProposalResponse, MsgCreatePolicyPermissions, MsgCreatePolicyPermissionsResponse, MsgUpdatePolicyPermissions, MsgUpdatePolicyPermissionsResponse, MsgDeletePolicyPermissions, MsgDeletePolicyPermissionsResponse, MsgRegisterGroup, MsgRegisterGroupResponse, MsgRenewGroup, MsgRenewGroupResponse, MsgUpdateGroupMembers, MsgUpdateGroupMembersResponse, MsgUpdateGroupConfig, MsgUpdateGroupConfigResponse, MsgForceUpgrade, MsgForceUpgradeResponse, MsgDeleteGroup, MsgDeleteGroupResponse, MsgVetoGroupProposals, MsgVetoGroupProposalsResponse, MsgSubmitProposal, MsgSubmitProposalResponse, MsgVoteProposal, MsgVoteProposalResponse, MsgExecuteProposal, MsgExecuteProposalResponse, MsgSubmitAnonymousProposal, MsgSubmitAnonymousProposalResponse, MsgAnonymousVoteProposal, MsgAnonymousVoteProposalResponse, MsgCreateCategory, MsgCreateCategoryResponse, MsgDeleteCategory, MsgDeleteCategoryResponse, MsgScheduleRecurringSpend, MsgScheduleRecurringSpendResponse, MsgCancelRecurringSpend, MsgCancelRecurringSpendResponse, MsgClaimRecurringSpend, MsgClaimRecurringSpendResponse, MsgDeclineRecurringSpend, MsgDeclineRecurringSpendResponse, MsgOpenPoll, MsgOpenPollResponse, MsgVotePoll, MsgVotePollResponse, MsgAnonymousVotePoll, MsgAnonymousVotePollResponse, MsgCancelPoll, MsgCancelPollResponse, MsgDelegateTreasury, MsgDelegateTreasuryResponse, MsgUndelegateTreasury, MsgUndelegateTreasuryResponse, MsgRedelegateTreasury, MsgRedelegateTreasuryResponse, MsgWithdrawTreasuryRewards, MsgWithdrawTreasuryRewardsResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /**
@@ -87,6 +87,23 @@ export interface Msg {
   anonymousVotePoll(request: MsgAnonymousVotePoll): Promise<MsgAnonymousVotePollResponse>;
   /** CancelPoll withdraws a poll before anyone has voted on it. */
   cancelPoll(request: MsgCancelPoll): Promise<MsgCancelPollResponse>;
+  /**
+   * DelegateTreasury stakes SPARK from a group treasury with a validator.
+   * Signed by the group's policy address through a proposal.
+   */
+  delegateTreasury(request: MsgDelegateTreasury): Promise<MsgDelegateTreasuryResponse>;
+  /**
+   * UndelegateTreasury starts unbonding treasury stake; the SPARK returns to
+   * the treasury after the staking unbonding period.
+   */
+  undelegateTreasury(request: MsgUndelegateTreasury): Promise<MsgUndelegateTreasuryResponse>;
+  /** RedelegateTreasury moves treasury stake from one validator to another. */
+  redelegateTreasury(request: MsgRedelegateTreasury): Promise<MsgRedelegateTreasuryResponse>;
+  /**
+   * WithdrawTreasuryRewards pays a treasury's pending staking rewards into
+   * the treasury. Anyone may send it: the rewards can go nowhere else.
+   */
+  withdrawTreasuryRewards(request: MsgWithdrawTreasuryRewards): Promise<MsgWithdrawTreasuryRewardsResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -272,6 +289,33 @@ export class MsgClientImpl implements Msg {
     const data = MsgCancelPoll.encode(request).finish();
     const promise = this.rpc.request("sparkdream.commons.v1.Msg", "CancelPoll", data);
     return promise.then(data => MsgCancelPollResponse.decode(new BinaryReader(data)));
+  };
+  /* DelegateTreasury stakes SPARK from a group treasury with a validator.
+   Signed by the group's policy address through a proposal. */
+  delegateTreasury = async (request: MsgDelegateTreasury): Promise<MsgDelegateTreasuryResponse> => {
+    const data = MsgDelegateTreasury.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Msg", "DelegateTreasury", data);
+    return promise.then(data => MsgDelegateTreasuryResponse.decode(new BinaryReader(data)));
+  };
+  /* UndelegateTreasury starts unbonding treasury stake; the SPARK returns to
+   the treasury after the staking unbonding period. */
+  undelegateTreasury = async (request: MsgUndelegateTreasury): Promise<MsgUndelegateTreasuryResponse> => {
+    const data = MsgUndelegateTreasury.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Msg", "UndelegateTreasury", data);
+    return promise.then(data => MsgUndelegateTreasuryResponse.decode(new BinaryReader(data)));
+  };
+  /* RedelegateTreasury moves treasury stake from one validator to another. */
+  redelegateTreasury = async (request: MsgRedelegateTreasury): Promise<MsgRedelegateTreasuryResponse> => {
+    const data = MsgRedelegateTreasury.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Msg", "RedelegateTreasury", data);
+    return promise.then(data => MsgRedelegateTreasuryResponse.decode(new BinaryReader(data)));
+  };
+  /* WithdrawTreasuryRewards pays a treasury's pending staking rewards into
+   the treasury. Anyone may send it: the rewards can go nowhere else. */
+  withdrawTreasuryRewards = async (request: MsgWithdrawTreasuryRewards): Promise<MsgWithdrawTreasuryRewardsResponse> => {
+    const data = MsgWithdrawTreasuryRewards.encode(request).finish();
+    const promise = this.rpc.request("sparkdream.commons.v1.Msg", "WithdrawTreasuryRewards", data);
+    return promise.then(data => MsgWithdrawTreasuryRewardsResponse.decode(new BinaryReader(data)));
   };
 }
 export const createClientImpl = (rpc: TxRpc) => {

@@ -123,6 +123,17 @@ export interface GenesisState {
    * trip does not grant a second daily allowance.
    */
   pollOpenCounts: PollOpenCount[];
+  /**
+   * treasury_wind_downs are the deleted groups whose staked treasury is
+   * still being unbonded and swept.
+   */
+  treasuryWindDowns: TreasuryWindDown[];
+  /**
+   * treasury_stakers are the standard policy addresses of the live groups
+   * that have delegated from their treasury. The treasury stake cap and the
+   * x/gov tally read this index instead of walking every group.
+   */
+  treasuryStakers: string[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/sparkdream.commons.v1.GenesisState";
@@ -243,10 +254,77 @@ export interface GenesisStateAmino {
    * trip does not grant a second daily allowance.
    */
   poll_open_counts?: PollOpenCountAmino[];
+  /**
+   * treasury_wind_downs are the deleted groups whose staked treasury is
+   * still being unbonded and swept.
+   */
+  treasury_wind_downs?: TreasuryWindDownAmino[];
+  /**
+   * treasury_stakers are the standard policy addresses of the live groups
+   * that have delegated from their treasury. The treasury stake cap and the
+   * x/gov tally read this index instead of walking every group.
+   */
+  treasury_stakers?: string[];
 }
 export interface GenesisStateAminoMsg {
   type: "/sparkdream.commons.v1.GenesisState";
   value: GenesisStateAmino;
+}
+/**
+ * TreasuryWindDown is the pending unwinding of a deleted group's treasury
+ * stake: the EndBlocker undelegates what is still staked, waits for the
+ * unbonding entries to mature and then sweeps the balance to the heir.
+ * @name TreasuryWindDown
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.TreasuryWindDown
+ */
+export interface TreasuryWindDown {
+  /**
+   * policy_address is the deleted group's standard policy address.
+   */
+  policyAddress: string;
+  /**
+   * heir receives the unbonded SPARK: the deleted group's parent policy.
+   * Empty when the parent was not a group policy (x/gov); the funds then
+   * stay at policy_address, like the rest of such a group's treasury.
+   */
+  heir: string;
+  /**
+   * due is when the EndBlocker next looks at this entry (unix seconds).
+   */
+  due: bigint;
+}
+export interface TreasuryWindDownProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.TreasuryWindDown";
+  value: Uint8Array;
+}
+/**
+ * TreasuryWindDown is the pending unwinding of a deleted group's treasury
+ * stake: the EndBlocker undelegates what is still staked, waits for the
+ * unbonding entries to mature and then sweeps the balance to the heir.
+ * @name TreasuryWindDownAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.TreasuryWindDown
+ */
+export interface TreasuryWindDownAmino {
+  /**
+   * policy_address is the deleted group's standard policy address.
+   */
+  policy_address?: string;
+  /**
+   * heir receives the unbonded SPARK: the deleted group's parent policy.
+   * Empty when the parent was not a group policy (x/gov); the funds then
+   * stay at policy_address, like the rest of such a group's treasury.
+   */
+  heir?: string;
+  /**
+   * due is when the EndBlocker next looks at this entry (unix seconds).
+   */
+  due?: string;
+}
+export interface TreasuryWindDownAminoMsg {
+  type: "/sparkdream.commons.v1.TreasuryWindDown";
+  value: TreasuryWindDownAmino;
 }
 /**
  * ProposalVoterTreeEntry pairs a proposal ID with its voter snapshot.
@@ -664,7 +742,9 @@ function createBaseGenesisState(): GenesisState {
     nextPollId: BigInt(0),
     proposalVoterTrees: [],
     pollVoterTrees: [],
-    pollOpenCounts: []
+    pollOpenCounts: [],
+    treasuryWindDowns: [],
+    treasuryStakers: []
   };
 }
 /**
@@ -751,6 +831,12 @@ export const GenesisState = {
     for (const v of message.pollOpenCounts) {
       PollOpenCount.encode(v!, writer.uint32(202).fork()).ldelim();
     }
+    for (const v of message.treasuryWindDowns) {
+      TreasuryWindDown.encode(v!, writer.uint32(210).fork()).ldelim();
+    }
+    for (const v of message.treasuryStakers) {
+      writer.uint32(218).string(v!);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -835,6 +921,12 @@ export const GenesisState = {
         case 25:
           message.pollOpenCounts.push(PollOpenCount.decode(reader, reader.uint32()));
           break;
+        case 26:
+          message.treasuryWindDowns.push(TreasuryWindDown.decode(reader, reader.uint32()));
+          break;
+        case 27:
+          message.treasuryStakers.push(reader.string());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -869,6 +961,8 @@ export const GenesisState = {
     message.proposalVoterTrees = object.proposalVoterTrees?.map(e => ProposalVoterTreeEntry.fromPartial(e)) || [];
     message.pollVoterTrees = object.pollVoterTrees?.map(e => PollVoterTreeEntry.fromPartial(e)) || [];
     message.pollOpenCounts = object.pollOpenCounts?.map(e => PollOpenCount.fromPartial(e)) || [];
+    message.treasuryWindDowns = object.treasuryWindDowns?.map(e => TreasuryWindDown.fromPartial(e)) || [];
+    message.treasuryStakers = object.treasuryStakers?.map(e => e) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -908,6 +1002,8 @@ export const GenesisState = {
     message.proposalVoterTrees = object.proposal_voter_trees?.map(e => ProposalVoterTreeEntry.fromAmino(e)) || [];
     message.pollVoterTrees = object.poll_voter_trees?.map(e => PollVoterTreeEntry.fromAmino(e)) || [];
     message.pollOpenCounts = object.poll_open_counts?.map(e => PollOpenCount.fromAmino(e)) || [];
+    message.treasuryWindDowns = object.treasury_wind_downs?.map(e => TreasuryWindDown.fromAmino(e)) || [];
+    message.treasuryStakers = object.treasury_stakers?.map(e => e) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -1017,6 +1113,16 @@ export const GenesisState = {
     } else {
       obj.poll_open_counts = message.pollOpenCounts;
     }
+    if (message.treasuryWindDowns) {
+      obj.treasury_wind_downs = message.treasuryWindDowns.map(e => e ? TreasuryWindDown.toAmino(e) : undefined);
+    } else {
+      obj.treasury_wind_downs = message.treasuryWindDowns;
+    }
+    if (message.treasuryStakers) {
+      obj.treasury_stakers = message.treasuryStakers.map(e => e);
+    } else {
+      obj.treasury_stakers = message.treasuryStakers;
+    }
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {
@@ -1032,6 +1138,101 @@ export const GenesisState = {
     return {
       typeUrl: "/sparkdream.commons.v1.GenesisState",
       value: GenesisState.encode(message).finish()
+    };
+  }
+};
+function createBaseTreasuryWindDown(): TreasuryWindDown {
+  return {
+    policyAddress: "",
+    heir: "",
+    due: BigInt(0)
+  };
+}
+/**
+ * TreasuryWindDown is the pending unwinding of a deleted group's treasury
+ * stake: the EndBlocker undelegates what is still staked, waits for the
+ * unbonding entries to mature and then sweeps the balance to the heir.
+ * @name TreasuryWindDown
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.TreasuryWindDown
+ */
+export const TreasuryWindDown = {
+  typeUrl: "/sparkdream.commons.v1.TreasuryWindDown",
+  encode(message: TreasuryWindDown, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.policyAddress !== "") {
+      writer.uint32(10).string(message.policyAddress);
+    }
+    if (message.heir !== "") {
+      writer.uint32(18).string(message.heir);
+    }
+    if (message.due !== BigInt(0)) {
+      writer.uint32(24).int64(message.due);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): TreasuryWindDown {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTreasuryWindDown();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.policyAddress = reader.string();
+          break;
+        case 2:
+          message.heir = reader.string();
+          break;
+        case 3:
+          message.due = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<TreasuryWindDown>): TreasuryWindDown {
+    const message = createBaseTreasuryWindDown();
+    message.policyAddress = object.policyAddress ?? "";
+    message.heir = object.heir ?? "";
+    message.due = object.due !== undefined && object.due !== null ? BigInt(object.due.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: TreasuryWindDownAmino): TreasuryWindDown {
+    const message = createBaseTreasuryWindDown();
+    if (object.policy_address !== undefined && object.policy_address !== null) {
+      message.policyAddress = object.policy_address;
+    }
+    if (object.heir !== undefined && object.heir !== null) {
+      message.heir = object.heir;
+    }
+    if (object.due !== undefined && object.due !== null) {
+      message.due = BigInt(object.due);
+    }
+    return message;
+  },
+  toAmino(message: TreasuryWindDown): TreasuryWindDownAmino {
+    const obj: any = {};
+    obj.policy_address = message.policyAddress === "" ? undefined : message.policyAddress;
+    obj.heir = message.heir === "" ? undefined : message.heir;
+    obj.due = message.due !== BigInt(0) ? message.due?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: TreasuryWindDownAminoMsg): TreasuryWindDown {
+    return TreasuryWindDown.fromAmino(object.value);
+  },
+  fromProtoMsg(message: TreasuryWindDownProtoMsg): TreasuryWindDown {
+    return TreasuryWindDown.decode(message.value);
+  },
+  toProto(message: TreasuryWindDown): Uint8Array {
+    return TreasuryWindDown.encode(message).finish();
+  },
+  toProtoMsg(message: TreasuryWindDown): TreasuryWindDownProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.TreasuryWindDown",
+      value: TreasuryWindDown.encode(message).finish()
     };
   }
 };

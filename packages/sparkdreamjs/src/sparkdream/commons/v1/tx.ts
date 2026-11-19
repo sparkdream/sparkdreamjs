@@ -1958,6 +1958,298 @@ export interface MsgCancelPollResponseAminoMsg {
   type: "/sparkdream.commons.v1.MsgCancelPollResponse";
   value: MsgCancelPollResponseAmino;
 }
+/**
+ * MsgDelegateTreasury stakes SPARK from a group treasury with a validator.
+ * The authority is the group's standard policy address, so the message only
+ * runs as a proposal of that group. Refused when the group is not yet active
+ * or its term has expired, when the validator's operator is a member of the
+ * group, when the group would stake with too many validators, or when the
+ * delegation would take all group treasuries together above the treasury
+ * stake cap (a share of total bonded stake).
+ * @name MsgDelegateTreasury
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgDelegateTreasury
+ */
+export interface MsgDelegateTreasury {
+  authority: string;
+  validatorAddress: string;
+  /**
+   * amount is in the chain's bond denom.
+   */
+  amount: Coin;
+}
+export interface MsgDelegateTreasuryProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgDelegateTreasury";
+  value: Uint8Array;
+}
+/**
+ * MsgDelegateTreasury stakes SPARK from a group treasury with a validator.
+ * The authority is the group's standard policy address, so the message only
+ * runs as a proposal of that group. Refused when the group is not yet active
+ * or its term has expired, when the validator's operator is a member of the
+ * group, when the group would stake with too many validators, or when the
+ * delegation would take all group treasuries together above the treasury
+ * stake cap (a share of total bonded stake).
+ * @name MsgDelegateTreasuryAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgDelegateTreasury
+ */
+export interface MsgDelegateTreasuryAmino {
+  authority?: string;
+  validator_address?: string;
+  /**
+   * amount is in the chain's bond denom.
+   */
+  amount: CoinAmino;
+}
+export interface MsgDelegateTreasuryAminoMsg {
+  type: "sparkdream/x/commons/MsgDelegateTreasury";
+  value: MsgDelegateTreasuryAmino;
+}
+/**
+ * MsgDelegateTreasuryResponse defines the MsgDelegateTreasuryResponse message.
+ * @name MsgDelegateTreasuryResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgDelegateTreasuryResponse
+ */
+export interface MsgDelegateTreasuryResponse {}
+export interface MsgDelegateTreasuryResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgDelegateTreasuryResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgDelegateTreasuryResponse defines the MsgDelegateTreasuryResponse message.
+ * @name MsgDelegateTreasuryResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgDelegateTreasuryResponse
+ */
+export interface MsgDelegateTreasuryResponseAmino {}
+export interface MsgDelegateTreasuryResponseAminoMsg {
+  type: "/sparkdream.commons.v1.MsgDelegateTreasuryResponse";
+  value: MsgDelegateTreasuryResponseAmino;
+}
+/**
+ * MsgUndelegateTreasury starts unbonding treasury stake from a validator.
+ * The SPARK returns to the treasury after the staking unbonding period. It
+ * has no activation or term gate: a group may always bring its stake home.
+ * @name MsgUndelegateTreasury
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgUndelegateTreasury
+ */
+export interface MsgUndelegateTreasury {
+  authority: string;
+  validatorAddress: string;
+  /**
+   * amount is in the chain's bond denom.
+   */
+  amount: Coin;
+}
+export interface MsgUndelegateTreasuryProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgUndelegateTreasury";
+  value: Uint8Array;
+}
+/**
+ * MsgUndelegateTreasury starts unbonding treasury stake from a validator.
+ * The SPARK returns to the treasury after the staking unbonding period. It
+ * has no activation or term gate: a group may always bring its stake home.
+ * @name MsgUndelegateTreasuryAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgUndelegateTreasury
+ */
+export interface MsgUndelegateTreasuryAmino {
+  authority?: string;
+  validator_address?: string;
+  /**
+   * amount is in the chain's bond denom.
+   */
+  amount: CoinAmino;
+}
+export interface MsgUndelegateTreasuryAminoMsg {
+  type: "sparkdream/x/commons/MsgUndelegateTreasury";
+  value: MsgUndelegateTreasuryAmino;
+}
+/**
+ * MsgUndelegateTreasuryResponse defines the MsgUndelegateTreasuryResponse message.
+ * @name MsgUndelegateTreasuryResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgUndelegateTreasuryResponse
+ */
+export interface MsgUndelegateTreasuryResponse {
+  /**
+   * completion_time is when the SPARK returns to the treasury (unix seconds).
+   */
+  completionTime: bigint;
+}
+export interface MsgUndelegateTreasuryResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgUndelegateTreasuryResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgUndelegateTreasuryResponse defines the MsgUndelegateTreasuryResponse message.
+ * @name MsgUndelegateTreasuryResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgUndelegateTreasuryResponse
+ */
+export interface MsgUndelegateTreasuryResponseAmino {
+  /**
+   * completion_time is when the SPARK returns to the treasury (unix seconds).
+   */
+  completion_time?: string;
+}
+export interface MsgUndelegateTreasuryResponseAminoMsg {
+  type: "/sparkdream.commons.v1.MsgUndelegateTreasuryResponse";
+  value: MsgUndelegateTreasuryResponseAmino;
+}
+/**
+ * MsgRedelegateTreasury moves treasury stake from one validator to another
+ * without unbonding. The destination is checked like a new delegation
+ * (member-operated validators refused, validator count limit); the total
+ * staked does not change, so the stake cap is not re-checked.
+ * @name MsgRedelegateTreasury
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgRedelegateTreasury
+ */
+export interface MsgRedelegateTreasury {
+  authority: string;
+  srcValidatorAddress: string;
+  dstValidatorAddress: string;
+  /**
+   * amount is in the chain's bond denom.
+   */
+  amount: Coin;
+}
+export interface MsgRedelegateTreasuryProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgRedelegateTreasury";
+  value: Uint8Array;
+}
+/**
+ * MsgRedelegateTreasury moves treasury stake from one validator to another
+ * without unbonding. The destination is checked like a new delegation
+ * (member-operated validators refused, validator count limit); the total
+ * staked does not change, so the stake cap is not re-checked.
+ * @name MsgRedelegateTreasuryAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgRedelegateTreasury
+ */
+export interface MsgRedelegateTreasuryAmino {
+  authority?: string;
+  src_validator_address?: string;
+  dst_validator_address?: string;
+  /**
+   * amount is in the chain's bond denom.
+   */
+  amount: CoinAmino;
+}
+export interface MsgRedelegateTreasuryAminoMsg {
+  type: "sparkdream/x/commons/MsgRedelegateTreasury";
+  value: MsgRedelegateTreasuryAmino;
+}
+/**
+ * MsgRedelegateTreasuryResponse defines the MsgRedelegateTreasuryResponse message.
+ * @name MsgRedelegateTreasuryResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgRedelegateTreasuryResponse
+ */
+export interface MsgRedelegateTreasuryResponse {
+  /**
+   * completion_time is when the redelegation matures (unix seconds).
+   */
+  completionTime: bigint;
+}
+export interface MsgRedelegateTreasuryResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgRedelegateTreasuryResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgRedelegateTreasuryResponse defines the MsgRedelegateTreasuryResponse message.
+ * @name MsgRedelegateTreasuryResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgRedelegateTreasuryResponse
+ */
+export interface MsgRedelegateTreasuryResponseAmino {
+  /**
+   * completion_time is when the redelegation matures (unix seconds).
+   */
+  completion_time?: string;
+}
+export interface MsgRedelegateTreasuryResponseAminoMsg {
+  type: "/sparkdream.commons.v1.MsgRedelegateTreasuryResponse";
+  value: MsgRedelegateTreasuryResponseAmino;
+}
+/**
+ * MsgWithdrawTreasuryRewards pays the pending staking rewards of a group
+ * treasury (or of a deleted group's treasury that is still winding down)
+ * into that treasury. Any account may sign: a treasury's withdraw address
+ * cannot be changed, so the rewards can only land in the treasury itself.
+ * @name MsgWithdrawTreasuryRewards
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgWithdrawTreasuryRewards
+ */
+export interface MsgWithdrawTreasuryRewards {
+  creator: string;
+  /**
+   * policy_address is the treasury (the group's standard policy address).
+   */
+  policyAddress: string;
+  validatorAddress: string;
+}
+export interface MsgWithdrawTreasuryRewardsProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgWithdrawTreasuryRewards";
+  value: Uint8Array;
+}
+/**
+ * MsgWithdrawTreasuryRewards pays the pending staking rewards of a group
+ * treasury (or of a deleted group's treasury that is still winding down)
+ * into that treasury. Any account may sign: a treasury's withdraw address
+ * cannot be changed, so the rewards can only land in the treasury itself.
+ * @name MsgWithdrawTreasuryRewardsAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgWithdrawTreasuryRewards
+ */
+export interface MsgWithdrawTreasuryRewardsAmino {
+  creator?: string;
+  /**
+   * policy_address is the treasury (the group's standard policy address).
+   */
+  policy_address?: string;
+  validator_address?: string;
+}
+export interface MsgWithdrawTreasuryRewardsAminoMsg {
+  type: "sparkdream/x/commons/MsgWithdrawTreasuryRewards";
+  value: MsgWithdrawTreasuryRewardsAmino;
+}
+/**
+ * MsgWithdrawTreasuryRewardsResponse defines the MsgWithdrawTreasuryRewardsResponse message.
+ * @name MsgWithdrawTreasuryRewardsResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgWithdrawTreasuryRewardsResponse
+ */
+export interface MsgWithdrawTreasuryRewardsResponse {
+  /**
+   * amount is what was paid into the treasury.
+   */
+  amount: Coin[];
+}
+export interface MsgWithdrawTreasuryRewardsResponseProtoMsg {
+  typeUrl: "/sparkdream.commons.v1.MsgWithdrawTreasuryRewardsResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgWithdrawTreasuryRewardsResponse defines the MsgWithdrawTreasuryRewardsResponse message.
+ * @name MsgWithdrawTreasuryRewardsResponseAmino
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgWithdrawTreasuryRewardsResponse
+ */
+export interface MsgWithdrawTreasuryRewardsResponseAmino {
+  /**
+   * amount is what was paid into the treasury.
+   */
+  amount?: CoinAmino[];
+}
+export interface MsgWithdrawTreasuryRewardsResponseAminoMsg {
+  type: "/sparkdream.commons.v1.MsgWithdrawTreasuryRewardsResponse";
+  value: MsgWithdrawTreasuryRewardsResponseAmino;
+}
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
     authority: "",
@@ -7103,6 +7395,697 @@ export const MsgCancelPollResponse = {
     return {
       typeUrl: "/sparkdream.commons.v1.MsgCancelPollResponse",
       value: MsgCancelPollResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgDelegateTreasury(): MsgDelegateTreasury {
+  return {
+    authority: "",
+    validatorAddress: "",
+    amount: Coin.fromPartial({})
+  };
+}
+/**
+ * MsgDelegateTreasury stakes SPARK from a group treasury with a validator.
+ * The authority is the group's standard policy address, so the message only
+ * runs as a proposal of that group. Refused when the group is not yet active
+ * or its term has expired, when the validator's operator is a member of the
+ * group, when the group would stake with too many validators, or when the
+ * delegation would take all group treasuries together above the treasury
+ * stake cap (a share of total bonded stake).
+ * @name MsgDelegateTreasury
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgDelegateTreasury
+ */
+export const MsgDelegateTreasury = {
+  typeUrl: "/sparkdream.commons.v1.MsgDelegateTreasury",
+  aminoType: "sparkdream/x/commons/MsgDelegateTreasury",
+  encode(message: MsgDelegateTreasury, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.validatorAddress !== "") {
+      writer.uint32(18).string(message.validatorAddress);
+    }
+    if (message.amount !== undefined) {
+      Coin.encode(message.amount, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgDelegateTreasury {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgDelegateTreasury();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+        case 2:
+          message.validatorAddress = reader.string();
+          break;
+        case 3:
+          message.amount = Coin.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgDelegateTreasury>): MsgDelegateTreasury {
+    const message = createBaseMsgDelegateTreasury();
+    message.authority = object.authority ?? "";
+    message.validatorAddress = object.validatorAddress ?? "";
+    message.amount = object.amount !== undefined && object.amount !== null ? Coin.fromPartial(object.amount) : undefined;
+    return message;
+  },
+  fromAmino(object: MsgDelegateTreasuryAmino): MsgDelegateTreasury {
+    const message = createBaseMsgDelegateTreasury();
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
+    if (object.validator_address !== undefined && object.validator_address !== null) {
+      message.validatorAddress = object.validator_address;
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = Coin.fromAmino(object.amount);
+    }
+    return message;
+  },
+  toAmino(message: MsgDelegateTreasury): MsgDelegateTreasuryAmino {
+    const obj: any = {};
+    obj.authority = message.authority === "" ? undefined : message.authority;
+    obj.validator_address = message.validatorAddress === "" ? undefined : message.validatorAddress;
+    obj.amount = message.amount ? Coin.toAmino(message.amount) : Coin.toAmino(Coin.fromPartial({}));
+    return obj;
+  },
+  fromAminoMsg(object: MsgDelegateTreasuryAminoMsg): MsgDelegateTreasury {
+    return MsgDelegateTreasury.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgDelegateTreasury): MsgDelegateTreasuryAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgDelegateTreasury",
+      value: MsgDelegateTreasury.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgDelegateTreasuryProtoMsg): MsgDelegateTreasury {
+    return MsgDelegateTreasury.decode(message.value);
+  },
+  toProto(message: MsgDelegateTreasury): Uint8Array {
+    return MsgDelegateTreasury.encode(message).finish();
+  },
+  toProtoMsg(message: MsgDelegateTreasury): MsgDelegateTreasuryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgDelegateTreasury",
+      value: MsgDelegateTreasury.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgDelegateTreasuryResponse(): MsgDelegateTreasuryResponse {
+  return {};
+}
+/**
+ * MsgDelegateTreasuryResponse defines the MsgDelegateTreasuryResponse message.
+ * @name MsgDelegateTreasuryResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgDelegateTreasuryResponse
+ */
+export const MsgDelegateTreasuryResponse = {
+  typeUrl: "/sparkdream.commons.v1.MsgDelegateTreasuryResponse",
+  encode(_: MsgDelegateTreasuryResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgDelegateTreasuryResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgDelegateTreasuryResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(_: DeepPartial<MsgDelegateTreasuryResponse>): MsgDelegateTreasuryResponse {
+    const message = createBaseMsgDelegateTreasuryResponse();
+    return message;
+  },
+  fromAmino(_: MsgDelegateTreasuryResponseAmino): MsgDelegateTreasuryResponse {
+    const message = createBaseMsgDelegateTreasuryResponse();
+    return message;
+  },
+  toAmino(_: MsgDelegateTreasuryResponse): MsgDelegateTreasuryResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgDelegateTreasuryResponseAminoMsg): MsgDelegateTreasuryResponse {
+    return MsgDelegateTreasuryResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgDelegateTreasuryResponseProtoMsg): MsgDelegateTreasuryResponse {
+    return MsgDelegateTreasuryResponse.decode(message.value);
+  },
+  toProto(message: MsgDelegateTreasuryResponse): Uint8Array {
+    return MsgDelegateTreasuryResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgDelegateTreasuryResponse): MsgDelegateTreasuryResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgDelegateTreasuryResponse",
+      value: MsgDelegateTreasuryResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUndelegateTreasury(): MsgUndelegateTreasury {
+  return {
+    authority: "",
+    validatorAddress: "",
+    amount: Coin.fromPartial({})
+  };
+}
+/**
+ * MsgUndelegateTreasury starts unbonding treasury stake from a validator.
+ * The SPARK returns to the treasury after the staking unbonding period. It
+ * has no activation or term gate: a group may always bring its stake home.
+ * @name MsgUndelegateTreasury
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgUndelegateTreasury
+ */
+export const MsgUndelegateTreasury = {
+  typeUrl: "/sparkdream.commons.v1.MsgUndelegateTreasury",
+  aminoType: "sparkdream/x/commons/MsgUndelegateTreasury",
+  encode(message: MsgUndelegateTreasury, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.validatorAddress !== "") {
+      writer.uint32(18).string(message.validatorAddress);
+    }
+    if (message.amount !== undefined) {
+      Coin.encode(message.amount, writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUndelegateTreasury {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUndelegateTreasury();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+        case 2:
+          message.validatorAddress = reader.string();
+          break;
+        case 3:
+          message.amount = Coin.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgUndelegateTreasury>): MsgUndelegateTreasury {
+    const message = createBaseMsgUndelegateTreasury();
+    message.authority = object.authority ?? "";
+    message.validatorAddress = object.validatorAddress ?? "";
+    message.amount = object.amount !== undefined && object.amount !== null ? Coin.fromPartial(object.amount) : undefined;
+    return message;
+  },
+  fromAmino(object: MsgUndelegateTreasuryAmino): MsgUndelegateTreasury {
+    const message = createBaseMsgUndelegateTreasury();
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
+    if (object.validator_address !== undefined && object.validator_address !== null) {
+      message.validatorAddress = object.validator_address;
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = Coin.fromAmino(object.amount);
+    }
+    return message;
+  },
+  toAmino(message: MsgUndelegateTreasury): MsgUndelegateTreasuryAmino {
+    const obj: any = {};
+    obj.authority = message.authority === "" ? undefined : message.authority;
+    obj.validator_address = message.validatorAddress === "" ? undefined : message.validatorAddress;
+    obj.amount = message.amount ? Coin.toAmino(message.amount) : Coin.toAmino(Coin.fromPartial({}));
+    return obj;
+  },
+  fromAminoMsg(object: MsgUndelegateTreasuryAminoMsg): MsgUndelegateTreasury {
+    return MsgUndelegateTreasury.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgUndelegateTreasury): MsgUndelegateTreasuryAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgUndelegateTreasury",
+      value: MsgUndelegateTreasury.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgUndelegateTreasuryProtoMsg): MsgUndelegateTreasury {
+    return MsgUndelegateTreasury.decode(message.value);
+  },
+  toProto(message: MsgUndelegateTreasury): Uint8Array {
+    return MsgUndelegateTreasury.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUndelegateTreasury): MsgUndelegateTreasuryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgUndelegateTreasury",
+      value: MsgUndelegateTreasury.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgUndelegateTreasuryResponse(): MsgUndelegateTreasuryResponse {
+  return {
+    completionTime: BigInt(0)
+  };
+}
+/**
+ * MsgUndelegateTreasuryResponse defines the MsgUndelegateTreasuryResponse message.
+ * @name MsgUndelegateTreasuryResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgUndelegateTreasuryResponse
+ */
+export const MsgUndelegateTreasuryResponse = {
+  typeUrl: "/sparkdream.commons.v1.MsgUndelegateTreasuryResponse",
+  encode(message: MsgUndelegateTreasuryResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.completionTime !== BigInt(0)) {
+      writer.uint32(8).int64(message.completionTime);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgUndelegateTreasuryResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgUndelegateTreasuryResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.completionTime = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgUndelegateTreasuryResponse>): MsgUndelegateTreasuryResponse {
+    const message = createBaseMsgUndelegateTreasuryResponse();
+    message.completionTime = object.completionTime !== undefined && object.completionTime !== null ? BigInt(object.completionTime.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgUndelegateTreasuryResponseAmino): MsgUndelegateTreasuryResponse {
+    const message = createBaseMsgUndelegateTreasuryResponse();
+    if (object.completion_time !== undefined && object.completion_time !== null) {
+      message.completionTime = BigInt(object.completion_time);
+    }
+    return message;
+  },
+  toAmino(message: MsgUndelegateTreasuryResponse): MsgUndelegateTreasuryResponseAmino {
+    const obj: any = {};
+    obj.completion_time = message.completionTime !== BigInt(0) ? message.completionTime?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgUndelegateTreasuryResponseAminoMsg): MsgUndelegateTreasuryResponse {
+    return MsgUndelegateTreasuryResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgUndelegateTreasuryResponseProtoMsg): MsgUndelegateTreasuryResponse {
+    return MsgUndelegateTreasuryResponse.decode(message.value);
+  },
+  toProto(message: MsgUndelegateTreasuryResponse): Uint8Array {
+    return MsgUndelegateTreasuryResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgUndelegateTreasuryResponse): MsgUndelegateTreasuryResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgUndelegateTreasuryResponse",
+      value: MsgUndelegateTreasuryResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRedelegateTreasury(): MsgRedelegateTreasury {
+  return {
+    authority: "",
+    srcValidatorAddress: "",
+    dstValidatorAddress: "",
+    amount: Coin.fromPartial({})
+  };
+}
+/**
+ * MsgRedelegateTreasury moves treasury stake from one validator to another
+ * without unbonding. The destination is checked like a new delegation
+ * (member-operated validators refused, validator count limit); the total
+ * staked does not change, so the stake cap is not re-checked.
+ * @name MsgRedelegateTreasury
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgRedelegateTreasury
+ */
+export const MsgRedelegateTreasury = {
+  typeUrl: "/sparkdream.commons.v1.MsgRedelegateTreasury",
+  aminoType: "sparkdream/x/commons/MsgRedelegateTreasury",
+  encode(message: MsgRedelegateTreasury, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.srcValidatorAddress !== "") {
+      writer.uint32(18).string(message.srcValidatorAddress);
+    }
+    if (message.dstValidatorAddress !== "") {
+      writer.uint32(26).string(message.dstValidatorAddress);
+    }
+    if (message.amount !== undefined) {
+      Coin.encode(message.amount, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRedelegateTreasury {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRedelegateTreasury();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.authority = reader.string();
+          break;
+        case 2:
+          message.srcValidatorAddress = reader.string();
+          break;
+        case 3:
+          message.dstValidatorAddress = reader.string();
+          break;
+        case 4:
+          message.amount = Coin.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgRedelegateTreasury>): MsgRedelegateTreasury {
+    const message = createBaseMsgRedelegateTreasury();
+    message.authority = object.authority ?? "";
+    message.srcValidatorAddress = object.srcValidatorAddress ?? "";
+    message.dstValidatorAddress = object.dstValidatorAddress ?? "";
+    message.amount = object.amount !== undefined && object.amount !== null ? Coin.fromPartial(object.amount) : undefined;
+    return message;
+  },
+  fromAmino(object: MsgRedelegateTreasuryAmino): MsgRedelegateTreasury {
+    const message = createBaseMsgRedelegateTreasury();
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority;
+    }
+    if (object.src_validator_address !== undefined && object.src_validator_address !== null) {
+      message.srcValidatorAddress = object.src_validator_address;
+    }
+    if (object.dst_validator_address !== undefined && object.dst_validator_address !== null) {
+      message.dstValidatorAddress = object.dst_validator_address;
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = Coin.fromAmino(object.amount);
+    }
+    return message;
+  },
+  toAmino(message: MsgRedelegateTreasury): MsgRedelegateTreasuryAmino {
+    const obj: any = {};
+    obj.authority = message.authority === "" ? undefined : message.authority;
+    obj.src_validator_address = message.srcValidatorAddress === "" ? undefined : message.srcValidatorAddress;
+    obj.dst_validator_address = message.dstValidatorAddress === "" ? undefined : message.dstValidatorAddress;
+    obj.amount = message.amount ? Coin.toAmino(message.amount) : Coin.toAmino(Coin.fromPartial({}));
+    return obj;
+  },
+  fromAminoMsg(object: MsgRedelegateTreasuryAminoMsg): MsgRedelegateTreasury {
+    return MsgRedelegateTreasury.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgRedelegateTreasury): MsgRedelegateTreasuryAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgRedelegateTreasury",
+      value: MsgRedelegateTreasury.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgRedelegateTreasuryProtoMsg): MsgRedelegateTreasury {
+    return MsgRedelegateTreasury.decode(message.value);
+  },
+  toProto(message: MsgRedelegateTreasury): Uint8Array {
+    return MsgRedelegateTreasury.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRedelegateTreasury): MsgRedelegateTreasuryProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgRedelegateTreasury",
+      value: MsgRedelegateTreasury.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgRedelegateTreasuryResponse(): MsgRedelegateTreasuryResponse {
+  return {
+    completionTime: BigInt(0)
+  };
+}
+/**
+ * MsgRedelegateTreasuryResponse defines the MsgRedelegateTreasuryResponse message.
+ * @name MsgRedelegateTreasuryResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgRedelegateTreasuryResponse
+ */
+export const MsgRedelegateTreasuryResponse = {
+  typeUrl: "/sparkdream.commons.v1.MsgRedelegateTreasuryResponse",
+  encode(message: MsgRedelegateTreasuryResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.completionTime !== BigInt(0)) {
+      writer.uint32(8).int64(message.completionTime);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgRedelegateTreasuryResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRedelegateTreasuryResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.completionTime = reader.int64();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgRedelegateTreasuryResponse>): MsgRedelegateTreasuryResponse {
+    const message = createBaseMsgRedelegateTreasuryResponse();
+    message.completionTime = object.completionTime !== undefined && object.completionTime !== null ? BigInt(object.completionTime.toString()) : BigInt(0);
+    return message;
+  },
+  fromAmino(object: MsgRedelegateTreasuryResponseAmino): MsgRedelegateTreasuryResponse {
+    const message = createBaseMsgRedelegateTreasuryResponse();
+    if (object.completion_time !== undefined && object.completion_time !== null) {
+      message.completionTime = BigInt(object.completion_time);
+    }
+    return message;
+  },
+  toAmino(message: MsgRedelegateTreasuryResponse): MsgRedelegateTreasuryResponseAmino {
+    const obj: any = {};
+    obj.completion_time = message.completionTime !== BigInt(0) ? message.completionTime?.toString() : undefined;
+    return obj;
+  },
+  fromAminoMsg(object: MsgRedelegateTreasuryResponseAminoMsg): MsgRedelegateTreasuryResponse {
+    return MsgRedelegateTreasuryResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgRedelegateTreasuryResponseProtoMsg): MsgRedelegateTreasuryResponse {
+    return MsgRedelegateTreasuryResponse.decode(message.value);
+  },
+  toProto(message: MsgRedelegateTreasuryResponse): Uint8Array {
+    return MsgRedelegateTreasuryResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgRedelegateTreasuryResponse): MsgRedelegateTreasuryResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgRedelegateTreasuryResponse",
+      value: MsgRedelegateTreasuryResponse.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgWithdrawTreasuryRewards(): MsgWithdrawTreasuryRewards {
+  return {
+    creator: "",
+    policyAddress: "",
+    validatorAddress: ""
+  };
+}
+/**
+ * MsgWithdrawTreasuryRewards pays the pending staking rewards of a group
+ * treasury (or of a deleted group's treasury that is still winding down)
+ * into that treasury. Any account may sign: a treasury's withdraw address
+ * cannot be changed, so the rewards can only land in the treasury itself.
+ * @name MsgWithdrawTreasuryRewards
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgWithdrawTreasuryRewards
+ */
+export const MsgWithdrawTreasuryRewards = {
+  typeUrl: "/sparkdream.commons.v1.MsgWithdrawTreasuryRewards",
+  aminoType: "sparkdream/x/commons/MsgWithdrawTreasuryRewards",
+  encode(message: MsgWithdrawTreasuryRewards, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.policyAddress !== "") {
+      writer.uint32(18).string(message.policyAddress);
+    }
+    if (message.validatorAddress !== "") {
+      writer.uint32(26).string(message.validatorAddress);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgWithdrawTreasuryRewards {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgWithdrawTreasuryRewards();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.policyAddress = reader.string();
+          break;
+        case 3:
+          message.validatorAddress = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgWithdrawTreasuryRewards>): MsgWithdrawTreasuryRewards {
+    const message = createBaseMsgWithdrawTreasuryRewards();
+    message.creator = object.creator ?? "";
+    message.policyAddress = object.policyAddress ?? "";
+    message.validatorAddress = object.validatorAddress ?? "";
+    return message;
+  },
+  fromAmino(object: MsgWithdrawTreasuryRewardsAmino): MsgWithdrawTreasuryRewards {
+    const message = createBaseMsgWithdrawTreasuryRewards();
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    }
+    if (object.policy_address !== undefined && object.policy_address !== null) {
+      message.policyAddress = object.policy_address;
+    }
+    if (object.validator_address !== undefined && object.validator_address !== null) {
+      message.validatorAddress = object.validator_address;
+    }
+    return message;
+  },
+  toAmino(message: MsgWithdrawTreasuryRewards): MsgWithdrawTreasuryRewardsAmino {
+    const obj: any = {};
+    obj.creator = message.creator === "" ? undefined : message.creator;
+    obj.policy_address = message.policyAddress === "" ? undefined : message.policyAddress;
+    obj.validator_address = message.validatorAddress === "" ? undefined : message.validatorAddress;
+    return obj;
+  },
+  fromAminoMsg(object: MsgWithdrawTreasuryRewardsAminoMsg): MsgWithdrawTreasuryRewards {
+    return MsgWithdrawTreasuryRewards.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgWithdrawTreasuryRewards): MsgWithdrawTreasuryRewardsAminoMsg {
+    return {
+      type: "sparkdream/x/commons/MsgWithdrawTreasuryRewards",
+      value: MsgWithdrawTreasuryRewards.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgWithdrawTreasuryRewardsProtoMsg): MsgWithdrawTreasuryRewards {
+    return MsgWithdrawTreasuryRewards.decode(message.value);
+  },
+  toProto(message: MsgWithdrawTreasuryRewards): Uint8Array {
+    return MsgWithdrawTreasuryRewards.encode(message).finish();
+  },
+  toProtoMsg(message: MsgWithdrawTreasuryRewards): MsgWithdrawTreasuryRewardsProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgWithdrawTreasuryRewards",
+      value: MsgWithdrawTreasuryRewards.encode(message).finish()
+    };
+  }
+};
+function createBaseMsgWithdrawTreasuryRewardsResponse(): MsgWithdrawTreasuryRewardsResponse {
+  return {
+    amount: []
+  };
+}
+/**
+ * MsgWithdrawTreasuryRewardsResponse defines the MsgWithdrawTreasuryRewardsResponse message.
+ * @name MsgWithdrawTreasuryRewardsResponse
+ * @package sparkdream.commons.v1
+ * @see proto type: sparkdream.commons.v1.MsgWithdrawTreasuryRewardsResponse
+ */
+export const MsgWithdrawTreasuryRewardsResponse = {
+  typeUrl: "/sparkdream.commons.v1.MsgWithdrawTreasuryRewardsResponse",
+  encode(message: MsgWithdrawTreasuryRewardsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.amount) {
+      Coin.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgWithdrawTreasuryRewardsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgWithdrawTreasuryRewardsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.amount.push(Coin.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromPartial(object: DeepPartial<MsgWithdrawTreasuryRewardsResponse>): MsgWithdrawTreasuryRewardsResponse {
+    const message = createBaseMsgWithdrawTreasuryRewardsResponse();
+    message.amount = object.amount?.map(e => Coin.fromPartial(e)) || [];
+    return message;
+  },
+  fromAmino(object: MsgWithdrawTreasuryRewardsResponseAmino): MsgWithdrawTreasuryRewardsResponse {
+    const message = createBaseMsgWithdrawTreasuryRewardsResponse();
+    message.amount = object.amount?.map(e => Coin.fromAmino(e)) || [];
+    return message;
+  },
+  toAmino(message: MsgWithdrawTreasuryRewardsResponse): MsgWithdrawTreasuryRewardsResponseAmino {
+    const obj: any = {};
+    if (message.amount) {
+      obj.amount = message.amount.map(e => e ? Coin.toAmino(e) : undefined);
+    } else {
+      obj.amount = message.amount;
+    }
+    return obj;
+  },
+  fromAminoMsg(object: MsgWithdrawTreasuryRewardsResponseAminoMsg): MsgWithdrawTreasuryRewardsResponse {
+    return MsgWithdrawTreasuryRewardsResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgWithdrawTreasuryRewardsResponseProtoMsg): MsgWithdrawTreasuryRewardsResponse {
+    return MsgWithdrawTreasuryRewardsResponse.decode(message.value);
+  },
+  toProto(message: MsgWithdrawTreasuryRewardsResponse): Uint8Array {
+    return MsgWithdrawTreasuryRewardsResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgWithdrawTreasuryRewardsResponse): MsgWithdrawTreasuryRewardsResponseProtoMsg {
+    return {
+      typeUrl: "/sparkdream.commons.v1.MsgWithdrawTreasuryRewardsResponse",
+      value: MsgWithdrawTreasuryRewardsResponse.encode(message).finish()
     };
   }
 };
